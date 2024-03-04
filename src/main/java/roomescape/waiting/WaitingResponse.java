@@ -1,25 +1,25 @@
-package roomescape.reservation;
+package roomescape.waiting;
 
-public class MyReservationResponse {
+public class WaitingResponse {
     private Long id;
-    private String theme;
+    private Long theme;
     private String date;
     private String time;
-    private String status;
+    private int waitingNumber;
 
-    public MyReservationResponse(Long id, String theme, String date, String time, String status) {
+    public WaitingResponse(Long id, Long theme, String date, String time, int waitingNumber) {
         this.id = id;
         this.theme = theme;
         this.date = date;
         this.time = time;
-        this.status = status;
+        this.waitingNumber = waitingNumber;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getTheme() {
+    public Long getTheme() {
         return theme;
     }
 
@@ -31,7 +31,7 @@ public class MyReservationResponse {
         return time;
     }
 
-    public String getStatus() {
-        return status;
+    public int getWaitingNumber() {
+        return waitingNumber;
     }
 }
