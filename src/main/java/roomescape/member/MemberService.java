@@ -43,10 +43,14 @@ public class MemberService {
                 .parseClaimsJws(token)
                 .getBody().getSubject());
 
-        return findById(memberId);
+        return findResponseById(memberId);
     }
 
-    public MemberResponse findById(Long id) {
+    public Member findMemberById(Long id) {
+        return memberRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    public MemberResponse findResponseById(Long id) {
         Member member = memberRepository.findById(id).orElse(new Member());
         return new MemberResponse(member.getId(), member.getName(), member.getEmail(), member.getRole());
     }

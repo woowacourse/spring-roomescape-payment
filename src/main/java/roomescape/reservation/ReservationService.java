@@ -2,6 +2,7 @@ package roomescape.reservation;
 
 import org.springframework.stereotype.Service;
 import roomescape.member.LoginMember;
+import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.theme.Theme;
 import roomescape.theme.ThemeRepository;
@@ -27,15 +28,11 @@ public class ReservationService {
     public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
         Time time = timeRepository.findById(reservationRequest.getTime()).orElseThrow(RuntimeException::new);
         Theme theme = themeRepository.findById(reservationRequest.getTheme()).orElseThrow(RuntimeException::new);
-        String name = reservationRequest.getName() == null ? findMemberName(loginMember) : reservationRequest.getName();
+        Member member = memberService.findMemberById(loginMember.memberId);
 
-        Reservation reservation = reservationRepository.save(new Reservation(name, reservationRequest.getDate(), time, theme));
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationRequest.getName(), reservationRequest.getDate(), time, theme));
 
-        return new ReservationResponse(reservation.getId(), reservation.getName(), reservation.getTheme().getName(), reservation.getDate(), reservation.getTime().getValue());
-    }
-
-    private String findMemberName(LoginMember loginMember) {
-        return memberService.findById(loginMember.getMemberId()).getName();
+        return new ReservationResponse(reservation.getId(), reservation.getDisplayName(), reservation.getTheme().getName(), reservation.getDate(), reservation.getTime().getValue());
     }
 
     public void deleteById(Long id) {
@@ -44,7 +41,14 @@ public class ReservationService {
 
     public List<ReservationResponse> findAll() {
         return reservationRepository.findAll().stream()
-                .map(it -> new ReservationResponse(it.getId(), it.getName(), it.getTheme().getName(), it.getDate(), it.getTime().getValue()))
+                .map(it -> new ReservationResponse(it.getId(), it.getDisplayName(), it.getTheme().getName(), it.getDate(), it.getTime().getValue()))
                 .toList();
+    }
+
+    public List<MyReservationResponse> findMine(LoginMember loginMember) {
+        List<MyReservationResponse> reservations = reservationRepository.findByMemberId(loginMember.memberId).stream()
+                .map(it -> new MyReservationResponse(it.getId(), it.getTheme().getName(), it.getDate(), it.getTime().getValue(), "예약"))
+                .toList();
+        return reservations;
     }
 }

@@ -1,7 +1,6 @@
 package roomescape.member;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +46,7 @@ public class MemberController {
 
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> checkLogin(LoginMember loginMember) {
-        MemberResponse member = memberService.findById(loginMember.memberId);
+        MemberResponse member = memberService.findResponseById(loginMember.memberId);
         return ResponseEntity.ok(member);
     }
 }
