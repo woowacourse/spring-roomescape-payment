@@ -6,19 +6,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
-    private MemberDao memberDao;
+    private MemberRepository memberRepository;
 
-    public MemberService(MemberDao memberDao) {
-        this.memberDao = memberDao;
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     public MemberResponse createMember(MemberRequest memberRequest) {
-        Member member = memberDao.save(new Member(memberRequest.getName(), memberRequest.getEmail(), memberRequest.getPassword(), "USER"));
+        Member member = memberRepository.save(new Member(memberRequest.getName(), memberRequest.getEmail(), memberRequest.getPassword(), "USER"));
         return new MemberResponse(member.getId(), member.getName(), member.getEmail(), member.getRole());
     }
 
     public String login(LoginRequest loginRequest) {
-        Member member = memberDao.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+        Member member = memberRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (member == null) {
             throw new RuntimeException();
@@ -43,12 +43,11 @@ public class MemberService {
                 .parseClaimsJws(token)
                 .getBody().getSubject());
 
-        Member member = memberDao.findById(memberId);
-        return new MemberResponse(member.getId(), member.getName(), member.getEmail(), member.getRole());
+        return findById(memberId);
     }
 
     public MemberResponse findById(Long id) {
-        Member member = memberDao.findById(id);
+        Member member = memberRepository.findById(id).orElse(new Member());
         return new MemberResponse(member.getId(), member.getName(), member.getEmail(), member.getRole());
     }
 }

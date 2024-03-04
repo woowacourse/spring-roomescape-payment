@@ -14,8 +14,7 @@ import java.util.List;
 
 @RestController
 public class ReservationController {
-
-    private final ReservationService reservationService;
+    private ReservationService reservationService;
 
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
