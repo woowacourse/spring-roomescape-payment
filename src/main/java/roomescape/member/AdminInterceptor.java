@@ -1,17 +1,16 @@
 package roomescape.member;
 
+import auth.JwtUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-@Component
 public class AdminInterceptor implements HandlerInterceptor {
-    private MemberService memberService;
+    private JwtUtils jwtUtils;
 
-    public AdminInterceptor(MemberService memberService) {
-        this.memberService = memberService;
+    public AdminInterceptor(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -20,9 +19,9 @@ public class AdminInterceptor implements HandlerInterceptor {
 
         String token = extractTokenFromCookie(cookies);
 
-        MemberResponse memberResponse = memberService.checkMember(token);
+        String role = jwtUtils.extractClaim(token, "role");
 
-        if (memberResponse == null || !memberResponse.getRole().equals("ADMIN")) {
+        if ("ADMIN".equals(role)) {
             response.setStatus(401);
             return false;
         }

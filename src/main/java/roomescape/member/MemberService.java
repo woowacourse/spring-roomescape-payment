@@ -1,15 +1,18 @@
 package roomescape.member;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import auth.JwtUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class MemberService {
     private MemberRepository memberRepository;
+    private JwtUtils jwtUtils;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, JwtUtils jwtUtils) {
         this.memberRepository = memberRepository;
+        this.jwtUtils = jwtUtils;
     }
 
     public MemberResponse createMember(MemberRequest memberRequest) {
@@ -24,26 +27,7 @@ public class MemberService {
             throw new RuntimeException();
         }
 
-        return Jwts.builder()
-                .setSubject(member.getId().toString())
-                .claim("name", member.getName())
-                .claim("role", member.getRole())
-                .signWith(Keys.hmacShaKeyFor("Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=".getBytes()))
-                .compact();
-    }
-
-    public MemberResponse checkMember(String token) {
-        if (token.isBlank()) {
-            return null;
-        }
-
-        Long memberId = Long.valueOf(Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor("Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=".getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody().getSubject());
-
-        return findResponseById(memberId);
+        return jwtUtils.createToken(member.getId().toString(), Map.of("name", member.getName(), "role", member.getRole()));
     }
 
     public Member findMemberById(Long id) {
