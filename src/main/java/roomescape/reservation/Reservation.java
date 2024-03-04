@@ -48,7 +48,7 @@ public class Reservation {
     }
 
     public String getDisplayName() {
-        return name != null ? name : member.getName();
+        return name.isBlank() ? member.getName() : name;
     }
 
     public String getDate() {
