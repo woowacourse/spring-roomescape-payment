@@ -72,9 +72,20 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-  requestRead(AVAILABLE_TIMES_API_ENDPOINT + `?date=${date}&themeId=${themeId}`)
-      .then(renderAvailableTimes)
-      .catch(error => console.error("Error fetching available times:", error));
+  /*
+  TODO: [3단계] 사용자 예약 - 예약 가능 시간 조회 API 호출
+        요청 포맷에 맞게 설정
+  */
+  fetch(`/times/available?date=${date}&themeId=${themeId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(response => {
+    if (response.status === 200) return response.json();
+    throw new Error('Read failed');
+  }).then(renderAvailableTimes)
+  .catch(error => console.error("Error fetching available times:", error));
 }
 
 function renderAvailableTimes(times) {
@@ -90,7 +101,12 @@ function renderAvailableTimes(times) {
     return;
   }
   times.forEach(time => {
-    const div = createSlot('time', time.time, time.timeId, time.booked);
+    /*
+    TODO: [3단계] 사용자 예약 - 예약 가능 시간 조회 API 호출 후 렌더링
+          response 명세에 맞춰 createSlot 함수 호출 시 값 설정
+          createSlot('time', 시작 시간, time id, 예약 여부) 형태로 호출
+    */
+    const div = createSlot('time', time.startAt, time.timeId, time.booked);
     timeSlots.appendChild(div);
   });
 }
@@ -100,7 +116,7 @@ function checkDateAndThemeAndTime() {
   const selectedThemeElement = document.querySelector('.theme-slot.active');
   const selectedTimeElement = document.querySelector('.time-slot.active');
   const reserveButton = document.getElementById("reserve-button");
-  const waitButton = document.getElementById("wait-button"); // '예약 대기 버튼'의 ID 가정
+  const waitButton = document.getElementById("wait-button");
 
   if (selectedDate && selectedThemeElement && selectedTimeElement) {
     if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
@@ -167,6 +183,9 @@ function onWaitButtonClick() {
       time: selectedTimeId
     };
 
+    /*
+    TODO: [3단계] 예약 대기 생성 요청 API 호출
+     */
     fetch('/waitings', {
       method: 'POST',
       headers: {
@@ -175,19 +194,19 @@ function onWaitButtonClick() {
       body: JSON.stringify(reservationData)
     })
         .then(response => {
-          if (!response.ok) throw new Error('Reservation failed');
+          if (!response.ok) throw new Error('Reservation waiting failed');
           return response.json();
         })
         .then(data => {
-          alert("대기 순서" + data.waitingNumber + "번째");
+          alert('');
           window.location.href = "/";
         })
         .catch(error => {
-          alert("An error occurred while making the reservation.");
+          alert("An error occurred while making the reservation waiting.");
           console.error(error);
         });
   } else {
-    alert("Please select a date, theme, and time before making a reservation.");
+    alert("Please select a date, theme, and time before making a reservation waiting.");
   }
 }
 
