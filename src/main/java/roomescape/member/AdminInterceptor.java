@@ -21,7 +21,7 @@ public class AdminInterceptor implements HandlerInterceptor {
 
         String role = jwtUtils.extractClaim(token, "role");
 
-        if ("ADMIN".equals(role)) {
+        if (!"ADMIN".equals(role)) {
             response.setStatus(401);
             return false;
         }
