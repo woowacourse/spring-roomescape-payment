@@ -76,7 +76,7 @@ function fetchAvailableTimes(date, themeId) {
   TODO: [3단계] 사용자 예약 - 예약 가능 시간 조회 API 호출
         요청 포맷에 맞게 설정
   */
-  fetch(`/times/available?date=${date}&themeId=${themeId}`, {
+  fetch(`/available-times?date=${date}&themeId=${themeId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ function renderAvailableTimes(times) {
           response 명세에 맞춰 createSlot 함수 호출 시 값 설정
           createSlot('time', 시작 시간, time id, 예약 여부) 형태로 호출
     */
-    const div = createSlot('time', time.startAt, time.timeId, time.booked);
+    const div = createSlot('time', time.time, time.timeId, time.booked);
     timeSlots.appendChild(div);
   });
 }
