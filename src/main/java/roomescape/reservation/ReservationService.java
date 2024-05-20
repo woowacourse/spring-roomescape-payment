@@ -41,8 +41,7 @@ public class ReservationService {
                 .ifPresent(it -> {
                     throw new IllegalArgumentException("이미 예약된 시간입니다.");
                 });
-
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationRequest.getName(), reservationRequest.getDate(), time, theme));
+        Reservation reservation = reservationRepository.save(new Reservation(member, member.getName(), reservationRequest.getDate(), time, theme));
 
         return new ReservationResponse(reservation.getId(), reservation.getDisplayName(), reservation.getTheme().getName(), reservation.getDate(), reservation.getTime().getValue());
     }

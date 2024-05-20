@@ -26,14 +26,13 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity create(@RequestBody ReservationRequest reservationRequest, LoginMember loginMember) {
+    public ResponseEntity<ReservationResponse> create(@RequestBody ReservationRequest reservationRequest, LoginMember loginMember) {
         if (reservationRequest.getDate() == null
                 || reservationRequest.getTheme() == null
                 || reservationRequest.getTime() == null) {
             return ResponseEntity.badRequest().build();
         }
         ReservationResponse reservation = reservationService.save(loginMember, reservationRequest);
-
         return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservation);
     }
 

@@ -25,7 +25,7 @@ public class PageController {
         return "admin/time";
     }
 
-    @GetMapping("/")
+    @GetMapping("/reservation")
     public String reservation() {
         return "reservation";
     }
