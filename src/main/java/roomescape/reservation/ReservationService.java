@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import roomescape.member.LoginMember;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
+import roomescape.payment.PaymentConfirmRequest;
+import roomescape.payment.PaymentService;
 import roomescape.theme.Theme;
 import roomescape.theme.ThemeRepository;
 import roomescape.time.Time;
@@ -21,13 +23,21 @@ public class ReservationService {
     private MemberService memberService;
     private TimeRepository timeRepository;
     private ThemeRepository themeRepository;
+    private PaymentService paymentService;
 
-    public ReservationService(ReservationRepository reservationRepository, WaitingRepository waitingRepository, MemberService memberService, TimeRepository timeRepository, ThemeRepository themeRepository) {
+    public ReservationService(ReservationRepository reservationRepository,
+                              WaitingRepository waitingRepository,
+                              MemberService memberService,
+                              TimeRepository timeRepository,
+                              ThemeRepository themeRepository,
+                              PaymentService paymentService
+                              ) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.memberService = memberService;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
+        this.paymentService = paymentService;
     }
 
     public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
@@ -42,7 +52,7 @@ public class ReservationService {
                     throw new IllegalArgumentException("이미 예약된 시간입니다.");
                 });
         Reservation reservation = reservationRepository.save(new Reservation(member, member.getName(), reservationRequest.getDate(), time, theme));
-
+        paymentService.pay(new PaymentConfirmRequest(reservationRequest));
         return new ReservationResponse(reservation.getId(), reservation.getDisplayName(), reservation.getTheme().getName(), reservation.getDate(), reservation.getTime().getValue());
     }
 

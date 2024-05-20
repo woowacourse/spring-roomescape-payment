@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.exception.RoomEscapeErrorCode;
+import roomescape.exception.RoomEscapeException;
 import roomescape.member.LoginMember;
 
 import java.net.URI;
@@ -21,7 +23,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations")
-    public List<ReservationResponse> list() {
+    public List<ReservationResponse> list() throws Exception {
         return reservationService.findAll();
     }
 
