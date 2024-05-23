@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import roomescape.member.LoginMember;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
+import roomescape.payment.Payment;
 import roomescape.payment.PaymentConfirmRequest;
 import roomescape.payment.PaymentService;
 import roomescape.theme.Theme;
@@ -52,7 +53,7 @@ public class ReservationService {
                     throw new IllegalArgumentException("이미 예약된 시간입니다.");
                 });
         Reservation reservation = reservationRepository.save(new Reservation(member, member.getName(), reservationRequest.getDate(), time, theme));
-        paymentService.pay(new PaymentConfirmRequest(reservationRequest));
+        Payment payment = paymentService.pay(new PaymentConfirmRequest(reservationRequest), reservation);
         return new ReservationResponse(reservation.getId(), reservation.getDisplayName(), reservation.getTheme().getName(), reservation.getDate(), reservation.getTime().getValue());
     }
 

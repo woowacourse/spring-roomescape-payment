@@ -1,36 +1,41 @@
 package roomescape.payment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentConfirmResponse {
-    private String mId;
-    private String lastTransactionKey;
     private String paymentKey;
     private String orderId;
     private String orderName;
-    private int taxExemptionAmount;
+    private int totalAmount;
+    private String method;
     private String status;
-    private String requestedAt;
-    private String approvedAt;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private LocalDateTime approvedAt;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private LocalDateTime requestedAt;
 
     public PaymentConfirmResponse() {
     }
 
-    public String getmId() {
-        return mId;
-    }
-
-    public void setmId(String mId) {
-        this.mId = mId;
-    }
-
-    public String getLastTransactionKey() {
-        return lastTransactionKey;
-    }
-
-    public void setLastTransactionKey(String lastTransactionKey) {
-        this.lastTransactionKey = lastTransactionKey;
+    public PaymentConfirmResponse(String paymentKey, String orderId, String orderName, int totalAmount, String method, String status, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.orderName = orderName;
+        this.totalAmount = totalAmount;
+        this.method = method;
+        this.status = status;
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
     }
 
     public String getPaymentKey() {
@@ -57,12 +62,20 @@ public class PaymentConfirmResponse {
         this.orderName = orderName;
     }
 
-    public int getTaxExemptionAmount() {
-        return taxExemptionAmount;
+    public int getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setTaxExemptionAmount(int taxExemptionAmount) {
-        this.taxExemptionAmount = taxExemptionAmount;
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public String getStatus() {
@@ -73,19 +86,19 @@ public class PaymentConfirmResponse {
         this.status = status;
     }
 
-    public String getRequestedAt() {
+    public LocalDateTime getRequestedAt() {
         return requestedAt;
     }
 
-    public void setRequestedAt(String requestedAt) {
+    public void setRequestedAt(LocalDateTime requestedAt) {
         this.requestedAt = requestedAt;
     }
 
-    public String getApprovedAt() {
+    public LocalDateTime getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(String approvedAt) {
+    public void setApprovedAt(LocalDateTime approvedAt) {
         this.approvedAt = approvedAt;
     }
 }
