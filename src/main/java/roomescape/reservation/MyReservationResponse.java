@@ -6,13 +6,23 @@ public class MyReservationResponse {
     private String date;
     private String time;
     private String status;
+    private String paymentKey;
+    private Long amount;
 
-    public MyReservationResponse(Long id, String theme, String date, String time, String status) {
+    public MyReservationResponse(Long id,
+                                 String theme,
+                                 String date,
+                                 String time,
+                                 String status,
+                                 String paymentKey,
+                                 Long amount) {
         this.id = id;
         this.theme = theme;
         this.date = date;
         this.time = time;
         this.status = status;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     public Long getId() {
@@ -33,5 +43,13 @@ public class MyReservationResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }

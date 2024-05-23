@@ -16,7 +16,7 @@ public class Payment {
     private String paymentKey;
     private String orderId;
     private String orderName;
-    private int totalAmount;
+    private long totalAmount;
     private String method;
     private String status;
     private LocalDateTime requestedAt;

@@ -14,7 +14,7 @@ public class PaymentConfirmResponse {
     private String paymentKey;
     private String orderId;
     private String orderName;
-    private int totalAmount;
+    private Long totalAmount;
     private String method;
     private String status;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -27,7 +27,7 @@ public class PaymentConfirmResponse {
     public PaymentConfirmResponse() {
     }
 
-    public PaymentConfirmResponse(String paymentKey, String orderId, String orderName, int totalAmount, String method, String status, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public PaymentConfirmResponse(String paymentKey, String orderId, String orderName, Long totalAmount, String method, String status, LocalDateTime requestedAt, LocalDateTime approvedAt) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.orderName = orderName;
@@ -62,11 +62,11 @@ public class PaymentConfirmResponse {
         this.orderName = orderName;
     }
 
-    public int getTotalAmount() {
+    public Long getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(int totalAmount) {
+    public void setTotalAmount(Long totalAmount) {
         this.totalAmount = totalAmount;
     }
 

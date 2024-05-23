@@ -68,12 +68,23 @@ public class ReservationService {
     }
 
     public List<MyReservationResponse> findMine(LoginMember loginMember) {
-        List<MyReservationResponse> reservations = reservationRepository.findByMemberId(loginMember.getMemberId()).stream()
-                .map(it -> new MyReservationResponse(it.getId(), it.getTheme().getName(), it.getDate(), it.getTime().getValue(), "예약"))
+        List<MyReservationResponse> reservations = reservationRepository.findPaymentByMemberId(loginMember.getMemberId()).stream()
+                .map(it -> new MyReservationResponse(it.getReservation().getId(),
+                        it.getReservation().getTheme().getName(),
+                        it.getReservation().getDate(),
+                        it.getReservation().getTime().getValue(),
+                        "예약"
+                        ,it.getPaymentKey(),
+                        it.getTotalAmount()
+                ))
                 .toList();
 
         List<MyReservationResponse> waitings = waitingRepository.findWaitingsWithRankByMemberId(loginMember.getMemberId()).stream()
-                .map(it -> new MyReservationResponse(it.getWaiting().getId(), it.getWaiting().getTheme().getName(), it.getWaiting().getDate(), it.getWaiting().getTime(), (it.getRank() + 1) + "번째 예약대기"))
+                .map(it -> new MyReservationResponse(it.getWaiting().getId(),
+                        it.getWaiting().getTheme().getName(),
+                        it.getWaiting().getDate(),
+                        it.getWaiting().getTime(),
+                        (it.getRank() + 1) + "번째 예약대기",null,null))
                 .toList();
 
         List<MyReservationResponse> results = Stream.concat(reservations.stream(), waitings.stream())
