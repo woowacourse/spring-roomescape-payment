@@ -1,18 +1,18 @@
 package roomescape.payment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.exception.PaymentException;
 
 import java.util.Base64;
 
+// TODO: 인터페이스로 분리
 public class PaymentClient {
 
-    private static final Logger log = LoggerFactory.getLogger(PaymentClient.class);
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"; // TODO 얘 어캄
+    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
 
     private final RestClient restClient;
 
@@ -29,6 +29,9 @@ public class PaymentClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    throw new PaymentException(response.getStatusText());
+                }))
                 .toBodilessEntity();
     }
 }

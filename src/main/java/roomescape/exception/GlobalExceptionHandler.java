@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import roomescape.controller.exception.AuthenticationException;
 import roomescape.controller.exception.AuthorizationException;
@@ -59,6 +60,14 @@ public class GlobalExceptionHandler {
         logger.error(e.getMessage(), e);
         return ResponseEntity.notFound()
                 .build();
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ErrorResponse> handleHttpClientErrorException(final HttpClientErrorException e) {
+        ErrorResponse response = e.getResponseBodyAs(ErrorResponse.class);
+        logger.error(e.getResponseBodyAsString());
+        return ResponseEntity.badRequest()
+                .body(response);
     }
 
     @ExceptionHandler(Exception.class)
