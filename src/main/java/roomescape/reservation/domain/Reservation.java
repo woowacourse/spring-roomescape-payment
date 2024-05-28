@@ -32,7 +32,7 @@ public class Reservation {
     @JoinColumn(name = "THEME_ID")
     private Theme theme;
 
-    public Reservation() {
+    protected Reservation() {
     }
 
     public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme) {

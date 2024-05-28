@@ -73,29 +73,6 @@ public class ReservationApplicationService {
         return ReservationResponse.from(memberReservation);
     }
 
-//    @Transactional
-//    public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
-//        ReservationTime reservationTime = reservationCommonService.getReservationTime(memberReservationCreate.timeId());
-//        Theme theme = reservationCommonService.getTheme(memberReservationCreate.themeId());
-//        Member member = reservationCommonService.getMember(memberReservationCreate.memberId());
-//        Reservation reservation = reservationCommonService.getReservation(memberReservationCreate.date(),
-//                reservationTime, theme);
-//
-//        reservationCommonService.validatePastReservation(reservation);
-//        reservationCommonService.validateDuplicatedReservation(reservation, member);
-//
-//        return createReservation(reservation, member);
-//    }
-
-    private ReservationResponse createReservation(Reservation reservation, Member member) {
-        if (reservationCommonService.isReservationConfirmed(reservation)) {
-            MemberReservation waiting = waitingReservationService.addWaiting(member, reservation);
-            return ReservationResponse.from(waiting.getId(), reservation, member);
-        }
-        MemberReservation memberReservation = memberReservationService.createMemberReservation(member, reservation);
-        return ReservationResponse.from(memberReservation.getId(), reservation, member);
-    }
-
     @Transactional
     public void deleteMemberReservation(AuthInfo authInfo, long memberReservationId) {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);

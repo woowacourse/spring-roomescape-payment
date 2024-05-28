@@ -31,7 +31,7 @@ public class MemberReservation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    public MemberReservation() {
+    protected MemberReservation() {
     }
 
     public MemberReservation(Long id, Member member, Reservation reservation, ReservationStatus reservationStatus) {

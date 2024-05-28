@@ -31,7 +31,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(Long id, String name, String email, String password, Role role) {

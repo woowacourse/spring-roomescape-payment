@@ -28,7 +28,7 @@ public class Theme {
     @Embedded
     private Price price;
 
-    public Theme() {
+    protected Theme() {
     }
 
     public Theme(Long id, String name, String description, String thumbnail, Long price) {
