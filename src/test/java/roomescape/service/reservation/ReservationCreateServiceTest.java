@@ -41,7 +41,7 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     void createMemberReservation() {
         //given
         ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
 
         //when
         ReservationResponse result = reservationCreateService.createMemberReservation(reservationRequest, member.getId());
@@ -60,11 +60,11 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     void createMemberWaiting() {
         //given
         ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
         reservationCreateService.createMemberReservation(reservationRequest, member.getId());
 
         ReservationRequest anotherReservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
 
         //when
         ReservationResponse result = reservationCreateService.createMemberReservation(anotherReservationRequest, anotherMember.getId());
@@ -83,7 +83,7 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     void cannotCreateByExistingMemberReservation() {
         //given
         ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
         reservationCreateService.createMemberReservation(reservationRequest, member.getId());
 
         //when & then
@@ -97,10 +97,10 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     void cannotCreateByExistingMemberWaiting() {
         //given
         ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
         reservationCreateService.createMemberReservation(reservationRequest, member.getId());
         ReservationRequest anotherReservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), theme.getId(),"","",0L);
         reservationCreateService.createMemberReservation(anotherReservationRequest, anotherMember.getId());
 
         //when & then

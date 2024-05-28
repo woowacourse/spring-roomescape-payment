@@ -1,6 +1,9 @@
 package roomescape.domain.reservation;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
@@ -14,6 +17,8 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation SET status = 'CANCELED' WHERE id = ?")
+@SQLRestriction("status <> 'CANCELED'")
 @EntityListeners(AuditingEntityListener.class)
 public class Reservation {
     @Id
