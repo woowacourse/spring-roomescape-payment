@@ -2,7 +2,10 @@ package roomescape.core.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
 import roomescape.core.dto.member.LoginMember;
-import roomescape.core.dto.reservation.MemberReservationRequest;
+import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
+import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
@@ -24,9 +29,12 @@ import roomescape.core.service.ReservationService;
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
+    private final RestClient restClient;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService,
+                                 final RestClient restClient) {
         this.reservationService = reservationService;
+        this.restClient = restClient;
     }
 
     @PostMapping
@@ -36,6 +44,18 @@ public class ReservationController {
         final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
                 memberRequest.getTimeId(),
                 memberRequest.getThemeId());
+
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
+        PaymentConfirmResponse confirmResponse = restClient.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", authorizations)
+                .body(new PaymentConfirmRequest(memberRequest))
+                .retrieve()
+                .body(PaymentConfirmResponse.class);
 
         final ReservationResponse response = reservationService.create(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
