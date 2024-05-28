@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -35,7 +36,7 @@ class PaymentServiceTest extends ServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse("tgen_20240528163518tcin", "DONE", "MC4wOTA5NzEwMjg3MjQ2", 1000L));
-        doReturn(okResponse).when(paymentClient).confirm(paymentRequest);
+        doReturn(okResponse).when(paymentClient).confirm(paymentRequest,"encode-secret-key");
 
         //when
         final PaymentResponse response = paymentService.confirm(paymentRequest);
@@ -49,7 +50,7 @@ class PaymentServiceTest extends ServiceTest {
     void throw_exception() {
         //given
         doThrow(new PaymentException(new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
-                .when(paymentClient).confirm(any());
+                .when(paymentClient).confirm(any(),anyString());
         PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then

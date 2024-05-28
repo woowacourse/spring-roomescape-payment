@@ -17,11 +17,11 @@ public class PaymentClient {
         this.restClient = restClient;
     }
 
-    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest) {
+    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest,String encodeKey) {
         try {
             return restClient.post()
                     .uri("https://api.tosspayments.com/v1/payments/confirm")
-                    .header("Authorization", "Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6")
+                    .header("Authorization", encodeKey)
                     .body(paymentRequest)
                     .retrieve().toEntity(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
