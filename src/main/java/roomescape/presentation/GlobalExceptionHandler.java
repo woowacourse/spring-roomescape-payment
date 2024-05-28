@@ -19,6 +19,7 @@ import roomescape.domain.exception.DomainValidationException;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorResponse;
+import roomescape.exception.PaymentException;
 import roomescape.exception.TokenException;
 import roomescape.exception.UnauthorizedException;
 
@@ -117,6 +118,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         log.error("[BadRequestException]", e);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+        log.error("[PaymentException]", e);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
