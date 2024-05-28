@@ -75,8 +75,10 @@ public class Reservation {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void changeStatus() {
+        if (status.isWaiting()) {
+            status = Status.RESERVATION;
+        }
     }
 
     @Override
