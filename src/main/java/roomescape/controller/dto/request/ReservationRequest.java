@@ -1,5 +1,6 @@
 package roomescape.controller.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
@@ -15,7 +16,17 @@ public record ReservationRequest(
 
         @NotNull(message = "테마 id을 입력해주세요.")
         @Positive
-        Long themeId
+        Long themeId,
+
+        @NotBlank(message = "paymentKey를 입력해주세요.")
+        String paymentKey,
+
+        @NotBlank(message = "orderId를 입력해주세요.")
+        String orderId,
+
+        @NotNull(message = "결제 금액을 입력해주세요.")
+        @Positive
+        Integer amount
 ) {
 
     public CreateReservationRequest toCreateReservationRequest(long memberId) {

@@ -3,7 +3,7 @@
 예약과 결제는 1:1 관계
 
 ### 예약
-- [ ] 예약 생성시 paymentKey, orderId, amount를 입력받는다.
+- [x] 예약 생성시 paymentKey, orderId, amount를 입력받는다.
 - 
 
 ### 결제 요청
@@ -20,3 +20,11 @@
 
 api secret key : test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
+우리의 고민
+토스에게 결제 조회 api를 요청해야 하는가?
+- 어차피 어떤 예약의 결제 정보인지 알려면 우리 db에도 paymentKey를 저장해야 한다
+- 만약 예약이 100개면 나의 예약 조회할 때마다 토스에게 100개의 GET 요청을 보내야 한다
+-> 결론: LMS는 연동 테스트를 위해서 한 번 해봐~이다. 고로 무시한다.
+
+예약에 필드를 추가할 것인가 vs 결제 관련 테이블을 추가하고 예악과 연관 관계를 설정할 것인가 -> 결제 성공시
+- id, paymentKey, amount, reservation_id
