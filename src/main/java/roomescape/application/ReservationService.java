@@ -18,6 +18,8 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
+import roomescape.application.dto.request.PaymentRequest;
+import roomescape.infra.payment.PaymentClient;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,19 +30,23 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentClient paymentClient;
+
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            WaitingRepository waitingRepository
+            WaitingRepository waitingRepository,
+            PaymentClient paymentClient
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
@@ -57,6 +63,8 @@ public class ReservationService {
         validateWaitingExists(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        paymentClient.confirmPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
 
         return ReservationResponse.from(savedReservation);
     }
