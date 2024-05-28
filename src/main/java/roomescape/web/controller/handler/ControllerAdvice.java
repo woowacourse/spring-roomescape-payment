@@ -1,5 +1,7 @@
 package roomescape.web.controller.handler;
 
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -9,12 +11,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.exception.ReservationExistsException;
 import roomescape.web.exception.AuthorizationException;
-
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ControllerAdvice {
@@ -56,5 +56,11 @@ public class ControllerAdvice {
         logger.error(e.getMessage(), e);
 
         return ResponseEntity.internalServerError().body("예기치 못한 에러 발생   " + e.getMessage());
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException e) {
+        return ResponseEntity.status(e.getStatusCode())
+                .body(e.getResponseBodyAsString());
     }
 }
