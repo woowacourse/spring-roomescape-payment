@@ -1,9 +1,9 @@
 # 요구사항 문서
 
-- [ ] 사용자가 날짜, 테마, 시간을 선택하고 결제를 해야 예약할 수 있도록 변경
-- [ ] 결제 API 연동
+- [x] 사용자가 날짜, 테마, 시간을 선택하고 결제를 해야 예약할 수 있도록 변경
+- [x] 결제 API 연동
 - [ ] 결제 승인 API 호출에 실패 한 경우, 에러 핸들링
-  - [ ] 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있어야함
+    - [ ] 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있어야함
 
 # API 명세
 
@@ -328,7 +328,9 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
 ### Request
 
 > GET /reservations/mine HTTP/1.1
-> cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> cookie:
+>
+token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
 > host: localhost:8080
 
 ### Response

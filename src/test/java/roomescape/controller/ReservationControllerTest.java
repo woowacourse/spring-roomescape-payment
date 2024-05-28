@@ -1,5 +1,10 @@
 package roomescape.controller;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.fixture.ReservationFixture.DEFAULT_REQUEST;
+import static roomescape.fixture.ReservationFixture.DEFAULT_RESERVATION;
+import static roomescape.fixture.ReservationFixture.DEFAULT_RESPONSE;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,11 +16,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.fixture.ReservationFixture.DEFAULT_REQUEST;
-import static roomescape.fixture.ReservationFixture.DEFAULT_RESERVATION;
-import static roomescape.fixture.ReservationFixture.DEFAULT_RESPONSE;
 
 @SpringBootTest
 class ReservationControllerTest {
@@ -32,7 +32,7 @@ class ReservationControllerTest {
         Mockito.when(reservationService.save(DEFAULT_REQUEST))
                 .thenReturn(DEFAULT_RESPONSE);
 
-        ResponseEntity<ReservationResponse> response = reservationController.saveReservation(
+        ResponseEntity<ReservationResponse> response = reservationController.saveWaitingReservation(
                 DEFAULT_RESERVATION.getId(), DEFAULT_REQUEST);
 
         assertAll(

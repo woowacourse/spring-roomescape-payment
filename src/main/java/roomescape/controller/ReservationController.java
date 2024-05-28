@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
 import roomescape.dto.MyReservationResponse;
+import roomescape.dto.PaidReservationResponse;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
@@ -28,7 +29,27 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> saveReservation(
+    public ResponseEntity<PaidReservationResponse> savePaidReservation(
+            @Auth long memberId,
+            @RequestBody PaymentRequest reservationRequest
+    ) {
+        reservationRequest = new PaymentRequest(
+                reservationRequest.date(),
+                memberId,
+                reservationRequest.timeId(),
+                reservationRequest.themeId(),
+                reservationRequest.paymentKey(),
+                reservationRequest.orderId(),
+                reservationRequest.amount()
+        );
+
+        PaidReservationResponse saved = reservationService.savePaid(reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
+                .body(saved);
+    }
+
+    @PostMapping("/waiting")
+    public ResponseEntity<ReservationResponse> saveWaitingReservation(
             @Auth long memberId,
             @RequestBody ReservationRequest reservationRequest
     ) {
