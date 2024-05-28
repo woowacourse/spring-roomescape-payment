@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class TokenProvider {
     private static final String COOKIE_NAME = "token";
     private static final String secretKey = "secretkeyofspringroomescapewaitingmissionstep1";
-    private static final long validityInMilliseconds = 360 * 1000L;
+    private static final long validityInMilliseconds = 3600 * 1000L;
 
     public String createToken(final String payload, final String role) {
         Date now = new Date();
