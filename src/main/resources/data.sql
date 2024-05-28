@@ -35,6 +35,8 @@ INSERT INTO reservation (date, time_id, theme_id)
 VALUES (FORMATDATETIME(DATEADD('DAY', -2, NOW()), 'yyyy-MM-dd'), 1, 3);
 INSERT INTO reservation (date, time_id, theme_id)
 VALUES (FORMATDATETIME(DATEADD('DAY', 2, NOW()), 'yyyy-MM-dd'), 1, 3);
+INSERT INTO reservation (date, time_id, theme_id)
+VALUES (FORMATDATETIME(DATEADD('DAY', 3, NOW()), 'yyyy-MM-dd'), 1, 1);
 
 INSERT INTO member_reservation (member_id, reservation_id, created_at)
 VALUES (2, 1, CURRENT_TIMESTAMP);
@@ -59,3 +61,5 @@ INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
 VALUES (3, 3, 'WAITING', CURRENT_TIMESTAMP);
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
 VALUES (1, 9, 'PENDING', CURRENT_TIMESTAMP);
+INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
+VALUES (1, 10, 'PENDING', CURRENT_TIMESTAMP);
