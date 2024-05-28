@@ -31,7 +31,7 @@ public class PaymentService {
         this.tossPaymentProperties = tossPaymentProperties;
     }
 
-    public void confirm(PaymentRequest paymentRequest, MemberReservation memberReservation) {
+    public void approvePayment(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         try {
             String encodeKey = encoder.encode(tossPaymentProperties.getSecretKey());
             PaymentResponse response = paymentClient.confirm(paymentRequest, encodeKey).getBody();

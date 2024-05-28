@@ -67,7 +67,7 @@ public class ReservationApplicationService {
         }
         MemberReservation memberReservation = memberReservationService.createMemberReservation(member, reservation);
 
-        paymentService.confirm(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
+        paymentService.approvePayment(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
                 memberReservationCreate.paymentKey()), memberReservation);
 
         return ReservationResponse.from(memberReservation);

@@ -3,6 +3,9 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static roomescape.fixture.DateFixture.getNextDay;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
 import static roomescape.fixture.MemberFixture.getMemberClover;
@@ -18,11 +21,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.PaymentRequest;
+import roomescape.payment.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
@@ -51,6 +57,14 @@ class ReservationApplicationServiceTest extends ServiceTest {
         time = reservationTimeRepository.save(getNoon());
         theme1 = themeRepository.save(getTheme1());
         memberChoco = memberRepository.save(getMemberChoco());
+        String paymentKey = "tgen_20240528172021mxEG4";
+        String paymentType = "카드";
+        long totalAmount = 1000L;
+        PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
+        ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
+                new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
+        doReturn(okResponse).when(paymentClient).confirm(any(),anyString());
+
     }
 
 
@@ -76,7 +90,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         Member memberClover = memberRepository.save(getMemberClover());
         LocalDate date = getNextDay();
         ReservationResponse reservationResponse = reservationApplicationService.createMemberReservation(
-                new MemberReservationCreate(memberChoco.getId(), date, time.getId(), theme1.getId())
+                new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
+                        10000L, date)
         );
         ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
                 new WaitingCreate(memberClover.getId(), date, time.getId(), theme1.getId())
@@ -97,7 +112,9 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         LocalDate date = getNextDay();
         ReservationResponse reservationResponse = reservationApplicationService.createMemberReservation(
-                new MemberReservationCreate(memberChoco.getId(), date, time.getId(), theme1.getId()));
+                new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
+                        10000L, date)
+        );
 
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.deleteWaiting(AuthInfo.from(memberChoco),
@@ -112,15 +129,13 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+        LocalDate date = getNextDay();
 
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.createMemberReservation(
-                new MemberReservationCreate(
-                        memberChoco.getId(),
-                        reservation.getDate(),
-                        time.getId(),
-                        theme1.getId()
-                ))).isInstanceOf(
+                new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
+                        10000L, date)
+        )).isInstanceOf(
                 BadRequestException.class).hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 

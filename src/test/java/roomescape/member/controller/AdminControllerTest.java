@@ -72,6 +72,9 @@ class AdminControllerTest extends ControllerTest {
         params.put("date", "2099-08-05");
         params.put("timeId", reservationTimeResponse.id());
         params.put("themeId", themeResponse.id());
+        params.put("paymentKey","payemnt-key");
+        params.put("orderId","orderId-123");
+        params.put("amount",15000L);
 
         //when
         doReturn(reservationResponse)
