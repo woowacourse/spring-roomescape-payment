@@ -4,6 +4,8 @@ public record PaymentResponse(
         String paymentKey,
         String status,
         String orderId,
-        Long totalAmount
+        Long totalAmount,
+        String method
+
 ) {
 }

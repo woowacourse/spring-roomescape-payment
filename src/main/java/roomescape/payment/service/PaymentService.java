@@ -8,30 +8,37 @@ import roomescape.payment.PaymentErrorResponse;
 import roomescape.payment.PaymentRequest;
 import roomescape.payment.PaymentResponse;
 import roomescape.payment.TossPaymentProperties;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.exception.PaymentException;
+import roomescape.reservation.domain.MemberReservation;
 
 @Service
 @Transactional(readOnly = true)
 public class PaymentService {
 
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
     private final Encoder encoder;
     private final TossPaymentProperties tossPaymentProperties;
 
-    public PaymentService(PaymentClient paymentClient, Encoder encoder, TossPaymentProperties tossPaymentProperties) {
+    public PaymentService(PaymentClient paymentClient, PaymentRepository paymentRepository, Encoder encoder,
+                          TossPaymentProperties tossPaymentProperties) {
         this.paymentClient = paymentClient;
+        this.paymentRepository = paymentRepository;
         this.encoder = encoder;
         this.tossPaymentProperties = tossPaymentProperties;
     }
 
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public void confirm(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         try {
             String encodeKey = encoder.encode(tossPaymentProperties.getSecretKey());
-            return paymentClient.confirm(paymentRequest,encodeKey).getBody();
+            PaymentResponse response = paymentClient.confirm(paymentRequest, encodeKey).getBody();
+            paymentRepository.save(
+                    Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
 
         } catch (HttpClientErrorException e) {
-            System.out.println(e);
             throw new PaymentException(e.getResponseBodyAs(PaymentErrorResponse.class));
         }
     }

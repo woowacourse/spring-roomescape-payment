@@ -10,6 +10,7 @@ public class Base64Encoder implements Encoder {
 
     @Override
     public String encode(String key) {
-        return PREFIX + Base64.getEncoder().encodeToString(key.getBytes());
+        String value = key +":";
+        return PREFIX + Base64.getEncoder().encodeToString(value.getBytes());
     }
 }

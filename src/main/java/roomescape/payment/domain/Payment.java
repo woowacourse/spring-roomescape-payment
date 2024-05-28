@@ -15,7 +15,6 @@ import roomescape.global.entity.BaseEntity;
 import roomescape.reservation.domain.MemberReservation;
 
 @Entity
-@Table
 public class Payment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +37,13 @@ public class Payment extends BaseEntity {
         this.paymentType = paymentType;
         this.amount = amount;
         this.memberReservation = memberReservation;
+    }
+
+    protected Payment() {
+    }
+
+    public static Payment from(String paymentKey, String paymentType, long amount, MemberReservation memberReservation) {
+        return new Payment(paymentKey, PaymentType.from(paymentType), PayAmount.from(amount), memberReservation);
     }
 
     public Long getId() {

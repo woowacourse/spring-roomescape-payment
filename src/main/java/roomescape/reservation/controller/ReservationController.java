@@ -51,9 +51,12 @@ public class ReservationController {
                                                       @RequestBody @Valid ReservationRequest reservationRequest) {
         MemberReservationCreate memberReservationCreate = new MemberReservationCreate(
                 authInfo.getId(),
-                reservationRequest.date(),
+                reservationRequest.themeId(),
                 reservationRequest.timeId(),
-                reservationRequest.themeId()
+                reservationRequest.paymentKey(),
+                reservationRequest.orderId(),
+                reservationRequest.amount(),
+                reservationRequest.date()
         );
         ReservationResponse response = reservationApplicationService.createMemberReservation(memberReservationCreate);
         return ResponseEntity.created(URI.create("/reservations/" + response.memberReservationId())).body(response);

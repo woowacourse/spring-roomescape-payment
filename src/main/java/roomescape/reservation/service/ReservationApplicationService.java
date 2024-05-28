@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.member.domain.Member;
+import roomescape.payment.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -28,13 +30,16 @@ public class ReservationApplicationService {
     private final MemberReservationService memberReservationService;
 
     private final WaitingReservationService waitingReservationService;
+    private final PaymentService paymentService;
 
     public ReservationApplicationService(ReservationCommonService reservationCommonService,
                                          MemberReservationService memberReservationService,
-                                         WaitingReservationService waitingReservationService) {
+                                         WaitingReservationService waitingReservationService,
+                                         PaymentService paymentService) {
         this.reservationCommonService = reservationCommonService;
         this.memberReservationService = memberReservationService;
         this.waitingReservationService = waitingReservationService;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findMemberReservations(ReservationQueryRequest request) {
@@ -53,12 +58,34 @@ public class ReservationApplicationService {
         Member member = reservationCommonService.getMember(memberReservationCreate.memberId());
         Reservation reservation = reservationCommonService.getReservation(memberReservationCreate.date(),
                 reservationTime, theme);
-
         reservationCommonService.validatePastReservation(reservation);
         reservationCommonService.validateDuplicatedReservation(reservation, member);
 
-        return createReservation(reservation, member);
+        if (reservationCommonService.isReservationConfirmed(reservation)) {
+            MemberReservation waiting = waitingReservationService.addWaiting(member, reservation);
+            return ReservationResponse.from(waiting.getId(), reservation, member);
+        }
+        MemberReservation memberReservation = memberReservationService.createMemberReservation(member, reservation);
+
+        paymentService.confirm(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
+                memberReservationCreate.paymentKey()), memberReservation);
+
+        return ReservationResponse.from(memberReservation);
     }
+
+//    @Transactional
+//    public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
+//        ReservationTime reservationTime = reservationCommonService.getReservationTime(memberReservationCreate.timeId());
+//        Theme theme = reservationCommonService.getTheme(memberReservationCreate.themeId());
+//        Member member = reservationCommonService.getMember(memberReservationCreate.memberId());
+//        Reservation reservation = reservationCommonService.getReservation(memberReservationCreate.date(),
+//                reservationTime, theme);
+//
+//        reservationCommonService.validatePastReservation(reservation);
+//        reservationCommonService.validateDuplicatedReservation(reservation, member);
+//
+//        return createReservation(reservation, member);
+//    }
 
     private ReservationResponse createReservation(Reservation reservation, Member member) {
         if (reservationCommonService.isReservationConfirmed(reservation)) {
