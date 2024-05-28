@@ -1,6 +1,7 @@
 package roomescape.presentation.api.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -13,7 +14,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.ReservationResponse;
@@ -32,6 +35,8 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
+import roomescape.infra.payment.PaymentClient;
+import roomescape.infra.payment.PaymentResponse;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.AdminReservationWebRequest;
 
@@ -51,6 +56,9 @@ class AdminReservationControllerTest extends BaseControllerTest {
 
     @Autowired
     private WaitingRepository waitingRepository;
+
+    @SpyBean
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("조건에 맞는 예약들(예약 대기 제외)을 조회하고 성공할 경우 200을 반환한다.")
@@ -102,6 +110,10 @@ class AdminReservationControllerTest extends BaseControllerTest {
             Member admin = memberRepository.save(Fixture.MEMBER_ADMIN);
             String token = tokenProvider.createToken(admin.getId().toString());
 
+            // given
+            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
+                    .when(paymentClient).confirmPayment(any());
+
             ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(11, 0)));
             Theme theme = themeRepository.save(new Theme("테마 이름", "테마 설명", "https://example.com"));
 
@@ -109,6 +121,10 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     LocalDate.of(2024, 6, 22),
                     reservationTime.getId(),
                     theme.getId(),
+                    "test-paymentKey",
+                    "test-orderId",
+                    1L,
+                    "test-paymentType",
                     admin.getId()
             );
 
@@ -145,6 +161,10 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     LocalDate.of(2024, 6, 22),
                     1L,
                     1L,
+                    null,
+                    null,
+                    null,
+                    null,
                     1L
             );
 
