@@ -9,15 +9,12 @@ import roomescape.domain.schedule.ReservationDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    @Query("""
-            SELECT r FROM Reservation AS r
-            WHERE (:memberId is null or r.member.id = :memberId)
-            AND (:themeId is null or r.detail.theme.id = :themeId)
-            AND (:dateFrom is null or r.detail.schedule.date >= :dateFrom)
-            AND (:dateTo is null or r.detail.schedule.date < :dateTo)""")
-    List<Reservation> findBy(@Param("memberId") Long memberId, @Param("themeId") Long themeId,
-                             @Param("dateFrom") ReservationDate dateFrom, @Param("dateTo") ReservationDate dateTo);
+public interface ReservationRepository {
+
+    Reservation save(Reservation reservation);
+
+    List<Reservation> findBy(Long memberId, Long themeId,
+                             ReservationDate dateFrom, ReservationDate dateTo);
 
     boolean existsByDetailIdAndMemberId(Long reservationDetailId, Long memberId);
 
@@ -31,12 +28,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByStatus(ReservationStatus status);
 
-    @Query("""
-            select new roomescape.domain.dto.ReservationWithRank(r,
-            (select count(*) from Reservation as cr
-            where cr.detail.id = r.detail.id and cr.createdAt < r.createdAt))
-            from Reservation r
-            where r.member.id = :memberId
-            """)
-    List<ReservationWithRank> findWithRankingByMemberId(@Param("memberId") long memberId);
+    List<ReservationWithRank> findWithRankingByMemberId(long memberId);
+
+    Optional<Reservation> findById(long id);
+
+    void deleteById(long id);
 }
