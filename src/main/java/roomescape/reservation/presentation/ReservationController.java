@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
 import roomescape.auth.dto.Accessor;
+import roomescape.payment.TossPaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
 import roomescape.reservation.dto.ReservationResponse;
@@ -23,9 +25,12 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final TossPaymentClient tossPaymentClient;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService,
+            final TossPaymentClient tossPaymentClient) {
         this.reservationService = reservationService;
+        this.tossPaymentClient = tossPaymentClient;
     }
 
     @GetMapping("/reservations")
@@ -59,8 +64,19 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveMemberReservation(
             @Authenticated Accessor accessor,
             @Valid @RequestBody MemberReservationAddRequest memberReservationAddRequest) {
+
+        System.out.println(memberReservationAddRequest.paymentKey() + "페이먼트키");
+        System.out.println(memberReservationAddRequest.orderId() + "오더아이디");
+
+        tossPaymentClient.confirmPayments(new PaymentConfirmRequest(
+                memberReservationAddRequest.paymentKey(),
+                memberReservationAddRequest.orderId(),
+                memberReservationAddRequest.amount()
+        ));
+
         ReservationResponse saveResponse = reservationService.saveMemberReservation(accessor.id(),
                 memberReservationAddRequest);
+
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);
     }

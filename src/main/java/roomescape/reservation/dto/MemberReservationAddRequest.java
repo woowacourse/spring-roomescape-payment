@@ -7,5 +7,13 @@ import java.time.LocalDate;
 public record MemberReservationAddRequest(
         @NotNull(message = "예약 날짜는 필수 입니다.") LocalDate date,
         @NotNull(message = "예약 시간 선택은 필수 입니다.") @Positive Long timeId,
-        @NotNull(message = "테마 선택은 필수 입니다.") @Positive Long themeId) {
+        @NotNull(message = "테마 선택은 필수 입니다.") @Positive Long themeId,
+        @NotNull(message = "결제키는 필수 입니다.") String paymentKey,
+        @NotNull(message = "주문 ID는 필수 입니다.") String orderId,
+        @NotNull(message = "결제 금액은 필수 입니다.") @Positive Long amount
+) {
+
+    public MemberReservationAddRequest(LocalDate date, Long timeId, Long themeId) {
+        this(date, timeId, themeId, null, null, null);
+    }
 }
