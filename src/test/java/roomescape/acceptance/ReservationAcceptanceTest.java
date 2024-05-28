@@ -79,23 +79,6 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     }
 
     @TestFactory
-    @DisplayName("이미 다른 사람이 예약한 테마와 시간을 예약을 하면, 예외 대기로 등록한다")
-    Stream<DynamicTest> duplicateReservationTest() {
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-
-        return Stream.of(
-                dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 1L, 1L, 201)),
-                dynamicTest("내가 등록한 예약과 동일한 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 1L, 1L, 409)),
-                dynamicTest("다른 사람이 등록한 예약과 동일한 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, "2099-04-29", 1L, 1L, 201)),
-                dynamicTest("모든 예약을 조회한다 (총 4개)", () -> ReservationTestStep.getReservations(200, 4)),
-                dynamicTest("예약 대기를 조회한다 (총 1개)", () -> getWaitings(adminToken, 200, 1)),
-                dynamicTest("예약 대기와 동일한 예약을 삭제한다", () -> ReservationTestStep.deleteReservation(1L, 204)),
-                dynamicTest("모든 예약을 조회한다 (총 4개)", () -> ReservationTestStep.getReservations(200, 4)),
-                dynamicTest("예약 대기를 조회한다 (총 0개)", () -> getWaitings(adminToken, 200, 0))
-        );
-    }
-
-    @TestFactory
     @DisplayName("예약을 추가하고 삭제한다")
     Stream<DynamicTest> reservationPostAndDeleteTest() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);

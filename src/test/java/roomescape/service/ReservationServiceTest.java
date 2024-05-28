@@ -20,6 +20,7 @@ import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
+import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.ReservationResponse;
@@ -101,10 +102,10 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         return Stream.of(
                 dynamicTest("예약 대기를 조회한다. (총 0개)", () -> assertThat(reservationService.findAllByStatus(Status.WAITING)).isEmpty()),
                 dynamicTest("예약을 추가한다.", () -> firstReservationResponse.set(reservationService.saveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_1))),
-                dynamicTest("저장되어 있는 예약과 동일한 예약을 추가한다.", () -> secondReservationResponse.set(reservationService.saveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_2))),
-                dynamicTest("예약의 상태를 확인한다 (RESERVATION)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.WAITING)),
+                dynamicTest("예약 대기를 추가한다.", () -> secondReservationResponse.set(reservationService.saveWaitingByClient(new LoginMember(1L, "찰리"), new WaitingRequest(LocalDate.now().plusDays(5), 1L, 9L)))),
+                dynamicTest("예약의 상태를 확인한다 (WAITING)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.WAITING)),
                 dynamicTest("예약을 삭제한다.", () -> reservationService.deleteById(firstReservationResponse.get().id())),
-                dynamicTest("예약의 상태를 확인한다 (WAITING)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.RESERVATION))
+                dynamicTest("예약의 상태를 확인한다 (RESERVATION)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.RESERVATION))
         );
     }
 }

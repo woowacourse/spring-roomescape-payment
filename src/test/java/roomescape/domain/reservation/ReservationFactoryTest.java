@@ -31,7 +31,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
     @Test
     @DisplayName("존재하지 않는 테마로 예약을 생성시 예외를 반환한다.")
     void shouldThrowIllegalArgumentExceptionWhenNotFoundTheme() {
-        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 1, 1), 1L, 99L, null, null, 0);
+        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.now().plusDays(1), 1L, 99L, null, null, 0);
 
         assertThatThrownBy(() -> reservationFactory.createReservation(1L, reservationRequest.date(),
                 reservationRequest.timeId(), reservationRequest.themeId()))
@@ -51,7 +51,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
 
         assertThatThrownBy(() -> reservationFactory.createReservation(existReservation.getMember().getId(), reservationRequest.date(), reservationRequest.timeId(), reservationRequest.themeId()))
                 .isInstanceOf(RoomescapeException.class)
-                .hasMessage("이미 예약을 했습니다.");
+                .hasMessage("예약이 존재합니다.");
     }
 
     @DisplayName("과거 시간을 예약하는 경우 예외를 반환한다.")
