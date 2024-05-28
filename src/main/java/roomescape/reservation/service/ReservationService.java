@@ -3,9 +3,11 @@ package roomescape.reservation.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
+import roomescape.reservation.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.dto.response.MemberReservationResponse;
@@ -19,21 +21,25 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationFactoryService reservationFactoryService;
     private final ReservationSchedulerService reservationSchedulerService;
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationFactoryService reservationFactoryService,
-            ReservationSchedulerService reservationSchedulerService
+            ReservationSchedulerService reservationSchedulerService,
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationFactoryService = reservationFactoryService;
         this.reservationSchedulerService = reservationSchedulerService;
+        this.paymentService = paymentService;
     }
 
     @Transactional
     public ReservationResponse save(ReservationSaveRequest saveRequest) {
         Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
         reservationSchedulerService.validateSaveReservation(reservation);
+        PaymentConfirmRequest paymentRequest = PaymentConfirmRequest.from(saveRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return ReservationResponse.toResponse(savedReservation);

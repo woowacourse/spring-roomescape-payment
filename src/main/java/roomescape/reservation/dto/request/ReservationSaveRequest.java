@@ -12,7 +12,10 @@ public record ReservationSaveRequest(
         @NotNull Long memberId,
         @NotNull LocalDate date,
         @NotNull Long themeId,
-        @NotNull Long timeId
+        @NotNull Long timeId,
+        @NotNull String paymentKey,
+        @NotNull String orderId,
+        @NotNull Long amount
 ) {
 
     public static ReservationSaveRequest of(ReservationDetailRequest detail, Long memberId) {
@@ -20,7 +23,10 @@ public record ReservationSaveRequest(
                 memberId,
                 detail.date(),
                 detail.themeId(),
-                detail.timeId()
+                detail.timeId(),
+                detail.paymentKey(),
+                detail.orderId(),
+                detail.amount()
         );
     }
 
