@@ -10,7 +10,7 @@ public class ClientConfig {
 
     @Bean
     public PaymentClient paymentRestClient() {
-        return new PaymentClient(new HttpComponentsClientHttpRequestFactory());
+        return new PaymentClient(factory());
     }
 
     @Bean
