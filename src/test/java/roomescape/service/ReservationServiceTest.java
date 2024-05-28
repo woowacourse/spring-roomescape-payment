@@ -108,7 +108,7 @@ class ReservationServiceTest {
         reservationTimeRepository.save(DEFAULT_TIME);
         themeRepository.save(DEFAULT_THEME);
         ReservationRequest reservationRequestWithPastDate = new ReservationRequest(LocalDate.now().minusDays(1),
-                DEFAULT_MEMBER.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId());
+                DEFAULT_MEMBER.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId(), null);
 
         Assertions.assertThatThrownBy(() -> reservationService.save(reservationRequestWithPastDate))
                 .isInstanceOf(RoomescapeException.class)
@@ -124,7 +124,7 @@ class ReservationServiceTest {
 
         ReservationRequest reservationRequestFromAdmin = new ReservationRequest(
                 ReservationFixture.DEFAULT_REQUEST.date(),
-                DEFAULT_ADMIN.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId());
+                DEFAULT_ADMIN.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId(), null);
         ReservationResponse saved = reservationService.save(reservationRequestFromAdmin);
 
         Assertions.assertThatThrownBy(() -> reservationService.cancel(DEFAULT_MEMBER.getId(), saved.id()))

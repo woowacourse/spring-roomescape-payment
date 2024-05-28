@@ -15,6 +15,7 @@ import roomescape.annotation.Auth;
 import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.ReservationWaitingService;
 
@@ -23,17 +24,22 @@ import roomescape.service.ReservationWaitingService;
 public class ReservationController {
     private final ReservationService reservationService;
     private final ReservationWaitingService waitingService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, ReservationWaitingService waitingService) {
+    public ReservationController(ReservationService reservationService, ReservationWaitingService waitingService,
+                                 PaymentService paymentService) {
         this.reservationService = reservationService;
         this.waitingService = waitingService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
-                reservationRequest.themeId());
+                reservationRequest.themeId(), reservationRequest.approveRequest());
+        // 결제 성공하면 이후 진행
+        paymentService.approve(reservationRequest.approveRequest(), memberId);
         ReservationResponse saved = reservationService.save(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
                 .body(saved);

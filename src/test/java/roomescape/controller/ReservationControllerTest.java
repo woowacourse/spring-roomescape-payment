@@ -16,12 +16,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.ReservationResponse;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @SpringBootTest
 class ReservationControllerTest {
     @MockBean
     private ReservationService reservationService;
+    @MockBean
+    private PaymentService paymentService;
     @Autowired
     private ReservationController reservationController;
 

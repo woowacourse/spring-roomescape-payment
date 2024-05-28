@@ -24,7 +24,7 @@ public class ReservationWaitingController {
     @PostMapping("/reservations/waiting")
     public ReservationWaitingResponse save(@Auth long memberId, @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
-                reservationRequest.themeId());
+                reservationRequest.themeId(), reservationRequest.approveRequest());
         return waitingService.save(reservationRequest);
     }
 

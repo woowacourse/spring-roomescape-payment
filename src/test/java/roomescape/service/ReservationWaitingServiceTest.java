@@ -145,7 +145,7 @@ class ReservationWaitingServiceTest {
                 new Reservation(1L, DEFAULT_ADMIN, DEFAULT_RESERVATION.getDate(), DEFAULT_TIME, DEFAULT_THEME));
 
         ReservationWaitingResponse response = waitingService.save(new ReservationRequest(DEFAULT_RESERVATION.getDate(),
-                DEFAULT_MEMBER.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId()));
+                DEFAULT_MEMBER.getId(), DEFAULT_TIME.getId(), DEFAULT_THEME.getId(), null));
 
         assertDoesNotThrow(() -> waitingService.delete(DEFAULT_ADMIN.getId(), response.id()));
     }
