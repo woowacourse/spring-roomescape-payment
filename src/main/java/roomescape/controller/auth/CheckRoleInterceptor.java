@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.auth.CookieProvider;
 import roomescape.domain.member.Role;
-import roomescape.dto.MemberResponse;
+import roomescape.dto.member.MemberResponse;
 import roomescape.service.MemberService;
 
 @Component

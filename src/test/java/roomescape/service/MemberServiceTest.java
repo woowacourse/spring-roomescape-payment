@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.member.Member;
-import roomescape.dto.MemberResponse;
+import roomescape.dto.member.MemberResponse;
 import roomescape.repository.MemberRepository;
 
 import java.util.List;

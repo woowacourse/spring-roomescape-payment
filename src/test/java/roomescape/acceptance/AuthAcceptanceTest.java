@@ -4,7 +4,7 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import roomescape.dto.MemberResponse;
+import roomescape.dto.member.MemberResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.MEMBER_TENNY_EMAIL;

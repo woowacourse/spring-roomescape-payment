@@ -5,10 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.controller.auth.AuthenticationPrincipal;
 import roomescape.dto.auth.LoginMember;
+import roomescape.dto.payment.PaymentDto;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 import java.util.List;
@@ -18,9 +20,11 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
@@ -28,7 +32,13 @@ public class ReservationController {
             @AuthenticationPrincipal final LoginMember loginMember,
             @RequestBody final ReservationSaveRequest request) {
         final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(reservationDto));
+        final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
+
+        final PaymentDto paymentDto = PaymentDto.of(request);
+        paymentService.confirmPayment(paymentDto, reservationResponse.id());
+
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
     }
 
     @GetMapping

@@ -9,7 +9,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.auth.CookieProvider;
-import roomescape.dto.MemberResponse;
+import roomescape.dto.member.MemberResponse;
 import roomescape.dto.auth.LoginMember;
 import roomescape.service.MemberService;
 
