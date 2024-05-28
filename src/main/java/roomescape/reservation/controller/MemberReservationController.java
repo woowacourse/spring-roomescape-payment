@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.dto.LoginMember;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.dto.MemberReservationCreateRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MyReservationResponse;
@@ -27,6 +28,15 @@ public class MemberReservationController {
             LoginMember member
     ) {
         return reservationFacadeService.createReservation(request, member);
+    }
+
+    @PostMapping("/{id}/payments/confirm")
+    public ResponseEntity<Void> confirmPendingReservation(
+            @PathVariable Long id,
+            @RequestBody PaymentRequest paymentRequest
+    ) {
+        reservationFacadeService.confirmPendingReservation(id, paymentRequest);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/my")
