@@ -14,7 +14,7 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("관리자가 테마를 생성한다.")
     void createThemeTest() {
-        ThemeRequest request = new ThemeRequest("테마명", "테마 설명", "url");
+        ThemeRequest request = new ThemeRequest("테마명", "테마 설명", "url", 10_000L);
 
         RestAssured.given().log().all()
                 .cookie("token", fixture.getAdminToken())
@@ -28,8 +28,8 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("관리자가 테마 목록을 조회한다.")
     void findAllThemesTest() {
-        fixture.createTheme(new ThemeRequest("테마명1", "테마 설명1", "url1"));
-        fixture.createTheme(new ThemeRequest("테마명2", "테마 설명2", "url2"));
+        fixture.createTheme(new ThemeRequest("테마명1", "테마 설명1", "url1", 10_000L));
+        fixture.createTheme(new ThemeRequest("테마명2", "테마 설명2", "url2", 10_000L));
 
         ThemeResponse[] responses = RestAssured.given().log().all()
                 .cookie("token", fixture.getAdminToken())
@@ -45,7 +45,9 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("관리자가 테마를 삭제한다.")
     void deleteThemeTest() {
-        long themeId = fixture.createTheme(new ThemeRequest("테마명", "테마 설명", "url")).id();
+        long themeId = fixture.createTheme(
+                new ThemeRequest("테마명", "테마 설명", "url", 10_000L)
+        ).id();
 
         RestAssured.given().log().all()
                 .cookie("token", fixture.getAdminToken())

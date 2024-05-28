@@ -18,7 +18,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("예약을 생성한다.")
     void createReservationTest() {
-        long themeId = fixture.createTheme(new ThemeRequest("테마명", "테마 설명", "url")).id();
+        long themeId = fixture.createTheme(
+                new ThemeRequest("테마명", "테마 설명", "url", 10_000L)
+        ).id();
         long timeId = fixture.createReservationTime(10, 0).id();
         fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
         String token = fixture.loginAndGetToken("email@mail.com", "12341234");
@@ -36,7 +38,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("관리자가 예약을 삭제한다.")
     void deleteReservation() {
-        long themeId = fixture.createTheme(new ThemeRequest("name", "desc", "url")).id();
+        long themeId = fixture.createTheme(
+                new ThemeRequest("name", "desc", "url", 10_000L)
+        ).id();
         long timeId = fixture.createReservationTime(10, 0).id();
         fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
         String token = fixture.loginAndGetToken("email@mail.com", "12341234");
@@ -55,7 +59,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("나의 예약 목록을 조회한다.")
     void findMyReservations() {
-        long themeId = fixture.createTheme(new ThemeRequest("name", "desc", "url")).id();
+        long themeId = fixture.createTheme(
+                new ThemeRequest("name", "desc", "url", 10_000L)
+        ).id();
         long timeId = fixture.createReservationTime(10, 0).id();
         fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
         String token = fixture.loginAndGetToken("email@mail.com", "12341234");

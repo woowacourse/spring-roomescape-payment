@@ -6,9 +6,9 @@ import java.util.NoSuchElementException;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import roomescape.domain.reservation.BookStatus;
+import roomescape.domain.reservation.PopularThemeLookupFilter;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.ThemeRepository;
-import roomescape.domain.reservation.PopularThemeLookupFilter;
 
 public interface ThemeJpaRepository extends ThemeRepository, ListCrudRepository<Theme, Long> {
 

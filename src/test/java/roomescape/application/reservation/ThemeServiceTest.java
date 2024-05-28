@@ -32,7 +32,7 @@ class ThemeServiceTest {
     @Test
     @DisplayName("테마를 생성한다.")
     void shouldReturnCreatedTheme() {
-        ThemeRequest request = new ThemeRequest("테마", "테마 설명", "url");
+        ThemeRequest request = new ThemeRequest("테마", "테마 설명", "url", 10_000L);
         themeService.create(request);
         List<Theme> themes = themeRepository.findAll();
         assertThat(themes).hasSize(1);

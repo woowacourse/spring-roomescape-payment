@@ -69,7 +69,9 @@ class ReservationTimeAcceptanceTest extends AcceptanceTest {
         fixture.createReservationTime(10, 0);
         fixture.createReservationTime(11, 30);
         long timeId = fixture.createReservationTime(13, 0).id();
-        long themeId = fixture.createTheme(new ThemeRequest("theme", "desc", "url")).id();
+        long themeId = fixture.createTheme(
+                new ThemeRequest("theme", "desc", "url", 10_000L)
+        ).id();
         ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 12, 25), timeId, themeId);
         fixture.createReservation(token, request);
 

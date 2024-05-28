@@ -14,6 +14,7 @@ import java.util.Objects;
 public class Theme {
     private static final int MAX_DESCRIPTION_LENGTH = 200;
     private static final int MAX_THUMBNAIL_URL_LENGTH = 200;
+    private static final long MIN_PRICE = 0L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,23 +26,28 @@ public class Theme {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "price", nullable = false)
+    private long price;
+
     @Column(name = "thumbnail_url", nullable = false)
     private String thumbnailUrl;
 
     protected Theme() {
     }
 
-    public Theme(Long id, ThemeName name, String description, String thumbnailUrl) {
+    public Theme(Long id, ThemeName name, String description, long price, String thumbnailUrl) {
         validateDescription(description);
+        validatePrice(price);
         validateThumbnailUrl(thumbnailUrl);
         this.id = id;
         this.name = name;
         this.description = description;
+        this.price = price;
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public Theme(String name, String description, String thumbnailUrl) {
-        this(null, new ThemeName(name), description, thumbnailUrl);
+    public Theme(String name, String description, long price, String thumbnailUrl) {
+        this(null, new ThemeName(name), description, price, thumbnailUrl);
     }
 
     private void validateDescription(String description) {
@@ -53,6 +59,12 @@ public class Theme {
     private void validateThumbnailUrl(String thumbnailUrl) {
         if (thumbnailUrl != null && thumbnailUrl.length() > MAX_THUMBNAIL_URL_LENGTH) {
             throw new IllegalArgumentException(String.format("테마 썸네일 URL은 %d자 이하여야 합니다.", MAX_THUMBNAIL_URL_LENGTH));
+        }
+    }
+
+    private void validatePrice(long price) {
+        if (price < MIN_PRICE) {
+            throw new IllegalArgumentException("가격은 %d원 이상이어야 합니다.".formatted(MIN_PRICE));
         }
     }
 
@@ -82,6 +94,10 @@ public class Theme {
 
     public String getDescription() {
         return description;
+    }
+
+    public long getPrice() {
+        return price;
     }
 
     public String getThumbnailUrl() {

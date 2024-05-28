@@ -14,6 +14,7 @@ create table if not exists theme
     name          varchar(20)  not null,
     description   varchar(200) not null,
     thumbnail_url varchar(200) not null,
+    price         bigint       not null,
     primary key (id)
 );
 

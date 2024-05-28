@@ -24,7 +24,7 @@ class ReservationTest {
         LocalDateTime createdAt = LocalDateTime.of(2024, 1, 1, 12, 1, 0);
         LocalDate date = reservationTime.toLocalDate();
         ReservationTime time = new ReservationTime(reservationTime.toLocalTime());
-        Theme theme = new Theme("테마명", "설명", "url");
+        Theme theme = TEST_THEME.create();
         Member member = MEMBER_ARU.create();
 
         assertThatCode(() -> new Reservation(member, theme, date, time, createdAt, BookStatus.BOOKED))
