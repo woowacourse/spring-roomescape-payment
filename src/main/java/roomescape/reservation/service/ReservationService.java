@@ -18,6 +18,7 @@ import roomescape.reservation.domain.specification.ReservationSpecification;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -112,12 +113,14 @@ public class ReservationService {
         reservationSlotRepository.deleteById(reservationId);
     }
 
-    public void reserve(ReservationPaymentRequest reservationPaymentRequest, PaymentResponse paymentResponse, Long memberId) {
+    public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, PaymentResponse paymentResponse, Long memberId) {
         ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
-        ReservationResponse reservation = createReservation(reservationRequest, memberId);
+        ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
 
-        if (paymentResponse.totalAmount() != 1000) { // TODO 리팩
+        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) { // TODO 리팩
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
+
+        return reservationResponse;
     }
 }

@@ -11,6 +11,8 @@ import roomescape.member.domain.Member;
 @Entity
 public class Reservation {
 
+    private static final Long AMOUNT = 1000L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,9 +28,6 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-
-    //TODO 1000원
-
 
     public Reservation() {
     }
@@ -76,6 +75,10 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public Long getAMOUNT() {
+        return AMOUNT;
     }
 
     @Override

@@ -13,14 +13,16 @@ public record ReservationResponse(
         MemberResponse member,
         LocalDate date,
         ReservationTimeResponse time,
-        ThemeResponse theme) {
+        ThemeResponse theme,
+        Long amount) {
     public static ReservationResponse from(long reservationId, ReservationSlot reservationSlot, Member member) {
         return new ReservationResponse(
                 reservationId,
                 MemberResponse.from(member),
                 reservationSlot.getDate(),
                 ReservationTimeResponse.from(reservationSlot.getTime()),
-                ThemeResponse.from(reservationSlot.getTheme())
+                ThemeResponse.from(reservationSlot.getTheme()),
+                1000L
         );
     }
 
@@ -31,7 +33,8 @@ public record ReservationResponse(
                 MemberResponse.from(reservation.getMember()),
                 reservationSlot.getDate(),
                 ReservationTimeResponse.from(reservationSlot.getTime()),
-                ThemeResponse.from(reservationSlot.getTheme())
+                ThemeResponse.from(reservationSlot.getTheme()),
+                reservation.getAMOUNT()
         );
     }
 }

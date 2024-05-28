@@ -48,12 +48,9 @@ public class ReservationController {
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
 //        reservationService.validateAmount(reservationPaymentRequest); // TODO 예약 확정 전에 검증하는게 좋을듯
         PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, paymentResponse, authInfo.getId());
 
-        reservationService.reserve(reservationPaymentRequest, paymentResponse, authInfo.getId());
-
-//        ReservationResponse response = reservationService.createReservation(reservationRequest, authInfo.getId());
-//        return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
-        return ResponseEntity.created(URI.create("/reservations/" + "asdsad")).body(null);
+        return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
     }
 
     @DeleteMapping("/reservations/{id}")
