@@ -31,6 +31,13 @@ public class RoomescapeExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(PaymentException.class)
+    public ErrorResponse handle(PaymentException e) {
+        logger.error(e.getMessage());
+        return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
+                .build();
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ErrorResponse handle(MissingServletRequestParameterException e) {
         logger.error("{}{}{}", NO_QUERY_PARAMETER.getLogMessage(), System.lineSeparator(), e.getMessage());

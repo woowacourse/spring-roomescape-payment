@@ -1,18 +1,24 @@
 package roomescape.config;
 
-import static roomescape.exception.ExceptionType.UN_EXPECTED_ERROR;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResponseErrorHandler;
 
-import roomescape.exception.RoomescapeException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import roomescape.exception.PaymentException;
 
 @Component
 public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
@@ -22,12 +28,10 @@ public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse httpResponse) throws IOException {
-        if (httpResponse.getStatusCode().is5xxServerError()) {
-            //Handle SERVER_ERROR
-            throw new HttpClientErrorException(httpResponse.getStatusCode());
-        } else if (httpResponse.getStatusCode().is4xxClientError()) {
-            //Handle CLIENT_ERROR
-            throw new RoomescapeException(UN_EXPECTED_ERROR);
-        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getBody()));
+        String responseBody = reader.lines().collect(Collectors.joining(""));
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String errorMessage = jsonNode.path("message").asText("Unknown error");
+        throw new PaymentException(httpResponse.getStatusCode(), errorMessage);
     }
 }

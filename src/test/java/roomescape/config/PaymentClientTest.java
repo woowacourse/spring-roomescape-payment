@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import roomescape.dto.PaymentRequest;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.PaymentException;
 
 @SpringBootTest
 class PaymentClientTest {
@@ -16,10 +16,10 @@ class PaymentClientTest {
     @Autowired
     PaymentClient paymentClient;
 
-    @DisplayName("외부 API와 연동할 수 있다.")
+    @DisplayName("paymentkey를 클라이언트에서 획득하지 않은 값으로 요청한 경우 예외가 발생한다.")
     @Test
     void approve() {
-        assertThatThrownBy(() -> paymentClient.approve(new PaymentRequest("invalidPaymentKey", "123", 1000)))
-                .isInstanceOf(RoomescapeException.class);
+        assertThatThrownBy(() -> paymentClient.approve(new PaymentRequest("invalidPaymentKey", "-1", 1000)))
+                .isInstanceOf(PaymentException.class);
     }
 }
