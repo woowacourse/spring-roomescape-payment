@@ -1,6 +1,9 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Base64;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -14,11 +17,6 @@ import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
-
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class PaymentService {
@@ -64,20 +62,18 @@ public class PaymentService {
 
     public void cancelPayment(MemberReservation memberReservation) {
         String token = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
-        Payment payment = paymentRepository.findByMemberReservation(memberReservation);
+        paymentRepository.findByMemberReservation(memberReservation).ifPresent(payment -> {
+            requestCancel(payment, token);
+            paymentRepository.delete(payment);
+        });
 
-        requestCancel(payment, token);
-        paymentRepository.delete(payment);
     }
 
     private void requestCancel(Payment payment, String token) {
-        Map<String, String> body = new HashMap<>();
-        body.put("cancelReason", "고객 변심");
-
         restClient.post()
                 .uri("/" + payment.getPaymentKey() + "/cancel")
                 .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_PREFIX + token)
-                .body(body)
+                .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                     PaymentFailure paymentFailure = objectMapper.readValue(res.getBody(), PaymentFailure.class);
