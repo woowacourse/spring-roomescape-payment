@@ -27,4 +27,10 @@ public class ExceptionApiController {
 
         return ResponseEntity.badRequest().body(errors);
     }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> paymentExHandler(PaymentException exception) {
+        return ResponseEntity.status(exception.getStatusCode())
+                .body(exception.getMessage());
+    }
 }
