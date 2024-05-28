@@ -17,9 +17,12 @@ import java.util.List;
 @RestController
 public class ReservationController {
     private ReservationService reservationService;
+    private ReservationServiceV2 reservationServiceV2;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService,
+                                 ReservationServiceV2 reservationServiceV2) {
         this.reservationService = reservationService;
+        this.reservationServiceV2 = reservationServiceV2;
     }
 
     @GetMapping("/reservations")
@@ -47,5 +50,16 @@ public class ReservationController {
     @GetMapping("/reservations-mine")
     public List<MyReservationResponse> mine(LoginMember loginMember) {
         return reservationService.findMine(loginMember);
+    }
+
+    @PostMapping("/reservations/v2")
+    public ResponseEntity<ReservationResponse> createV2(@RequestBody ReservationRequest reservationRequest, LoginMember loginMember) {
+        if (reservationRequest.getDate() == null
+                || reservationRequest.getTheme() == null
+                || reservationRequest.getTime() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        ReservationResponse reservation = reservationServiceV2.save(loginMember, reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservation);
     }
 }
