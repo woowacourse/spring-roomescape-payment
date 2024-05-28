@@ -72,7 +72,7 @@ class ThemeAcceptanceTest extends BasicAcceptanceTest {
     }
 
     private Long postTheme(String token, int expectedHttpCode) {
-        ThemeRequest themeRequest = new ThemeRequest("테마", "설명서", "썸네일");
+        ThemeRequest themeRequest = new ThemeRequest("테마", "설명서", "썸네일", 1000);
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

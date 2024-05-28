@@ -21,13 +21,13 @@ values ('10:00'),
        ('12:00'),
        ('13:00');
 
-insert into theme (name, description, thumbnail)
-values ('name1', 'description1', 'thumbnail1'),
-       ('name2', 'description2', 'thumbnail2'),
-       ('name3', 'description3', 'thumbnail3'),
-       ('name4', 'description4', 'thumbnail4'),
-       ('name5', 'description5', 'thumbnail5'),
-       ('name6', 'description6', 'thumbnail6');
+insert into theme (name, description, thumbnail, price)
+values ('name1', 'description1', 'thumbnail1', 1000),
+       ('name2', 'description2', 'thumbnail2', 1000),
+       ('name3', 'description3', 'thumbnail3', 1000),
+       ('name4', 'description4', 'thumbnail4', 1000),
+       ('name5', 'description5', 'thumbnail5', 1000),
+       ('name6', 'description6', 'thumbnail6', 1000);
 
 insert into reservation (date, member_id, time_id, theme_id, status)
 values ('2099-04-29', 2, 1, 1, 'RESERVATION'),

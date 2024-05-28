@@ -23,15 +23,17 @@ public class Theme {
     private String description;
     @Column(nullable = false)
     private String thumbnail;
+    @Column(nullable = false)
+    private int price;
 
     protected Theme() {
     }
 
-    public Theme(ThemeName name, String description, String thumbnail) {
-        this(null, name, description, thumbnail);
+    public Theme(ThemeName name, String description, String thumbnail, int price) {
+        this(null, name, description, thumbnail, price);
     }
 
-    public Theme(Long id, ThemeName name, String description, String thumbnail) {
+    public Theme(Long id, ThemeName name, String description, String thumbnail, int price) {
         int descriptionLength = description.length();
         if (descriptionLength > MAX_DESCRIPTION_LENGTH) {
             throw new RoomescapeException(
@@ -44,6 +46,7 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
     public Long getId() {
@@ -60,6 +63,10 @@ public class Theme {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    public int getPrice() {
+        return price;
     }
 
     @Override
