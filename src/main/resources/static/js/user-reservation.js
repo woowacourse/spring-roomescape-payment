@@ -16,22 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------  결제위젯 초기화 ------
   // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
   // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-  const paymentAmount = 1000;
   const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
   const customerKey = 'evmbwvjYyP4gZ6Lv5KyOz' // 내 상점에서 고객을 구분하기 위해 발급한 고객의 고유 ID
   const paymentWidget = PaymentWidget(widgetClientKey, customerKey);
-  paymentWidget.renderPaymentMethods(
-      "#payment-method",
-      {value: paymentAmount},
-      {variantKey: "DEFAULT"}
-  );
 
-  document.getElementById('theme-slots').addEventListener('click', event => {
+  document.getElementById('theme-slots').addEventListener('click', async event => {
     if (event.target.classList.contains('theme-slot')) {
       document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
       event.target.classList.add('active');
       checkDateAndTheme();
     }
+    const themeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const paymentAmount = await requestPriceRead(themeId);
+    paymentWidget.renderPaymentMethods(
+      "#payment-method",
+      {value: paymentAmount.price},
+      {variantKey: "DEFAULT"}
+    );
   });
 
   document.getElementById('time-slots').addEventListener('click', event => {
@@ -184,7 +185,7 @@ function onReservationButtonClick(event, paymentWidget) {
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
     });
   } else {
     alert("Please select a date, theme, and time before making a reservation.");
@@ -277,4 +278,12 @@ function requestRead(endpoint) {
         if (response.status === 200) return response.json();
         throw new Error('Read failed');
       });
+}
+
+async function requestPriceRead(id) {
+  return fetch(`/themes/${id}/price`)
+    .then(response => {
+      if (response.status === 200) return response.json();
+      throw new Error('Read failed');
+    });
 }
