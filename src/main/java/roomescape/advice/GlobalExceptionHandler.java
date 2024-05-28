@@ -49,10 +49,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<String> handlePaymentException(PaymentException e) {
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
         return ResponseEntity.status(e.getStatusCode())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(e.getResponse());
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

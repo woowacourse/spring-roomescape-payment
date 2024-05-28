@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.exception.PaymentException;
 
 @Service
@@ -46,7 +47,8 @@ public class PaymentService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException exception) {
-            throw new PaymentException(exception.getStatusCode(), exception.getResponseBodyAsString());
+            PaymentErrorResponse errorResponse = exception.getResponseBodyAs(PaymentErrorResponse.class);
+            throw new PaymentException(exception.getStatusCode(), errorResponse.message());
         }
     }
 }
