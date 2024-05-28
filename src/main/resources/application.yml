@@ -12,3 +12,6 @@ spring:
         format_sql: true
         ddl-auto: create-drop
     defer-datasource-initialization: true
+
+payments:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
