@@ -1,10 +1,12 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
@@ -23,19 +25,23 @@ public class Theme {
 
     private String thumbnail;
 
+    @Embedded
+    private Price price;
+
     public Theme() {
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    public Theme(Long id, String name, String description, String thumbnail, Long price) {
         validate(name, description, thumbnail);
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = new Price(price);
     }
 
-    public Theme(String name, String description, String thumbnail) {
-        this(null, name, description, thumbnail);
+    public Theme(String name, String description, String thumbnail, Long price) {
+        this(null, name, description, thumbnail, price);
     }
 
     private void validate(String name, String description, String thumbnail) {
@@ -66,6 +72,10 @@ public class Theme {
         return thumbnail;
     }
 
+    public BigDecimal getPrice() {
+        return price.getPrice();
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -90,6 +100,7 @@ public class Theme {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
+                ", price=" + price +
                 '}';
     }
 }

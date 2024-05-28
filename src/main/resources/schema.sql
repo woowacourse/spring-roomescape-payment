@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS theme
     name        VARCHAR(255) NOT NULL,
     description VARCHAR(1023) NOT NULL,
     thumbnail   VARCHAR(255) NOT NULL,
+    price       DECIMAL      NOT NULL,
     PRIMARY KEY (id)
 );
 

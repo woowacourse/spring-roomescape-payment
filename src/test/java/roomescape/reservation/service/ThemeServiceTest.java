@@ -61,7 +61,8 @@ class ThemeServiceTest extends ServiceTest {
         String name = "name";
         String description = "description";
         String thumbnail = "thumbnail";
-        ThemeCreate themeCreate = new ThemeCreate(name, description, thumbnail);
+        long price = 15000L;
+        ThemeCreate themeCreate = new ThemeCreate(name, description, thumbnail,price);
 
         //when
         ThemeResponse themeResponse = themeService.create(themeCreate);
