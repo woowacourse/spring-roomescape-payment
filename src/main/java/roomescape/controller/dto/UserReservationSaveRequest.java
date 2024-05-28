@@ -20,10 +20,16 @@ public record UserReservationSaveRequest(
 
         @NotNull
         @Positive
-        Long themeId
+        Long themeId,
+
+        Integer amount,
+
+        String orderId,
+
+        String paymentKey
 ) {
 
     public ReservationSaveRequest toReservationSaveRequest(Long memberId) {
-        return new ReservationSaveRequest(memberId, date, timeId, themeId);
+        return new ReservationSaveRequest(memberId, date, timeId, themeId, amount, orderId, paymentKey);
     }
 }

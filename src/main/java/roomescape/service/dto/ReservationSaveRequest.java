@@ -23,10 +23,24 @@ public record ReservationSaveRequest(
 
         @NotNull
         @Positive
-        Long themeId
+        Long themeId,
+
+        Integer amount,
+
+        String orderId,
+
+        String paymentKey
 ) {
-        public ReservationSlotRequest toSlotRequest() {
-                return new ReservationSlotRequest(date, timeId, themeId);
-        }
+    public ReservationSaveRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        this(memberId, date, timeId, themeId, null, null, null);
+    }
+
+    public ReservationSlotRequest toSlotRequest() {
+        return new ReservationSlotRequest(date, timeId, themeId);
+    }
+
+    public PaymentRequest toPaymentRequest() {
+        return new PaymentRequest(amount, orderId, paymentKey);
+    }
 }
 
