@@ -20,7 +20,7 @@ import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.TossPaymentsClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
@@ -91,7 +91,7 @@ class ReservationControllerTest extends ControllerTest {
     private ThemeService themeService;
 
     @MockBean
-    private PaymentService paymentService;
+    private TossPaymentsClient tossPaymentsClient;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
@@ -110,7 +110,7 @@ class ReservationControllerTest extends ControllerTest {
         BDDMockito.given(themeService.findById(anyLong()))
                 .willReturn(expectedTheme);
         BDDMockito.willDoNothing()
-                .given(paymentService)
+                .given(tossPaymentsClient)
                 .confirm(any());
 
         // when & then

@@ -1,7 +1,7 @@
 package roomescape.payment.application;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 
@@ -9,11 +9,11 @@ import java.util.Base64;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Service
-public class PaymentService {
+@Component
+public class TossPaymentsClient {
     private final RestClient restClient;
 
-    public PaymentService(@Value("${security.toss.secret-key}") String secretKey) {
+    public TossPaymentsClient(@Value("${security.toss.secret-key}") String secretKey) {
         secretKey = Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes());
         this.restClient = RestClient.builder()
