@@ -1,7 +1,9 @@
 package roomescape.config;
 
 import java.util.List;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -29,5 +31,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(checkAuthenticationInterceptor)
                 .addPathPatterns("/admin/**");
+    }
+
+    @Bean
+    public RestClient restClient() {
+        return RestClient.builder().baseUrl("http://jsonplaceholder.typicode.com").build();
     }
 }

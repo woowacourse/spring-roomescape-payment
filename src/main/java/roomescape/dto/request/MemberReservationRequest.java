@@ -4,7 +4,7 @@ import roomescape.domain.*;
 
 import java.time.LocalDate;
 
-public record MemberReservationRequest(LocalDate date, Long timeId, Long themeId) {
+public record MemberReservationRequest(LocalDate date, Long timeId, Long themeId, String paymentKey, String orderId, int amount) {
 
     public MemberReservationRequest {
         isValid(date, timeId, themeId);
