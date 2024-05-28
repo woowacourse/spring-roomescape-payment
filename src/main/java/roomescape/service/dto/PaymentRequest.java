@@ -7,14 +7,7 @@ public record PaymentRequest(
         String orderId,
         String paymentKey
 ) {
-    public PaymentRequest(Integer amount, String orderId, String paymentKey) {
-        validate(amount, orderId, paymentKey);
-        this.amount = amount;
-        this.orderId = orderId;
-        this.paymentKey = paymentKey;
-    }
-
-    private void validate(Integer amount, String orderId, String paymentKey) {
+    public PaymentRequest {
         validateAmount(amount);
         validateOrderId(orderId);
         validatePaymentKey(paymentKey);
