@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Version;
 import java.util.Objects;
 import roomescape.global.entity.BaseEntity;
 import roomescape.member.domain.Member;
@@ -31,9 +30,6 @@ public class MemberReservation extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
-
-    @Version
-    private Long version;
 
     public MemberReservation() {
     }
