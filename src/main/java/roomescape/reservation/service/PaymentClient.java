@@ -5,29 +5,33 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
 import roomescape.reservation.dto.PaymentConfirmRequest;
 
+@Component
 public class PaymentClient {
+
+    private static final String BASE_URL = "https://api.tosspayments.com";
+    private static final String CONFIRM_URI = "/v1/payments/confirm";
+    private static final String AUTH_TYPE = "Basic ";
 
     @Value("${third-party-api.payment.secret-key}")
     private String secretKey;
     private final RestClient restClient;
 
-    public PaymentClient(RestClient restClient) {
-        this.restClient = restClient;
+    public PaymentClient() {
+        this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
     }
 
     public void requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + new String(encodedBytes))
+                .header("Authorization", createAuthorizationValue())
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
@@ -37,5 +41,12 @@ public class PaymentClient {
                     throw new InternalServerException("결제 승인 도중 알 수 없는 예외가 발생했습니다");
                 })
                 .toBodilessEntity();
+    }
+
+    private String createAuthorizationValue() {
+        byte[] encodedBytes = Base64.getEncoder().encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String encodedSecretKey = new String(encodedBytes);
+
+        return AUTH_TYPE + encodedSecretKey;
     }
 }
