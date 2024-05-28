@@ -167,7 +167,7 @@ function onReservationButtonClick(event, paymentWidget) {
     */
     // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
     // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "WTEST";
+    const orderIdPrefix = "JERRY-PRIN-PREFIX-";
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
       orderName: "테스트 방탈출 예약 결제 1건",
