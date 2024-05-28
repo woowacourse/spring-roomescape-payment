@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.PaymentService;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -21,6 +22,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -37,25 +39,39 @@ public class ReservationController {
     private final WaitingQueryService waitingQueryService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
+    private final PaymentService paymentService;
 
     public ReservationController(BookingQueryService bookingQueryService,
                                  @Qualifier("waitingManageService") ReservationManageService waitingScheduler,
                                  @Qualifier("bookingManageService") ReservationManageService bookingScheduler,
                                  WaitingQueryService waitingQueryService,
                                  ReservationTimeService reservationTimeService,
-                                 ThemeService themeService) {
+                                 ThemeService themeService,
+                                 PaymentService paymentService) {
         this.bookingQueryService = bookingQueryService;
         this.waitingScheduler = waitingScheduler;
         this.bookingScheduler = bookingScheduler;
         this.waitingQueryService = waitingQueryService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationSaveRequest request,
                                                                  Member loginMember) {
         Reservation newReservation = toNewReservation(request, loginMember, ReservationStatus.BOOKING);
+        Reservation createdReservation = bookingScheduler.create(newReservation);
+        Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ReservationResponse.from(scheduledReservation));
+    }
+
+    @PostMapping("/v2")
+    public ResponseEntity<ReservationResponse> createReservationV2(@RequestBody @Valid ReservationPayRequest request,
+                                                                 Member loginMember) {
+        paymentService.confirm(request.paymentConfirmRequest());
+        Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
         Reservation createdReservation = bookingScheduler.create(newReservation);
         Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)

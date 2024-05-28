@@ -16,6 +16,8 @@ security:
     token:
       secret-key: YzbMlPH7Bt4HXEjizwC2RxFtcWGLxSgZKDt9XOZm0IAyUv3yD5rth1sf7fw9NRFWgIe3aOeYgTEaMBYOd7iE4jIvS1f5SEaMJDUrI
       expire-length: 3600000
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 logging:
   level:
     org:
