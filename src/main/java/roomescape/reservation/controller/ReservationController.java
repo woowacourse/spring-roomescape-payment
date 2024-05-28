@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
-import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.service.ReservationCreateService;
 import roomescape.reservation.service.ReservationDeleteService;
 import roomescape.reservation.service.ReservationFindMineService;
@@ -51,7 +51,7 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
-            @RequestBody AdminReservationCreateRequest request,
+            @RequestBody UserReservationCreateRequest request,
             LoggedInMember member) {
         ReservationResponse response = createService.createReservation(request, member.id());
 

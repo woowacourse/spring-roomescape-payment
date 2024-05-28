@@ -10,6 +10,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -22,15 +23,17 @@ public class ReservationCreateService {
     private final MemberRepository memberRepository;
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentService paymentService;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
                                     MemberRepository memberRepository,
                                     TimeRepository timeRepository,
-                                    ThemeRepository themeRepository) {
+                                    ThemeRepository themeRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -41,7 +44,9 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(AdminReservationCreateRequest request, Long memberId) {
+    public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
+        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
+
         Reservation reservation = makeReservation(
                 memberId, request.date(), request.timeId(), request.themeId());
         return saveReservation(reservation);
