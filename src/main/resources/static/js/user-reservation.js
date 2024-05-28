@@ -185,25 +185,25 @@ function onReservationButtonClick(event, paymentWidget)  {
             timeId: selectedTimeId
         };
 
-        fetch('/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(reservationData)
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Reservation failed');
-                return response.json();
-            })
-            .then(data => {
-                alert("Reservation successful!");
-                location.reload();
-            })
-            .catch(error => {
-                alert("An error occurred while making the reservation.");
-                console.error(error);
-            });
+        // fetch('/reservations', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(reservationData)
+        // })
+        //     .then(response => {
+        //         if (!response.ok) throw new Error('Reservation failed');
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         alert("Reservation successful!");
+        //         location.reload();
+        //     })
+        //     .catch(error => {
+        //         alert("An error occurred while making the reservation.");
+        //         console.error(error);
+        //     });
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
         /*

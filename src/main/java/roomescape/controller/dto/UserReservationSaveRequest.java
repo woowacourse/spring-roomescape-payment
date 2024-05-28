@@ -18,7 +18,11 @@ public record UserReservationSaveRequest(
 
         @NotNull(message = "테마를 선택해주세요")
         @Positive(message = "잘못된 테마입력이 들어왔습니다")
-        Long themeId
+        Long themeId,
+        String paymentKey,
+        String orderId,
+        String amount,
+        String paymentType
 ) {
     public ReservationSaveRequest toReservationSaveRequest(Long memberId) {
         return new ReservationSaveRequest(memberId, date, timeId, themeId);

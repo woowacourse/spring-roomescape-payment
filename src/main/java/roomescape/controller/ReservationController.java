@@ -1,6 +1,8 @@
 package roomescape.controller;
 
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +17,20 @@ import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.request.ReservationSaveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentController paymentController;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(
+            ReservationService reservationService,
+            PaymentController paymentController
+    ) {
         this.reservationService = reservationService;
+        this.paymentController = paymentController;
     }
 
     @PostMapping("/reservations")
@@ -32,6 +38,9 @@ public class ReservationController {
             @Login LoginMember member,
             @RequestBody @Valid UserReservationSaveRequest userReservationSaveRequest
     ) {
+        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
+        paymentController.approve(paymentApproveRequest);
+
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
         ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
