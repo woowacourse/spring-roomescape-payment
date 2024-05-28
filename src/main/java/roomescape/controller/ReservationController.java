@@ -2,8 +2,6 @@ package roomescape.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,23 +14,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
-import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.PaymentRequest;
-import roomescape.exception.RoomescapeException;
-import roomescape.service.ReservationService;
 import roomescape.config.LoginMemberConverter;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.LoginMember;
-import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.request.reservation.ReservationRequest;
+import roomescape.dto.request.reservation.WaitingRequest;
+import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
+import roomescape.exception.RoomescapeException;
+import roomescape.service.ReservationService;
+import roomescape.service.TossPaymentService;
 
 @RestController
 public class ReservationController {
     private final RestClient restClient;
     private final ReservationService reservationService;
+    private final TossPaymentService tossPaymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, TossPaymentService tossPaymentService) {
+        this.tossPaymentService = tossPaymentService;
         this.restClient = RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments/confirm").build();
         this.reservationService = reservationService;
     }
@@ -47,15 +47,9 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
-        PaymentRequest paymentRequest = new PaymentRequest(reservationRequest.orderId(), reservationRequest.amount(),
-                reservationRequest.paymentKey());
-        restClient.post().header("Authorization", authorizations)
+        restClient.post().header("Authorization", tossPaymentService.createAuthorization())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(tossPaymentService.createPaymentRequest(reservationRequest))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
                     throw new RoomescapeException(HttpStatus.NOT_FOUND, "결제 승인 안됨");
