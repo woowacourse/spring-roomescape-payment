@@ -16,23 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.domain.LoginMember;
 import roomescape.dto.AdminReservationDetailResponse;
 import roomescape.dto.AdminReservationRequest;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
+import roomescape.dto.ReservationPaymentRequest;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(@Authenticated LoginMember loginMember,
-                                                               @RequestBody ReservationRequest reservationRequest) {
-        ReservationResponse savedReservationResponse = reservationService.save(loginMember, reservationRequest);
+                                                               @RequestBody ReservationPaymentRequest request) {
+        paymentService.pay(PaymentRequest.from(request));
+        ReservationResponse savedReservationResponse = reservationService.save(loginMember, ReservationRequest.from(request));
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
     }
