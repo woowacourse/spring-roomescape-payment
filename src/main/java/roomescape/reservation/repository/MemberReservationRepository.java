@@ -23,6 +23,9 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
     @Query("select mr from MemberReservation as mr where mr.reservation = :reservation and mr.status IN ('CONFIRMATION', 'PENDING')")
     Optional<MemberReservation> findByReservationAndStatusIsConfirmationAndPending(Reservation reservation);
 
+    @Query("select mr from MemberReservation as mr where mr.status in :statuses")
+    List<MemberReservation> findByStatuses(List<ReservationStatus> statuses);
+
     List<MemberReservation> findByStatus(ReservationStatus status);
 
     @Query("SELECT mr from MemberReservation as mr where mr.member.id = :memberId and mr.status IN :statuses")

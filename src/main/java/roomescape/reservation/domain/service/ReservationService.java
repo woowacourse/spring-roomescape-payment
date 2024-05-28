@@ -39,7 +39,8 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<MemberReservationResponse> readReservations() {
-        return memberReservationRepository.findByStatus(ReservationStatus.CONFIRMATION).stream()
+        return memberReservationRepository.findByStatuses(
+                        List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING)).stream()
                 .map(MemberReservationResponse::from)
                 .toList();
     }
