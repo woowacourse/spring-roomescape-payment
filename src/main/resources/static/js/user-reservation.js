@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
   const paymentAmount = 1000;
   const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-  const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
+  const customerKey = 'evmbwvjYyP4gZ6Lv5KyOz' // 내 상점에서 고객을 구분하기 위해 발급한 고객의 고유 ID
+  const paymentWidget = PaymentWidget(widgetClientKey, customerKey);
   paymentWidget.renderPaymentMethods(
       "#payment-method",
       {value: paymentAmount},
@@ -204,7 +205,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
-    paymentType: paymentData.paymentType,
+    //paymentType: paymentData.paymentType,
   }
 
   const reservationURL = "/reservations";

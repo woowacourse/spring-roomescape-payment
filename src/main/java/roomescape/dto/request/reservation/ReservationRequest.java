@@ -6,6 +6,9 @@ import java.time.LocalDate;
 public record ReservationRequest(
         @NotNull LocalDate date,
         long timeId,
-        long themeId
+        long themeId,
+        String paymentKey,
+        String orderId,
+        int amount
 ) {
 }
