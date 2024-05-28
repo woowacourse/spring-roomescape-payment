@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.PaymentException;
 import roomescape.application.dto.request.PaymentRequest;
+import roomescape.exception.PaymentException;
 
 @Component
 public class PaymentClient {
@@ -28,19 +28,20 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    public void confirmPayment(PaymentRequest paymentRequest) {
-        restClient.post()
+    public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
+        return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", encodedSecretKey)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                .onStatus(HttpStatusCode::isError, (req, res) -> {
                     PaymentErrorResponse errorResponse = objectMapper
                             .readValue(res.getBody(), PaymentErrorResponse.class);
 
                     throw new PaymentException(errorResponse.message());
-                });
+                })
+                .body(PaymentResponse.class);
     }
 
     private static String encodeSecretKey(String secretKey) {

@@ -2,6 +2,7 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.MEMBER_2;
 import static roomescape.fixture.Fixture.RESERVATION_TIME_1;
@@ -15,7 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.ReservationResponse;
@@ -34,6 +37,8 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
+import roomescape.infra.payment.PaymentClient;
+import roomescape.infra.payment.PaymentResponse;
 
 class ReservationServiceTest extends BaseServiceTest {
 
@@ -55,6 +60,9 @@ class ReservationServiceTest extends BaseServiceTest {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
+    @SpyBean
+    private PaymentClient paymentClient;
+
     private Member member1;
     private Member member2;
     private ReservationTime time1;
@@ -75,6 +83,9 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("성공한다.")
         void success() {
+            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
+                    .when(paymentClient).confirmPayment(any());
+
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
             LocalDate reservationDate = LocalDate.of(2024, 4, 9);
             ReservationRequest request = new ReservationRequest(
@@ -82,6 +93,10 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
+                    "test-paymentKey",
+                    "test-orderId",
+                    1L,
+                    "test-paymentType",
                     member1.getId()
             );
             ReservationResponse response = reservationService.addReservation(request);
@@ -108,6 +123,10 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
+                    null,
+                    null,
+                    null,
+                    null,
                     member1.getId()
             );
 
@@ -129,7 +148,12 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
+                    null,
+                    null,
+                    null,
+                    null,
                     member1.getId()
+
             );
 
             assertThatThrownBy(() -> reservationService.addReservation(request))

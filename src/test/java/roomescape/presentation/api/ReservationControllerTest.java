@@ -1,5 +1,7 @@
 package roomescape.presentation.api;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -11,7 +13,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.MyReservationResponse;
@@ -31,6 +35,8 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
+import roomescape.infra.payment.PaymentClient;
+import roomescape.infra.payment.PaymentResponse;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.ReservationWebRequest;
 
@@ -50,6 +56,9 @@ class ReservationControllerTest extends BaseControllerTest {
 
     @Autowired
     private WaitingRepository waitingRepository;
+
+    @SpyBean
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("나의 예약들을 예약 대기 순번과 함께 조회하고, 성공하면 200을 반환한다.")
@@ -105,10 +114,21 @@ class ReservationControllerTest extends BaseControllerTest {
             String token = tokenProvider.createToken(user.getId().toString());
 
             // given
+            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
+                    .when(paymentClient).confirmPayment(any());
+
             ReservationTime time = reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);
             Theme theme = themeRepository.save(Fixture.THEME_1);
 
-            ReservationWebRequest request = new ReservationWebRequest(LocalDate.of(2024, 4, 9), 1L, 1L);
+            ReservationWebRequest request = new ReservationWebRequest(
+                    LocalDate.of(2024, 4, 9),
+                    1L,
+                    1L,
+                    "test-paymentKey",
+                    "test-orderId",
+                    1L,
+                    "test-paymentType"
+            );
 
             ExtractableResponse<Response> response = RestAssured.given().log().all()
                     .cookie("token", token)
@@ -144,7 +164,15 @@ class ReservationControllerTest extends BaseControllerTest {
             reservationTimeRepository.save(new ReservationTime(LocalTime.of(11, 0)));
             themeRepository.save(new Theme("테마 이름", "테마 설명", "https://example.com"));
 
-            ReservationWebRequest request = new ReservationWebRequest(LocalDate.of(2024, 4, 7), 1L, 1L);
+            ReservationWebRequest request = new ReservationWebRequest(
+                    LocalDate.of(2024, 4, 7),
+                    1L,
+                    1L,
+                    "test-paymentKey",
+                    "test-orderId",
+                    1L,
+                    "test-paymentType"
+            );
 
             ExtractableResponse<Response> response = RestAssured.given().log().all()
                     .cookie("token", token)
