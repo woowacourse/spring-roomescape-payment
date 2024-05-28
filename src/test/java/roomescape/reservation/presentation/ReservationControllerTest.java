@@ -109,9 +109,6 @@ class ReservationControllerTest extends ControllerTest {
                 .willReturn(expectedTime);
         BDDMockito.given(themeService.findById(anyLong()))
                 .willReturn(expectedTheme);
-        BDDMockito.willDoNothing()
-                .given(tossPaymentsClient)
-                .confirm(any());
 
         // when & then
         mockMvc.perform(post("/reservations")

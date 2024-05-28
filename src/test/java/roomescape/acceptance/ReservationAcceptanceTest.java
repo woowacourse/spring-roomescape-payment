@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import roomescape.global.dto.ErrorResponse;
 import roomescape.member.domain.Member;
+import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -44,7 +45,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
         Long timeId = createTestReservationTime();
 
-        ReservationSaveRequest request = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -109,7 +111,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
         createTestReservation(MIA_RESERVATION_DATE, timeId, themeId, token, BOOKING);
 
-        ReservationSaveRequest request = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -138,7 +141,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
         Long timeId = createTestReservationTime();
 
-        ReservationSaveRequest request = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
         // when
         for (int i = 0; i < threadCount; i++) {
@@ -280,7 +284,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
         Long timeId = createTestReservationTime();
 
-        ReservationSaveRequest request = new ReservationSaveRequest(null, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(null, timeId, themeId);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -309,7 +314,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long notExistingTimeId = 1L;
         Long themeId = createTestTheme();
 
-        ReservationSaveRequest request = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when

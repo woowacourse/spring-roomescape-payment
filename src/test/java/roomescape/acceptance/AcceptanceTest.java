@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.dto.request.LoginRequest;
@@ -18,7 +19,9 @@ import roomescape.common.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.request.MemberJoinRequest;
 import roomescape.member.dto.response.MemberResponse;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.request.ReservationTimeSaveRequest;
 import roomescape.reservation.dto.request.ThemeSaveRequest;
@@ -40,8 +43,12 @@ import static roomescape.member.domain.Role.ADMIN;
 import static roomescape.member.domain.Role.USER;
 
 @ActiveProfiles(value = "test")
+@Import(TestClientConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
+    protected static final PaymentConfirmRequest paymentConfirmRequest =
+            new PaymentConfirmRequest("key", "orderId", 1000L, "none");
+
     @LocalServerPort
     private int port;
 
@@ -92,29 +99,30 @@ public abstract class AcceptanceTest {
     }
 
     protected Long createTestReservation(LocalDate date, Long timeId, Long themeId, String token, ReservationStatus status) {
-        ReservationSaveRequest request = new ReservationSaveRequest(date, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(date, timeId, themeId);
         Cookie cookie = new Cookie.Builder("token", token).build();
         if (status.isBooking()) {
-            return createTestBooking(request, cookie);
+            return createTestBooking(reservationSaveRequest, cookie);
         }
-        return createTestWaiting(request, cookie);
+        return createTestWaiting(reservationSaveRequest, cookie);
     }
 
-    protected Long createTestBooking(ReservationSaveRequest request, Cookie cookie) {
+    protected Long createTestBooking(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
+        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)
-                .body(request)
+                .body(reservationPayRequest)
                 .when().post("/reservations")
                 .then().extract().as(ReservationResponse.class)
                 .id();
     }
 
-    protected Long createTestWaiting(ReservationSaveRequest request, Cookie cookie) {
+    protected Long createTestWaiting(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)
-                .body(request)
+                .body(reservationSaveRequest)
                 .when().post("/reservations/waiting")
                 .then().extract().as(ReservationResponse.class)
                 .id();
