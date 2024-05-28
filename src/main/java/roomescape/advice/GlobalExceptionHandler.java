@@ -2,6 +2,7 @@ package roomescape.advice;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -9,6 +10,7 @@ import roomescape.advice.dto.ErrorResponse;
 import roomescape.auth.exception.AdminAuthorizationException;
 import roomescape.auth.exception.AuthenticationException;
 import roomescape.exception.BadArgumentRequestException;
+import roomescape.reservation.service.PaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -44,6 +46,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(DATA_INTEGRITY_VIOLATION_EXCEPTION_ERROR_MESSAGE));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> handlePaymentException(PaymentException e) {
+        return ResponseEntity.status(e.getStatusCode())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(e.getResponse());
     }
 
     @ExceptionHandler(Exception.class)
