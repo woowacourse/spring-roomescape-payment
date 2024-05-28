@@ -9,6 +9,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -39,14 +40,6 @@ class ThemeServiceTest {
     private ThemeService themeService;
     @Autowired
     private ThemeRepository themeRepository;
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private ReservationDetailRepository reservationDetailRepository;
 
     @DisplayName("테마를 생성한다.")
     @Test
@@ -107,18 +100,12 @@ class ThemeServiceTest {
 
     @DisplayName("예약이 존재하는 테마를 삭제하면 예외가 발생한다.")
     @Test
+    @Sql("/truncate-with-reservations.sql")
     void cannotDeleteByReservation() {
         //given
-        Theme theme = createTheme();
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
-        Member member = memberRepository.save(new Member("member", "member@email.com", "member123", Role.GUEST));
-        ReservationDate reservationDate = ReservationDate.of(LocalDate.MAX);
-        ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
-        reservationRepository.save(reservation);
+        long themeId = 1;
 
         //when&then
-        long themeId = theme.getId();
         assertThatThrownBy(() -> themeService.deleteById(themeId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("해당 테마로 예약(대기)이 존재해서 삭제할 수 없습니다.");

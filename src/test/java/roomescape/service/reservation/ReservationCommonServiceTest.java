@@ -1,10 +1,15 @@
 package roomescape.service.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.dto.ReservationWithRank;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -12,12 +17,8 @@ import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class ReservationCommonServiceTest extends ReservationServiceTest {
+
     @Autowired
     private ReservationCommonService reservationCommonService;
     @Autowired
@@ -38,10 +39,10 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void findByMember() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(), null, null,
-                null);
+            null);
 
         //when
         List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
@@ -54,11 +55,11 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void findByMemberAndTheme() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
         long notMemberThemeId = theme.getId() + 1;
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(),
-                notMemberThemeId, null, null);
+            notMemberThemeId, null, null);
 
         //when
         List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
@@ -71,7 +72,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void deleteReservationById() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         Reservation target = reservationRepository.save(reservation);
 
         //when
@@ -85,9 +86,9 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void deleteThenUpdateReservation() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
-        Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING);
-        Reservation reservation3 = new Reservation(anotherMember, reservationDetail, ReservationStatus.WAITING);
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
+        Reservation reservation3 = new Reservation(anotherMember, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
         reservationRepository.save(reservation);
         reservationRepository.save(reservation2);
         reservationRepository.save(reservation3);
@@ -109,7 +110,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationCommonService.deleteById(id))
-                .isInstanceOf(InvalidReservationException.class)
-                .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
+            .isInstanceOf(InvalidReservationException.class)
+            .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
     }
 }

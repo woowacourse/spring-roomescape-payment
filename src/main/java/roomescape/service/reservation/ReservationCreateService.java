@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -40,21 +41,23 @@ public class ReservationCreateService {
     private final MemberRepository memberRepository;
     private final ReservationDetailRepository reservationDetailRepository;
     private final RestClient restClient;
+    private final PaymentRepository paymentRepository;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-        MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, RestClient restClient) {
+        MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, RestClient restClient, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.reservationDetailRepository = reservationDetailRepository;
         this.restClient = restClient;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
         return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-            adminReservationRequest.memberId(), adminReservationRequest.date());
+            adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
@@ -72,18 +75,18 @@ public class ReservationCreateService {
             .body(Payment.class);
 
         return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-            reservationRequest.date());
+            reservationRequest.date(), payment);
     }
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date) {
+    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date, Payment payment) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Theme theme = findThemeById(themeId);
         Member member = findMemberById(memberId);
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         ReservationStatus reservationStatus = determineStatus(reservationDetail, member);
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, reservationStatus));
-
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, reservationStatus, payment));
+        paymentRepository.save(payment);
         return new ReservationResponse(reservation);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -107,7 +108,7 @@ class ReservationTimeServiceTest {
                 "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
         Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
 
         //when&then
@@ -130,7 +131,7 @@ class ReservationTimeServiceTest {
                 "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
         Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, bookedReservationTime), theme));
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
 
         //when
