@@ -5,12 +5,17 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.ReservationSearchCondition;
+import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentClient;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationFactory;
 import roomescape.domain.reservation.ReservationRepository;
@@ -28,6 +33,8 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationFactory reservationFactory;
     private final ReservationDetailFactory reservationDetailFactory;
+    private final PaymentClient paymentRestClient;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public synchronized Reservation saveReservation(ReservationRequest request) {
@@ -35,7 +42,16 @@ public class ReservationService {
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
-        return reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        if (savedReservation.isReserved()) {
+            PaymentRequest paymentRequest = request.toPaymentRequest();
+            PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+            Payment payment = paymentRepository.save(paymentResponse.toPayment());
+            savedReservation.setPayment(payment);
+        }
+
+        return savedReservation;
     }
 
     public List<ReservationResponse> findAllReservationsWithoutCancel() {

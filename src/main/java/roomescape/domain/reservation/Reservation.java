@@ -11,22 +11,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.exception.reservation.CancelReservationException;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")
 @EntityListeners(AuditingEntityListener.class)
 public class Reservation {
@@ -42,6 +42,10 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private ReservationDetail detail;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -50,7 +54,9 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     public Reservation(Member member, ReservationDetail detail, Status status) {
-        this(null, member, detail, status, null);
+        this.member = member;
+        this.detail = detail;
+        this.status = status;
     }
 
     public Reservation approve() {
@@ -92,5 +98,16 @@ public class Reservation {
 
     private boolean isCanceled() {
         return this.status == Status.CANCELED;
+    }
+
+    public Payment getPayment() {
+        if (this.payment == null) {
+            throw new IllegalStateException("결제 정보가 없습니다.");
+        }
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }
