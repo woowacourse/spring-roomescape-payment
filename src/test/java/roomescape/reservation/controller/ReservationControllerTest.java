@@ -15,7 +15,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.dto.LoginRequest;
-import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/init-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -63,7 +63,7 @@ class ReservationControllerTest {
     @DisplayName("예약을 DB에 추가할 수 있다.")
     @Test
     void createReservation() {
-        ReservationCreateRequest params = new ReservationCreateRequest(
+        AdminReservationCreateRequest params = new AdminReservationCreateRequest(
                 null, LocalDate.of(2040, 8, 5), 1L, 1L);
         long expectedId = COUNT_OF_RESERVATION + 1;
         Cookies userCookies = makeUserCookie();

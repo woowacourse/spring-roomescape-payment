@@ -73,7 +73,7 @@ public class WaitingService {
 
     private boolean isAlreadyWaited(Reservation reservation, Member member) {
         return reservation.getMember().equals(member)
-                || waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId());
+               || waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId());
     }
 
     public void deleteWaiting(Long id) {

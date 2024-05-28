@@ -73,8 +73,8 @@ public class Member {
         }
         Member member = (Member) object;
         return Objects.equals(id, member.id)
-                && Objects.equals(name, member.name)
-                && Objects.equals(email, member.email);
+               && Objects.equals(name, member.name)
+               && Objects.equals(email, member.email);
     }
 
     @Override

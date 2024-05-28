@@ -19,7 +19,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -46,7 +46,7 @@ class ReservationCreateServiceTest {
     @Test
     void createReservationTest() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))
@@ -72,7 +72,7 @@ class ReservationCreateServiceTest {
     @Test
     void createReservationTest_whenMemberNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> reservationCreateService.createReservation(request))
@@ -84,7 +84,7 @@ class ReservationCreateServiceTest {
     @Test
     void createReservationTest_whenTimeNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L)).willReturn(Optional.empty());
@@ -98,7 +98,7 @@ class ReservationCreateServiceTest {
     @Test
     void createReservationTest_whenThemeNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))
@@ -114,7 +114,7 @@ class ReservationCreateServiceTest {
     @Test
     void createReservationTest_whenDateTimeIsBefore() {
         LocalDate date = LocalDate.now().minusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))

@@ -8,7 +8,7 @@ import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -34,14 +34,14 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(ReservationCreateRequest request) {
+    public ReservationResponse createReservation(AdminReservationCreateRequest request) {
         Reservation reservation = makeReservation(
                 request.memberId(), request.date(), request.timeId(), request.themeId());
         return saveReservation(reservation);
     }
 
     @Transactional
-    public ReservationResponse createReservation(ReservationCreateRequest request, Long memberId) {
+    public ReservationResponse createReservation(AdminReservationCreateRequest request, Long memberId) {
         Reservation reservation = makeReservation(
                 memberId, request.date(), request.timeId(), request.themeId());
         return saveReservation(reservation);
