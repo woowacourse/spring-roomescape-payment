@@ -2,10 +2,12 @@ package roomescape.reservation.facade;
 
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
-import roomescape.reservation.dto.*;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.service.ReservationCreateService;
 import roomescape.reservation.domain.service.ReservationService;
 import roomescape.reservation.domain.service.WaitingReservationService;
+import roomescape.reservation.dto.*;
 
 import java.util.List;
 
@@ -15,14 +17,16 @@ public class ReservationFacadeService {
     private final ReservationService reservationService;
     private final ReservationCreateService reservationCreateService;
     private final WaitingReservationService waitingReservationService;
+    private final PaymentService paymentService;
 
     public ReservationFacadeService(ReservationService reservationService,
                                     ReservationCreateService reservationCreateService,
-                                    WaitingReservationService waitingReservationService
-    ) {
+                                    WaitingReservationService waitingReservationService,
+                                    PaymentService paymentService) {
         this.reservationService = reservationService;
         this.reservationCreateService = reservationCreateService;
         this.waitingReservationService = waitingReservationService;
+        this.paymentService = paymentService;
     }
 
     public MemberReservationResponse createReservation(ReservationCreateRequest request) {
@@ -31,6 +35,7 @@ public class ReservationFacadeService {
 
     public MemberReservationResponse createReservation(MemberReservationCreateRequest request, LoginMember member) {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.of(request, member);
+        paymentService.confirmPayment(PaymentRequest.from(request));
         return reservationCreateService.createReservation(reservationCreateRequest);
     }
 

@@ -1,13 +1,16 @@
 package roomescape.payment.dto;
 
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+
 public record PaymentResponse(
         String paymentKey,
         String status,
         String orderId,
         String orderName,
-        Long requestedAt,
-        Long approvedAt,
-        Integer totalAmount,
-        Integer balanceAmount
+        ZonedDateTime requestedAt,
+        ZonedDateTime approvedAt,
+        BigDecimal totalAmount,
+        BigDecimal balanceAmount
 ) {
 }

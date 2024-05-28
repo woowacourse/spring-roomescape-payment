@@ -1,16 +1,15 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.payment.dto.PaymentResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Payment {
 
     @Id
@@ -38,7 +37,6 @@ public class Payment {
     }
 
     public static Payment from(PaymentResponse paymentResponse) {
-        BigDecimal totalAmount = BigDecimal.valueOf(paymentResponse.totalAmount());
-        return new Payment(paymentResponse.paymentKey(), paymentResponse.orderId(), totalAmount);
+        return new Payment(paymentResponse.paymentKey(), paymentResponse.orderId(), paymentResponse.totalAmount());
     }
 }

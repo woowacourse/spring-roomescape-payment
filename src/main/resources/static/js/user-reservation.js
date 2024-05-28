@@ -206,10 +206,10 @@ async function fetchReservationPayment(paymentData, reservationData) {
     date: reservationData.date,
     themeId: reservationData.themeId,
     timeId: reservationData.timeId,
+    status: 'CONFIRMATION',
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
-    paymentType: paymentData.paymentType,
   }
 
   const reservationURL = "/reservations";
