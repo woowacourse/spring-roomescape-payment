@@ -10,7 +10,6 @@ public class ClientConfig {
     @Bean
     public RestClient restClient() {
         return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
                 .build();
     }
 }

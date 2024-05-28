@@ -3,7 +3,6 @@ package roomescape.reservation.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
@@ -39,7 +38,7 @@ public class ReservationService {
     public ReservationResponse save(ReservationSaveRequest saveRequest) {
         Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
         reservationSchedulerService.validateSaveReservation(reservation);
-        PaymentConfirmRequest paymentRequest = PaymentConfirmRequest.from(saveRequest);
+        paymentService.confirmPayment(PaymentConfirmRequest.from(saveRequest));
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return ReservationResponse.toResponse(savedReservation);
