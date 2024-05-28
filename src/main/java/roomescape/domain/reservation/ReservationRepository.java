@@ -2,6 +2,7 @@ package roomescape.domain.reservation;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ import roomescape.domain.reservation.slot.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    Reservation findBySlot(ReservationSlot slot);
+    Optional<Reservation> findBySlot(ReservationSlot slot);
 
     @Query("""
             select r
