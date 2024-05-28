@@ -53,12 +53,12 @@ class ReservationServiceTest {
     void readReservation() {
         // when
         Long id = 1L;
-        MemberReservationResponse reservation = reservationService.readReservation(id);
+        MemberReservation reservation = reservationService.readReservation(id);
 
         // then
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(reservation.date()).isEqualTo(LocalDate.of(2099, 12, 31));
-        softAssertions.assertThat(reservation.memberName()).isEqualTo("클로버");
+        softAssertions.assertThat(reservation.getReservation().getDate()).isEqualTo(LocalDate.of(2099, 12, 31));
+        softAssertions.assertThat(reservation.getMember().getName()).isEqualTo("클로버");
         softAssertions.assertAll();
     }
 
@@ -66,7 +66,9 @@ class ReservationServiceTest {
     @Test
     void deleteReservation() {
         // when & then
-        assertThatCode(() -> reservationService.deleteReservation(id))
+        MemberReservation memberReservation = memberReservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
+        assertThatCode(() -> reservationService.deleteReservation(memberReservation))
                 .doesNotThrowAnyException();
     }
 
@@ -74,11 +76,12 @@ class ReservationServiceTest {
     @Test
     void deleteNotOwnerReservation() {
         // given
-        Long id = 1L;
+        MemberReservation memberReservation = memberReservationRepository.findById(1L)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
         LoginMember loginMember = new LoginMember(3L, "admin@gamil.com");
 
         // when & then
-        assertThatThrownBy(() -> reservationService.deleteReservation(id, loginMember))
+        assertThatThrownBy(() -> reservationService.deleteReservation(memberReservation, loginMember))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("본인의 예약 대기만 삭제할 수 있습니다.");
     }
@@ -87,13 +90,13 @@ class ReservationServiceTest {
     @Test
     void confirmFirstWaitingReservation() {
         // given
-        Long deleteId = 13L;
-        Long firstWaitingId = 14L;
-        MemberReservation firstWaiting = memberReservationRepository.findById(firstWaitingId)
+        MemberReservation deletedMemberReservation = memberReservationRepository.findById(13L)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
+        MemberReservation firstWaiting = memberReservationRepository.findById(14L)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
 
         // when
-        reservationService.deleteReservation(deleteId);
+        reservationService.deleteReservation(deletedMemberReservation);
 
         // then
         assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.PENDING);

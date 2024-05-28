@@ -16,10 +16,14 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class PaymentService {
+
+    private static final String AUTHORIZATION_PREFIX = "Basic ";
 
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
@@ -38,14 +42,14 @@ public class PaymentService {
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
         String token = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
 
-        PaymentResponse response = getPaymentResponse(request, token)
+        PaymentResponse response = getConfirmResponse(request, token)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
         Payment payment = Payment.of(response, memberReservation);
         paymentRepository.save(payment);
     }
 
-    private Optional<PaymentResponse> getPaymentResponse(PaymentRequest request, String token) {
+    private Optional<PaymentResponse> getConfirmResponse(PaymentRequest request, String token) {
         return Optional.ofNullable(restClient.post()
                 .uri("/confirm")
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + token)
@@ -56,5 +60,29 @@ public class PaymentService {
                     throw new BadRequestException(paymentFailure.message());
                 })
                 .body(PaymentResponse.class));
+    }
+
+    public void cancelPayment(MemberReservation memberReservation) {
+        String token = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
+        Payment payment = paymentRepository.findByMemberReservation(memberReservation);
+
+        requestCancel(payment, token);
+        paymentRepository.delete(payment);
+    }
+
+    private void requestCancel(Payment payment, String token) {
+        Map<String, String> body = new HashMap<>();
+        body.put("cancelReason", "고객 변심");
+
+        restClient.post()
+                .uri("/" + payment.getPaymentKey() + "/cancel")
+                .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_PREFIX + token)
+                .body(body)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    PaymentFailure paymentFailure = objectMapper.readValue(res.getBody(), PaymentFailure.class);
+                    throw new BadRequestException(paymentFailure.message());
+                })
+                .body(PaymentResponse.class);
     }
 }

@@ -65,10 +65,14 @@ public class ReservationFacadeService {
     }
 
     public void deleteReservation(Long id) {
-        reservationService.deleteReservation(id);
+        MemberReservation memberReservation = reservationService.readReservation(id);
+        paymentService.cancelPayment(memberReservation);
+        reservationService.deleteReservation(memberReservation);
     }
 
     public void deleteReservation(Long id, LoginMember loginMember) {
-        reservationService.deleteReservation(id, loginMember);
+        MemberReservation memberReservation = reservationService.readReservation(id);
+        paymentService.cancelPayment(memberReservation);
+        reservationService.deleteReservation(memberReservation, loginMember);
     }
 }

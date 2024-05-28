@@ -75,26 +75,23 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public MemberReservationResponse readReservation(Long id) {
-        MemberReservation memberReservation = findMemberReservationById(id);
-        return MemberReservationResponse.from(memberReservation);
+    public MemberReservation readReservation(Long id) {
+        return findMemberReservationById(id);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteReservation(Long id) {
-        MemberReservation memberReservation = findMemberReservationById(id);
+    public void deleteReservation(MemberReservation memberReservation) {
         memberReservation.validateIsBeforeNow();
-        memberReservationRepository.deleteById(id);
+        memberReservationRepository.delete(memberReservation);
 
         confirmFirstWaitingReservation(memberReservation.getReservation());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteReservation(Long id, LoginMember loginMember) {
-        MemberReservation memberReservation = findMemberReservationById(id);
+    public void deleteReservation(MemberReservation memberReservation, LoginMember loginMember) {
         memberReservation.validateIsOwner(loginMember);
         memberReservation.validateIsBeforeNow();
-        memberReservationRepository.deleteById(id);
+        memberReservationRepository.delete(memberReservation);
 
         confirmFirstWaitingReservation(memberReservation.getReservation());
     }

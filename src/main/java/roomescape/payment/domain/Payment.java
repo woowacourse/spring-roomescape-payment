@@ -53,4 +53,28 @@ public class Payment {
                 paymentResponse.totalAmount(),
                 memberReservation);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public MemberReservation getMemberReservation() {
+        return memberReservation;
+    }
 }
