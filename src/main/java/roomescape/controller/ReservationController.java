@@ -1,11 +1,8 @@
 package roomescape.controller;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,47 +11,35 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
 import roomescape.dto.AdminReservationRequest;
 import roomescape.dto.LoginMemberRequest;
 import roomescape.dto.PaymentRequest;
-import roomescape.dto.PaymentResponse;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.dto.ReservationWithPaymentRequest;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
+
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(@Authenticated LoginMemberRequest loginMemberRequest,
                                                                @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest) {
 
-        RestClient tossApi = RestClient.builder().baseUrl("https://api.tosspayments.com").build();
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
+        paymentService.pay(PaymentRequest.from(reservationWithPaymentRequest));
 
-        PaymentResponse body = tossApi.post()
-                .uri("v1/payments/confirm")
-                .header("Authorization", authorizations)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(PaymentRequest.from(reservationWithPaymentRequest))
-                .retrieve()
-                .body(PaymentResponse.class);
-
-        ReservationResponse savedReservationResponse =
-                reservationService.saveByUser(loginMemberRequest,
-                        ReservationRequest.from(reservationWithPaymentRequest));
+        ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,
+                ReservationRequest.from(reservationWithPaymentRequest));
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
     }
