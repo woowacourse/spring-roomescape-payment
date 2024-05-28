@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -20,8 +21,12 @@ public class PaymentService {
     private final RestClient restClient;
     private final String authorizationKey;
 
-    public PaymentService(@Value("${payment.secret-key}") String secretKey) {
-        this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
+    public PaymentService(JdkClientHttpRequestFactory factory,
+                          @Value("${payment.secret-key}") String secretKey) {
+        this.restClient = RestClient.builder()
+                .requestFactory(factory)
+                .baseUrl(BASE_URL)
+                .build();
         this.authorizationKey = createAuthorizationKey(secretKey);
     }
 
