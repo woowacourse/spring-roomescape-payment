@@ -92,7 +92,7 @@ public class ReservationCreateService {
     }
 
     private void validateNotWaitingReservation(MemberReservation memberReservation) {
-        memberReservationRepository.findByReservationAndStatusIsConfirmation(
+        memberReservationRepository.findByReservationAndStatusIsConfirmationAndPending(
                         memberReservation.getReservation())
                 .ifPresent(memberReservation::validateDuplicated);
     }

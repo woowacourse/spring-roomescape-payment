@@ -11,7 +11,6 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ForbiddenException;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.domain.service.ReservationService;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.repository.MemberReservationRepository;
 
@@ -84,7 +83,7 @@ class ReservationServiceTest {
                 .hasMessage("본인의 예약 대기만 삭제할 수 있습니다.");
     }
 
-    @DisplayName("예약 서비스는 다음 대기가 있는 경우 예약 삭제 시 대기를 자동으로 승인한다.")
+    @DisplayName("예약 서비스는 다음 대기가 있는 경우 예약 삭제 시 대기를 자동으로 결제 대기 상태로 변경한다.")
     @Test
     void confirmFirstWaitingReservation() {
         // given
@@ -97,6 +96,6 @@ class ReservationServiceTest {
         reservationService.deleteReservation(deleteId);
 
         // then
-        assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.CONFIRMATION);
+        assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.PENDING);
     }
 }

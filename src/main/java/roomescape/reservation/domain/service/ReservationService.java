@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ResourceNotFoundException;
+import roomescape.reservation.domain.dto.WaitingReservationRanking;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.domain.dto.WaitingReservationRanking;
-import roomescape.reservation.dto.*;
+import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.ReservationSearchRequestParameter;
 import roomescape.reservation.repository.MemberReservationRepository;
 import roomescape.reservation.repository.ReservationRepository;
 
@@ -45,7 +47,7 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
         List<MemberReservation> confirmationReservation = memberReservationRepository
-                .findByMemberIdAndStatus(loginMember.id(), ReservationStatus.CONFIRMATION);
+                .findByMemberIdAndStatuses(loginMember.id(), List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING));
         List<WaitingReservationRanking> waitingReservation = memberReservationRepository.
                 findWaitingReservationRankingByMemberId(loginMember.id());
 
@@ -96,6 +98,6 @@ public class ReservationService {
 
     private void confirmFirstWaitingReservation(Reservation reservation) {
         memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING)
-                .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.CONFIRMATION));
+                .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
     }
 }

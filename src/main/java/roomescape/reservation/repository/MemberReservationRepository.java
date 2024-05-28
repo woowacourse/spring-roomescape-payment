@@ -4,10 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.member.domain.Member;
+import roomescape.reservation.domain.dto.WaitingReservationRanking;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.domain.dto.WaitingReservationRanking;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,12 +20,13 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
 
     Optional<MemberReservation> findFirstByReservationAndStatus(Reservation reservation, ReservationStatus status);
 
-    @Query("select mr from MemberReservation as mr where mr.reservation = :reservation and mr.status = 'CONFIRMATION'")
-    Optional<MemberReservation> findByReservationAndStatusIsConfirmation(Reservation reservation);
+    @Query("select mr from MemberReservation as mr where mr.reservation = :reservation and mr.status IN ('CONFIRMATION', 'PENDING')")
+    Optional<MemberReservation> findByReservationAndStatusIsConfirmationAndPending(Reservation reservation);
 
     List<MemberReservation> findByStatus(ReservationStatus status);
 
-    List<MemberReservation> findByMemberIdAndStatus(Long memberId, ReservationStatus status);
+    @Query("SELECT mr from MemberReservation as mr where mr.member.id = :memberId and mr.status IN :statuses")
+    List<MemberReservation> findByMemberIdAndStatuses(Long memberId, List<ReservationStatus> statuses);
 
     List<MemberReservation> findByMemberIdAndReservationIn(Long memberId, List<Reservation> reservations);
 
