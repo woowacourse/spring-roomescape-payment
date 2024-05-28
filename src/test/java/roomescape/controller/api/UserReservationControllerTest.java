@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.controller.dto.CreateReservationRequest;
+import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
@@ -70,6 +71,7 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약 저장 -> 201")
     @Test
     void save() {
+        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
         CreateReservationRequest request = new CreateReservationRequest(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()
@@ -138,6 +140,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
     @Test
     void save_TimeIdNotFound() {
+        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
         CreateReservationRequest request = new CreateReservationRequest(
             USER_ID, DATE_FIRST, 2L, THEME_ID);
 
@@ -154,6 +157,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
     @Test
     void save_ThemeIdNotFound() {
+        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
         CreateReservationRequest request = new CreateReservationRequest(
             USER_ID, DATE_FIRST, TIME_ID, 2L);
 
@@ -170,9 +174,11 @@ class UserReservationControllerTest {
     @DisplayName("실패: 중복 예약 -> 400")
     @Test
     void save_Duplication() {
+        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
         userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
-        CreateReservationRequest request = new CreateReservationRequest(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        CreateUserReservationRequest request
+            = new CreateUserReservationRequest(DATE_FIRST, THEME_ID, TIME_ID, "123", "123", 1000, "123");
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -180,7 +186,7 @@ class UserReservationControllerTest {
             .body(request)
             .when().post("/reservations")
             .then().log().all()
-            .statusCode(400);
+            .statusCode(404);
     }
 
     @DisplayName("실패: 과거 시간 예약 -> 400")

@@ -18,5 +18,12 @@ public record CreateUserReservationRequest(
 
     @NotNull(message = "null일 수 없습니다.")
     @Positive(message = "양수만 입력할 수 있습니다.")
-    Long timeId
-) { }
+    Long timeId,
+
+    String paymentKey,
+    String orderId,
+    long amount,
+    String paymentType
+) {
+
+}
