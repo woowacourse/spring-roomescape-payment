@@ -8,10 +8,7 @@ import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.controller.dto.ReservationQueryRequest;
-import roomescape.reservation.controller.dto.ReservationRequest;
-import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
@@ -113,5 +110,14 @@ public class ReservationService {
     public void delete(long reservationId) {
         reservationRepository.deleteByReservationSlot_Id(reservationId);
         reservationSlotRepository.deleteById(reservationId);
+    }
+
+    public void reserve(ReservationPaymentRequest reservationPaymentRequest, PaymentResponse paymentResponse, Long memberId) {
+        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
+        ReservationResponse reservation = createReservation(reservationRequest, memberId);
+
+        if (paymentResponse.totalAmount() != 1000) { // TODO 리팩
+            throw new BadRequestException("결제 금액이 잘못되었습니다.");
+        }
     }
 }

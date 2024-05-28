@@ -27,6 +27,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+    //TODO 1000원
+
+
     public Reservation() {
     }
 
