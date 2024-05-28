@@ -13,18 +13,28 @@ public class ReservationRequest {
     private final LocalDate date;
     private final Long timeId;
     private final Long themeId;
+    private final String paymentKey;
+    private final String orderId;
+    private final Integer amount;
 
-    public ReservationRequest(String date, String timeId, String themeId) {
+    public ReservationRequest(String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
         validate(date, timeId, themeId);
         this.date = LocalDate.parse(date);
         this.timeId = Long.parseLong(timeId);
         this.themeId = Long.parseLong(themeId);
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
     }
 
+    // TODO: null 처리
     public ReservationRequest(AdminReservationRequest request) {
         this.date = request.getDate();
         this.timeId = request.getTimeId();
         this.themeId = request.getThemeId();
+        this.paymentKey = null;
+        this.orderId = null;
+        this.amount = null;
     }
 
     public void validate(String date, String timeId, String themeId) {
