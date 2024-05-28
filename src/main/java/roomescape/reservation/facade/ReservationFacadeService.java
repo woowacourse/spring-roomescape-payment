@@ -79,4 +79,9 @@ public class ReservationFacadeService {
         }
         reservationService.deleteReservation(memberReservation, loginMember);
     }
+
+    public void confirmPendingReservation(Long id, PaymentRequest paymentRequest) {
+        MemberReservation memberReservation = reservationService.readReservation(id);
+        paymentService.confirmPayment(paymentRequest, memberReservation);
+    }
 }
