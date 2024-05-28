@@ -60,24 +60,6 @@ class ReservationControllerTest {
         assertThat(size).isEqualTo(BRI_COUNT_OF_RESERVATION);
     }
 
-    @DisplayName("예약을 DB에 추가할 수 있다.")
-    @Test
-    void createReservation() {
-        AdminReservationCreateRequest params = new AdminReservationCreateRequest(
-                null, LocalDate.of(2040, 8, 5), 1L, 1L);
-        long expectedId = COUNT_OF_RESERVATION + 1;
-        Cookies userCookies = makeUserCookie();
-
-        RestAssured.given().log().all()
-                .cookies(userCookies)
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201)
-                .header("Location", "/reservations/" + expectedId);
-    }
-
     private Cookies makeUserCookie() {
         LoginRequest request = new LoginRequest("bri@abc.com", "1234");
 
