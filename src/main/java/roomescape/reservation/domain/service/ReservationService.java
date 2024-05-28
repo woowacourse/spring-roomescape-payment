@@ -1,8 +1,12 @@
 package roomescape.reservation.domain.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.exception.BadRequestException;
 import roomescape.exception.ResourceNotFoundException;
 import roomescape.reservation.domain.dto.WaitingReservationRanking;
 import roomescape.reservation.domain.entity.MemberReservation;
@@ -13,10 +17,6 @@ import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequestParameter;
 import roomescape.reservation.repository.MemberReservationRepository;
 import roomescape.reservation.repository.ReservationRepository;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class ReservationService {
@@ -48,7 +48,8 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
         List<MemberReservation> confirmationReservation = memberReservationRepository
-                .findByMemberIdAndStatuses(loginMember.id(), List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING));
+                .findByMemberIdAndStatuses(loginMember.id(),
+                        List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING));
         List<WaitingReservationRanking> waitingReservation = memberReservationRepository.
                 findWaitingReservationRankingByMemberId(loginMember.id());
 
@@ -69,7 +70,8 @@ public class ReservationService {
                 searchCondition.themeId()
         );
 
-        return memberReservationRepository.findByMemberIdAndReservationIn(searchCondition.memberId(), reservations).stream()
+        return memberReservationRepository.findByMemberIdAndReservationIn(searchCondition.memberId(), reservations)
+                .stream()
                 .map(MemberReservationResponse::from)
                 .toList();
     }
@@ -99,5 +101,21 @@ public class ReservationService {
     private void confirmFirstWaitingReservation(Reservation reservation) {
         memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING)
                 .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void confirmPendingReservation(Long id) {
+        MemberReservation memberReservation = memberReservationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
+        validatePendingStatus(memberReservation);
+
+        memberReservation.setStatus(ReservationStatus.CONFIRMATION);
+        memberReservationRepository.save(memberReservation);
+    }
+
+    private static void validatePendingStatus(MemberReservation memberReservation) {
+        if (memberReservation.getStatus() != ReservationStatus.PENDING) {
+            throw new BadRequestException("예약 상태가 결제대기가 아닙니다.");
+        }
     }
 }
