@@ -32,6 +32,15 @@ public record ReservationRequest(
         );
     }
 
+    public static ReservationRequest of(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
+        return new ReservationRequest(
+                userReservationPaymentRequest.date(),
+                userReservationPaymentRequest.timeId(),
+                userReservationPaymentRequest.themeId(),
+                memberId
+        );
+    }
+
     public Reservation toEntity(ReservationTime reservationTime, Theme theme, Member member, Status status) {
         return new Reservation(
                 date,

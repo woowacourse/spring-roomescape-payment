@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.login.LoginMember;
 import roomescape.dto.reservation.ReservationFilter;
+import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.service.booking.reservation.ReservationService;
 
@@ -29,17 +29,19 @@ class ReservationController {
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationByAdmin(
             @RequestBody ReservationRequest reservationRequest) {
-        Long savedId = reservationService.resisterReservation(reservationRequest);
+        Long savedId = reservationService.registerReservation(reservationRequest);
         ReservationResponse reservationResponse = reservationService.findReservation(savedId);
         return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservationByUser(
-            @RequestBody UserReservationRequest userReservationRequest,
+            @RequestBody UserReservationPaymentRequest userReservationPaymentRequest,
             LoginMember loginMember) {
-        ReservationRequest reservationRequest = ReservationRequest.from(userReservationRequest, loginMember.id());
-        Long savedId = reservationService.resisterReservation(reservationRequest);
+
+//        ReservationRequest reservationRequest = ReservationRequest.from(loginMember.id());
+
+        Long savedId = reservationService.registerReservationPayments(userReservationPaymentRequest, loginMember.id());
         ReservationResponse reservationResponse = reservationService.findReservation(savedId);
         return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);
     }

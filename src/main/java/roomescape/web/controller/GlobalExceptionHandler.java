@@ -29,11 +29,11 @@ class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
-    @ExceptionHandler(value = Exception.class)
-    private ProblemDetail handleGeneralException(Exception e) {
-        logger.log(Level.SEVERE, e.getMessage());
-        String errorMessage = "시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.";
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
-    }
+//    @ExceptionHandler(value = Exception.class)
+//    private ProblemDetail handleGeneralException(Exception e) {
+//        logger.log(Level.SEVERE, e.getMessage());
+//        String errorMessage = "시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.";
+//        return ProblemDetail.forStatusAndDetail(
+//                HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+//    }
 }
