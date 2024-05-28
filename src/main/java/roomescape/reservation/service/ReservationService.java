@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationDto;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SearchReservationsParams;
@@ -30,6 +31,7 @@ public class ReservationService {
     private final MemberService memberService;
     private final ThemeService themeService;
     private final ReservationTimeService reservationTimeService;
+    private final PaymentService paymentService;
 
     public ReservationService(
             final CustomReservationRepository customReservationRepository,
@@ -37,7 +39,7 @@ public class ReservationService {
             final ReservationWaitingRepository reservationWaitingRepository,
             final MemberService memberService,
             final ThemeService themeService,
-            final ReservationTimeService reservationTimeService
+            final ReservationTimeService reservationTimeService, final PaymentService paymentService
     ) {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;
@@ -45,6 +47,7 @@ public class ReservationService {
         this.memberService = memberService;
         this.themeService = themeService;
         this.reservationTimeService = reservationTimeService;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationDto> getReservations() {
@@ -76,6 +79,8 @@ public class ReservationService {
 
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplicated(reservation);
+
+        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), member);
 
         return ReservationDto.from(reservationRepository.save(reservation));
     }

@@ -8,10 +8,25 @@ import roomescape.reservation.model.Theme;
 
 import java.time.LocalDate;
 
-public record SaveReservationRequest(LocalDate date, Long memberId, Long timeId, Long themeId) {
-
+public record SaveReservationRequest(
+        LocalDate date,
+        Long memberId,
+        Long timeId,
+        Long themeId,
+        String orderId,
+        Long amount,
+        String paymentKey
+) {
     public SaveReservationRequest setMemberId(final Long memberId) {
-        return new SaveReservationRequest(date, memberId, timeId, themeId);
+        return new SaveReservationRequest(
+                date,
+                memberId,
+                timeId,
+                themeId,
+                orderId,
+                amount,
+                paymentKey
+        );
     }
 
     public Reservation toReservation(

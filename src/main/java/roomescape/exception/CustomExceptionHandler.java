@@ -40,6 +40,20 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> handlePaymentCredentialMissMatchException(final PaymentCredentialMissMatchException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> handlePaymentConfirmFailException(final PaymentConfirmFailException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
     protected ResponseEntity<ErrorResponse> handleAccessUnauthorizedException(final UnauthorizedException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(UNAUTHORIZED)

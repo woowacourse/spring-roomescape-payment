@@ -27,15 +27,15 @@ public class PaymentCredential {
         this.amount = amount;
     }
 
-    public Long getAmount() {
-        return amount;
-    }
-
     public Long getId() {
         return id;
     }
 
     public String getOrderId() {
         return orderId;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }
