@@ -1,10 +1,17 @@
 package roomescape.reservation.service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
+import roomescape.global.exception.InternalServerException;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
@@ -24,13 +31,19 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final ReservationRepository reservationRepository;
+    private final RestClient restClient;
+
+    @Value("${third-party-api.payment.secret-key}")
+    private String secretKey;
 
     public ReservationService(MemberService memberService, ReservationTimeService reservationTimeService,
-                              ThemeService themeService, ReservationRepository reservationRepository) {
+                              ThemeService themeService, ReservationRepository reservationRepository,
+                              RestClient restClient) {
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.reservationRepository = reservationRepository;
+        this.restClient = restClient;
     }
 
     @Transactional(readOnly = true)
@@ -64,6 +77,23 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+        restClient.post()
+                .uri("/v1/payments/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Basic " + new String(encodedBytes))
+                .body(request.extractPaymentInformation())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new IllegalRequestException("결제 승인 요청 정보가 잘못되었습니다");
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new InternalServerException("결제 승인 도중 알 수 없는 예외가 발생했습니다");
+                })
+                .toBodilessEntity();
+
         validateMemberReservationNotExistInSlot(memberId, request);
 
         Reservation newReservation = Reservation.createNewReservation(

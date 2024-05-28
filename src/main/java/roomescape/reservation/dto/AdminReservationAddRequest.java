@@ -11,6 +11,6 @@ public record AdminReservationAddRequest(
         @NotNull(message = "테마 선택은 필수 입니다.") @Positive Long themeId) {
 
     public MemberReservationAddRequest toMemberRequest() {
-        return new MemberReservationAddRequest(date, timeId, themeId);
+        return new MemberReservationAddRequest(date, timeId, themeId, null, null, null);
     }
 }
