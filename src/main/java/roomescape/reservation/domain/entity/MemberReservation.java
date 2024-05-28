@@ -88,6 +88,10 @@ public class MemberReservation {
         }
     }
 
+    public void validateIsBeforeNow() {
+        reservation.validateIsBeforeNow();
+    }
+
     public Long getId() {
         return id;
     }

@@ -83,6 +83,7 @@ public class ReservationService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(Long id) {
         MemberReservation memberReservation = findMemberReservationById(id);
+        memberReservation.validateIsBeforeNow();
         memberReservationRepository.deleteById(id);
 
         confirmFirstWaitingReservation(memberReservation.getReservation());
@@ -92,6 +93,7 @@ public class ReservationService {
     public void deleteReservation(Long id, LoginMember loginMember) {
         MemberReservation memberReservation = findMemberReservationById(id);
         memberReservation.validateIsOwner(loginMember);
+        memberReservation.validateIsBeforeNow();
         memberReservationRepository.deleteById(id);
 
         confirmFirstWaitingReservation(memberReservation.getReservation());

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.Fixtures;
 import roomescape.exception.BadRequestException;
-import roomescape.reservation.domain.entity.Reservation;
 
 import java.time.LocalDate;
 
@@ -27,6 +26,6 @@ class ReservationTest {
         // when & then
         assertThatThrownBy(reservation::validateIsBeforeNow)
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("이미 지난 날짜는 예약할 수 없습니다.");
+                .hasMessage("이미 지난 날짜는 예약 또는 삭제할 수 없습니다.");
     }
 }

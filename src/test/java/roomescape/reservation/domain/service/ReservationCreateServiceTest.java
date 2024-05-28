@@ -86,7 +86,7 @@ public class ReservationCreateServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationCreateService.createReservation(request))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("이미 지난 날짜는 예약할 수 없습니다.");
+                .hasMessage("이미 지난 날짜는 예약 또는 삭제할 수 없습니다.");
     }
 
     @DisplayName("예약 생성 서비스는 중복된 예약 요청이 들어오면 예외가 발생한다.")

@@ -46,7 +46,7 @@ public class Reservation {
     public void validateIsBeforeNow() {
         LocalDateTime dateTime = LocalDateTime.of(date, time.getStartAt());
         if (dateTime.isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("이미 지난 날짜는 예약할 수 없습니다.");
+            throw new BadRequestException("이미 지난 날짜는 예약 또는 삭제할 수 없습니다.");
         }
     }
 
