@@ -18,14 +18,25 @@ public class ReservationRequest {
     @NotNull(message = "테마 ID는 비어있을 수 없습니다.")
     private Long themeId;
 
+    private String paymentKey;
+
+    private String orderId;
+
     public ReservationRequest() {
     }
 
     public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId) {
+        this(memberId, date, timeId, themeId, null, null);
+    }
+
+    public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId,
+                              final String paymentKey, final String orderId) {
         this.memberId = memberId;
         this.date = date;
         this.timeId = timeId;
         this.themeId = themeId;
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
     }
 
     public Long getMemberId() {
@@ -42,5 +53,13 @@ public class ReservationRequest {
 
     public Long getThemeId() {
         return themeId;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
     }
 }

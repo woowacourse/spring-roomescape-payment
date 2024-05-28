@@ -24,18 +24,17 @@ public class ReservationPaymentRequest {
     @NotNull(message = "결제 금액은 null일 수 없습니다.")
     private Integer amount;
 
-    @NotBlank(message = "결제 타입은 비어있을 수 없습니다.")
-    private String paymentType;
+    public ReservationPaymentRequest() {
+    }
 
     public ReservationPaymentRequest(final String date, final Long timeId, final Long themeId, final String paymentKey,
-                                     final String orderId, final Integer amount, final String paymentType) {
+                                     final String orderId, final Integer amount) {
         this.date = date;
         this.timeId = timeId;
         this.themeId = themeId;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-        this.paymentType = paymentType;
     }
 
     public String getDate() {
@@ -60,9 +59,5 @@ public class ReservationPaymentRequest {
 
     public Integer getAmount() {
         return amount;
-    }
-
-    public String getPaymentType() {
-        return paymentType;
     }
 }

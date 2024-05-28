@@ -61,9 +61,13 @@ public class ReservationService {
 
     private Reservation createReservation(final ReservationRequest request) {
         final Member member = getMemberById(request.getMemberId());
+        final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
-        final Reservation reservation = new Reservation(member, request.getDate(), reservationTime, theme);
+        final String paymentKey = request.getPaymentKey();
+        final String orderId = request.getOrderId();
+
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme, paymentKey, orderId);
 
         validateDuplicatedReservation(reservation, reservationTime);
 
