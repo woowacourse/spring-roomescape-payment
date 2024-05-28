@@ -1,6 +1,6 @@
 package roomescape.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
-import roomescape.dto.response.ErrorResponse;
+import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.PaymentRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.ReservationService;
@@ -43,10 +43,10 @@ public class ReservationController {
         return ResponseEntity.ok(responses);
     }
 
-    @PostMapping(value = {"/reservations", "/waitings"})
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
-            @RequestBody ReservationRequest reservationRequest) {
+            @RequestBody @Valid ReservationRequest reservationRequest) {
         String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
@@ -60,7 +60,16 @@ public class ReservationController {
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
                     throw new RoomescapeException(HttpStatus.NOT_FOUND, "결제 승인 안됨");
                 }));
-        ReservationResponse response = reservationService.saveByClient(loginMember, reservationRequest);
+        ReservationResponse response = reservationService.saveReservationByClient(loginMember, reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
+    }
+
+    @PostMapping("/waitings")
+    public ResponseEntity<ReservationResponse> saveWaitingByClient(
+            @LoginMemberConverter LoginMember loginMember,
+            @RequestBody @Valid WaitingRequest waitingRequest
+    ) {
+        ReservationResponse response = reservationService.saveWaitingByClient(loginMember, waitingRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 

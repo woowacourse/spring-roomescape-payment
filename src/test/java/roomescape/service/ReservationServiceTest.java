@@ -39,7 +39,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         LoginMember loginMember = new LoginMember(1L, "찰리");
         ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, 0);
-        reservationService.saveByClient(loginMember, reservationRequest);
+        reservationService.saveReservationByClient(loginMember, reservationRequest);
 
         List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
 
@@ -51,7 +51,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     void saveByAdmin() {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         AdminReservationRequest adminReservationRequest = new AdminReservationRequest(1L, tomorrow, 1L, 1L);
-        reservationService.saveByAdmin(adminReservationRequest);
+        reservationService.saveReservationByAdmin(adminReservationRequest);
 
         List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
 
@@ -100,8 +100,8 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         AtomicReference<ReservationResponse> secondReservationResponse = new AtomicReference<>();
         return Stream.of(
                 dynamicTest("예약 대기를 조회한다. (총 0개)", () -> assertThat(reservationService.findAllByStatus(Status.WAITING)).isEmpty()),
-                dynamicTest("예약을 추가한다.", () -> firstReservationResponse.set(reservationService.saveByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_1))),
-                dynamicTest("저장되어 있는 예약과 동일한 예약을 추가한다.", () -> secondReservationResponse.set(reservationService.saveByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_2))),
+                dynamicTest("예약을 추가한다.", () -> firstReservationResponse.set(reservationService.saveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_1))),
+                dynamicTest("저장되어 있는 예약과 동일한 예약을 추가한다.", () -> secondReservationResponse.set(reservationService.saveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_2))),
                 dynamicTest("예약의 상태를 확인한다 (RESERVATION)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.WAITING)),
                 dynamicTest("예약을 삭제한다.", () -> reservationService.deleteById(firstReservationResponse.get().id())),
                 dynamicTest("예약의 상태를 확인한다 (WAITING)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.RESERVATION))

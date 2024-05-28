@@ -11,6 +11,7 @@ import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
+import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
@@ -28,8 +29,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        Reservation reservation = reservationFactory.create(
+    public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+        Reservation reservation = reservationFactory.createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
@@ -38,8 +39,20 @@ public class ReservationService {
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
-    public ReservationResponse saveByAdmin(AdminReservationRequest adminReservationRequest) {
-        Reservation reservation = reservationFactory.create(
+    @Transactional
+    public ReservationResponse saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
+        Reservation reservation = reservationFactory.createWaiting(
+                loginMember.id(),
+                waitingRequest.date(),
+                waitingRequest.timeId(),
+                waitingRequest.themeId()
+        );
+        return ReservationResponse.from(reservationRepository.save(reservation));
+    }
+
+    @Transactional
+    public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
+        Reservation reservation = reservationFactory.createReservation(
                 adminReservationRequest.memberId(),
                 adminReservationRequest.date(),
                 adminReservationRequest.timeId(),

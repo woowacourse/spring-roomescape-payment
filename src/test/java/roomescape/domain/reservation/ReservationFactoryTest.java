@@ -22,7 +22,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
     void shouldReturnIllegalArgumentExceptionWhenNotFoundReservationTime() {
         ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 1, 1), 99L, 1L, null, null, 0);
 
-        assertThatThrownBy(() -> reservationFactory.create(1L, reservationRequest.date(),
+        assertThatThrownBy(() -> reservationFactory.createReservation(1L, reservationRequest.date(),
                 reservationRequest.timeId(), reservationRequest.themeId()))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("존재하지 않는 예약 시간입니다.");
@@ -33,7 +33,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
     void shouldThrowIllegalArgumentExceptionWhenNotFoundTheme() {
         ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 1, 1), 1L, 99L, null, null, 0);
 
-        assertThatThrownBy(() -> reservationFactory.create(1L, reservationRequest.date(),
+        assertThatThrownBy(() -> reservationFactory.createReservation(1L, reservationRequest.date(),
                 reservationRequest.timeId(), reservationRequest.themeId()))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("존재하지 않는 테마입니다.");
@@ -49,7 +49,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
                 existReservation.getTheme().getId(),
                 null, null, 0);
 
-        assertThatThrownBy(() -> reservationFactory.create(existReservation.getMember().getId(), reservationRequest.date(), reservationRequest.timeId(), reservationRequest.themeId()))
+        assertThatThrownBy(() -> reservationFactory.createReservation(existReservation.getMember().getId(), reservationRequest.date(), reservationRequest.timeId(), reservationRequest.themeId()))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("이미 예약을 했습니다.");
     }
@@ -59,7 +59,7 @@ class ReservationFactoryTest extends BasicAcceptanceTest {
     void shouldThrowsIllegalArgumentExceptionWhenReservationDateIsBeforeCurrentDate() {
         ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(1999, 1, 1), 1L, 1L, null, null, 0);
 
-        assertThatThrownBy(() -> reservationFactory.create(1L, reservationRequest.date(), reservationRequest.timeId(), reservationRequest.themeId()))
+        assertThatThrownBy(() -> reservationFactory.createReservation(1L, reservationRequest.date(), reservationRequest.timeId(), reservationRequest.themeId()))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("현재 시간보다 과거로 예약할 수 없습니다.");
     }
