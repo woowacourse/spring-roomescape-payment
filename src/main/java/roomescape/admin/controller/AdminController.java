@@ -22,20 +22,17 @@ import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.domain.waiting.dto.WaitingResponse;
 import roomescape.registration.domain.waiting.service.WaitingService;
-import roomescape.registration.service.RegistrationService;
 
 @RestController
 @Auth(roles = MemberRole.ADMIN)
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final RegistrationService registrationService;
     private final ReservationService reservationService;
     private final WaitingService waitingService;
 
-    public AdminController(RegistrationService registrationService, ReservationService reservationService,
+    public AdminController(ReservationService reservationService,
                            WaitingService waitingService) {
-        this.registrationService = registrationService;
         this.reservationService = reservationService;
         this.waitingService = waitingService;
     }
@@ -63,11 +60,5 @@ public class AdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void waitingReject(@PathVariable long waitingId) {
         waitingService.removeWaiting(waitingId);
-    }
-
-    @PatchMapping("/waitings/{waitingId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void waitingApprove(@PathVariable long waitingId) {
-        registrationService.approveWaitingToReservation(waitingId);
     }
 }
