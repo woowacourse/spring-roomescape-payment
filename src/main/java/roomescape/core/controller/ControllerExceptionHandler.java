@@ -10,11 +10,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.core.dto.exception.ExceptionResponse;
 import roomescape.core.dto.exception.HttpExceptionResponse;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
+
+    public static final String REQUEST_TIMEOUT_EXCEPTION_MESSAGE = "요청 시간이 만료되었습니다. 다시 요청해주세요.";
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(
             final MethodArgumentNotValidException exception) {
@@ -49,9 +53,15 @@ public class ControllerExceptionHandler {
         final String exceptionMessage = Optional.ofNullable(exception.getResponseBodyAs(HttpExceptionResponse.class))
                 .map(HttpExceptionResponse::getMessage)
                 .orElse(exception.getMessage());
-        
+
         return ResponseEntity.status(exception.getStatusCode())
                 .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(), exceptionMessage));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> handleResourceAccessException(final ResourceAccessException exception) {
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.REQUEST_TIMEOUT, REQUEST_TIMEOUT_EXCEPTION_MESSAGE));
     }
 
     @ExceptionHandler

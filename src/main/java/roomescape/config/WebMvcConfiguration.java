@@ -1,8 +1,10 @@
 package roomescape.config;
 
+import java.time.Duration;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -34,7 +36,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public RestClient restClient() {
+        final JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
+        factory.setReadTimeout(Duration.ofSeconds(5));
+
         return RestClient.builder()
+                .requestFactory(factory)
                 .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
                 .build();
     }
