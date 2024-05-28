@@ -21,6 +21,15 @@ public class ReservationSaveRequest {
     @NotNull
     private Long timeId;
 
+    @NotNull
+    private String paymentKey;
+
+    @NotNull
+    private String orderId;
+
+    @NotNull
+    private int amount;
+
     public ReservationSaveRequest() {
     }
 
@@ -37,7 +46,19 @@ public class ReservationSaveRequest {
         this.timeId = timeId;
     }
 
-    public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime, ReservationStatus reservationStatus) {
+    public ReservationSaveRequest(Long memberId, LocalDate date, Long themeId, Long timeId, String paymentKey,
+                                  String orderId, int amount) {
+        this.memberId = memberId;
+        this.date = date;
+        this.themeId = themeId;
+        this.timeId = timeId;
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
+    }
+
+    public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime,
+                                     ReservationStatus reservationStatus) {
         return new Reservation(member, date, theme, reservationTime, reservationStatus);
     }
 
@@ -55,5 +76,17 @@ public class ReservationSaveRequest {
 
     public Long getTimeId() {
         return timeId;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 }
