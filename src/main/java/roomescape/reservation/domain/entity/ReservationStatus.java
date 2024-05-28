@@ -19,4 +19,8 @@ public enum ReservationStatus {
     public boolean isNotWaiting() {
         return !this.equals(WAITING);
     }
+
+    public boolean isConfirmation() {
+        return this.equals(CONFIRMATION);
+    }
 }

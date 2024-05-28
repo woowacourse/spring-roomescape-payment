@@ -72,6 +72,10 @@ public class MemberReservation {
         return status.isNotWaiting();
     }
 
+    public boolean isConfirmationStatus() {
+        return status.isConfirmation();
+    }
+
     public void validateRankConfirm(Long waitingRank) {
         if (!canConfirm(waitingRank)) {
             throw new BadRequestException("예약 대기는 순서대로 승인할 수 있습니다.");

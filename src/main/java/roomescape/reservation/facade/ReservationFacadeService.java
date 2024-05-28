@@ -66,13 +66,17 @@ public class ReservationFacadeService {
 
     public void deleteReservation(Long id) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        paymentService.cancelPayment(memberReservation);
+        if (memberReservation.isConfirmationStatus()) {
+            paymentService.cancelPayment(memberReservation);
+        }
         reservationService.deleteReservation(memberReservation);
     }
 
     public void deleteReservation(Long id, LoginMember loginMember) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        paymentService.cancelPayment(memberReservation);
+        if (memberReservation.isConfirmationStatus()) {
+            paymentService.cancelPayment(memberReservation);
+        }
         reservationService.deleteReservation(memberReservation, loginMember);
     }
 }
