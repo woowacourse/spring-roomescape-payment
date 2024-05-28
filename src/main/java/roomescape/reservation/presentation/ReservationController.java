@@ -58,17 +58,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationSaveRequest request,
-                                                                 Member loginMember) {
-        Reservation newReservation = toNewReservation(request, loginMember, ReservationStatus.BOOKING);
-        Reservation createdReservation = bookingScheduler.create(newReservation);
-        Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ReservationResponse.from(scheduledReservation));
-    }
-
-    @PostMapping("/v2")
-    public ResponseEntity<ReservationResponse> createReservationV2(@RequestBody @Valid ReservationPayRequest request,
+    public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
         paymentService.confirm(request.paymentConfirmRequest());
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
