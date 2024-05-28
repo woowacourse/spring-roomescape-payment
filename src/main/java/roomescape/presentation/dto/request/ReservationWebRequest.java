@@ -17,10 +17,33 @@ public record ReservationWebRequest(
 
         @NotNull(message = "테마 id을 입력해주세요.")
         @Positive
-        Long themeId
+        Long themeId,
+
+        @NotNull(message = "payment key를 입력해주세요.")
+        String paymentKey,
+
+        @NotNull(message = "주문 id을 입력해주세요.")
+        String orderId,
+
+        @NotNull(message = "가격을 입력해주세요.")
+        @Positive
+        Long amount,
+
+        @NotNull(message = "payment type을 입력해주세요.")
+        String paymentType
 ) {
 
     public ReservationRequest toReservationRequest(Clock clock, Long memberId) {
-        return new ReservationRequest(LocalDateTime.now(clock), date, themeId, timeId, memberId);
+        return new ReservationRequest(
+                LocalDateTime.now(clock),
+                date,
+                themeId,
+                timeId,
+                paymentKey,
+                orderId,
+                amount,
+                paymentType,
+                memberId
+        );
     }
 }
