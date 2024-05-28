@@ -2,6 +2,8 @@ package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Login;
 import roomescape.member.dto.LoginMemberInToken;
+import roomescape.reservation.client.PaymentClient;
+import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.PaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.service.ReservationService;
@@ -24,9 +29,11 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
+    private final PaymentClient paymentClient;
 
-    public ReservationApiController(ReservationService reservationService) {
+    public ReservationApiController(ReservationService reservationService, PaymentClient paymentClient) {
         this.reservationService = reservationService;
+        this.paymentClient = paymentClient;
     }
 
     @GetMapping("/reservations")
@@ -50,6 +57,14 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
             @Login LoginMemberInToken loginMemberInToken
     ) {
+
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
+        PaymentResponse paymentResponse = paymentClient.paymentReservation(authorizations, PaymentRequest.toRequest(reservationCreateRequest)).getBody();
+
         Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
         ReservationResponse reservationResponse = reservationService.findById(id);
 

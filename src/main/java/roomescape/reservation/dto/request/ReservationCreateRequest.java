@@ -11,7 +11,11 @@ import roomescape.reservation.domain.Theme;
 public record ReservationCreateRequest(
         @NotNull LocalDate date,
         @NotNull Long themeId,
-        @NotNull Long timeId
+        @NotNull Long timeId,
+        @NotNull String paymentKey,
+        @NotNull String orderId,
+        @NotNull Integer amount,
+        @NotNull String paymentType
 ) {
 
     public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime, Status status) {
