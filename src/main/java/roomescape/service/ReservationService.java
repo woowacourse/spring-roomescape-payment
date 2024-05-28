@@ -1,5 +1,8 @@
 package roomescape.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.member.dto.LoginMember;
@@ -10,6 +13,8 @@ import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -34,15 +39,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentClient paymentClient;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository,
+                              final PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +87,7 @@ public class ReservationService {
         final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
         validateBeforeDay(reservationDateTime);
         validateReservation(member, theme, time, date);
+        paymentClient.postPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
 
         return reservationRepository.save(reservation);
     }

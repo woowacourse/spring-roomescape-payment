@@ -56,8 +56,9 @@ public class ReservationController {
             @RequestBody @Valid final UserCreateReservationRequest request,
             @Valid final LoginMember loginMember) {
 
+        //TODO 너무 파라미터가 너무 많다. 리팩터링 필요
         final CreateReservationRequest create = new CreateReservationRequest(loginMember.id(),
-                request.themeId(), request.date(), request.timeId());
+                request.themeId(), request.date(), request.timeId(), request.paymentKey(), request.orderId(), request.amount());
 
         final Reservation reservation = reservationService.addReservation(create);
         final URI uri = UriComponentsBuilder.fromPath("/reservations/{id}")
@@ -67,6 +68,8 @@ public class ReservationController {
         return ResponseEntity.created(uri)
                 .body(ReservationResponse.from(reservation));
     }
+
+
 
     @GetMapping(value = "/search", params = {"themeId", "memberId", "dateFrom", "dateTo"})
     public List<ReservationResponse> searchReservations(final ReservationSearchCondition request) {

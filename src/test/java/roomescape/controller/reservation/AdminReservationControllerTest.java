@@ -49,7 +49,7 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
     @DisplayName("ADMIN이 예약 생성")
     void createReservationAdmin() {
         final CreateReservationRequest request = new CreateReservationRequest(1L,
-                1L, LocalDate.now().plusDays(1), 1L);
+                1L, LocalDate.now().plusDays(1), 1L, null, null, null);
 
         RestAssured.given().log().all()
                 .cookie("token", ADMIN_TOKEN)

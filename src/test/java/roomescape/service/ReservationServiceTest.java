@@ -55,7 +55,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final long themeId = 4L;
         final long timeId = 1L;
         final LocalDate date = LocalDate.now().plusDays(1);
-        final CreateReservationRequest request = new CreateReservationRequest(memberId, themeId, date, timeId);
+        final CreateReservationRequest request = new CreateReservationRequest(memberId, themeId, date, timeId, null, null, null);
         final Reservation reservation = reservationService.addReservation(request);
 
         assertAll(
@@ -129,7 +129,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void duplicateReservationInfo() {
         //given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L);
+        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
 
         //when && then
         reservationService.addReservation(request);
@@ -142,8 +142,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void addReservation() {
         //given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L);
-        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L);
+        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
+        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, null, null, null);
 
         //when && then
         reservationService.addReservation(request1);
