@@ -17,11 +17,8 @@ public class PaymentService {
     private final RestClient restClient;
     private final String secretKey;
 
-    public PaymentService(
-            RestClient restClient,
-            @Value("${payment.secret-key}") String secretKey
-    ) {
-        this.restClient = restClient;
+    public PaymentService(@Value("${payment.secret-key}") String secretKey) {
+        this.restClient = RestClient.create();
         this.secretKey = secretKey;
     }
 
