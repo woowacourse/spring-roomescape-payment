@@ -2,31 +2,37 @@ package roomescape.reservation.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.ResponseSpec;
 import roomescape.reservation.dto.request.PaymentConfirmRequest;
 
 @Service
 public class PaymentService {
 
     private final RestClient restClient;
+    private final String secretKey;
 
-    public PaymentService(RestClient restClient) {
+    public PaymentService(
+            RestClient restClient,
+            @Value("${payment.secret-key}") String secretKey
+    ) {
         this.restClient = restClient;
+        this.secretKey = secretKey;
     }
 
     public void confirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
         try {
-            ResponseSpec responseSpec = restClient.post()
+            restClient.post()
                     .uri(new URI("https://api.tosspayments.com/v1/payments/confirm"))
-                    .body(paymentConfirmRequest)
-                    .retrieve()
-                    .onStatus(status -> status.value() == 200, (request, response) -> {
-                        System.out.println("request = " + request);
-                        System.out.println("response = " + response);
-                    });
-            System.out.println("responseSpec = " + responseSpec);
+                    .header("Authorization", authorizations)
+                    .body(paymentConfirmRequest);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
