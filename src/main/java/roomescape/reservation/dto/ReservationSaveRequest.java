@@ -21,13 +21,10 @@ public class ReservationSaveRequest {
     @NotNull
     private Long timeId;
 
-    @NotNull
     private String paymentKey;
 
-    @NotNull
     private String orderId;
 
-    @NotNull
     private int amount;
 
     public ReservationSaveRequest() {

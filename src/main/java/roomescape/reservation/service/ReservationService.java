@@ -1,15 +1,9 @@
 package roomescape.reservation.service;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -18,7 +12,6 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.MemberReservationResponse;
-import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
@@ -31,23 +24,17 @@ import roomescape.reservation.repository.ThemeRepository;
 @Transactional
 public class ReservationService {
 
-    @Value("${payment.secret-key}")
-    private static String PAYMENT_SECRET_KEY;
-
-    private final RestClient restClient;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
     public ReservationService(
-            RestClient restClient,
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository
     ) {
-        this.restClient = restClient;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -58,26 +45,7 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((PAYMENT_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
-
-        PaymentRequest paymentRequest = new PaymentRequest(
-                reservationSaveRequest.getOrderId(),
-                reservationSaveRequest.getAmount(),
-                reservationSaveRequest.getPaymentKey()
-        );
-
-        ResponseEntity<Void> authorization = restClient.post()
-                .uri("/v1/payments/confirm")
-                .header("Authorization", authorizations)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
-                .retrieve()
-                .toBodilessEntity();
-
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember,
-                ReservationStatus.SUCCESS);
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -88,8 +56,7 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember,
-                ReservationStatus.WAIT);
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
         validateDuplicatedReservationWaiting(reservation, loginMember);
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -132,8 +99,7 @@ public class ReservationService {
                 reservation.getStartAt()
         );
 
-        if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(
-                ReservationStatus.WAIT)) {
+        if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(ReservationStatus.WAIT)) {
             throw new IllegalArgumentException("예약이 완료되었거나, 대기 상태로 등록된 예약입니다.");
         }
     }
@@ -148,8 +114,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findAllByStatus(ReservationStatus reservationStatus) {
-        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(reservationStatus,
-                LocalDate.now());
+        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(reservationStatus, LocalDate.now());
 
         return waitingReservations.stream()
                 .map(ReservationResponse::toResponse)
@@ -175,8 +140,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationWaitingResponse> findWaitingReservations() {
-        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT,
-                LocalDate.now());
+        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT, LocalDate.now());
 
         return waitingReservations.stream()
                 .map(ReservationWaitingResponse::toResponse)
