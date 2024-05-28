@@ -8,6 +8,7 @@ import roomescape.domain.theme.PopularThemeFinder;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.dto.request.theme.ThemeRequest;
+import roomescape.dto.response.theme.ThemePriceResponse;
 import roomescape.dto.response.theme.ThemeResponse;
 import roomescape.exception.RoomescapeException;
 
@@ -45,5 +46,11 @@ public class ThemeService {
         return popularThemeFinder.findThemes().stream()
                 .map(ThemeResponse::from)
                 .toList();
+    }
+
+    public ThemePriceResponse findThemePriceById(long id) {
+        Theme theme = themeRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 테마입니다."));
+        return new ThemePriceResponse(theme.getPrice());
     }
 }

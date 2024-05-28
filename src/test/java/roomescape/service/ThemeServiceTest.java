@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
 import roomescape.TestFixtures;
+import roomescape.dto.response.theme.ThemePriceResponse;
 import roomescape.dto.response.theme.ThemeResponse;
 import roomescape.exception.RoomescapeException;
 
@@ -33,5 +34,12 @@ class ThemeServiceTest extends BasicAcceptanceTest {
                 .isInstanceOf(RoomescapeException.class)
                 .extracting("httpStatus")
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void name() {
+        ThemePriceResponse themePriceResponse = themeService.findThemePriceById(1L);
+
+        assertThat(themePriceResponse.price()).isEqualTo(1000);
     }
 }
