@@ -1,7 +1,6 @@
 package roomescape.domain.payment;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+public interface PaymentRepository{
 
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
-
+    Payment save(Payment payment);
 }
