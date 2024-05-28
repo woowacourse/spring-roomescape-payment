@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.client.PaymentClient;
 import roomescape.controller.auth.AuthenticationPrincipal;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.MemberResponse;
 import roomescape.dto.auth.LoginMember;
+import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.AutoReservedFilter;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
 import roomescape.dto.reservation.MyReservationResponse;
@@ -34,6 +37,8 @@ import java.util.List;
 @RestController
 public class ReservationController {
 
+    private final PaymentClient paymentClient;
+
     private final MemberService memberService;
     private final ReservationService reservationService;
     private final WaitingService waitingService;
@@ -41,12 +46,13 @@ public class ReservationController {
     private final ThemeService themeService;
     private final AutoReserveService autoReserveService;
 
-    public ReservationController(final MemberService memberService,
+    public ReservationController(PaymentClient paymentClient, final MemberService memberService,
                                  final ReservationService reservationService,
                                  final WaitingService waitingService,
                                  final ReservationTimeService reservationTimeService,
                                  final ThemeService themeService,
                                  final AutoReserveService autoReserveService) {
+        this.paymentClient = paymentClient;
         this.memberService = memberService;
         this.reservationService = reservationService;
         this.waitingService = waitingService;
@@ -65,7 +71,12 @@ public class ReservationController {
         final ThemeResponse themeResponse = themeService.findById(request.themeId());
 
         final Reservation reservation = saveRequest.toReservation(memberResponse, themeResponse, reservationTimeResponse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(reservation));
+
+        final PaymentRequest paymentRequest = request.toPaymentRequest();
+        final PaymentResponse pay = paymentClient.pay(paymentRequest);
+
+        final ReservationResponse response = reservationService.create(reservation);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
