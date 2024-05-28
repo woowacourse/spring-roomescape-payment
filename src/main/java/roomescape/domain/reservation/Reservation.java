@@ -19,9 +19,6 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Enumerated(EnumType.STRING)
-//    private ReservationStatus status;
-
     @Embedded
     private ReservationInfo info;
 
@@ -64,10 +61,6 @@ public class Reservation {
     public Long getId() {
         return id;
     } // TODO: get 네이밍에서 없앨지 고민하기
-//
-//    public ReservationStatus getStatus() {
-//        return status;
-//    }
 
     public ReservationInfo getInfo() {
         return info;
