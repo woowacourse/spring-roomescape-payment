@@ -53,7 +53,7 @@ public class ThemeService {
 
     public void deleteTheme(long id) {
         Theme theme = findThemeById(id);
-        if (reservationRepository.existsByThemeId(theme.getId())) {
+        if (reservationRepository.existsByInfoTheme(theme)) {
             throw new ReservationReferencedThemeException();
         }
         themeRepository.delete(theme);

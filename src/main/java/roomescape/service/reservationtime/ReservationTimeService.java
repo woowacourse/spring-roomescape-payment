@@ -62,7 +62,7 @@ public class ReservationTimeService {
 
     public void deleteReservationTime(long id) {
         ReservationTime reservationTime = findReservationTimeById(id);
-        if (reservationRepository.existsByTimeId(reservationTime.getId())) {
+        if (reservationRepository.existsByInfoTime(reservationTime)) {
             throw new ReservationReferencedTimeException();
         }
         reservationTimeRepository.delete(reservationTime);

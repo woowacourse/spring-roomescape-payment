@@ -108,8 +108,7 @@ public class ReservationService {
     }
 
     private void validateDuplicateReservation(Reservation reservation) {
-        if (reservationRepository.existsByDateAndTimeAndTheme(
-                reservation.getDate(), reservation.getTime(), reservation.getTheme())) {
+        if (reservationRepository.existsByInfo(reservation.getInfo())) {
             throw new DuplicatedReservationException();
         }
     }

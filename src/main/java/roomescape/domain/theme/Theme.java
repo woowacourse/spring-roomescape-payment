@@ -17,7 +17,7 @@ public class Theme {
     private ThemeName name;
 
     private String description;
-    
+
     private String thumbnail;
 
     protected Theme() {
@@ -28,6 +28,10 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+    }
+
+    public Theme(Long id) {
+        this(id, null, null, null);
     }
 
     public Theme(ThemeName name, String description, String thumbnail) {

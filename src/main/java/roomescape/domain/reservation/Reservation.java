@@ -1,10 +1,10 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,14 +19,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
+//    @Enumerated(EnumType.STRING)
+//    private ReservationStatus status;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "reservation_time_id")
-    private ReservationTime time;
-
-    @ManyToOne(optional = false)
-    private Theme theme;
+    @Embedded
+    private ReservationInfo info;
 
     @ManyToOne(optional = false)
     private Member member;
@@ -34,16 +31,18 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this.id = id;
-        this.date = date;
-        this.time = time;
-        this.theme = theme;
-        this.member = member;
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
+        this(null, new ReservationInfo(date, time, theme), member);
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
+        this(id, new ReservationInfo(date, time, theme), member);
+    }
+
+    public Reservation(Long id, ReservationInfo info, Member member) {
+        this.id = id;
+        this.info = info;
+        this.member = member;
     }
 
     public void updateMember(Member member) {
@@ -51,8 +50,7 @@ public class Reservation {
     }
 
     public boolean isPast(LocalDateTime now) {
-        LocalDateTime dateTime = date.atTime(time.getStartAt());
-        return dateTime.isBefore(now);
+        return info.isPast(now);
     }
 
     public boolean isOwnedBy(Member otherMember) {
@@ -65,18 +63,26 @@ public class Reservation {
 
     public Long getId() {
         return id;
+    } // TODO: get 네이밍에서 없앨지 고민하기
+//
+//    public ReservationStatus getStatus() {
+//        return status;
+//    }
+
+    public ReservationInfo getInfo() {
+        return info;
     }
 
     public LocalDate getDate() {
-        return date;
+        return info.getDate();
     }
 
     public ReservationTime getTime() {
-        return time;
+        return info.getTime();
     }
 
     public Theme getTheme() {
-        return theme;
+        return info.getTheme();
     }
 
     public Member getMember() {

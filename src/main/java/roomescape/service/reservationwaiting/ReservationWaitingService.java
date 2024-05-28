@@ -1,13 +1,13 @@
 package roomescape.service.reservationwaiting;
 
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationInfo;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
@@ -44,8 +44,8 @@ public class ReservationWaitingService {
     }
 
     public ReservationWaitingResponse saveReservationWaiting(ReservationWaitingRequest request, Member member) {
-        Reservation reservation = findReservationByDateAndTimeIdAndThemeId(
-                request.getDate(), request.getTimeId(), request.getThemeId());
+        ReservationInfo info = new ReservationInfo(request.getDate(), request.getTimeId(), request.getThemeId());
+        Reservation reservation = findByInfo(info);
         validateReservationForWaiting(reservation, member);
 
         ReservationWaiting reservationWaiting = new ReservationWaiting(reservation, member);
@@ -53,8 +53,8 @@ public class ReservationWaitingService {
         return new ReservationWaitingResponse(savedReservationWaiting);
     }
 
-    private Reservation findReservationByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId) {
-        return reservationRepository.findByDateAndTimeIdAndThemeId(date, timeId, themeId)
+    private Reservation findByInfo(ReservationInfo info) { // TODO: id값 그대로 조회할지 고민해보F
+        return reservationRepository.findByInfo(info)
                 .orElseThrow(NotFoundReservationException::new);
     }
 

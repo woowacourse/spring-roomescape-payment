@@ -11,28 +11,28 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
-    boolean existsByDateAndTimeAndTheme(LocalDate date, ReservationTime time, Theme theme);
+    boolean existsByInfo(ReservationInfo info);
 
-    boolean existsByTimeId(long timeId);
+    boolean existsByInfoTime(ReservationTime time);
 
-    boolean existsByThemeId(long themeId);
+    boolean existsByInfoTheme(Theme theme);
 
     List<Reservation> findByMemberId(Long id);
 
-    Optional<Reservation> findByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+    Optional<Reservation> findByInfo(ReservationInfo info);
 
     @Query("""
-            SELECT r.time.id
+            SELECT r.info.time.id
             FROM Reservation r
-            WHERE r.date = :date AND r.theme.id = :themeId
+            WHERE r.info.date = :date AND r.info.theme.id = :themeId
             """)
     List<Long> findTimeIdByDateAndThemeId(LocalDate date, long themeId);
 
     @Query("""
             SELECT t
             FROM Reservation r
-            LEFT JOIN Theme t ON t.id=r.theme.id
-            WHERE r.date > :startDate AND r.date < :endDate
+            LEFT JOIN Theme t ON t.id=r.info.theme.id
+            WHERE r.info.date > :startDate AND r.info.date < :endDate
             GROUP BY t.id
             ORDER BY COUNT(*) DESC
             LIMIT 10
@@ -54,7 +54,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                 if (themeId == null) {
                     return builder.conjunction();
                 }
-                return builder.equal(root.get("theme").get("id"), themeId);
+                return builder.equal(root.get("info").get("theme").get("id"), themeId);
             };
         }
 
@@ -63,7 +63,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                 if (dateFrom == null) {
                     return builder.conjunction();
                 }
-                return builder.greaterThanOrEqualTo(root.get("date"), dateFrom);
+                return builder.greaterThanOrEqualTo(root.get("info").get("date"), dateFrom);
             };
         }
 
@@ -72,7 +72,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                 if (dateTo == null) {
                     return builder.conjunction();
                 }
-                return builder.lessThanOrEqualTo(root.get("date"), dateTo);
+                return builder.lessThanOrEqualTo(root.get("info").get("date"), dateTo);
             };
         }
     }
