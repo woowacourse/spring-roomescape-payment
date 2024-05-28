@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ResourceNotFoundException;
+import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.domain.service.ReservationCreateService;
-import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 
 import java.time.LocalDate;
@@ -45,13 +44,13 @@ public class ReservationCreateServiceTest {
         ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
 
         // when
-        MemberReservationResponse reservation = reservationCreateService.createReservation(request);
+        MemberReservation reservation = reservationCreateService.createReservation(request);
 
         // then
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(reservation.date()).isEqualTo(date);
-        softAssertions.assertThat(reservation.memberName()).isEqualTo(name);
-        softAssertions.assertThat(reservation.startAt()).isEqualTo(LocalTime.of(10, 0));
+        softAssertions.assertThat(reservation.getReservation().getDate()).isEqualTo(date);
+        softAssertions.assertThat(reservation.getMember().getName()).isEqualTo(name);
+        softAssertions.assertThat(reservation.getReservation().getTime().getStartAt()).isEqualTo(LocalTime.of(10, 0));
         softAssertions.assertAll();
     }
 
@@ -67,13 +66,13 @@ public class ReservationCreateServiceTest {
                 ReservationStatus.WAITING);
 
         // when
-        MemberReservationResponse reservation = reservationCreateService.createReservation(request);
+        MemberReservation reservation = reservationCreateService.createReservation(request);
 
         // then
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(reservation.date()).isEqualTo(date);
-        softAssertions.assertThat(reservation.memberName()).isEqualTo(name);
-        softAssertions.assertThat(reservation.startAt()).isEqualTo(LocalTime.of(10, 0));
+        softAssertions.assertThat(reservation.getReservation().getDate()).isEqualTo(date);
+        softAssertions.assertThat(reservation.getMember().getName()).isEqualTo(name);
+        softAssertions.assertThat(reservation.getReservation().getTime().getStartAt()).isEqualTo(LocalTime.of(10, 0));
         softAssertions.assertAll();
     }
 

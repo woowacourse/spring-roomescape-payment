@@ -7,7 +7,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
-import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.repository.MemberReservationRepository;
 import roomescape.reservation.repository.ReservationRepository;
@@ -55,7 +54,7 @@ public class ReservationCreateService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public MemberReservationResponse createReservation(ReservationCreateRequest request) {
+    public MemberReservation createReservation(ReservationCreateRequest request) {
         Member member = findMemberById(request.memberId());
         Reservation reservation = findReservationOrSave(request);
 
@@ -63,8 +62,7 @@ public class ReservationCreateService {
         reservation.validateIsBeforeNow();
         validateDuplicated(memberReservation);
 
-        MemberReservation savedMemberReservation = memberReservationRepository.save(memberReservation);
-        return MemberReservationResponse.from(savedMemberReservation);
+        return memberReservationRepository.save(memberReservation);
     }
 
     private Reservation findReservationOrSave(ReservationCreateRequest request) {

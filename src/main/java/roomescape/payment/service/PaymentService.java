@@ -13,6 +13,7 @@ import roomescape.payment.dto.PaymentFailure;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.entity.MemberReservation;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -34,13 +35,13 @@ public class PaymentService {
                 .build();
     }
 
-    public void confirmPayment(PaymentRequest request) {
+    public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
         String token = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
 
         PaymentResponse response = getPaymentResponse(request, token)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
-        Payment payment = Payment.from(response);
+        Payment payment = Payment.of(response, memberReservation);
         paymentRepository.save(payment);
     }
 

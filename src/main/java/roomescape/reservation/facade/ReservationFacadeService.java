@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.service.ReservationCreateService;
 import roomescape.reservation.domain.service.ReservationService;
 import roomescape.reservation.domain.service.WaitingReservationService;
@@ -30,13 +31,17 @@ public class ReservationFacadeService {
     }
 
     public MemberReservationResponse createReservation(ReservationCreateRequest request) {
-        return reservationCreateService.createReservation(request);
+        MemberReservation savedMemberReservation = reservationCreateService.createReservation(request);
+        return MemberReservationResponse.from(savedMemberReservation);
     }
 
     public MemberReservationResponse createReservation(MemberReservationCreateRequest request, LoginMember member) {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.of(request, member);
-        paymentService.confirmPayment(PaymentRequest.from(request));
-        return reservationCreateService.createReservation(reservationCreateRequest);
+
+        MemberReservation savedMemberReservation = reservationCreateService.createReservation(reservationCreateRequest);
+        paymentService.confirmPayment(PaymentRequest.from(request), savedMemberReservation);
+
+        return MemberReservationResponse.from(savedMemberReservation);
     }
 
     public List<MemberReservationResponse> readReservations() {
