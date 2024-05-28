@@ -10,7 +10,7 @@ import roomescape.advice.dto.ErrorResponse;
 import roomescape.auth.exception.AdminAuthorizationException;
 import roomescape.auth.exception.AuthenticationException;
 import roomescape.exception.BadArgumentRequestException;
-import roomescape.reservation.service.PaymentException;
+import roomescape.payment.exception.PaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.payment.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.exception.PaymentException;
 
 @Service
 public class PaymentService {
