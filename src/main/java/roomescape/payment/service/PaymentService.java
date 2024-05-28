@@ -14,7 +14,7 @@ import roomescape.payment.exception.PaymentException;
 
 @Service
 public class PaymentService {
-    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments/confirm";
+    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     private static final String AUTHORIZATION_PREFIX = "Basic ";
     private static final String SECRET_KEY_SUFFIX = ":";
 
@@ -27,10 +27,10 @@ public class PaymentService {
                 .requestFactory(factory)
                 .baseUrl(BASE_URL)
                 .build();
-        this.authorizationKey = createAuthorizationKey(secretKey);
+        this.authorizationKey = initializeAuthorizationKey(secretKey);
     }
 
-    private String createAuthorizationKey(String secretKey) {
+    private String initializeAuthorizationKey(String secretKey) {
         Encoder encoder = Base64.getEncoder();
         byte[] encodedSecretKey = encoder.encode((secretKey + SECRET_KEY_SUFFIX).getBytes(StandardCharsets.UTF_8));
         return AUTHORIZATION_PREFIX + new String(encodedSecretKey);
@@ -39,6 +39,7 @@ public class PaymentService {
     public void confirmPayment(PaymentConfirmRequest confirmRequest) {
         try {
             restClient.post()
+                    .uri("/confirm")
                     .header("Authorization", authorizationKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(confirmRequest)
