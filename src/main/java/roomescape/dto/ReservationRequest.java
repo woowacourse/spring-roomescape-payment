@@ -10,4 +10,10 @@ public record ReservationRequest(LocalDate date, long timeId, long themeId) {
     public Reservation toReservation(Member member, ReservationTime reservationTime, Theme theme) {
         return new Reservation(this.date, reservationTime, theme, member);
     }
+
+    public static ReservationRequest from(ReservationWithPaymentRequest reservationWithPaymentRequest) {
+        return new ReservationRequest(reservationWithPaymentRequest.date(),
+                reservationWithPaymentRequest.timeId(),
+                reservationWithPaymentRequest.themeId());
+    }
 }

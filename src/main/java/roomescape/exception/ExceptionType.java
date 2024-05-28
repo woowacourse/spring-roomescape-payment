@@ -35,8 +35,7 @@ public enum ExceptionType {
     INVALID_NAME(BAD_REQUEST, "잘못된 이름 형식입니다. 빈 값이 아닌 문자열을 입력해 주세요."),
     INVALID_PASSWORD(BAD_REQUEST,
             String.format("잘못된 비밀번호 형식입니다. 비밀번호는 %d자 이상의 문자열이어야 합니다.", Password.MIN_PASSWORD_LENGTH)),
-    FORBIDDEN_DELETE(FORBIDDEN, "삭제 권한이 없습니다.")
-    ;
+    FORBIDDEN_DELETE(FORBIDDEN, "삭제 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;

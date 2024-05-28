@@ -5,7 +5,6 @@ import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Duration;
 import roomescape.domain.Theme;
 import roomescape.dto.ThemeRequest;

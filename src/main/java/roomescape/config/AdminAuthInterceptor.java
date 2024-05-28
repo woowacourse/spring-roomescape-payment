@@ -23,11 +23,10 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (!(handler instanceof HandlerMethod)) {
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
         }
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        if(!requiredAdmin(handlerMethod)){
+        if (!requiredAdmin(handlerMethod)) {
             return true;
         }
         String accessToken = CookieExtractor.getTokenCookie(request).getValue();
@@ -42,9 +41,6 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
         if (handlerMethod.hasMethodAnnotation(AdminOnly.class)) {
             return true;
         }
-        if (handlerMethod.getBeanType().isAnnotationPresent(AdminOnly.class)) {
-            return true;
-        }
-        return false;
+        return handlerMethod.getBeanType().isAnnotationPresent(AdminOnly.class);
     }
 }
