@@ -1,15 +1,15 @@
 package roomescape.reservation.service;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.RequestBodySpec;
 import roomescape.common.exception.PaymentException;
 import roomescape.reservation.dto.request.PaymentConfirmRequest;
+import roomescape.reservation.dto.response.PaymentResponse;
 
 @Service
 public class PaymentService {
@@ -25,24 +25,27 @@ public class PaymentService {
         this.secretKey = secretKey;
     }
 
-    public void confirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
+    public PaymentResponse confirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);
 
+        RequestBodySpec body = restClient.post()
+                .uri("https://api.tosspayments.com/v1/payments/confirm")
+                .header("Authorization", authorizations)
+                .body(paymentConfirmRequest);
+
         try {
-            restClient.post()
-                    .uri(new URI("https://api.tosspayments.com/v1/payments/confirm"))
-                    .header("Authorization", authorizations)
-                    .body(paymentConfirmRequest)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                        if (response.getStatusCode().is4xxClientError()) {
-                            throw new PaymentException(response.getStatusCode(), "status 만 해볼게");
-                        }
-                    });
-        } catch (URISyntaxException e) {
-            throw new PaymentException(HttpStatusCode.valueOf(401), e.getMessage());
+            return body.retrieve().body(PaymentResponse.class);
+
+        } catch (HttpClientErrorException e) {
+            body.exchange((request, response) -> {
+                if (response.getStatusCode().isError()) {
+                    throw new PaymentException(response.getStatusCode(), e.getMessage());
+                }
+                return null;
+            });
         }
+        return null;
     }
 }
