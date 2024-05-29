@@ -10,6 +10,7 @@ import roomescape.controller.response.ReservationResponse;
 import roomescape.model.Member;
 import roomescape.model.Reservation;
 import roomescape.service.AuthService;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.ReservationWaitingService;
 
@@ -22,11 +23,16 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final AuthService authService;
     private final ReservationWaitingService reservationWaitingService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, AuthService authService, ReservationWaitingService reservationWaitingService) {
+    public ReservationController(ReservationService reservationService,
+                                 AuthService authService,
+                                 ReservationWaitingService reservationWaitingService,
+                                 PaymentService paymentService) {
         this.reservationService = reservationService;
         this.authService = authService;
         this.reservationWaitingService = reservationWaitingService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -47,7 +53,8 @@ public class ReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest request,
-                                                         @AuthenticationPrincipal Member member) {
+                                                                 @AuthenticationPrincipal Member member) {
+        paymentService.confirmReservationPayments(request);
         Reservation reservation = reservationService.addReservation(request, member);
         ReservationResponse reservationResponse = new ReservationResponse(reservation);
         return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservationResponse);

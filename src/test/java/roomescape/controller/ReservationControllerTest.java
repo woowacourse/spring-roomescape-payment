@@ -3,26 +3,44 @@ package roomescape.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.AdminReservationRequest;
 import roomescape.controller.request.MemberLoginRequest;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.service.PaymentService;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql({"/test_data.sql", "/controller-test-data.sql"})
 class ReservationControllerTest {
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
     private ReservationController reservationController;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @DisplayName("예약을 조회한다.")
     @Test
@@ -56,6 +74,8 @@ class ReservationControllerTest {
     @DisplayName("사용자가 예약을 추가할 수 있다.")
     @Test
     void should_insert_reservation_whenT_member_request() {
+        doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
+
         MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
 
         String cookie = RestAssured
@@ -109,6 +129,8 @@ class ReservationControllerTest {
     @DisplayName("예약을 추가할 수 있다.")
     @Test
     void should_add_reservation_when_admin_request() {
+        doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
+
         MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
 
         String cookie = RestAssured
