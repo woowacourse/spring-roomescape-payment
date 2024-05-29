@@ -1,5 +1,7 @@
 package roomescape.payment.domain;
 
+import java.util.Arrays;
+
 public enum PaymentType {
     CARD("카드"),
     VIRTUAL_ACCOUNT("가상계좌"),
@@ -18,12 +20,10 @@ public enum PaymentType {
     }
 
     public static PaymentType from(String value) {
-        for (PaymentType paymentType : PaymentType.values()) {
-            if (paymentType.value.equals(value)) {
-                return paymentType;
-            }
-        }
-        throw new IllegalArgumentException(String.format("%s는 없는 값입니다.", value));
+        return Arrays.stream(PaymentType.values())
+                .filter(paymentType -> paymentType.value.equals(value))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("%s의 결제 타입은 존재하지 않습니다.", value)));
     }
 
     public String getValue() {
