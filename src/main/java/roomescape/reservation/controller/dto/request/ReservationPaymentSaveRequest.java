@@ -6,10 +6,10 @@ import java.time.LocalDate;
 @NotNull
 public record ReservationPaymentSaveRequest(
         LocalDate date,
-        Long themeId,
-        Long timeId,
+        long themeId,
+        long timeId,
         String paymentKey,
         String orderId,
-        Long amount
+        long amount
 ) {
 }

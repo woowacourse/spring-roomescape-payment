@@ -3,7 +3,7 @@ package roomescape.reservation.service.dto.request;
 public record PaymentConfirmRequest(
         String paymentKey,
         String orderId,
-        Long amount
+        long amount
 ) {
 
     public static PaymentConfirmRequest from(ReservationPaymentRequest request) {

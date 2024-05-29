@@ -7,7 +7,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 
 public record ReservationResponse(
-        Long id,
+        long id,
         MemberResponse member,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         ThemeResponse theme,

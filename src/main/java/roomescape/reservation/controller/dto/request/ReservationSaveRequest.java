@@ -11,12 +11,12 @@ import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 
 @NotNull
 public record ReservationSaveRequest(
-        Long memberId,
+        long memberId,
         LocalDate date,
-        Long themeId,
-        Long timeId
+        long themeId,
+        long timeId
 ) {
-    public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, Long memberId) {
+    public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, long memberId) {
         return new ReservationSaveRequest(
                 memberId,
                 detail.date(),

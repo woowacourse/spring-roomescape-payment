@@ -9,13 +9,13 @@ import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 
 public record WaitingReservationRequest(
-        Long memberId,
+        long memberId,
         LocalDate date,
-        Long themeId,
-        Long timeId
+        long themeId,
+        long timeId
 ) {
 
-    public static WaitingReservationRequest of(WaitingReservationSaveRequest saveRequest, Long memberId) {
+    public static WaitingReservationRequest of(WaitingReservationSaveRequest saveRequest, long memberId) {
         return new WaitingReservationRequest(
                 memberId,
                 saveRequest.date(),

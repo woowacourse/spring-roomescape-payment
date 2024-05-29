@@ -7,10 +7,14 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
 
 @NotNull
-@NotBlank
 public record ThemeSaveRequest(
+        @NotBlank
         String name,
+
+        @NotBlank
         String description,
+
+        @NotBlank
         String thumbnail
 ) {
 

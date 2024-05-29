@@ -5,13 +5,13 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
 public record ReservationPaymentRequest(
-        Long memberId,
+        long memberId,
         LocalDate date,
-        Long themeId,
-        Long timeId,
+        long themeId,
+        long timeId,
         String paymentKey,
         String orderId,
-        Long amount
+        long amount
 ) {
     public static ReservationPaymentRequest of(ReservationPaymentSaveRequest saveRequest, LoginMember loginMember) {
         return new ReservationPaymentRequest(

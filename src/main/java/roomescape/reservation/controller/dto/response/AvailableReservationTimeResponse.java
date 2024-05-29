@@ -5,7 +5,7 @@ import java.time.LocalTime;
 import roomescape.reservation.domain.ReservationTime;
 
 public record AvailableReservationTimeResponse(
-        Long id,
+        long id,
         @JsonFormat(pattern = "HH:mm") LocalTime startAt,
         boolean booked
 ) {

@@ -7,12 +7,12 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationWithRank;
 
 public record MemberReservationResponse(
-        Long reservationId,
+        long reservationId,
         String theme,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
-        Long waitingRank
+        long waitingRank
 ) {
 
     public static MemberReservationResponse toResponse(ReservationWithRank reservationWithRank) {
