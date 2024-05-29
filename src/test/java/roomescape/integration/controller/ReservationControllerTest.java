@@ -22,12 +22,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.config.PaymentClient;
 import roomescape.domain.Role;
 import roomescape.dto.ReservationResponse;
 import roomescape.entity.Member;
@@ -57,6 +59,9 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     private Theme theme = ThemeFixture.themeOfName("theme");
     private String token;
@@ -152,17 +157,17 @@ public class ReservationControllerTest {
                     .post("/reservations")
                     .then().log().all()
                     .statusCode(201)
-                    .body("id", is(11),
-                            "member.name", is(DEFAULT_MEMBER.getName()),
-                            "date", is(reservationParam.get("date")),
-                            "time.startAt", is(DEFAULT_RESERVATION_TIME.getStartAt().toString()),
-                            "theme.name", is(DEFAULT_THEME.getName()));
+                    .body("reservationResponse.id", is(11),
+                            "reservationResponse.member.name", is(DEFAULT_MEMBER.getName()),
+                            "reservationResponse.date", is(reservationParam.get("date")),
+                            "reservationResponse.time.startAt", is(DEFAULT_RESERVATION_TIME.getStartAt().toString()),
+                            "reservationResponse.theme.name", is(DEFAULT_THEME.getName()));
 
             RestAssured.given().log().all()
                     .when().get("/reservations")
                     .then().log().all()
                     .statusCode(200)
-                    .body("size()", is(11));
+                    .body("reservationResponse.size()", is(11));
         }
 
         @DisplayName("예약 대기 하나를 생성할 수 있다.")

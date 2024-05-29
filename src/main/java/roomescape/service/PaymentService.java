@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import roomescape.config.PaymentClient;
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.PaymentResponse;
 
 @Service
 public class PaymentService {
@@ -13,7 +14,8 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public void pay(PaymentRequest request) {
+    public PaymentResponse payment(PaymentRequest request) {
         paymentClient.approve(request);
+        return paymentClient.readPayment(request.paymentKey());
     }
 }

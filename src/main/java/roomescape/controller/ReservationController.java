@@ -17,8 +17,10 @@ import roomescape.domain.LoginMember;
 import roomescape.dto.AdminReservationDetailResponse;
 import roomescape.dto.AdminReservationRequest;
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.PaymentResponse;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationPaymentRequest;
+import roomescape.dto.ReservationPaymentResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.PaymentService;
@@ -35,12 +37,12 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> saveReservation(@Authenticated LoginMember loginMember,
-                                                               @RequestBody ReservationPaymentRequest request) {
-        paymentService.pay(PaymentRequest.from(request));
+    public ResponseEntity<ReservationPaymentResponse> saveReservation(@Authenticated LoginMember loginMember,
+                                                                      @RequestBody ReservationPaymentRequest request) {
+        PaymentResponse paymentResponse = paymentService.payment(PaymentRequest.from(request));
         ReservationResponse savedReservationResponse = reservationService.save(loginMember, ReservationRequest.from(request));
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
-                .body(savedReservationResponse);
+                .body(new ReservationPaymentResponse(savedReservationResponse, paymentResponse));
     }
 
     @PostMapping("/reservations-waiting")
