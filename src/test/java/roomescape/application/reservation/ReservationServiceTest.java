@@ -18,7 +18,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.ServiceTest;
-import roomescape.application.reservation.dto.request.ReservationRequest;
+import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
+import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.BookStatus;
@@ -53,7 +54,7 @@ class ReservationServiceTest {
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Theme theme = themeRepository.save(TEST_THEME.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest reservationRequest = new ReservationRequest(
+        ReservationPaymentRequest reservationRequest = new ReservationPaymentRequest(
                 member.getId(),
                 LocalDate.of(2024, 1, 1),
                 time.getId(),
@@ -71,7 +72,7 @@ class ReservationServiceTest {
     void shouldReturnIllegalArgumentExceptionWhenNotFoundReservationTime() {
         Theme savedTheme = themeRepository.save(TEST_THEME.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest request = new ReservationRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
                 LocalDate.of(2024, 1, 1),
                 99L,
@@ -87,7 +88,7 @@ class ReservationServiceTest {
     void shouldThrowIllegalArgumentExceptionWhenNotFoundTheme() {
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest request = new ReservationRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
                 LocalDate.of(2024, 1, 1),
                 time.getId(),
@@ -104,7 +105,7 @@ class ReservationServiceTest {
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Theme theme = themeRepository.save(TEST_THEME.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest request = new ReservationRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
                 LocalDate.of(1999, 12, 31),
                 time.getId(),

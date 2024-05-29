@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import roomescape.application.ServiceTest;
-import roomescape.application.reservation.dto.request.ReservationRequest;
+import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -48,7 +48,7 @@ class ReservationBookingServiceTest {
         ReservationTime reservationTime = reservation.getTime();
         Theme theme = reservation.getTheme();
 
-        ReservationRequest request = new ReservationRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
                 LocalDate.of(2024, 1, 1),
                 reservationTime.getId(),

@@ -31,7 +31,7 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@RequestBody @Valid ReservationRequest request) {
-        ReservationResponse response = reservationService.bookReservation(request);
+        ReservationResponse response = reservationService.bookReservationWithoutPurchase(request);
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location).body(response);
     }

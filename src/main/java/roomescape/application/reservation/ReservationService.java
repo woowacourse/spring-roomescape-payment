@@ -4,6 +4,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.payment.PaymentService;
+import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationWaitingResponse;
@@ -25,17 +27,20 @@ import roomescape.exception.reservation.WaitingListExceededException;
 public class ReservationService {
     private static final int MAX_WAITING_COUNT = 5;
 
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final Clock clock;
 
-    public ReservationService(ReservationRepository reservationRepository,
+    public ReservationService(PaymentService paymentService,
+                              ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
                               Clock clock) {
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -44,7 +49,22 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse bookReservation(ReservationRequest request) {
+    public ReservationResponse bookReservation(ReservationPaymentRequest request) {
+        Reservation reservation = getReservationFromRequest(request.toReservationRequest());
+        Reservation savedReservation = reservationRepository.save(reservation);
+        Theme theme = reservation.getTheme();
+        paymentService.purchase(savedReservation, request.toPaymentRequest(theme.getPrice()));
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse bookReservationWithoutPurchase(ReservationRequest request) {
+        Reservation reservation = getReservationFromRequest(request);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation getReservationFromRequest(ReservationRequest request) {
         if (reservationRepository.existsActiveReservation(
                 request.themeId(), request.date(), request.timeId())
         ) {
@@ -54,9 +74,7 @@ public class ReservationService {
         Theme theme = themeRepository.getById(request.themeId());
         ReservationTime time = reservationTimeRepository.getById(request.timeId());
         LocalDateTime now = LocalDateTime.now(clock);
-        Reservation reservation = new Reservation(member, theme, request.date(), time, now, BookStatus.BOOKED);
-        reservationRepository.save(reservation);
-        return ReservationResponse.from(reservation);
+        return new Reservation(member, theme, request.date(), time, now, BookStatus.BOOKED);
     }
 
     @Transactional
