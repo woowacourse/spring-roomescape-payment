@@ -1,11 +1,17 @@
 package roomescape.core.dto.payment;
 
+import roomescape.core.domain.Payment;
+
 public class PaymentConfirmResponse {
-    private Integer totalAmount;
+    private Long totalAmount;
     private String orderId;
     private String paymentKey;
 
-    public PaymentConfirmResponse(Integer totalAmount, String orderId, String paymentKey) {
+    public PaymentConfirmResponse(Payment payment) {
+        this(payment.getAmount(), payment.getOrderId(), payment.getPaymentKey());
+    }
+
+    public PaymentConfirmResponse(Long totalAmount, String orderId, String paymentKey) {
         this.totalAmount = totalAmount;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -14,7 +20,7 @@ public class PaymentConfirmResponse {
     public PaymentConfirmResponse() {
     }
 
-    public Integer getTotalAmount() {
+    public Long getTotalAmount() {
         return totalAmount;
     }
 

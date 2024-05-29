@@ -7,12 +7,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
 import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
@@ -55,10 +57,14 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(final ReservationRequest request) {
         final Reservation reservation = createReservation(request);
-        reservation.validateDateAndTime();
+        return saveAndResponseReservation(reservation);
+    }
 
-        final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation.getId(), savedReservation);
+    @Transactional
+    public ReservationResponse create(final ReservationRequest request,
+                                      final PaymentConfirmResponse paymentResponse) {
+        final Reservation reservation = createReservation(request, paymentResponse);
+        return saveAndResponseReservation(reservation);
     }
 
     private Reservation createReservation(final ReservationRequest request) {
@@ -66,15 +72,34 @@ public class ReservationService {
         final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
-        final String paymentKey = request.getPaymentKey();
-        final String orderId = request.getOrderId();
 
         final Reservation reservation
-                = new Reservation(member, date, reservationTime, theme, paymentKey, orderId);
+                = new Reservation(member, date, reservationTime, theme);
 
         validateDuplicatedReservation(reservation, reservationTime);
-
         return reservation;
+    }
+
+    private Reservation createReservation(final ReservationRequest request,
+                                          final PaymentConfirmResponse paymentResponse) {
+        final Member member = getMemberById(request.getMemberId());
+        final String date = request.getDate();
+        final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
+        final Theme theme = getThemeById(request.getThemeId());
+        final Payment payment = new Payment(paymentResponse.getPaymentKey(),
+                paymentResponse.getOrderId(), paymentResponse.getTotalAmount());
+
+        final Reservation reservation
+                = new Reservation(member, date, reservationTime, theme, payment);
+
+        validateDuplicatedReservation(reservation, reservationTime);
+        return reservation;
+    }
+
+    private ReservationResponse saveAndResponseReservation(Reservation reservation) {
+        reservation.validateDateAndTime();
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        return new ReservationResponse(savedReservation.getId(), savedReservation);
     }
 
     private Member getMemberById(final Long id) {

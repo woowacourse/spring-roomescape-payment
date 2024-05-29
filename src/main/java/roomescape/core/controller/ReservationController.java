@@ -43,13 +43,12 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody final ReservationPaymentRequest memberRequest,
             final LoginMember member) {
-        final PaymentConfirmResponse confirmResponse = getPaymentConfirmResponse(memberRequest);
+        final PaymentConfirmResponse paymentResponse = getPaymentConfirmResponse(memberRequest);
 
         final ReservationRequest request = new ReservationRequest(member.getId(),
-                memberRequest.getDate(), memberRequest.getTimeId(), memberRequest.getThemeId(),
-                confirmResponse.getPaymentKey(), confirmResponse.getOrderId());
+                memberRequest.getDate(), memberRequest.getTimeId(), memberRequest.getThemeId());
 
-        final ReservationResponse response = reservationService.create(request);
+        final ReservationResponse response = reservationService.create(request, paymentResponse);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);
     }
