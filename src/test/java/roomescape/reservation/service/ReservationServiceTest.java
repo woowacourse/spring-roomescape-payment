@@ -1,16 +1,17 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.system.exception.model.DataDuplicateException;
-import roomescape.system.exception.model.NotFoundException;
-import roomescape.system.exception.model.ValidateException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
@@ -19,15 +20,11 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.model.ValidateException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.service.ThemeService;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -56,7 +53,8 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"), member.getId()))
+                new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId()))
                 .isInstanceOf(ValidateException.class);
     }
 
@@ -71,7 +69,8 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"), member.getId()))
+                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
+                        "orderId", "amount", "paymentType"), member.getId()))
                 .isInstanceOf(ValidateException.class);
     }
 
@@ -86,7 +85,8 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"),
+                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
+                        "orderId", "amount", "paymentType"),
                 NotExistMemberId))
                 .isInstanceOf(NotFoundException.class);
     }

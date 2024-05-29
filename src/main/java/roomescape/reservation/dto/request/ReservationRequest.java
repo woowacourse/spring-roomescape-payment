@@ -20,13 +20,4 @@ public record ReservationRequest(
         String amount,
         String paymentType
 ) {
-
-    public Reservation toEntity(
-            final ReservationTime reservationTime,
-            final Theme theme,
-            final Member member,
-            final ReservationStatus status
-    ) {
-        return new Reservation(this.date, reservationTime, theme, member, status);
-    }
 }

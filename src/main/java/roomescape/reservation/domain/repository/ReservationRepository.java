@@ -26,8 +26,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
 
     List<Reservation> findByDateAndTheme(LocalDate date, Theme theme);
 
-    List<Reservation> findByMember(Member member);
-
     @Query("SELECT new roomescape.reservation.domain.WaitingWithRank(" +
             "    w, " +
             "    (SELECT COUNT(w2) " +
