@@ -179,6 +179,7 @@ function onReservationButtonClick(event, paymentWidget) {
       amount: 1000,
     }).then(function (data) {
       console.debug(data);
+      alert(data.paymentKey)
       fetchReservationPayment(data, reservationData);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
