@@ -7,6 +7,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.request.PaymentConfirmRequest;
+import roomescape.reservation.dto.request.ReservationDetailRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.dto.response.MemberReservationResponse;
@@ -35,13 +36,24 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse save(ReservationSaveRequest saveRequest) {
-        Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
-        reservationSchedulerService.validateSaveReservation(reservation);
-        paymentService.confirmPayment(PaymentConfirmRequest.from(saveRequest));
-        Reservation savedReservation = reservationRepository.save(reservation);
+    public ReservationResponse save(ReservationDetailRequest detailRequest, long memberId) {
+        ReservationSaveRequest saveRequest = ReservationSaveRequest.of(detailRequest, memberId);
+        Reservation savedReservation = createReservation(saveRequest);
+        paymentService.confirmPayment(PaymentConfirmRequest.from(detailRequest));
 
         return ReservationResponse.toResponse(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponse saveByAdmin(ReservationSaveRequest saveRequest) {
+        Reservation savedReservation = createReservation(saveRequest);
+        return ReservationResponse.toResponse(savedReservation);
+    }
+
+    private Reservation createReservation(ReservationSaveRequest saveRequest) {
+        Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
+        reservationSchedulerService.validateSaveReservation(reservation);
+        return reservationRepository.save(reservation);
     }
 
     public ReservationResponse findById(Long id) {
