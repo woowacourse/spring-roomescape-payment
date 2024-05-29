@@ -13,5 +13,8 @@ public record ReservationRequest(
         @Positive(message = "[ERROR] timeId의 값이 1보다 작을 수 없습니다.")
         long timeId,
         @Positive(message = "[ERROR] themeId의 값이 1보다 작을 수 없습니다.")
-        long themeId) {
+        long themeId,
+        String orderId,
+        String paymentKey,
+        long amount) {
 }

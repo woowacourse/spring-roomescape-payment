@@ -55,7 +55,7 @@ class ReservationControllerTest {
 
     @DisplayName("사용자가 예약을 추가할 수 있다.")
     @Test
-    void should_insert_reservation_when_member_request() {
+    void should_insert_reservation_whenT_member_request() {
         MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
 
         String cookie = RestAssured
@@ -67,7 +67,8 @@ class ReservationControllerTest {
                 .extract().header("Set-Cookie");
 
         ReservationRequest request = new ReservationRequest(
-                LocalDate.of(2030, 8, 5), 6L, 10L);
+                LocalDate.of(2030, 8, 5), 6L, 10L,
+                "asdfsdf", "dfadf", 1999999);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -119,7 +120,8 @@ class ReservationControllerTest {
                 .extract().header("Set-Cookie");
 
         ReservationRequest request = new ReservationRequest(
-                LocalDate.of(2030, 8, 5), 6L, 10L);
+                LocalDate.of(2030, 8, 5), 6L, 10L,
+                "asdfsdf", "dfadf", 1999999);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

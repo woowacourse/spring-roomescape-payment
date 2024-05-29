@@ -1,12 +1,15 @@
 package roomescape.service;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import roomescape.controller.request.AdminReservationRequest;
+import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.PaymentException;
 import roomescape.model.Member;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTime;
@@ -17,26 +20,32 @@ import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @Service
 public class ReservationService {
+
+    private final static long RESERVATION_PRICE = 1999999;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final RestClient restClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository, MemberRepository memberRepository) {
+                              ThemeRepository themeRepository,
+                              MemberRepository memberRepository,
+                              RestClient restClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.restClient = restClient;
     }
 
     public List<Reservation> findAllReservations() {
@@ -54,6 +63,8 @@ public class ReservationService {
 
     @Transactional
     public Reservation addReservation(ReservationRequest request, Member member) {
+        confirmPayments(request.paymentKey(), request.orderId(), request.amount());
+
         ReservationTime reservationTime = findReservationTime(request.date(), request.timeId(),
                 request.themeId());
         Theme theme = themeRepository.findById(request.themeId())
@@ -61,6 +72,27 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
+    }
+
+    private void confirmPayments(String paymentKey, String orderId, Long amount) {
+        validatePayments(amount);
+        restClient.post()
+                .uri("/confirm")
+                .contentType(APPLICATION_JSON)
+                .body(new PaymentRequest(paymentKey, orderId, amount))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new PaymentException("결제 정보가 일치하지 않습니다.");
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new PaymentException("결제 시스템이 원활하게 동작하지 않습니다.");
+                }).toBodilessEntity();
+    }
+
+    private void validatePayments(long amount) {
+        if (RESERVATION_PRICE != amount) {
+            throw new PaymentException("클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [%d]".formatted(amount));
+        }
     }
 
     @Transactional

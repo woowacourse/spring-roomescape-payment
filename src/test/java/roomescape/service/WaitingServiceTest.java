@@ -177,7 +177,7 @@ class WaitingServiceTest {
         memberRepository.save(new Member(1L, "배키", MEMBER, "dmsgml@email.com", "2222"));
         Member member = memberRepository.findById(1L).orElseThrow();
 
-        ReservationRequest reservationRequest = new ReservationRequest(now().plusDays(2), 1L, 1L);
+        ReservationRequest reservationRequest = new ReservationRequest(now().plusDays(2), 1L, 1L, "adfsdaf", "asdf", 111);
         reservationService.addReservation(reservationRequest, member);
 
         WaitingRequest request = new WaitingRequest(now().plusDays(2), 1L, 1L);

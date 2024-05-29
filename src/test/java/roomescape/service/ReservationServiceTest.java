@@ -101,7 +101,7 @@ class ReservationServiceTest {
         memberRepository.save(new Member(1L, "배키", MEMBER, "dmsgml@email.com", "2222"));
         Member member = memberRepository.findById(1L).orElseThrow();
 
-        ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L);
+        ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L, "adfadsf", "asdfas", 1999999);
 
         reservationService.addReservation(request, member);
 
@@ -190,7 +190,7 @@ class ReservationServiceTest {
         themeRepository.save(new Theme(1L, "name1", "description1", "thumbnail1"));
         reservationTimeRepository.save(new ReservationTime(1L, LocalTime.of(10, 0)));
         ReservationRequest request =
-                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L);
+                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234);
         Member member = new Member(1L, "썬", MEMBER, "sun@email.com", "1111");
 
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
@@ -208,7 +208,7 @@ class ReservationServiceTest {
         reservationTimeRepository.save(new ReservationTime(LocalTime.now()));
 
         ReservationRequest request =
-                new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L);
+                new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 10000);
 
         assertThatCode(() -> reservationService.addReservation(request, member))
                 .doesNotThrowAnyException();
@@ -231,7 +231,7 @@ class ReservationServiceTest {
         reservationRepository.save(new Reservation(1L, date, reservationTime, theme1, member));
         reservationRepository.save(new Reservation(2L, now().plusDays(1), reservationTime, theme2, member));
 
-        ReservationRequest request = new ReservationRequest(date, 1L, 1L);
+        ReservationRequest request = new ReservationRequest(date, 1L, 1L, "orderId", "paymentKey", 1234);
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
