@@ -34,16 +34,9 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponse> handleAccessUnauthorizedException(final UnauthorizedException e) {
+    protected ResponseEntity<ErrorResponse> handleAccessUnauthorizedException(final CustomException e) {
         log.error(e.getMessage());
-        return ResponseEntity.status(UNAUTHORIZED)
-                .body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler
-    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(final AccessDeniedException e) {
-        log.error(e.getMessage());
-        return ResponseEntity.status(FORBIDDEN)
+        return ResponseEntity.status(e.getHttpStatus())
                 .body(new ErrorResponse(e.getMessage()));
     }
 
