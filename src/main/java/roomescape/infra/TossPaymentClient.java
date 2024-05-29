@@ -1,4 +1,4 @@
-package roomescape.infra.payment;
+package roomescape.infra;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
@@ -8,23 +8,26 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.application.PaymentClient;
 import roomescape.application.dto.request.PaymentRequest;
+import roomescape.application.dto.response.PaymentErrorResponse;
+import roomescape.application.dto.response.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 @Component
-public class PaymentClient {
+public class TossPaymentClient implements PaymentClient {
 
     private final String encodedSecretKey;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentClient(
-            @Value("${payment.base-url}") String paymentBaseUrl,
+    public TossPaymentClient(
             @Value("${payment.secret-key}") String secretKey,
+            RestClient restClient,
             ObjectMapper objectMapper
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
-        this.restClient = RestClient.builder().baseUrl(paymentBaseUrl).build();
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 

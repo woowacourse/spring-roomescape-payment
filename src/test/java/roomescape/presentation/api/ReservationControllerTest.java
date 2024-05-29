@@ -17,6 +17,7 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
+import roomescape.application.PaymentClient;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.MyReservationResponse;
 import roomescape.application.dto.response.ReservationResponse;
@@ -35,8 +36,8 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
-import roomescape.infra.payment.PaymentClient;
-import roomescape.infra.payment.PaymentResponse;
+import roomescape.application.dto.response.PaymentResponse;
+import roomescape.infra.TossPaymentClient;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.ReservationWebRequest;
 

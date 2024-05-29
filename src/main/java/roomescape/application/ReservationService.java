@@ -19,7 +19,6 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
-import roomescape.infra.payment.PaymentClient;
 
 @Service
 @Transactional(readOnly = true)

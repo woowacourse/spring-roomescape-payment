@@ -37,8 +37,7 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
-import roomescape.infra.payment.PaymentClient;
-import roomescape.infra.payment.PaymentResponse;
+import roomescape.application.dto.response.PaymentResponse;
 
 class ReservationServiceTest extends BaseServiceTest {
 
