@@ -77,7 +77,7 @@ class PaymentServiceTest extends ServiceTest {
         doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
 
         //when
-        paymentService.approvePayment(paymentRequest, memberReservation);
+        paymentService.pay(paymentRequest, memberReservation);
 
         //then
         Optional<Payment> optionalPayment = paymentRepository.findByPaymentKey(paymentKey);
@@ -99,7 +99,7 @@ class PaymentServiceTest extends ServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then
-        assertThatThrownBy(() -> paymentService.approvePayment(paymentRequest, memberReservation))
+        assertThatThrownBy(() -> paymentService.pay(paymentRequest, memberReservation))
                 .isInstanceOf(PaymentException.class);
     }
 }
