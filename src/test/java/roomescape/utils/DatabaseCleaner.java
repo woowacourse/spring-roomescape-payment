@@ -62,8 +62,10 @@ public class DatabaseCleaner {
     }
 
     private void resetIdColumn(final String tableName) {
-        entityManager.createNativeQuery(String.format(ALTER_COLUMN_ID, tableName))
-                .executeUpdate();
+        if (!tableName.equals("payment")) {
+            entityManager.createNativeQuery(String.format(ALTER_COLUMN_ID, tableName))
+                    .executeUpdate();
+        }
     }
 
     private void enableIntegrity() {
