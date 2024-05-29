@@ -118,7 +118,7 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ReservationResponse.class);
 
-        assertThat(reservations.size()).isEqualTo(16);
+        assertThat(reservations).hasSize(16);
     }
 
     @DisplayName("관리자가 아닌 클라이언트가 예약 정보를 삭제하려고 하면 에러 코드가 응답된다.")
@@ -182,7 +182,7 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ReservationTimeResponse.class);
 
-        assertThat(reservationTimes.size()).isEqualTo(7);
+        assertThat(reservationTimes).hasSize(7);
     }
 
     @DisplayName("관리자가 아닌 클라이언트가 예약 시간 정보를 삭제하려고 하면 예외를 발생시킨다.")
@@ -252,7 +252,7 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ThemeResponse.class);
 
-        assertThat(themes.size()).isEqualTo(14);
+        assertThat(themes).hasSize(14);
     }
 
     @DisplayName("관리자가 아닌 클라이언트가 테마 정보를 삭제하려고 하면 예외를 발생시킨다.")

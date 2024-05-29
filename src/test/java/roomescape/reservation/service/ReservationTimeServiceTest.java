@@ -44,8 +44,8 @@ class ReservationTimeServiceTest {
         final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(startAt);
 
         // When
-        final ReservationTimeDto reservationTime = reservationTimeService.saveReservationTime(
-                saveReservationTimeRequest);
+        final ReservationTimeDto reservationTime =
+                reservationTimeService.saveReservationTime(saveReservationTimeRequest);
 
         // Then
         final List<ReservationTimeDto> reservationTimes = reservationTimeService.getReservationTimes();
@@ -105,7 +105,7 @@ class ReservationTimeServiceTest {
         final Map<ReservationTime, Boolean> values = availableReservationTimes.values();
         Assertions.assertAll(
                 () -> assertThat(values).hasSize(8),
-                () -> assertThat(values.values().contains(false)).isTrue()
+                () -> assertThat(values).containsValue(false)
         );
     }
 }

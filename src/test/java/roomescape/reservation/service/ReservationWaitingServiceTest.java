@@ -82,8 +82,8 @@ class ReservationWaitingServiceTest {
     @Test
     void saveDuplicateReservationWaitingTest() {
         // Given
-        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(
-                LocalDate.now().plusDays(6), 2L, 3L, 8L);
+        final SaveReservationWaitingRequest saveReservationWaitingRequest =
+                new SaveReservationWaitingRequest(LocalDate.now().plusDays(6), 2L, 3L, 8L);
 
         // When & Then
         assertThatThrownBy(() -> reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest))

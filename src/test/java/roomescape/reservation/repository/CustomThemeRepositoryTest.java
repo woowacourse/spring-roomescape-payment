@@ -33,7 +33,7 @@ class CustomThemeRepositoryTest {
 
         // Then
         assertAll(
-                () -> assertThat(popularThemes.size()).isLessThanOrEqualTo(10),
+                () -> assertThat(popularThemes).hasSizeLessThanOrEqualTo(10),
                 () -> assertThat(popularThemes.get(0).getId()).isEqualTo(1),
                 () -> assertThat(popularThemes.get(1).getId()).isEqualTo(2),
                 () -> assertThat(popularThemes.get(2).getId()).isEqualTo(10)

@@ -26,7 +26,7 @@ class ReservationTimeRepositoryTest {
         final Optional<ReservationTime> reservationTime = reservationTimeRepository.findById(reservationTimeId);
 
         // Then
-        assertThat(reservationTime.isPresent()).isTrue();
+        assertThat(reservationTime).isPresent();
     }
 
     @DisplayName("모든 예약 시간을 조회한다.")

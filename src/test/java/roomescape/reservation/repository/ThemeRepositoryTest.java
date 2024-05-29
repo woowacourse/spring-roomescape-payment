@@ -25,7 +25,7 @@ class ThemeRepositoryTest {
         final Optional<Theme> theme = themeRepository.findById(themeId);
 
         // Then
-        assertThat(theme.isPresent()).isTrue();
+        assertThat(theme).isPresent();
     }
 
     @DisplayName("모든 테마 정보를 조회한다.")

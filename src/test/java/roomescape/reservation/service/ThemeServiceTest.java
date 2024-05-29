@@ -2,9 +2,9 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ class ThemeServiceTest {
 
         // Then
         final List<ThemeDto> themes = themeService.getThemes();
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(themes).hasSize(16),
                 () -> assertThat(theme.id()).isEqualTo(16L),
                 () -> assertThat(theme.name().getValue()).isEqualTo(name),
@@ -83,7 +83,7 @@ class ThemeServiceTest {
         final List<ThemeDto> popularThemes = themeService.getPopularThemes();
 
         // Then
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(popularThemes).hasSize(7),
                 () -> assertThat(popularThemes.get(0).id()).isEqualTo(1L)
         );

@@ -33,7 +33,7 @@ class TokenProviderTest {
 
         assertAll(
                 () -> assertThat(Long.parseLong(tokenProvider.getTokenClaims(token).getSubject())).isEqualTo(memberId),
-                () -> assertThat(tokenProvider.getTokenClaims(token).get("role")).isEqualTo(role.name()),
+                () -> assertThat(tokenProvider.getTokenClaims(token)).containsEntry("role", role.name()),
                 () -> assertThat(expirationPeriod).isEqualTo(7)
         );
     }

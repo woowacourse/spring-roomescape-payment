@@ -1,6 +1,7 @@
 package roomescape.reservation.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,14 +36,16 @@ class ReservationTimeAvailabilitiesTest {
         );
 
         // When
-        final ReservationTimeAvailabilities reservationTimeAvailabilities = ReservationTimeAvailabilities.of(
-                reservationTimes, reservations);
+        final ReservationTimeAvailabilities reservationTimeAvailabilities =
+                ReservationTimeAvailabilities.of(reservationTimes, reservations);
 
         // Then
         final Map<ReservationTime, Boolean> values = reservationTimeAvailabilities.values();
-        assertThat(values.get(reservationTime1)).isTrue();
-        assertThat(values.get(reservationTime2)).isTrue();
-        assertThat(values.get(reservationTime3)).isTrue();
-        assertThat(values.get(notBookedTime)).isFalse();
+        assertAll(
+                () -> assertThat(values.get(reservationTime1)).isTrue(),
+                () -> assertThat(values.get(reservationTime2)).isTrue(),
+                () -> assertThat(values.get(reservationTime3)).isTrue(),
+                () -> assertThat(values.get(notBookedTime)).isFalse()
+        );
     }
 }

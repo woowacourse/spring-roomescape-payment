@@ -73,8 +73,8 @@ class CustomReservationRepositoryTest {
         final long themeId = 11L;
         final LocalDate from = LocalDate.now().minusDays(7);
         final LocalDate to = LocalDate.now().plusDays(1);
-        final SearchReservationsParams searchReservationsParams = new SearchReservationsParams(memberId, themeId, from,
-                to);
+        final SearchReservationsParams searchReservationsParams =
+                new SearchReservationsParams(memberId, themeId, from, to);
 
         // When
         final List<Reservation> reservations = customReservationRepository.searchReservations(searchReservationsParams);
