@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.util.Fixture.TODAY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,12 +12,18 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
+import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.service.PaymentService;
 import roomescape.util.CookieUtils;
 
 class ReservationApiControllerTest extends IntegrationTest {
+
+    @MockBean
+    private PaymentService paymentService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,7 +84,10 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, 1L, 1L);
+        ReservationSaveRequest reservationSaveRequest
+                = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
+
+        doNothing().when(paymentService).payment(PaymentRequest.from(reservationSaveRequest));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

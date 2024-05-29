@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
@@ -37,6 +38,9 @@ import roomescape.reservation.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class ReservationServiceTest {
+
+    @MockBean
+    private PaymentService paymentService;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;

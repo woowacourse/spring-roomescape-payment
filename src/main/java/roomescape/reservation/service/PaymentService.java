@@ -24,12 +24,11 @@ public class PaymentService {
     private static final String KEY_PREFIX = "Basic ";
 
     private final RestClient restClient;
+    private final String paymentSecretKey;
 
-    @Value("${payment.secret-key}")
-    private String PAYMENT_SECRET_KEY;
-
-    public PaymentService(RestClient restClient) {
+    public PaymentService(RestClient restClient, @Value("${payment.secret-key}") String paymentSecretKey) {
         this.restClient = restClient;
+        this.paymentSecretKey = paymentSecretKey;
     }
 
     public void payment(PaymentRequest paymentRequest) {
@@ -46,7 +45,7 @@ public class PaymentService {
 
     private String createAuthorizations() {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode(("PAYMENT_SECRET_KEY" + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((paymentSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return KEY_PREFIX + new String(encodedBytes);
     }
 

@@ -23,3 +23,6 @@ security:
   jwt:
     secret-key: eyJhbGciOiJIeyJzdWIilowafgfaoTazAGa
     expiration-time: 36000000
+
+payment:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
