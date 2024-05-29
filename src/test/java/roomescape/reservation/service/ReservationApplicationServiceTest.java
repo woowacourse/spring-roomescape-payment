@@ -63,7 +63,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
-        doReturn(okResponse).when(paymentClient).confirm(any(),anyString());
+        doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
 
     }
 
@@ -165,5 +165,20 @@ class ReservationApplicationServiceTest extends ServiceTest {
                 () -> assertThat(optionalMemberReservation.get()
                         .getReservationStatus()).isEqualTo(ReservationStatus.NOT_PAID)
         );
+    }
+
+    @DisplayName("예약 삭제 시, 환불된다.")
+    @Test
+    void deleteRefund() {
+        //given
+        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        MemberReservation memberReservation = memberReservationRepository.save(
+                new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+
+        //when
+        reservationApplicationService.delete(reservation.getId());
+
+        //then
+        assertThat(paymentRepository.findByMemberReservationId(memberReservation.getId())).isEmpty();
     }
 }

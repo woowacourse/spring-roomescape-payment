@@ -1,5 +1,8 @@
 package roomescape.payment.service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,6 +31,20 @@ public class PaymentClient {
             PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(paymentResponse);
         }
-
+    }
+    public ResponseEntity<PaymentResponse> cancel(String paymentKey,String encodeKey) {
+        try {
+            Map<String,String > params = new HashMap<>();
+            String cancelReason = "단순 변심";
+            params.put("cancelReason",cancelReason);
+            return restClient.post()
+                    .uri(String.format("https://api.tosspayments.com/v1/payments/%s/cancel",paymentKey))
+                    .header("Authorization", encodeKey)
+                    .body(params)
+                    .retrieve().toEntity(PaymentResponse.class);
+        }catch (HttpClientErrorException e){
+            PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
+            throw new PaymentException(paymentResponse);
+        }
     }
 }

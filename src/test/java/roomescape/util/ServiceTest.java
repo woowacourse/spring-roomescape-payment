@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -32,6 +33,9 @@ public class ServiceTest {
 
     @Autowired
     protected MemberReservationRepository memberReservationRepository;
+
+    @Autowired
+    protected PaymentRepository paymentRepository;
 
     @MockBean
     protected PaymentClient paymentClient;
