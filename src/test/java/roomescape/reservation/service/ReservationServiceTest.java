@@ -83,7 +83,8 @@ class ReservationServiceTest {
         themeRepository.save(reservation.getTheme());
         memberRepository.save(reservation.getMember());
         ReservationRequest reservationRequest = new ReservationRequest(reservation.getDate(),
-                reservation.getReservationTime().getId(), reservation.getTheme().getId());
+                reservation.getReservationTime().getId(), reservation.getTheme().getId(),
+                "paymentType", "paymentKey", "orderId", 1000);
 
         ReservationResponse reservationResponse = reservationService
                 .addReservation(new RegistrationDto(
@@ -146,7 +147,8 @@ class ReservationServiceTest {
         memberRepository.save(reservation.getMember());
         reservationRepository.save(reservation);
 
-        ReservationRequest reservationRequest = new ReservationRequest(BEFORE, 1L, 1L);
+        ReservationRequest reservationRequest = new ReservationRequest(BEFORE, 1L, 1L,
+                "paymentType", "paymentKey", "orderId", 0);
 
         Throwable pastDateReservation = assertThrows(RoomEscapeException.class,
                 () -> reservationService.addReservation(new RegistrationDto(
