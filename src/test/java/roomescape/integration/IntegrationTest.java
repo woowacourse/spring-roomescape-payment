@@ -12,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.config.TestConfig;
 import roomescape.helper.CookieProvider;
 import roomescape.helper.DatabaseCleaner;
 import roomescape.helper.domain.MemberFixture;
@@ -20,12 +22,17 @@ import roomescape.helper.domain.ReservationFixture;
 import roomescape.helper.domain.ReservationTimeFixture;
 import roomescape.helper.domain.ThemeFixture;
 import roomescape.helper.domain.WaitingFixture;
+import roomescape.service.payment.PaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(TestConfig.class)
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
     @LocalServerPort
     int port;
+
+    @Autowired
+    protected PaymentClient paymentClient;
 
     @Autowired
     protected DatabaseCleaner databaseCleaner;
