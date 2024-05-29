@@ -9,7 +9,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.dto.ErrorResponse;
-import roomescape.dto.PaymentErrorResponse;
 
 @ControllerAdvice
 public class RoomescapeExceptionHandler {
@@ -37,10 +36,10 @@ public class RoomescapeExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<PaymentErrorResponse> handle(PaymentException e) {
+    public ResponseEntity<ErrorResponse> handle(PaymentException e) {
         e.printStackTrace();
         return ResponseEntity.status(e.getHttpStatusCode())
-                .body(e.getPaymentErrorResponse());
+                .body(new ErrorResponse(e.getErrorMessage()));
     }
 
     @ExceptionHandler(Exception.class)

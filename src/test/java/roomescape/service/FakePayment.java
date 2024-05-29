@@ -1,7 +1,6 @@
 package roomescape.service;
 
 import org.springframework.http.HttpStatusCode;
-import roomescape.dto.PaymentErrorResponse;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
 
@@ -20,7 +19,6 @@ public class FakePayment implements PaymentClient {
                 && CORRECT_REQ.amount() == paymentRequest.amount()) {
             return;
         }
-        throw new PaymentException(new PaymentErrorResponse("BAD_REQUEST", "잘못된 요청입니다."),
-                HttpStatusCode.valueOf(400));
+        throw new PaymentException(HttpStatusCode.valueOf(400), "잘못된 요청입니다.");
     }
 }

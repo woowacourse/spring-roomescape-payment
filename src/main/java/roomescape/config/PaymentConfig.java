@@ -10,7 +10,7 @@ import roomescape.service.PaymentClient;
 public class PaymentConfig {
 
     @Bean
-    public PaymentClient tossPaymentClient() {
+    public PaymentClient getTossPaymentClient() {
         return new TossPaymentClient(RestClient.builder().baseUrl("https://api.tosspayments.com").build());
     }
 }

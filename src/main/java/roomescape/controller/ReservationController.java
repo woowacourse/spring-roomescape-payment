@@ -33,8 +33,10 @@ public class ReservationController {
 
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> saveReservation(@Authenticated LoginMemberRequest loginMemberRequest,
-                                                               @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest) {
+    public ResponseEntity<ReservationResponse> saveReservation(
+            @Authenticated LoginMemberRequest loginMemberRequest,
+            @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest
+    ) {
         paymentService.pay(PaymentRequest.from(reservationWithPaymentRequest));
 
         ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,

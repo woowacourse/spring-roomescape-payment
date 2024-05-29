@@ -30,7 +30,7 @@ public class TossPaymentClient implements PaymentClient {
     @Override
     public void pay(PaymentRequest paymentRequest) {
         try {
-            PaymentResponse body = restClient.post()
+            restClient.post()
                     .uri("v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -38,7 +38,7 @@ public class TossPaymentClient implements PaymentClient {
                     .retrieve()
                     .body(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
-            throw new PaymentException(e.getResponseBodyAs(PaymentErrorResponse.class), e.getStatusCode());
+            throw new PaymentException(e.getStatusCode(), e.getResponseBodyAs(PaymentErrorResponse.class).message());
         }
     }
 }
