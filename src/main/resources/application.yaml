@@ -27,3 +27,8 @@ security:
         expire-length: 1800000 # 30 분
       refresh:
         expire-length: 604800000 # 7일
+
+payment:
+  widget:
+    confirm:
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
