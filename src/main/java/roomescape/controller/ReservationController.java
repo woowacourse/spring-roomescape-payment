@@ -2,9 +2,7 @@ package roomescape.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.Base64;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,51 +12,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
-import roomescape.domain.PaymentInfo;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.MemberReservationRequest;
 import roomescape.dto.response.ReservationMineResponse;
 import roomescape.dto.response.ReservationResponse;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    @Value("atto.ash.secret-key")
-    private String secretKey;
-
-    private final RestClient restClient;
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(RestClient restClient, ReservationService reservationService) {
-        this.restClient = restClient;
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservationByClient(
             @Valid @RequestBody MemberReservationRequest memberRequest, LoginMember member) {
         ReservationResponse reservationResponse = reservationService.createByClient(member.id(), memberRequest);
-        payment(memberRequest);
+        paymentService.payment(memberRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
-    }
-
-    private PaymentInfo payment(MemberReservationRequest memberReservationRequest) {
-        int amount = memberReservationRequest.amount();
-        String orderId = memberReservationRequest.orderId();
-        String paymentKey = memberReservationRequest.paymentKey();
-
-        PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
-        String base64SecretKey = Base64.getEncoder().encodeToString((secretKey).getBytes());
-        return restClient.post()
-                .uri("https://api.tosspayments.com/v1/payments/confirm")
-                .header("Authorization", "Basic " + base64SecretKey)
-                .body(paymentInfo)
-                .retrieve()
-                .body(PaymentInfo.class);
     }
 
     @GetMapping
@@ -78,7 +57,8 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationMineResponse>> findMyReservations(LoginMember loginMember) {
-        List<ReservationMineResponse> myReservationsAndWaitings = reservationService.findMyReservationsAndWaitings(loginMember);
+        List<ReservationMineResponse> myReservationsAndWaitings = reservationService
+                .findMyReservationsAndWaitings(loginMember);
         return ResponseEntity.ok(myReservationsAndWaitings);
     }
 
