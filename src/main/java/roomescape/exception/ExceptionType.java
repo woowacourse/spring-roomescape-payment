@@ -1,10 +1,10 @@
 package roomescape.exception;
 
-import org.springframework.http.HttpStatus;
-
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+import org.springframework.http.HttpStatus;
 
 public enum ExceptionType {
 
@@ -33,7 +33,10 @@ public enum ExceptionType {
     INVALID_TOKEN(UNAUTHORIZED, "잘못된 토큰입니다. 다시 로그인하세요"),
     NO_AUTHORITY(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     ENCRYPT_FAIL(INTERNAL_SERVER_ERROR, "비밀번호 암호화에 실패하였습니다."),
-    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다.");
+    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다."),
+
+    CLIENT_ERROR(BAD_REQUEST, "사용자 잘못"),
+    PAYMENT_SERVER_ERROR(INTERNAL_SERVER_ERROR, "토스 잘못");
 
     private final HttpStatus status;
     private final String message;
@@ -43,11 +46,11 @@ public enum ExceptionType {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public HttpStatus getStatus() {
         return status;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
