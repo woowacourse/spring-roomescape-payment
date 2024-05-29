@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
 import roomescape.reservation.controller.dto.MyReservationResponse;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
@@ -44,6 +45,13 @@ public class ReservationController {
     ) {
         return ResponseEntity.ok(reservationApplicationService.findMemberReservations(
                 new ReservationQueryRequest(themeId, memberId, startDate, endDate)));
+    }
+
+    @PostMapping("/payment")
+    public ResponseEntity<ReservationResponse> pay(@LoginUser AuthInfo authInfo,
+                                                   @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
+        ReservationResponse response = reservationApplicationService.publish(authInfo, reservationPaymentRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping

@@ -51,6 +51,12 @@ public class ReservationCommonService {
         }
     }
 
+    public void validateMemberReservation(MemberReservation memberReservation, Member member) {
+        if (!memberReservation.getMember().equals(member)) {
+            throw new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER);
+        }
+    }
+
     public void delete(Member member, MemberReservation memberReservation) {
         if (!memberReservation.canDelete(member)) {
             throw new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER);

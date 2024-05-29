@@ -50,6 +50,9 @@ public class MemberReservation extends BaseEntity {
     }
 
     public void approve() {
+        if(this.reservationStatus != ReservationStatus.NOT_PAID){
+            throw new IllegalStateException("결제 대기 상태에서만 가능합니다.");
+        }
         this.reservationStatus = ReservationStatus.APPROVED;
     }
 

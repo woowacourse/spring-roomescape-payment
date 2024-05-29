@@ -7,6 +7,7 @@ import roomescape.auth.domain.AuthInfo;
 import roomescape.member.domain.Member;
 import roomescape.payment.PaymentRequest;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -48,6 +49,24 @@ public class ReservationApplicationService {
     public List<MyReservationInfo> findMyReservations(AuthInfo authInfo) {
         Member member = reservationCommonService.getMember(authInfo.getId());
         return memberReservationService.findMyReservations(member);
+    }
+
+    @Transactional
+    public ReservationResponse publish(AuthInfo authInfo, ReservationPaymentRequest reservationPaymentRequest) {
+        Member member = reservationCommonService.getMember(authInfo.getId());
+        MemberReservation memberReservation = reservationCommonService.getMemberReservation(
+                reservationPaymentRequest.memberReservationId());
+
+        reservationCommonService.validateMemberReservation(memberReservation, member);
+        reservationCommonService.validatePastReservation(memberReservation.getReservation());
+
+        memberReservation.approve();
+
+        paymentService.approvePayment(
+                new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
+                        reservationPaymentRequest.paymentKey()), memberReservation);
+
+        return ReservationResponse.from(memberReservation);
     }
 
     @Transactional
