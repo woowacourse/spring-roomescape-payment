@@ -1,14 +1,15 @@
 package roomescape.payment.dto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import roomescape.member.model.Member;
 import roomescape.payment.model.PaymentHistory;
 import roomescape.payment.model.PaymentStatus;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 public class PaymentConfirmResponse {
+
+    private static final String PAYMENT_PROVIDER_KEY = "provider";
 
     private final String orderId;
     private final String status;
@@ -30,12 +31,11 @@ public class PaymentConfirmResponse {
         this.orderName = orderName;
         this.totalAmount = totalAmount;
         this.approvedAt = convertLocalDateTime(approvedAt);
-        this.paymentProvider = easyPay.get("provider");
+        this.paymentProvider = easyPay.get(PAYMENT_PROVIDER_KEY);
     }
 
     private LocalDateTime convertLocalDateTime(final String approvedAt) {
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(approvedAt);
-        return offsetDateTime.toLocalDateTime();
+        return LocalDateTime.parse(approvedAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public PaymentHistory toPaymentHistory(final Member member) {
