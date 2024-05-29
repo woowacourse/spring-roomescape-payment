@@ -2,23 +2,22 @@ package roomescape.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.TossPaymentClientErrorHandler;
-import roomescape.service.PaymentService;
 
 @Configuration
 public class ClientConfig {
-    private final TossPaymentClientErrorHandler tossPaymentClientErrorHandler;
 
-    public ClientConfig(TossPaymentClientErrorHandler tossPaymentClientErrorHandler) {
-        this.tossPaymentClientErrorHandler = tossPaymentClientErrorHandler;
-    }
+    private static final int CONNECT_TIMEOUT_MILLISECONDS = 60000;
+    private static final int CONNECTION_REQUEST_TIMEOUT_MILLISECONDS = 30000;
 
     @Bean
-    public PaymentService paymentService() {
-        return new PaymentService(
-                RestClient.builder().baseUrl("https://api.tosspayments.com").build(),
-                tossPaymentClientErrorHandler
-        );
+    public RestClient restClient() {
+        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(CONNECT_TIMEOUT_MILLISECONDS);
+        clientHttpRequestFactory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT_MILLISECONDS);
+        return RestClient.builder()
+                .requestFactory(clientHttpRequestFactory)
+                .build();
     }
 }
