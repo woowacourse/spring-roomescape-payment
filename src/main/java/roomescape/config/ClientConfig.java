@@ -17,8 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ClientConfig {
 
-    private static final int CONNECTION_TIMEOUT_MS = 10;
-    private static final int READ_TIMEOUT_MS = 30;
+    private static final int CONNECTION_TIMEOUT_MS = 30_000;
+    private static final int READ_TIMEOUT_MS = 30_000;
 
     @Bean
     public RestClient restClient(@Value("${payment.base-url}") String paymentBaseUrl) {
