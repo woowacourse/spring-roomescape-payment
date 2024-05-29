@@ -38,7 +38,6 @@ public class ReservationController {
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
                 reservationRequest.themeId(), reservationRequest.approveRequest());
-        // 결제 성공하면 이후 진행
         paymentService.approve(reservationRequest.approveRequest(), memberId);
         ReservationResponse saved = reservationService.save(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
