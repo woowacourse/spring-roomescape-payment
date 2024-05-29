@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
 @Component
-public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
+class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
 
     public PaymentApiResponseErrorHandler(ObjectMapper objectMapper) {
@@ -25,8 +25,7 @@ public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         byte[] bytes = response.getBody().readAllBytes();
         String rawResponseBody = new String(bytes);
-        ApproveApiError apiError = objectMapper.readValue(rawResponseBody,
-                ApproveApiError.class);
+        ApproveApiError apiError = objectMapper.readValue(rawResponseBody, ApproveApiError.class);
         throw new ApiCallException(apiError);
     }
 }
