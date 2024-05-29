@@ -31,10 +31,6 @@ public class Theme {
         this(null, name, description, thumbnail);
     }
 
-    public Theme(Long id, Theme theme) {
-        this(id, theme.name, theme.description, theme.thumbnail);
-    }
-
     public Theme(Long id, String name, String description, String thumbnail) {
         validateName(name);
         this.id = id;

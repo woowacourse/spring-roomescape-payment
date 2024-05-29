@@ -29,11 +29,6 @@ public class ReservationTime {
         this(null, startAt);
     }
 
-    public ReservationTime(Long id, ReservationTime time) {
-        this.id = id;
-        this.startAt = time.startAt;
-    }
-
     public ReservationTime(Long id, LocalTime startAt) {
         validateTimeUnit(startAt);
         this.id = id;

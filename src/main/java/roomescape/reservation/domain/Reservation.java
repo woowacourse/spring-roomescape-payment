@@ -50,10 +50,6 @@ public class Reservation {
         this(null, member, date, time, theme, status);
     }
 
-    public Reservation(Long id, Reservation reservation) {
-        this(id, reservation.member, reservation.date, reservation.time, reservation.theme, reservation.status);
-    }
-
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time,
                        Theme theme, ReservationStatus status) {
         this.id = id;

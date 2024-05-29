@@ -1,6 +1,8 @@
 package roomescape;
 
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.Name;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -41,7 +43,7 @@ public class TestFixture {
     }
 
     public static Member USER_MIA(Long id) {
-        return new Member(id, MIA_NAME, MIA_EMAIL, TEST_PASSWORD, USER);
+        return new Member(id, new Name(MIA_NAME), new Email(MIA_EMAIL), TEST_PASSWORD, USER);
     }
 
     public static Member USER_TOMMY() {
@@ -53,7 +55,7 @@ public class TestFixture {
     }
 
     public static Member USER_ADMIN(Long id) {
-        return new Member(id, ADMIN_NAME, ADMIN_EMAIL, TEST_PASSWORD, ADMIN);
+        return new Member(id, new Name(ADMIN_NAME), new Email(ADMIN_EMAIL), TEST_PASSWORD, ADMIN);
     }
 
     public static Reservation MIA_RESERVATION() {

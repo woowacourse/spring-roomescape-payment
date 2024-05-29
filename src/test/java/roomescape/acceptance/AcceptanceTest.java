@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.common.DatabaseCleaner;
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.Name;
 import roomescape.member.dto.request.MemberJoinRequest;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
@@ -95,7 +97,7 @@ public abstract class AcceptanceTest {
                 .when().post("/members/join")
                 .then().extract()
                 .as(MemberResponse.class);
-        return new Member(response.id(), response.name(), response.email(), request.password(), USER);
+        return new Member(response.id(), new Name(response.name()), new Email(response.email()), request.password(), USER);
     }
 
     protected Long createTestReservation(LocalDate date, Long timeId, Long themeId, String token, ReservationStatus status) {
@@ -136,7 +138,7 @@ public abstract class AcceptanceTest {
                 .when().post("/members/join/admin")
                 .then().extract()
                 .as(MemberResponse.class);
-        return new Member(response.id(), response.name(), response.email(), request.password(), ADMIN);
+        return new Member(response.id(), new Name(response.name()), new Email(response.email()), request.password(), ADMIN);
     }
 
     protected String createTestToken(String email) {

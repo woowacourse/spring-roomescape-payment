@@ -49,7 +49,7 @@ class ReservationTimeControllerTest extends ControllerTest {
     void createReservationTime() throws Exception {
         // given
         ReservationTimeSaveRequest request = new ReservationTimeSaveRequest(MIA_RESERVATION_TIME);
-        ReservationTime expectedReservationTime = new ReservationTime(1L, request.toModel());
+        ReservationTime expectedReservationTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
 
         BDDMockito.given(reservationTimeService.create(any()))
                 .willReturn(expectedReservationTime);
