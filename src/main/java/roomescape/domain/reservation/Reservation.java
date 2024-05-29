@@ -75,9 +75,9 @@ public class Reservation {
         return status;
     }
 
-    public void changeStatus() {
+    public void changePaymentWaiting() {
         if (status.isWaiting()) {
-            status = Status.RESERVATION;
+            status = Status.PAYMENT_WAITING;
         }
     }
 

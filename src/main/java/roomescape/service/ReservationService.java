@@ -74,7 +74,7 @@ public class ReservationService {
         if (isWaitingUpdatableToReservation(reservation)) {
             reservationRepository.findFirstByDateAndTimeIdAndThemeIdAndStatus(
                     reservation.getDate(), reservation.getTime().getId(), reservation.getTheme().getId(), Status.WAITING
-            ).ifPresent(Reservation::changeStatus);
+            ).ifPresent(Reservation::changePaymentWaiting);
         }
     }
 

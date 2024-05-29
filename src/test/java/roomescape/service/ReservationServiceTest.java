@@ -105,7 +105,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
                 dynamicTest("예약 대기를 추가한다.", () -> secondReservationResponse.set(reservationService.saveWaitingByClient(new LoginMember(1L, "찰리"), new WaitingRequest(LocalDate.now().plusDays(5), 1L, 9L)))),
                 dynamicTest("예약의 상태를 확인한다 (WAITING)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.WAITING)),
                 dynamicTest("예약을 삭제한다.", () -> reservationService.deleteById(firstReservationResponse.get().id())),
-                dynamicTest("예약의 상태를 확인한다 (RESERVATION)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.RESERVATION))
+                dynamicTest("첫번째 예약 대기의 상태가 PAYMENT_WAITING으로 바뀐다.", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.PAYMENT_WAITING))
         );
     }
 }

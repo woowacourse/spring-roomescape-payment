@@ -22,9 +22,9 @@ public record MyReservationResponse(
     }
 
     private static String getWaitingOrder(Status status, long rank) {
-        if (status == Status.RESERVATION) {
-            return status.getValue();
+        if (status == Status.WAITING) {
+            return rank + "번째 " + status.getValue();
         }
-        return rank + "번째 " + status.getValue();
+        return status.getValue();
     }
 }
