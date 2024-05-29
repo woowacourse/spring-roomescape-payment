@@ -21,13 +21,11 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final WaitingReservationService waitingReservationService;
-    private final PaymentWithRestClient paymentRestClient;
 
     public ReservationController(ReservationService reservationService,
-                                 WaitingReservationService waitingReservationService, PaymentWithRestClient paymentRestClient) {
+                                 WaitingReservationService waitingReservationService) {
         this.reservationService = reservationService;
         this.waitingReservationService = waitingReservationService;
-        this.paymentRestClient = paymentRestClient;
     }
 
     @GetMapping("/reservations")
@@ -45,10 +43,8 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
                                                       @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
 
-        PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
 //        reservationService.validateAmount(reservationPaymentRequest); // TODO 예약 확정 전에 검증하는게 좋을듯
-        PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
-        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, paymentResponse, authInfo.getId());
+        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, authInfo.getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
     }
