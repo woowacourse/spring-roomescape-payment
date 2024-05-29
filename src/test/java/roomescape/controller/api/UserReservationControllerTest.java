@@ -88,7 +88,7 @@ class UserReservationControllerTest {
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, THEME_ID, TIME_ID, null, null, 1000, null);
+            DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
 
         RestAssured.given().log().all()
             .contentType(ContentType.JSON)
@@ -161,7 +161,7 @@ class UserReservationControllerTest {
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, THEME_ID, 2L, null, null, 1000, null);
+            DATE_FIRST, THEME_ID, 2L, "1", "1", 1000, "1");
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -181,7 +181,7 @@ class UserReservationControllerTest {
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, 2L, TIME_ID, null, null, 1000, null);
+            DATE_FIRST, 2L, TIME_ID, "1", "1", 1000, "1");
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -219,7 +219,7 @@ class UserReservationControllerTest {
     @Test
     void save_PastTime() {
         CreateUserReservationRequest request = new CreateUserReservationRequest(
-            LocalDate.now().minusDays(1), THEME_ID, TIME_ID, null, null, 1000, null);
+            LocalDate.now().minusDays(1), THEME_ID, TIME_ID, "1", "1", 1000, "1");
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
