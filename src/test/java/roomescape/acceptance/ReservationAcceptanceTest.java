@@ -3,21 +3,31 @@ package roomescape.acceptance;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import roomescape.client.PaymentClient;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
 import roomescape.dto.reservation.ReservationSaveRequest;
 
+import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.TestFixture.DUMMY_PAYMENT_RESPONSE;
 import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("사용자가 예약을 성공적으로 생성하면 201을 응답한다.")
     void respondCreatedWhenCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, null, null, null);
+
+        given(paymentClient.pay(request.toPaymentRequest()))
+                .willReturn(DUMMY_PAYMENT_RESPONSE());
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 201);
     }
@@ -37,7 +47,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondBadRequestWhenNotExistingReservationTime() {
         saveReservationTime();
         final Long themeId = saveTheme();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, null, null, null);
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 400);
     }
@@ -47,7 +57,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondBadRequestWhenNotExistingTheme() {
         saveTheme();
         final Long timeId = saveReservationTime();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, null, null, null);
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 400);
     }

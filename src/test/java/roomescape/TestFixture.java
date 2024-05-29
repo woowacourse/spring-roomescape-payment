@@ -7,6 +7,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Waiting;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.payment.PaymentResponse;
 
 import java.time.LocalDate;
 
@@ -105,4 +106,9 @@ public class TestFixture {
     public static Waiting WAITING() {
         return new Waiting(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L));
     }
+
+    public static PaymentResponse DUMMY_PAYMENT_RESPONSE() {
+        return new PaymentResponse("dummy");
+    }
+
 }

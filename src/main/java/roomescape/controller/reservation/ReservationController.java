@@ -38,7 +38,6 @@ import java.util.List;
 public class ReservationController {
 
     private final PaymentClient paymentClient;
-
     private final MemberService memberService;
     private final ReservationService reservationService;
     private final WaitingService waitingService;
@@ -46,7 +45,8 @@ public class ReservationController {
     private final ThemeService themeService;
     private final AutoReserveService autoReserveService;
 
-    public ReservationController(PaymentClient paymentClient, final MemberService memberService,
+    public ReservationController(final PaymentClient paymentClient,
+                                 final MemberService memberService,
                                  final ReservationService reservationService,
                                  final WaitingService waitingService,
                                  final ReservationTimeService reservationTimeService,
