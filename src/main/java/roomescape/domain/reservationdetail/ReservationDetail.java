@@ -1,16 +1,23 @@
 package roomescape.domain.reservationdetail;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Objects;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Objects;
-
 @Entity
 public class ReservationDetail {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,8 +44,12 @@ public class ReservationDetail {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ReservationDetail other)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ReservationDetail other)) {
+            return false;
+        }
         return Objects.equals(id, other.id);
     }
 

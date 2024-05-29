@@ -1,11 +1,17 @@
 package roomescape.domain.theme;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Objects;
 
 @Entity
 public class Theme {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,8 +44,12 @@ public class Theme {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Theme other)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Theme other)) {
+            return false;
+        }
         return Objects.equals(id, other.id);
     }
 

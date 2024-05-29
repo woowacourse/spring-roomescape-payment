@@ -1,15 +1,15 @@
 package roomescape.domain.theme;
 
 import jakarta.persistence.Embeddable;
-import roomescape.exception.InvalidReservationException;
-
 import java.util.Objects;
+import roomescape.exception.InvalidReservationException;
 
 @Embeddable
 public class Description {
+
     private static final int MAXIMUM_DESCRIPTION_LENGTH = 100;
     private static final String INVALID_DESCRIPTION_LENGTH = String.format("설명은 %d자를 초과할 수 없습니다.",
-            MAXIMUM_DESCRIPTION_LENGTH);
+        MAXIMUM_DESCRIPTION_LENGTH);
 
     private String value;
 

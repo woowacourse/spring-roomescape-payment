@@ -1,9 +1,8 @@
 package roomescape.service.reservation.dto;
 
 import jakarta.validation.constraints.NotNull;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public record ReservationRequest(
     @NotNull(message = "날짜를 입력해주세요.") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,

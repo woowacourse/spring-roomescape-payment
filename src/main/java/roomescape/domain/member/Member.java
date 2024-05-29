@@ -1,11 +1,19 @@
 package roomescape.domain.member;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Objects;
 
 @Entity
 public class Member {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,8 +62,12 @@ public class Member {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Member other)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Member other)) {
+            return false;
+        }
         return Objects.equals(id, other.id);
     }
 

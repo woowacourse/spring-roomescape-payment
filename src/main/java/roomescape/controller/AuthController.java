@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +17,9 @@ import roomescape.service.auth.dto.SignUpRequest;
 import roomescape.service.member.dto.MemberResponse;
 import roomescape.util.CookieUtils;
 
-import java.net.URI;
-
 @RestController
 public class AuthController {
+
     private final AuthService authService;
 
     public AuthController(AuthService authService) {

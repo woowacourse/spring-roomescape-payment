@@ -1,5 +1,6 @@
 package roomescape.service.schedule;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
@@ -14,17 +15,16 @@ import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
 import roomescape.service.schedule.dto.ReservationTimeReadRequest;
 import roomescape.service.schedule.dto.ReservationTimeResponse;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 public class ReservationTimeService {
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationDetailRepository reservationDetailRepository;
 
     public ReservationTimeService(ReservationTimeRepository reservationTimeRepository,
-                                  ReservationRepository reservationRepository, ReservationDetailRepository reservationDetailRepository) {
+        ReservationRepository reservationRepository, ReservationDetailRepository reservationDetailRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
         this.reservationDetailRepository = reservationDetailRepository;
@@ -34,7 +34,7 @@ public class ReservationTimeService {
     public ReservationTimeResponse create(ReservationTimeCreateRequest reservationTimeCreateRequest) {
         validateDuplicated(reservationTimeCreateRequest);
         ReservationTime reservationTime = reservationTimeRepository.save(
-                reservationTimeCreateRequest.toReservationTime());
+            reservationTimeCreateRequest.toReservationTime());
         return new ReservationTimeResponse(reservationTime);
     }
 
@@ -46,8 +46,8 @@ public class ReservationTimeService {
 
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeRepository.findAll().stream()
-                .map(ReservationTimeResponse::new)
-                .toList();
+            .map(ReservationTimeResponse::new)
+            .toList();
     }
 
     @Transactional
@@ -63,18 +63,18 @@ public class ReservationTimeService {
     }
 
     public List<AvailableReservationTimeResponse> findAvailableTimes(
-            ReservationTimeReadRequest reservationTimeReadRequest) {
+        ReservationTimeReadRequest reservationTimeReadRequest) {
         List<ReservationDetail> reservationDetails = reservationDetailRepository.findByScheduleDateAndThemeId(
-                ReservationDate.of(reservationTimeReadRequest.date()), reservationTimeReadRequest.themeId());
+            ReservationDate.of(reservationTimeReadRequest.date()), reservationTimeReadRequest.themeId());
         return reservationTimeRepository.findAll().stream()
-                .map(time -> new AvailableReservationTimeResponse(time.getId(), time.getStartAt(),
-                        isBooked(reservationDetails, time)))
-                .toList();
+            .map(time -> new AvailableReservationTimeResponse(time.getId(), time.getStartAt(),
+                isBooked(reservationDetails, time)))
+            .toList();
     }
 
     private boolean isBooked(List<ReservationDetail> reservationDetails, ReservationTime time) {
         return reservationDetails.stream()
-                .map(ReservationDetail::getReservationTime)
-                .anyMatch(time::isSame);
+            .map(ReservationDetail::getReservationTime)
+            .anyMatch(time::isSame);
     }
 }

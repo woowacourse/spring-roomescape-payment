@@ -4,12 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
 import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
 public class ReservationTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +33,12 @@ public class ReservationTime {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ReservationTime other)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ReservationTime other)) {
+            return false;
+        }
         return Objects.equals(id, other.id);
     }
 

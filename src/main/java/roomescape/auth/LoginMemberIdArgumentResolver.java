@@ -13,6 +13,7 @@ import roomescape.util.CookieUtils;
 
 @Component
 public class LoginMemberIdArgumentResolver implements HandlerMethodArgumentResolver {
+
     private final TokenProvider tokenProvider;
 
     @Autowired

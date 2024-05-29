@@ -1,6 +1,7 @@
 package roomescape.exception;
 
 public class InvalidMemberException extends RuntimeException {
+
     public InvalidMemberException() {
         super();
     }

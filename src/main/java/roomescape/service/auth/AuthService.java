@@ -17,6 +17,7 @@ import roomescape.service.member.dto.MemberResponse;
 
 @Service
 public class AuthService {
+
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
 
@@ -47,7 +48,7 @@ public class AuthService {
 
     private Member getByEmail(String email) {
         return memberRepository.findByEmail(Email.of(email))
-                .orElseThrow(() -> new InvalidMemberException("이메일 또는 비밀번호가 잘못되었습니다."));
+            .orElseThrow(() -> new InvalidMemberException("이메일 또는 비밀번호가 잘못되었습니다."));
     }
 
     public MemberResponse create(SignUpRequest signUpRequest) {
