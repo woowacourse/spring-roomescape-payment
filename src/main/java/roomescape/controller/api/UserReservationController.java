@@ -17,18 +17,20 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
-import roomescape.global.exception.RoomescapeException;
+import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
-import roomescape.util.PaymentManager;
+import roomescape.service.dto.PaymentRequestDto;
 
 @RestController
 @RequestMapping("/reservations")
 public class UserReservationController {
 
     private final UserReservationService userReservationService;
+    private final PaymentService paymentService;
 
-    public UserReservationController(UserReservationService userReservationService) {
+    public UserReservationController(UserReservationService userReservationService, PaymentService paymentService) {
         this.userReservationService = userReservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
@@ -36,13 +38,7 @@ public class UserReservationController {
         @Valid @RequestBody CreateUserReservationRequest request,
         @AuthenticationPrincipal Member member) throws Exception {
 
-        PaymentManager paymentManager = new PaymentManager();
-        paymentManager.requestPaymentApproval(request.orderId(), request.amount(), request.paymentKey());
-
-        if (paymentManager.isPaymentRequestFailed()) {
-            String errorMessage = paymentManager.getErrorMessage();
-            throw new RoomescapeException(errorMessage);
-        }
+        paymentService.pay(new PaymentRequestDto(request.orderId(), request.amount(), request.paymentKey()));
 
         CreateReservationResponse response = userReservationService.reserve(
             member.getId(),
