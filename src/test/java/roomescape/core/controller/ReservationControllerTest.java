@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
+import roomescape.infrastructure.PaymentSecretKeyEncoder;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -32,6 +33,9 @@ class ReservationControllerTest {
 
     @Autowired
     private TestFixture testFixture;
+
+    @Autowired
+    private PaymentSecretKeyEncoder paymentSecretKeyEncoder;
 
     private String accessToken;
 

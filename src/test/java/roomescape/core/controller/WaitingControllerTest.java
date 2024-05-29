@@ -11,14 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
 import roomescape.utils.AccessTokenGenerator;
-import roomescape.utils.AdminGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
 
 @AcceptanceTest
 class WaitingControllerTest {
     public static final String WAITING_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약 대기만 취소할 수 있습니다.";
-    private static final String TODAY = TestFixture.getTodayDate();
     private static final String TOMORROW = TestFixture.getTomorrowDate();
 
     private String accessToken;
@@ -28,9 +26,6 @@ class WaitingControllerTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
-
-    @Autowired
-    private AdminGenerator adminGenerator;
 
     @Autowired
     private TestFixture testFixture;

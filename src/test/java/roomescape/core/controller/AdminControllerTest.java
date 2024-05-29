@@ -14,14 +14,12 @@ import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.utils.AccessTokenGenerator;
-import roomescape.utils.AdminGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
 import roomescape.utils.ThemeRequestGenerator;
 
 @AcceptanceTest
 class AdminControllerTest {
-    private static final String TODAY = TestFixture.getTodayDate();
     private static final String TOMORROW = TestFixture.getTomorrowDate();
 
     @LocalServerPort
@@ -30,10 +28,8 @@ class AdminControllerTest {
     @Autowired
     private DatabaseCleaner databaseCleaner;
 
-    @Autowired
-    private AdminGenerator adminGenerator;
-
     private String accessToken;
+
     @Autowired
     private TestFixture testFixture;
 
