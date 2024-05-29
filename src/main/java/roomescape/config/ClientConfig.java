@@ -17,23 +17,26 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ClientConfig {
 
-    private static final int CONNECTION_TIMEOUT_MS = 5_000;
-    private static final int READ_TIMEOUT_MS = 30_000;
-
     @Bean
-    public RestClient restClient(@Value("${payment.base-url}") String paymentBaseUrl) {
-        return RestClient.builder(new RestTemplate(clientHttpRequestFactory()))
+    public RestClient restClient(
+            @Value("${payment.base-url}") String paymentBaseUrl,
+            @Value("${payment.connection-timeout-ms}") int connectionTimeoutMs,
+            @Value("${payment.read-timeout-ms}") int readTimeoutMs
+    ) {
+        RestTemplate template = new RestTemplate(clientHttpRequestFactory(connectionTimeoutMs, readTimeoutMs));
+
+        return RestClient.builder(template)
                 .baseUrl(paymentBaseUrl)
                 .build();
     }
 
-    private ClientHttpRequestFactory clientHttpRequestFactory() {
+    private ClientHttpRequestFactory clientHttpRequestFactory(int connectionTimeoutMs, int readTimeoutMs) {
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(CONNECTION_TIMEOUT_MS))
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeoutMs))
                 .build();
 
         SocketConfig socketConfig = SocketConfig.custom()
-                .setSoTimeout(Timeout.ofMilliseconds(READ_TIMEOUT_MS))
+                .setSoTimeout(Timeout.ofMilliseconds(readTimeoutMs))
                 .build();
 
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();

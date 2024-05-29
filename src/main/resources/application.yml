@@ -30,3 +30,5 @@ security:
 payment:
   base-url: https://api.tosspayments.com
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  connection-timeout-ms: 5000
+  read-timeout-ms: 30000
