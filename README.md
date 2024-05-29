@@ -6,8 +6,8 @@
     - [x] 결제창에서 결제수단을 선택하고 토스페이먼츠에게 결제 요청을 함 [2]
     - [x] 서버에게 결제정보를 전달함 [3]
 - [x] 토스페이먼츠에게 결제승인 API를 호출함 [4]
+    - 사용자 예약 추가 API Request에 결제승인을 위한 정보(paymentKey, orderId) 추가
 - [x] 결제승인 API 호출에 실패 한 경우, 에러 핸들링 [4]
-- [ ] 사용자 예약 추가 API Request에 결제승인을 위한 정보(paymentKey, orderId) 추가
 
 ### 결제 플로우
 
@@ -226,7 +226,10 @@ Content-Type: application/json
 {
   "date": "2024-08-06",
   "themeId": 1,
-  "timeId": 1
+  "timeId": 1,
+  "paymentKey": "testPaymentKey",
+  "orderId": "testOrderId",
+  "amount": 1
 }
 ```
 

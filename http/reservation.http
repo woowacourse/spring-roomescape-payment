@@ -11,7 +11,10 @@ Content-Type: application/json
 {
   "date": "2024-08-06",
   "themeId": 1,
-  "timeId": 1
+  "timeId": 1,
+  "paymentKey": "",
+  "orderId": "",
+  "amount": 1
 }
 
 ### 관리자용 예약 추가 API (접근 권한: 관리자)
