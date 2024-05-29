@@ -12,6 +12,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "theme")
 public class Theme {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -44,10 +45,6 @@ public class Theme {
     protected Theme() {
     }
 
-    public Theme withId(Long id) {
-        return new Theme(id, this.name, this.description, this.thumbnail);
-    }
-
     public Long getId() {
         return id;
     }
@@ -66,8 +63,12 @@ public class Theme {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Theme theme = (Theme) o;
 
@@ -82,10 +83,10 @@ public class Theme {
     @Override
     public String toString() {
         return "Theme{" +
-               "id=" + id +
-               ", name=" + name +
-               ", description=" + description +
-               ", thumbnail=" + thumbnail +
-               '}';
+                "id=" + id +
+                ", name=" + name +
+                ", description=" + description +
+                ", thumbnail=" + thumbnail +
+                '}';
     }
 }

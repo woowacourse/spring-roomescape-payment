@@ -19,6 +19,7 @@ import roomescape.time.domain.ReservationTime;
 @Entity
 @Table(name = "reservation", uniqueConstraints = @UniqueConstraint(columnNames = {"date", "time_id", "theme_id"}))
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -99,8 +100,12 @@ public class Reservation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Reservation that = (Reservation) o;
 
@@ -115,11 +120,11 @@ public class Reservation {
     @Override
     public String toString() {
         return "Reservation{" +
-               "id=" + id +
-               ", member=" + member +
-               ", date=" + date +
-               ", time=" + time +
-               ", theme=" + theme +
-               '}';
+                "id=" + id +
+                ", member=" + member +
+                ", date=" + date +
+                ", time=" + time +
+                ", theme=" + theme +
+                '}';
     }
 }

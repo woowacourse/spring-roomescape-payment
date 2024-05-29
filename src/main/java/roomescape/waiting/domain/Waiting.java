@@ -20,6 +20,7 @@ import roomescape.reservation.domain.Reservation;
 @Table(name = "waiting", uniqueConstraints = @UniqueConstraint(columnNames = {"reservation_id", "member_id"}))
 @EntityListeners(AuditingEntityListener.class)
 public class Waiting {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
