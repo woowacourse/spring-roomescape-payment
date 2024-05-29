@@ -14,13 +14,13 @@
 - [ ] 결제 실패 시 400 또는 500 코드를 응답한다.
 
 서버-토스 결제 승인 요청
-- [ ] 클라이언트 측에서 받은 데이터로 토스에 결제 승인을 요청한다.
+- [x] 클라이언트 측에서 받은 데이터로 토스에 결제 승인을 요청한다.
   - EndPoint : `POST https://api.tosspayments.com/v1/payments/confirm` 
-- [ ] 요청 시 다음과 같이 Basic 인증 헤더를 설정한다.
+- [x] 요청 시 다음과 같이 Basic 인증 헤더를 설정한다.
   - `Authorization: Basic base64("{WIDGET_SECRET_KEY}:")`
-- [ ] request body에 필요한 데이터는 다음과 같다.  
+- [x] request body에 필요한 데이터는 다음과 같다.  
     `orderId` : 주문 id  
     `amount` : 결제 금액  
     `paymentKey` : 페이먼트 키  
-- [ ] 결제가 승인된 경우, Payment 객체가 응답된다.
+- [x] 결제가 승인된 경우, Payment 객체가 응답된다.
 - [ ] 결제에 실패한 경우, 에러 코드가 응답된다.

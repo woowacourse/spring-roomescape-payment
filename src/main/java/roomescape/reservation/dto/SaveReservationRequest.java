@@ -34,4 +34,8 @@ public record SaveReservationRequest(@NotNull(message = "예약 날짜는 공백
                 member
         );
     }
+
+    public PaymentRequest toPaymentRequest() {
+        return new PaymentRequest(paymentKey, orderId, amount);
+    }
 }

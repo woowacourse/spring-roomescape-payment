@@ -12,6 +12,7 @@ import roomescape.auth.principal.AuthenticatedMember;
 import roomescape.reservation.dto.*;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.Waiting;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingService;
 import roomescape.resolver.Authenticated;
@@ -21,10 +22,12 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService, final WaitingService waitingService) {
+    public ReservationController(final ReservationService reservationService, final WaitingService waitingService,final PaymentService paymentService) {
         this.reservationService = reservationService;
         this.waitingService = waitingService;
+        this.paymentService=paymentService;
     }
 
     @GetMapping("/reservations")
@@ -42,6 +45,8 @@ public class ReservationController {
     ) {
         final Reservation savedReservation = reservationService.saveReservation(
                 request.setMemberId(authenticatedMember.id()));
+
+        paymentService.requestTossPayment(request.toPaymentRequest()); // 200 -> 성공 400,500 실패
 
         return ResponseEntity.created(URI.create("/reservations/" + savedReservation.getId()))
                 .body(ReservationResponse.from(savedReservation));
