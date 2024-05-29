@@ -1,7 +1,6 @@
 package roomescape.acceptance;
 
 import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
 
 import io.restassured.RestAssured;
@@ -95,7 +94,7 @@ public class AcceptanceFixture {
     }
 
     public ReservationResponse createReservation(String token, ReservationRequest request) {
-        given(paymentClient.requestPurchase(anyString(), any(PaymentRequest.class)))
+        given(paymentClient.requestPurchase(any(PaymentRequest.class)))
                 .willReturn(new Payment("paymentKey", "orderId", "DONE", 10000L));
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
                 request.memberId(), request.themeId(), request.date(), request.timeId(),

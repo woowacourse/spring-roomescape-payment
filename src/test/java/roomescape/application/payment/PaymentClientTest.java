@@ -50,7 +50,7 @@ class PaymentClientTest {
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
-        Payment payment = paymentClient.requestPurchase("secret", request);
+        Payment payment = paymentClient.requestPurchase(request);
 
         assertThat(payment)
                 .isEqualTo(new Payment("qwer", "1234abcd", "DONE", 1000L));
@@ -74,7 +74,7 @@ class PaymentClientTest {
                 .andRespond((req) -> response);
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
 
-        assertThatCode(() -> paymentClient.requestPurchase("secret", request))
+        assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class);
     }
 }

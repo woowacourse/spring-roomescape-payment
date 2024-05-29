@@ -2,7 +2,6 @@ package roomescape.application.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +43,7 @@ class PaymentServiceTest {
         Reservation reservation = reservationFixture.saveReservation();
         Theme theme = reservation.getTheme();
         PaymentRequest request = new PaymentRequest("orderId", theme.getPrice(), "paymentKey");
-        given(paymentClient.requestPurchase(anyString(), any(PaymentRequest.class)))
+        given(paymentClient.requestPurchase(any(PaymentRequest.class)))
                 .willReturn(new Payment("paymentKey", "orderId", "DONE", theme.getPrice()));
 
         paymentService.purchase(reservation, request);
