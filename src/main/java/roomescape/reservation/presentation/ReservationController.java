@@ -18,6 +18,7 @@ import roomescape.payment.TossPaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
@@ -63,15 +64,18 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveMemberReservation(
             @Authenticated Accessor accessor,
-            @Valid @RequestBody MemberReservationAddRequest memberReservationAddRequest) {
+            @Valid @RequestBody MemberReservationWithPaymentAddRequest memberReservationWithPaymentAddRequest) {
 
-        System.out.println(memberReservationAddRequest.paymentKey() + "페이먼트키");
-        System.out.println(memberReservationAddRequest.orderId() + "오더아이디");
+        MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(
+                memberReservationWithPaymentAddRequest.date(),
+                memberReservationWithPaymentAddRequest.timeId(),
+                memberReservationWithPaymentAddRequest.timeId()
+        );
 
         tossPaymentClient.confirmPayments(new PaymentConfirmRequest(
-                memberReservationAddRequest.paymentKey(),
-                memberReservationAddRequest.orderId(),
-                memberReservationAddRequest.amount()
+                memberReservationWithPaymentAddRequest.paymentKey(),
+                memberReservationWithPaymentAddRequest.orderId(),
+                memberReservationWithPaymentAddRequest.amount()
         ));
 
         ReservationResponse saveResponse = reservationService.saveMemberReservation(accessor.id(),
