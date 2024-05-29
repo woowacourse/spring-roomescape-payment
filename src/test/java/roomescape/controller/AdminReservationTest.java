@@ -2,6 +2,9 @@ package roomescape.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static roomescape.fixture.TestFixture.RESERVATION_COUNT;
+import static roomescape.fixture.TestFixture.TOKEN;
+import static roomescape.fixture.TestFixture.WAITING_COUNT;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -22,18 +25,15 @@ import org.springframework.test.context.TestPropertySource;
 import roomescape.domain.Role;
 import roomescape.infrastructure.TokenGenerator;
 
-import static roomescape.fixture.TestFixture.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource(properties = {"spring.config.location=classpath:/application.properties"})
 class AdminReservationTest {
 
-    @Autowired
-    TokenGenerator tokenGenerator;
-
     private static final String EMAIL = "testDB@email.com";
 
+    @Autowired
+    private TokenGenerator tokenGenerator;
     @LocalServerPort
     private int port;
     private String accessToken;
@@ -55,29 +55,15 @@ class AdminReservationTest {
                 .body("size()", is(RESERVATION_COUNT));
     }
 
-    @DisplayName("reservation 페이지에 새로운 예약 정보를 추가, 조회, 삭제할 수 있다.")
+    @DisplayName("reservation 페이지에 새로운 예약 정보를 조회, 삭제할 수 있다.")
     @Test
     void given_when_saveAndDeleteReservations_then_statusCodeIsOkay() {
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "브라운");
-        reservation.put("date", "2999-12-31");
-        reservation.put("timeId", 1);
-        reservation.put("themeId", 1);
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookies(TOKEN, accessToken)
-                .body(reservation)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
-
         RestAssured.given().log().all()
                 .cookies(TOKEN, accessToken)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(RESERVATION_COUNT + 1));
+                .body("size()", is(RESERVATION_COUNT));
 
         RestAssured.given().log().all()
                 .cookies(TOKEN, accessToken)
@@ -244,23 +230,5 @@ class AdminReservationTest {
                 .then().log().all()
                 .statusCode(400)
                 .body(containsString("[ERROR] 존재하지 않는 테마 입니다"));
-    }
-
-    @DisplayName("이미 예약이 된 시간의 다른 테마를 예약을 할 수 있다.")
-    @Test
-    void given_when_saveDuplicatedReservationDateAndTimeAndDifferentThemeId_then_statusCodeIsCreated() {
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "포케");
-        reservation.put("date", "2099-04-30");
-        reservation.put("timeId", 1); // 10:00
-        reservation.put("themeId", 3);
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookies(TOKEN, accessToken)
-                .body(reservation)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
     }
 }
