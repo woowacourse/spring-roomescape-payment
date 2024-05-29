@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
 @Component
+public
 class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
 

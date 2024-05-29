@@ -38,6 +38,10 @@ public class Payment {
         this.reservation = reservation;
     }
 
+    public Payment(long id, Payment payment) {
+        this(id, payment.orderId, payment.paymentKey, payment.amount, payment.member, payment.reservation);
+    }
+
     public Long getId() {
         return id;
     }
