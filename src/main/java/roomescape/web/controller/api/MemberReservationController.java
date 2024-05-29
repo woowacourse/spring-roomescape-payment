@@ -3,8 +3,6 @@ package roomescape.web.controller.api;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +26,6 @@ import roomescape.web.controller.response.ReservationMineResponse;
 @RequestMapping("/reservations")
 public class MemberReservationController {
 
-    private static final Logger log = LoggerFactory.getLogger(MemberReservationController.class);
     private final ReservationService reservationService;
     private final PaymentManager paymentManager;
 
@@ -73,12 +70,12 @@ public class MemberReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@Auth LoginMember loginMember) {
-        List<ReservationMineResponse> reservationMineRespons = reservationService.findByMemberId(loginMember.id())
+        List<ReservationMineResponse> reservationMineResponse = reservationService.findByMemberId(loginMember.id())
                 .stream()
                 .map(ReservationMineResponse::new)
                 .toList();
 
-        return ResponseEntity.ok(reservationMineRespons);
+        return ResponseEntity.ok(reservationMineResponse);
     }
 
 }
