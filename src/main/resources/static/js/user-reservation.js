@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------  결제위젯 초기화 ------
   // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
   // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-  const paymentAmount = 1000;
+  const paymentAmount = 0;
   const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
   const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-  paymentWidget.renderPaymentMethods(
+  const renderedPaymentWidget = paymentWidget.renderPaymentMethods(
       "#payment-method",
       {value: paymentAmount},
       {variantKey: "DEFAULT"}
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
   document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
   function onReservationButtonClickWithPaymentWidget(event) {
-    onReservationButtonClick(event, paymentWidget);
+    onReservationButtonClick(event, paymentWidget, renderedPaymentWidget);
   }
 });
 
@@ -54,15 +54,19 @@ function renderTheme(themes) {
   themes.forEach(theme => {
     const name = theme.name;
     const themeId = theme.id;
-    themeSlots.appendChild(createSlot('theme', name, themeId));
+    const price = theme.price;
+    themeSlots.appendChild(createSlot('theme', name, themeId, null, price));
   });
 }
 
-function createSlot(type, text, id, booked) {
+function createSlot(type, text, id, booked, price) {
   const div = document.createElement('div');
   div.className = type + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
   div.textContent = text;
   div.setAttribute('data-' + type + '-id', id);
+  if (type === 'theme') {
+    div.setAttribute('data-' + type + '-price', price);
+  }
   if (type === 'time') {
     div.setAttribute('data-time-booked', booked);
   }
@@ -125,7 +129,7 @@ function renderAvailableTimes(times) {
     const timeId = time.id;
     const alreadyBooked = response.isBooked;
 
-    const div = createSlot('time', startAt, timeId, alreadyBooked); // createSlot('time', 시작 시간, time id, 예약 여부)
+    const div = createSlot('time', startAt, timeId, alreadyBooked, null); // createSlot('time', 시작 시간, time id, 예약 여부)
     timeSlots.appendChild(div);
   });
 }
@@ -154,18 +158,20 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+function onReservationButtonClick(event, paymentWidget, renderedPaymentWidget) {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+  const price = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-price');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
   // const name = document.getElementById('user-name').value;
-
+  renderedPaymentWidget.updateAmount(price);
   if (selectedDate && selectedThemeId && selectedTimeId) {
 
     const reservationData = {
       date: selectedDate,
       themeId: selectedThemeId,
-      timeId: selectedTimeId
+      timeId: selectedTimeId,
+      price: price
     };
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
@@ -179,14 +185,14 @@ function onReservationButtonClick(event, paymentWidget) {
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
       orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
+      amount: price
     }).then(function (data) {
       console.debug(data);
       fetchReservationPayment(data, reservationData);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
     });
   } else {
     alert("Please select a date, theme, and time before making a reservation.");
@@ -206,8 +212,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     timeId: reservationData.timeId,
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
-    amount: paymentData.amount,
-    paymentType: paymentData.paymentType,
+    // paymentType: paymentData.paymentType,
   }
 
   const reservationURL = "/reservations";
