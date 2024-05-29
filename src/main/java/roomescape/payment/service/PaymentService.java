@@ -5,7 +5,7 @@ import roomescape.exception.PaymentFailureException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.infrastructure.TossRestClient;
+import roomescape.payment.infrastructure.TossPaymentRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 
@@ -14,10 +14,10 @@ import java.util.Map;
 @Service
 public class PaymentService {
 
-    private final TossRestClient restClient;
+    private final TossPaymentRestClient restClient;
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(PaymentRepository paymentRepository, TossRestClient restClient) {
+    public PaymentService(PaymentRepository paymentRepository, TossPaymentRestClient restClient) {
         this.paymentRepository = paymentRepository;
         this.restClient = restClient;
     }

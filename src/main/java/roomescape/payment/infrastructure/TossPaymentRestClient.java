@@ -15,12 +15,12 @@ import java.util.Base64;
 import java.util.Optional;
 
 @Component
-public class TossRestClient {
+public class TossPaymentRestClient {
 
     private final RestClient restClient;
 
-    public TossRestClient(ObjectMapper objectMapper,
-                          @Value("${toss.secret}") String tossSecretKey
+    public TossPaymentRestClient(ObjectMapper objectMapper,
+                                 @Value("${toss.secret}") String tossSecretKey
     ) {
         String authorizationToken = Base64.getEncoder()
                 .encodeToString((tossSecretKey + ":").getBytes());
