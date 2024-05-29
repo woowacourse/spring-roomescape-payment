@@ -3,14 +3,14 @@ package roomescape.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 
 @Configuration
 public class ClientConfig {
 
     @Bean
-    public PaymentClient paymentRestClient() {
-        return new PaymentClient(factory());
+    public TossPaymentClient paymentRestClient() {
+        return new TossPaymentClient(factory());
     }
 
     @Bean

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PaymentClientTest extends IntegrationTestSupport {
 
     @Autowired
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClient;
 
     @Test
     @DisplayName("유효하지 않은 키로 결제 시도하면 실패한다.")
