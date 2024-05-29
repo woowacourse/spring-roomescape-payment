@@ -36,10 +36,6 @@ public class ReservationPayment {
         this.amount = amount;
     }
 
-    public ReservationPayment(String orderId, Reservation reservation, long amount) {
-        this(orderId, reservation, null, amount);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -5,6 +5,4 @@ public interface ReservationPaymentRepository {
     ReservationPayment save(ReservationPayment reservationPayment);
 
     ReservationPayment getById(String id);
-
-    void deleteById(String id);
 }
