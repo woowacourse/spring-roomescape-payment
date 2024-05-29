@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.HORROR_THEME;
 import static roomescape.util.Fixture.JOJO;
 import static roomescape.util.Fixture.KAKI;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
+import roomescape.exception.PaymentFailException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -29,6 +31,7 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
@@ -63,6 +66,22 @@ class ReservationServiceTest {
     @AfterEach
     void init() {
         databaseCleaner.cleanUp();
+    }
+
+    @DisplayName("예약 시 결제에 실패하면 예외가 발생한다.")
+    @Test
+    void paymentFailExceptionTest() {
+        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
+        Theme horrorTheme = themeRepository.save(HORROR_THEME);
+
+        LoginMember loginMember = LOGIN_MEMBER_KAKI;
+        ReservationSaveRequest reservationSaveRequest =
+                new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+
+        doThrow(PaymentFailException.class).when(paymentService).payment(PaymentRequest.from(reservationSaveRequest));
+
+        assertThatThrownBy(() -> reservationService.saveReservationSuccess(reservationSaveRequest, loginMember))
+                .isInstanceOf(PaymentFailException.class);
     }
 
     @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")

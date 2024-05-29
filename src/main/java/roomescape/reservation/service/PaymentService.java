@@ -38,17 +38,14 @@ public class PaymentService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handleClientErrorResponse(response))
-                .toBodilessEntity();
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handleClientErrorResponse(response));
     }
-
 
     private String createAuthorizations() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((paymentSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return KEY_PREFIX + new String(encodedBytes);
     }
-
 
     private void handleClientErrorResponse(ClientHttpResponse response) throws IOException {
         JSONParser parser = new JSONParser();
