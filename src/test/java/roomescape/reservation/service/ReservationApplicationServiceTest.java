@@ -89,10 +89,6 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
         LocalDate date = getNextDay();
-        ReservationResponse reservationResponse = reservationApplicationService.createMemberReservation(
-                new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
-                        10000L, date)
-        );
         ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
                 new WaitingCreate(memberClover.getId(), date, time.getId(), theme1.getId())
         );

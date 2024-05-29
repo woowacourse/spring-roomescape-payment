@@ -68,12 +68,11 @@ public class ReservationApplicationService {
 
     @Transactional
     public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
-        MemberReservation memberReservation = reservationCommonService.getReservation(
+        MemberReservation memberReservation = reservationCommonService.create(
                 memberReservationCreate.toReservationCreate());
         paymentService.approvePayment(
                 new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
                         memberReservationCreate.paymentKey()), memberReservation);
-        memberReservationService.createMemberReservation(memberReservation);
         return ReservationResponse.from(memberReservation);
     }
 
@@ -96,9 +95,7 @@ public class ReservationApplicationService {
 
     @Transactional
     public ReservationResponse addWaiting(WaitingCreate waitingCreate) {
-        MemberReservation memberReservation = reservationCommonService.getReservation(
-                waitingCreate.toReservationCreate());
-        memberReservationService.createMemberReservation(memberReservation);
+        MemberReservation memberReservation = reservationCommonService.create(waitingCreate.toReservationCreate());
         return ReservationResponse.from(memberReservation);
     }
 

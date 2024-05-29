@@ -50,27 +50,6 @@ class MemberReservationServiceTest extends ServiceTest {
         memberChoco = memberRepository.save(getMemberChoco());
     }
 
-    @DisplayName("예약 생성에 성공한다.")
-    @Test
-    void create() {
-        //given
-        LocalDate date = LocalDate.now().plusMonths(1);
-        Reservation reservation = reservationRepository.save(new Reservation(date, time, theme1));
-
-        //when
-        MemberReservation memberReservation = memberReservationService.createMemberReservation(
-                new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
-
-        //then
-        assertAll(
-                () -> assertThat(memberReservation.getReservationStatus()).isEqualTo(ReservationStatus.APPROVED),
-                () -> assertThat(memberReservation.getMember()).isEqualTo(memberChoco),
-                () -> assertThat(memberReservation.getReservation().getDate()).isEqualTo(date),
-                () -> assertThat(memberReservation.getReservation().getTime()).isEqualTo(time),
-                () -> assertThat(memberReservation.getReservation().getTheme()).isEqualTo(theme1)
-        );
-    }
-
     @DisplayName("예약 조회에 성공한다.")
     @Test
     void find() {

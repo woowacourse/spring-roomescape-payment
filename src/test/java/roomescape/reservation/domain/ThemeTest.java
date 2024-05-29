@@ -29,8 +29,8 @@ class ThemeTest {
         long price2 = 20000L;
 
         //when
-        Theme theme1 = new Theme(id1, name1, description1, thumbnail1,price1);
-        Theme theme2 = new Theme(id1, name2, description2, thumbnail2,price2);
+        Theme theme1 = new Theme(id1, name1, description1, thumbnail1, price1);
+        Theme theme2 = new Theme(id1, name2, description2, thumbnail2, price2);
 
         //then
         assertThat(theme1).isEqualTo(theme2);
@@ -49,13 +49,13 @@ class ThemeTest {
 
         //when & then
         assertAll(
-                () -> assertThatThrownBy(() -> new Theme(id, value, description, thumbnail,price))
+                () -> assertThatThrownBy(() -> new Theme(id, value, description, thumbnail, price))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage(ErrorType.MISSING_REQUIRED_VALUE_ERROR.getMessage()),
-                () -> assertThatThrownBy(() -> new Theme(id, name, value, thumbnail,price))
+                () -> assertThatThrownBy(() -> new Theme(id, name, value, thumbnail, price))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage(ErrorType.MISSING_REQUIRED_VALUE_ERROR.getMessage()),
-                () -> assertThatThrownBy(() -> new Theme(id, name, description, value,price))
+                () -> assertThatThrownBy(() -> new Theme(id, name, description, value, price))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage(ErrorType.MISSING_REQUIRED_VALUE_ERROR.getMessage())
         );

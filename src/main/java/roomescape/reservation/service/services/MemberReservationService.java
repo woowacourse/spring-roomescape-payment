@@ -59,11 +59,6 @@ public class MemberReservationService {
     }
 
     @Transactional
-    public MemberReservation createMemberReservation(MemberReservation memberReservation) {
-        return memberReservationRepository.save(memberReservation);
-    }
-
-    @Transactional
     public void updateStatus(Reservation reservation) {
         memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation).ifPresent(
                 MemberReservation::notPaid

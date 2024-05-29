@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
@@ -41,25 +40,17 @@ import roomescape.util.ServiceTest;
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest extends ServiceTest {
 
+    ReservationTime time;
+    Theme theme1;
+    Member memberChoco;
+    Reservation reservation;
+    MemberReservation memberReservation;
     @Autowired
     private PaymentService paymentService;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private PaymentRepository paymentRepository;
-
-
-    ReservationTime time;
-
-    Theme theme1;
-
-    Member memberChoco;
-
-    Reservation reservation;
-
-    MemberReservation memberReservation;
 
     @BeforeEach
     void setUp() {

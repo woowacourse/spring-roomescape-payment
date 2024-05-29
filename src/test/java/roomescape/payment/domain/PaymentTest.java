@@ -16,7 +16,7 @@ class PaymentTest {
 
     @DisplayName("결제를 생성한다.")
     @Test
-    void create(){
+    void create() {
         String paymentKey = "paymentKey";
         PaymentType paymentType = PaymentType.CARD;
         PayAmount payAmount = PayAmount.from(10000L);

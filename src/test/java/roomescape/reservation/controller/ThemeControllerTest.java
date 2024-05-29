@@ -38,7 +38,7 @@ class ThemeControllerTest extends ControllerTest {
         params.put("name", "siso");
         params.put("description", "Hi, I am Siso");
         params.put("thumbnail", "thumbnail");
-        params.put("price","10000");
+        params.put("price", "10000");
 
         //when
         doReturn(themeResponse)

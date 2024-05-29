@@ -101,7 +101,8 @@ public class ReservationCommonService {
                 .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND));
     }
 
-    public MemberReservation getReservation(ReservationCreate reservationCreate) {
+    @Transactional
+    public MemberReservation create(ReservationCreate reservationCreate) {
         ReservationTime reservationTime = getReservationTime(reservationCreate.timeId());
         Theme theme = getTheme(reservationCreate.themeId());
         Member member = getMember(reservationCreate.memberId());
@@ -113,6 +114,7 @@ public class ReservationCommonService {
         if (isReservationConfirmed(reservation)) {
             return new MemberReservation(member, reservation, ReservationStatus.PENDING);
         }
-        return new MemberReservation(member, reservation, ReservationStatus.APPROVED);
+
+        return memberReservationRepository.save(new MemberReservation(member, reservation, ReservationStatus.APPROVED));
     }
 }
