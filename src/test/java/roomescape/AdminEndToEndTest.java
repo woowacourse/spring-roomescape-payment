@@ -84,8 +84,9 @@ class AdminEndToEndTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 저장 및 삭제")
     void saveAndDeleteReservation() {
-        final Map<String, String> params = Map.of("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE),
-                "timeId", "1", "themeId", "1");
+        Map<String, Object> params = Map.of("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE),
+                "timeId", "1", "themeId", "1", "paymentKey", "tgen_20240529194618t4hG2",
+                "orderId", "MC4wMzc1NDM4Njg4NTE1", "amount", 1000L);
 
         RestAssured.given().log().all()
                 .cookie("token", ADMIN_TOKEN)
