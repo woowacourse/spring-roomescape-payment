@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
@@ -192,10 +193,10 @@ function onReservationButtonClick(event, paymentWidget) {
         */
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-        const orderIdPrefix = "WTEST";
+        const orderIdPrefix = "R_E_";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
-            orderName: "테스트 방탈출 예약 결제 1건",
+            orderName: "방탈출 예약 결제 1건",
             amount: 1000,
         }).then(function (data) {
             console.debug(data);
@@ -238,7 +239,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         if (!response.ok) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                window.alert(errorBody.message);
             });
         } else {
             response.json().then(successBody => {
