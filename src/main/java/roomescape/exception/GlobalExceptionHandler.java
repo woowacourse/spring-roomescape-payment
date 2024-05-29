@@ -1,4 +1,4 @@
-package roomescape.controller;
+package roomescape.exception;
 
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -10,9 +10,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.exception.AuthenticationException;
-import roomescape.exception.AuthorizationException;
-import roomescape.exception.RoomEscapeBusinessException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -62,6 +59,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest()
                 .body(ProblemDetail.forStatusAndDetail(
                         HttpStatus.BAD_REQUEST,
+                        e.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ProblemDetail> handlePaymentException(PaymentException e) {
+        logger.error(e.getMessage(), e);
+        return ResponseEntity.status(e.getStatusCode())
+                .body(ProblemDetail.forStatusAndDetail(
+                        e.getStatusCode(),
                         e.getMessage()
                 ));
     }

@@ -19,6 +19,7 @@ import roomescape.IntegrationTestSupport;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
 
+
 class ReservationControllerTest extends IntegrationTestSupport {
 
     String userReservationId;
@@ -44,7 +45,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 1L,
                             "date", "2025-10-06",
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     adminReservationId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -59,7 +63,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 1L,
                             "date", "2025-10-05",
                             "timeId", 100L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -74,7 +81,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 1L,
                             "date", "2025-10-05",
                             "timeId", 1L,
-                            "themeId", 100L);
+                            "themeId", 100L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -89,7 +99,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 100L,
                             "date", "2025-10-05",
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -143,7 +156,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", LocalDate.now(),
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     userReservationId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -174,7 +190,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", "2025-10-05",
                             "timeId", 100L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -189,7 +208,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 1L,
                             "date", "2025-10-05",
                             "timeId", 1L,
-                            "themeId", 100L);
+                            "themeId", 100L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -227,7 +249,10 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", LocalDate.now(),
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "amount", 1000,
+                            "orderId", "orderId",
+                            "paymentKey", "paymentKey");
 
                     userReservationId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)

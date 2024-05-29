@@ -18,6 +18,7 @@ import roomescape.domain.reservation.dto.ReservationReadOnly;
 import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.exception.AuthorizationException;
 import roomescape.exception.RoomEscapeBusinessException;
+import roomescape.infrastructure.PaymentClient;
 import roomescape.service.dto.LoginMember;
 import roomescape.service.dto.PaymentRequest;
 import roomescape.service.dto.ReservationBookedResponse;
@@ -34,20 +35,20 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final MemberRepository memberRepository;
-    private final PaymentService paymentService;
+    private final PaymentClient paymentClient;
 
     public ReservationService(
             ReservationSlotService reservationSlotService,
             ReservationRepository reservationRepository,
             WaitingRepository waitingRepository,
             MemberRepository memberRepository,
-            PaymentService paymentService
+            PaymentClient paymentClient
     ) {
         this.reservationSlotService = reservationSlotService;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.memberRepository = memberRepository;
-        this.paymentService = paymentService;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
@@ -65,7 +66,7 @@ public class ReservationService {
         }
 
         PaymentRequest paymentRequest = reservationSaveRequest.toPaymentRequest();
-        paymentService.requestApproval(paymentRequest);
+        paymentClient.requestApproval(paymentRequest);
 
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
         return ReservationResponse.createByReservation(savedReservation);

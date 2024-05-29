@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
@@ -24,7 +21,6 @@ import roomescape.domain.reservation.slot.ReservationTimeRepository;
 import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.reservation.slot.ThemeRepository;
 import roomescape.exception.RoomEscapeBusinessException;
-import roomescape.service.dto.PaymentRequest;
 import roomescape.service.dto.ReservationResponse;
 import roomescape.service.dto.ReservationSaveRequest;
 import roomescape.service.dto.ReservationStatus;
@@ -49,9 +45,6 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @MockBean
-    private PaymentService paymentService;
-
     @DisplayName("예약 저장")
     @Test
     void saveReservation() {
@@ -59,16 +52,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        PaymentService paymentService = mock(PaymentService.class);
-        int amount = 1000;
-        String orderId = "orderId";
-        String paymentKey = "paymentKey";
-        PaymentRequest request = new PaymentRequest(amount, orderId, paymentKey);
-
-        doNothing().when(paymentService).requestApproval(request);
-
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), amount, orderId, paymentKey);
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
 
         assertAll(
@@ -93,9 +78,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Member member2 = memberRepository.save(Member.createUser("고구마2", "email2@email.com", "1234"));
 
         ReservationSaveRequest reservationSaveRequest1 = new ReservationSaveRequest(member1.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationSaveRequest reservationSaveRequest2 = new ReservationSaveRequest(member2.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
         ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationSaveRequest1);
 
@@ -206,11 +191,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Member member2 = memberRepository.save(Member.createUser("고구마2", "email2@email.com", "1234"));
 
         ReservationSaveRequest reservationSaveRequest1 = new ReservationSaveRequest(member1.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationSaveRequest reservationSaveRequest2 = new ReservationSaveRequest(member2.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationSaveRequest reservationSaveRequest3 = new ReservationSaveRequest(member3.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
         Long reservationId = reservationService.saveReservation(reservationSaveRequest1).id();
         reservationService.saveReservation(reservationSaveRequest2);
