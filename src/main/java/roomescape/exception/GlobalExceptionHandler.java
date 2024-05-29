@@ -30,6 +30,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponse("[Client Error] " + errorResponse.message()));
     }
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> externalApiException(ExternalApiException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ErrorResponse("[External Error] " + e.getMessage()));
+    }
+
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(AuthorizationException e) {
         e.printStackTrace();
