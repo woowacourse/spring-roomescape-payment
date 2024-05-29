@@ -1,7 +1,10 @@
 package roomescape.exception;
 
-public class PaymentException extends RuntimeException{
-    public PaymentException(final String message) {
-        super(message);
+import org.springframework.http.HttpStatus;
+
+public class PaymentException extends CustomException {
+
+    public PaymentException(final String message, HttpStatus httpStatus) {
+        super(message, httpStatus);
     }
 }
