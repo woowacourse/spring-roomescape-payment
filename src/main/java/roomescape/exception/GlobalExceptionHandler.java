@@ -37,6 +37,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER, e.getMessage());
     }
 
+    @ExceptionHandler(ThirdPartyAPIException.class)
+    public ResponseEntity<Object> handleThirdPartyAPIException(ThirdPartyAPIException e) {
+        logger.error(e.getMessage(), e);
+        return makeErrorResponseEntity(ErrorCode.INTERNAL_SERVER, e.getMessage());
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             @Nullable MethodArgumentNotValidException exception,
