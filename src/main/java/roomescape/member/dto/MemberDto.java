@@ -13,6 +13,7 @@ public record MemberDto(
         MemberName name,
         MemberPassword password
 ) {
+
     public static MemberDto from(Member member) {
         return new MemberDto(
                 member.getId(),

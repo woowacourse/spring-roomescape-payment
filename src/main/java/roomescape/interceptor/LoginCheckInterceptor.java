@@ -11,6 +11,8 @@ import roomescape.util.CookieParser;
 
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
+    private static final String COOKIE_TOKEN_KEY = "token";
+
     private final TokenProvider tokenProvider;
 
     public LoginCheckInterceptor(final TokenProvider tokenProvider) {
@@ -30,7 +32,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     }
 
     private String parseAuthenticationToken(final HttpServletRequest request) {
-        final String accessToken = CookieParser.findCookie(request, "token")
+        final String accessToken = CookieParser.findCookie(request, COOKIE_TOKEN_KEY)
                 .orElseThrow(() -> new UnauthorizedException("인증되지 않은 요청입니다."))
                 .getValue();
 

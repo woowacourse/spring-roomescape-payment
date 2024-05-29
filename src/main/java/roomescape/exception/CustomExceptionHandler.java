@@ -16,6 +16,7 @@ import static org.springframework.web.client.HttpServerErrorException.InternalSe
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
+
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @ExceptionHandler

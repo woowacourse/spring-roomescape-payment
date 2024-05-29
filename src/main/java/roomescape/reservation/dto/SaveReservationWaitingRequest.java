@@ -8,6 +8,7 @@ public record SaveReservationWaitingRequest(
         Long time,
         Long theme
 ) {
+
     public SaveReservationWaitingRequest setMemberId(final Long memberId) {
         return new SaveReservationWaitingRequest(date, memberId, time, theme);
     }

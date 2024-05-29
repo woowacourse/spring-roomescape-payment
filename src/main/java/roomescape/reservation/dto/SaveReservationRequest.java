@@ -17,6 +17,7 @@ public record SaveReservationRequest(
         Long amount,
         String paymentKey
 ) {
+
     public SaveReservationRequest setMemberId(final Long memberId) {
         return new SaveReservationRequest(
                 date,

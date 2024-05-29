@@ -10,6 +10,7 @@ public record MyReservationResponse(
         LocalTime time,
         String status
 ) {
+
     public static MyReservationResponse from(final ReservationDto reservation) {
         return new MyReservationResponse(
                 reservation.id(),

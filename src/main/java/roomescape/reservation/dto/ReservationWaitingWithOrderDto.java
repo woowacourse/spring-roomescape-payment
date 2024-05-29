@@ -12,6 +12,7 @@ public record ReservationWaitingWithOrderDto(
         ThemeDto theme,
         MemberDto member
 ) {
+
     public static ReservationWaitingWithOrderDto from(ReservationWaitingWithOrder reservationWaitingWithOrder) {
         return new ReservationWaitingWithOrderDto(
                 reservationWaitingWithOrder.getReservationWaiting().getId(),

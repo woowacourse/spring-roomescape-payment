@@ -11,6 +11,7 @@ public record ThemeDto(
         ThemeDescription description,
         ThemeThumbnail thumbnail
 ) {
+
     public static ThemeDto from(final Theme theme) {
         return new ThemeDto(
                 theme.getId(),

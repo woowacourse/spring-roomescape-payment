@@ -28,20 +28,13 @@ public class TokenProvider {
     }
 
     private Claims createClaims(final Long memberId, final MemberRole role) {
+        Date expiredTime = new Date(new Date().getTime() + tokenExpirationPeriod);
         return Jwts.claims()
                 .subject(memberId.toString())
                 .issuedAt(new Date(currentTimeMillis()))
-                .expiration(createExpirationDate())
+                .expiration(expiredTime)
                 .add("role", role.name())
                 .build();
-    }
-
-    private Date createExpirationDate() {
-        return generateTokenExpiration();
-    }
-
-    private Date generateTokenExpiration() {
-        return new Date(new Date().getTime() + tokenExpirationPeriod);
     }
 
     public Claims getTokenClaims(final String token) {

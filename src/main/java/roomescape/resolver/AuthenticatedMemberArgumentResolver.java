@@ -23,7 +23,6 @@ public class AuthenticatedMemberArgumentResolver implements HandlerMethodArgumen
 
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
-
         final boolean hasLoginAnnotation = parameter.hasParameterAnnotation(Authenticated.class);
         final boolean hasAuthenticatedMemberPrincipal = AuthenticatedMember.class
                 .isAssignableFrom(parameter.getParameterType());

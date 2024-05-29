@@ -9,6 +9,7 @@ public record AvailableReservationTimeResponse(
         LocalTime startAt,
         boolean alreadyBooked
 ) {
+
     public static AvailableReservationTimeResponse of(
             final ReservationTime reservationTime,
             final boolean alreadyBooked

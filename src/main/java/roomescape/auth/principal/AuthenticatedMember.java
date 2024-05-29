@@ -9,6 +9,7 @@ public record AuthenticatedMember(
         String email,
         MemberRole role
 ) {
+
     public static AuthenticatedMember from(final Member member) {
         return new AuthenticatedMember(
                 member.getId(),

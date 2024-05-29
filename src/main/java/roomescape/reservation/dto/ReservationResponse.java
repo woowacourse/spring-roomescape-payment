@@ -11,6 +11,7 @@ public record ReservationResponse(
         ReservationTimeResponse time,
         ThemeResponse theme
 ) {
+
     public static ReservationResponse from(final ReservationDto reservation) {
         return new ReservationResponse(
                 reservation.id(),

@@ -1,11 +1,12 @@
 package roomescape.reservation.repository;
 
+import java.util.List;
 import roomescape.reservation.model.ReservationDate;
 import roomescape.reservation.model.Theme;
 
-import java.util.List;
-
 public interface CustomThemeRepository {
 
-    List<Theme> findPopularThemes(final ReservationDate startAt, final ReservationDate endAt, final int maximumThemeCount);
+    List<Theme> findPopularThemes(ReservationDate startAt,
+                                  ReservationDate endAt,
+                                  int maximumThemeCount);
 }

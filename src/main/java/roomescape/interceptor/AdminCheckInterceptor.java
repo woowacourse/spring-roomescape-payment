@@ -10,6 +10,9 @@ import roomescape.util.CookieParser;
 
 public class AdminCheckInterceptor implements HandlerInterceptor {
 
+    private static final String COOKIE_TOKEN_KEY = "token";
+    private static final String COOKIE_ROLE_KEY = "role";
+
     private final TokenProvider tokenProvider;
 
     public AdminCheckInterceptor(final TokenProvider tokenProvider) {
@@ -32,12 +35,12 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
     }
 
     private MemberRole parseMemberRole(final HttpServletRequest request) {
-        final String accessToken = CookieParser.findCookie(request, "token")
+        final String accessToken = CookieParser.findCookie(request, COOKIE_TOKEN_KEY)
                 .orElseThrow(() -> new IllegalArgumentException("인증되지 않은 요청입니다."))
                 .getValue();
 
         final String role = tokenProvider.getTokenClaims(accessToken)
-                .get("role")
+                .get(COOKIE_ROLE_KEY)
                 .toString();
 
         return MemberRole.valueOf(role);

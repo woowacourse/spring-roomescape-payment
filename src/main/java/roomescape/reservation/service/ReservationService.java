@@ -39,7 +39,8 @@ public class ReservationService {
             final ReservationWaitingRepository reservationWaitingRepository,
             final MemberService memberService,
             final ThemeService themeService,
-            final ReservationTimeService reservationTimeService, final PaymentService paymentService
+            final ReservationTimeService reservationTimeService,
+            final PaymentService paymentService
     ) {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;

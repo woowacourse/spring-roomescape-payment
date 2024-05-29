@@ -13,6 +13,7 @@ public record ReservationDto(
         ThemeDto theme,
         MemberDto member
 ) {
+
     public static ReservationDto from(Reservation reservation) {
         return new ReservationDto(
                 reservation.getId(),
