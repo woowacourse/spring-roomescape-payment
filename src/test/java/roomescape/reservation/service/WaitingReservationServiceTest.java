@@ -8,6 +8,7 @@ import static roomescape.Fixture.MEMBER_KAKI;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
 import static roomescape.Fixture.TOMORROW;
+import static roomescape.reservation.domain.Status.PAYMENT_PENDING;
 import static roomescape.reservation.domain.Status.SUCCESS;
 import static roomescape.reservation.domain.Status.WAIT;
 
@@ -74,7 +75,7 @@ class WaitingReservationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("예약 대기 승인 시, 확정된 예약이 없으면 예약 상태로 변경된다.")
+    @DisplayName("예약 대기 승인 시, 확정된 예약이 없으면 결제 대기 상태로 변경된다.")
     @Test
     void approveReservation() {
         ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
@@ -86,7 +87,7 @@ class WaitingReservationServiceTest {
 
         Reservation afterUpdate = reservationRepository.findById(waiting.getId()).get();
 
-        assertThat(afterUpdate.getStatus()).isEqualTo(SUCCESS);
+        assertThat(afterUpdate.getStatus()).isEqualTo(PAYMENT_PENDING);
     }
 
     @DisplayName("예약 대기 승인 시, 확정된 예약이 있으면 예외가 발생한다.")

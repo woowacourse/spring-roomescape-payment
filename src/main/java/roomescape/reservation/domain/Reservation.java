@@ -80,15 +80,14 @@ public class Reservation {
         }
     }
 
-    public void updateSuccessStatus() {
+    public void updatePaymentPending() {
         if (status.isSuccess()) {
             throw new IllegalArgumentException("이미 확정된 예약입니다.");
         }
-        status = Status.SUCCESS;
-    }
-
-    public boolean isSameMember(Member member) {
-        return this.member.equals(member);
+        if (status.isPaymentPending()) {
+            throw new IllegalArgumentException("이미 결제 대기된 예약입니다.");
+        }
+        status = Status.PAYMENT_PENDING;
     }
 
     public boolean isSuccessReservation() {

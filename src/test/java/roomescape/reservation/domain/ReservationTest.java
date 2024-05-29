@@ -38,9 +38,9 @@ class ReservationTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("예약 상태를 성공으로 변경한다.")
+    @DisplayName("예약 상태를 결제 대기로 변경한다.")
     @Test
-    void updateSuccessStatusWithWaitingReservation() {
+    void updatePaymentPendingWithWaitingReservation() {
         Reservation waitingReservation = new Reservation(
                 MEMBER_JOJO,
                 TOMORROW,
@@ -49,15 +49,15 @@ class ReservationTest {
                 Status.WAIT
         );
 
-        waitingReservation.updateSuccessStatus();
+        waitingReservation.updatePaymentPending();
 
-        assertThat(waitingReservation.getStatus()).isEqualTo(Status.SUCCESS);
+        assertThat(waitingReservation.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
 
     }
 
-    @DisplayName("예약 성공으로 변경 시, 이미 성공 상태이면 예외가 발생한다.")
+    @DisplayName("예약 결제 대기로 변경 시, 이미 성공 상태이면 예외가 발생한다.")
     @Test
-    void updateSuccessStatusWithReservation() {
+    void updatePaymentPendingWithSuccessReservation() {
         Reservation reservation = new Reservation(
                 MEMBER_JOJO,
                 TOMORROW,
@@ -66,7 +66,22 @@ class ReservationTest {
                 Status.SUCCESS
         );
 
-        assertThatThrownBy(reservation::updateSuccessStatus)
+        assertThatThrownBy(reservation::updatePaymentPending)
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("예약 결제 대기로 변경 시, 이미 결제 대기 상태이면 예외가 발생한다.")
+    @Test
+    void updatePaymentPendingWithPaymentPendingReservation() {
+        Reservation reservation = new Reservation(
+                MEMBER_JOJO,
+                TOMORROW,
+                HORROR_THEME,
+                RESERVATION_TIME_10_00,
+                Status.PAYMENT_PENDING
+        );
+
+        assertThatThrownBy(reservation::updatePaymentPending)
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

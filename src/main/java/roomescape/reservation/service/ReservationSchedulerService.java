@@ -26,8 +26,11 @@ public class ReservationSchedulerService {
     }
 
     public void validateApproveReservation(Reservation reservation) {
-        if (findSuccessReservation(reservation).isPresent()) {
+        if (findReservationByStatus(reservation, Status.SUCCESS).isPresent()) {
             throw new IllegalArgumentException("이미 확정된 예약이 있습니다.");
+        }
+        if (findReservationByStatus(reservation, Status.PAYMENT_PENDING).isPresent()) {
+            throw new IllegalArgumentException("이미 결제 대기 중인 예약이 있습니다.");
         }
     }
 
@@ -73,12 +76,12 @@ public class ReservationSchedulerService {
         );
     }
 
-    private Optional<Reservation> findSuccessReservation(Reservation reservation) {
+    private Optional<Reservation> findReservationByStatus(Reservation reservation, Status status) {
         return reservationRepository.findFirstByDateAndReservationTimeAndThemeAndStatus(
                 reservation.getDate(),
                 reservation.getTime(),
                 reservation.getTheme(),
-                Status.SUCCESS
+                status
         );
     }
 }

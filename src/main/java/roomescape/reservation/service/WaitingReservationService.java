@@ -49,6 +49,6 @@ public class WaitingReservationService {
         Reservation waitingReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("예약 대기 내역이 없습니다."));
         reservationSchedulerService.validateApproveReservation(waitingReservation);
-        waitingReservation.updateSuccessStatus();
+        waitingReservation.updatePaymentPending();
     }
 }
