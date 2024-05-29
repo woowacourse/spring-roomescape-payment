@@ -1,6 +1,6 @@
 package roomescape.application.payment;
 
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class PaymentService {
     public PaymentService(@Value("${payment.secret}") String secret,
                           PaymentClient paymentClient,
                           ReservationPaymentRepository reservationPaymentRepository) {
-        this.clientSecret = Arrays.toString(Base64.getEncoder().encode((secret + ":").getBytes()));
+        this.clientSecret = new String(Base64.getEncoder().encode((secret + ":").getBytes(StandardCharsets.UTF_8)));
         this.paymentClient = paymentClient;
         this.reservationPaymentRepository = reservationPaymentRepository;
     }

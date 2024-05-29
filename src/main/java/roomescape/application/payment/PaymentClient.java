@@ -10,6 +10,7 @@ import roomescape.application.payment.dto.request.PaymentRequest;
 
 @Component
 public class PaymentClient {
+    private static final String BASIC_AUTH_FORMAT = "Basic %s";
 
     private final RestClient client;
     private final ResponseErrorHandler handler;
@@ -26,7 +27,7 @@ public class PaymentClient {
     public Payment requestPurchase(String secret, PaymentRequest request) {
         return client.post()
                 .uri(url)
-                .header("Authorization", secret)
+                .header("Authorization", BASIC_AUTH_FORMAT.formatted(secret))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
