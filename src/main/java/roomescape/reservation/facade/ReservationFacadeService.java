@@ -1,6 +1,7 @@
 package roomescape.reservation.facade;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
@@ -30,11 +31,13 @@ public class ReservationFacadeService {
         this.paymentService = paymentService;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public MemberReservationResponse createReservation(ReservationCreateRequest request) {
         MemberReservation savedMemberReservation = reservationCreateService.createReservation(request);
         return MemberReservationResponse.from(savedMemberReservation);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public MemberReservationResponse createReservation(MemberReservationCreateRequest request, LoginMember member) {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.of(request, member);
 
@@ -46,26 +49,32 @@ public class ReservationFacadeService {
         return MemberReservationResponse.from(savedMemberReservation);
     }
 
+    @Transactional(readOnly = true)
     public List<MemberReservationResponse> readReservations() {
         return reservationService.readReservations();
     }
 
+    @Transactional(readOnly = true)
     public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
         return reservationService.readMemberReservations(loginMember);
     }
 
+    @Transactional(readOnly = true)
     public List<MemberReservationResponse> searchReservations(ReservationSearchRequestParameter searchCondition) {
         return reservationService.searchReservations(searchCondition);
     }
 
+    @Transactional(readOnly = true)
     public List<MemberReservationResponse> readWaitingReservations() {
         return waitingReservationService.readWaitingReservations();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void confirmWaitingReservation(Long id) {
         waitingReservationService.confirmWaitingReservation(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(Long id) {
         MemberReservation memberReservation = reservationService.readReservation(id);
         if (memberReservation.isConfirmationStatus()) {
@@ -74,6 +83,7 @@ public class ReservationFacadeService {
         reservationService.deleteReservation(memberReservation);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(Long id, LoginMember loginMember) {
         MemberReservation memberReservation = reservationService.readReservation(id);
         if (memberReservation.isConfirmationStatus()) {
@@ -82,6 +92,7 @@ public class ReservationFacadeService {
         reservationService.deleteReservation(memberReservation, loginMember);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void confirmPendingReservation(Long id, PaymentRequest paymentRequest) {
         MemberReservation memberReservation = reservationService.readReservation(id);
         paymentService.confirmPayment(paymentRequest, memberReservation);

@@ -1,7 +1,6 @@
 package roomescape.reservation.domain.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ResourceNotFoundException;
 import roomescape.reservation.domain.entity.MemberReservation;
@@ -21,14 +20,12 @@ public class WaitingReservationService {
         this.memberReservationRepository = memberReservationRepository;
     }
 
-    @Transactional(readOnly = true)
     public List<MemberReservationResponse> readWaitingReservations() {
         return memberReservationRepository.findByStatus(ReservationStatus.WAITING).stream()
                 .map(MemberReservationResponse::from)
                 .toList();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void confirmWaitingReservation(Long id) {
         MemberReservation memberReservation = findMemberReservationById(id);
         memberReservation.validateWaitingStatus();

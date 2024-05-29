@@ -1,7 +1,6 @@
 package roomescape.reservation.domain.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ResourceNotFoundException;
 import roomescape.reservation.domain.dto.WaitingReservationRanking;
@@ -37,7 +36,6 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }
 
-    @Transactional(readOnly = true)
     public List<MemberReservationResponse> readReservations() {
         return memberReservationRepository.findByStatuses(
                         List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING)).stream()
@@ -45,7 +43,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
         List<MemberReservation> confirmationReservation = memberReservationRepository
                 .findByMemberIdAndStatuses(loginMember.id(),
@@ -61,7 +58,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<MemberReservationResponse> searchReservations(ReservationSearchRequestParameter searchCondition) {
 
         List<Reservation> reservations = reservationRepository.findByDateBetweenAndThemeId(
@@ -76,12 +72,10 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public MemberReservation readReservation(Long id) {
         return findMemberReservationById(id);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(MemberReservation memberReservation) {
         memberReservation.validateIsBeforeNow();
         memberReservationRepository.delete(memberReservation);
@@ -89,7 +83,6 @@ public class ReservationService {
         confirmFirstWaitingReservation(memberReservation.getReservation());
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(MemberReservation memberReservation, LoginMember loginMember) {
         memberReservation.validateIsOwner(loginMember);
         memberReservation.validateIsBeforeNow();
@@ -103,7 +96,6 @@ public class ReservationService {
                 .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void confirmPendingReservation(Long id) {
         MemberReservation memberReservation = findMemberReservationById(id);
         memberReservation.validatePendingStatus();
