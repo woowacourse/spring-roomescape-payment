@@ -27,7 +27,7 @@ public class AdminReservationController {
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> makeReservation(@RequestBody @Valid ReservationRequest request) {
-        ReservationResponse response = reservationService.saveReservation(request);
+        ReservationResponse response = reservationService.saveReservationByAdmin(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
@@ -58,13 +58,13 @@ public class AdminReservationController {
 
     @DeleteMapping("/admin/waitings/{idWaiting}")
     public ResponseEntity<Void> cancelWaiting(@PathVariable("idWaiting") Long waitingId) {
-        cancelService.forceCancelReservation(waitingId);
+        cancelService.cancelReservationByAdmin(waitingId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/admin/reservations/{idReservation}")
     public ResponseEntity<Void> cancelReservation(@PathVariable("idReservation") Long reservationId) {
-        cancelService.forceCancelReservation(reservationId);
+        cancelService.cancelReservationByAdmin(reservationId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -73,10 +74,10 @@ public class Reservation {
         if (this.isReserved()) {
             throw new CancelReservationException("예약 취소는 어드민만 할 수 있습니다.");
         }
-        forceCancel();
+        this.status = Status.CANCELED;
     }
 
-    public void forceCancel() {
+    public void cancelByAdmin() {
         if (this.isCanceled()) {
             throw new CancelReservationException("이미 취소된 예약입니다.");
         }
@@ -103,11 +104,8 @@ public class Reservation {
         return this.status == Status.CANCELED;
     }
 
-    public Payment getPayment() {
-        if (this.payment == null) {
-            throw new IllegalStateException("결제 정보가 없습니다.");
-        }
-        return payment;
+    public Optional<Payment> getPayment() {
+        return Optional.ofNullable(payment);
     }
 
     public void setPayment(Payment payment) {

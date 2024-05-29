@@ -30,11 +30,7 @@ public class MemberReservationController {
             @RequestBody @Valid UserReservationRequest request,
             MemberInfo memberInfo
     ) {
-        ReservationRequest reservationRequest = new ReservationRequest(
-                request.date(), memberInfo.id(), request.timeId(), request.themeId(),
-                request.amount(), request.orderId(), request.paymentKey(), request.paymentType());
-
-        ReservationResponse response = reservationService.saveReservation(reservationRequest);
+        ReservationResponse response = reservationService.saveReservation(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }

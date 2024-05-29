@@ -7,7 +7,6 @@ import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.payment.CancelReason;
 import roomescape.domain.payment.PaymentClient;
-import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 
@@ -15,7 +14,6 @@ import roomescape.domain.reservation.ReservationRepository;
 @RequiredArgsConstructor
 public class CancelService {
     private final ReservationRepository reservationRepository;
-    private final PaymentRepository paymentRepository;
     private final CancelEventPublisher eventPublisher;
     private final PaymentClient paymentClient;
 
@@ -23,15 +21,15 @@ public class CancelService {
     public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
         Reservation reservation = reservationRepository.getById(reservationId);
         reservation.cancel(memberInfo.id());
-        paymentClient.cancel(reservation.getPayment(), CancelReason.empty());
+        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);
     }
 
     @Transactional
-    public void forceCancelReservation(Long reservationId) {
+    public void cancelReservationByAdmin(Long reservationId) {
         Reservation reservation = reservationRepository.getById(reservationId);
-        reservation.forceCancel();
-        paymentClient.cancel(reservation.getPayment(), CancelReason.empty());
+        reservation.cancelByAdmin();
+        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);
     }
 

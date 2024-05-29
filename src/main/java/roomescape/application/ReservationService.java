@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.ReservationSearchCondition;
+import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
@@ -35,20 +36,29 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public synchronized ReservationResponse saveReservation(ReservationRequest request) {
+    public synchronized ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
+        Member member = memberRepository.getById(memberId);
+        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
+                request.date(), request.timeId(), request.themeId());
+        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
+        reservationRepository.save(reservation);
+
+        if (reservation.isReserved()) {
+            PaymentRequest paymentRequest = request.toPaymentRequest();
+            PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+            Payment payment = paymentRepository.save(paymentResponse.toPayment());
+            reservation.setPayment(payment);
+        }
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public synchronized ReservationResponse saveReservationByAdmin(ReservationRequest request) {
         Member member = memberRepository.getById(request.memberId());
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        if (savedReservation.isReserved()) {
-            PaymentRequest paymentRequest = request.toPaymentRequest();
-            PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
-            Payment payment = paymentRepository.save(paymentResponse.toPayment());
-            savedReservation.setPayment(payment);
-        }
-
+        reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
     }
 
