@@ -8,8 +8,16 @@ public class ApiCallException extends RuntimeException {
         this.apiError = apiError;
     }
 
+    public ApiCallException(String message) {
+        super(message);
+        this.apiError = null;
+    }
+
     @Override
     public String getMessage() {
-        return apiError.message();
+        if (apiError != null) {
+            return apiError.message();
+        }
+        return super.getMessage();
     }
 }
