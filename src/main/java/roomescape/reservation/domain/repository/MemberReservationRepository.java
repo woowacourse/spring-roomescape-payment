@@ -48,6 +48,7 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
 
     boolean existsByReservationAndMember(Reservation reservation, Member member);
 
+    // TODO: 쿼리 변경
     @Modifying
     @Query(value = """
             UPDATE MemberReservation mr

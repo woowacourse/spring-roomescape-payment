@@ -57,6 +57,10 @@ public class MemberReservation extends BaseEntity {
         this.reservationStatus = ReservationStatus.DENY;
     }
 
+    public void notPaid() {
+        this.reservationStatus = ReservationStatus.NOT_PAID;
+    }
+
     public boolean canDelete(Member member) {
         return member.isAdmin() || isRegisteredMember(member);
     }

@@ -4,5 +4,6 @@ public enum ReservationStatus {
     APPROVED,
     PENDING,
     DENY,
+    NOT_PAID,
     ;
 }

@@ -67,8 +67,9 @@ public class ReservationApplicationService {
         }
         MemberReservation memberReservation = memberReservationService.createMemberReservation(member, reservation);
 
-        paymentService.approvePayment(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
-                memberReservationCreate.paymentKey()), memberReservation);
+        paymentService.approvePayment(
+                new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
+                        memberReservationCreate.paymentKey()), memberReservation);
 
         return ReservationResponse.from(memberReservation);
     }
@@ -78,7 +79,7 @@ public class ReservationApplicationService {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
         reservationCommonService.delete(member, memberReservation);
-        memberReservationService.updateStatus(memberReservation, ReservationStatus.PENDING, ReservationStatus.APPROVED);
+        memberReservationService.updateStatus(memberReservation, ReservationStatus.PENDING, ReservationStatus.NOT_PAID);
     }
 
     @Transactional

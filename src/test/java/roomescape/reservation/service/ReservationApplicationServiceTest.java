@@ -163,7 +163,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         assertAll(
                 () -> assertThat(optionalMemberReservation).isNotNull(),
                 () -> assertThat(optionalMemberReservation.get()
-                        .getReservationStatus()).isEqualTo(ReservationStatus.APPROVED)
+                        .getReservationStatus()).isEqualTo(ReservationStatus.NOT_PAID)
         );
     }
 }

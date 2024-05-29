@@ -114,7 +114,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         //then
         MemberReservation memberReservation = memberReservationRepository.findById(waitingReservation.getId())
                 .orElseThrow(IllegalStateException::new);
-        assertThat(memberReservation.getReservationStatus()).isEqualTo(ReservationStatus.APPROVED);
+        assertThat(memberReservation.getReservationStatus()).isEqualTo(ReservationStatus.NOT_PAID);
     }
 
     @DisplayName("대기 예약이 아닌 예약 승인 시, 예외가 발생한다.")

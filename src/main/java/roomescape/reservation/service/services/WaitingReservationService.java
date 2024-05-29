@@ -46,7 +46,7 @@ public class WaitingReservationService {
     public void approveWaiting(Member member, MemberReservation memberReservation) {
         validateAdminPermission(member);
         validateWaitingReservation(memberReservation);
-        memberReservation.approve();
+        memberReservation.notPaid();
     }
 
     @Transactional
