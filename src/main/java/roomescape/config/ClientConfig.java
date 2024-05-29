@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ClientConfig {
 
-    private static final int CONNECTION_TIMEOUT_MS = 30_000;
+    private static final int CONNECTION_TIMEOUT_MS = 5_000;
     private static final int READ_TIMEOUT_MS = 30_000;
 
     @Bean
