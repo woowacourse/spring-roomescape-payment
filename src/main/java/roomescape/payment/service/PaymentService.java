@@ -19,20 +19,13 @@ public class PaymentService {
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
-    private final Encoder encoder;
-    private final TossPaymentProperties tossPaymentProperties;
-
-    public PaymentService(PaymentClient paymentClient, PaymentRepository paymentRepository, Encoder encoder,
-                          TossPaymentProperties tossPaymentProperties) {
+    public PaymentService(PaymentClient paymentClient, PaymentRepository paymentRepository) {
         this.paymentClient = paymentClient;
         this.paymentRepository = paymentRepository;
-        this.encoder = encoder;
-        this.tossPaymentProperties = tossPaymentProperties;
     }
 
     public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
-        String encodeKey = encoder.encode(tossPaymentProperties.getSecretKey());
-        PaymentResponse response = paymentClient.confirm(paymentRequest, encodeKey).getBody();
+        PaymentResponse response = paymentClient.confirm(paymentRequest).getBody();
         paymentRepository.save(
                 Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
     }
@@ -40,9 +33,8 @@ public class PaymentService {
     public void refund(long memberReservationId) {
         Payment payment = paymentRepository.findByMemberReservationId(memberReservationId)
                 .orElseThrow((() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND)));
-        String encodeKey = encoder.encode(tossPaymentProperties.getSecretKey());
 
-        paymentClient.cancel(payment.getPaymentKey(), encodeKey);
+        paymentClient.cancel(payment.getPaymentKey());
         paymentRepository.delete(payment);
     }
 }

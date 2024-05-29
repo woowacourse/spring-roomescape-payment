@@ -45,12 +45,17 @@ import roomescape.util.ServiceTest;
 class ReservationApplicationServiceTest extends ServiceTest {
 
     ReservationTime time;
+
     Theme theme1;
+
     Member memberChoco;
+
     @PersistenceContext
     private EntityManager entityManager;
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private ReservationApplicationService reservationApplicationService;
 
@@ -63,7 +68,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         BigDecimal totalAmount = BigDecimal.valueOf(15000L);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
-        doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
+        doReturn(okResponse).when(paymentClient).confirm(any());
     }
 
 
