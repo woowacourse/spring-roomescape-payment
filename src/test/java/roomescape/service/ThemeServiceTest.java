@@ -36,8 +36,9 @@ class ThemeServiceTest extends BasicAcceptanceTest {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @DisplayName("해당 id의 테마 가격을 가져온다.")
     @Test
-    void name() {
+    void findThemePriceById() {
         ThemePriceResponse themePriceResponse = themeService.findThemePriceById(1L);
 
         assertThat(themePriceResponse.price()).isEqualTo(1000);
