@@ -38,7 +38,8 @@ public class PaymentService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handleClientErrorResponse(response));
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handleClientErrorResponse(response))
+                .toBodilessEntity();
     }
 
     private String createAuthorizations() {
