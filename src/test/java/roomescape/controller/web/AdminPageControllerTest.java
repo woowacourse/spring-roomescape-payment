@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.controller.dto.LoginRequest;
@@ -14,9 +15,12 @@ import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminPageControllerTest {
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -26,6 +30,8 @@ class AdminPageControllerTest {
 
     @BeforeEach
     void setUpTokens() {
+        RestAssured.port = port;
+
         memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
         memberRepository.save(new Member("사용자", "user@a.com", "123a!", Role.USER));
 

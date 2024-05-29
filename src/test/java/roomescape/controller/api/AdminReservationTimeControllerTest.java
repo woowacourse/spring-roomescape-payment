@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.controller.dto.CreateTimeRequest;
@@ -24,9 +25,12 @@ import roomescape.service.AdminReservationService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminReservationTimeControllerTest {
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -44,6 +48,8 @@ class AdminReservationTimeControllerTest {
 
     @BeforeEach
     void setUpToken() {
+        RestAssured.port = port;
+
         memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
 
         LoginRequest admin = new LoginRequest("admin@a.com", "123a!");

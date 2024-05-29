@@ -2,6 +2,8 @@ package roomescape.controller.api;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -12,22 +14,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequestDto;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationControllerTest {
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -41,6 +49,9 @@ class UserReservationControllerTest {
     @Autowired
     private UserReservationService userReservationService;
 
+    @MockBean
+    private PaymentService paymentService;
+
     private static final Long USER_ID = 1L;
     private static final Long ANOTHER_USER_ID = 2L;
 
@@ -53,7 +64,9 @@ class UserReservationControllerTest {
     private String userToken;
 
     @BeforeEach
-    void setUpData() {
+    void setUp() {
+        RestAssured.port = port;
+
         reservationTimeService.save("10:00");
         themeService.save("t1", "설명1", "https://test.com/test.jpg");
         memberRepository.save(new Member("러너덕", "user@a.com", "123a!", Role.USER));
@@ -71,8 +84,12 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약 저장 -> 201")
     @Test
     void save() {
-        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
-        CreateReservationRequest request = new CreateReservationRequest(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        doNothing()
+            .when(paymentService)
+            .pay(any(PaymentRequestDto.class));
+
+        CreateUserReservationRequest request = new CreateUserReservationRequest(
+            DATE_FIRST, THEME_ID, TIME_ID, null, null, 1000, null);
 
         RestAssured.given().log().all()
             .contentType(ContentType.JSON)
@@ -140,9 +157,12 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
     @Test
     void save_TimeIdNotFound() {
-        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
-        CreateReservationRequest request = new CreateReservationRequest(
-            USER_ID, DATE_FIRST, 2L, THEME_ID);
+        doNothing()
+            .when(paymentService)
+            .pay(any(PaymentRequestDto.class));
+
+        CreateUserReservationRequest request = new CreateUserReservationRequest(
+            DATE_FIRST, THEME_ID, 2L, null, null, 1000, null);
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -157,9 +177,12 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
     @Test
     void save_ThemeIdNotFound() {
-        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
-        CreateReservationRequest request = new CreateReservationRequest(
-            USER_ID, DATE_FIRST, TIME_ID, 2L);
+        doNothing()
+            .when(paymentService)
+            .pay(any(PaymentRequestDto.class));
+
+        CreateUserReservationRequest request = new CreateUserReservationRequest(
+            DATE_FIRST, 2L, TIME_ID, null, null, 1000, null);
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -174,7 +197,10 @@ class UserReservationControllerTest {
     @DisplayName("실패: 중복 예약 -> 400")
     @Test
     void save_Duplication() {
-        // TODO: 결제 api 호출을 mocking 혹은 가짜객체 사용하는 방식으로 수정
+        doNothing()
+            .when(paymentService)
+            .pay(any(PaymentRequestDto.class));
+
         userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         CreateUserReservationRequest request
@@ -186,14 +212,15 @@ class UserReservationControllerTest {
             .body(request)
             .when().post("/reservations")
             .then().log().all()
-            .statusCode(404);
+            .statusCode(400)
+            .body("message", is("해당 시간에 예약이 이미 존재합니다."));
     }
 
     @DisplayName("실패: 과거 시간 예약 -> 400")
     @Test
     void save_PastTime() {
-        CreateReservationRequest request = new CreateReservationRequest(
-            USER_ID, LocalDate.now().minusDays(1), TIME_ID, THEME_ID);
+        CreateUserReservationRequest request = new CreateUserReservationRequest(
+            LocalDate.now().minusDays(1), THEME_ID, TIME_ID, null, null, 1000, null);
 
         RestAssured.given().log().all()
             .cookie("token", userToken)
@@ -201,7 +228,8 @@ class UserReservationControllerTest {
             .body(request)
             .when().post("/reservations")
             .then().log().all()
-            .statusCode(400);
+            .statusCode(400)
+            .body("message", is("[date](은)는 과거 날짜로는 예약할 수 없습니다."));
     }
 
     @DisplayName("성공: 나의 예약 목록 조회 -> 200")
