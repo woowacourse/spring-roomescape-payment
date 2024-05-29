@@ -17,7 +17,7 @@ public class TossPaymentClient implements PaymentClient {
 
     @Value("${security.api.toss.secret-key}")
     private String widgetSecretKey;
-    String authorizations;
+    private final String authorizations;
 
     public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
