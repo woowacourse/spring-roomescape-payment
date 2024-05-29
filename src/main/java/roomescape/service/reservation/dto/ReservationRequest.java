@@ -2,7 +2,6 @@ package roomescape.service.reservation.dto;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import roomescape.controller.reservation.dto.AdminReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -70,5 +69,5 @@ public class ReservationRequest {
 
     public Long getThemeId() {
         return themeId;
-    }
+    } // TODO: getter 동작 점검하기
 }

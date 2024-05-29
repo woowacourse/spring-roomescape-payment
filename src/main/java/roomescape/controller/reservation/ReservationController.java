@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.auth.LoginMember;
 import roomescape.controller.auth.RoleAllowed;
-import roomescape.controller.reservation.dto.AdminReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.service.member.MemberService;
 import roomescape.service.reservation.ReservationService;
+import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -61,9 +61,7 @@ public class ReservationController {
     @RoleAllowed(MemberRole.ADMIN)
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> saveAdminReservation(@RequestBody AdminReservationRequest request) {
-        ReservationRequest input = new ReservationRequest(request);
-        Member member = memberService.findById(request.getMemberId());
-        ReservationResponse response = reservationService.saveReservation(input, member);
+        ReservationResponse response = reservationService.saveAdminReservation(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
