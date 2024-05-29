@@ -27,8 +27,9 @@ public class ReservationPaymentRequest {
     public ReservationPaymentRequest() {
     }
 
-    public ReservationPaymentRequest(final String date, final Long timeId, final Long themeId, final String paymentKey,
-                                     final String orderId, final Integer amount) {
+    public ReservationPaymentRequest(final String date, final Long timeId, final Long themeId,
+                                     final String paymentKey, final String orderId,
+                                     final Integer amount) {
         this.date = date;
         this.timeId = timeId;
         this.themeId = themeId;

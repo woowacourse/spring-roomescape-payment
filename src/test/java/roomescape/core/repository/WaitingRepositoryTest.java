@@ -31,13 +31,16 @@ class WaitingRepositoryTest {
     @Test
     @DisplayName("회원의 예약 대기가 몇 번째 순번인지 조회한다.")
     void findWaitingRankByMember() {
-        final Member member = memberRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
-        final ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
+        final Member member = memberRepository.findById(1L)
+                .orElseThrow(IllegalArgumentException::new);
+        final ReservationTime time = reservationTimeRepository.findById(1L)
+                .orElseThrow(IllegalArgumentException::new);
         final Theme theme = themeRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
         final Waiting waiting = new Waiting(member, TestFixture.getTomorrowDate(), time, theme);
         waitingRepository.save(waiting);
 
-        final List<WaitingWithRank> waitingWithRanks = waitingRepository.findAllWithRankByMember(member);
+        final List<WaitingWithRank> waitingWithRanks
+                = waitingRepository.findAllWithRankByMember(member);
 
         assertThat(waitingWithRanks.get(0).getRank()).isZero();
     }

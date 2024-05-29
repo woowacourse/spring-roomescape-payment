@@ -10,7 +10,8 @@ public class PaymentSecretKeyEncoder {
 
     public String getEncodedSecretKey() {
         final Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode(
+                (WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
 
         return "Basic " + new String(encodedBytes);
     }

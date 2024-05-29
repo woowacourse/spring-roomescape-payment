@@ -37,7 +37,8 @@ public class Waiting {
     public Waiting() {
     }
 
-    public Waiting(final Member member, final String date, final ReservationTime time, final Theme theme) {
+    public Waiting(final Member member, final String date,
+                   final ReservationTime time, final Theme theme) {
         this.member = member;
         this.date = parseDate(date);
         this.time = time;

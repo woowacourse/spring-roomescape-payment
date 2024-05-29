@@ -16,7 +16,8 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
 
-    public LoginMemberArgumentResolver(final MemberService memberService, final TokenProvider tokenProvider) {
+    public LoginMemberArgumentResolver(final MemberService memberService,
+                                       final TokenProvider tokenProvider) {
         this.memberService = memberService;
         this.tokenProvider = tokenProvider;
     }
@@ -27,8 +28,10 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     }
 
     @Override
-    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(final MethodParameter parameter,
+                                  final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest,
+                                  final WebDataBinderFactory binderFactory) {
         final HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         final String token = tokenProvider.getTokenFromCookies(request);
 

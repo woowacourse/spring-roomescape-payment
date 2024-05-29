@@ -25,12 +25,13 @@ public class ReservationRequest {
     public ReservationRequest() {
     }
 
-    public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId) {
+    public ReservationRequest(final Long memberId, final String date, final Long timeId,
+                              final Long themeId) {
         this(memberId, date, timeId, themeId, null, null);
     }
 
-    public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId,
-                              final String paymentKey, final String orderId) {
+    public ReservationRequest(final Long memberId, final String date, final Long timeId,
+                              final Long themeId, final String paymentKey, final String orderId) {
         this.memberId = memberId;
         this.date = date;
         this.timeId = timeId;

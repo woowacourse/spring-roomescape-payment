@@ -59,7 +59,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") final long id, final LoginMember loginMember) {
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") final long id,
+                                                  final LoginMember loginMember) {
         reservationService.deleteByAdmin(id, loginMember);
         return ResponseEntity.noContent().build();
     }
@@ -89,7 +90,8 @@ public class AdminController {
     }
 
     @PostMapping("/themes")
-    public ResponseEntity<ThemeResponse> createTheme(@Valid @RequestBody final ThemeRequest request) {
+    public ResponseEntity<ThemeResponse> createTheme(
+            @Valid @RequestBody final ThemeRequest request) {
         final ThemeResponse response = themeService.create(request);
         return ResponseEntity.created(URI.create("/themes/" + response.getId()))
                 .body(response);
@@ -107,7 +109,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/waitings/{id}")
-    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") final long id, final LoginMember loginMember) {
+    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") final long id,
+                                              final LoginMember loginMember) {
         waitingService.deleteByAdmin(id, loginMember);
         return ResponseEntity.noContent().build();
     }

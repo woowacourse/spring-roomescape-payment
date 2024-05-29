@@ -27,11 +27,12 @@ public class WaitingController {
     }
 
     @PostMapping
-    public ResponseEntity<WaitingResponse> create(@Valid @RequestBody final MemberWaitingRequest request,
-                                                  final LoginMember loginMember) {
-        final WaitingRequest waitingRequest = new WaitingRequest(loginMember.getId(), request.getDate(),
-                request.getTimeId(),
-                request.getThemeId());
+    public ResponseEntity<WaitingResponse> create(
+            @Valid @RequestBody final MemberWaitingRequest request,
+            final LoginMember loginMember) {
+        final WaitingRequest waitingRequest = new WaitingRequest(
+                loginMember.getId(), request.getDate(),
+                request.getTimeId(), request.getThemeId());
 
         final WaitingResponse response = waitingService.create(waitingRequest);
         return ResponseEntity.created(URI.create("/waitings/" + response.getId()))
@@ -44,7 +45,8 @@ public class WaitingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") final long id, final LoginMember loginMember) {
+    public ResponseEntity<Void> delete(@PathVariable("id") final long id,
+                                       final LoginMember loginMember) {
         waitingService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }

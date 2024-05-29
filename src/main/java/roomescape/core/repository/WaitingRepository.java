@@ -27,8 +27,9 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     Waiting findFirstByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time,
                                            final Theme theme);
 
-    boolean existsByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time, final Theme theme);
+    boolean existsByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time,
+                                        final Theme theme);
 
-    boolean existsByMemberAndDateAndTimeAndTheme(final Member member, final LocalDate date, final ReservationTime time,
-                                                 final Theme theme);
+    boolean existsByMemberAndDateAndTimeAndTheme(final Member member, final LocalDate date,
+                                                 final ReservationTime time, final Theme theme);
 }

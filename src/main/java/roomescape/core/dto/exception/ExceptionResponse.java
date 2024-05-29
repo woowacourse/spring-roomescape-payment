@@ -8,7 +8,9 @@ public class ExceptionResponse {
     private final String error;
     private final List<ExceptionDetails> details;
 
-    public ExceptionResponse(final int status, final String error, final BindingResult bindingResult) {
+    public ExceptionResponse(final int status,
+                             final String error,
+                             final BindingResult bindingResult) {
         this.status = status;
         this.error = error;
         this.details = ExceptionDetails.create(bindingResult);

@@ -37,12 +37,14 @@ public class ReservationTimeService {
         final ReservationTime reservationTime = new ReservationTime(request.getStartAt());
         validateDuplicatedStartAt(reservationTime);
 
-        final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
+        final ReservationTime savedReservationTime
+                = reservationTimeRepository.save(reservationTime);
         return new ReservationTimeResponse(savedReservationTime.getId(), savedReservationTime);
     }
 
     private void validateDuplicatedStartAt(final ReservationTime reservationTime) {
-        final Integer reservationTimeCount = reservationTimeRepository.countByStartAt(reservationTime.getStartAt());
+        final Integer reservationTimeCount
+                = reservationTimeRepository.countByStartAt(reservationTime.getStartAt());
 
         if (reservationTimeCount > 0) {
             throw new IllegalArgumentException(DUPLICATED_TIME_EXCEPTION_MESSAGE);
@@ -59,9 +61,10 @@ public class ReservationTimeService {
 
     @Transactional(readOnly = true)
     public List<BookedTimeResponse> findAllWithBookable(final String date, final long themeId) {
-        final Theme theme = themeRepository.findById(themeId).orElseThrow(IllegalArgumentException::new);
-        final List<Reservation> reservations = reservationRepository.findAllByDateAndTheme(LocalDate.parse(date),
-                theme);
+        final Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(IllegalArgumentException::new);
+        final List<Reservation> reservations = reservationRepository.findAllByDateAndTheme(
+                LocalDate.parse(date), theme);
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
 
         return reservationTimes.stream()
@@ -71,12 +74,15 @@ public class ReservationTimeService {
 
     private BookedTimeResponse findBookedTimes(final ReservationTime reservationTime,
                                                final List<Reservation> reservations) {
-        return new BookedTimeResponse(reservationTime, isAlreadyBooked(reservationTime, reservations));
+        boolean isAlreadyBooked = isAlreadyBooked(reservationTime, reservations);
+        return new BookedTimeResponse(reservationTime, isAlreadyBooked);
     }
 
-    private boolean isAlreadyBooked(final ReservationTime reservationTime, final List<Reservation> reservations) {
+    private boolean isAlreadyBooked(final ReservationTime reservationTime,
+                                    final List<Reservation> reservations) {
         return reservations.stream()
-                .anyMatch(reservation -> Objects.equals(reservation.getReservationTime(), reservationTime));
+                .anyMatch(reservation -> Objects.equals(reservation.getReservationTime(),
+                        reservationTime));
     }
 
     @Transactional

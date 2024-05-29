@@ -15,19 +15,22 @@ import roomescape.core.repository.ThemeRepository;
 public class ThemeService {
     public static final String THEME_NAME_DUPLICATED_EXCEPTION_MESSAGE = "해당 이름의 테마가 이미 존재합니다.";
     public static final String TIME_ZONE = "Asia/Seoul";
-    public static final String BOOKED_THEME_DELETE_EXCEPTION_MESSAGE = "예약 내역이 존재하는 테마는 삭제할 수 없습니다.";
+    public static final String BOOKED_THEME_DELETE_EXCEPTION_MESSAGE = "예약 내역이 존재하는 테마는 삭제할 수 "
+            + "없습니다.";
 
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ThemeService(final ThemeRepository themeRepository, final ReservationRepository reservationRepository) {
+    public ThemeService(final ThemeRepository themeRepository,
+                        final ReservationRepository reservationRepository) {
         this.themeRepository = themeRepository;
         this.reservationRepository = reservationRepository;
     }
 
     @Transactional
     public ThemeResponse create(final ThemeRequest request) {
-        final Theme theme = new Theme(request.getName(), request.getDescription(), request.getThumbnail());
+        final Theme theme = new Theme(request.getName(), request.getDescription(),
+                request.getThumbnail());
         validateDuplicatedName(theme);
         final Theme savedTheme = themeRepository.save(theme);
 

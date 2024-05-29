@@ -34,7 +34,8 @@ public class Member {
         this(null, name, email, password, role);
     }
 
-    public Member(final Long id, final String name, final String email, final String password, final Role role) {
+    public Member(final Long id, final String name, final String email,
+                  final String password, final Role role) {
         this.id = id;
         this.name = name;
         this.email = email;

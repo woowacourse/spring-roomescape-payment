@@ -95,12 +95,18 @@ class ThemeServiceTest {
     }
 
     private void createReservations() {
-        final ReservationTime reservationTimeAfterOneMinute = testFixture.persistReservationTimeAfterMinute(1);
-        final Reservation oneMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
+        final ReservationTime reservationTimeAfterOneMinute =
+                testFixture.persistReservationTimeAfterMinute(
+                1);
+        final Reservation oneMinuteAfterReservation = new Reservation(getMember(),
+                TestFixture.getTodayDate(),
                 reservationTimeAfterOneMinute, getTheme());
 
-        final ReservationTime reservationTimeAfterTwoMinute = testFixture.persistReservationTimeAfterMinute(2);
-        final Reservation twoMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
+        final ReservationTime reservationTimeAfterTwoMinute =
+                testFixture.persistReservationTimeAfterMinute(
+                2);
+        final Reservation twoMinuteAfterReservation = new Reservation(getMember(),
+                TestFixture.getTodayDate(),
                 reservationTimeAfterTwoMinute, getTheme());
 
         reservationRepository.save(oneMinuteAfterReservation);

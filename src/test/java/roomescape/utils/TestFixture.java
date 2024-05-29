@@ -57,7 +57,8 @@ public class TestFixture {
     }
 
     public static Member getMember() {
-        return new Member("사용자", TestFixture.getMemberEmail(), TestFixture.getPassword(), Role.USER);
+        return new Member("사용자", TestFixture.getMemberEmail(), TestFixture.getPassword(),
+                Role.USER);
     }
 
     @Transactional
@@ -90,7 +91,8 @@ public class TestFixture {
     }
 
     @Transactional
-    public void persistReservationWithDateAndTimeAndTheme(final String date, final long timeId, final long themeId) {
+    public void persistReservationWithDateAndTimeAndTheme(final String date, final long timeId,
+                                                          final long themeId) {
         final Member member = memberRepository.findById(1L)
                 .orElseThrow(IllegalArgumentException::new);
         final ReservationTime time = reservationTimeRepository.findById(timeId)

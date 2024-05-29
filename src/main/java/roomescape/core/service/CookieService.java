@@ -27,6 +27,7 @@ public class CookieService {
                 .filter(cookie -> cookie.getName().equals(COOKIE_NAME))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new IllegalArgumentException(TOKEN_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(TOKEN_NOT_EXISTS_EXCEPTION_MESSAGE));
     }
 }

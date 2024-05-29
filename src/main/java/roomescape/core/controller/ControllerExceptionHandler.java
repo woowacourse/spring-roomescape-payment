@@ -32,9 +32,11 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleIllegalArgumentException(final IllegalArgumentException exception) {
+    public ResponseEntity<ProblemDetail> handleIllegalArgumentException(
+            final IllegalArgumentException exception) {
         return ResponseEntity.badRequest()
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                        exception.getMessage()));
     }
 
     @ExceptionHandler
@@ -43,30 +45,37 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleDuplicateKeyException(final DuplicateKeyException exception) {
+    public ResponseEntity<ProblemDetail> handleDuplicateKeyException(
+            final DuplicateKeyException exception) {
         return ResponseEntity.badRequest()
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                        exception.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleHttpClientErrorException(final HttpClientErrorException exception) {
-        final String exceptionMessage = Optional.ofNullable(exception.getResponseBodyAs(HttpExceptionResponse.class))
+    public ResponseEntity<ProblemDetail> handleHttpClientErrorException(
+            final HttpClientErrorException exception) {
+        final String message = Optional.ofNullable(exception
+                        .getResponseBodyAs(HttpExceptionResponse.class))
                 .map(HttpExceptionResponse::getMessage)
                 .orElse(exception.getMessage());
 
         return ResponseEntity.status(exception.getStatusCode())
-                .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(), exceptionMessage));
+                .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(), message));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleResourceAccessException(final ResourceAccessException exception) {
+    public ResponseEntity<ProblemDetail> handleResourceAccessException(
+            final ResourceAccessException exception) {
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.REQUEST_TIMEOUT, REQUEST_TIMEOUT_EXCEPTION_MESSAGE));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.REQUEST_TIMEOUT,
+                        REQUEST_TIMEOUT_EXCEPTION_MESSAGE));
     }
 
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleRuntimeException(final RuntimeException exception) {
         return ResponseEntity.internalServerError()
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+                        exception.getMessage()));
     }
 }

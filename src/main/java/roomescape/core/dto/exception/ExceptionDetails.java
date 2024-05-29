@@ -8,7 +8,9 @@ public class ExceptionDetails {
     private final String rejectedField;
     private final String rejectedValue;
 
-    private ExceptionDetails(final String message, final String rejectedField, final String rejectedValue) {
+    private ExceptionDetails(final String message,
+                             final String rejectedField,
+                             final String rejectedValue) {
         this.message = message;
         this.rejectedField = rejectedField;
         this.rejectedValue = rejectedValue;

@@ -11,7 +11,8 @@ public class PaymentConfirmResponse {
         this.paymentKey = paymentKey;
     }
 
-    public PaymentConfirmResponse() {}
+    public PaymentConfirmResponse() {
+    }
 
     public Integer getTotalAmount() {
         return totalAmount;

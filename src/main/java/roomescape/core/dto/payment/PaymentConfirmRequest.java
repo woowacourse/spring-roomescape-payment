@@ -13,7 +13,8 @@ public class PaymentConfirmRequest {
         this.paymentKey = request.getPaymentKey();
     }
 
-    public PaymentConfirmRequest() {}
+    public PaymentConfirmRequest() {
+    }
 
     public Integer getAmount() {
         return amount;

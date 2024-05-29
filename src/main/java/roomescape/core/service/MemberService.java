@@ -23,17 +23,20 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
 
-    public MemberService(final TokenProvider tokenProvider, final MemberRepository memberRepository) {
+    public MemberService(final TokenProvider tokenProvider,
+                         final MemberRepository memberRepository) {
         this.tokenProvider = tokenProvider;
         this.memberRepository = memberRepository;
     }
 
     public TokenResponse createToken(final TokenRequest request) {
-        final Member member = memberRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
+        final Member member = memberRepository
+                .findByEmailAndPassword(request.getEmail(), request.getPassword());
         if (member == null) {
             throw new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION_MESSAGE);
         }
-        return new TokenResponse(tokenProvider.createToken(member.getEmail(), member.getRole().name()));
+        return new TokenResponse(
+                tokenProvider.createToken(member.getEmail(), member.getRole().name()));
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +69,8 @@ public class MemberService {
 
     @Transactional
     public MemberResponse create(final MemberRequest request) {
-        final Member member = new Member(request.getName(), request.getEmail(), request.getPassword(), Role.USER);
+        final Member member = new Member(request.getName(),request.getEmail(),
+                request.getPassword(), Role.USER);
         try {
             final Member savedMember = memberRepository.save(member);
             return new MemberResponse(savedMember.getId(), savedMember.getName());

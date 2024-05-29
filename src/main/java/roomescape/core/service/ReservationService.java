@@ -27,9 +27,11 @@ public class ReservationService {
     protected static final String MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 회원입니다.";
     protected static final String TIME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약 시간입니다.";
     protected static final String THEME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 테마입니다.";
-    protected static final String ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE = "해당 시간에 이미 예약 내역이 존재합니다.";
+    protected static final String ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE
+            = "해당 시간에 이미 예약 내역이 존재합니다.";
     protected static final String RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약입니다.";
-    protected static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약만 취소할 수 있습니다.";
+    protected static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE
+            = "본인의 예약만 취소할 수 있습니다.";
     protected static final String NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE = "관리자만 예약을 취소할 수 있습니다.";
 
     private final ReservationRepository reservationRepository;
@@ -67,7 +69,8 @@ public class ReservationService {
         final String paymentKey = request.getPaymentKey();
         final String orderId = request.getOrderId();
 
-        final Reservation reservation = new Reservation(member, date, reservationTime, theme, paymentKey, orderId);
+        final Reservation reservation
+                = new Reservation(member, date, reservationTime, theme, paymentKey, orderId);
 
         validateDuplicatedReservation(reservation, reservationTime);
 
@@ -76,7 +79,8 @@ public class ReservationService {
 
     private Member getMemberById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
     }
 
     private ReservationTime getReservationTimeById(final Long id) {
@@ -86,10 +90,12 @@ public class ReservationService {
 
     private Theme getThemeById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(THEME_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(THEME_NOT_EXISTS_EXCEPTION_MESSAGE));
     }
 
-    private void validateDuplicatedReservation(final Reservation reservation, final ReservationTime reservationTime) {
+    private void validateDuplicatedReservation(final Reservation reservation,
+                                               final ReservationTime reservationTime) {
         final Integer reservationCount = reservationRepository.countByDateAndTimeAndTheme(
                 reservation.getDate(), reservationTime, reservation.getTheme());
         if (reservationCount > 0) {
@@ -131,14 +137,17 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> findAllByMemberAndThemeAndPeriod(final Long memberId, final Long themeId,
-                                                                      final String from, final String to) {
+    public List<ReservationResponse> findAllByMemberAndThemeAndPeriod(final Long memberId,
+                                                                      final Long themeId,
+                                                                      final String from,
+                                                                      final String to) {
         final Member member = getMemberById(memberId);
         final Theme theme = getThemeById(themeId);
         final LocalDate dateFrom = LocalDate.parse(from);
         final LocalDate dateTo = LocalDate.parse(to);
 
-        return reservationRepository.findAllByMemberAndThemeAndDateBetween(member, theme, dateFrom, dateTo)
+        return reservationRepository
+                .findAllByMemberAndThemeAndDateBetween(member, theme, dateFrom, dateTo)
                 .stream()
                 .map(ReservationResponse::new)
                 .toList();
@@ -147,7 +156,8 @@ public class ReservationService {
     @Transactional
     public void delete(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
         final Long reservationMemberId = reservation.getMember().getId();
         final Long loginMemberId = loginMember.getId();
 
@@ -165,7 +175,8 @@ public class ReservationService {
         final Theme theme = reservation.getTheme();
 
         if (waitingRepository.existsByDateAndTimeAndTheme(date, time, theme)) {
-            final Waiting waiting = waitingRepository.findFirstByDateAndTimeAndTheme(date, time, theme);
+            final Waiting waiting
+                    = waitingRepository.findFirstByDateAndTimeAndTheme(date, time, theme);
             final Member member = waiting.getMember();
             final String dateString = date.format(DateTimeFormatter.ISO_DATE);
 
@@ -179,9 +190,11 @@ public class ReservationService {
     @Transactional
     public void deleteByAdmin(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         if (member.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException(NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE);

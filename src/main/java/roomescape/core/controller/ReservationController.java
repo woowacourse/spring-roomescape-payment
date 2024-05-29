@@ -40,20 +40,22 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest memberRequest,
-                                                      final LoginMember member) {
+    public ResponseEntity<ReservationResponse> create(
+            @Valid @RequestBody final ReservationPaymentRequest memberRequest,
+            final LoginMember member) {
         final PaymentConfirmResponse confirmResponse = getPaymentConfirmResponse(memberRequest);
 
-        final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
-                memberRequest.getTimeId(), memberRequest.getThemeId(), confirmResponse.getPaymentKey(),
-                confirmResponse.getOrderId());
+        final ReservationRequest request = new ReservationRequest(member.getId(),
+                memberRequest.getDate(), memberRequest.getTimeId(), memberRequest.getThemeId(),
+                confirmResponse.getPaymentKey(), confirmResponse.getOrderId());
 
         final ReservationResponse response = reservationService.create(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);
     }
 
-    private PaymentConfirmResponse getPaymentConfirmResponse(final ReservationPaymentRequest memberRequest) {
+    private PaymentConfirmResponse getPaymentConfirmResponse(
+            final ReservationPaymentRequest memberRequest) {
         final String authorizations = paymentSecretKeyEncoder.getEncodedSecretKey();
 
         return restClient.post()
@@ -75,17 +77,19 @@ public class ReservationController {
             @RequestParam(required = false, name = "themeId") final Long themeId,
             @RequestParam(required = false, name = "dateFrom") final String dateFrom,
             @RequestParam(required = false, name = "dateTo") final String dateTo) {
-        return ResponseEntity.ok(
-                reservationService.findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo));
+        return ResponseEntity.ok(reservationService
+                .findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo));
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(final LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(
+            final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findAllByMember(loginMember));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") final long id, final LoginMember loginMember) {
+    public ResponseEntity<Void> delete(@PathVariable("id") final long id,
+                                       final LoginMember loginMember) {
         reservationService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }

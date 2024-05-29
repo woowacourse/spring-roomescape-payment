@@ -46,22 +46,24 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme) {
+    public Reservation(final Member member, final String date, final ReservationTime time,
+                       final Theme theme) {
         this(null, member, date, time, theme);
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
-                       final String paymentKey, final String orderId) {
+    public Reservation(final Member member, final String date, final ReservationTime time,
+                       final Theme theme, final String paymentKey, final String orderId) {
         this(null, member, date, time, theme, paymentKey, orderId);
     }
 
-    public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme) {
+    public Reservation(final Long id, final Member member, final String date,
+                       final ReservationTime time, final Theme theme) {
         this(id, member, date, time, theme, null, null);
     }
 
-    public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final String paymentKey, final String orderId) {
+    public Reservation(final Long id, final Member member, final String date,
+                       final ReservationTime time, final Theme theme,
+                       final String paymentKey, final String orderId) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);

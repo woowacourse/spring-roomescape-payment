@@ -50,7 +50,7 @@ class ReservationControllerTest {
     @ValueSource(strings = {" ", "abc"})
     @DisplayName("예약 생성 시, date의 형식이 올바르지 않으면 예외가 발생한다.")
     void validateReservationWithDateFormat(final String date) {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1000);
+        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -64,7 +64,8 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 생성 시, timeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullTimeId() {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1000);
+        ReservationPaymentRequest request
+                = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -78,7 +79,8 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 생성 시, themeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullThemeId() {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1000);
+        ReservationPaymentRequest request
+                = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -146,7 +148,8 @@ class ReservationControllerTest {
     @Test
     @DisplayName("토큰이 유효하지 않을 경우 예외가 발생한다.")
     void validateToken() {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1000);
+        ReservationPaymentRequest request
+                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1);
 
         RestAssured.given().log().all()
                 .cookies("token", "invalid-token")

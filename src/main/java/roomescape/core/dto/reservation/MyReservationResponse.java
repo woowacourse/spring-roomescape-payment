@@ -15,8 +15,8 @@ public class MyReservationResponse {
     private final String time;
     private final String status;
 
-    private MyReservationResponse(final Long reservationId, final String theme, final String date, final String time,
-                                  final String status) {
+    private MyReservationResponse(final Long reservationId, final String theme, final String date,
+                                  final String time, final String status) {
         this.id = reservationId;
         this.theme = theme;
         this.date = date;
@@ -31,8 +31,8 @@ public class MyReservationResponse {
         final ReservationTime time = waiting.getTime();
         final String status = (waitingWithRank.getRank() + 1) + "번째 예약 대기";
 
-        return new MyReservationResponse(waiting.getId(), theme.getName(), date.format(DateTimeFormatter.ISO_DATE),
-                time.getStartAtString(), status);
+        return new MyReservationResponse(waiting.getId(), theme.getName(),
+                date.format(DateTimeFormatter.ISO_DATE), time.getStartAtString(), status);
     }
 
     public static MyReservationResponse from(final Reservation reservation) {
@@ -40,8 +40,8 @@ public class MyReservationResponse {
         final ReservationTime time = reservation.getReservationTime();
         final String status = "예약";
 
-        return new MyReservationResponse(reservation.getId(), theme.getName(), reservation.getDateString(),
-                time.getStartAtString(), status);
+        return new MyReservationResponse(reservation.getId(), theme.getName(),
+                reservation.getDateString(), time.getStartAtString(), status);
     }
 
     public Long getId() {

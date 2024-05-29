@@ -18,11 +18,12 @@ public class WaitingResponse {
     private final ThemeResponse theme;
 
     public WaitingResponse(final Waiting waiting) {
-        this(waiting.getId(), waiting.getMember(), waiting.getDate(), waiting.getTime(), waiting.getTheme());
+        this(waiting.getId(), waiting.getMember(), waiting.getDate(),
+                waiting.getTime(), waiting.getTheme());
     }
 
-    public WaitingResponse(final Long id, final Member member, final LocalDate date, final ReservationTime time,
-                           final Theme theme) {
+    public WaitingResponse(final Long id, final Member member, final LocalDate date,
+                           final ReservationTime time, final Theme theme) {
         this.id = id;
         this.member = new MemberResponse(member);
         this.date = date.format(DateTimeFormatter.ISO_DATE);

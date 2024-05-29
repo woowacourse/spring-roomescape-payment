@@ -54,7 +54,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약을 생성한다.")
     void create() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
 
         final ReservationResponse response = reservationService.create(request);
 
@@ -69,7 +70,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원으로 예약을 생성하려고 하면 예외가 발생한다.")
     void createWithInvalidMember() {
-        final ReservationRequest request = new ReservationRequest(0L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(0L, TestFixture.getTomorrowDate(), 1L, 1L);
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -79,7 +81,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("존재하지 않는 예약 시간으로 예약을 생성하려고 하면 예외가 발생한다.")
     void createWithInvalidTime() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 0L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 0L, 1L);
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -89,7 +92,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("존재하지 않는 테마로 예약을 생성하려고 하면 예외가 발생한다.")
     void createWithInvalidTheme() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 0L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 0L);
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -99,7 +103,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("이미 예약된 날짜, 시간, 테마로 예약을 생성하려고 하면 예외가 발생한다.")
     void createWithDuplicatedReservation() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         reservationService.create(request);
 
         assertThatThrownBy(() -> reservationService.create(request))
@@ -110,7 +115,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약 목록을 조회한다.")
     void findAll() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         reservationService.create(request);
 
         assertThat(reservationService.findAll()).hasSize(2);
@@ -119,7 +125,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("로그인한 회원의 예약 목록을 조회한다.")
     void findAllByMember() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         final LoginMember loginMember = new LoginMember(1L);
         reservationService.create(request);
 
@@ -129,17 +136,19 @@ class ReservationServiceTest {
     @Test
     @DisplayName("특정 회원의 기간 내 예약 목록을 조회한다.")
     void findAllByMemberAndThemeAndPeriod() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         reservationService.create(request);
 
-        assertThat(reservationService.findAllByMemberAndThemeAndPeriod(1L, 1L, TestFixture.getTodayDate(),
-                TestFixture.getTomorrowDate())).hasSize(2);
+        assertThat(reservationService.findAllByMemberAndThemeAndPeriod(1L, 1L,
+                TestFixture.getTodayDate(), TestFixture.getTomorrowDate())).hasSize(2);
     }
 
     @Test
     @DisplayName("예약을 삭제한다.")
     void delete() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         reservationService.create(request);
         final LoginMember loginMember = new LoginMember(1L);
 
@@ -161,7 +170,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약을 삭제한 후, 해당 날짜, 시간, 테마에 예약 대기가 있다면 자동으로 예약으로 전환한다.")
     void deleteAndAcceptWaiting() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         final ReservationResponse response = reservationService.create(request);
         saveWaiting(TestFixture.getTomorrowDate());
         final LoginMember loginMember = new LoginMember(1L);
@@ -183,7 +193,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약을 삭제할 때, 본인의 예약이 아니면 예외가 발생한다.")
     void deleteNotMyReservation() {
-        final ReservationRequest request = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(1L, TestFixture.getTomorrowDate(), 1L, 1L);
         final ReservationResponse response = reservationService.create(request);
         final LoginMember loginMember = new LoginMember(2L);
 
@@ -195,7 +206,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약을 삭제할 때, 관리자용 삭제를 시도한 사용자가 관리자가 아니면 예외가 발생한다.")
     void deleteReservationByAdminRole() {
-        final ReservationRequest request = new ReservationRequest(2L, TestFixture.getTomorrowDate(), 1L, 1L);
+        final ReservationRequest request
+                = new ReservationRequest(2L, TestFixture.getTomorrowDate(), 1L, 1L);
         final ReservationResponse response = reservationService.create(request);
         final LoginMember loginMember = new LoginMember(2L);
 
