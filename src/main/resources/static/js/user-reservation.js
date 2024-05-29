@@ -208,7 +208,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }
   }
 
-  fetch(RESERVATION_API_ENDPOINT + "/v2", {
+  fetch(RESERVATION_API_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

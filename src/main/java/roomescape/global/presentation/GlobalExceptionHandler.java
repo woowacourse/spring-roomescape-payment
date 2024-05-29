@@ -22,6 +22,7 @@ import roomescape.auth.exception.AuthorizationException;
 import roomescape.global.dto.ErrorResponse;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
+import roomescape.payment.exception.PaymentServerException;
 import roomescape.reservation.exception.DataNotConvertedException;
 
 import java.util.Objects;
@@ -112,6 +113,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logErrorMessage(e);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("DATA ACCESS ERROR"));
+    }
+
+    @ExceptionHandler(PaymentServerException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentServerException(PaymentServerException e) {
+        logErrorMessage(e);
+        return ResponseEntity.internalServerError()
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
