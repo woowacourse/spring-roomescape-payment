@@ -17,7 +17,7 @@ public class PaymentErrorDecoder implements ErrorDecoder {
             ObjectMapper mapper = new ObjectMapper();
             TossErrorResponse tossErrorResponse = mapper.readValue(response.body().asInputStream(),
                     TossErrorResponse.class);
-            return new PaymentException(tossErrorResponse, response.status());
+            return new PaymentException(tossErrorResponse);
         } catch (IOException e) {
             return defaultErrorDecoder.decode(methodKey, response);
         }
