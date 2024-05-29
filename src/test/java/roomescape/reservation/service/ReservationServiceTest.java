@@ -3,10 +3,17 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static roomescape.reservation.fixture.ReservationFixture.MEMBER_ID_1_RESERVATION;
 import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
+import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS;
+import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
+import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_2;
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
@@ -26,6 +33,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWithWaiting;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.PaymentConfirmRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.service.ThemeService;
 import roomescape.time.service.ReservationTimeService;
@@ -44,6 +52,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeService themeService;
+
+    @Mock
+    private PaymentClient paymentClient;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -76,7 +87,7 @@ class ReservationServiceTest {
         when(themeService.findById(1L)).thenReturn(THEME_1);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(MEMBER_ID_1_RESERVATION);
 
-        ReservationResponse savedReservation = reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1);
+        ReservationResponse savedReservation = reservationService.saveReservation(RESERVATION_REQUEST_1);
 
         assertThat(savedReservation).isEqualTo(new ReservationResponse(MEMBER_ID_1_RESERVATION));
     }
@@ -88,7 +99,7 @@ class ReservationServiceTest {
         when(reservationTimeService.findById(1L)).thenReturn(RESERVATION_TIME_10_00_ID_1);
         when(themeService.findById(1L)).thenReturn(THEME_1);
 
-        assertThatThrownBy(() -> reservationService.saveMemberReservation(1L, PAST_DATE_RESERVATION_REQUEST))
+        assertThatThrownBy(() -> reservationService.saveReservation(PAST_DATE_RESERVATION_REQUEST))
                 .isInstanceOf(IllegalRequestException.class);
     }
 
@@ -99,7 +110,30 @@ class ReservationServiceTest {
                 any(Long.class))).thenReturn(List.of(
                 MEMBER_ID_1_RESERVATION));
 
-        assertThatThrownBy(() -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+        assertThatThrownBy(() -> reservationService.saveReservation(RESERVATION_REQUEST_1))
                 .isInstanceOf(IllegalRequestException.class);
+    }
+
+    @DisplayName("결제가 승인되지 않으면 멤버의 예약 저장에 실패한다")
+    @Test
+    void should_throw_exception_when_reservation_not_confirmed_payments() {
+        doThrow(IllegalRequestException.class)
+                .when(paymentClient)
+                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+
+        assertThatThrownBy(
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
+                .isInstanceOf(IllegalRequestException.class);
+    }
+
+    @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
+    @Test
+    void should_save_member_reservation_when_payment_is_confirmed() {
+        doNothing().when(paymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
+
+        reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
+
+        verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 }

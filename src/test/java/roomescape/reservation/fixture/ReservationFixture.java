@@ -10,19 +10,38 @@ import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_11
 import roomescape.member.fixture.MemberFixture;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MemberReservationAddRequest;
+import roomescape.reservation.dto.ReservationRequest;
 
 public class ReservationFixture {
 
-    public static final MemberReservationAddRequest RESERVATION_REQUEST_1 = new MemberReservationAddRequest(
+    public static final ReservationRequest RESERVATION_REQUEST_1 = new ReservationRequest(
             TOMORROW,
             1L,
-            1L);
-
-    public static final MemberReservationAddRequest PAST_DATE_RESERVATION_REQUEST = new MemberReservationAddRequest(
-            YESTERDAY,
             1L,
             1L);
 
+
+    public static final ReservationRequest PAST_DATE_RESERVATION_REQUEST = new ReservationRequest(
+            YESTERDAY,
+            1L,
+            1L,
+            1L);
+
+    public static final MemberReservationAddRequest RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS = new MemberReservationAddRequest(
+            TOMORROW,
+            1L,
+            1L,
+            "invalid payment key",
+            "invalid order id",
+            10000);
+
+    public static final MemberReservationAddRequest RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS = new MemberReservationAddRequest(
+            TOMORROW,
+            1L,
+            1L,
+            "valid payment key",
+            "valid order id",
+            10000);
     public static final Reservation SAVED_RESERVATION_1 = new Reservation(
             1L,
             MemberFixture.MEMBER_ID_1,
