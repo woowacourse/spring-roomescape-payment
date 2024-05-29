@@ -12,6 +12,9 @@ public class DateUtil {
     public static final LocalDate A_WEEK_AGO = LocalDate.now().minusDays(7);
     public static final LocalTime CURRENT_TIME = LocalTime.now();
 
+    private DateUtil() {
+    }
+
     public static Date getCurrentTime() {
         return new Date();
     }
