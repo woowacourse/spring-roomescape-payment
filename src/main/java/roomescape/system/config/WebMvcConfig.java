@@ -1,7 +1,9 @@
 package roomescape.system.config;
 
 import java.util.List;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,5 +28,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor);
+    }
+
+    @Bean
+    public RestClient paymentClient() {
+        return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
     }
 }

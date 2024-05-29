@@ -1,5 +1,6 @@
 package roomescape.system.exception;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import roomescape.system.dto.response.ErrorResponse;
 import roomescape.system.exception.error.ErrorType;
 import roomescape.system.exception.model.AssociatedDataExistsException;
@@ -42,6 +44,7 @@ public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         logger.error(e.getMessage(), e);
+
         return ErrorResponse.of(ErrorType.INVALID_REQUEST_DATA, e.getMessage());
     }
 
@@ -64,6 +67,14 @@ public class ExceptionControllerAdvice {
     public ErrorResponse handleHttpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException e) {
         logger.error(e.getMessage(), e);
         return ErrorResponse.of(ErrorType.METHOD_NOT_ALLOWED, ErrorType.METHOD_NOT_ALLOWED.getDescription());
+    }
+
+    @ExceptionHandler(value = HttpClientErrorException.class)
+    public ErrorResponse handlePaymentException(final HttpClientErrorException e, final HttpServletResponse response) {
+        logger.error(e.getMessage(), e);
+        response.setStatus(e.getStatusCode().value());
+
+        return ErrorResponse.of(ErrorType.PAYMENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(value = {DataDuplicateException.class, AssociatedDataExistsException.class})

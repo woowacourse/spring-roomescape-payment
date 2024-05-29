@@ -3,27 +3,22 @@ package roomescape.reservation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import org.apache.tomcat.websocket.server.WsHandshakeRequest;
-import org.hibernate.tool.schema.TargetType;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.core.ResolvableType;
+import java.util.Base64;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.DataBinder;
-import org.springframework.validation.DataBinder.ValueResolver;
-import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.NativeWebRequest;
-import roomescape.reservation.dto.request.FilteredReservationRequest;
+import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -38,9 +33,11 @@ import roomescape.system.dto.response.ApiResponse;
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
+    private final RestClient restClient;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService, RestClient restClient) {
         this.reservationService = reservationService;
+        this.restClient = restClient;
     }
 
     @Admin
@@ -71,7 +68,7 @@ public class ReservationController {
     ) {
         return ApiResponse.success(
                 reservationService.findFilteredReservations(request)
-                );
+        );
     }
 
     @Admin
@@ -94,6 +91,7 @@ public class ReservationController {
             @MemberId final Long memberId,
             final HttpServletResponse response
     ) {
+        confirm(reservationRequest);
         final ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
 
         response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());
@@ -109,5 +107,22 @@ public class ReservationController {
         reservationService.removeReservationById(reservationId, memberId);
 
         return ApiResponse.success();
+    }
+
+    private void confirm(ReservationRequest reservationRequest) {
+
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
+        ResponseEntity<Void> authorization = restClient.post()
+                .uri("/v1/payments/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reservationRequest)
+                .header("Authorization", authorizations)
+                .retrieve()
+                .toBodilessEntity();
     }
 }
