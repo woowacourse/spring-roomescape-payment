@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan("roomescape.auth.service.jwt")
+@ConfigurationPropertiesScan(basePackages = {"roomescape.payment", "roomescape.auth.service.jwt"})
 public class RoomescapeApplication {
     public static void main(String[] args) {
         SpringApplication.run(RoomescapeApplication.class, args);
     }
-
 }

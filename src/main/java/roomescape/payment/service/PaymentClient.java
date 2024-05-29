@@ -31,7 +31,7 @@ public class PaymentClient {
     public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest) {
         try {
             return restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
+                    .uri(tossPaymentProperties.getConfirmUrl())
                     .header("Authorization", getEncodeKey())
                     .body(paymentRequest)
                     .retrieve().toEntity(PaymentResponse.class);
@@ -48,7 +48,7 @@ public class PaymentClient {
         
         try {
             return restClient.post()
-                    .uri(String.format("https://api.tosspayments.com/v1/payments/%s/cancel", paymentKey))
+                    .uri(String.format(tossPaymentProperties.getCancelUrl(), paymentKey))
                     .header("Authorization", getEncodeKey())
                     .body(params)
                     .retrieve().toEntity(PaymentResponse.class);

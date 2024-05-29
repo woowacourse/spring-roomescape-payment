@@ -17,6 +17,7 @@ import roomescape.reservation.domain.MemberReservation;
 public class PaymentService {
 
     private final PaymentClient paymentClient;
+
     private final PaymentRepository paymentRepository;
 
     public PaymentService(PaymentClient paymentClient, PaymentRepository paymentRepository) {
