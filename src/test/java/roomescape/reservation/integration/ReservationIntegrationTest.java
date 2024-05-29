@@ -1,26 +1,38 @@
 package roomescape.reservation.integration;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.willDoNothing;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
+import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
+@ExtendWith(MockitoExtension.class)
 class ReservationIntegrationTest extends IntegrationTest {
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회, 삭제한다.")
     void adminReservationPageWork() {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
-
-        ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L);
+        ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
+                "paymentType", "paymentKey", "orderId", 1000);
+        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
+        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
 
         int id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -54,8 +66,10 @@ class ReservationIntegrationTest extends IntegrationTest {
     void notExistTime() {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
-
-        ReservationRequest reservationRequest = new ReservationRequest(TODAY, 0L, 1L);
+        ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 0L,
+                "paymentType", "paymentKey", "orderId", 1000);
+        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
+        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

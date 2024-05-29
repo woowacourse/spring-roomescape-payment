@@ -12,22 +12,26 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.registration.domain.reservation.controller.ReservationController;
-import roomescape.vo.Name;
+import roomescape.client.payment.PaymentClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.model.ControllerTest;
+import roomescape.registration.domain.reservation.controller.ReservationController;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
-import roomescape.theme.domain.Theme;
 import roomescape.reservationtime.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
+import roomescape.vo.Name;
 
+@ExtendWith(MockitoExtension.class)
 @WebMvcTest(ReservationController.class)
 class ReservationControllerTest extends ControllerTest {
 
@@ -48,6 +52,9 @@ class ReservationControllerTest extends ControllerTest {
 
     @MockBean
     private ReservationService reservationService;
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("예약 정보를 잘 불러오는지 확인한다.")
