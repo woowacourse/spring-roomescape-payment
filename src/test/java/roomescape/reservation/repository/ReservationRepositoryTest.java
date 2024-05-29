@@ -37,7 +37,7 @@ import roomescape.reservation.domain.ReservationWithRank;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
-import roomescape.reservation.dto.request.ReservationSearchCondRequest;
+import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 
 @DataJpaTest
 class ReservationRepositoryTest {

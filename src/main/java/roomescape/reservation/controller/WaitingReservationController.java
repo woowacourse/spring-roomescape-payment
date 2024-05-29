@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.ResourcesResponse;
-import roomescape.reservation.dto.request.WaitingReservationRequest;
-import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
-import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.controller.dto.request.WaitingReservationSaveRequest;
+import roomescape.reservation.controller.dto.response.ReservationResponse;
+import roomescape.reservation.controller.dto.response.WaitingResponse;
 import roomescape.reservation.service.WaitingReservationService;
+import roomescape.reservation.service.dto.request.WaitingReservationRequest;
 
 @RestController
 public class WaitingReservationController {

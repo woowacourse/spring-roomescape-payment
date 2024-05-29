@@ -3,7 +3,7 @@ package roomescape.common.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.temporal.ChronoUnit;
-import roomescape.reservation.dto.request.ReservationSearchCondRequest;
+import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 
 public class DateRangeValidator implements ConstraintValidator<ValidDateRange, ReservationSearchCondRequest> {
 

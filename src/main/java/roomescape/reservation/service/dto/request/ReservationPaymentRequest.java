@@ -1,7 +1,8 @@
-package roomescape.reservation.dto.request;
+package roomescape.reservation.service.dto.request;
 
 import java.time.LocalDate;
 import roomescape.auth.dto.LoginMember;
+import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
 public record ReservationPaymentRequest(
         Long memberId,

@@ -3,13 +3,13 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.controller.dto.request.ReservationSaveRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.WaitingReservationRequest;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
+import roomescape.reservation.service.dto.request.WaitingReservationRequest;
 
 @Service
 public class ReservationFactoryService {
@@ -28,7 +28,7 @@ public class ReservationFactoryService {
         this.memberRepository = memberRepository;
     }
 
-    public Reservation createSuccess(ReservationRequest saveRequest) {
+    public Reservation createSuccess(ReservationSaveRequest saveRequest) {
         Member member = findMember(saveRequest.memberId());
         Theme theme = findTheme(saveRequest.themeId());
         ReservationTime reservationTime = findReservationTime(saveRequest.timeId());

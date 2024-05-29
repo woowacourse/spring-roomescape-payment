@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
-import roomescape.reservation.dto.request.PaymentConfirmRequest;
-import roomescape.reservation.dto.response.PaymentResponse;
+import roomescape.reservation.controller.dto.response.PaymentResponse;
+import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 
 @Service
 public class PaymentService {

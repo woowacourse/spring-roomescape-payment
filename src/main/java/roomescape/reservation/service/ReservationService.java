@@ -4,15 +4,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.reservation.controller.dto.request.ReservationSaveRequest;
+import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
+import roomescape.reservation.controller.dto.response.MemberReservationResponse;
+import roomescape.reservation.controller.dto.response.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
-import roomescape.reservation.dto.request.PaymentConfirmRequest;
-import roomescape.reservation.dto.request.ReservationPaymentRequest;
-import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.ReservationSearchCondRequest;
-import roomescape.reservation.dto.response.MemberReservationResponse;
-import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,20 +37,20 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse save(ReservationPaymentRequest request) {
-        ReservationRequest reservationRequest = ReservationRequest.from(request);
-        Reservation savedReservation = createReservation(reservationRequest);
+        ReservationSaveRequest reservationSaveRequest = ReservationSaveRequest.from(request);
+        Reservation savedReservation = createReservation(reservationSaveRequest);
         paymentService.confirmPayment(PaymentConfirmRequest.from(request));
 
         return ReservationResponse.toResponse(savedReservation);
     }
 
     @Transactional
-    public ReservationResponse saveByAdmin(ReservationRequest saveRequest) {
+    public ReservationResponse saveByAdmin(ReservationSaveRequest saveRequest) {
         Reservation savedReservation = createReservation(saveRequest);
         return ReservationResponse.toResponse(savedReservation);
     }
 
-    private Reservation createReservation(ReservationRequest saveRequest) {
+    private Reservation createReservation(ReservationSaveRequest saveRequest) {
         Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
         reservationSchedulerService.validateSaveReservation(reservation);
         return reservationRepository.save(reservation);

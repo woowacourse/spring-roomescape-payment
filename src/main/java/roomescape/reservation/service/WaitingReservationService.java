@@ -3,12 +3,12 @@ package roomescape.reservation.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.reservation.controller.dto.response.ReservationResponse;
+import roomescape.reservation.controller.dto.response.WaitingResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
-import roomescape.reservation.dto.request.WaitingReservationRequest;
-import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.dto.request.WaitingReservationRequest;
 
 @Service
 @Transactional(readOnly = true)

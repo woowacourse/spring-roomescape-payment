@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.common.config.IntegrationTest;
 import roomescape.common.util.CookieUtils;
-import roomescape.reservation.dto.request.ThemeSaveRequest;
+import roomescape.reservation.controller.dto.request.ThemeSaveRequest;
 
 class ThemeControllerTest extends IntegrationTest {
 
