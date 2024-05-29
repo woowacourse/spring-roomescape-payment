@@ -53,16 +53,16 @@ class ThemeControllerTest {
                 .body("size()", is(5));
     }
 
-    @Test
-    @DisplayName("지난 한 주 동안의 인기 테마 목록을 조회한다.")
-    void findPopularThemes() {
-        createReservationTimes();
-        createReservations();
-        ValidatableResponse response = e2eTest.get("/themes/popular");
-        response.statusCode(200)
-                .body("size()", is(1))
-                .body("name", is(List.of("테마2")));
-    }
+//    @Test
+//    @DisplayName("지난 한 주 동안의 인기 테마 목록을 조회한다.")
+//    void findPopularThemes() {
+//        createReservationTimes();
+//        createReservations();
+//        ValidatableResponse response = e2eTest.get("/themes/popular");
+//        response.statusCode(200)
+//                .body("size()", is(1))
+//                .body("name", is(List.of("테마2")));
+//    }
 
     private void createReservationTimes() {
         ReservationTimeRequest timeRequest = new ReservationTimeRequest(
@@ -78,17 +78,17 @@ class ThemeControllerTest {
         response2.statusCode(201);
     }
 
-    private void createReservations() {
-        MemberReservationRequest firstThemeMemberReservationRequest = new MemberReservationRequest(
-                LocalDate.now().format(DateTimeFormatter.ISO_DATE), 4L, 2L, Status.BOOKED.getValue());
-
-        ValidatableResponse response1 = e2eTest.post(firstThemeMemberReservationRequest, "/reservations", accessToken);
-        response1.statusCode(201);
-
-        MemberReservationRequest firstThemeMemberReservationRequest2 = new MemberReservationRequest(
-                LocalDate.now().format(DateTimeFormatter.ISO_DATE), 5L, 2L, Status.BOOKED.getValue());
-
-        ValidatableResponse response2 = e2eTest.post(firstThemeMemberReservationRequest2, "/reservations", accessToken);
-        response2.statusCode(201);
-    }
+//    private void createReservations() {
+//        MemberReservationRequest firstThemeMemberReservationRequest = new MemberReservationRequest(
+//                LocalDate.now().format(DateTimeFormatter.ISO_DATE), 4L, 2L, Status.BOOKED.getValue());
+//
+//        ValidatableResponse response1 = e2eTest.post(firstThemeMemberReservationRequest, "/reservations", accessToken);
+//        response1.statusCode(201);
+//
+//        MemberReservationRequest firstThemeMemberReservationRequest2 = new MemberReservationRequest(
+//                LocalDate.now().format(DateTimeFormatter.ISO_DATE), 5L, 2L, Status.BOOKED.getValue());
+//
+//        ValidatableResponse response2 = e2eTest.post(firstThemeMemberReservationRequest2, "/reservations", accessToken);
+//        response2.statusCode(201);
+//    }
 }

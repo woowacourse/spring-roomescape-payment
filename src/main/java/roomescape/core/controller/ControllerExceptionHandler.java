@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.core.dto.exception.ExceptionResponse;
+import roomescape.core.exception.PaymentException;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
@@ -21,7 +22,6 @@ public class ControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 exception.getBindingResult()
         );
-
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -47,6 +47,11 @@ public class ControllerExceptionHandler {
             final DataIntegrityViolationException exception) {
         return ResponseEntity.badRequest()
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ""));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handlePaymentException(final PaymentException exception) {
+        return ResponseEntity.status(exception.getStatusCode()).body(exception.getMessage());
     }
 
     @ExceptionHandler

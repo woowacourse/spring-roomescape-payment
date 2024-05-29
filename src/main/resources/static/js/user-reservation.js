@@ -222,6 +222,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     date: reservationData.date,
     themeId: reservationData.themeId,
     timeId: reservationData.timeId,
+    status: '예약',
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
