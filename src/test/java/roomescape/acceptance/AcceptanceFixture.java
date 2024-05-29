@@ -1,17 +1,28 @@
 package roomescape.acceptance;
 
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.given;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalTime;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.application.auth.TokenManager;
 import roomescape.application.auth.dto.TokenPayload;
 import roomescape.application.member.dto.request.MemberLoginRequest;
 import roomescape.application.member.dto.request.MemberRegisterRequest;
+import roomescape.application.payment.PaymentClient;
+import roomescape.application.payment.dto.Payment;
+import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.request.ReservationTimeRequest;
 import roomescape.application.reservation.dto.request.ThemeRequest;
@@ -21,10 +32,14 @@ import roomescape.application.reservation.dto.response.ThemeResponse;
 import roomescape.domain.member.Role;
 
 @TestComponent
+@ExtendWith(MockitoExtension.class)
 public class AcceptanceFixture {
 
     @Autowired
     private TokenManager tokenManager;
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     private String adminToken;
 
@@ -80,10 +95,16 @@ public class AcceptanceFixture {
     }
 
     public ReservationResponse createReservation(String token, ReservationRequest request) {
+        given(paymentClient.requestPurchase(anyString(), any(PaymentRequest.class)))
+                .willReturn(new Payment("paymentKey", "orderId", "DONE", 10000L));
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                request.memberId(), request.themeId(), request.date(), request.timeId(),
+                "paymentKey", "orderId"
+        );
         return RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .body(request)
+                .body(reservationPaymentRequest)
                 .when().post("/reservations")
                 .then().log().all()
                 .extract()

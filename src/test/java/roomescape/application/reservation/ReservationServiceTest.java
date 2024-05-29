@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.ServiceTest;
 import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
+import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.BookStatus;
@@ -53,14 +54,13 @@ class ReservationServiceTest {
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Theme theme = themeRepository.save(TEST_THEME.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationPaymentRequest reservationRequest = new ReservationPaymentRequest(
+        ReservationRequest reservationRequest = new ReservationRequest(
                 member.getId(),
-                LocalDate.of(2024, 1, 1),
-                time.getId(),
-                theme.getId()
+                theme.getId(), LocalDate.of(2024, 1, 1),
+                time.getId()
         );
 
-        reservationService.bookReservation(reservationRequest);
+        reservationService.bookReservationWithoutPurchase(reservationRequest);
 
         List<Reservation> reservations = reservationRepository.findAllBookedReservations();
         assertThat(reservations).hasSize(1);
@@ -73,9 +73,11 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MEMBER_ARU.create());
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
-                LocalDate.of(2024, 1, 1),
+                savedTheme.getId(), LocalDate.of(2024, 1, 1),
                 99L,
-                savedTheme.getId());
+                "paymentKey",
+                "orderId"
+        );
 
         assertThatCode(() -> reservationService.bookReservation(request))
                 .isInstanceOf(NoSuchElementException.class)
@@ -89,9 +91,10 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MEMBER_ARU.create());
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
-                LocalDate.of(2024, 1, 1),
+                99L, LocalDate.of(2024, 1, 1),
                 time.getId(),
-                99L
+                "paymentKey",
+                "orderId"
         );
         assertThatCode(() -> reservationService.bookReservation(request))
                 .isInstanceOf(NoSuchElementException.class)
@@ -106,9 +109,10 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MEMBER_ARU.create());
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
-                LocalDate.of(1999, 12, 31),
+                theme.getId(), LocalDate.of(1999, 12, 31),
                 time.getId(),
-                theme.getId()
+                "paymentKey",
+                "orderId"
         );
 
         assertThatCode(() -> reservationService.bookReservation(request))

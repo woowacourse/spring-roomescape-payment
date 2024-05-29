@@ -3,7 +3,6 @@ package roomescape.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,26 +13,6 @@ import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationStatusResponse;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
-
-    @Test
-    @DisplayName("예약을 생성한다.")
-    void createReservationTest() {
-        long themeId = fixture.createTheme(
-                new ThemeRequest("테마명", "테마 설명", "url", 10_000L)
-        ).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
-        String token = fixture.loginAndGetToken("email@mail.com", "12341234");
-
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 12, 25), timeId, themeId);
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
-    }
 
     @Test
     @DisplayName("관리자가 예약을 삭제한다.")

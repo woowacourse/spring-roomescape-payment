@@ -56,7 +56,7 @@ class ReservationWaitingServiceTest {
         LocalDate date = LocalDate.parse("2023-01-01");
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest request = new ReservationRequest(member.getId(), date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(member.getId(), theme.getId(), date, time.getId());
 
         reservationService.enqueueWaitingList(request);
 
@@ -75,7 +75,7 @@ class ReservationWaitingServiceTest {
         LocalDate date = LocalDate.parse("2023-01-01");
         ReservationTime time = reservationTimeRepository.save(TWELVE_PM.create());
         Member member = memberRepository.save(MEMBER_ARU.create());
-        ReservationRequest request = new ReservationRequest(member.getId(), date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(member.getId(), theme.getId(), date, time.getId());
         LocalDateTime createdAt = LocalDateTime.parse("1999-01-01T00:00:00");
         reservationRepository.save(
                 new Reservation(member, theme, date, time, createdAt, status)
@@ -93,7 +93,7 @@ class ReservationWaitingServiceTest {
         Member member = memberRepository.save(MEMBER_ARU.create());
         Member pk = memberRepository.save(MEMBER_PK.create());
         LocalDate date = LocalDate.parse("2023-01-01");
-        ReservationRequest request = new ReservationRequest(member.getId(), date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(member.getId(), theme.getId(), date, time.getId());
         LocalDateTime createdAt = LocalDateTime.of(1999, 1, 1, 12, 0);
         reservationRepository.save(
                 new Reservation(pk, theme, date, time, createdAt, BookStatus.BOOKED)

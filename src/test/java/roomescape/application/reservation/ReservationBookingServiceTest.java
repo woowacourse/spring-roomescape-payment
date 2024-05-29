@@ -50,9 +50,10 @@ class ReservationBookingServiceTest {
 
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 member.getId(),
-                LocalDate.of(2024, 1, 1),
+                theme.getId(), LocalDate.of(2024, 1, 1),
                 reservationTime.getId(),
-                theme.getId()
+                "paymentKey",
+                "orderId"
         );
         assertThatCode(() -> reservationService.bookReservation(request))
                 .isInstanceOf(AlreadyBookedException.class);
