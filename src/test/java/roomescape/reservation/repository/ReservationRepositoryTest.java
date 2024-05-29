@@ -89,27 +89,6 @@ public class ReservationRepositoryTest {
         assertThat(findReservation.getMember().getEmail()).isEqualTo(savedReservation.getMember().getEmail());
     }
 
-    @DisplayName("예약 대기 순서를 반환한다.")
-    @Test
-    void countWaitingRankBy() {
-        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
-        Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
-        Member kaki = memberRepository.save(KAKI);
-        Member jojo = memberRepository.save(JOJO);
-
-        reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.WAIT));
-
-        Reservation jojoReservation = reservationRepository.save(
-                new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.WAIT)
-        );
-
-        int jojoRank = reservationRepository.countWaitingRankBy(TODAY, horrorTheme.getId(), hour10.getId(), jojoReservation.getCreatedAt());
-
-        assertThat(jojoRank).isEqualTo(2);
-    }
-
     @DisplayName("예약 대기 상태인 첫 번째 예약을 반환한다.")
     @Test
     void findFirstWaitingReservationBy() {

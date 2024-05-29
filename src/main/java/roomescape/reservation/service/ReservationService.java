@@ -13,6 +13,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waitings;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -128,18 +129,14 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<MemberReservationResponse> findMemberReservations(LoginMember loginMember) {
-        List<Reservation> memberReservations = reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(
-                loginMember.id(), LocalDate.now());
+        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT, LocalDate.now());
 
-        return memberReservations.stream()
+        Waitings waitings = new Waitings(waitingReservations);
+
+        return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
                 .map(reservation -> MemberReservationResponse.toResponse(
                         reservation,
-                        reservationRepository.countWaitingRankBy(
-                                reservation.getDate(),
-                                reservation.getTime().getId(),
-                                reservation.getTheme().getId(),
-                                reservation.getCreatedAt()
-                        )
+                        waitings.findMemberRank(reservation, loginMember.id())
                 )).toList();
     }
 
