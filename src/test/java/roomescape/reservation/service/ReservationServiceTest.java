@@ -10,14 +10,19 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.common.ClientConfiguration;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.FakePaymentClient;
+import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
@@ -37,27 +42,30 @@ import roomescape.waiting.service.WaitingService;
 
 @JpaRepositoryTest
 @DatabaseIsolation
-@Import({ReservationService.class, WaitingService.class})
+@Import({ReservationService.class,
+        PaymentService.class,
+        WaitingService.class,
+        FakePaymentClient.class,
+        ClientConfiguration.class})
+@EnableConfigurationProperties({PaymentProperties.class})
 class ReservationServiceTest {
 
     private final ReservationService reservationService;
-    private final WaitingService waitingService;
-    private final ReservationRepository reservationRepository;
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     ReservationServiceTest(final ReservationService reservationService,
-                           final WaitingService waitingService,
                            final ReservationRepository reservationRepository,
                            final ReservationTimeRepository reservationTimeRepository,
                            final ThemeRepository themeRepository,
                            final MemberRepository memberRepository,
                            final WaitingRepository waitingRepository) {
         this.reservationService = reservationService;
-        this.waitingService = waitingService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -74,7 +82,8 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MemberFixture.getOne());
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
-                LocalDate.of(2024, 10, 10), reservationTime.getId(), theme.getId());
+                LocalDate.of(2024, 10, 10), reservationTime.getId(), theme.getId(),
+                "paymentKey", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when
@@ -94,7 +103,7 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MemberFixture.getOne());
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
-                LocalDate.of(2024, 10, 10), 1L, theme.getId());
+                LocalDate.of(2024, 10, 10), 1L, theme.getId(), "paymentKey", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
@@ -111,7 +120,7 @@ class ReservationServiceTest {
         Member member = memberRepository.save(MemberFixture.getOne());
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
-                LocalDate.of(2024, 10, 10), reservationTime.getId(), 1L);
+                LocalDate.of(2024, 10, 10), reservationTime.getId(), 1L, "paymentKey", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
@@ -131,7 +140,7 @@ class ReservationServiceTest {
         reservationRepository.save(new Reservation(members.get(0), sameDate, sameReservationTime, sameTheme));
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
-                sameDate, sameReservationTime.getId(), sameTheme.getId());
+                sameDate, sameReservationTime.getId(), sameTheme.getId(), "paymentKey", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(members.get(1).getId(), members.get(1).getName(), members.get(1).getRole());
 
         // when & then
@@ -150,7 +159,7 @@ class ReservationServiceTest {
         List<Member> members = MemberFixture.get(2).stream().map(memberRepository::save).toList();
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
-                sameDate, sameReservationTime.getId(), sameTheme.getId());
+                sameDate, sameReservationTime.getId(), sameTheme.getId(), "paymentKey", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(members.get(1).getId(), members.get(1).getName(), members.get(1).getRole());
 
         // when & then

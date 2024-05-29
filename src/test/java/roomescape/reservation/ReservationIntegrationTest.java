@@ -17,7 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationFixture;
@@ -26,6 +28,9 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.FakePaymentClient;
+import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.PaymentProperties;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
@@ -40,22 +45,30 @@ import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @IntegrationTest
+@Import(FakePaymentClient.class)
 class ReservationIntegrationTest {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final ReservationTimeRepository reservationTimeRepository;
+    private final ThemeRepository themeRepository;
+    private final ReservationRepository reservationRepository;
+    private final WaitingRepository waitingRepository;
+    private final PaymentClient paymentClient;
 
     @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private ThemeRepository themeRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private WaitingRepository waitingRepository;
+    ReservationIntegrationTest(final MemberRepository memberRepository,
+                               final ReservationTimeRepository reservationTimeRepository,
+                               final ThemeRepository themeRepository,
+                               final ReservationRepository reservationRepository,
+                               final WaitingRepository waitingRepository,
+                               final PaymentClient paymentClient) {
+        this.memberRepository = memberRepository;
+        this.reservationTimeRepository = reservationTimeRepository;
+        this.themeRepository = themeRepository;
+        this.reservationRepository = reservationRepository;
+        this.waitingRepository = waitingRepository;
+        this.paymentClient = paymentClient;
+    }
 
     @LocalServerPort
     private int port;
@@ -82,8 +95,9 @@ class ReservationIntegrationTest {
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
 
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                1L, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                1L, 1L, "paymentKey", "orderId", 100_000L);
 
         // when & then
         RestAssured.given().log().all()
@@ -118,8 +132,9 @@ class ReservationIntegrationTest {
     @Test
     @DisplayName("방탈출 예약 생성 살패: 날짜 과거")
     void createReservationTime_WhenDimeIsPast() {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2000-11-30"),
-                1L, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2000-11-30"),
+                1L, 1L, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -135,7 +150,8 @@ class ReservationIntegrationTest {
     @Test
     @DisplayName("방탈출 예약 생성 살패: 날짜 없음")
     void createReservationTime_WhenDimeIsNull() {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(null, 1L, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(null, 1L, 1L, "paymentKey",
+                "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -152,8 +168,9 @@ class ReservationIntegrationTest {
     @ValueSource(longs = {0, -1})
     @DisplayName("방탈출 예약 생성 살패: 시간 식별자 형식")
     void createReservationTime_WhenTimeIsInvalidType(Long timeId) {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                timeId, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                timeId, 1L, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -169,8 +186,9 @@ class ReservationIntegrationTest {
     @Test
     @DisplayName("방탈출 예약 생성 살패: 시간 null")
     void createReservationTime_WhenTimeIsPast() {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                null, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                null, 1L, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -187,8 +205,9 @@ class ReservationIntegrationTest {
     @DisplayName("방탈출 예약 생성 살패: 시간 없음")
     void createReservation_WhenTimeNotExist() {
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                1L, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                1L, 1L, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -205,8 +224,9 @@ class ReservationIntegrationTest {
     @ValueSource(longs = {0, -1})
     @DisplayName("방탈출 예약 생성 살패: 테마 식별자 형식")
     void createReservationTime_WhenThemeIdIsInvalidType(Long themeId) {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                1L, themeId);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                1L, themeId, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -222,8 +242,9 @@ class ReservationIntegrationTest {
     @Test
     @DisplayName("방탈출 예약 생성 살패: 테마 null")
     void createReservation_WhenThemeIsNull() {
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                1L, null);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                1L, null, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -241,8 +262,9 @@ class ReservationIntegrationTest {
     void createReservation_WhenThemeNotExist() {
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
 
-        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2024-11-30"),
-                1L, 1L);
+        CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2024-11-30"),
+                1L, 1L, "paymentKey", "orderId", 100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -266,8 +288,8 @@ class ReservationIntegrationTest {
                 new Reservation(member, LocalDate.parse("2025-12-23"), reservationTime, theme));
 
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(reservation.getDate(),
-                reservation.getReservationTime().getId(),
-                reservation.getTheme().getId());
+                reservation.getReservationTime().getId(), reservation.getTheme().getId(), "paymentKey", "orderId",
+                100_000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
