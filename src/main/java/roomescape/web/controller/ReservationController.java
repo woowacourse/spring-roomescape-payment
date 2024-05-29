@@ -38,9 +38,6 @@ class ReservationController {
     public ResponseEntity<ReservationResponse> addReservationByUser(
             @RequestBody UserReservationPaymentRequest userReservationPaymentRequest,
             LoginMember loginMember) {
-
-//        ReservationRequest reservationRequest = ReservationRequest.from(loginMember.id());
-
         Long savedId = reservationService.registerReservationPayments(userReservationPaymentRequest, loginMember.id());
         ReservationResponse reservationResponse = reservationService.findReservation(savedId);
         return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);

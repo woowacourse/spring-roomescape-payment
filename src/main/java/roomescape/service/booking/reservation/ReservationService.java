@@ -2,8 +2,8 @@ package roomescape.service.booking.reservation;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.payment.PaymentRequest;
-import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
@@ -32,17 +32,12 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public Long registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
-       Long id = reservationRegisterService.registerReservation(ReservationRequest.of(userReservationPaymentRequest, memberId));
-        // 1. 예약 가능한지 검증
-//        registerReservation.validte();
-
-        // 2. 결제
-        // pay 키같은 거 뽑아서, secre 추가해서
-        // 결제 승인 api를 호출, httpClinet 통해서
+        Long id = reservationRegisterService.registerReservation(
+                ReservationRequest.of(userReservationPaymentRequest, memberId));
         PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
         paymentService.pay(paymentRequest);
-        // 3. 예약 등록
         return id;
     }
 
