@@ -90,7 +90,7 @@ public class Reservation {
     }
 
     public void approve() {
-        status = ReservationStatus.APPROVED;
+        status = ReservationStatus.RESERVED_UNPAID;
     }
 
     public LocalTime getTime() {

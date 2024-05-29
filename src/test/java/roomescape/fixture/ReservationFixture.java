@@ -33,6 +33,6 @@ public class ReservationFixture {
             DEFAULT_RESERVATION.getDate(),
             ReservationTimeFixture.DEFAULT_RESPONSE,
             ThemeFixture.DEFAULT_RESPONSE,
-            ReservationStatus.APPROVED
+            ReservationStatus.RESERVED_UNPAID
     );
 }

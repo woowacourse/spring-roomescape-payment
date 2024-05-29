@@ -5,15 +5,20 @@ import roomescape.exception.RoomescapeException;
 
 public enum ReservationStatus {
 
-    APPROVED,
+    RESERVED_COMPLETE,
+    RESERVED_UNPAID,
     PENDING;
 
-    private static final String APPROVED_MESSAGE = "예약";
+    private static final String RESERVED_COMPLETE_MESSAGE = "예약";
+    private static final String RESERVED_UNPAID_MESSAGE = "결제대기";
     private static final String PENDING_MESSAGE = "번째 예약대기";
 
     public String makeStatusMessage(Long rank) {
-        if (this == APPROVED) {
-            return APPROVED_MESSAGE;
+        if (this == RESERVED_COMPLETE) {
+            return RESERVED_COMPLETE_MESSAGE;
+        }
+        if (this == RESERVED_UNPAID) {
+            return RESERVED_UNPAID_MESSAGE;
         }
         if (this == PENDING) {
             return rank + PENDING_MESSAGE;

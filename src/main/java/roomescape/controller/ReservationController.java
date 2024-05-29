@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
 import roomescape.dto.MyReservationResponse;
-import roomescape.dto.PaidReservationResponse;
-import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
@@ -28,28 +26,28 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping
-    public ResponseEntity<PaidReservationResponse> savePaidReservation(
-            @Auth long memberId,
-            @RequestBody PaymentRequest reservationRequest
-    ) {
-        reservationRequest = new PaymentRequest(
-                reservationRequest.date(),
-                memberId,
-                reservationRequest.timeId(),
-                reservationRequest.themeId(),
-                reservationRequest.paymentKey(),
-                reservationRequest.orderId(),
-                reservationRequest.amount()
-        );
+//    @PostMapping
+//    public ResponseEntity<PaidReservationResponse> savePaidReservation(
+//            @Auth long memberId,
+//            @RequestBody PaymentRequest reservationRequest
+//    ) {
+//        reservationRequest = new PaymentRequest(
+//                reservationRequest.date(),
+//                memberId,
+//                reservationRequest.timeId(),
+//                reservationRequest.themeId(),
+//                reservationRequest.paymentKey(),
+//                reservationRequest.orderId(),
+//                reservationRequest.amount()
+//        );
+//
+//        PaidReservationResponse saved = reservationService.savePaid(reservationRequest);
+//        return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
+//                .body(saved);
+//    }
 
-        PaidReservationResponse saved = reservationService.savePaid(reservationRequest);
-        return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
-                .body(saved);
-    }
-
-    @PostMapping("/waiting")
-    public ResponseEntity<ReservationResponse> saveWaitingReservation(
+    @PostMapping()
+    public ResponseEntity<ReservationResponse> saveReservation(
             @Auth long memberId,
             @RequestBody ReservationRequest reservationRequest
     ) {

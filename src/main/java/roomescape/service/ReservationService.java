@@ -12,9 +12,6 @@ import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.MyReservationResponse;
-import roomescape.dto.PaidReservationResponse;
-import roomescape.dto.PaymentRequest;
-import roomescape.dto.PaymentResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.ExceptionType;
@@ -71,37 +68,37 @@ public class ReservationService {
 
         return ReservationResponse.from(saved);
     }
-
-    public PaidReservationResponse savePaid(PaymentRequest reservationRequest) {
-        ReservationTime time = reservationTimeRepository.findById(reservationRequest.timeId())
-                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION_TIME));
-        Theme theme = themeRepository.findById(reservationRequest.themeId())
-                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_THEME));
-        Member member = memberRepository.findById(reservationRequest.memberId())
-                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_MEMBER));
-        LocalDate date = reservationRequest.date();
-
-        validatePastTimeReservation(date, time);
-        validateDuplicateReservation(date, time, theme, member);
-
-        ReservationStatus status = determineStatus(time, theme, date);
-
-        // 결제 API 호출
-        Reservation reservation = Reservation.builder()
-                .member(member)
-                .date(date)
-                .time(time)
-                .theme(theme)
-                .status(status)
-                .build();
-        Reservation saved = reservationRepository.save(reservation);
-
-        PaymentResponse paymentResponse = paymentService.askPayment(reservationRequest);
-        ReservationResponse reservationResponse = ReservationResponse.from(saved);
-        PaidReservationResponse response = PaidReservationResponse.of(reservationResponse, paymentResponse);
-
-        return response;
-    }
+//
+//    public PaidReservationResponse savePaid(PaymentRequest reservationRequest) {
+//        ReservationTime time = reservationTimeRepository.findById(reservationRequest.timeId())
+//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION_TIME));
+//        Theme theme = themeRepository.findById(reservationRequest.themeId())
+//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_THEME));
+//        Member member = memberRepository.findById(reservationRequest.memberId())
+//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_MEMBER));
+//        LocalDate date = reservationRequest.date();
+//
+//        validatePastTimeReservation(date, time);
+//        validateDuplicateReservation(date, time, theme, member);
+//
+//        ReservationStatus status = determineStatus(time, theme, date);
+//
+//        // 결제 API 호출
+//        Reservation reservation = Reservation.builder()
+//                .member(member)
+//                .date(date)
+//                .time(time)
+//                .theme(theme)
+//                .status(status)
+//                .build();
+//        Reservation saved = reservationRepository.save(reservation);
+//
+//        PaymentResponse paymentResponse = paymentService.askPayment(reservationRequest);
+//        ReservationResponse reservationResponse = ReservationResponse.from(saved);
+//        PaidReservationResponse response = PaidReservationResponse.of(reservationResponse, paymentResponse);
+//
+//        return response;
+//    }
 
     private void validateDuplicateReservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
         if (reservationRepository.existsByThemeAndDateAndTimeAndReservationMember(theme, date, time, member)) {
@@ -121,7 +118,7 @@ public class ReservationService {
         if (isAlreadyBooked) {
             return ReservationStatus.PENDING;
         }
-        return ReservationStatus.APPROVED;
+        return ReservationStatus.RESERVED_UNPAID;
     }
 
     public List<ReservationResponse> findAll() {

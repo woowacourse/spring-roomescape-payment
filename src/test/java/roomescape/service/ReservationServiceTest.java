@@ -1,5 +1,13 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.fixture.MemberFixture.DEFAULT_ADMIN;
+import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
+import static roomescape.fixture.ReservationTimeFixture.DEFAULT_TIME;
+import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
+
+import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,15 +25,6 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.MemberFixture.DEFAULT_ADMIN;
-import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
-import static roomescape.fixture.ReservationTimeFixture.DEFAULT_TIME;
-import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 @SpringBootTest
 class ReservationServiceTest {
@@ -107,10 +106,11 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(DEFAULT_THEME);
         LocalDate date = LocalDate.now().plusDays(1);
 
-        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(), theme.getId());
+        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(),
+                theme.getId());
         ReservationResponse reservationResponse = reservationService.save(reservationRequest);
 
-        assertThat(reservationResponse.status()).isEqualTo(ReservationStatus.APPROVED);
+        assertThat(reservationResponse.status()).isEqualTo(ReservationStatus.RESERVED_UNPAID);
     }
 
     @Test
@@ -121,7 +121,8 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(DEFAULT_THEME);
         LocalDate date = LocalDate.now().plusDays(1);
 
-        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(), theme.getId());
+        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(),
+                theme.getId());
         reservationService.save(reservationRequest);
         assertThatThrownBy(() -> reservationService.save(reservationRequest))
                 .isInstanceOf(RoomescapeException.class)
@@ -138,8 +139,10 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(DEFAULT_THEME);
         LocalDate date = LocalDate.now().plusDays(1);
 
-        ReservationRequest reservationRequestByMember1 = new ReservationRequest(date, member1.getId(), time.getId(), theme.getId());
-        ReservationRequest reservationRequestByMember2 = new ReservationRequest(date, member2.getId(), time.getId(), theme.getId());
+        ReservationRequest reservationRequestByMember1 = new ReservationRequest(date, member1.getId(), time.getId(),
+                theme.getId());
+        ReservationRequest reservationRequestByMember2 = new ReservationRequest(date, member2.getId(), time.getId(),
+                theme.getId());
         reservationService.save(reservationRequestByMember1);
         ReservationResponse reservationResponse = reservationService.save(reservationRequestByMember2);
 

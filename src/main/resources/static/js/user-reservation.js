@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-  document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+  // document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
 
   function onReservationButtonClickWithPaymentWidget(event) {
     onReservationButtonClick(event, paymentWidget);
@@ -135,22 +135,10 @@ function checkDateAndThemeAndTime() {
   const selectedThemeElement = document.querySelector('.theme-slot.active');
   const selectedTimeElement = document.querySelector('.time-slot.active');
   const reserveButton = document.getElementById("reserve-button");
-  const waitButton = document.getElementById("wait-button");
 
-  if (selectedDate && selectedThemeElement && selectedTimeElement) {
-    if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
-      // 선택된 시간이 이미 예약된 경우
-      reserveButton.classList.add("disabled");
-      waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
-    } else {
-      // 선택된 시간이 예약 가능한 경우
-      reserveButton.classList.remove("disabled");
-      waitButton.classList.add("disabled"); // 예약 대기 버튼 비활성화
-    }
-  } else {
+  if (!(selectedDate && selectedThemeElement && selectedTimeElement)) {
     // 날짜, 테마, 시간 중 하나라도 선택되지 않은 경우
     reserveButton.classList.add("disabled");
-    waitButton.classList.add("disabled");
   }
 }
 
@@ -162,33 +150,64 @@ function onReservationButtonClick(event, paymentWidget) {
   if (selectedDate && selectedThemeId && selectedTimeId) {
     const reservationData = {
       date: selectedDate,
-      themeId   : selectedThemeId,
+      themeId: selectedThemeId,
       timeId: selectedTimeId
     };
 
-    const generateRandomString = () =>
-        window.btoa(Math.random()).slice(0, 20);
-    /*
-    TODO: [1단계]
-          - orderIdPrefix 를 자신만의 prefix로 변경
-    */
-    // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-    // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "WTEST";
-    paymentWidget.requestPayment({
-      orderId: orderIdPrefix + generateRandomString(),
-      orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
-    }).then(function (data) {
-      console.debug(data);
-      fetchReservationPayment(data, reservationData);
-    }).catch(function (error) {
-      // TOSS 에러 처리: 에러 목록을 확인하세요
-      // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
-    });
+    fetch('/reservations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reservationData)
+    })
+        .then(response => {
+          if (!response.ok) throw new Error('Reservation failed');
+          return response.json();
+        })
+        .then(data => {
+          alert('Reservation successful!');
+          location.reload();
+        })
+        .catch(error => {
+          alert("An error occurred while making the reservation.");
+          console.error(error);
+        });
+
+    // const selectedDate = document.getElementById("datepicker").value;
+    // const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    // const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+    //
+    // if (selectedDate && selectedThemeId && selectedTimeId) {
+    //   const reservationData = {
+    //     date: selectedDate,
+    //     themeId   : selectedThemeId,
+    //     timeId: selectedTimeId
+    //   };
+    //
+    //   const generateRandomString = () =>
+    //       window.btoa(Math.random()).slice(0, 20);
+    //   /*
+    //   TODO: [1단계]
+    //         - orderIdPrefix 를 자신만의 prefix로 변경
+    //   */
+    //   // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
+    //   // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+    //   const orderIdPrefix = "WTEST";
+    //   paymentWidget.requestPayment({
+    //     orderId: orderIdPrefix + generateRandomString(),
+    //     orderName: "테스트 방탈출 예약 결제 1건",
+    //     amount: 1000,
+    //   }).then(function (data) {
+    //     console.debug(data);
+    //     fetchReservationPayment(data, reservationData);
+    //   }).catch(function (error) {
+    //     // TOSS 에러 처리: 에러 목록을 확인하세요
+    //     // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
+    //     alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+    //   });
   } else {
-    alert("Please select a date, theme, and time before making a reservation.");
+    alert("Please select a date, theme, and time before making a reservation waiting.");
   }
 }
 
@@ -231,42 +250,6 @@ async function fetchReservationPayment(paymentData, reservationData) {
   }).catch(error => {
     console.error(error.message);
   });
-}
-
-function onWaitButtonClick() {
-  const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
-  if (selectedDate && selectedThemeId && selectedTimeId) {
-    const reservationData = {
-      date: selectedDate,
-      themeId: selectedThemeId,
-      timeId: selectedTimeId
-    };
-
-    fetch('/reservations/waiting', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reservationData)
-    })
-        .then(response => {
-          if (!response.ok) throw new Error('Reservation waiting failed');
-          return response.json();
-        })
-        .then(data => {
-          alert('Reservation waiting successful!');
-          location.reload();
-        })
-        .catch(error => {
-          alert("An error occurred while making the reservation waiting.");
-          console.error(error);
-        });
-  } else {
-    alert("Please select a date, theme, and time before making a reservation waiting.");
-  }
 }
 
 function requestRead(endpoint) {

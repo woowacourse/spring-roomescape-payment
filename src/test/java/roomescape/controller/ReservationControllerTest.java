@@ -32,7 +32,7 @@ class ReservationControllerTest {
         Mockito.when(reservationService.save(DEFAULT_REQUEST))
                 .thenReturn(DEFAULT_RESPONSE);
 
-        ResponseEntity<ReservationResponse> response = reservationController.saveWaitingReservation(
+        ResponseEntity<ReservationResponse> response = reservationController.saveReservation(
                 DEFAULT_RESERVATION.getId(), DEFAULT_REQUEST);
 
         assertAll(
