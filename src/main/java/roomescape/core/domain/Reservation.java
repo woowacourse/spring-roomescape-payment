@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,17 +34,14 @@ public class Reservation {
     private Status status;
     @Column(nullable = false)
     private LocalDateTime createAt;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
 
     public Reservation() {
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
-                       final Status status, final LocalDateTime createAt) {
-        this(null, member, date, time, theme, status, createAt);
-    }
-
     public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final Status status, final LocalDateTime createAt) {
+                       final Theme theme, final Status status, final LocalDateTime createAt, final Payment payment) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);
@@ -51,6 +49,12 @@ public class Reservation {
         this.theme = theme;
         this.status = status;
         this.createAt = createAt;
+        this.payment = payment;
+    }
+
+    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
+                       final Status status, final LocalDateTime createAt, final Payment payment) {
+        this(null, member, date, time, theme, status, createAt, payment);
     }
 
     private LocalDate parseDate(final String date) {
@@ -126,5 +130,9 @@ public class Reservation {
 
     public LocalDateTime getCreateAt() {
         return createAt;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }

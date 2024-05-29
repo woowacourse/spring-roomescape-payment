@@ -168,6 +168,7 @@ function saveRow(event) {
     themeId: themeSelect.value,
     timeId: timeSelect.value,
     memberId: memberSelect.value,
+    status : '예약'
   };
 
   requestCreate(reservation)

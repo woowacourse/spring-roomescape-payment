@@ -6,15 +6,18 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.repository.MemberRepository;
+import roomescape.core.repository.PaymentRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
@@ -27,15 +30,17 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -43,9 +48,10 @@ public class ReservationService {
         final Member member = getMember(request);
         final ReservationTime reservationTime = getReservationTime(request);
         final Theme theme = getTheme(request);
+        final Payment payment = getPayment(request);
         final Reservation reservation = new Reservation(
                 member, request.getDate(), reservationTime, theme, Status.findStatus(request.getStatus()),
-                LocalDateTime.now());
+                LocalDateTime.now(), payment);
 
         validateDuplicateReservation(Status.findStatus(request.getStatus()), reservation);
         reservation.validateDateAndTime();
@@ -67,6 +73,13 @@ public class ReservationService {
     private Theme getTheme(final ReservationRequest request) {
         return themeRepository.findById(request.getThemeId())
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    private Payment getPayment(ReservationRequest request) {
+        if (request.getPaymentId() == null) {
+            return null;
+        }
+        return paymentRepository.findById(request.getPaymentId()).orElseThrow(IllegalArgumentException::new);
     }
 
     private void validateDuplicateReservation(final Status status, final Reservation reservation) {
@@ -123,12 +136,15 @@ public class ReservationService {
 
     @Transactional
     public void delete(final Long id) {
-        updateReservationStatus(id);
+        Reservation delete = reservationRepository.findReservationById(id);
+        updateReservationStatus(delete);
         reservationRepository.deleteById(id);
+        if (delete.getPayment() != null) {
+            paymentRepository.delete(delete.getPayment());
+        }
     }
 
-    private void updateReservationStatus(final Long id) {
-        Reservation delete = reservationRepository.findReservationById(id);
+    private void updateReservationStatus(final Reservation delete) {
         if (delete.getStatus().equals(Status.STANDBY)) {
             return;
         }
@@ -138,6 +154,11 @@ public class ReservationService {
                 .filter(reservation -> reservation.getStatus().equals(Status.STANDBY))
                 .findFirst()
                 .ifPresent(Reservation::approve);
+    }
+
+    public PaymentResponse findPaymentByDeleteReservation(final Long id) {
+        Reservation delete = reservationRepository.findReservationById(id);
+        return new PaymentResponse(delete.getPayment().getPaymentKey());
     }
 
     @Transactional(readOnly = true)
@@ -157,5 +178,9 @@ public class ReservationService {
         return reservations.stream()
                 .map(ReservationResponse::new)
                 .toList();
+    }
+
+    public Boolean isNotAdminReservation(final Long id) {
+        return reservationRepository.isNotAdminReservation(id);
     }
 }

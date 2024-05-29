@@ -1,5 +1,6 @@
 package roomescape.core.dto.reservation;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -21,16 +22,25 @@ public class ReservationRequest {
     @NotBlank(message = "status 는 비어있을 수 없습니다.")
     private String status;
 
+    @Nullable
+    private Long paymentId;
+
     public ReservationRequest() {
     }
 
     public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId,
-                              final String status) {
+                              final String status, final Long paymentId) {
         this.memberId = memberId;
         this.date = date;
         this.timeId = timeId;
         this.themeId = themeId;
         this.status = status;
+        this.paymentId = paymentId;
+    }
+
+    public ReservationRequest(final Long memberId, final String date, final Long timeId, final Long themeId,
+                              final String status) {
+        this(memberId, date, timeId, themeId, status, null);
     }
 
     public Long getMemberId() {
@@ -51,5 +61,9 @@ public class ReservationRequest {
 
     public String getStatus() {
         return status;
+    }
+
+    public Long getPaymentId() {
+        return paymentId;
     }
 }

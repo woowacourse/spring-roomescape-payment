@@ -3,6 +3,7 @@ package roomescape.core.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
+import roomescape.core.domain.Payment;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
@@ -48,10 +50,10 @@ public class ReservationController {
                 memberRequest.getOrderId(), memberRequest.getAmount());
 
         approvePayment(paymentRequest, paymentService.createPaymentAuthorization());
-        paymentService.save(paymentRequest);
+        Payment payment = paymentService.save(paymentRequest);
 
         final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
-                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus());
+                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus(), payment.getId());
         final ReservationResponse result = reservationService.create(request);
         return ResponseEntity.created(URI.create("/reservations/" + result.getId()))
                 .body(result);
@@ -65,8 +67,7 @@ public class ReservationController {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new PaymentErrorHandler())
-                .body(PaymentResponse.class);
+                .onStatus(new PaymentErrorHandler());
     }
 
     @GetMapping
@@ -96,7 +97,22 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
+        if (reservationService.isNotAdminReservation(id)) {
+            refundPayment(reservationService.findPaymentByDeleteReservation(id),
+                    paymentService.createPaymentAuthorization());
+        }
         reservationService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void refundPayment(final PaymentResponse paymentResponse,
+                               final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+        restClient.post()
+                .uri("/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
+                .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Map.of("cancelReason", "고객 변심"))
+                .retrieve()
+                .onStatus(new PaymentErrorHandler());
     }
 }
