@@ -11,9 +11,9 @@ public class PaymentManager {
     private final PaymentAuthorizationGenerator paymentAuthorizationGenerator;
     private final RestClient restClient;
 
-    public PaymentManager(PaymentAuthorizationGenerator paymentAuthorizationGenerator) {
+    public PaymentManager(PaymentAuthorizationGenerator paymentAuthorizationGenerator, RestClient restClient) {
         this.paymentAuthorizationGenerator = paymentAuthorizationGenerator;
-        this.restClient = RestClient.builder().build();
+        this.restClient = restClient;
     }
 
     public void approve(PaymentApproveRequest request) {
