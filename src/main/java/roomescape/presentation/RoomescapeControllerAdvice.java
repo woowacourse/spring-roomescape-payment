@@ -15,6 +15,7 @@ import roomescape.exception.AuthenticationInformationNotFoundException;
 import roomescape.exception.ExpiredTokenException;
 import roomescape.exception.InvalidTokenException;
 import roomescape.exception.UnAuthorizedException;
+import roomescape.exception.payment.PaymentException;
 import roomescape.exception.reservation.ReservationException;
 
 @RestControllerAdvice
@@ -59,6 +60,12 @@ public class RoomescapeControllerAdvice {
     public ProblemDetail handleIllegalArgumentException(RuntimeException exception) {
         logger.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ProblemDetail handlePaymentException(PaymentException exception) {
+        logger.error(exception.getMessage(), exception);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler(ReservationException.class)
