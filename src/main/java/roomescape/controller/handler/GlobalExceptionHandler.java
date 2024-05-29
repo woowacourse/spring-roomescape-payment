@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import roomescape.dto.response.ExceptionInfo;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,7 +18,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleJwtException(final JwtException ex) {
+    public ResponseEntity<String> handleJwtException(JwtException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionInfo> handleHttpClientException(HttpClientErrorException exception) {
+        ExceptionInfo exceptionInfo = exception.getResponseBodyAs(ExceptionInfo.class);
+        return ResponseEntity.badRequest().body(exceptionInfo);
     }
 }

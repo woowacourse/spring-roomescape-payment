@@ -192,10 +192,6 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-  /*
-  TODO: [1단계]
-      - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-  */
   const reservationPaymentRequest = {
     date: reservationData.date,
     themeId: reservationData.themeId,
@@ -216,7 +212,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     if (!response.ok) {
       return response.json().then(errorBody => {
         console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-        window.alert("예약 결제 실패 메시지");
+        window.alert(errorBody.message);
       });
     } else {
       response.json().then(successBody => {
