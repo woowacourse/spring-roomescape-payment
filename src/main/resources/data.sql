@@ -6,7 +6,9 @@ VALUES ('15:40'),
 INSERT INTO member (name, email, password, role)
 VALUES ('폴라(어드민)', 'polla@gmail.com', 'pollari99', 'ADMIN'),
        ('레모네(어드민)', 'lemone@wooteco.com', 'lemone1234', 'ADMIN'),
-       ('폴라(일반)', 'polla@naver.com', 'pollari999', 'MEMBER');
+       ('산초(어드민)', 'sancho@wooteco.com', 'sancho', 'ADMIN'),
+       ('제이(일반)', 'jay@wooteco.com', 'jay', 'MEMBER'),
+       ('웨지(일반)', 'wedge@wooteco.com', 'wedge', 'MEMBER');
 
 INSERT INTO theme (name, description, thumbnail)
 VALUES ('테마 - polla', '폴라 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
