@@ -30,8 +30,7 @@ public class PaymentService {
         this.tossPaymentProperties = tossPaymentProperties;
     }
 
-    // TODO: 메서드명 pay로 변경
-    public void approvePayment(PaymentRequest paymentRequest, MemberReservation memberReservation) {
+    public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         String encodeKey = encoder.encode(tossPaymentProperties.getSecretKey());
         PaymentResponse response = paymentClient.confirm(paymentRequest, encodeKey).getBody();
         paymentRepository.save(

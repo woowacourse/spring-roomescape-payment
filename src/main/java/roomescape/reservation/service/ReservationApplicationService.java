@@ -59,7 +59,7 @@ public class ReservationApplicationService {
 
         memberReservation.approve();
 
-        paymentService.approvePayment(
+        paymentService.pay(
                 new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
                         reservationPaymentRequest.paymentKey()), memberReservation);
 
@@ -70,7 +70,7 @@ public class ReservationApplicationService {
     public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
         MemberReservation memberReservation = reservationCommonService.create(
                 memberReservationCreate.toReservationCreate());
-        paymentService.approvePayment(
+        paymentService.pay(
                 new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
                         memberReservationCreate.paymentKey()), memberReservation);
         return ReservationResponse.from(memberReservation);
