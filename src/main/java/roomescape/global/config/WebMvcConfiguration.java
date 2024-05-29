@@ -1,8 +1,13 @@
 package roomescape.global.config;
 
+import java.time.Duration;
 import java.util.List;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -36,8 +41,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public TossPaymentClient tossPaymentClient() {
+        ClientHttpRequestFactory factory = getClientHttpRequestFactory();
+
         return new TossPaymentClient(
-                RestClient.builder().baseUrl("https://api.tosspayments.com").build()
+                RestClient.builder()
+                        .requestFactory(factory)
+                        .baseUrl("https://api.tosspayments.com")
+                        .build()
         );
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(5))
+                .withReadTimeout(Duration.ofSeconds(45));
+
+        return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
