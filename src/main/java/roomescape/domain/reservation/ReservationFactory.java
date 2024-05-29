@@ -30,7 +30,10 @@ public class ReservationFactory {
     }
 
     private Reservation getReservation(ReservationDetail detail, Member member) {
-        boolean isReservationExists = reservationRepository.existsByDetailAndStatus(detail, Status.RESERVED);
-        return new Reservation(member, detail, Status.from(isReservationExists));
+        // TODO: 예약, 결제 대기 모두 걸러야 함
+        if (reservationRepository.existsByDetailAndStatus(detail, Status.RESERVED)) {
+            return new Reservation(member, detail, Status.WAITING);
+        }
+        return new Reservation(member, detail, Status.RESERVED);
     }
 }
