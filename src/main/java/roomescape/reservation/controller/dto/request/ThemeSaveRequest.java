@@ -6,16 +6,10 @@ import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
 
-@NotNull
 public record ThemeSaveRequest(
-        @NotBlank
-        String name,
-
-        @NotBlank
-        String description,
-
-        @NotBlank
-        String thumbnail
+        @NotNull @NotBlank String name,
+        @NotNull @NotBlank String description,
+        @NotNull @NotBlank String thumbnail
 ) {
 
     public Theme toTheme() {

@@ -5,9 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import roomescape.reservation.domain.ReservationTime;
 
-@NotNull
 public record TimeSaveRequest(
-        @JsonFormat(pattern = "HH:mm") LocalTime startAt
+        @NotNull @JsonFormat(pattern = "HH:mm") LocalTime startAt
 ) {
 
     public ReservationTime toReservationTime() {

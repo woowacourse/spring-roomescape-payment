@@ -3,10 +3,9 @@ package roomescape.reservation.controller.dto.request;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@NotNull
 public record WaitingReservationSaveRequest(
-        LocalDate date,
-        long themeId,
-        long timeId
+        @NotNull LocalDate date,
+        @NotNull long themeId,
+        @NotNull long timeId
 ) {
 }

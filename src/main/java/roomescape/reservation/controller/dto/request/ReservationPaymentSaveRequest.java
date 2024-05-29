@@ -3,13 +3,12 @@ package roomescape.reservation.controller.dto.request;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@NotNull
 public record ReservationPaymentSaveRequest(
-        LocalDate date,
-        long themeId,
-        long timeId,
-        String paymentKey,
-        String orderId,
-        long amount
+        @NotNull LocalDate date,
+        @NotNull long themeId,
+        @NotNull long timeId,
+        @NotNull String paymentKey,
+        @NotNull String orderId,
+        @NotNull long amount
 ) {
 }
