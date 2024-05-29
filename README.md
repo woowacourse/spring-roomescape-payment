@@ -27,18 +27,13 @@ host: localhost:8080
 - [x] 테마 선택 시 price 서버에서 받아 오기
 - [x] 예약 삭제 시 첫번째 예약 대기 Status 결제 대기로 변경
 
-- [ ] 토스 결제 API 연동
-  - [ ] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링
+- [x] 토스 결제 API 연동
+  - [x] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링
     - 에러 객체
     ```json
     {
-    "code": "NOT_FOUND_PAYMENT",
-    "message": "존재하지 않는 결제 입니다."
+      "code": "NOT_FOUND_PAYMENT",
+      "message": "존재하지 않는 결제 입니다."
     }
     ```
-    - 결제 승인 API 테스트시, 에러응답을 얻을 수 있는 시도
-      - 시크릿 키를 정상적이지 않은 값으로 요청
-      - paymentkey를 클라이언트에서 획득하지 않은 값으로 요청
-      - 이미 성공한 paymentKey로 요청
-      - INVALID_API_KEY, UNAUTHORIZED_KEY, INCORRECT_BASIC_AUTH_FORMAT
-- [ ] 예약 실패 시, 결제 실패 사유 응답
+- [x] 예약 실패 시, 결제 실패 사유 응답

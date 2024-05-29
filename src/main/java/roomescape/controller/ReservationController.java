@@ -3,9 +3,6 @@ package roomescape.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
 import roomescape.config.LoginMemberConverter;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.LoginMember;
@@ -21,20 +17,17 @@ import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
-import roomescape.exception.RoomescapeException;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
-import roomescape.service.TossPaymentService;
 
 @RestController
 public class ReservationController {
-    private final RestClient restClient;
     private final ReservationService reservationService;
-    private final TossPaymentService tossPaymentService;
+    private final PaymentService tossPaymentService;
 
-    public ReservationController(ReservationService reservationService, TossPaymentService tossPaymentService) {
-        this.tossPaymentService = tossPaymentService;
-        this.restClient = RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments/confirm").build();
+    public ReservationController(ReservationService reservationService, PaymentService tossPaymentService) {
         this.reservationService = reservationService;
+        this.tossPaymentService = tossPaymentService;
     }
 
     @GetMapping("/reservations")
@@ -47,13 +40,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
-        restClient.post().header("Authorization", tossPaymentService.createAuthorization())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(tossPaymentService.createPaymentRequest(reservationRequest))
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, ((request, response) -> {
-                    throw new RoomescapeException(HttpStatus.NOT_FOUND, "결제 승인 안됨");
-                }));
+        tossPaymentService.pay(reservationRequest);
         ReservationResponse response = reservationService.saveReservationByClient(loginMember, reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }

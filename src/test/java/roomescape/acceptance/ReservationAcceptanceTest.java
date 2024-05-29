@@ -13,8 +13,14 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.mockito.BDDMockito;
+import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
+import roomescape.dto.request.reservation.ReservationRequest;
+import roomescape.dto.response.reservation.TossExceptionResponse;
+import roomescape.exception.PaymentException;
 
 class ReservationAcceptanceTest extends BasicAcceptanceTest {
     private String clientToken;
@@ -94,6 +100,20 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
         );
     }
 
+    @DisplayName("결제가 실패하면 예약이 생성되지 않는다.")
+    @Test
+    void reservationPostWhenPaymentFail() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
+        BDDMockito.given(paymentService.pay(request))
+                .willThrow(new PaymentException(
+                        HttpStatus.BAD_REQUEST, new TossExceptionResponse("EXCEPTION", "exception")));
+
+        ReservationTestStep.postClientReservation(
+                clientToken, tomorrow.toString(), 1L, 1L, 400);
+        ReservationTestStep.getReservations(200, 3);
+    }
+
     private void adminSearch(String token, Long themeId, Long memberId, String dateFrom, String dateTo, int expectedHttpCode, int expectedReservationResponsesSize) {
         Response response = RestAssured.given().log().all()
                 .cookies("token", token)
@@ -112,20 +132,6 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().get("/reservations/mine")
-                .then().log().all()
-                .statusCode(expectedHttpCode)
-                .extract().response();
-
-        List<?> reservationResponses = response.as(List.class);
-
-        assertThat(reservationResponses).hasSize(expectedReservationResponsesSize);
-    }
-
-    private void getWaitings(String token, int expectedHttpCode, int expectedReservationResponsesSize) {
-        Response response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .when().get("/admin/waitings")
                 .then().log().all()
                 .statusCode(expectedHttpCode)
                 .extract().response();
