@@ -6,7 +6,6 @@ import roomescape.exception.ResourceNotFoundException;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.repository.MemberReservationRepository;
 
 import java.util.List;
@@ -20,10 +19,8 @@ public class WaitingReservationService {
         this.memberReservationRepository = memberReservationRepository;
     }
 
-    public List<MemberReservationResponse> readWaitingReservations() {
-        return memberReservationRepository.findByStatus(ReservationStatus.WAITING).stream()
-                .map(MemberReservationResponse::from)
-                .toList();
+    public List<MemberReservation> readWaitingReservations() {
+        return memberReservationRepository.findByStatus(ReservationStatus.WAITING);
     }
 
     public void confirmWaitingReservation(Long id) {

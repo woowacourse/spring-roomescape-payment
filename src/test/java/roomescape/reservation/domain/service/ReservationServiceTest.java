@@ -11,7 +11,6 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ForbiddenException;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
-import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.repository.MemberReservationRepository;
 
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ class ReservationServiceTest {
     @Test
     void readReservations() {
         // when
-        List<MemberReservationResponse> reservations = reservationService.readReservations();
+        List<MemberReservation> reservations = reservationService.readReservations();
 
         // then
         assertThat(reservations.size()).isEqualTo(11);
