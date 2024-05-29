@@ -51,7 +51,10 @@ class ReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         RestAssured.given().log().all()
@@ -71,7 +74,10 @@ class ReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 80L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         RestAssured.given().log().all()
@@ -91,7 +97,10 @@ class ReservationControllerTest {
                 LocalDate.now().minusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         RestAssured.given().log().all()

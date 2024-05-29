@@ -29,7 +29,10 @@ class SaveReservationRequestTest {
                 reservationDate,
                 3L,
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         // When

@@ -39,7 +39,13 @@ class ReservationServiceTest {
     void saveReservationTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(date, 3L, 1L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(date,
+                3L,
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L);
 
         // When
         final Reservation reservation = reservationService.saveReservation(saveReservationRequest);
@@ -59,7 +65,13 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenSaveReservationWithNotExistReservationTimeTest() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now(), 3L, 9L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now(),
+                3L,
+                9L,
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L);
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -82,7 +94,13 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenPastDateOrTime() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now().minusDays(3), 3L, 1L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now().minusDays(3),
+                3L,
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L);
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -98,7 +116,10 @@ class ReservationServiceTest {
                 LocalDate.now().plusDays(2),
                 3L,
                 4L,
-                9L
+                9L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         // When & Then

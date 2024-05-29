@@ -43,7 +43,10 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         RestAssured.given().log().all()
@@ -63,7 +66,10 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L
         );
 
         RestAssured.given().log().all()
