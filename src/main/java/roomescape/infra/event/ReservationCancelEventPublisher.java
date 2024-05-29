@@ -10,7 +10,7 @@ public class ReservationCancelEventPublisher implements CancelEventPublisher {
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publishCancelEvent(Reservation reservation) {
-        publisher.publishEvent(new ReservationCancelEvent(this, reservation));
+    public void publishPaymentPendingEvent(Reservation reservation) {
+        publisher.publishEvent(new PaymentPendingEvent(this, reservation.getId()));
     }
 }
