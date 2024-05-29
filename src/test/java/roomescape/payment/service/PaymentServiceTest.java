@@ -38,6 +38,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.util.ServiceTest;
 
+@DisplayName("결제 로직 테스트")
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest extends ServiceTest {
 
