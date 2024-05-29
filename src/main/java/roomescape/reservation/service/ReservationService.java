@@ -12,6 +12,7 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
 import roomescape.theme.service.ThemeService;
@@ -65,12 +66,25 @@ public class ReservationService {
                 .toList();
     }
 
+
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
         paymentClient.requestConfirmPayment(request.extractPaymentInformation());
-        validateMemberReservationNotExistInSlot(memberId, request);
+        ReservationRequest reservationRequest = new ReservationRequest(
+                request.date(),
+                memberId,
+                request.timeId(),
+                request.themeId()
+        );
+        return saveReservation(reservationRequest);
+    }
+
+    @Transactional
+    public ReservationResponse saveReservation(ReservationRequest request) {
+        validateMemberReservationNotExistInSlot(request);
+
         Reservation newReservation = Reservation.createNewReservation(
-                memberService.findById(memberId),
+                memberService.findById(request.memberId()),
                 new ReservationDate(request.date()),
                 reservationTimeService.findById(request.timeId()),
                 themeService.findById(request.themeId())
@@ -80,14 +94,14 @@ public class ReservationService {
         return new ReservationResponse(saved);
     }
 
-    private void validateMemberReservationNotExistInSlot(Long memberId, MemberReservationAddRequest request) {
+    private void validateMemberReservationNotExistInSlot(ReservationRequest request) {
         Reservations sameSlotReservations = new Reservations(reservationRepository.findByDateAndTimeAndTheme(
                 request.date(),
                 request.timeId(),
                 request.themeId()
         ));
 
-        if (sameSlotReservations.hasReservationMadeBy(memberId)) {
+        if (sameSlotReservations.hasReservationMadeBy(request.memberId())) {
             throw new IllegalRequestException("해당 아이디로 진행되고 있는 예약(대기)이 이미 존재합니다");
         }
     }
