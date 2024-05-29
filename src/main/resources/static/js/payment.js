@@ -53,7 +53,6 @@ async function fetchReservationPayment(paymentData) {
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
     const paymentRequest = {
-        // TODO: reservationId 읽어오기
         reservationId: paymentData.reservationId,
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,

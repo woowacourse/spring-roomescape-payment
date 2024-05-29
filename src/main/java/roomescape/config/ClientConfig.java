@@ -8,9 +8,11 @@ import org.springframework.web.client.RestClient;
 public class ClientConfig {
 
     @Bean
-    public TossPaymentRestClient todoRestClient() {
-        return new TossPaymentRestClient(
-                RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments/confirm").build()
+    public PaymentRestClient paymentRestClient() {
+        return new PaymentRestClient(
+                RestClient.builder()
+                        .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
+                        .build()
         );
     }
 }

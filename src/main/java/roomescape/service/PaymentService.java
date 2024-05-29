@@ -2,7 +2,7 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.config.TossPaymentRestClient;
+import roomescape.config.PaymentRestClient;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.dto.PaymentRequest;
@@ -15,12 +15,12 @@ import roomescape.repository.ReservationRepository;
 @Service
 public class PaymentService {
 
-    private final TossPaymentRestClient tossPaymentRestClient;
+    private final PaymentRestClient tossPaymentRestClient;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
 
     public PaymentService(
-            TossPaymentRestClient tossPaymentRestClient,
+            PaymentRestClient tossPaymentRestClient,
             ReservationRepository reservationRepository,
             PaymentRepository paymentRepository
     ) {
@@ -29,14 +29,12 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-
-    // TODO: 이름
     @Transactional
-    public PaymentResponse askPayment(PaymentRequest request) {
+    public PaymentResponse savePaymentAndUpdateReservationStatus(PaymentRequest request) {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        Payment payment = tossPaymentRestClient.pay(request);
+        Payment payment = tossPaymentRestClient.requestPaymentApproval(request);
         Payment saved = paymentRepository.save(payment);
         reservation.updatePayment(payment);
 

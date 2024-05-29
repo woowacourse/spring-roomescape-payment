@@ -8,15 +8,16 @@ import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.service.TossPaymentResponse;
 
-public class TossPaymentRestClient {
+public class PaymentRestClient {
 
     private final RestClient restClient;
 
-    public TossPaymentRestClient(RestClient restClient) {
+    public PaymentRestClient(RestClient restClient) {
         this.restClient = restClient;
     }
 
-    public Payment pay(PaymentRequest request) {
+    public Payment requestPaymentApproval(PaymentRequest request) {
+        // TODO: yaml로 빼기
         String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));

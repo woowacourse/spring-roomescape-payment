@@ -24,20 +24,17 @@ import roomescape.repository.ThemeRepository;
 @Service
 public class ReservationService {
 
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
     public ReservationService(
-            PaymentService paymentService,
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository
     ) {
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -68,37 +65,6 @@ public class ReservationService {
 
         return ReservationResponse.from(saved);
     }
-//
-//    public PaidReservationResponse savePaid(PaymentRequest reservationRequest) {
-//        ReservationTime time = reservationTimeRepository.findById(reservationRequest.timeId())
-//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION_TIME));
-//        Theme theme = themeRepository.findById(reservationRequest.themeId())
-//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_THEME));
-//        Member member = memberRepository.findById(reservationRequest.memberId())
-//                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_MEMBER));
-//        LocalDate date = reservationRequest.date();
-//
-//        validatePastTimeReservation(date, time);
-//        validateDuplicateReservation(date, time, theme, member);
-//
-//        ReservationStatus status = determineStatus(time, theme, date);
-//
-//        // 결제 API 호출
-//        Reservation reservation = Reservation.builder()
-//                .member(member)
-//                .date(date)
-//                .time(time)
-//                .theme(theme)
-//                .status(status)
-//                .build();
-//        Reservation saved = reservationRepository.save(reservation);
-//
-//        PaymentResponse paymentResponse = paymentService.askPayment(reservationRequest);
-//        ReservationResponse reservationResponse = ReservationResponse.from(saved);
-//        PaidReservationResponse response = PaidReservationResponse.of(reservationResponse, paymentResponse);
-//
-//        return response;
-//    }
 
     private void validateDuplicateReservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
         if (reservationRepository.existsByThemeAndDateAndTimeAndReservationMember(theme, date, time, member)) {
