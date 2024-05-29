@@ -24,21 +24,31 @@ public record CreateReservationRequest(
 
         @Positive(message = "예약 등록 시 테마 식별자는 양수만 가능합니다.")
         @NotNull(message = "예약 등록 시 테마는 필수입니다.")
-        Long themeId) {
+        Long themeId,
+
+        String paymentKey,
+        String orderId,
+        Long amount) {
 
     public static CreateReservationRequest of(final Long memberId,
                                               final CreateMyReservationRequest createMyReservationRequest) {
         return new CreateReservationRequest(createMyReservationRequest.date(),
                 memberId,
                 createMyReservationRequest.timeId(),
-                createMyReservationRequest.themeId());
+                createMyReservationRequest.themeId(),
+                createMyReservationRequest.paymentKey(),
+                createMyReservationRequest.orderId(),
+                createMyReservationRequest.amount());
     }
 
     public static CreateReservationRequest of(final CreateReservationByAdminRequest createReservationByAdminRequest) {
         return new CreateReservationRequest(createReservationByAdminRequest.date(),
                 createReservationByAdminRequest.memberId(),
                 createReservationByAdminRequest.timeId(),
-                createReservationByAdminRequest.themeId());
+                createReservationByAdminRequest.themeId(),
+                null,
+                null,
+                null);
     }
 
     public Reservation toReservation(final Member member, final ReservationTime reservationTime, final Theme theme) {

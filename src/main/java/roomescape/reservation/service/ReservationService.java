@@ -8,6 +8,8 @@ import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
 import roomescape.reservation.dto.request.CreateReservationRequest;
@@ -29,6 +31,8 @@ import roomescape.waiting.service.WaitingService;
 public class ReservationService {
 
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
+
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -36,12 +40,13 @@ public class ReservationService {
     private final WaitingRepository waitingRepository;
 
     public ReservationService(final WaitingService waitingService,
-                              final ReservationRepository reservationRepository,
+                              final PaymentService paymentService, final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository) {
         this.waitingService = waitingService;
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -56,10 +61,9 @@ public class ReservationService {
         return CreateReservationResponse.from(createReservation(createReservationRequest));
     }
 
-    public CreateReservationResponse createReservationByAdmin(
-            final CreateReservationByAdminRequest createReservationByAdminRequest) {
+    public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(createReservationByAdminRequest);
-        return CreateReservationResponse.from(createReservation(createReservationRequest));
+        return CreateReservationResponse.from(createReservationWithPayment(createReservationRequest));
     }
 
     public Reservation createReservation(final CreateReservationRequest createReservationRequest) {
@@ -70,6 +74,19 @@ public class ReservationService {
         checkAlreadyExistReservation(createReservationRequest, createReservationRequest.date(), theme.getName(),
                 reservationTime.getStartAt());
         Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
+        return reservationRepository.save(reservation);
+    }
+
+    public Reservation createReservationWithPayment(final CreateReservationRequest createReservationRequest) {
+        ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
+        Theme theme = themeRepository.getById(createReservationRequest.themeId());
+        Member member = memberRepository.getById(createReservationRequest.memberId());
+
+        checkAlreadyExistReservation(createReservationRequest, createReservationRequest.date(), theme.getName(),
+                reservationTime.getStartAt());
+        Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
+
+        paymentService.createPayment(ConfirmPaymentRequest.from(createReservationRequest));
         return reservationRepository.save(reservation);
     }
 
