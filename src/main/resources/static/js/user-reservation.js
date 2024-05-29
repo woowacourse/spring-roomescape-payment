@@ -192,7 +192,7 @@ function onReservationButtonClick(event, paymentWidget, renderedPaymentWidget) {
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
+      alert(error.message);
     });
   } else {
     alert("Please select a date, theme, and time before making a reservation.");
