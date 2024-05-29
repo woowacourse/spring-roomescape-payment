@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
@@ -15,6 +16,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse("[Request Error] " + e.getMessage()));
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ErrorResponse> httpClientErrorException(HttpClientErrorException e) {
+        e.printStackTrace();
+        ErrorResponse errorResponse = e.getResponseBodyAs(ErrorResponse.class);
+        if (errorResponse == null) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ErrorResponse("[Client Error] 관리자에게 문의하세요"));
+        }
+        return ResponseEntity.status(e.getStatusCode())
+                .body(new ErrorResponse("[Client Error] " + errorResponse.message()));
     }
 
     @ExceptionHandler(AuthorizationException.class)
