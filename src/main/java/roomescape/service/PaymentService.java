@@ -6,9 +6,9 @@ import roomescape.dto.PaymentRequest;
 @Service
 public class PaymentService {
 
-    private final TossPaymentClient paymentClient;
+    private final PaymentClient paymentClient;
 
-    public PaymentService(TossPaymentClient paymentClient) {
+    public PaymentService(PaymentClient paymentClient) {
         this.paymentClient = paymentClient;
     }
 
