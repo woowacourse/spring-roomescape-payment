@@ -8,10 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.dto.ReservationWithRank;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.schedule.ReservationDate;
 
-public interface ReservationJpaRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationJpaRepository extends JpaRepository<Reservation, Long>, ReservationRepository {
 
     @Query("""
         SELECT r FROM Reservation AS r
