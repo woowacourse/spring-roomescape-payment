@@ -1,5 +1,8 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +16,6 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.service.exception.ReservationExistsException;
 import roomescape.service.request.ThemeSaveDto;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ThemeServiceTest {

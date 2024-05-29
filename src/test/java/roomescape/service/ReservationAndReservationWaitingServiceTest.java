@@ -1,5 +1,13 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.Fixture.VALID_MEMBER;
+import static roomescape.Fixture.VALID_RESERVATION_TIME;
+import static roomescape.Fixture.VALID_THEME;
+import static roomescape.Fixture.VALID_USER_PASSWORD;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,14 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.*;
-import roomescape.domain.repository.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.Fixture.*;
+import roomescape.domain.Member;
+import roomescape.domain.MemberEmail;
+import roomescape.domain.MemberName;
+import roomescape.domain.MemberRole;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationDate;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.ReservationWaiting;
+import roomescape.domain.Theme;
+import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+import roomescape.domain.repository.ReservationWaitingRepository;
+import roomescape.domain.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

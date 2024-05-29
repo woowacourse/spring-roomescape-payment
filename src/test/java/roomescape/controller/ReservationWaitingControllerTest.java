@@ -1,22 +1,34 @@
 package roomescape.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.domain.*;
-import roomescape.domain.repository.*;
-import roomescape.infrastructure.auth.JwtProvider;
-import roomescape.web.controller.request.ReservationWaitingRequest;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static roomescape.Fixture.VALID_RESERVATION_TIME;
 import static roomescape.Fixture.VALID_THEME;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.Member;
+import roomescape.domain.MemberEmail;
+import roomescape.domain.MemberName;
+import roomescape.domain.MemberPassword;
+import roomescape.domain.MemberRole;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationDate;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.ReservationWaiting;
+import roomescape.domain.Theme;
+import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+import roomescape.domain.repository.ReservationWaitingRepository;
+import roomescape.domain.repository.ThemeRepository;
+import roomescape.infrastructure.auth.JwtProvider;
+import roomescape.web.controller.request.ReservationWaitingRequest;
 
 public class ReservationWaitingControllerTest extends ControllerTest {
 

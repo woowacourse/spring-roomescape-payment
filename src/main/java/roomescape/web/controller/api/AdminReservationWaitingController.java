@@ -1,12 +1,15 @@
 package roomescape.web.controller.api;
 
+import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationWaitingService;
 import roomescape.service.response.ReservationWaitingDto;
 import roomescape.web.controller.response.ReservationWaitingResponse;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/reservation-waitings")

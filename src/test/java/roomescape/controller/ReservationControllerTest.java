@@ -1,6 +1,21 @@
 package roomescape.controller;
 
-import org.junit.jupiter.api.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static roomescape.Fixture.VALID_ADMIN_EMAIL;
+import static roomescape.Fixture.VALID_ADMIN_NAME;
+import static roomescape.Fixture.VALID_ADMIN_PASSWORD;
+import static roomescape.Fixture.VALID_THEME;
+import static roomescape.Fixture.VALID_USER_EMAIL;
+import static roomescape.Fixture.VALID_USER_NAME;
+import static roomescape.Fixture.VALID_USER_PASSWORD;
+
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
@@ -9,12 +24,6 @@ import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
 import roomescape.domain.MemberRole;
 import roomescape.web.controller.request.MemberReservationRequest;
-
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static roomescape.Fixture.*;
 
 @ExtendWith(MockitoExtension.class)
 @Import(TestPaymentConfiguration.class)

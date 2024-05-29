@@ -1,11 +1,10 @@
 package roomescape.service.specification;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.domain.Reservation;
 import roomescape.service.request.AdminSearchedReservationDto;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ReservationSpecification {
 

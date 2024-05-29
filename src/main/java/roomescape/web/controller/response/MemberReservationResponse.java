@@ -1,7 +1,6 @@
 package roomescape.web.controller.response;
 
 import java.time.LocalDate;
-
 import roomescape.service.response.ReservationDto;
 
 public record MemberReservationResponse(

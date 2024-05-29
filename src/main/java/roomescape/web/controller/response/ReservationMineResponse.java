@@ -1,8 +1,7 @@
 package roomescape.web.controller.response;
 
-import roomescape.service.response.ReservationDto;
-
 import java.time.LocalDate;
+import roomescape.service.response.ReservationDto;
 
 public record ReservationMineResponse(Long reservationId, ThemeResponse theme, LocalDate date,
                                       ReservationTimeResponse time) {

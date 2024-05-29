@@ -1,14 +1,13 @@
 package roomescape.domain.repository;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationWaiting;
 import roomescape.domain.ReservationWaitingWithRank;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ReservationWaitingRepository extends JpaRepository<ReservationWaiting, Long> {

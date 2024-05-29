@@ -1,9 +1,9 @@
 package roomescape.controller.steps;
 
+import static roomescape.Fixture.COOKIE_NAME;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-
-import static roomescape.Fixture.COOKIE_NAME;
 
 public class ReservationAdminSteps {
 

@@ -1,11 +1,11 @@
 package roomescape.controller.steps;
 
+import static roomescape.Fixture.COOKIE_NAME;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import roomescape.web.controller.request.MemberReservationRequest;
-
-import static roomescape.Fixture.COOKIE_NAME;
 
 public class ReservationSteps {
 

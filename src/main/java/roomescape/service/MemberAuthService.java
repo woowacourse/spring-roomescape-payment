@@ -1,5 +1,7 @@
 package roomescape.service;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Member;
 import roomescape.domain.MemberEmail;
@@ -8,9 +10,6 @@ import roomescape.domain.MemberPassword;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class MemberAuthService {

@@ -1,5 +1,19 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static roomescape.Fixture.VALID_MEMBER;
+import static roomescape.Fixture.VALID_RESERVATION;
+import static roomescape.Fixture.VALID_RESERVATION_DATE;
+import static roomescape.Fixture.VALID_RESERVATION_TIME;
+import static roomescape.Fixture.VALID_THEME;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,17 +33,6 @@ import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.response.ReservationTimeDto;
 import roomescape.service.response.ThemeDto;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static roomescape.Fixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
