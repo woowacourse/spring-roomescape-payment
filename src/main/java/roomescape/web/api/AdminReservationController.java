@@ -18,7 +18,6 @@ import roomescape.application.ReservationService;
 import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.ReservationSearchCondition;
 import roomescape.application.dto.response.reservation.ReservationResponse;
-import roomescape.domain.reservation.Reservation;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +27,9 @@ public class AdminReservationController {
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> makeReservation(@RequestBody @Valid ReservationRequest request) {
-        Reservation reservation = reservationService.saveReservation(request);
-        return ResponseEntity.created(URI.create("/reservations/" + reservation.getId()))
-                .body(ReservationResponse.from(reservation));
+        ReservationResponse response = reservationService.saveReservation(request);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
+                .body(response);
     }
 
     @GetMapping("/admin/reservations")
@@ -47,14 +46,14 @@ public class AdminReservationController {
             @RequestParam("themeId") Long themeId
     ) {
         ReservationSearchCondition searchQuery = new ReservationSearchCondition(start, end, memberId, themeId);
-        List<ReservationResponse> reservations = reservationService.findAllReservationByConditions(searchQuery);
-        return ResponseEntity.ok(reservations);
+        List<ReservationResponse> response = reservationService.findAllReservationByConditions(searchQuery);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/admin/waitings")
     public ResponseEntity<List<ReservationResponse>> findAllWaitings() {
-        List<ReservationResponse> waitings = reservationService.findAllWaitings();
-        return ResponseEntity.ok(waitings);
+        List<ReservationResponse> response = reservationService.findAllWaitings();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/admin/waitings/{idWaiting}")

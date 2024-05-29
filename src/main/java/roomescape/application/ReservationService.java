@@ -35,7 +35,7 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public synchronized Reservation saveReservation(ReservationRequest request) {
+    public synchronized ReservationResponse saveReservation(ReservationRequest request) {
         Member member = memberRepository.getById(request.memberId());
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
@@ -49,7 +49,7 @@ public class ReservationService {
             savedReservation.setPayment(payment);
         }
 
-        return savedReservation;
+        return ReservationResponse.from(reservation);
     }
 
     public List<ReservationResponse> findAllReservationsWithoutCancel() {

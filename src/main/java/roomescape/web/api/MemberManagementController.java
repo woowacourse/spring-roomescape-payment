@@ -28,8 +28,8 @@ public class MemberManagementController {
 
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> findAllMembers() {
-        List<MemberResponse> allMember = memberService.findAllMember();
-        return ResponseEntity.ok(allMember);
+        List<MemberResponse> response = memberService.findAllMember();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/members/{idMember}")

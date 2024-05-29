@@ -18,7 +18,6 @@ import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
-import roomescape.domain.reservation.Reservation;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,22 +30,19 @@ public class MemberReservationController {
             @RequestBody @Valid UserReservationRequest request,
             MemberInfo memberInfo
     ) {
-        ReservationRequest reservationRequest = ReservationRequest.builder()
-                .date(request.date()).memberId(memberInfo.id())
-                .timeId(request.timeId()).themeId(request.themeId())
-                .build();
+        ReservationRequest reservationRequest = new ReservationRequest(
+                request.date(), memberInfo.id(), request.timeId(), request.themeId(),
+                request.amount(), request.orderId(), request.paymentKey(), request.paymentType());
 
-        Reservation reservation = reservationService.saveReservation(reservationRequest);
-
-        ReservationResponse response = ReservationResponse.from(reservation);
-        return ResponseEntity.created(URI.create("/reservations/" + reservation.getId()))
+        ReservationResponse response = reservationService.saveReservation(reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
 
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(MemberInfo memberInfo) {
-        List<UserReservationResponse> reservations = reservationService.findAllWithRank(memberInfo.id());
-        return ResponseEntity.ok(reservations);
+        List<UserReservationResponse> response = reservationService.findAllWithRank(memberInfo.id());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/waitings/{idWaiting}")
