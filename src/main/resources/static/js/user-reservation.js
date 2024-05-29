@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
+    const paymentAmount = 128000;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
     paymentWidget.renderPaymentMethods(
@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
@@ -183,41 +184,23 @@ function onReservationButtonClick(event, paymentWidget) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 32000,
+            amount: 128000
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-            alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+            alert(error.message);
         });
-
-        fetch('/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(reservationData)
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Reservation failed');
-                return response.json();
-            })
-            .then(data => {
-                alert("Reservation successful!");
-                location.reload();
-            })
-            .catch(error => {
-                alert("An error occurred while making the reservation.");
-                console.error(error);
-            });
     } else {
         alert("Please select a date, theme, and time before making a reservation.");
     }
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
+    console.log(paymentData);
+    console.log(reservationData);
     /*
     TODO: [1단계]
         - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
