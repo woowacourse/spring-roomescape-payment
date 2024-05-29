@@ -48,7 +48,7 @@ class ReservationWaitingControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("예약 대기를 생성한다.")
     void addReservationWaiting() {
-        ReservationRequest request = new ReservationRequest(LocalDate.parse(RESERVATION_DATE), 1L, 1L);
+        ReservationRequest request = new ReservationRequest(LocalDate.parse(RESERVATION_DATE), 1L, 1L, null, null, null);
 
         RestAssured.given().log().all()
                 .contentType("application/json")

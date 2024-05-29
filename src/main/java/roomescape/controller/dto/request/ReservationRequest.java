@@ -30,6 +30,6 @@ public record ReservationRequest(
 ) {
 
     public CreateReservationRequest toCreateReservationRequest(long memberId) {
-        return new CreateReservationRequest(date, timeId, themeId, memberId);
+        return new CreateReservationRequest(date, timeId, themeId, memberId, paymentKey, orderId, amount);
     }
 }

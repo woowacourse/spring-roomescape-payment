@@ -88,7 +88,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 LocalDate.of(2024, 4, 9),
                 time.getId(),
                 theme.getId(),
-                member.getId()
+                member.getId(), null, null, 0
         );
         ReservationResponse response = reservationService.addReservation(request);
 

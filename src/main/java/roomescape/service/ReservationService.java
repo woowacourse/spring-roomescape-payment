@@ -29,6 +29,7 @@ import roomescape.service.dto.response.ReservationResponse;
 @Transactional(readOnly = true)
 public class ReservationService {
 
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -37,6 +38,7 @@ public class ReservationService {
     private final Clock clock;
 
     public ReservationService(
+            PaymentService paymentService,
             ReservationRepository reservationRepository,
             ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
@@ -44,6 +46,7 @@ public class ReservationService {
             MemberRepository memberRepository,
             Clock clock
     ) {
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -67,10 +70,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addReservation(CreateReservationRequest request) {
+    public ReservationResponse addReservation(CreateReservationRequest request) { // todo 시그니처 변경
         Reservation reservation = createReservation(request);
         reservation.validateFutureReservation(LocalDateTime.now(clock));
         validateDuplicatedReservation(reservation);
+        paymentService.pay(request.toPaymentRequest());
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }

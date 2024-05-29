@@ -23,6 +23,6 @@ public record AdminReservationRequest(
 ) {
 
     public CreateReservationRequest toCreateReservationRequest() {
-        return new CreateReservationRequest(date, timeId, themeId, memberId);
+        return new CreateReservationRequest(date, timeId, themeId, memberId, null, null, 0); // TODO: null 수정
     }
 }

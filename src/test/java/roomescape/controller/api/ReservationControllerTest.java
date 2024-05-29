@@ -68,7 +68,7 @@ class ReservationControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("지나간 날짜/시간에 대한 예약은 실패한다.")
     void failWhenDateTimePassed() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L);
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, null, null, null);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
@@ -102,7 +102,7 @@ class ReservationControllerTest extends BaseControllerTest {
     @DisplayName("나의 예약들을 조회한다")
     void getMyReservations() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest saveRequest = new ReservationRequest(date, time.getId(), theme.getId());
+        ReservationRequest saveRequest = new ReservationRequest(date, time.getId(), theme.getId(), null, null, null);
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
@@ -132,7 +132,7 @@ class ReservationControllerTest extends BaseControllerTest {
 
     private void addReservation() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), null, null, null);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
@@ -185,7 +185,7 @@ class ReservationControllerTest extends BaseControllerTest {
     }
 
     private void addReservationFailWhenDuplicatedReservation() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L);
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L, null, null, null);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
