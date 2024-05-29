@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import roomescape.core.domain.ReservationTime;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
 import roomescape.utils.AccessTokenGenerator;
@@ -62,6 +65,39 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("예약 생성 시, date가 이미 지난 날짜면 예외가 발생한다.")
+    void validateReservationWithPastDate() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest("2020-10-10", 1L, 1L, "", "", 1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("예약 생성 시, date는 오늘이고 time은 이미 지난 시간이면 예외가 발생한다.")
+    void validateReservationWithTodayPastTime() {
+        final ReservationTime pastTime = testFixture.persistReservationTimeBeforeMinute(1);
+
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
+                LocalDate.now().format(DateTimeFormatter.ISO_DATE),
+                pastTime.getId(), 1L, "", "", 1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+
+    @Test
     @DisplayName("예약 생성 시, timeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullTimeId() {
         ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1000);
@@ -76,9 +112,59 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("예약 생성 시, timeId 값으로 찾을 수 있는 시간이 없으면 예외가 발생한다.")
+    void validateReservationWithTimeIdNotFound() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 0L, 1L, "", "", 1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("예약 생성 시, 해당 날짜와 시간에 예약 내역이 있으면 예외가 발생한다.")
+    void validateReservationWithDuplicatedDateAndTime() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
     @DisplayName("예약 생성 시, themeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullThemeId() {
         ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("예약 생성 시, themeId 값으로 찾을 수 있는 테마가 없으면 예외가 발생한다.")
+    void validateReservationWithThemeIdNotFound() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, 0L, "", "", 1000);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)

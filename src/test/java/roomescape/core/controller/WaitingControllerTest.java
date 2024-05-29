@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.AdminGenerator;
@@ -57,6 +58,31 @@ class WaitingControllerTest {
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("이미 예약한 내역이 존재하면 예약 대기를 생성할 수 없다.")
+    void createWaitingAlreadyHaveReservation() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "paymentKey", "orderId",
+                1000);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        MemberWaitingRequest waitingRequest = new MemberWaitingRequest(TOMORROW, 1L, 1L);
+
+        RestAssured.given().log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(waitingRequest)
+                .when().post("/waitings")
+                .then().log().all()
+                .statusCode(400);
     }
 
     @Test
