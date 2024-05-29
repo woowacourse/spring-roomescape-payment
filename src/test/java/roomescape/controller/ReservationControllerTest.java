@@ -2,9 +2,14 @@ package roomescape.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
@@ -48,7 +53,8 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "memberId", 1L,
                             "date", "2025-10-06",
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L
+                                );
 
                     createdId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
