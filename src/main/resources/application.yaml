@@ -39,3 +39,6 @@ jwt:
   secret-key: gotjrgoeh2rjtdmsqufakfdldkslqslekgoehrgkwlaktpdydkwhaejrlfdjdigkskqhspdyrhldwkdglekdghkdtmfjq=
   expiration: 1800000
 
+payment:
+  widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
