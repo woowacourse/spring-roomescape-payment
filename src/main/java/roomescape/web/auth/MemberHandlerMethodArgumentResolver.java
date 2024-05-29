@@ -7,6 +7,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
 import roomescape.service.response.MemberDto;
 import roomescape.web.controller.request.LoginMember;

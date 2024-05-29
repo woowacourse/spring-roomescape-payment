@@ -16,7 +16,7 @@ import roomescape.service.MemberAuthService;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
 import roomescape.web.auth.CookieHandler;
-import roomescape.web.auth.JwtProvider;
+import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.web.controller.request.MemberSignUpRequest;
 import roomescape.web.controller.request.TokenRequest;
 import roomescape.web.controller.response.MemberResponse;

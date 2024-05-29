@@ -1,4 +1,4 @@
-package roomescape.web.auth;
+package roomescape.infrastructure.auth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
