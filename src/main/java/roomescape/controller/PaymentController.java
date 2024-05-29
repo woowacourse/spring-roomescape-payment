@@ -5,10 +5,10 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import roomescape.controller.dto.PaymentApproveRequest;
 
 @RestController
 public class PaymentController {
@@ -22,11 +22,9 @@ public class PaymentController {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<PaymentApproveResponse> approve(PaymentApproveRequest paymentApproveRequest) {
-        HttpHeaders headers = new HttpHeaders();
+    public ResponseEntity<PaymentApproveResponse> approve(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
+        HttpHeaders headers = headerGenerator.generate();
         headers.setBasicAuth(encodeSecretKey());
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity httpEntity = new HttpEntity(paymentApproveRequest, headers);
 
         return restTemplate.postForEntity(
@@ -39,6 +37,6 @@ public class PaymentController {
     private String encodeSecretKey() {
         return Base64.getEncoder()
                 .encodeToString((secretKey + ":")
-                .getBytes(StandardCharsets.UTF_8));
+                        .getBytes(StandardCharsets.UTF_8));
     }
 }

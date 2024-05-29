@@ -1,6 +1,4 @@
-package roomescape.controller;
-
-import roomescape.controller.dto.UserReservationSaveRequest;
+package roomescape.controller.dto;
 
 public record PaymentApproveRequest(
         String paymentKey,
