@@ -1,15 +1,24 @@
 package roomescape.reservation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.token.TokenProvider;
+import roomescape.config.TestPaymentGatewayConfig;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationTimeResponse;
@@ -18,15 +27,9 @@ import roomescape.reservation.dto.SaveReservationTimeRequest;
 import roomescape.reservation.dto.SaveThemeRequest;
 import roomescape.reservation.dto.ThemeResponse;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestPaymentGatewayConfig.class)
 class AdminReservationControllerTest {
 
     @Autowired
@@ -53,13 +56,17 @@ class AdminReservationControllerTest {
 
 
     @DisplayName("(관리자) - 사용자 아이디를 포함하여 예약 정보를 저장한다.")
+    @Sql("classpath:test-payment-credential-data.sql")
     @Test
     void saveReservationForAdminTest() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
-                1L
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         RestAssured.given().log().all()
@@ -79,7 +86,10 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         RestAssured.given().log().all()
@@ -125,7 +135,8 @@ class AdminReservationControllerTest {
     @DisplayName("예약 시간 정보를 저장한다.")
     @Test
     void saveReservationTimeTest() {
-        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(LocalTime.of(12, 15));
+        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(
+                LocalTime.of(12, 15));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -140,7 +151,8 @@ class AdminReservationControllerTest {
     @DisplayName("관리자가 아닌 클라이언트가 예약 시간 정보를 저장하려고 하면 예외를 발생시킨다.")
     @Test
     void saveReservationTimeWhoNotAdminTest() {
-        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(LocalTime.of(12, 15));
+        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(
+                LocalTime.of(12, 15));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

@@ -1,31 +1,34 @@
 package roomescape.reservation.controller;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.token.TokenProvider;
+import roomescape.config.TestPaymentGatewayConfig;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.SaveReservationRequest;
 
-import java.time.LocalDate;
-
-import static org.hamcrest.Matchers.is;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestPaymentGatewayConfig.class)
 class ReservationControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
 
     @LocalServerPort
-    int randomServerPort;
+    private int randomServerPort;
 
     @BeforeEach
     public void initReservation() {
@@ -33,13 +36,17 @@ class ReservationControllerTest {
     }
 
     @DisplayName("예약 정보를 저장한다.")
+    @Sql("classpath:test-payment-credential-data.sql")
     @Test
     void saveReservationTest() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         RestAssured.given().log().all()
@@ -59,7 +66,10 @@ class ReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 80L,
-                1L
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         RestAssured.given().log().all()
@@ -79,7 +89,10 @@ class ReservationControllerTest {
                 LocalDate.now().minusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         RestAssured.given().log().all()

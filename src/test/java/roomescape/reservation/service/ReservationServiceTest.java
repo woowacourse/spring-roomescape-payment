@@ -1,10 +1,22 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.config.TestPaymentGatewayConfig;
+import roomescape.payment.dto.SavePaymentCredentialRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationDto;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.model.Reservation;
@@ -12,17 +24,9 @@ import roomescape.reservation.model.ReservationWaiting;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationWaitingRepository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestPaymentGatewayConfig.class)
 class ReservationServiceTest {
 
     @Autowired
@@ -31,6 +35,8 @@ class ReservationServiceTest {
     private ReservationWaitingRepository reservationWaitingRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private PaymentService paymentService;
 
     @DisplayName("전체 예약 정보를 조회한다.")
     @Test
@@ -47,7 +53,18 @@ class ReservationServiceTest {
     void saveReservationTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(date, 3L, 1L, 1L);
+        String orderId = "orderId";
+        long amount = 1000L;
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                date,
+                3L,
+                1L,
+                1L,
+                orderId,
+                amount,
+                "paymentKey"
+        );
+        paymentService.saveCredential(new SavePaymentCredentialRequest(orderId, amount));
 
         // When
         final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
@@ -67,7 +84,15 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenSaveReservationWithNotExistReservationTimeTest() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now(), 3L, 9L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                LocalDate.now(),
+                3L,
+                9L,
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
+        );
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -96,10 +121,14 @@ class ReservationServiceTest {
 
         // Then
         assertAll(
-                () -> assertThat(reservationWaiting.getTheme().getId()).isEqualTo(newReservation.getTheme().getId()),
-                () -> assertThat(reservationWaiting.getMember().getId()).isEqualTo(newReservation.getMember().getId()),
-                () -> assertThat(reservationWaiting.getDate().getValue()).isEqualTo(newReservation.getDate().getValue()),
-                () -> assertThat(reservationWaiting.getTime().getStartAt()).isEqualTo(newReservation.getTime().getStartAt())
+                () -> assertThat(reservationWaiting.getTheme().getId())
+                        .isEqualTo(newReservation.getTheme().getId()),
+                () -> assertThat(reservationWaiting.getMember().getId())
+                        .isEqualTo(newReservation.getMember().getId()),
+                () -> assertThat(reservationWaiting.getDate().getValue())
+                        .isEqualTo(newReservation.getDate().getValue()),
+                () -> assertThat(reservationWaiting.getTime().getStartAt())
+                        .isEqualTo(newReservation.getTime().getStartAt())
         );
     }
 
@@ -107,7 +136,15 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenPastDateOrTime() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now().minusDays(3), 3L, 1L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                LocalDate.now().minusDays(3),
+                3L,
+                1L,
+                1L,
+                "orderId",
+                1000L,
+                "paymentKey"
+        );
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -123,7 +160,10 @@ class ReservationServiceTest {
                 LocalDate.now().plusDays(2),
                 3L,
                 4L,
-                9L
+                9L,
+                "orderId",
+                1000L,
+                "paymentKey"
         );
 
         // When & Then
