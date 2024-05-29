@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.domain.Role;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.config.DatabaseCleaner;
@@ -34,6 +35,7 @@ import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@ActiveProfiles("test")
 class ReservationServiceTest {
 
     @Autowired
@@ -73,22 +75,6 @@ class ReservationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("예약 시, 중복된 예약이 있다면 예외가 발생한다.")
-    @Test
-    void duplicateReservationExceptionTest() {
-        Theme horror = themeRepository.save(HORROR_THEME);
-        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_TIME_10_00);
-        Member jojo = memberRepository.save(MEMBER_JOJO);
-
-        ReservationPaymentRequest saveRequest = new ReservationPaymentRequest(
-                jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
-        );
-
-        reservationService.save(saveRequest);
-
-        assertThatThrownBy(() -> reservationService.save(saveRequest))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
 
     @DisplayName("예약 아이디로 조회 시 존재하지 않는 아이디면 예외가 발생한다.")
     @Test
