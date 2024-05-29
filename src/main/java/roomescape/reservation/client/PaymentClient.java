@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.response.PaymentResponse;
 
-@FeignClient(name = "paymentClient", url = "https://api.tosspayments.com/v1/payments/confirm")
+@FeignClient(name = "paymentClient", url = "https://api.tosspayments.com/v1/payments/confirm", configuration = FeignConfig.class)
 public interface PaymentClient {
 
-
     @PostMapping
-    ResponseEntity<PaymentResponse> paymentReservation(@RequestHeader(name = "Authorization") String authorization, PaymentRequest paymentRequest);
+    ResponseEntity<PaymentResponse> paymentReservation(
+            @RequestHeader(name = "Authorization") String authorization,
+            PaymentRequest paymentRequest);
 }

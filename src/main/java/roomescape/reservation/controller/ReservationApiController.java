@@ -1,10 +1,14 @@
 package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,18 +61,19 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
-
-        PaymentResponse paymentResponse = paymentClient.paymentReservation(authorizations, PaymentRequest.toRequest(reservationCreateRequest)).getBody();
+        PaymentResponse paymentResponse = paymentClient.paymentReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest)).getBody();
 
         Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
         ReservationResponse reservationResponse = reservationService.findById(id);
 
         return ResponseEntity.created(URI.create("/reservations/" + id)).body(reservationResponse);
+    }
+
+    private String getAuthorizations() {
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encodedBytes);
     }
 
     @GetMapping("/reservations/waiting")
