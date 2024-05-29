@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", encodedSecretKey)
+                .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
