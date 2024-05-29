@@ -2,17 +2,20 @@ package roomescape.exception;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import roomescape.client.PaymentException;
+
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionApiController {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionInfo> IllegalArgExHandler(IllegalArgumentException exception) {
+    public ResponseEntity<ExceptionInfo> illegalArgExHandler(IllegalArgumentException exception) {
         ExceptionInfo exceptionInfo = new ExceptionInfo(exception.getMessage());
 
         return ResponseEntity.badRequest().body(exceptionInfo);
@@ -28,5 +31,12 @@ public class ExceptionApiController {
         });
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ExceptionInfo> paymentExHandler(PaymentException paymentException) {
+        ExceptionInfo exceptionInfo = new ExceptionInfo(paymentException.getMessage());
+
+        return ResponseEntity.status(paymentException.getStatus()).body(exceptionInfo);
     }
 }
