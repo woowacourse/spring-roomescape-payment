@@ -26,27 +26,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-//    @PostMapping
-//    public ResponseEntity<PaidReservationResponse> savePaidReservation(
-//            @Auth long memberId,
-//            @RequestBody PaymentRequest reservationRequest
-//    ) {
-//        reservationRequest = new PaymentRequest(
-//                reservationRequest.date(),
-//                memberId,
-//                reservationRequest.timeId(),
-//                reservationRequest.themeId(),
-//                reservationRequest.paymentKey(),
-//                reservationRequest.orderId(),
-//                reservationRequest.amount()
-//        );
-//
-//        PaidReservationResponse saved = reservationService.savePaid(reservationRequest);
-//        return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
-//                .body(saved);
-//    }
-
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ReservationResponse> saveReservation(
             @Auth long memberId,
             @RequestBody ReservationRequest reservationRequest

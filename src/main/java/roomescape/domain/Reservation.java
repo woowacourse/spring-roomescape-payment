@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.exception.ExceptionType;
@@ -32,6 +33,9 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    @OneToOne
+    private Payment payment;
 
     protected Reservation() {
     }
@@ -79,6 +83,11 @@ public class Reservation {
         if (theme == null) {
             throw new RoomescapeException(ExceptionType.EMPTY_THEME);
         }
+    }
+
+    public void updatePayment(Payment payment) {
+        this.status = ReservationStatus.RESERVED_COMPLETE;
+        this.payment = payment;
     }
 
     public static ReservationBuilder builder() {

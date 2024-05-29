@@ -24,7 +24,7 @@ public record PaidReservationResponse(
                 reservationResponse.status(),
                 paymentResponse.paymentKey(),
                 paymentResponse.orderId(),
-                paymentResponse.amount()
+                paymentResponse.totalAmount()
         );
     }
 }
