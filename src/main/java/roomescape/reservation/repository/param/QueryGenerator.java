@@ -1,13 +1,16 @@
 package roomescape.reservation.repository.param;
 
-import roomescape.reservation.dto.SearchReservationsParams;
-
 import java.util.ArrayList;
 import java.util.List;
+import roomescape.reservation.dto.SearchReservationsParams;
 
 public class QueryGenerator {
 
-    public static String generateQueryWithSearchReservationsParams(final SearchReservationsParams params, final String baseQuery) {
+    private QueryGenerator() {
+    }
+
+    public static String generateQueryWithSearchReservationsParams(final SearchReservationsParams params,
+                                                                   final String baseQuery) {
         final List<SearchParam> searchParams = convertSearchParams(params);
         return generateQueryWithSearchParams(searchParams, baseQuery);
     }
@@ -26,7 +29,7 @@ public class QueryGenerator {
             isFirst = false;
         }
 
-        searchParams.add(new SearchDateParam(isFirst,"date", params.from(), params.to()));
+        searchParams.add(new SearchDateParam(isFirst, "date", params.from(), params.to()));
         return searchParams;
     }
 

@@ -2,10 +2,12 @@ package roomescape.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.Optional;
 
 public class CookieParser {
+
+    private CookieParser() {
+    }
 
     public static Optional<Cookie> findCookie(final HttpServletRequest request, final String name) {
         final Cookie[] cookies = request.getCookies();
