@@ -7,8 +7,4 @@ public class PaymentException extends RuntimeException {
         super(tossErrorResponse.message());
         this.tossErrorResponse = tossErrorResponse;
     }
-
-    public TossErrorResponse getErrorResponse() {
-        return tossErrorResponse;
-    }
 }
