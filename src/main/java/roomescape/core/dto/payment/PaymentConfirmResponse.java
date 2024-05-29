@@ -5,13 +5,14 @@ public class PaymentConfirmResponse {
     private String orderId;
     private String paymentKey;
 
-    public PaymentConfirmResponse(Integer totalAmount, String orderId, String paymentKey) {
+    public PaymentConfirmResponse(final Integer totalAmount, final String orderId, final String paymentKey) {
         this.totalAmount = totalAmount;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
     }
 
-    public PaymentConfirmResponse() {}
+    public PaymentConfirmResponse() {
+    }
 
     public Integer getTotalAmount() {
         return totalAmount;
