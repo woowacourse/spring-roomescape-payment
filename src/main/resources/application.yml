@@ -27,8 +27,10 @@ security:
     secret-key: abcdefghijklmnopqrstuvwxyz0123456789
     expiration-time: 3600000 # 1 hour
 
+client:
+  connection-timeout-ms: 5000
+  read-timeout-ms: 30000
+
 payment:
   base-url: https://api.tosspayments.com
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  connection-timeout-ms: 5000
-  read-timeout-ms: 30000

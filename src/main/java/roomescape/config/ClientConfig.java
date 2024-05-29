@@ -19,14 +19,12 @@ public class ClientConfig {
 
     @Bean
     public RestClient restClient(
-            @Value("${payment.base-url}") String paymentBaseUrl,
-            @Value("${payment.connection-timeout-ms}") int connectionTimeoutMs,
-            @Value("${payment.read-timeout-ms}") int readTimeoutMs
+            @Value("${client.connection-timeout-ms}") int connectionTimeoutMs,
+            @Value("${client.read-timeout-ms}") int readTimeoutMs
     ) {
         RestTemplate template = new RestTemplate(clientHttpRequestFactory(connectionTimeoutMs, readTimeoutMs));
 
         return RestClient.builder(template)
-                .baseUrl(paymentBaseUrl)
                 .build();
     }
 
@@ -39,14 +37,23 @@ public class ClientConfig {
                 .setSoTimeout(Timeout.ofMilliseconds(readTimeoutMs))
                 .build();
 
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultSocketConfig(socketConfig);
-        connectionManager.setDefaultConnectionConfig(connectionConfig);
+        PoolingHttpClientConnectionManager connectionManager = createConnectionManager(socketConfig, connectionConfig);
 
         HttpClient httpClient = HttpClientBuilder.create()
                 .setConnectionManager(connectionManager)
                 .build();
 
         return new HttpComponentsClientHttpRequestFactory(httpClient);
+    }
+
+    private PoolingHttpClientConnectionManager createConnectionManager(
+            SocketConfig socketConfig,
+            ConnectionConfig connectionConfig
+    ) {
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setDefaultSocketConfig(socketConfig);
+        connectionManager.setDefaultConnectionConfig(connectionConfig);
+
+        return connectionManager;
     }
 }

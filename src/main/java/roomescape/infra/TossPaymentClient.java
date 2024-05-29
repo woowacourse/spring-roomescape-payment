@@ -22,12 +22,13 @@ public class TossPaymentClient implements PaymentClient {
     private final ObjectMapper objectMapper;
 
     public TossPaymentClient(
+            @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
-            RestClient restClient,
+            RestClient.Builder restClient,
             ObjectMapper objectMapper
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
-        this.restClient = restClient;
+        this.restClient = restClient.baseUrl(paymentBaseUrl).build();
         this.objectMapper = objectMapper;
     }
 
@@ -47,7 +48,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(PaymentResponse.class);
     }
 
-    private static String encodeSecretKey(String secretKey) {
+    private String encodeSecretKey(String secretKey) {
         return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }
 }
