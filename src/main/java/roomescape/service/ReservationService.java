@@ -59,10 +59,6 @@ public class ReservationService {
         return saveReservationWithPayment(reservationRequest, freePayment());
     }
 
-    private Consumer<ReservationRequest> freePayment() {
-        return request -> {};
-    }
-
     @Transactional
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
         return saveReservationWithPayment(reservationPaymentRequest.toReservationRequest(), reservationRequest -> {
@@ -88,6 +84,10 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
         return ReservationResponse.createByReservation(savedReservation);
+    }
+
+    private Consumer<ReservationRequest> freePayment() {
+        return request -> {};
     }
 
     @Transactional
