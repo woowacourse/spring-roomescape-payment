@@ -15,6 +15,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.common.exception.UnAuthorizationException;
 
@@ -47,6 +48,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(400)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exceptionMessage));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpClientErrorException ex) {
+        logger.warning(EXCEPTION_PREFIX + ex.getMessage());
+
+        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
     }
 
     @ExceptionHandler

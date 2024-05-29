@@ -58,12 +58,12 @@ public class ReservationService {
                                                          final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
                 createMyReservationRequest);
-        return CreateReservationResponse.from(createReservation(createReservationRequest));
+        return CreateReservationResponse.from(createReservationWithPayment(createReservationRequest));
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(createReservationByAdminRequest);
-        return CreateReservationResponse.from(createReservationWithPayment(createReservationRequest));
+        return CreateReservationResponse.from(createReservation(createReservationRequest));
     }
 
     public Reservation createReservation(final CreateReservationRequest createReservationRequest) {
