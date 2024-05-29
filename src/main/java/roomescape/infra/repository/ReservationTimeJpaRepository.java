@@ -40,6 +40,22 @@ public interface ReservationTimeJpaRepository extends
     );
 
     @Override
+    @Query("""
+            select d.time from ReservationDetail d
+            where d.date = :date
+            and d.theme.id = :themeId
+            and exists (
+                select 1 from Reservation r
+                where r.detail.id = d.id
+                and r.status = 'RESERVED' or r.status = 'PAYMENT_PENDING'
+            )
+            """)
+    List<ReservationTime> findAllUnAvailableTimes(
+            @Param("date") LocalDate date,
+            @Param("themeId") Long themeId
+    );
+
+    @Override
     boolean existsByStartAt(LocalTime startAt);
 
     @Override

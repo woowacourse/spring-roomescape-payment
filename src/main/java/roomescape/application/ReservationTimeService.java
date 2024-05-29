@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.dto.request.time.ReservationTimeRequest;
+import roomescape.application.dto.response.time.AvailableReservationTimeResponse;
+import roomescape.application.dto.response.time.ReservationTimeResponse;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.exception.time.DuplicatedTimeException;
 import roomescape.exception.time.NotFoundTimeException;
 import roomescape.exception.time.ReservationReferencedTimeException;
-import roomescape.application.dto.request.time.ReservationTimeRequest;
-import roomescape.application.dto.response.time.AvailableReservationTimeResponse;
-import roomescape.application.dto.response.time.ReservationTimeResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +30,7 @@ public class ReservationTimeService {
 
     public List<AvailableReservationTimeResponse> findAllAvailableReservationTime(LocalDate date, Long themeId) {
         List<ReservationTime> totalTimes = reservationTimeRepository.findAll();
-        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTimeByDateAndThemeId(
-                date, themeId);
+        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllUnAvailableTimes(date, themeId);
 
         return totalTimes.stream()
                 .map(time -> AvailableReservationTimeResponse.of(time, reservedTimes))

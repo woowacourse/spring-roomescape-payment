@@ -20,6 +20,8 @@ public interface ReservationTimeRepository {
 
     List<ReservationTime> findAllReservedTimeByDateAndThemeId(LocalDate date, Long themeId);
 
+    List<ReservationTime> findAllUnAvailableTimes(LocalDate date, Long themeId);
+
     boolean existsByStartAt(LocalTime startAt);
 
     void delete(ReservationTime time);
