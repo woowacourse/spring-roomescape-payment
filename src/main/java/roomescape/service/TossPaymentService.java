@@ -8,7 +8,6 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 import roomescape.dto.request.reservation.ReservationRequest;
@@ -16,15 +15,14 @@ import roomescape.dto.response.PaymentRequest;
 import roomescape.dto.response.reservation.TossExceptionResponse;
 import roomescape.exception.PaymentException;
 
-@Service
 public class TossPaymentService implements PaymentService {
 
-    private final RestClient restClient;
+    @Value("${payment.toss.secret-key}")
     private String widgetSecretKey;
+    private final RestClient restClient;
 
-    public TossPaymentService(@Value("payment.toss.secret-key") String widgetSecretKey) {
-        this.restClient = RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments/confirm").build();
-        this.widgetSecretKey = widgetSecretKey;
+    public TossPaymentService(RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public ReservationRequest pay(ReservationRequest reservationRequest) {
@@ -49,8 +47,7 @@ public class TossPaymentService implements PaymentService {
     }
 
     private String createAuthorization() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = Base64.getEncoder().encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }
 
