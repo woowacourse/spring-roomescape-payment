@@ -35,7 +35,6 @@ public class PaymentService {
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", encodedSecretKey)
-                .header("TossPayments-Test-Code", "INVALID_CARD_EXPIRATION")
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
