@@ -10,7 +10,7 @@ import roomescape.dto.request.MemberReservationRequest;
 @Service
 public class PaymentService {
 
-    @Value("atto.ash.secret-key")
+    @Value("${atto.ash.secret-key}")
     private String secretKey;
     private final RestClient restClient;
 
