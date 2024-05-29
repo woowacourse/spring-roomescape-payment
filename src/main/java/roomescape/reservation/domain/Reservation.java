@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
@@ -68,6 +69,14 @@ public class Reservation {
 
     public ReservationTime getTime() {
         return time;
+    }
+
+    public LocalTime getTimeValue() {
+        return time.getStartAt();
+    }
+
+    public String getThemeName() {
+        return theme.getName();
     }
 
     public Theme getTheme() {

@@ -1,6 +1,5 @@
 package roomescape.payment.exception;
 
-import org.springframework.web.client.HttpClientErrorException;
 import roomescape.payment.PaymentErrorResponse;
 
 public class PaymentException extends RuntimeException {

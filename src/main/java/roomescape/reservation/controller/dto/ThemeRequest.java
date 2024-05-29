@@ -12,7 +12,7 @@ public record ThemeRequest(
 
         @NotBlank(message = "이름은 필수 값입니다.")
         String thumbnail,
-        
+
         @NotNull(message = "금액은 필수 값입니다.")
         Long price
 ) {

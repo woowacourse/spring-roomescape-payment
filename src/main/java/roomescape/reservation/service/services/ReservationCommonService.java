@@ -65,7 +65,8 @@ public class ReservationCommonService {
     }
 
     public boolean isReservationConfirmed(Reservation reservation) {
-        return memberReservationRepository.existsByReservationAndReservationStatus(reservation, ReservationStatus.APPROVED);
+        return memberReservationRepository.existsByReservationAndReservationStatus(reservation,
+                ReservationStatus.APPROVED);
     }
 
     public ReservationTime getReservationTime(long timeId) {

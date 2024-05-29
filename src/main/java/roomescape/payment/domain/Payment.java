@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import roomescape.global.entity.BaseEntity;
 import roomescape.reservation.domain.MemberReservation;
 
@@ -42,7 +41,8 @@ public class Payment extends BaseEntity {
     protected Payment() {
     }
 
-    public static Payment from(String paymentKey, String paymentType, long amount, MemberReservation memberReservation) {
+    public static Payment from(String paymentKey, String paymentType, long amount,
+                               MemberReservation memberReservation) {
         return new Payment(paymentKey, PaymentType.from(paymentType), PayAmount.from(amount), memberReservation);
     }
 

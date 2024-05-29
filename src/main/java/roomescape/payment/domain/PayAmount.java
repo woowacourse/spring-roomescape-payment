@@ -13,11 +13,11 @@ public class PayAmount {
         this.amount = amount;
     }
 
-    public static PayAmount from(Long amount) {
-        return new PayAmount(new BigDecimal(amount));
+    protected PayAmount() {
     }
 
-    protected PayAmount() {
+    public static PayAmount from(Long amount) {
+        return new PayAmount(new BigDecimal(amount));
     }
 
     public BigDecimal getAmount() {

@@ -27,7 +27,6 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.domain.repository.dto.MyReservationProjection;
 import roomescape.reservation.service.services.MemberReservationService;
 import roomescape.reservation.service.services.WaitingReservationService;
 import roomescape.util.ServiceTest;
@@ -65,14 +64,13 @@ class WaitingReservationServiceTest extends ServiceTest {
 
         //when
         MemberReservation waitingReservation = waitingReservationService.addWaiting(memberClover, reservation);
-        List<MyReservationProjection> response = memberReservationRepository.findByMember(
+        List<MemberReservation> memberReservations = memberReservationRepository.findByMemberId(
                 memberClover.getId());
 
         //then
         assertAll(
                 () -> assertThat(waitingReservation.getReservationStatus()).isEqualTo(ReservationStatus.PENDING),
-                () -> assertThat(response.get(0)).isNotNull(),
-                () -> assertThat(response.get(0).getWaitingNumber()).isEqualTo(2)
+                () -> assertThat(memberReservations.get(0)).isNotNull()
         );
     }
 

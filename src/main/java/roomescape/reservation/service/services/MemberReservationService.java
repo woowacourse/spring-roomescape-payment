@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.controller.dto.WaitingResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -41,10 +42,20 @@ public class MemberReservationService {
     }
 
     public List<MyReservationInfo> findMyReservations(Member member) {
-        return memberReservationRepository.findByMember(member.getId())
-                .stream()
-                .map(MyReservationInfo::of)
-                .toList();
+        final List<MemberReservation> memberReservation = memberReservationRepository.findByMemberId(member.getId());
+        return memberReservation.stream().map(this::add).toList();
+    }
+
+    public MyReservationInfo add(MemberReservation memberReservation) {
+        List<MemberReservation> memberReservations = memberReservationRepository.findAllByReservationId(
+                memberReservation.getReservation().getId());
+        int rank = memberReservations.indexOf(memberReservation) + 1;
+        return new MyReservationInfo(
+                memberReservation.getId(),
+                memberReservation.getReservation().getThemeName(),
+                memberReservation.getReservation().getDate(),
+                memberReservation.getReservation().getTimeValue(),
+                new WaitingResponse(memberReservation.getReservationStatus(), rank));
     }
 
     @Transactional

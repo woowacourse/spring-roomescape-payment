@@ -17,6 +17,7 @@ public class WaitingResponse {
         return switch (status) {
             case APPROVED -> "예약";
             case PENDING -> waitingNumber + "번째 예약대기";
+            case NOT_PAID -> "결제 대기중";
             case DENY -> "거절된 예약";
             default -> throw new IllegalStateException("존재하지 않는 예약 상태입니다. status = " + status);
         };

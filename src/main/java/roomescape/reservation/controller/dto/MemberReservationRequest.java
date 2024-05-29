@@ -29,7 +29,6 @@ public record MemberReservationRequest(
         @NotBlank(message = "주문 id는 필수 값입니다.")
         String orderId,
 
-
         @NotNull(message = "결제 금액은 필수 값입니다.")
         @Positive
         Long amount

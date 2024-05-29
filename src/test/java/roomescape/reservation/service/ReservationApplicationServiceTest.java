@@ -103,7 +103,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         reservationApplicationService.deleteMemberReservation(authInfo, waitingResponse.memberReservationId());
 
         //then
-        assertThat(memberReservationRepository.findByMember(memberClover.getId())).hasSize(0);
+        assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).hasSize(0);
     }
 
     @DisplayName("대기 예약이 아닌 예약 삭제 시, 예외가 발생한다.")
