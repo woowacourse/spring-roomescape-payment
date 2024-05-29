@@ -1,4 +1,6 @@
-package roomescape.reservation.dto;
+package roomescape.payment.dto;
+
+import roomescape.reservation.dto.ReservationSaveRequest;
 
 public record PaymentRequest(String orderId, int amount, String paymentKey) {
 

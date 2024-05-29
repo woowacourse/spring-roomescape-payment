@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.payment.service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.JsonParseException;
 import roomescape.exception.PaymentFailException;
-import roomescape.reservation.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentRequest;
 
 @Service
 public class PaymentService {

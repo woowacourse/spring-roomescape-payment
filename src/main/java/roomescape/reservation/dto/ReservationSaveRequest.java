@@ -43,8 +43,7 @@ public class ReservationSaveRequest {
         this.timeId = timeId;
     }
 
-    public ReservationSaveRequest(Long memberId, LocalDate date, Long themeId, Long timeId, String paymentKey,
-                                  String orderId, int amount) {
+    public ReservationSaveRequest(Long memberId, LocalDate date, Long themeId, Long timeId, String paymentKey, String orderId, int amount) {
         this.memberId = memberId;
         this.date = date;
         this.themeId = themeId;
@@ -54,8 +53,7 @@ public class ReservationSaveRequest {
         this.amount = amount;
     }
 
-    public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime,
-                                     ReservationStatus reservationStatus) {
+    public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime, ReservationStatus reservationStatus) {
         return new Reservation(member, date, theme, reservationTime, reservationStatus);
     }
 

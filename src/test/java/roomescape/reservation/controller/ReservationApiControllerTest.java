@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
-import roomescape.reservation.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationSaveRequest;
-import roomescape.reservation.service.PaymentService;
 import roomescape.util.CookieUtils;
 
 class ReservationApiControllerTest extends IntegrationTest {
