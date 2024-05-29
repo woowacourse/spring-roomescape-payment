@@ -8,6 +8,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.common.InvalidRequestBodyException;
+import roomescape.service.payment.dto.PaymentConfirmRequest;
 
 public class ReservationRequest {
     private final LocalDate date;
@@ -17,7 +18,8 @@ public class ReservationRequest {
     private final String orderId;
     private final Integer amount;
 
-    public ReservationRequest(String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
+    public ReservationRequest(String date, String timeId, String themeId, String paymentKey, String orderId,
+                              Integer amount) {
         validate(date, timeId, themeId);
         this.date = LocalDate.parse(date);
         this.timeId = Long.parseLong(timeId);
@@ -52,6 +54,10 @@ public class ReservationRequest {
 
     public Reservation toReservation(ReservationTime reservationTime, Theme theme, Member member) {
         return new Reservation(date, reservationTime, theme, member);
+    }
+
+    public PaymentConfirmRequest toPaymentRequest() {
+        return new PaymentConfirmRequest(orderId, amount, paymentKey);
     }
 
     public LocalDate getDate() {
