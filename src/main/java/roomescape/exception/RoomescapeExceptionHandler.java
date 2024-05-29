@@ -8,7 +8,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
 import roomescape.dto.ErrorResponse;
 import roomescape.dto.PaymentErrorResponse;
 
@@ -37,11 +36,11 @@ public class RoomescapeExceptionHandler {
                 .body(new ErrorResponse(NO_QUERY_PARAMETER.getMessage()));
     }
 
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<PaymentErrorResponse> handle(HttpClientErrorException e) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<PaymentErrorResponse> handle(PaymentException e) {
         e.printStackTrace();
-        return ResponseEntity.status(e.getStatusCode())
-                .body(e.getResponseBodyAs(PaymentErrorResponse.class));
+        return ResponseEntity.status(e.getHttpStatusCode())
+                .body(e.getPaymentErrorResponse());
     }
 
     @ExceptionHandler(Exception.class)

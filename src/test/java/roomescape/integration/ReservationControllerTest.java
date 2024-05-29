@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
+import roomescape.TestPaymentConfig;
 import roomescape.domain.Duration;
 import roomescape.domain.Email;
 import roomescape.domain.Member;
@@ -38,9 +38,10 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+import roomescape.service.FakePayment;
 import roomescape.service.JwtGenerator;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TestPaymentConfig.class)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 public class ReservationControllerTest {
@@ -58,6 +59,7 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+
     private Theme defaultTheme1 = new Theme("theme1", "description", "thumbnail");
     private Theme defaultTheme2 = new Theme("theme2", "description", "thumbnail");
 
@@ -103,31 +105,7 @@ public class ReservationControllerTest {
         );
     }
 
-    @DisplayName("결제 테스트")
-    @Test
-    void paymentTest() {
-        //todo: paymentKey 받아오는 방법
-        Map<String, Object> reservationParam = Map.of(
-                "date", LocalDate.now().toString(),
-                "timeId", 1,
-                "themeId", 1,
-                "paymentKey", "5zJ4xY7m0kODnyRpQWGrN2xqGlNvLrKwv1M9ENjbeoPaZdL6",
-                "orderId", "a4CWyWY5m89PNh7xJwhk1",
-                "amount", "15000");
-
-        RestAssured.given().log().all()
-                .when()
-                .cookie("token", token)
-                .contentType(ContentType.JSON)
-                .body(reservationParam)
-                .post("/reservations")
-                .then().log().all()
-                .statusCode(404);
-    }
-
     @DisplayName("예약이 하나 존재할 때")
-    //todo paymentKey 등등... 해결 하면 @Disable 떼기
-    @Disabled
     @Nested
     class OneReservationTest {
         Member savedUser = defaultMember;
@@ -149,6 +127,9 @@ public class ReservationControllerTest {
         @Test
         void createReservationTest() {
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", savedReservation.getDate().plusDays(1).toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -174,10 +155,40 @@ public class ReservationControllerTest {
                     .body("size()", is(2));
         }
 
+        @DisplayName("예약 생성시 결제를 실패하면 저장을 실패한다.")
+        @Test
+        void paymentFailTest() {
+            Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.WRONG_REQ.paymentKey(),
+                    "orderId", FakePayment.WRONG_REQ.orderId(),
+                    "amount", FakePayment.WRONG_REQ.amount(),
+                    "date", savedReservation.getDate().plusDays(1).toString(),
+                    "timeId", savedReservation.getReservationTime().getId(),
+                    "themeId", savedReservation.getTheme().getId());
+
+            RestAssured.given().log().all()
+                    .when()
+                    .cookie("token", token)
+                    .contentType(ContentType.JSON)
+                    .body(reservationParam)
+                    .post("/reservations")
+                    .then().log().all()
+                    .statusCode(400);
+
+            RestAssured.given().log().all()
+                    .when().get("/reservations")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("size()", is(1));
+        }
+
         @DisplayName("예약이 이미 존재해도 예약을 추가로 생성할 수 있다. -> 예약 대기")
         @Test
         void createReservationWaitTest() {
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -207,6 +218,9 @@ public class ReservationControllerTest {
         @Test
         void createPastReservationTest() {
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", LocalDate.now().minusMonths(1).toString(),
                     "timeId", "1",
                     "themeId", "1");
@@ -244,6 +258,9 @@ public class ReservationControllerTest {
         void deleteReservationWaitTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -310,6 +327,9 @@ public class ReservationControllerTest {
         void deleteWaitingByAdminTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -360,6 +380,9 @@ public class ReservationControllerTest {
         void adminDeleteWaitingByUserFailTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
+                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.orderId(),
+                    "amount", FakePayment.CORRECT_REQ.amount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
