@@ -38,7 +38,7 @@ public class Theme {
         );
     }
 
-    public Theme (
+    public Theme(
             final Long id,
             final String name,
             final String description,

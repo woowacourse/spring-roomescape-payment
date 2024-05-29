@@ -1,5 +1,7 @@
 package roomescape.member.service;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import roomescape.member.dto.MemberDto;
 import roomescape.member.dto.SaveMemberRequest;
@@ -7,9 +9,6 @@ import roomescape.member.encoder.PasswordEncoder;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberEmail;
 import roomescape.member.repository.MemberRepository;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class MemberService {
@@ -58,7 +57,7 @@ public class MemberService {
 
         if (password.length() < minimumEnableLength || password.length() > maximumEnableLength) {
             throw new IllegalArgumentException("회원 비밀번호 길이는 " + minimumEnableLength + "이상 "
-                    + maximumEnableLength + "이하여만 합니다.");
+                                               + maximumEnableLength + "이하여만 합니다.");
         }
     }
 }

@@ -2,7 +2,6 @@ package roomescape.member.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-
 import java.util.regex.Pattern;
 
 @Embeddable

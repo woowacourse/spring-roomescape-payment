@@ -1,5 +1,6 @@
 package roomescape.reservation.repository;
 
+import java.util.List;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,8 +12,6 @@ import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.ReservationWaiting;
 import roomescape.reservation.model.ReservationWaitingWithOrder;
 import roomescape.reservation.model.Theme;
-
-import java.util.List;
 
 @Repository
 public class CustomReservationWaitingRepositoryImpl implements CustomReservationWaitingRepository {

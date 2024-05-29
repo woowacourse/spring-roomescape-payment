@@ -1,11 +1,10 @@
 package roomescape.reservation.controller;
 
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.dto.ThemeResponse;
 import roomescape.reservation.service.ThemeService;
-
-import java.util.List;
 
 @RestController
 public class ThemeController {

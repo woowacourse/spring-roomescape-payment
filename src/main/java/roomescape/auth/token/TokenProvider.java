@@ -1,13 +1,12 @@
 package roomescape.auth.token;
 
+import static java.lang.System.currentTimeMillis;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import roomescape.member.model.MemberRole;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
-
-import static java.lang.System.currentTimeMillis;
+import javax.crypto.SecretKey;
+import roomescape.member.model.MemberRole;
 
 public class TokenProvider {
 

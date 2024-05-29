@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,9 +14,6 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.service.ReservationService;
 import roomescape.resolver.Authenticated;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 public class ReservationController {

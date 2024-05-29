@@ -1,6 +1,7 @@
 package roomescape.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -10,8 +11,6 @@ import roomescape.auth.principal.AuthenticatedMember;
 import roomescape.auth.service.AuthService;
 import roomescape.member.model.Member;
 import roomescape.util.CookieParser;
-
-import java.util.Objects;
 
 public class AuthenticatedMemberArgumentResolver implements HandlerMethodArgumentResolver {
 

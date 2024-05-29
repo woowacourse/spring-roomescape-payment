@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +23,6 @@ import roomescape.reservation.dto.ThemeResponse;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 public class AdminReservationController {
@@ -72,7 +71,8 @@ public class AdminReservationController {
     }
 
     @PostMapping("/admin/times")
-    public ResponseEntity<ReservationTimeResponse> saveReservationTime(@RequestBody final SaveReservationTimeRequest request) {
+    public ResponseEntity<ReservationTimeResponse> saveReservationTime(
+            @RequestBody final SaveReservationTimeRequest request) {
         final ReservationTimeDto savedReservationTime = reservationTimeService.saveReservationTime(request);
 
         return ResponseEntity.created(URI.create("/times/" + savedReservationTime.id()))

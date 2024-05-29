@@ -1,5 +1,11 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalDate;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,13 +16,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.reservation.dto.ReservationWaitingDto;
 import roomescape.reservation.dto.ReservationWaitingWithOrderDto;
 import roomescape.reservation.dto.SaveReservationWaitingRequest;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -42,7 +41,8 @@ class ReservationWaitingServiceTest {
         final Long memberId = 1L;
 
         // When
-        final List<ReservationWaitingWithOrderDto> myReservationWaiting = reservationWaitingService.getMyReservationWaiting(memberId);
+        final List<ReservationWaitingWithOrderDto> myReservationWaiting = reservationWaitingService.getMyReservationWaiting(
+                memberId);
 
         // Then
         assertAll(
@@ -55,7 +55,8 @@ class ReservationWaitingServiceTest {
     @Test
     void saveReservationWaitingTest() {
         // Given
-        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(LocalDate.now().plusDays(3), 2L, 1L, 10L);
+        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(
+                LocalDate.now().plusDays(3), 2L, 1L, 10L);
 
         // When
         final Long reservationWaiting = reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest);
@@ -68,7 +69,8 @@ class ReservationWaitingServiceTest {
     @Test
     void saveNotExistReservationWaitingTest() {
         // Given
-        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(LocalDate.now(), 1L, 1L, 2L);
+        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(
+                LocalDate.now(), 1L, 1L, 2L);
 
         // When & Then
         assertThatThrownBy(() -> reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest))
@@ -80,7 +82,8 @@ class ReservationWaitingServiceTest {
     @Test
     void saveDuplicateReservationWaitingTest() {
         // Given
-        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(LocalDate.now().plusDays(6), 2L, 3L, 8L);
+        final SaveReservationWaitingRequest saveReservationWaitingRequest = new SaveReservationWaitingRequest(
+                LocalDate.now().plusDays(6), 2L, 3L, 8L);
 
         // When & Then
         assertThatThrownBy(() -> reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest))

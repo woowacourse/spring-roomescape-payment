@@ -7,9 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import roomescape.member.model.Member;
-
 import java.time.LocalDateTime;
+import roomescape.member.model.Member;
 
 @Entity
 public class ReservationWaiting {
@@ -39,7 +38,7 @@ public class ReservationWaiting {
             final Member member,
             final ReservationDate date,
             final LocalDateTime createdAt
-            ) {
+    ) {
         this(
                 null,
                 time,

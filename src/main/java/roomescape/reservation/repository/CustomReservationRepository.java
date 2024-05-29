@@ -1,9 +1,8 @@
 package roomescape.reservation.repository;
 
+import java.util.List;
 import roomescape.reservation.dto.SearchReservationsParams;
 import roomescape.reservation.model.Reservation;
-
-import java.util.List;
 
 public interface CustomReservationRepository {
 

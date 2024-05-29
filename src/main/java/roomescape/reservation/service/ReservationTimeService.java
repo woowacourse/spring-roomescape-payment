@@ -1,5 +1,8 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import roomescape.reservation.dto.ReservationTimeDto;
 import roomescape.reservation.dto.SaveReservationTimeRequest;
@@ -9,10 +12,6 @@ import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.ReservationTimeAvailabilities;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservationTimeService {
@@ -66,7 +65,8 @@ public class ReservationTimeService {
 
     public ReservationTimeAvailabilities getAvailableReservationTimes(final LocalDate date, final Long themeId) {
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
-        final List<Reservation> reservations = reservationRepository.findAllByDateAndTheme_Id(new ReservationDate(date), themeId);
+        final List<Reservation> reservations = reservationRepository.findAllByDateAndTheme_Id(new ReservationDate(date),
+                themeId);
 
         return ReservationTimeAvailabilities.of(reservationTimes, reservations);
     }

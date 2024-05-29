@@ -1,5 +1,8 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
@@ -17,10 +20,6 @@ import roomescape.reservation.model.Theme;
 import roomescape.reservation.repository.CustomReservationRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationWaitingRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservationService {
@@ -109,9 +108,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
         reservationRepository.deleteById(reservation.getId());
         reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
-                reservation.getDate(),
-                reservation.getTime(),
-                reservation.getTheme())
+                        reservation.getDate(),
+                        reservation.getTime(),
+                        reservation.getTheme())
                 .ifPresent(this::saveReservationWithWaiting);
     }
 

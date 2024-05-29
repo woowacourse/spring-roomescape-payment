@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +16,6 @@ import roomescape.reservation.dto.SaveReservationWaitingRequest;
 import roomescape.reservation.dto.SaveReservationWaitingResponse;
 import roomescape.reservation.service.ReservationWaitingService;
 import roomescape.resolver.Authenticated;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 public class ReservationWaitingController {
@@ -36,7 +35,8 @@ public class ReservationWaitingController {
     }
 
     @GetMapping("/reservation-waiting-mine")
-    public List<MyReservationWaitingResponse> getMyReservationWaiting(@Authenticated final AuthenticatedMember authenticatedMember) {
+    public List<MyReservationWaitingResponse> getMyReservationWaiting(
+            @Authenticated final AuthenticatedMember authenticatedMember) {
         return reservationWaitingService.getMyReservationWaiting(authenticatedMember.id())
                 .stream()
                 .map(MyReservationWaitingResponse::from)
@@ -50,14 +50,16 @@ public class ReservationWaitingController {
     ) {
         final SaveReservationWaitingRequest setMemberIdRequest = request.setMemberId(authenticatedMember.id());
         final Long reservationWaitingId = reservationWaitingService.saveReservationWaiting(setMemberIdRequest);
-        final SaveReservationWaitingResponse saveReservationWaitingResponse = new SaveReservationWaitingResponse(reservationWaitingId);
+        final SaveReservationWaitingResponse saveReservationWaitingResponse = new SaveReservationWaitingResponse(
+                reservationWaitingId);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationWaitingId))
                 .body(saveReservationWaitingResponse);
     }
 
     @DeleteMapping("/reservation-waiting/{reservationWaitingId}")
-    public ResponseEntity<Void> deleteReservationWaiting(@PathVariable("reservationWaitingId") final Long reservationWaitingId) {
+    public ResponseEntity<Void> deleteReservationWaiting(
+            @PathVariable("reservationWaitingId") final Long reservationWaitingId) {
         reservationWaitingService.deleteReservationWaiting(reservationWaitingId);
         return ResponseEntity.noContent().build();
     }

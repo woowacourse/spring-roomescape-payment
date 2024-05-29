@@ -1,18 +1,17 @@
 package roomescape.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.NoSuchElementException;
-
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.web.client.HttpServerErrorException.InternalServerError;
+
+import java.util.NoSuchElementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
@@ -41,7 +40,8 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponse> handlePaymentCredentialMissMatchException(final PaymentCredentialMissMatchException e) {
+    protected ResponseEntity<ErrorResponse> handlePaymentCredentialMissMatchException(
+            final PaymentCredentialMissMatchException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));

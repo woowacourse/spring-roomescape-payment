@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.member.model.Member;
 import roomescape.member.service.MemberService;
@@ -13,9 +15,6 @@ import roomescape.reservation.model.Theme;
 import roomescape.reservation.repository.CustomReservationWaitingRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationWaitingRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class ReservationWaitingService {
@@ -92,7 +91,8 @@ public class ReservationWaitingService {
             final ReservationTime reservationTime,
             final Theme theme
     ) {
-        if (reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, reservationDate, reservationTime, theme)) {
+        if (reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, reservationDate, reservationTime,
+                theme)) {
             throw new IllegalStateException("이미 해당 예약 대기가 존재합니다.");
         }
     }

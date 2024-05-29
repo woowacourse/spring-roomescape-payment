@@ -1,9 +1,9 @@
 package roomescape.reservation.model;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationTimeTest {
     @DisplayName("예약 시간에 공백을 입력하면 예외를 발생한다.")

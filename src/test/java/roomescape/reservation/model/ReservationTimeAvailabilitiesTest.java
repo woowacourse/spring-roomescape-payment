@@ -1,16 +1,15 @@
 package roomescape.reservation.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import roomescape.member.model.Member;
-import roomescape.member.model.MemberRole;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import roomescape.member.model.Member;
+import roomescape.member.model.MemberRole;
 
 class ReservationTimeAvailabilitiesTest {
 
@@ -23,7 +22,8 @@ class ReservationTimeAvailabilitiesTest {
         final ReservationTime reservationTime2 = new ReservationTime(2L, LocalTime.of(2, 30));
         final ReservationTime reservationTime3 = new ReservationTime(3L, LocalTime.of(4, 30));
         final ReservationTime notBookedTime = new ReservationTime(4L, LocalTime.of(3, 30));
-        final List<ReservationTime> reservationTimes = List.of(reservationTime1, reservationTime2, reservationTime3, notBookedTime);
+        final List<ReservationTime> reservationTimes = List.of(reservationTime1, reservationTime2, reservationTime3,
+                notBookedTime);
         final Theme theme = new Theme(1L, "켈리의 두근두근", "안녕", "사진 링크");
         final Member member = new Member(1L, MemberRole.USER, "password1111", "kelly", "kelly6bf@mail.com");
 
@@ -34,9 +34,9 @@ class ReservationTimeAvailabilitiesTest {
                 new Reservation(3L, reservationStatus, date, reservationTime3, theme, member)
         );
 
-
         // When
-        final ReservationTimeAvailabilities reservationTimeAvailabilities = ReservationTimeAvailabilities.of(reservationTimes, reservations);
+        final ReservationTimeAvailabilities reservationTimeAvailabilities = ReservationTimeAvailabilities.of(
+                reservationTimes, reservations);
 
         // Then
         final Map<ReservationTime, Boolean> values = reservationTimeAvailabilities.values();

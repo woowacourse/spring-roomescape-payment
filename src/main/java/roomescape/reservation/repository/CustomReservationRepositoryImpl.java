@@ -1,5 +1,6 @@
 package roomescape.reservation.repository;
 
+import java.util.List;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,8 +12,6 @@ import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.Theme;
 import roomescape.reservation.repository.param.QueryGenerator;
-
-import java.util.List;
 
 @Repository
 public class CustomReservationRepositoryImpl implements CustomReservationRepository {
@@ -28,16 +27,16 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         final String sql = QueryGenerator.generateQueryWithSearchReservationsParams(
                 searchReservationsParams,
                 """
-                    SELECT
-                        r.id AS reservation_id, r.date AS reservation_date, r.status AS reservation_status,
-                        rt.id AS time_id, rt.start_at AS reservation_time,
-                        th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
-                        m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role
-                    FROM reservation AS r
-                    INNER JOIN reservation_time AS rt on r.time_id = rt.id
-                    INNER JOIN theme AS th ON r.theme_id = th.id
-                    INNER JOIN member AS m ON r.member_id = m.id
-                """
+                            SELECT
+                                r.id AS reservation_id, r.date AS reservation_date, r.status AS reservation_status,
+                                rt.id AS time_id, rt.start_at AS reservation_time,
+                                th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
+                                m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role
+                            FROM reservation AS r
+                            INNER JOIN reservation_time AS rt on r.time_id = rt.id
+                            INNER JOIN theme AS th ON r.theme_id = th.id
+                            INNER JOIN member AS m ON r.member_id = m.id
+                        """
         );
 
         return template.query(sql, itemRowMapper());

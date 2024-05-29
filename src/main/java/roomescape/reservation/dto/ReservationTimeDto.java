@@ -1,8 +1,7 @@
 package roomescape.reservation.dto;
 
-import roomescape.reservation.model.ReservationTime;
-
 import java.time.LocalTime;
+import roomescape.reservation.model.ReservationTime;
 
 public record ReservationTimeDto(
         Long id,

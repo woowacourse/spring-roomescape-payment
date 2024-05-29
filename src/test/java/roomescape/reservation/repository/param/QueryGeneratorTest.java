@@ -1,11 +1,10 @@
 package roomescape.reservation.repository.param;
 
+import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.reservation.dto.SearchReservationsParams;
-
-import java.time.LocalDate;
 
 class QueryGeneratorTest {
 
@@ -17,17 +16,19 @@ class QueryGeneratorTest {
         final long themeId = 3L;
         final LocalDate from = LocalDate.now().minusDays(4);
         final LocalDate to = LocalDate.now().plusDays(1);
-        final SearchReservationsParams searchReservationsParams = new SearchReservationsParams(memberId, themeId, from, to);
+        final SearchReservationsParams searchReservationsParams = new SearchReservationsParams(memberId, themeId, from,
+                to);
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                "WHERE member_id = " + memberId + " " +
-                "AND theme_id = " + themeId + " " +
-                "AND date BETWEEN \'" + from + "\' " +
-                "AND \'" + to + "\'";
+                              "WHERE member_id = " + memberId + " " +
+                              "AND theme_id = " + themeId + " " +
+                              "AND date BETWEEN \'" + from + "\' " +
+                              "AND \'" + to + "\'";
 
         // When
-        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams, baseQuery);
+        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams,
+                baseQuery);
 
         // Then
         Assertions.assertThat(generateSql).isEqualTo(expect);
@@ -44,12 +45,13 @@ class QueryGeneratorTest {
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                "WHERE theme_id = " + themeId + " " +
-                "AND date BETWEEN \'" + from + "\' " +
-                "AND \'" + to + "\'";
+                              "WHERE theme_id = " + themeId + " " +
+                              "AND date BETWEEN \'" + from + "\' " +
+                              "AND \'" + to + "\'";
 
         // When
-        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams, baseQuery);
+        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams,
+                baseQuery);
 
         // Then
         Assertions.assertThat(generateSql).isEqualTo(expect);
@@ -65,11 +67,12 @@ class QueryGeneratorTest {
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                "WHERE date BETWEEN \'" + from + "\' " +
-                "AND \'" + to + "\'";
+                              "WHERE date BETWEEN \'" + from + "\' " +
+                              "AND \'" + to + "\'";
 
         // When
-        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams, baseQuery);
+        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams,
+                baseQuery);
 
         // Then
         Assertions.assertThat(generateSql).isEqualTo(expect);
@@ -84,10 +87,11 @@ class QueryGeneratorTest {
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                "WHERE date >= \'" + from + "\'";
+                              "WHERE date >= \'" + from + "\'";
 
         // When
-        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams, baseQuery);
+        final String generateSql = QueryGenerator.generateQueryWithSearchReservationsParams(searchReservationsParams,
+                baseQuery);
 
         // Then
         Assertions.assertThat(generateSql).isEqualTo(expect);

@@ -1,15 +1,14 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.reservation.model.ReservationWaitingWithOrder;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class CustomReservationWaitingRepositoryImplTest {
@@ -24,7 +23,8 @@ class CustomReservationWaitingRepositoryImplTest {
         final Long memberId = 1L;
 
         // When
-        final List<ReservationWaitingWithOrder> reservationWaitingWithOrders = customReservationWaitingRepository.findAllReservationWaitingWithOrdersByMemberId(memberId);
+        final List<ReservationWaitingWithOrder> reservationWaitingWithOrders = customReservationWaitingRepository.findAllReservationWaitingWithOrdersByMemberId(
+                memberId);
         final ReservationWaitingWithOrder firstReservationWaitingWithOrder = reservationWaitingWithOrders.get(0);
         final ReservationWaitingWithOrder secondReservationWaitingWithOrder = reservationWaitingWithOrders.get(1);
         // Then
