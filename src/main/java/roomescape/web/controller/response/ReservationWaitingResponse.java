@@ -1,6 +1,7 @@
 package roomescape.web.controller.response;
 
 import java.time.LocalDate;
+import roomescape.domain.ReservationDate;
 import roomescape.service.response.ReservationWaitingDto;
 
 public record ReservationWaitingResponse(
@@ -9,13 +10,15 @@ public record ReservationWaitingResponse(
         LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme,
-        String status) {
+        String status
+) {
 
-    public ReservationWaitingResponse(ReservationWaitingDto response) {
-        this(
+    public static ReservationWaitingResponse from(ReservationWaitingDto response) {
+        ReservationDate date = response.date();
+        return new ReservationWaitingResponse(
                 response.id(),
                 response.name(),
-                response.date().getDate(),
+                date.getDate(),
                 ReservationTimeResponse.from(response.reservationTimeDto()),
                 ThemeResponse.from(response.themeDto()),
                 response.status()

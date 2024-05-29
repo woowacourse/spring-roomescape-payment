@@ -14,9 +14,9 @@ class ReservationTimeTest {
     @Test
     void create() {
         assertThatCode(() -> new ReservationTime(1L, LocalTime.now().toString()))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
         assertThatCode(() -> new ReservationTime(LocalTime.now().toString()))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
 
     }
 
@@ -25,6 +25,6 @@ class ReservationTimeTest {
     @ValueSource(strings = {"24:00", "-10:00"})
     void createByIllegalDate(String input) {
         assertThatCode(() -> new ReservationTime(1L, input))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

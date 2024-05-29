@@ -55,8 +55,10 @@ public class ThemeService {
     public List<ThemeDto> findPopular() {
         LocalDate from = LocalDate.now().minusDays(BASED_ON_PERIOD_POPULAR_THEME);
         LocalDate to = LocalDate.now().minusDays(1);
-        return themeRepository.findMostReservedThemesInPeriod(from, to,
-                        PageRequest.of(0, MAX_POPULAR_THEME_COUNT)).stream()
+        List<Theme> mostReservedThemes = themeRepository.findMostReservedThemesInPeriod(from, to,
+                PageRequest.of(0, MAX_POPULAR_THEME_COUNT));
+
+        return mostReservedThemes.stream()
                 .map(ThemeDto::from)
                 .toList();
     }

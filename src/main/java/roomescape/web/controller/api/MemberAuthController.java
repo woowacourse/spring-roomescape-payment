@@ -75,11 +75,7 @@ public class MemberAuthController {
         List<MemberDto> appResponses = memberAuthService.findAll();
 
         List<MemberResponse> responses = appResponses.stream()
-                .map(memberAppResponse -> new MemberResponse(
-                        memberAppResponse.id(),
-                        memberAppResponse.name(),
-                        memberAppResponse.role())
-                )
+                .map(MemberResponse::from)
                 .toList();
 
         return ResponseEntity.ok().body(responses);

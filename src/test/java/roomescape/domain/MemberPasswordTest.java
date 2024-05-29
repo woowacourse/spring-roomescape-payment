@@ -14,7 +14,7 @@ class MemberPasswordTest {
     @Test
     void create() {
         assertThatCode(() -> new MemberPassword("abc1234"))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("비밀 번호가 빈 값이면 예외가 발생한다.")
@@ -22,6 +22,6 @@ class MemberPasswordTest {
     @NullAndEmptySource
     void create_Fail(String input) {
         assertThatThrownBy(() -> new MemberPassword(input))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

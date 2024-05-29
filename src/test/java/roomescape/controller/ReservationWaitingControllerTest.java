@@ -56,7 +56,9 @@ public class ReservationWaitingControllerTest extends ControllerTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         Theme theme = themeRepository.save(VALID_THEME);
         String date = LocalDate.now().plusMonths(1).toString();
-        Member reservedMember = memberRepository.save(new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
+        Member reservedMember = memberRepository.save(
+                new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
         reservationRepository.save(new Reservation(reservedMember, new ReservationDate(date), time, theme));
 
         ReservationWaitingRequest request = new ReservationWaitingRequest(date, time.getId(), theme.getId());
@@ -75,8 +77,12 @@ public class ReservationWaitingControllerTest extends ControllerTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         Theme theme = themeRepository.save(VALID_THEME);
         String date = LocalDate.now().plusMonths(1).toString();
-        Member reservedMember = memberRepository.save(new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
-        Member waitingMember = memberRepository.save(new Member(new MemberName("고구마"), new MemberEmail("222@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
+        Member reservedMember = memberRepository.save(
+                new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
+        Member waitingMember = memberRepository.save(
+                new Member(new MemberName("고구마"), new MemberEmail("222@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
         reservationRepository.save(new Reservation(reservedMember, new ReservationDate(date), time, theme));
         String token = jwtProvider.createToken(waitingMember.getEmail().getEmail());
 
@@ -98,8 +104,11 @@ public class ReservationWaitingControllerTest extends ControllerTest {
         Theme theme = themeRepository.save(VALID_THEME);
         String date = LocalDate.now().plusMonths(1).toString();
         LocalDateTime createdDateTime = LocalDateTime.now().minusMonths(2);
-        Member waitingMember = memberRepository.save(new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
-        ReservationWaiting waiting = reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
+        Member waitingMember = memberRepository.save(
+                new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
+        ReservationWaiting waiting = reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
         String token = jwtProvider.createToken(waitingMember.getEmail().getEmail());
 
         ReservationWaitingRequest request = new ReservationWaitingRequest(date, time.getId(), theme.getId());
@@ -120,11 +129,20 @@ public class ReservationWaitingControllerTest extends ControllerTest {
         Theme theme = themeRepository.save(VALID_THEME);
         LocalDate date = LocalDate.now().plusMonths(1);
         LocalDateTime createdDateTime = LocalDateTime.now().minusMonths(2);
-        Member waitingMember = memberRepository.save(new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
-        Member otherMember = memberRepository.save(new Member(new MemberName("고구마"), new MemberEmail("222@aaa.com"), new MemberPassword("asd"), MemberRole.USER));
-        reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
-        reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, otherMember, new ReservationDate(date.plusMonths(1)), time, theme));
-        reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, otherMember, new ReservationDate(date.plusMonths(2)), time, theme));
+        Member waitingMember = memberRepository.save(
+                new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
+        Member otherMember = memberRepository.save(
+                new Member(new MemberName("고구마"), new MemberEmail("222@aaa.com"), new MemberPassword("asd"),
+                        MemberRole.USER));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, otherMember, new ReservationDate(date.plusMonths(1)), time,
+                        theme));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, otherMember, new ReservationDate(date.plusMonths(2)), time,
+                        theme));
         String token = jwtProvider.createToken(waitingMember.getEmail().getEmail());
 
         ReservationWaitingRequest request = new ReservationWaitingRequest(date.toString(), time.getId(), theme.getId());

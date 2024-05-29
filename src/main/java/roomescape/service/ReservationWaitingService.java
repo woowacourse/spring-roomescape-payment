@@ -45,17 +45,20 @@ public class ReservationWaitingService {
         ReservationWaiting waiting = createWaiting(request);
         validateWaiting(waiting);
         ReservationWaiting savedWaiting = reservationWaitingRepository.save(waiting);
-        return new ReservationWaitingDto(savedWaiting);
+        return ReservationWaitingDto.from(savedWaiting);
     }
 
     private ReservationWaiting createWaiting(ReservationWaitingSaveDto request) {
         Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("예약 대기 생성 실패: 사용자를 찾을 수 없습니다 (id: %d)", request.memberId())));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("예약 대기 생성 실패: 사용자를 찾을 수 없습니다 (id: %d)", request.memberId())));
         ReservationDate date = new ReservationDate(request.date());
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("예약 대기 생성 실패: 시간을 찾을 수 없습니다 (id: %d)", request.timeId())));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("예약 대기 생성 실패: 시간을 찾을 수 없습니다 (id: %d)", request.timeId())));
         Theme theme = themeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException(String.format("예약 대기 생성 실패: 테마를 찾을 수 없습니다 (id: %d)", request.themeId())));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("예약 대기 생성 실패: 테마를 찾을 수 없습니다 (id: %d)", request.themeId())));
 
         return new ReservationWaiting(LocalDateTime.now(), member, date, time, theme);
     }
@@ -86,7 +89,8 @@ public class ReservationWaitingService {
         ReservationDate date = waiting.getDate();
         Long timeId = waiting.getTime().getId();
         Long themeId = waiting.getTheme().getId();
-        boolean isWaitingExist = reservationWaitingRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(memberId, date, timeId, themeId);
+        boolean isWaitingExist = reservationWaitingRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(memberId, date,
+                timeId, themeId);
 
         if (isWaitingExist) {
             throw new IllegalArgumentException(String.format(
@@ -96,34 +100,35 @@ public class ReservationWaitingService {
     }
 
     public List<ReservationWaitingWithRankDto> findWaitingWithRankByMemberId(Long memberId) {
-        return reservationWaitingRepository.findAllWaitingWithRankByMemberId(memberId)
-                .stream()
-                .map(ReservationWaitingWithRankDto::new)
+        return reservationWaitingRepository.findAllWaitingWithRankByMemberId(memberId).stream()
+                .map(ReservationWaitingWithRankDto::from)
                 .toList();
     }
 
     public void deleteMemberWaiting(Long memberId, Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("사용자 예약 대기 삭제 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("사용자 예약 대기 삭제 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
         if (!waiting.hasMemberId(memberId)) {
-            throw new AuthorizationException(String.format("예약 대기 삭제 권한이 없는 사용자입니다. (id: %d)", memberId));
+            throw new AuthorizationException(
+                    String.format("예약 대기 삭제 권한이 없는 사용자입니다. (id: %d)", memberId));
         }
         reservationWaitingRepository.deleteById(waitingId);
     }
 
     public List<ReservationWaitingDto> findAllAllowed() {
-        return reservationWaitingRepository.findAll()
-                .stream()
+        return reservationWaitingRepository.findAll().stream()
                 .filter(ReservationWaiting::isAllowed)
-                .map(ReservationWaitingDto::new)
+                .map(ReservationWaitingDto::from)
                 .toList();
     }
 
     public ReservationWaitingDto denyWaiting(Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("예약 대기 상태 변경 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("예약 대기 상태 변경 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
         waiting.setDeniedAt(LocalDateTime.now());
         ReservationWaiting updatedWaiting = reservationWaitingRepository.save(waiting);
-        return new ReservationWaitingDto(updatedWaiting);
+        return ReservationWaitingDto.from(updatedWaiting);
     }
 }

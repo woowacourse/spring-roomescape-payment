@@ -40,24 +40,6 @@ import roomescape.web.exception.AuthorizationException;
 @Transactional
 class ReservationWaitingServiceTest {
 
-    @Autowired
-    private ReservationWaitingService reservationWaitingService;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ThemeRepository themeRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ReservationWaitingRepository reservationWaitingRepository;
-
     private final List<Member> members = List.of(
             new Member(
                     new MemberName("감자"),
@@ -84,6 +66,18 @@ class ReservationWaitingServiceTest {
                     MemberRole.USER
             )
     );
+    @Autowired
+    private ReservationWaitingService reservationWaitingService;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ReservationWaitingRepository reservationWaitingRepository;
 
     @Test
     @DisplayName("올바르게 예약 대기를 생성한다.")
@@ -95,11 +89,12 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(otherMember, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(), member.getId());
+        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+                member.getId());
         ReservationWaitingDto response = reservationWaitingService.save(request);
         ReservationWaiting expectedWaiting = reservationWaitingRepository.findById(response.id()).get();
 
-        assertThat(response).isEqualTo(new ReservationWaitingDto(expectedWaiting));
+        assertThat(response).isEqualTo(ReservationWaitingDto.from(expectedWaiting));
     }
 
     @Test
@@ -111,7 +106,8 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(member, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(), member.getId());
+        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+                member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -126,7 +122,8 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(), member.getId());
+        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+                member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -142,9 +139,11 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(otherMember, new ReservationDate(date), time, theme));
-        reservationWaitingRepository.save(new ReservationWaiting(LocalDateTime.now(), member, new ReservationDate(date), time, theme));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(LocalDateTime.now(), member, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(), member.getId());
+        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+                member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -161,7 +160,8 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(otherMember, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(), member.getId());
+        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+                member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -179,15 +179,20 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(savedMembers.get(0), new ReservationDate(date), time, theme));
-        reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, savedMembers.get(3), new ReservationDate(date), time, theme, LocalDateTime.now()));
-        reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, savedMembers.get(1), new ReservationDate(date), time, theme));
-        ReservationWaiting savedWaiting = reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, savedMembers.get(2), new ReservationDate(date), time, theme));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, savedMembers.get(3), new ReservationDate(date), time, theme,
+                        LocalDateTime.now()));
+        reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, savedMembers.get(1), new ReservationDate(date), time, theme));
+        ReservationWaiting savedWaiting = reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, savedMembers.get(2), new ReservationDate(date), time, theme));
 
-        List<ReservationWaitingWithRankDto> waitingWithRankAppResponses = reservationWaitingService.findWaitingWithRankByMemberId(savedMembers.get(2).getId());
+        List<ReservationWaitingWithRankDto> waitingWithRankAppResponses = reservationWaitingService.findWaitingWithRankByMemberId(
+                savedMembers.get(2).getId());
 
         assertThat(waitingWithRankAppResponses)
                 .hasSize(1)
-                .containsExactly(new ReservationWaitingWithRankDto(new ReservationWaitingWithRank(savedWaiting, 2L)));
+                .containsExactly(ReservationWaitingWithRankDto.from(new ReservationWaitingWithRank(savedWaiting, 2L)));
     }
 
     @Test
@@ -200,7 +205,8 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(reservedMember, new ReservationDate(date), time, theme));
-        ReservationWaiting savedWaiting = reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
+        ReservationWaiting savedWaiting = reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
 
         reservationWaitingService.deleteMemberWaiting(waitingMember.getId(), savedWaiting.getId());
 
@@ -228,7 +234,8 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(reservedMember, new ReservationDate(date), time, theme));
-        ReservationWaiting savedWaiting = reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
+        ReservationWaiting savedWaiting = reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, waitingMember, new ReservationDate(date), time, theme));
 
         assertThatThrownBy(() ->
                 reservationWaitingService.deleteMemberWaiting(reservedMember.getId(), savedWaiting.getId()))

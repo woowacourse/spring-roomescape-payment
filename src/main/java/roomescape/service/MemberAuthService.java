@@ -27,24 +27,22 @@ public class MemberAuthService {
         Member newMember = Member.createUser(
                 new MemberName(request.name()),
                 new MemberEmail(request.email()),
-                new MemberPassword(request.password()));
+                new MemberPassword(request.password())
+        );
 
         Member savedMember = memberRepository.save(newMember);
-        return new MemberDto(savedMember.getId(), savedMember.getName().getName(),
-                savedMember.getRole().name());
+        return new MemberDto(savedMember.getId(), savedMember.getName(), savedMember.getRole().name());
     }
 
     public MemberDto findMemberByEmail(String email) {
         return memberRepository.findByEmail(new MemberEmail(email))
-                .map(member -> new MemberDto(member.getId(), member.getName().getName(),
-                        member.getRole().name()))
+                .map(MemberDto::from)
                 .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾지 못했습니다. 다시 로그인 해주세요."));
     }
 
     public List<MemberDto> findAll() {
         return memberRepository.findAll().stream()
-                .map(member -> new MemberDto(member.getId(), member.getName().getName(),
-                        member.getRole().name()))
+                .map(member -> new MemberDto(member.getId(), member.getName(), member.getRole().name()))
                 .toList();
     }
 

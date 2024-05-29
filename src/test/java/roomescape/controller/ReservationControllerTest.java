@@ -44,7 +44,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약을 저장한다. -> 201")
     @Test
     void reserve() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId", 1000L);
+        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId",
+                1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(201)
                 .body("name", is(VALID_USER_NAME.getName()));
@@ -68,7 +69,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: 예약 날짜가 잘못될 경우 -> 400")
     @Test
     void reserve_IllegalDateRequest() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "orderId", 1000L);
+        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "orderId",
+                1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -76,7 +78,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: 존재하지 않는 테마에 대한 예약  -> 400")
     @Test
     void reserve_NoSuchTheme() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 200L, "paymentKey", "orderId", 1000L);
+        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 200L, "paymentKey", "orderId",
+                1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -84,7 +87,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: 존재하지 않는 예약 시간에 대한 예약  -> 400")
     @Test
     void reserve_NoSuchTime() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 100L, 1L, "paymentKey", "orderId", 1000L);
+        MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 100L, 1L, "paymentKey", "orderId",
+                1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -92,7 +96,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("과거 시간에 예약을 넣을 경우 -> 400")
     @Test
     void reserve_PastTime() {
-        MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 100L, 1L, "paymentKey", "orderId", 1000L);
+        MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 100L, 1L, "paymentKey", "orderId",
+                1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -138,7 +143,8 @@ class ReservationControllerTest extends ControllerTest {
                                 .statusCode(200)
                                 .body("size()", is(1))),
                 dynamicTest("전체 조건으로 예약 필터링", () ->
-                        ReservationAdminSteps.searchReservation("memberId=1&themeId=1&dateFrom=2026-02-01&dateTo=2026-03-02", getAdminToken())
+                        ReservationAdminSteps.searchReservation(
+                                        "memberId=1&themeId=1&dateFrom=2026-02-01&dateTo=2026-03-02", getAdminToken())
                                 .statusCode(200)
                                 .body("size()", is(1))),
                 dynamicTest("종료 날짜로 예약 필터링", () ->

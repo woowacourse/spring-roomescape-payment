@@ -1,7 +1,11 @@
 package roomescape.service.response;
 
+import roomescape.domain.Member;
 import roomescape.domain.ReservationDate;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.ReservationWaiting;
 import roomescape.domain.ReservationWaitingWithRank;
+import roomescape.domain.Theme;
 
 public record ReservationWaitingWithRankDto(
         Long id,
@@ -12,20 +16,19 @@ public record ReservationWaitingWithRankDto(
         Long rank,
         String deniedAt) {
 
-    public ReservationWaitingWithRankDto(ReservationWaitingWithRank waitingWithRank) {
-        this(
-                waitingWithRank.getWaiting().getId(),
-                waitingWithRank.getWaiting().getMember().getName().getName(),
-                waitingWithRank.getWaiting().getDate(),
-                new ReservationTimeDto(
-                        waitingWithRank.getWaiting().getTime().getId(),
-                        waitingWithRank.getWaiting().getTime().getStartAt()),
-                new ThemeDto(waitingWithRank.getWaiting().getTheme().getId(),
-                        waitingWithRank.getWaiting().getTheme().getName(),
-                        waitingWithRank.getWaiting().getTheme().getDescription(),
-                        waitingWithRank.getWaiting().getTheme().getThumbnail()),
+    public static ReservationWaitingWithRankDto from(ReservationWaitingWithRank waitingWithRank) {
+        ReservationWaiting waiting = waitingWithRank.getWaiting();
+        Member member = waiting.getMember();
+        ReservationTime time = waiting.getTime();
+        Theme theme = waiting.getTheme();
+        return new ReservationWaitingWithRankDto(
+                waiting.getId(),
+                member.getName(),
+                waiting.getDate(),
+                ReservationTimeDto.from(time),
+                ThemeDto.from(theme),
                 waitingWithRank.getRank(),
-                waitingWithRank.getWaiting().getDeniedAt()
+                waiting.getDeniedAt()
         );
     }
 }

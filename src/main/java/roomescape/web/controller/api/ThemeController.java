@@ -29,8 +29,7 @@ public class ThemeController {
 
     @PostMapping
     public ResponseEntity<ThemeResponse> create(@Valid @RequestBody ThemeRequest request) {
-        ThemeDto appResponse = themeService.save(
-                new ThemeSaveDto(request.name(), request.description(), request.thumbnail()));
+        ThemeDto appResponse = themeService.save(ThemeSaveDto.from(request));
 
         Long id = appResponse.id();
         ThemeResponse webResponse = ThemeResponse.from(appResponse);
@@ -40,8 +39,7 @@ public class ThemeController {
 
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> findAll() {
-        List<ThemeResponse> response = themeService.findAll()
-                .stream()
+        List<ThemeResponse> response = themeService.findAll().stream()
                 .map(ThemeResponse::from).toList();
 
         return ResponseEntity.ok().body(response);
@@ -49,8 +47,7 @@ public class ThemeController {
 
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> findPopular() {
-        List<ThemeResponse> response = themeService.findPopular()
-                .stream()
+        List<ThemeResponse> response = themeService.findPopular().stream()
                 .map(ThemeResponse::from)
                 .toList();
 

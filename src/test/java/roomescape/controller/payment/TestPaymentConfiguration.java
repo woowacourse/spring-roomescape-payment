@@ -15,8 +15,7 @@ public class TestPaymentConfiguration {
     private PaymentManager paymentManager;
 
     @PostConstruct
-    private void initMock()
-    {
+    private void initMock() {
         doNothing().when(paymentManager).approve(any());
     }
 }

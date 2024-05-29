@@ -35,14 +35,17 @@ public class MemberReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest reservationRequest,
-                                                             @Valid @Auth LoginMember loginMember) {
+    public ResponseEntity<MemberReservationResponse> reserve(
+            @Valid @RequestBody MemberReservationRequest reservationRequest,
+            @Valid @Auth LoginMember loginMember) {
         PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
         paymentManager.approve(request);
 
         ReservationDto appResponse = reservationService.save(
-                new ReservationSaveDto(reservationRequest.date(), reservationRequest.timeId(),
-                        reservationRequest.themeId(), loginMember.id()), request);
+                new ReservationSaveDto(reservationRequest.date(),
+                        reservationRequest.timeId(),
+                        reservationRequest.themeId(),
+                        loginMember.id()), request);
 
         Long id = appResponse.id();
         MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);
@@ -70,12 +73,11 @@ public class MemberReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@Auth LoginMember loginMember) {
-        List<ReservationMineResponse> reservationMineResponse = reservationService.findByMemberId(loginMember.id())
-                .stream()
-                .map(ReservationMineResponse::new)
+        List<ReservationMineResponse> responses = reservationService.findByMemberId(loginMember.id()).stream()
+                .map(ReservationMineResponse::from)
                 .toList();
 
-        return ResponseEntity.ok(reservationMineResponse);
+        return ResponseEntity.ok(responses);
     }
 
 }

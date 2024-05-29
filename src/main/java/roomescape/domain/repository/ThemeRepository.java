@@ -26,8 +26,7 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
                     GROUP BY th.id
                     ORDER BY count DESC
             """)
-    List<Theme> findMostReservedThemesInPeriod(
-            @Param("from") LocalDate from,
-            @Param("to") LocalDate to,
-            Pageable pageable);
+    List<Theme> findMostReservedThemesInPeriod(@Param("from") LocalDate from,
+                                               @Param("to") LocalDate to,
+                                               Pageable pageable);
 }

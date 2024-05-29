@@ -79,10 +79,12 @@ class ReservationAndReservationWaitingServiceTest {
     @Test
     @DisplayName("예약 대기가 존재하는 경우, 우선순위가 높은 대기를 예약으로 변경한다.")
     void updateReservation() {
-        Member waitingMember = memberRepository.save(new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), VALID_USER_PASSWORD, MemberRole.USER));
+        Member waitingMember = memberRepository.save(
+                new Member(new MemberName("감자"), new MemberEmail("111@aaa.com"), VALID_USER_PASSWORD, MemberRole.USER));
         LocalDateTime createdDateTime = LocalDateTime.now().minusMonths(2);
         Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
-        ReservationWaiting waiting = reservationWaitingRepository.save(new ReservationWaiting(createdDateTime, waitingMember, date, time, theme));
+        ReservationWaiting waiting = reservationWaitingRepository.save(
+                new ReservationWaiting(createdDateTime, waitingMember, date, time, theme));
 
         reservationAndWaitingService.deleteReservation(reservation.getId());
 

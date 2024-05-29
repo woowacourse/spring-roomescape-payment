@@ -54,7 +54,9 @@ public class ReservationTimeService {
     }
 
     public List<BookableReservationTimeDto> findAllWithBookAvailability(String date, Long themeId) {
-        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(new ReservationDate(date), themeId);
+        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(
+                new ReservationDate(date), themeId
+        );
         List<ReservationTime> reservedTimes = reservations.stream()
                 .map(Reservation::getTime)
                 .toList();

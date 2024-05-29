@@ -31,10 +31,10 @@ public class ReservationService {
     private final PaymentManager paymentManager;
 
     public ReservationService(ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            PaymentManager paymentManager) {
+                              ReservationTimeRepository reservationTimeRepository,
+                              ThemeRepository themeRepository,
+                              MemberRepository memberRepository,
+                              PaymentManager paymentManager) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -53,7 +53,7 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        return new ReservationDto(savedReservation);
+        return ReservationDto.from(savedReservation);
     }
 
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
@@ -94,7 +94,7 @@ public class ReservationService {
 
     public List<ReservationDto> findAll() {
         return reservationRepository.findAll().stream()
-                .map(ReservationDto::new)
+                .map(ReservationDto::from)
                 .toList();
     }
 
@@ -103,7 +103,7 @@ public class ReservationService {
         List<Reservation> searchedReservations = reservationRepository.findAll(reservationSpecification);
 
         return searchedReservations.stream()
-                .map(ReservationDto::new)
+                .map(ReservationDto::from)
                 .toList();
     }
 
@@ -111,7 +111,7 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
 
         return reservations.stream()
-                .map(ReservationDto::new)
+                .map(ReservationDto::from)
                 .toList();
     }
 }

@@ -15,7 +15,8 @@ public class ReservationAndWaitingService {
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
 
-    public ReservationAndWaitingService(ReservationRepository reservationRepository, ReservationWaitingRepository reservationWaitingRepository) {
+    public ReservationAndWaitingService(ReservationRepository reservationRepository,
+                                        ReservationWaitingRepository reservationWaitingRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
     }
@@ -23,7 +24,8 @@ public class ReservationAndWaitingService {
     @Transactional
     public void deleteReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("예약 삭제 실패: 존재하지 않는 예약입니다. (id: %d)", reservationId)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("예약 삭제 실패: 존재하지 않는 예약입니다. (id: %d)", reservationId)));
         reservationRepository.deleteById(reservationId);
         findWaitingOfReservation(reservation).ifPresent(this::changeWaitingToReservation);
     }

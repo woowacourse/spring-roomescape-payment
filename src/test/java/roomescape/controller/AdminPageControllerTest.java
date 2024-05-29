@@ -19,17 +19,17 @@ class AdminPageControllerTest extends ControllerTest {
     @BeforeEach
     void setInitialData() {
         jdbcTemplate.update(
-            "INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
-            VALID_USER_NAME.getName(),
-            VALID_USER_EMAIL.getEmail(),
-            VALID_USER_PASSWORD.getPassword(),
-            MemberRole.USER.name());
+                "INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
+                VALID_USER_NAME.getName(),
+                VALID_USER_EMAIL.getEmail(),
+                VALID_USER_PASSWORD.getPassword(),
+                MemberRole.USER.name());
         jdbcTemplate.update(
-            "INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
-            VALID_ADMIN_NAME.getName(),
-            VALID_ADMIN_EMAIL.getEmail(),
-            VALID_ADMIN_PASSWORD.getPassword(),
-            MemberRole.ADMIN.name());
+                "INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
+                VALID_ADMIN_NAME.getName(),
+                VALID_ADMIN_EMAIL.getEmail(),
+                VALID_ADMIN_PASSWORD.getPassword(),
+                MemberRole.ADMIN.name());
     }
 
     @DisplayName("admin 권한을 갖고 있으면 admin 페이지 접속이 가능하다. -> 200")
@@ -37,10 +37,10 @@ class AdminPageControllerTest extends ControllerTest {
     @ValueSource(strings = {"/admin", "/admin/reservation"})
     void getAdminPage(String endPoint) {
         RestAssured.given().log().all()
-            .cookie(COOKIE_NAME, getAdminToken())
-            .when().get(endPoint)
-            .then().log().all()
-            .statusCode(200);
+                .cookie(COOKIE_NAME, getAdminToken())
+                .when().get(endPoint)
+                .then().log().all()
+                .statusCode(200);
     }
 
     @DisplayName("user 권한을 갖고 있으면 admin 페이지 접속할 수 없다. -> 401")
@@ -48,9 +48,9 @@ class AdminPageControllerTest extends ControllerTest {
     @ValueSource(strings = {"/admin", "/admin/reservation"})
     void getAdminPage_ByUser(String endPoint) {
         RestAssured.given().log().all()
-            .cookie(COOKIE_NAME, getUserToken())
-            .when().get(endPoint)
-            .then().log().all()
-             .statusCode(401);
+                .cookie(COOKIE_NAME, getUserToken())
+                .when().get(endPoint)
+                .then().log().all()
+                .statusCode(401);
     }
 }

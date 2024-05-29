@@ -31,24 +31,26 @@ public class ReservationWaitingController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationWaitingResponse> save(@Valid @RequestBody ReservationWaitingRequest request, @Valid @Auth LoginMember loginMember) {
+    public ResponseEntity<ReservationWaitingResponse> save(@Valid @RequestBody ReservationWaitingRequest request,
+                                                           @Valid @Auth LoginMember loginMember) {
 
         ReservationWaitingDto waitingAppResponse = reservationWaitingService.save(
-                new ReservationWaitingSaveDto(request.date(), request.timeId(),
-                        request.themeId(), loginMember.id()));
-        ReservationWaitingResponse waitingWebResponse = new ReservationWaitingResponse(waitingAppResponse);
+                ReservationWaitingSaveDto.of(request, loginMember.id())
+        );
+        ReservationWaitingResponse waitingWebResponse = ReservationWaitingResponse.from(waitingAppResponse);
 
         return ResponseEntity.created(URI.create("/reservation-waitings/" + waitingWebResponse.id()))
                 .body(waitingWebResponse);
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<ReservationWaitingWithRankResponse>> findMyWaitingWithRank(@Valid @Auth LoginMember loginMember) {
+    public ResponseEntity<List<ReservationWaitingWithRankResponse>> findMyWaitingWithRank(
+            @Valid @Auth LoginMember loginMember) {
         Long memberId = loginMember.id();
-        List<ReservationWaitingWithRankResponse> waitingWithRankWebResponses = reservationWaitingService.findWaitingWithRankByMemberId(memberId)
-                .stream()
-                .map(ReservationWaitingWithRankResponse::new)
-                .toList();
+        List<ReservationWaitingWithRankResponse> waitingWithRankWebResponses =
+                reservationWaitingService.findWaitingWithRankByMemberId(memberId).stream()
+                        .map(ReservationWaitingWithRankResponse::from)
+                        .toList();
 
         return ResponseEntity.ok(waitingWithRankWebResponses);
     }

@@ -7,10 +7,14 @@ import roomescape.service.response.BookableReservationTimeDto;
 public record BookableReservationTimeResponse(
         Long id,
         @JsonFormat(pattern = "HH:mm") LocalTime startAt,
-        boolean alreadyBooked) {
+        boolean alreadyBooked
+) {
 
     public static BookableReservationTimeResponse from(BookableReservationTimeDto appResponse) {
-        return new BookableReservationTimeResponse(appResponse.id(), appResponse.startAt(),
-                appResponse.alreadyBooked());
+        return new BookableReservationTimeResponse(
+                appResponse.id(),
+                appResponse.startAt(),
+                appResponse.alreadyBooked()
+        );
     }
 }

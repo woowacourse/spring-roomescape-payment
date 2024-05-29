@@ -10,6 +10,6 @@ public record MemberReservationRequest(
         @NotNull @Positive Long themeId,
         @NotBlank String paymentKey,
         @NotBlank String orderId,
-        @NotNull Long amount) {
-
+        @NotNull Long amount
+) {
 }

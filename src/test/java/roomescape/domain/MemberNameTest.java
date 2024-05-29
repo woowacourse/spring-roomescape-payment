@@ -15,7 +15,7 @@ class MemberNameTest {
     @Test
     void create() {
         assertThatCode(() -> new MemberName("하이용"))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("빈 값이거나 10글자 이상이면 예외가 발생한다.")
@@ -24,6 +24,6 @@ class MemberNameTest {
     @ValueSource(strings = {"11111111111"})
     void create_Fail(String name) {
         assertThatThrownBy(() -> new MemberName(name))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

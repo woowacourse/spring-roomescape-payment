@@ -37,9 +37,11 @@ import roomescape.service.response.ThemeDto;
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
+    private final long timeId = 1L;
+    private final long themeId = 1L;
+    private final long memberId = 1L;
     @InjectMocks
     private ReservationService reservationService;
-
     @Mock
     private ReservationRepository reservationRepository;
     @Mock
@@ -48,9 +50,6 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Mock
     private MemberRepository memberRepository;
-    private final long timeId = 1L;
-    private final long themeId = 1L;
-    private final long memberId = 1L;
 
     @DisplayName("예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
     @Test
@@ -79,7 +78,7 @@ class ReservationServiceTest {
         ReservationDto actual = reservationService.save(request);
         ReservationDto expected = new ReservationDto(
                 reservationId,
-                reservation.getMember().getName().getName(),
+                reservation.getMember().getName(),
                 reservation.getDate(),
                 ReservationTimeDto.from(reservation.getTime()),
                 ThemeDto.from(reservation.getTheme()));

@@ -23,9 +23,8 @@ public class AdminReservationWaitingController {
 
     @GetMapping
     public ResponseEntity<List<ReservationWaitingResponse>> getAvailableWaitings() {
-        List<ReservationWaitingResponse> waitingWebResponses = reservationWaitingService.findAllAllowed()
-                .stream()
-                .map(ReservationWaitingResponse::new)
+        List<ReservationWaitingResponse> waitingWebResponses = reservationWaitingService.findAllAllowed().stream()
+                .map(ReservationWaitingResponse::from)
                 .toList();
 
         return ResponseEntity.ok().body(waitingWebResponses);
@@ -34,7 +33,7 @@ public class AdminReservationWaitingController {
     @PatchMapping("/{id}/deny")
     public ResponseEntity<ReservationWaitingResponse> updateWaitingStatus(@PathVariable Long id) {
         ReservationWaitingDto waitingAppResponse = reservationWaitingService.denyWaiting(id);
-        ReservationWaitingResponse waitingWebResponse = new ReservationWaitingResponse(waitingAppResponse);
+        ReservationWaitingResponse waitingWebResponse = ReservationWaitingResponse.from(waitingAppResponse);
 
         return ResponseEntity.ok(waitingWebResponse);
     }

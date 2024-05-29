@@ -40,15 +40,30 @@ public class ReservationWaiting {
     public ReservationWaiting() {
     }
 
-    public ReservationWaiting(LocalDateTime now, Member member, ReservationDate date, ReservationTime time, Theme theme) {
+    public ReservationWaiting(LocalDateTime now,
+                              Member member,
+                              ReservationDate date,
+                              ReservationTime time,
+                              Theme theme) {
         this(null, now, member, date, time, theme, null);
     }
 
-    public ReservationWaiting(LocalDateTime now, Member member, ReservationDate date, ReservationTime time, Theme theme, LocalDateTime deniedAt) {
+    public ReservationWaiting(LocalDateTime now,
+                              Member member,
+                              ReservationDate date,
+                              ReservationTime time,
+                              Theme theme,
+                              LocalDateTime deniedAt) {
         this(null, now, member, date, time, theme, deniedAt);
     }
 
-    public ReservationWaiting(Long id, LocalDateTime now, Member member, ReservationDate date, ReservationTime time, Theme theme, LocalDateTime deniedAt) {
+    public ReservationWaiting(Long id,
+                              LocalDateTime now,
+                              Member member,
+                              ReservationDate date,
+                              ReservationTime time,
+                              Theme theme,
+                              LocalDateTime deniedAt) {
         validateDateTime(now, date, time);
         this.member = member;
         this.id = id;
@@ -58,10 +73,14 @@ public class ReservationWaiting {
         this.deniedAt = deniedAt;
     }
 
-    private static void validateDateTime(final LocalDateTime now, final ReservationDate date, final ReservationTime time) {
+    private static void validateDateTime(LocalDateTime now,
+                                         ReservationDate date,
+                                         ReservationTime time) {
         LocalDateTime waitingDateTime = LocalDateTime.of(date.getDate(), time.getStartAt());
         if (waitingDateTime.isBefore(now)) {
-            throw new IllegalArgumentException(String.format("지나간 시간에 대한 에약 대기는 생성할 수 없습니다. (dateTime: %s)", waitingDateTime));
+            throw new IllegalArgumentException(
+                    String.format("지나간 시간에 대한 에약 대기는 생성할 수 없습니다. (dateTime: %s)", waitingDateTime)
+            );
         }
     }
 

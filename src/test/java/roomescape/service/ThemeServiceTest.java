@@ -20,17 +20,15 @@ import roomescape.service.request.ThemeSaveDto;
 @ExtendWith(MockitoExtension.class)
 class ThemeServiceTest {
 
+    private final String validName = "방탈출";
+    private final String validDescription = "재밌는 방탈출 게임이다";
+    private final String validThumbnail = "https://aaa.jpg";
     @InjectMocks
     private ThemeService themeService;
-
     @Mock
     private ThemeRepository themeRepository;
     @Mock
     private ReservationRepository reservationRepository;
-
-    private final String validName = "방탈출";
-    private final String validDescription = "재밌는 방탈출 게임이다";
-    private final String validThumbnail = "https://aaa.jpg";
 
     @DisplayName("이름이 null 또는 빈 값이면 예외가 발생한다.")
     @ParameterizedTest

@@ -10,10 +10,11 @@ public record ReservationWaitingWithRankResponse(
         ReservationTimeResponse time,
         ThemeResponse theme,
         Long order,
-        String deniedAt) {
+        String deniedAt
+) {
 
-    public ReservationWaitingWithRankResponse(ReservationWaitingWithRankDto response) {
-        this(
+    public static ReservationWaitingWithRankResponse from(ReservationWaitingWithRankDto response) {
+        return new ReservationWaitingWithRankResponse(
                 response.id(),
                 response.name(),
                 response.date().getDate(),

@@ -14,7 +14,7 @@ class MemberRoleTest {
     @ValueSource(strings = {"ADMIN", "USER"})
     void create(String role) {
         assertThatCode(() -> MemberRole.from(role))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("정해진 Role 값이 아니면 예외가 발생한다.")
@@ -23,6 +23,6 @@ class MemberRoleTest {
     @ValueSource(strings = {"MEMBER"})
     void create_Fail(String role) {
         assertThatThrownBy(() -> MemberRole.from(role))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

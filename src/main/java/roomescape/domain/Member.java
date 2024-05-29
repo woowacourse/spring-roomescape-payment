@@ -84,8 +84,8 @@ public class Member {
         return id;
     }
 
-    public MemberName getName() {
-        return name;
+    public String getName() {
+        return name.getName();
     }
 
     public MemberEmail getEmail() {
@@ -102,8 +102,12 @@ public class Member {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Member member = (Member) o;
         if (id == null || member.id == null) {
             throw new IllegalArgumentException("ID가 비어 있을 경우 equals()를 호출할 수 없습니다.");

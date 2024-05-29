@@ -1,9 +1,7 @@
 package roomescape.web.controller.api;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationAndWaitingService;
 import roomescape.service.ReservationService;
@@ -20,6 +17,7 @@ import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.web.controller.request.AdminReservationRequest;
+import roomescape.web.controller.request.SearchCondition;
 import roomescape.web.controller.response.AdminReservationResponse;
 import roomescape.web.controller.response.MemberReservationResponse;
 
@@ -30,7 +28,8 @@ public class AdminReservationController {
     private final ReservationService reservationService;
     private final ReservationAndWaitingService reservationAndWaitingService;
 
-    public AdminReservationController(ReservationService reservationService, ReservationAndWaitingService reservationAndWaitingService) {
+    public AdminReservationController(ReservationService reservationService,
+                                      ReservationAndWaitingService reservationAndWaitingService) {
         this.reservationService = reservationService;
         this.reservationAndWaitingService = reservationAndWaitingService;
     }
@@ -38,27 +37,18 @@ public class AdminReservationController {
     @PostMapping
     public ResponseEntity<AdminReservationResponse> reserve(
             @Valid @RequestBody AdminReservationRequest request) {
-        ReservationSaveDto appRequest = new ReservationSaveDto(request.date(), request.timeId(),
-                request.themeId(), request.memberId());
+        ReservationSaveDto appRequest = ReservationSaveDto.from(request);
 
         ReservationDto appResponse = reservationService.save(appRequest);
-        AdminReservationResponse adminReservationResponse = new AdminReservationResponse(
-                appResponse.date().getDate(),
-                appRequest.timeId(), appRequest.themeId(), appRequest.memberId());
+        AdminReservationResponse adminReservationResponse = AdminReservationResponse.from(appRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + appResponse.id()))
                 .body(adminReservationResponse);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<MemberReservationResponse>> getSearchedReservations(
-            @RequestParam(required = false) @Positive Long memberId,
-            @RequestParam(required = false) @Positive Long themeId,
-            @RequestParam(required = false) LocalDate dateFrom,
-            @RequestParam(required = false) LocalDate dateTo) {
-
-        AdminSearchedReservationDto appRequest = new AdminSearchedReservationDto(
-                memberId, themeId, dateFrom, dateTo);
+    public ResponseEntity<List<MemberReservationResponse>> getSearchedReservations(SearchCondition searchCondition) {
+        AdminSearchedReservationDto appRequest = AdminSearchedReservationDto.from(searchCondition);
 
         List<ReservationDto> appResponses = reservationService.findAllSearched(appRequest);
 

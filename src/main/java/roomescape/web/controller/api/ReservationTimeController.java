@@ -32,8 +32,7 @@ public class ReservationTimeController {
 
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody ReservationTimeRequest request) {
-        ReservationTimeDto appResponse = reservationTimeService.save(
-                new ReservationTimeSaveDto(request.startAt()));
+        ReservationTimeDto appResponse = reservationTimeService.save(new ReservationTimeSaveDto(request.startAt()));
         Long id = appResponse.id();
 
         return ResponseEntity.created(URI.create("/times/" + id))
@@ -51,26 +50,23 @@ public class ReservationTimeController {
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTimeDto> appResponses = reservationTimeService.findAll();
 
-        List<ReservationTimeResponse> reservationTimeRespons = appResponses.stream()
-                .map(appResponse -> new ReservationTimeResponse(appResponse.id(),
-                        appResponse.startAt()))
+        List<ReservationTimeResponse> reservationTimeResponses = appResponses.stream()
+                .map(ReservationTimeResponse::from)
                 .toList();
 
-        return ResponseEntity.ok(reservationTimeRespons);
+        return ResponseEntity.ok(reservationTimeResponses);
     }
 
     @GetMapping("/availability")
     public ResponseEntity<List<BookableReservationTimeResponse>> getReservationTimesWithAvailability(
-            @RequestParam String date, @RequestParam Long id) {
+            @RequestParam String date,
+            @RequestParam Long id) {
 
         List<BookableReservationTimeDto> appResponses = reservationTimeService
                 .findAllWithBookAvailability(date, id);
 
         List<BookableReservationTimeResponse> webResponses = appResponses.stream()
-                .map(response -> new BookableReservationTimeResponse(
-                        response.id(),
-                        response.startAt(),
-                        response.alreadyBooked()))
+                .map(BookableReservationTimeResponse::from)
                 .toList();
 
         return ResponseEntity.ok(webResponses);
