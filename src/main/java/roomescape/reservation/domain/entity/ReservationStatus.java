@@ -1,5 +1,7 @@
 package roomescape.reservation.domain.entity;
 
+import java.util.List;
+
 public enum ReservationStatus {
 
     CONFIRMATION("예약"),
@@ -26,5 +28,9 @@ public enum ReservationStatus {
 
     public boolean isPending() {
         return this.equals(PENDING);
+    }
+
+    public static List<ReservationStatus> getConfirmationStatuses() {
+        return List.of(CONFIRMATION, PENDING);
     }
 }

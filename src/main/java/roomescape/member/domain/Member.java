@@ -2,6 +2,7 @@ package roomescape.member.domain;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
+import roomescape.auth.dto.LoginMember;
 import roomescape.exception.BadRequestException;
 
 @Entity
@@ -54,6 +55,10 @@ public class Member {
         if (!this.password.equals(password)) {
             throw new BadRequestException("잘못된 사용자 인증 정보입니다.");
         }
+    }
+
+    public boolean isSameMember(LoginMember loginMember) {
+        return id.equals(loginMember.id());
     }
 
     public Long getId() {

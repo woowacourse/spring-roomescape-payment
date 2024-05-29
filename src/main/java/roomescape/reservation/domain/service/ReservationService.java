@@ -19,30 +19,21 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MemberReservationRepository memberReservationRepository;
 
-    public ReservationService(
-            ReservationRepository reservationRepository,
-            MemberReservationRepository memberReservationRepository
-    ) {
+    public ReservationService(ReservationRepository reservationRepository, MemberReservationRepository memberReservationRepository) {
         this.reservationRepository = reservationRepository;
         this.memberReservationRepository = memberReservationRepository;
     }
 
     private MemberReservation findMemberReservationById(Long id) {
-        return memberReservationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
+        return memberReservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }
 
     public List<MemberReservation> readReservations() {
-        return memberReservationRepository.findByStatuses(
-                List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING)
-        );
+        return memberReservationRepository.findByStatuses(ReservationStatus.getConfirmationStatuses());
     }
 
     public List<MemberReservation> readConfirmationMemberReservation(LoginMember loginMember) {
-        return memberReservationRepository.findByMemberIdAndStatuses(
-                loginMember.id(),
-                List.of(ReservationStatus.CONFIRMATION, ReservationStatus.PENDING)
-        );
+        return memberReservationRepository.findByMemberIdAndStatuses(loginMember.id(), ReservationStatus.getConfirmationStatuses());
     }
 
     public List<WaitingReservationRanking> readWaitingMemberReservation(LoginMember loginMember) {
@@ -50,11 +41,7 @@ public class ReservationService {
     }
 
     public List<MemberReservation> searchReservations(ReservationSearchRequestParameter searchCondition) {
-        List<Reservation> reservations = reservationRepository.findByDateBetweenAndThemeId(
-                searchCondition.dateFrom(),
-                searchCondition.dateTo(),
-                searchCondition.themeId()
-        );
+        List<Reservation> reservations = reservationRepository.findByDateBetweenAndThemeId(searchCondition.dateFrom(), searchCondition.dateTo(), searchCondition.themeId());
 
         return memberReservationRepository.findByMemberIdAndReservationIn(searchCondition.memberId(), reservations);
     }
@@ -76,8 +63,7 @@ public class ReservationService {
     }
 
     private void confirmFirstWaitingReservation(Reservation reservation) {
-        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING)
-                .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
+        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING).ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
     }
 
     public void confirmPendingReservation(Long id) {

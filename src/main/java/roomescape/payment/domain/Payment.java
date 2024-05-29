@@ -48,10 +48,12 @@ public class Payment {
     }
 
     public static Payment of(PaymentResponse paymentResponse, MemberReservation memberReservation) {
-        return new Payment(paymentResponse.paymentKey(),
+        return new Payment(
+                paymentResponse.paymentKey(),
                 paymentResponse.orderId(),
                 paymentResponse.totalAmount(),
-                memberReservation);
+                memberReservation
+        );
     }
 
     public Long getId() {

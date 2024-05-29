@@ -83,17 +83,13 @@ public class MemberReservation {
     }
 
     public void validateRankConfirm(Long waitingRank) {
-        if (!canConfirm(waitingRank)) {
+        if (!waitingRank.equals(CAN_CONFIRM_RANK)) {
             throw new BadRequestException("예약 대기는 순서대로 승인할 수 있습니다.");
         }
     }
 
-    private boolean canConfirm(Long waitingRank) {
-        return waitingRank.equals(CAN_CONFIRM_RANK);
-    }
-
     public void validateIsOwner(LoginMember loginMember) {
-        if (!member.getId().equals(loginMember.id())) {
+        if (!member.isSameMember(loginMember)) {
             throw new ForbiddenException("본인의 예약 대기만 삭제할 수 있습니다.");
         }
     }
