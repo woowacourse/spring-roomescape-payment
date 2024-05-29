@@ -63,9 +63,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<ErrorResponse> handleHttpClientErrorException(final HttpClientErrorException e) {
-        ErrorResponse response = e.getResponseBodyAs(ErrorResponse.class);
-        logger.error(e.getResponseBodyAsString());
+    public ResponseEntity<PaymentErrorResponse> handleHttpClientErrorException(final HttpClientErrorException e) {
+        final PaymentErrorResponse response = e.getResponseBodyAs(PaymentErrorResponse.class);
+        logger.error(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(response);
     }
