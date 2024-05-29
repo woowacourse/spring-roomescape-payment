@@ -15,11 +15,7 @@ public class ReservationResponse {
     private final PaymentConfirmResponse payment;
 
     public ReservationResponse(final Reservation reservation) {
-        this(reservation.getId(), reservation);
-    }
-
-    public ReservationResponse(final Long id, final Reservation reservation) {
-        this.id = id;
+        this.id = reservation.getId();
         this.date = reservation.getDateString();
         this.member = new MemberResponse(reservation.getMember());
         this.time = new ReservationTimeResponse(reservation.getReservationTime());

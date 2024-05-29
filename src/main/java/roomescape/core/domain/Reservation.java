@@ -95,6 +95,10 @@ public class Reservation {
         return date.isEqual(LocalDate.now(kst));
     }
 
+    public void setPayment(final Payment payment) {
+        this.payment = payment;
+    }
+
     public Long getId() {
         return id;
     }

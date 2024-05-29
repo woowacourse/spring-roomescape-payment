@@ -3,21 +3,21 @@ package roomescape.core.dto.payment;
 import roomescape.core.domain.Payment;
 
 public class PaymentConfirmResponse {
-    private Long totalAmount;
-    private String orderId;
     private String paymentKey;
+    private String orderId;
+    private Long totalAmount;
 
     public PaymentConfirmResponse(Payment payment) {
-        this(payment.getAmount(), payment.getOrderId(), payment.getPaymentKey());
-    }
-
-    public PaymentConfirmResponse(Long totalAmount, String orderId, String paymentKey) {
-        this.totalAmount = totalAmount;
-        this.orderId = orderId;
-        this.paymentKey = paymentKey;
+        this.paymentKey = payment.getPaymentKey();
+        this.orderId = payment.getOrderId();
+        this.totalAmount = payment.getAmount();
     }
 
     public PaymentConfirmResponse() {
+    }
+
+    public Payment toPayment() {
+        return new Payment(paymentKey, orderId, totalAmount);
     }
 
     public Long getTotalAmount() {

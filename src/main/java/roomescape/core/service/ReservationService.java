@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
-import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
 import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
@@ -36,17 +36,20 @@ public class ReservationService {
             = "본인의 예약만 취소할 수 있습니다.";
     protected static final String NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE = "관리자만 예약을 취소할 수 있습니다.";
 
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(final ReservationRepository reservationRepository,
+    public ReservationService(final PaymentService paymentService,
+                              final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository) {
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -56,18 +59,20 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(final ReservationRequest request) {
-        final Reservation reservation = createReservation(request);
-        return saveAndResponseReservation(reservation);
+        final Reservation reservation = saveAndGetReservation(request);
+        return new ReservationResponse(reservation);
     }
 
     @Transactional
-    public ReservationResponse create(final ReservationRequest request,
-                                      final PaymentConfirmResponse paymentResponse) {
-        final Reservation reservation = createReservation(request, paymentResponse);
-        return saveAndResponseReservation(reservation);
+    public ReservationResponse createAndPay(final ReservationRequest reservationRequest,
+                                            final PaymentConfirmRequest paymentRequest) {
+        final Reservation reservation = saveAndGetReservation(reservationRequest);
+        PaymentConfirmResponse paymentResponse = paymentService.confirmPayment(paymentRequest);
+        reservation.setPayment(paymentResponse.toPayment());
+        return new ReservationResponse(reservation);
     }
 
-    private Reservation createReservation(final ReservationRequest request) {
+    private Reservation saveAndGetReservation(final ReservationRequest request) {
         final Member member = getMemberById(request.getMemberId());
         final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
@@ -77,29 +82,8 @@ public class ReservationService {
                 = new Reservation(member, date, reservationTime, theme);
 
         validateDuplicatedReservation(reservation, reservationTime);
-        return reservation;
-    }
-
-    private Reservation createReservation(final ReservationRequest request,
-                                          final PaymentConfirmResponse paymentResponse) {
-        final Member member = getMemberById(request.getMemberId());
-        final String date = request.getDate();
-        final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
-        final Theme theme = getThemeById(request.getThemeId());
-        final Payment payment = new Payment(paymentResponse.getPaymentKey(),
-                paymentResponse.getOrderId(), paymentResponse.getTotalAmount());
-
-        final Reservation reservation
-                = new Reservation(member, date, reservationTime, theme, payment);
-
-        validateDuplicatedReservation(reservation, reservationTime);
-        return reservation;
-    }
-
-    private ReservationResponse saveAndResponseReservation(Reservation reservation) {
         reservation.validateDateAndTime();
-        final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation.getId(), savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private Member getMemberById(final Long id) {
@@ -181,8 +165,8 @@ public class ReservationService {
     @Transactional
     public void delete(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
         final Long reservationMemberId = reservation.getMember().getId();
         final Long loginMemberId = loginMember.getId();
 
