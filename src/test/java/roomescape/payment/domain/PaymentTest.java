@@ -8,8 +8,11 @@ import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
+import roomescape.global.entity.Price;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.ReservationStatus;
+
+import java.math.BigDecimal;
 
 @DisplayName("결제 도메인 테스트")
 class PaymentTest {
@@ -19,7 +22,7 @@ class PaymentTest {
     void create() {
         String paymentKey = "paymentKey";
         PaymentType paymentType = PaymentType.CARD;
-        PayAmount payAmount = PayAmount.from(10000L);
+        Price payAmount = new Price(BigDecimal.valueOf(10000L));
         MemberReservation memberReservation = new MemberReservation(
                 MemberFixture.getMemberChoco(),
                 ReservationFixture.getNextDayReservation(ReservationTimeFixture.get1PM(), ThemeFixture.getTheme1()),

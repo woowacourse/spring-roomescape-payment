@@ -7,6 +7,7 @@ import static roomescape.fixture.ReservationFixture.getNextDayReservation;
 import static roomescape.fixture.ReservationTimeFixture.getNoon;
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +62,7 @@ class ThemeServiceTest extends ServiceTest {
         String name = "name";
         String description = "description";
         String thumbnail = "thumbnail";
-        long price = 15000L;
+        BigDecimal price = BigDecimal.valueOf(10000L);
         ThemeCreate themeCreate = new ThemeCreate(name, description, thumbnail, price);
 
         //when

@@ -1,8 +1,6 @@
 package roomescape;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,15 +8,15 @@ import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Transactional
 @Component
@@ -63,7 +61,7 @@ public class DataLoader implements ApplicationRunner {
                 상형문자를 해독하여 분노한 파라오에게 제사를 지내고 아누비스의 저주를 풀어서 안전하게 피라미드 밖으로 탈출하자!!
                 """,
                 "https://naverbooking-phinf.pstatic.net/20201109_121/1604908062178KzsNV_JPEG/%C6%C4%B6%F3%BF%C0%C0%C7%BA%F1%B9%D0.jpeg",
-                10000L)
+                BigDecimal.valueOf(10000L))
         );
 
         Theme theme2 = themeRepository.save(
@@ -73,7 +71,7 @@ public class DataLoader implements ApplicationRunner {
                         백신을 완성하고 좀비들을 퇴치하여 탈출! 빼앗긴 세계를 되찾아라!!
                         """,
                         "https://naverbooking-phinf.pstatic.net/20201109_262/1604908247778Wgjrb_JPEG/%C1%BB%BA%F1%BE%EE%C5%C3.jpeg",
-                        20000L)
+                        BigDecimal.valueOf(20000L))
         );
 
         Theme theme3 = themeRepository.save(
@@ -82,7 +80,7 @@ public class DataLoader implements ApplicationRunner {
                         눈을 떠 보니, 그의 방 안에 갇혀 있는 자신을 발견하게 되고, 살인마가 잠시 나간 사이 60분 안에 방에서 탈출하지 못하면 무시무시한 흉기를 소지한 변태적인 살인마가 다시 돌아와서 당신을...
                         """,
                         "https://naverbooking-phinf.pstatic.net/20201109_271/1604906887897VLkai_JPEG/%C3%DF%C0%FB%C0%DA.jpeg",
-                        25000L)
+                        BigDecimal.valueOf(25000L))
         );
 
         Theme theme4 = themeRepository.save(
@@ -92,7 +90,7 @@ public class DataLoader implements ApplicationRunner {
                         경비원에게 들키지 않게 오래전 생일파티만을 기다리던 아이의 마지막 소원을 들어주고 우리만의 비밀 생일파티를 즐겁게 마치고 탈출하자..
                         """,
                         "https://naverbooking-phinf.pstatic.net/20201104_210/160445696075352J6M_JPEG/%BA%F1%B9%D0%B0%B6%B7%AF%B8%AE.jpeg",
-                        30000L)
+                        BigDecimal.valueOf(30000L))
         );
 
         ReservationTime time1 = timeRepository.save(new ReservationTime(LocalTime.of(11, 50)));

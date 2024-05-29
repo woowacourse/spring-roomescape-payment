@@ -15,6 +15,8 @@ import static roomescape.fixture.ThemeFixture.getTheme1;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,14 +59,11 @@ class ReservationApplicationServiceTest extends ServiceTest {
         time = reservationTimeRepository.save(getNoon());
         theme1 = themeRepository.save(getTheme1());
         memberChoco = memberRepository.save(getMemberChoco());
-        String paymentKey = "tgen_20240528172021mxEG4";
         String paymentType = "카드";
-        long totalAmount = 1000L;
-        PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
+        BigDecimal totalAmount = BigDecimal.valueOf(15000L);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
         doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
-
     }
 
 
@@ -109,7 +108,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         LocalDate date = getNextDay();
         ReservationResponse reservationResponse = reservationApplicationService.createMemberReservation(
                 new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
-                        10000L, date)
+                        BigDecimal.valueOf(10000L), date)
         );
 
         //when & then
@@ -130,7 +129,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.createMemberReservation(
                 new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
-                        10000L, date)
+                        BigDecimal.valueOf(10000L), date)
         )).isInstanceOf(
                 BadRequestException.class).hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }

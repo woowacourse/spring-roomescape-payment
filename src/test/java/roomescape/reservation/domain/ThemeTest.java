@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 
+import java.math.BigDecimal;
+
 @DisplayName("테마 도메인 테스트")
 class ThemeTest {
     @DisplayName("동일한 id는 같은 테마다.")
@@ -21,12 +23,12 @@ class ThemeTest {
         String name1 = "name1";
         String description1 = "description1";
         String thumbnail1 = "thumbnail1";
-        long price1 = 15000L;
+        BigDecimal price1 = BigDecimal.valueOf(15000L);
 
         String name2 = "name2";
         String description2 = "description2";
         String thumbnail2 = "thumbnail2";
-        long price2 = 20000L;
+        BigDecimal price2 = BigDecimal.valueOf(20000L);
 
         //when
         Theme theme1 = new Theme(id1, name1, description1, thumbnail1, price1);
@@ -45,7 +47,7 @@ class ThemeTest {
         String name = "name1";
         String description = "description1";
         String thumbnail = "thumbnail1";
-        long price = 15000L;
+        BigDecimal price = BigDecimal.valueOf(15000L);
 
         //when & then
         assertAll(

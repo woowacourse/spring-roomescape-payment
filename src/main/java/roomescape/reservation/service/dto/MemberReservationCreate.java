@@ -1,10 +1,12 @@
 package roomescape.reservation.service.dto;
 
-import java.time.LocalDate;
 import roomescape.reservation.controller.dto.MemberReservationRequest;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 public record MemberReservationCreate(long memberId, long themeId, long timeId, String paymentKey, String orderId,
-                                      long amount,
+                                      BigDecimal amount,
                                       LocalDate date) {
 
     public static MemberReservationCreate from(MemberReservationRequest memberReservationRequest) {

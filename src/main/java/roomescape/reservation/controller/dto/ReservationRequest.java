@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ReservationRequest(
@@ -26,6 +28,6 @@ public record ReservationRequest(
 
         @NotNull(message = "결제 금액은 필수 값입니다.")
         @Positive
-        Long amount
+        BigDecimal amount
 ) {
 }

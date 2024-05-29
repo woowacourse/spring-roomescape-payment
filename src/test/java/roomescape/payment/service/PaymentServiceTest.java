@@ -12,6 +12,7 @@ import static roomescape.fixture.ReservationFixture.getNextDayReservation;
 import static roomescape.fixture.ReservationTimeFixture.getNoon;
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,10 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.global.entity.Price;
 import roomescape.payment.service.dto.PaymentErrorResponse;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
-import roomescape.payment.domain.PayAmount;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
@@ -68,7 +69,7 @@ class PaymentServiceTest extends ServiceTest {
         //given
         String paymentKey = "tgen_20240528172021mxEG4";
         String paymentType = "카드";
-        long totalAmount = 1000L;
+        BigDecimal totalAmount = BigDecimal.valueOf(1000L);
         PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
@@ -83,7 +84,7 @@ class PaymentServiceTest extends ServiceTest {
         assertAll(
                 () -> assertThat(optionalPayment).isNotNull(),
                 () -> assertThat(optionalPayment.get().getPaymentType()).isEqualTo(PaymentType.from(paymentType)),
-                () -> assertThat(optionalPayment.get().getAmount()).isEqualTo(PayAmount.from(totalAmount))
+                () -> assertThat(optionalPayment.get().getAmount()).isEqualTo(new Price(totalAmount))
         );
     }
 
@@ -94,7 +95,7 @@ class PaymentServiceTest extends ServiceTest {
         doThrow(new PaymentException(
                 new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
                 .when(paymentClient).confirm(any(), anyString());
-        PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
+        PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then
         assertThatThrownBy(() -> paymentService.approvePayment(paymentRequest, memberReservation))

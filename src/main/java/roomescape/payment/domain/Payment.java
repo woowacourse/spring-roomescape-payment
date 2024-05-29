@@ -1,17 +1,11 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import roomescape.global.entity.BaseEntity;
+import roomescape.global.entity.Price;
 import roomescape.reservation.domain.MemberReservation;
+
+import java.math.BigDecimal;
 
 @Entity
 public class Payment extends BaseEntity {
@@ -25,13 +19,13 @@ public class Payment extends BaseEntity {
     private PaymentType paymentType;
 
     @Embedded
-    private PayAmount amount;
+    private Price amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_RESERVATION_ID")
     private MemberReservation memberReservation;
 
-    public Payment(String paymentKey, PaymentType paymentType, PayAmount amount, MemberReservation memberReservation) {
+    public Payment(String paymentKey, PaymentType paymentType, Price amount, MemberReservation memberReservation) {
         this.paymentKey = paymentKey;
         this.paymentType = paymentType;
         this.amount = amount;
@@ -41,9 +35,9 @@ public class Payment extends BaseEntity {
     protected Payment() {
     }
 
-    public static Payment from(String paymentKey, String paymentType, long amount,
+    public static Payment from(String paymentKey, String paymentType, BigDecimal amount,
                                MemberReservation memberReservation) {
-        return new Payment(paymentKey, PaymentType.from(paymentType), PayAmount.from(amount), memberReservation);
+        return new Payment(paymentKey, PaymentType.from(paymentType), new Price(amount), memberReservation);
     }
 
     public Long getId() {
@@ -58,7 +52,7 @@ public class Payment extends BaseEntity {
         return paymentType;
     }
 
-    public PayAmount getAmount() {
+    public Price getAmount() {
         return amount;
     }
 

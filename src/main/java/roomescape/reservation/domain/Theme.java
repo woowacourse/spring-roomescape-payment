@@ -1,15 +1,12 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.math.BigDecimal;
-import java.util.Objects;
+import jakarta.persistence.*;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.global.entity.Price;
+
+import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 public class Theme {
@@ -31,7 +28,7 @@ public class Theme {
     protected Theme() {
     }
 
-    public Theme(Long id, String name, String description, String thumbnail, Long price) {
+    public Theme(Long id, String name, String description, String thumbnail, BigDecimal price) {
         validate(name, description, thumbnail);
         this.id = id;
         this.name = name;
@@ -40,7 +37,7 @@ public class Theme {
         this.price = new Price(price);
     }
 
-    public Theme(String name, String description, String thumbnail, Long price) {
+    public Theme(String name, String description, String thumbnail, BigDecimal price) {
         this(null, name, description, thumbnail, price);
     }
 
