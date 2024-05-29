@@ -6,8 +6,6 @@ import org.springframework.web.client.RestClient;
 import roomescape.reservation.controller.dto.PaymentRequest;
 import roomescape.reservation.controller.dto.PaymentResponse;
 
-
-@Component
 public class PaymentWithRestClient {
 
     private final RestClient restClient;
