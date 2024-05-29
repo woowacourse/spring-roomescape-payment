@@ -19,7 +19,6 @@ import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
-import roomescape.service.dto.PaymentRequestDto;
 
 @RestController
 @RequestMapping("/reservations")
@@ -38,7 +37,7 @@ public class UserReservationController {
         @Valid @RequestBody CreateUserReservationRequest request,
         @AuthenticationPrincipal Member member) throws Exception {
 
-        paymentService.pay(new PaymentRequestDto(request.orderId(), request.amount(), request.paymentKey()));
+        paymentService.pay(request.orderId(), request.amount(), request.paymentKey());
 
         CreateReservationResponse response = userReservationService.reserve(
             member.getId(),

@@ -28,7 +28,6 @@ import roomescape.service.PaymentService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.UserReservationService;
-import roomescape.service.dto.PaymentRequestDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -86,7 +85,7 @@ class UserReservationControllerTest {
     void save() {
         doNothing()
             .when(paymentService)
-            .pay(any(PaymentRequestDto.class));
+            .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
             DATE_FIRST, THEME_ID, TIME_ID, null, null, 1000, null);
@@ -159,7 +158,7 @@ class UserReservationControllerTest {
     void save_TimeIdNotFound() {
         doNothing()
             .when(paymentService)
-            .pay(any(PaymentRequestDto.class));
+            .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
             DATE_FIRST, THEME_ID, 2L, null, null, 1000, null);
@@ -179,7 +178,7 @@ class UserReservationControllerTest {
     void save_ThemeIdNotFound() {
         doNothing()
             .when(paymentService)
-            .pay(any(PaymentRequestDto.class));
+            .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
             DATE_FIRST, 2L, TIME_ID, null, null, 1000, null);
@@ -199,7 +198,7 @@ class UserReservationControllerTest {
     void save_Duplication() {
         doNothing()
             .when(paymentService)
-            .pay(any(PaymentRequestDto.class));
+            .pay(any(String.class), any(Long.class), any(String.class));
 
         userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 

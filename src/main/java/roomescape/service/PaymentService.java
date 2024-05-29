@@ -26,14 +26,14 @@ public class PaymentService {
             .build();
     }
 
-    public void pay(PaymentRequestDto dto) {
+    public void pay(String orderId, long amount, String paymentKey) {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode(tossPaymentTestKey.getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTHORIZATION_PREFIX + new String(encodedBytes);
 
         restClient.post()
             .uri(TOSS_PAYMENTS_URL)
-            .body(dto)
+            .body(new PaymentRequestDto(orderId, amount, paymentKey))
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", authorizations)
             .retrieve()
