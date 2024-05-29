@@ -16,7 +16,6 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSpecification;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
-import roomescape.reservation.dto.request.FilteredReservationRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -212,7 +211,8 @@ public class ReservationService {
     }
 
     public WaitingWithRanksResponse findWaitingWithRankById(final Long myId) {
-        final List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(myId)
+        final List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
+                        myId)
                 .stream()
                 .map(WaitingWithRankResponse::from)
                 .toList();

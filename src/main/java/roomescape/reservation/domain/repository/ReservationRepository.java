@@ -29,15 +29,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     List<Reservation> findByMember(Member member);
 
     @Query("SELECT new roomescape.reservation.domain.WaitingWithRank(" +
-           "    w, " +
-           "    (SELECT COUNT(w2) " +
-           "     FROM Reservation w2 " +
-           "     WHERE w2.theme = w.theme " +
-           "       AND w2.date = w.date " +
-           "       AND w2.reservationTime = w.reservationTime " +
-           "       AND w2.id < w.id)) " +
-           "FROM Reservation w " +
-           "WHERE w.member.id = :memberId")
+            "    w, " +
+            "    (SELECT COUNT(w2) " +
+            "     FROM Reservation w2 " +
+            "     WHERE w2.theme = w.theme " +
+            "       AND w2.date = w.date " +
+            "       AND w2.reservationTime = w.reservationTime " +
+            "       AND w2.id < w.id)) " +
+            "FROM Reservation w " +
+            "WHERE w.member.id = :memberId")
     List<WaitingWithRank> findWaitingsWithRankByMemberId(Long memberId);
 
 }

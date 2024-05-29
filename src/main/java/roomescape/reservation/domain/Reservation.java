@@ -11,9 +11,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.member.domain.Member;
 import roomescape.system.exception.error.ErrorType;
 import roomescape.system.exception.model.ValidateException;
-import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -90,7 +90,9 @@ public class Reservation {
     }
 
     public Long getMemberId() {
-        return member.getId();}
+        return member.getId();
+    }
+
     public Long getId() {
         return id;
     }

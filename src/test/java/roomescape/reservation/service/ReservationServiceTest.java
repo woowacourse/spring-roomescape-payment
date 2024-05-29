@@ -56,7 +56,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId()), member.getId()))
+                new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"), member.getId()))
                 .isInstanceOf(ValidateException.class);
     }
 
@@ -71,8 +71,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId()),
-                member.getId()))
+                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"), member.getId()))
                 .isInstanceOf(ValidateException.class);
     }
 
@@ -87,7 +86,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId()),
+                new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", "amount", "paymentType"),
                 NotExistMemberId))
                 .isInstanceOf(NotFoundException.class);
     }

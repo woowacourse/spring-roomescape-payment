@@ -1,5 +1,7 @@
 package roomescape.theme.service;
 
+import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.system.exception.error.ErrorType;
 import roomescape.system.exception.model.NotFoundException;
@@ -8,9 +10,6 @@ import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.dto.ThemesResponse;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class ThemeService {
@@ -40,7 +39,8 @@ public class ThemeService {
         LocalDate endDate = today.minusDays(1);
         int limit = 10;
 
-        List<ThemeResponse> response = themeRepository.findTopNThemeBetweenStartDateAndEndDate(startDate, endDate, limit)
+        List<ThemeResponse> response = themeRepository.findTopNThemeBetweenStartDateAndEndDate(startDate, endDate,
+                        limit)
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();

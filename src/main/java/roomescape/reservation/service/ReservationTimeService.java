@@ -1,10 +1,7 @@
 package roomescape.reservation.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.AssociatedDataExistsException;
-import roomescape.system.exception.model.DataDuplicateException;
-import roomescape.system.exception.model.NotFoundException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -12,8 +9,10 @@ import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimesResponse;
-
-import java.util.List;
+import roomescape.system.exception.error.ErrorType;
+import roomescape.system.exception.model.AssociatedDataExistsException;
+import roomescape.system.exception.model.DataDuplicateException;
+import roomescape.system.exception.model.NotFoundException;
 
 @Service
 public class ReservationTimeService {
@@ -51,11 +50,13 @@ public class ReservationTimeService {
     }
 
     private void validateTimeDuplication(final ReservationTimeRequest reservationTimeRequest) {
-        List<ReservationTime> duplicateReservationTimes = reservationTimeRepository.findByStartAt(reservationTimeRequest.startAt());
+        List<ReservationTime> duplicateReservationTimes = reservationTimeRepository.findByStartAt(
+                reservationTimeRequest.startAt());
 
         if (!duplicateReservationTimes.isEmpty()) {
             throw new DataDuplicateException(ErrorType.TIME_DUPLICATED,
-                    String.format("이미 존재하는 예약 시간(ReservationTime) 입니다. [startAt: %s]", reservationTimeRequest.startAt()));
+                    String.format("이미 존재하는 예약 시간(ReservationTime) 입니다. [startAt: %s]",
+                            reservationTimeRequest.startAt()));
         }
     }
 

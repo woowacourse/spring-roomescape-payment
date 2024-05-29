@@ -4,9 +4,9 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import roomescape.reservation.domain.ReservationTime;
 import roomescape.system.exception.error.ErrorType;
 import roomescape.system.exception.model.ValidateException;
-import roomescape.reservation.domain.ReservationTime;
 
 public record ReservationTimeRequest(
         @NotNull(message = "예약 시간은 null일 수 없습니다.")

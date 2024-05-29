@@ -1,14 +1,14 @@
 package roomescape.system.auth.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.member.domain.Member;
+import roomescape.member.service.MemberService;
 import roomescape.system.auth.dto.LoginCheckResponse;
 import roomescape.system.auth.dto.LoginRequest;
 import roomescape.system.auth.jwt.JwtHandler;
 import roomescape.system.auth.jwt.dto.TokenDto;
 import roomescape.system.exception.error.ErrorType;
 import roomescape.system.exception.model.UnauthorizedException;
-import roomescape.member.domain.Member;
-import roomescape.member.service.MemberService;
 
 @Service
 public class AuthService {

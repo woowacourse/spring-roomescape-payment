@@ -59,10 +59,10 @@ public class Theme {
     @Override
     public String toString() {
         return "Theme{" +
-               "id=" + id +
-               ", name=" + name +
-               ", description=" + description +
-               ", thumbnail=" + thumbnail +
-               '}';
+                "id=" + id +
+                ", name=" + name +
+                ", description=" + description +
+                ", thumbnail=" + thumbnail +
+                '}';
     }
 }

@@ -48,8 +48,8 @@ public class ReservationTime {
     @Override
     public String toString() {
         return "ReservationTime{" +
-               "id=" + id +
-               ", startAt=" + startAt +
-               '}';
+                "id=" + id +
+                ", startAt=" + startAt +
+                '}';
     }
 }
