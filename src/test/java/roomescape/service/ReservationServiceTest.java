@@ -56,7 +56,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final long timeId = 1L;
         final LocalDate date = LocalDate.now().plusDays(1);
         final CreateReservationRequest request = new CreateReservationRequest(memberId, themeId, date, timeId, null, null, null);
-        final Reservation reservation = reservationService.addReservation(request);
+        final Reservation reservation = reservationService.addUserReservation(request);
 
         assertAll(
                 () -> assertThat(reservation.getMember().getId()).isEqualTo(memberId),
@@ -132,8 +132,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
 
         //when && then
-        reservationService.addReservation(request);
-        assertThatThrownBy(() -> reservationService.addReservation(request))
+        reservationService.addUserReservation(request);
+        assertThatThrownBy(() -> reservationService.addUserReservation(request))
                 .isInstanceOf(DuplicateReservationException.class);
     }
 
@@ -146,8 +146,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, null, null, null);
 
         //when && then
-        reservationService.addReservation(request1);
-        assertThatCode(() -> reservationService.addReservation(request2))
+        reservationService.addUserReservation(request1);
+        assertThatCode(() -> reservationService.addUserReservation(request2))
                 .doesNotThrowAnyException();
     }
 }

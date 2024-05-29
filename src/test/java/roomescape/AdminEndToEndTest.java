@@ -85,13 +85,13 @@ class AdminEndToEndTest extends IntegrationTestSupport {
     @DisplayName("예약 저장 및 삭제")
     void saveAndDeleteReservation() {
         final Map<String, String> params = Map.of("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE),
-                "timeId", "1", "themeId", "1");
+                "timeId", "1", "themeId", "1", "memberId", "1");
 
         RestAssured.given().log().all()
                 .cookie("token", ADMIN_TOKEN)
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/reservations")
+                .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201);
 

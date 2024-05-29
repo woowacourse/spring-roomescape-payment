@@ -3,6 +3,7 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.member.dto.LoginMember;
+import roomescape.controller.reservation.dto.CreateAdminReservationRequest;
 import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.controller.time.dto.IsMineRequest;
@@ -73,7 +74,23 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation addReservation(final CreateReservationRequest request) {
+    public Reservation addReservation(final CreateAdminReservationRequest request) {
+        final ReservationTime time = reservationTimeRepository.fetchById(request.timeId());
+        final Theme theme = themeRepository.fetchById(request.themeId());
+        final Member member = memberRepository.fetchById(request.memberId());
+        final LocalDate date = request.date();
+
+        final Reservation reservation = new Reservation(null, member, date, time, theme);
+
+        final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
+        validateBeforeDay(reservationDateTime);
+        validateReservation(member, theme, time, date);
+
+        return reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public Reservation addUserReservation(final CreateReservationRequest request) {
         final ReservationTime time = reservationTimeRepository.fetchById(request.timeId());
         final Theme theme = themeRepository.fetchById(request.themeId());
         final Member member = memberRepository.fetchById(request.memberId());

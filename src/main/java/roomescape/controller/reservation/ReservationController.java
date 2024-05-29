@@ -58,7 +58,7 @@ public class ReservationController {
 
         final CreateReservationRequest create = CreateReservationRequest.from(request, loginMember);
 
-        final Reservation reservation = reservationService.addReservation(create);
+        final Reservation reservation = reservationService.addUserReservation(create);
         final URI uri = UriComponentsBuilder.fromPath("/reservations/{id}")
                 .buildAndExpand(reservation.getId())
                 .toUri();
@@ -66,8 +66,6 @@ public class ReservationController {
         return ResponseEntity.created(uri)
                 .body(ReservationResponse.from(reservation));
     }
-
-
 
     @GetMapping(value = "/search", params = {"themeId", "memberId", "dateFrom", "dateTo"})
     public List<ReservationResponse> searchReservations(final ReservationSearchCondition request) {
