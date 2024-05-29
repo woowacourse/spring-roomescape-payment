@@ -1,10 +1,8 @@
 package roomescape.client;
 
 public class PaymentException extends RuntimeException {
-    private final TossErrorResponse tossErrorResponse;
 
     public PaymentException(TossErrorResponse tossErrorResponse) {
         super(tossErrorResponse.message());
-        this.tossErrorResponse = tossErrorResponse;
     }
 }

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Login;
-import roomescape.member.dto.LoginMemberInToken;
 import roomescape.client.PaymentClient;
+import roomescape.member.dto.LoginMemberInToken;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
@@ -57,7 +57,8 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        PaymentResponse paymentResponse = paymentClient.paymentReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest)).getBody();
+        PaymentResponse paymentResponse = paymentClient.paymentReservation(getAuthorizations(),
+                PaymentRequest.toRequest(reservationCreateRequest)).getBody();
 
         Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
         ReservationResponse reservationResponse = reservationService.findById(id);
@@ -66,7 +67,7 @@ public class ReservationApiController {
     }
 
     private String getAuthorizations() {
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
