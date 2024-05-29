@@ -1,13 +1,14 @@
 package roomescape.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.Arrays;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentServerException;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 public class TossPaymentClientErrorHandler implements ResponseErrorHandler {
@@ -35,7 +36,12 @@ public class TossPaymentClientErrorHandler implements ResponseErrorHandler {
 
     private enum TossErrorCode {
         FORBIDDEN_REQUEST,
-        UNAUTHORIZED_KEY;
+        UNAUTHORIZED_KEY,
+        FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING,
+        FAILED_INTERNAL_SYSTEM_PROCESSING,
+        UNKNOWN_PAYMENT_ERROR,
+        INCORRECT_BASIC_AUTH_FORMAT,
+        ;
 
         public static boolean shouldConvertToServerError(String errorCode) {
             return Arrays.stream(values())
