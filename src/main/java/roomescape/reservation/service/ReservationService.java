@@ -37,7 +37,6 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse save(ReservationPaymentRequest request) {
-        // DTO
         ReservationRequest reservationRequest = ReservationRequest.from(request);
         Reservation savedReservation = createReservation(reservationRequest);
         paymentService.confirmPayment(PaymentConfirmRequest.from(request));

@@ -1,9 +1,6 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
-import static roomescape.Fixture.JOJO_EMAIL;
-import static roomescape.Fixture.JOJO_NAME;
-import static roomescape.Fixture.JOJO_PASSWORD;
 import static roomescape.Fixture.KAKI_EMAIL;
 import static roomescape.Fixture.KAKI_NAME;
 import static roomescape.Fixture.KAKI_PASSWORD;
@@ -57,21 +54,10 @@ class WaitingReservationControllerTest extends IntegrationTest {
         saveMember(MEMBER_KAKI);
         saveThemeAsHorror();
         saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
 
         WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
-        String jojoToken = getToken(new Member(1L, Role.MEMBER, new MemberName(JOJO_NAME), JOJO_EMAIL, JOJO_PASSWORD));
         String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
-
-        RestAssured.given().log().all()
-                .cookie(CookieUtils.TOKEN_KEY, jojoToken)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(saveRequest))
-                .accept(ContentType.JSON)
-                .when()
-                .post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .header("Location", "/reservations/1");
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, kakiToken)
@@ -85,7 +71,7 @@ class WaitingReservationControllerTest extends IntegrationTest {
                 .header("Location", "/reservations/wait/2");
     }
 
-    @DisplayName("예약 대기을 성공적으로 승인하면 204 응답을 받는다.")
+    @DisplayName("예약 대기를 성공적으로 승인하면 204 응답을 받는다.")
     @Test
     void approveReservation() {
         saveMember(MEMBER_KAKI);
