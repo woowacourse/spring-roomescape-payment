@@ -24,3 +24,8 @@ security:
       expire-length: 3600000
   password:
     salt: 4o0coJC44Iflk5+r9xDsvQ==
+
+payments:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    password: ":"

@@ -1,5 +1,6 @@
 package roomescape.payment;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -11,7 +12,10 @@ import java.util.Base64;
 // TODO: 인터페이스로 분리
 public class PaymentClient {
 
-    private static final String SECRET_KEY = "test_gsk_docs_OaP111z8L5KdmQXkzRz3y47BMw6:";
+    @Value("${payments.toss.secret-key}")
+    private String secretKey;
+    @Value("${payments.toss.password}")
+    private String password;
 
     private final RestClient restClient;
 
@@ -23,8 +27,8 @@ public class PaymentClient {
     }
 
     public ResponseEntity<Void> postPayment(final PaymentRequest paymentRequest) {
-        final String secret = "Basic " + Base64.getEncoder().encodeToString(SECRET_KEY.getBytes());
-
+        final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey+password).getBytes());
+        
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", secret)
