@@ -4,21 +4,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.service.PaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
 
 @RestController
 public class PaymentController {
 
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
-    public PaymentController(PaymentClient paymentClient) {
-        this.paymentClient = paymentClient;
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/confirm/toss")
-    public ResponseEntity<Void> sendConfirmToToss(@RequestBody PaymentRequest paymentRequest) {
-        paymentClient.addPayment(paymentRequest);
+    public ResponseEntity<Void> sendConfirmToToss(@RequestBody PaymentConfirmRequest paymentRequest) {
+        paymentService.sendPaymentConfirmToToss(paymentRequest);
 
         return ResponseEntity.ok().build();
     }
