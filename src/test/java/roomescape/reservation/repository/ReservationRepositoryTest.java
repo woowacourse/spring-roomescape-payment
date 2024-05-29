@@ -81,7 +81,7 @@ class ReservationRepositoryTest {
 
         // When
         final boolean isExist =
-                reservationRepository.existsByDateAndTime_IdAndTheme_Id(reservationDate, timeId, themeId);
+                reservationRepository.existsByDateAndTimeIdAndThemeId(reservationDate, timeId, themeId);
 
         // Then
         assertThat(isExist).isTrue();
@@ -108,7 +108,7 @@ class ReservationRepositoryTest {
         final Long themeId = 1L;
 
         // When
-        final List<Reservation> allByDateAndThemeId = reservationRepository.findAllByDateAndTheme_Id(reservationDate,
+        final List<Reservation> allByDateAndThemeId = reservationRepository.findAllByDateAndThemeId(reservationDate,
                 themeId);
 
         // Then

@@ -80,7 +80,7 @@ public class ReservationWaitingService {
             final ReservationDate date,
             final ReservationTime reservationTime
     ) {
-        if (!reservationRepository.existsByDateAndTime_IdAndTheme_Id(date, reservationTime.getId(), theme.getId())) {
+        if (!reservationRepository.existsByDateAndTimeIdAndThemeId(date, reservationTime.getId(), theme.getId())) {
             throw new IllegalStateException("존재하지 않는 예약에 대한 대기 신청을 할 수 없습니다.");
         }
     }
