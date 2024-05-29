@@ -1,11 +1,15 @@
 package roomescape.config;
 
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import roomescape.payment.PaymentClient;
+import roomescape.support.FakePaymentClient;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class TestConfig {
@@ -16,5 +20,11 @@ public class TestConfig {
         ZoneId zone = ZoneOffset.UTC;
 
         return Clock.fixed(fixedInstant, zone);
+    }
+
+    @Primary
+    @Bean
+    public PaymentClient paymentClient() {
+        return new FakePaymentClient();
     }
 }
