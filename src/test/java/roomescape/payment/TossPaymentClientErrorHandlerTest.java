@@ -2,6 +2,7 @@ package roomescape.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TossPaymentClientErrorHandlerTest {
     private final ObjectMapper objectMapper;
     private final TossPaymentClientErrorHandler tossPaymentClientErrorHandler;
@@ -40,7 +42,7 @@ class TossPaymentClientErrorHandlerTest {
                 .isEqualTo(statusCode);
     }
 
-    private static Stream<Arguments> provideForPaymentClientException() {
+    private Stream<Arguments> provideForPaymentClientException() {
         return Stream.of(
                 Arguments.of(new TossErrorResponse("NOT_FOUND_PAYMENT_SESSION", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."), HttpStatus.NOT_FOUND),
                 Arguments.of(new TossErrorResponse("REJECT_CARD_COMPANY", "결제 승인이 거절되었습니다."), HttpStatus.FORBIDDEN)
@@ -59,7 +61,7 @@ class TossPaymentClientErrorHandlerTest {
                 .hasMessage(tossErrorResponse.message());
     }
 
-    private static Stream<Arguments> provideForPaymentServerException() {
+    private Stream<Arguments> provideForPaymentServerException() {
         return Stream.of(
                 Arguments.of(new TossErrorResponse("FORBIDDEN_REQUEST", "허용되지 않은 요청입니다.")),
                 Arguments.of(new TossErrorResponse("UNAUTHORIZED_KEY", "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."))
