@@ -3,8 +3,6 @@ package roomescape.web.controller.api;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +15,6 @@ import roomescape.service.ReservationService;
 import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.web.auth.Auth;
-import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.web.controller.request.LoginMember;
 import roomescape.web.controller.request.MemberReservationRequest;
 import roomescape.service.request.PaymentApproveDto;
@@ -28,20 +25,16 @@ import roomescape.web.controller.response.ReservationMineResponse;
 @RequestMapping("/reservations")
 public class MemberReservationController {
 
-    private static final Logger log = LoggerFactory.getLogger(MemberReservationController.class);
     private final ReservationService reservationService;
-    private final PaymentManager paymentManager;
 
-    public MemberReservationController(ReservationService reservationService, PaymentManager paymentManager) {
+    public MemberReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentManager = paymentManager;
     }
 
     @PostMapping
     public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest reservationRequest,
                                                              @Valid @Auth LoginMember loginMember) {
         PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
-        paymentManager.approve(request);
 
         ReservationDto appResponse = reservationService.save(
                 new ReservationSaveDto(reservationRequest.date(), reservationRequest.timeId(),
