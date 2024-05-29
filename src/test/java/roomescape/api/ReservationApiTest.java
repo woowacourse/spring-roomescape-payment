@@ -12,14 +12,20 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
+import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.infrastructure.auth.JwtProvider;
+import roomescape.service.booking.reservation.module.PaymentService;
 
 @Sql("/member-theme-time-test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -28,6 +34,9 @@ class ReservationApiTest {
 
     @Autowired
     JwtProvider jwtProvider;
+
+    @MockBean
+    PaymentService paymentService;
 
     @LocalServerPort
     int port;
@@ -39,6 +48,13 @@ class ReservationApiTest {
         String userId = jwtProvider.getSubject(userAccessToken);
 
         UserReservationRequest userReservationRequest = createUserReservationRequest();
+
+        UserReservationPaymentRequest userReservationPaymentRequest = new UserReservationPaymentRequest(
+                LocalDate.now().plusDays(7), 1L, 1L, 1L, "paymentKey", "orderId", 1000, "paymentType");
+
+        PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
+        PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
+        Mockito.when(paymentService.pay(paymentRequest)).thenReturn(paymentResponse);
 
         RestAssured.given().log().all()
                 .port(port)
