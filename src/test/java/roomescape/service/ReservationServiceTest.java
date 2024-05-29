@@ -1,9 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,13 +15,15 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
-import roomescape.support.fixture.MemberFixture;
-import roomescape.support.fixture.ReservationFixture;
-import roomescape.support.fixture.ReservationTimeFixture;
-import roomescape.support.fixture.ReservationWaitingFixture;
-import roomescape.support.fixture.ThemeFixture;
+import roomescape.support.fixture.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ReservationServiceTest extends BaseServiceTest {
 
@@ -84,13 +82,15 @@ class ReservationServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("예약을 추가한다.")
     void addReservation() {
-        CreateReservationRequest request = new CreateReservationRequest(
+        CreateReservationRequest createReservationRequest = new CreateReservationRequest(
                 LocalDate.of(2024, 4, 9),
                 time.getId(),
                 theme.getId(),
-                member.getId(), null, null, 0
+                member.getId()
         );
-        ReservationResponse response = reservationService.addReservation(request);
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000);
+
+        ReservationResponse response = reservationService.addReservation(createReservationRequest, paymentRequest);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.date()).isEqualTo("2024-04-09");

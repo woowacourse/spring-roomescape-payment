@@ -4,15 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Stream;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.controller.BaseControllerTest;
@@ -25,6 +18,10 @@ import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Stream;
 
 class ReservationControllerTest extends BaseControllerTest {
 
@@ -68,7 +65,7 @@ class ReservationControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("지나간 날짜/시간에 대한 예약은 실패한다.")
     void failWhenDateTimePassed() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, null, null, null);
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, "paymentKey", "orderId", 1000);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
@@ -102,7 +99,7 @@ class ReservationControllerTest extends BaseControllerTest {
     @DisplayName("나의 예약들을 조회한다")
     void getMyReservations() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest saveRequest = new ReservationRequest(date, time.getId(), theme.getId(), null, null, null);
+        ReservationRequest saveRequest = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000);
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
@@ -132,7 +129,7 @@ class ReservationControllerTest extends BaseControllerTest {
 
     private void addReservation() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), null, null, null);
+        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
@@ -185,7 +182,7 @@ class ReservationControllerTest extends BaseControllerTest {
     }
 
     private void addReservationFailWhenDuplicatedReservation() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L, null, null, null);
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L, "paymentKey", "orderId", 1000);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)

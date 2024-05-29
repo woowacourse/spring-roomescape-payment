@@ -1,7 +1,6 @@
 package roomescape.controller.api;
 
 import io.restassured.RestAssured;
-import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,8 @@ import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
+
+import java.time.LocalDate;
 
 class ReservationWaitingControllerTest extends BaseControllerTest {
 
@@ -48,7 +49,7 @@ class ReservationWaitingControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("예약 대기를 생성한다.")
     void addReservationWaiting() {
-        ReservationRequest request = new ReservationRequest(LocalDate.parse(RESERVATION_DATE), 1L, 1L, null, null, null);
+        ReservationRequest request = new ReservationRequest(LocalDate.parse(RESERVATION_DATE), 1L, 1L, "paymentKey", "orderId", 1000);
 
         RestAssured.given().log().all()
                 .contentType("application/json")

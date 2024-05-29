@@ -1,13 +1,5 @@
 package roomescape.service;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -23,8 +15,18 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -71,16 +73,29 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addReservation(CreateReservationRequest request) { // todo 시그니처 변경
-        Reservation reservation = createReservation(request);
-        reservation.validateFutureReservation(LocalDateTime.now(clock));
-        validateDuplicatedReservation(reservation);
-        paymentClient.confirm(request.toPaymentRequest());
+    public ReservationResponse addReservationByAdmin(CreateReservationRequest createReservationRequest) {
+        Reservation reservation = createValidatedReservation(createReservationRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation createReservation(CreateReservationRequest request) {
+    @Transactional
+    public ReservationResponse addReservation(CreateReservationRequest createReservationRequest,
+                                              PaymentRequest paymentRequest) {
+        Reservation reservation = createValidatedReservation(createReservationRequest);
+        paymentClient.confirm(paymentRequest);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation createValidatedReservation(CreateReservationRequest createReservationRequest) {
+        Reservation reservation = getReservation(createReservationRequest);
+        reservation.validateFutureReservation(LocalDateTime.now(clock));
+        validateDuplicatedReservation(reservation);
+        return reservation;
+    }
+
+    private Reservation getReservation(CreateReservationRequest request) {
         Member member = getMember(request.memberId());
         ReservationTime reservationTime = getTime(request.timeId());
         Theme theme = getTheme(request.themeId());

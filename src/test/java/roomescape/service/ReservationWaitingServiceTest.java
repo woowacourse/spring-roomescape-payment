@@ -70,7 +70,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     void createReservationWaiting() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
         CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId(), null, null, 0);
+                theme.getId(), prin.getId());
 
         ReservationResponse response = reservationWaitingService.addReservationWaiting(request);
 
@@ -87,7 +87,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     void createReservationWaitingFailWhenReservationNotFound() {
         LocalDate date = LocalDate.parse("2024-05-24");
         CreateReservationRequest request = new CreateReservationRequest(date, time.getId(), theme.getId(),
-                prin.getId(), null, null, 0);
+                prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(NoSuchElementException.class)
@@ -99,7 +99,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     void createReservationWaitingFailWhenAlreadyReserved() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
         CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), reservation.getMember().getId(), null, null, 0);
+                theme.getId(), reservation.getMember().getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -115,7 +115,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
             reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prevWaitingMember));
         }
         CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId(), null, null, 0);
+                theme.getId(), prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -128,7 +128,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.save(notSavedReservation);
         reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prin));
         CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId(), null, null, 0);
+                theme.getId(), prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
