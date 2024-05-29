@@ -72,6 +72,12 @@ public class MemberReservation {
         return status.isNotWaiting();
     }
 
+    public void validatePendingStatus() {
+        if (!status.isPending()) {
+            throw new BadRequestException("해당 예약은 결제 대기 상태가 아닙니다.");
+        }
+    }
+
     public boolean isConfirmationStatus() {
         return status.isConfirmation();
     }
