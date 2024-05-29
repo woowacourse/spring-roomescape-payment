@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +24,12 @@ import roomescape.service.dto.LoginMember;
 import roomescape.service.dto.PaymentRequest;
 import roomescape.service.dto.ReservationBookedResponse;
 import roomescape.service.dto.ReservationConditionRequest;
+import roomescape.service.dto.ReservationPaymentRequest;
+import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationSaveRequest;
 import roomescape.service.dto.UserReservationResponse;
 import roomescape.service.dto.WaitingResponse;
+import roomescape.service.dto.WaitingSaveRequest;
 
 @Service
 public class ReservationService {
@@ -52,9 +55,25 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
-        Member member = findMemberById(reservationSaveRequest.memberId());
-        ReservationSlot slot = reservationSlotService.findSlot(reservationSaveRequest.toSlotRequest());
+    public ReservationResponse saveReservation(ReservationRequest reservationRequest) {
+        return saveReservationWithPayment(reservationRequest, freePayment());
+    }
+
+    private Consumer<ReservationRequest> freePayment() {
+        return request -> {};
+    }
+
+    @Transactional
+    public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
+        return saveReservationWithPayment(reservationPaymentRequest.toReservationRequest(), reservationRequest -> {
+            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+            paymentClient.requestApproval(paymentRequest);
+        });
+    }
+
+    private ReservationResponse saveReservationWithPayment(ReservationRequest reservationRequest, Consumer<ReservationRequest> payment) {
+        Member member = findMemberById(reservationRequest.memberId());
+        ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
         Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
 
         if (optionalReservation.isPresent()) {
@@ -65,11 +84,23 @@ public class ReservationService {
             return ReservationResponse.createByWaiting(waiting);
         }
 
-        PaymentRequest paymentRequest = reservationSaveRequest.toPaymentRequest();
-        paymentClient.requestApproval(paymentRequest);
+        payment.accept(reservationRequest);
 
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
         return ReservationResponse.createByReservation(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponse saveWaiting(WaitingSaveRequest waitingSaveRequest) {
+        Member member = findMemberById(waitingSaveRequest.memberId());
+        ReservationSlot slot = reservationSlotService.findSlot(waitingSaveRequest.toSlotRequest());
+        Reservation reservation = reservationRepository.findBySlot(slot)
+                .orElseThrow(() -> new RoomEscapeBusinessException("예약이 존재하지 않습니다."));
+
+        Waiting waiting = reservation.addWaiting(member);
+
+        waitingRepository.save(waiting);
+        return ReservationResponse.createByWaiting(waiting);
     }
 
     @Transactional(readOnly = true)

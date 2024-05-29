@@ -6,9 +6,9 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
-import roomescape.service.dto.ReservationPaymentRequest;
+import roomescape.service.dto.WaitingSaveRequest;
 
-public record UserReservationSaveRequest(
+public record UserWaitingSaveRequest(
         @NotNull
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
         @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -20,16 +20,9 @@ public record UserReservationSaveRequest(
 
         @NotNull
         @Positive
-        Long themeId,
-
-        Integer amount,
-
-        String orderId,
-
-        String paymentKey
+        Long themeId
 ) {
-
-    public ReservationPaymentRequest toReservationSaveRequest(Long memberId) {
-        return new ReservationPaymentRequest(memberId, date, timeId, themeId, amount, orderId, paymentKey);
+    public WaitingSaveRequest toWaitingSaveRequest(Long memberId) {
+        return new WaitingSaveRequest(memberId, date, timeId, themeId);
     }
 }

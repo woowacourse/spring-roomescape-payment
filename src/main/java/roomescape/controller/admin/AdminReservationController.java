@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.ReservationBookedResponse;
 import roomescape.service.dto.ReservationConditionRequest;
+import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationSaveRequest;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.WaitingResponse;
 
@@ -32,9 +32,9 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> saveReservation(
-            @RequestBody @Valid ReservationSaveRequest reservationSaveRequest
+            @RequestBody @Valid ReservationRequest reservationRequest
     ) {
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveReservation(reservationRequest);
         if (reservationResponse.status() == ReservationStatus.BOOKED) {
             return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                     .body(reservationResponse);

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
-public record ReservationSaveRequest(
+public record WaitingSaveRequest(
         @NotNull
         @Positive
         Long memberId,
@@ -23,24 +23,9 @@ public record ReservationSaveRequest(
 
         @NotNull
         @Positive
-        Long themeId,
-
-        Integer amount,
-
-        String orderId,
-
-        String paymentKey
+        Long themeId
 ) {
-    public ReservationSaveRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        this(memberId, date, timeId, themeId, null, null, null);
-    }
-
     public ReservationSlotRequest toSlotRequest() {
         return new ReservationSlotRequest(date, timeId, themeId);
     }
-
-    public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(amount, orderId, paymentKey);
-    }
 }
-

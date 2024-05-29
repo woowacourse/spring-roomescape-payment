@@ -17,9 +17,11 @@ import roomescape.infrastructure.Login;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.LoginMember;
 import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationSaveRequest;
+import roomescape.service.dto.ReservationPaymentRequest;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
+import roomescape.controller.dto.UserWaitingSaveRequest;
+import roomescape.service.dto.WaitingSaveRequest;
 
 @RestController
 public class ReservationController {
@@ -30,17 +32,29 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping(value = {"/reservations", "/reservations/waiting"})
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Login LoginMember member,
             @RequestBody @Valid UserReservationSaveRequest userReservationSaveRequest
     ) {
-        ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationPaymentRequest reservationPaymentRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
+        ReservationResponse reservationResponse = reservationService.saveReservation(
+                reservationPaymentRequest);
         if (reservationResponse.status() == ReservationStatus.BOOKED) {
             return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                     .body(reservationResponse);
         }
+        return ResponseEntity.created(URI.create("/reservations/waiting/" + reservationResponse.id()))
+                .body(reservationResponse);
+    }
+
+    @PostMapping("/reservations/waiting")
+    public ResponseEntity<ReservationResponse> saveWaiting(
+            @Login LoginMember member,
+            @RequestBody @Valid UserWaitingSaveRequest userWaitingSaveRequest
+    ) {
+        WaitingSaveRequest waitingSaveRequest = userWaitingSaveRequest.toWaitingSaveRequest(member.id());
+        ReservationResponse reservationResponse = reservationService.saveWaiting(waitingSaveRequest);
         return ResponseEntity.created(URI.create("/reservations/waiting/" + reservationResponse.id()))
                 .body(reservationResponse);
     }

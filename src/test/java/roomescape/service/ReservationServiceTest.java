@@ -22,7 +22,7 @@ import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.reservation.slot.ThemeRepository;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationSaveRequest;
+import roomescape.service.dto.ReservationPaymentRequest;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
 import roomescape.service.dto.WaitingResponse;
@@ -52,9 +52,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveReservation(reservationPaymentRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -77,15 +77,15 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Member member1 = memberRepository.save(Member.createUser("고구마1", "email1@email.com", "1234"));
         Member member2 = memberRepository.save(Member.createUser("고구마2", "email2@email.com", "1234"));
 
-        ReservationSaveRequest reservationSaveRequest1 = new ReservationSaveRequest(member1.getId(),
+        ReservationPaymentRequest reservationPaymentRequest1 = new ReservationPaymentRequest(member1.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationSaveRequest reservationSaveRequest2 = new ReservationSaveRequest(member2.getId(),
+        ReservationPaymentRequest reservationPaymentRequest2 = new ReservationPaymentRequest(member2.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
-        ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationSaveRequest1);
+        ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationPaymentRequest1);
 
         // when
-        ReservationResponse reservationResponse2 = reservationService.saveReservation(reservationSaveRequest2);
+        ReservationResponse reservationResponse2 = reservationService.saveReservation(reservationPaymentRequest2);
 
         // then
         assertAll(
@@ -106,10 +106,10 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void timeForSaveReservationNotFound() {
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), 100L, 1L);
         assertThatThrownBy(() -> {
-            reservationService.saveReservation(reservationSaveRequest);
+            reservationService.saveReservation(reservationPaymentRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -141,10 +141,10 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("한 사람이 중복된 예약을 할 수 없다.")
     @Test
     void saveDuplicatedReservation() {
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(1L, LocalDate.parse("2024-05-04"),
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L, LocalDate.parse("2024-05-04"),
                 1L, 1L);
 
-        assertThatThrownBy(() -> reservationService.saveReservation(reservationSaveRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -190,16 +190,16 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Member member3 = memberRepository.save(Member.createUser("고구마3", "email3@email.com", "1234"));
         Member member2 = memberRepository.save(Member.createUser("고구마2", "email2@email.com", "1234"));
 
-        ReservationSaveRequest reservationSaveRequest1 = new ReservationSaveRequest(member1.getId(),
+        ReservationPaymentRequest reservationPaymentRequest1 = new ReservationPaymentRequest(member1.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationSaveRequest reservationSaveRequest2 = new ReservationSaveRequest(member2.getId(),
+        ReservationPaymentRequest reservationPaymentRequest2 = new ReservationPaymentRequest(member2.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationSaveRequest reservationSaveRequest3 = new ReservationSaveRequest(member3.getId(),
+        ReservationPaymentRequest reservationPaymentRequest3 = new ReservationPaymentRequest(member3.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
-        Long reservationId = reservationService.saveReservation(reservationSaveRequest1).id();
-        reservationService.saveReservation(reservationSaveRequest2);
-        reservationService.saveReservation(reservationSaveRequest3);
+        Long reservationId = reservationService.saveReservation(reservationPaymentRequest1).id();
+        reservationService.saveReservation(reservationPaymentRequest2);
+        reservationService.saveReservation(reservationPaymentRequest3);
 
         // when
         reservationService.cancelReservation(reservationId);
