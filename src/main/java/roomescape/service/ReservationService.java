@@ -21,6 +21,7 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
@@ -29,7 +30,7 @@ import roomescape.service.dto.response.ReservationResponse;
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    private final PaymentService paymentService;
+    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -38,7 +39,7 @@ public class ReservationService {
     private final Clock clock;
 
     public ReservationService(
-            PaymentService paymentService,
+            PaymentClient paymentClient,
             ReservationRepository reservationRepository,
             ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
@@ -46,7 +47,7 @@ public class ReservationService {
             MemberRepository memberRepository,
             Clock clock
     ) {
-        this.paymentService = paymentService;
+        this.paymentClient = paymentClient;
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -74,7 +75,7 @@ public class ReservationService {
         Reservation reservation = createReservation(request);
         reservation.validateFutureReservation(LocalDateTime.now(clock));
         validateDuplicatedReservation(reservation);
-        paymentService.pay(request.toPaymentRequest());
+        paymentClient.confirm(request.toPaymentRequest());
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
