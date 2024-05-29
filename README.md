@@ -104,7 +104,11 @@
 {
   "date": "2021-07-01",
   "timeId": 1,
-  "themeId": 1
+  "themeId": 1,
+  "status": "예약",
+  "paymentKey": "paymentKey",
+  "orderId": "orderId",
+  "amount": 1000
 }
 ```
 
