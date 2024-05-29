@@ -3,9 +3,9 @@ package roomescape.payment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.HttpClientErrorException;
 import roomescape.IntegrationTestSupport;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.exception.PaymentException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -20,6 +20,7 @@ class PaymentClientTest extends IntegrationTestSupport {
         final PaymentRequest paymentRequest = new PaymentRequest("invalidPaymentKey", "MC40ODQxNTkyMjA5Mjcx", 10011L);
 
         assertThatThrownBy(() -> paymentClient.postPayment(paymentRequest))
-                .isInstanceOf(PaymentException.class);
+                .isInstanceOf(HttpClientErrorException.class)
+                .hasMessageContaining("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
     }
 }
