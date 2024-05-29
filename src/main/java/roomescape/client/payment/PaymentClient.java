@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.client.payment;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -6,24 +6,21 @@ import org.json.JSONException;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
+import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.PaymentException;
-import roomescape.payment.dto.PaymentConfirmFromTossDto;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.PaymentConfirmToTossDto;
 
-
-public class PaymentService {
+public class PaymentClient {
 
     private final String widgetSecretKey;
     private final RestClient restClient;
 
-    public PaymentService(String widgetSecretKey, RestClient restClient) {
+    public PaymentClient(String widgetSecretKey, RestClient restClient) {
         this.widgetSecretKey = widgetSecretKey;
         this.restClient = restClient;
     }
 
-    public void sendPaymentConfirmToToss(PaymentConfirmRequest paymentRequest) throws JSONException {
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(paymentRequest);
+    public void sendPaymentConfirmToToss(PaymentConfirmToTossDto paymentConfirmToTossDto) throws JSONException {
 
         Base64.Encoder encoder = Base64.getEncoder();
         String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());

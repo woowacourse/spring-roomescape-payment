@@ -1,4 +1,4 @@
-package roomescape.payment.dto;
+package roomescape.client.payment.dto;
 
 public record PaymentConfirmFromTossDto(String code, String message) {
 }

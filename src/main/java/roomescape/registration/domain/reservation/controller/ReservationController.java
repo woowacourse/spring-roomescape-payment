@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
-import roomescape.registration.domain.reservation.service.ReservationService;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.PaymentClient;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
+import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.dto.RegistrationDto;
 
 @RestController
@@ -24,23 +26,25 @@ import roomescape.registration.dto.RegistrationDto;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentClient paymentClient;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentClient paymentClient) {
         this.reservationService = reservationService;
+        this.paymentClient = paymentClient;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
                                                                @LoginMemberId long id) {
-        RegistrationDto registrationDto = new RegistrationDto(
-                reservationRequest.date(),
-                reservationRequest.themeId(),
-                reservationRequest.timeId(),
-                id);
+        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
+        paymentClient.sendPaymentConfirmToToss(paymentConfirmToTossDto);
+
+        RegistrationDto registrationDto = RegistrationDto.of(reservationRequest, id);
+        ReservationResponse reservationResponse = reservationService.addReservation(registrationDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(reservationService.addReservation(registrationDto));
+                .body(reservationResponse);
     }
 
     @GetMapping
