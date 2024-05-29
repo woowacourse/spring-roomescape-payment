@@ -33,12 +33,6 @@ public class AdminReservationController {
                 .body(ReservationResponse.from(reservation));
     }
 
-    @PostMapping("/admin/reservations/{idWaiting}")
-    public ResponseEntity<ReservationResponse> approveWaiting(@PathVariable("idWaiting") Long waitingId) {
-        Reservation reservation = reservationService.approveWaiting(waitingId);
-        return ResponseEntity.ok(ReservationResponse.from(reservation));
-    }
-
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ReservationResponse>> findAllReservations() {
         List<ReservationResponse> response = reservationService.findAllReservationsWithoutCancel();

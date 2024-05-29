@@ -23,7 +23,6 @@ import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailFactory;
-import roomescape.exception.reservation.ReservationException;
 
 @Service
 @RequiredArgsConstructor
@@ -92,20 +91,5 @@ public class ReservationService {
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
-    }
-
-    @Transactional
-    public Reservation approveWaiting(Long waitingId) {
-        Reservation waiting = reservationRepository.getById(waitingId);
-        rejectIfAnyReservationExist(waiting);
-        return waiting.approve();
-    }
-
-    private void rejectIfAnyReservationExist(Reservation reservation) {
-        boolean reservationExists = reservationRepository.existsByDetailAndStatus(
-                reservation.getDetail(), Status.RESERVED);
-        if (reservationExists) {
-            throw new ReservationException("다른 예약이 존재합니다.");
-        }
     }
 }
