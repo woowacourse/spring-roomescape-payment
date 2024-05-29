@@ -13,6 +13,17 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans
+
 
 security:
   jwt:
