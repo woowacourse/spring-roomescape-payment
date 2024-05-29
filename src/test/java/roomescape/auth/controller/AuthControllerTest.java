@@ -1,5 +1,7 @@
 package roomescape.auth.controller;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,15 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 
-import static org.hamcrest.Matchers.is;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AuthControllerTest {
 
     @Autowired
@@ -158,8 +159,8 @@ class AuthControllerTest {
     void loginCheckWithExpiredTokenTest() {
         // Given
         final String expiredToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0I" +
-                "joxNzE1MzY1ODI2LCJleHAiOjE3MTUzNjU4MjYsInJvbGUiOiJVU0VSIn0." +
-                "mLgs2dqD9oCOUtleHtpcmf4tTw39bC9pmqFaUBPQZy9ADPsgRXEu3qhLS8qqs3UiV6MPmP_03FaZHX8UrieK4A";
+                                    "joxNzE1MzY1ODI2LCJleHAiOjE3MTUzNjU4MjYsInJvbGUiOiJVU0VSIn0." +
+                                    "mLgs2dqD9oCOUtleHtpcmf4tTw39bC9pmqFaUBPQZy9ADPsgRXEu3qhLS8qqs3UiV6MPmP_03FaZHX8UrieK4A";
 
         // When & Then
         RestAssured.given().log().all()

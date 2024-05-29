@@ -1,10 +1,15 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.model.Reservation;
@@ -13,15 +18,7 @@ import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.Theme;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@DataJpaTest
 class ReservationRepositoryTest {
 
     @Autowired
@@ -47,7 +44,8 @@ class ReservationRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(1L, LocalTime.of(10, 10));
         final Theme theme = new Theme(1L, "테바의 비밀친구", "테바의 은밀한 비밀친구", "대충 테바 사진 링크");
         final Member member = new Member(1L, MemberRole.USER, "password1111", "kelly", "kelly6bf@mail.com");
-        final Reservation reservation = new Reservation(reservationStatus, reservationDate, reservationTime, theme, member);
+        final Reservation reservation = new Reservation(reservationStatus, reservationDate, reservationTime, theme,
+                member);
 
         // When
         final Reservation savedReservation = reservationRepository.save(reservation);
@@ -111,7 +109,8 @@ class ReservationRepositoryTest {
         final Long themeId = 1L;
 
         // When
-        final List<Reservation> allByDateAndThemeId = reservationRepository.findAllByDateAndTheme_Id(reservationDate, themeId);
+        final List<Reservation> allByDateAndThemeId = reservationRepository.findAllByDateAndTheme_Id(reservationDate,
+                themeId);
 
         // Then
         assertThat(allByDateAndThemeId).hasSize(2);

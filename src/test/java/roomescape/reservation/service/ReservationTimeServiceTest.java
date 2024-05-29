@@ -1,26 +1,26 @@
 package roomescape.reservation.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import roomescape.reservation.dto.SaveReservationTimeRequest;
-import roomescape.reservation.dto.ReservationTimeDto;
-import roomescape.reservation.model.ReservationTime;
-import roomescape.reservation.model.ReservationTimeAvailabilities;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.reservation.dto.ReservationTimeDto;
+import roomescape.reservation.dto.SaveReservationTimeRequest;
+import roomescape.reservation.model.ReservationTime;
+import roomescape.reservation.model.ReservationTimeAvailabilities;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ReservationTimeServiceTest {
 
     @Autowired
@@ -44,7 +44,8 @@ class ReservationTimeServiceTest {
         final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(startAt);
 
         // When
-        final ReservationTimeDto reservationTime = reservationTimeService.saveReservationTime(saveReservationTimeRequest);
+        final ReservationTimeDto reservationTime = reservationTimeService.saveReservationTime(
+                saveReservationTimeRequest);
 
         // Then
         final List<ReservationTimeDto> reservationTimes = reservationTimeService.getReservationTimes();
@@ -70,7 +71,8 @@ class ReservationTimeServiceTest {
     @Test
     void throwExceptionWhenExistReservationTimeTest() {
         // Given
-        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(LocalTime.of(9, 30));
+        final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(
+                LocalTime.of(9, 30));
         // When & Then
         assertThatThrownBy(() -> reservationTimeService.saveReservationTime(saveReservationTimeRequest))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -96,7 +98,8 @@ class ReservationTimeServiceTest {
         final Long themeId = 10L;
 
         // When
-        final ReservationTimeAvailabilities availableReservationTimes = reservationTimeService.getAvailableReservationTimes(date, themeId);
+        final ReservationTimeAvailabilities availableReservationTimes = reservationTimeService.getAvailableReservationTimes(
+                date, themeId);
 
         // Then
         final Map<ReservationTime, Boolean> values = availableReservationTimes.values();

@@ -12,16 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.auth.token.TokenProvider;
 import roomescape.config.TestPaymentGatewayConfig;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.SaveReservationRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Import(TestPaymentGatewayConfig.class)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ReservationControllerTest {
 
     @Autowired
@@ -36,8 +36,8 @@ class ReservationControllerTest {
     }
 
     @DisplayName("예약 정보를 저장한다.")
-    @Sql("classpath:test-payment-credential-data.sql")
     @Test
+    @Sql("classpath:test-payment-credential-data.sql")
     void saveReservationTest() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),

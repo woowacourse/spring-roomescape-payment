@@ -1,20 +1,20 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.reservation.dto.SearchReservationsParams;
 import roomescape.reservation.model.Reservation;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class CustomReservationRepositoryTest {
 
     @Autowired
@@ -73,7 +73,8 @@ class CustomReservationRepositoryTest {
         final long themeId = 11L;
         final LocalDate from = LocalDate.now().minusDays(7);
         final LocalDate to = LocalDate.now().plusDays(1);
-        final SearchReservationsParams searchReservationsParams = new SearchReservationsParams(memberId, themeId, from, to);
+        final SearchReservationsParams searchReservationsParams = new SearchReservationsParams(memberId, themeId, from,
+                to);
 
         // When
         final List<Reservation> reservations = customReservationRepository.searchReservations(searchReservationsParams);
