@@ -56,9 +56,7 @@ public class ReservationController {
             @RequestBody @Valid final UserCreateReservationRequest request,
             @Valid final LoginMember loginMember) {
 
-        //TODO 너무 파라미터가 너무 많다. 리팩터링 필요
-        final CreateReservationRequest create = new CreateReservationRequest(loginMember.id(),
-                request.themeId(), request.date(), request.timeId(), request.paymentKey(), request.orderId(), request.amount());
+        final CreateReservationRequest create = CreateReservationRequest.from(request, loginMember);
 
         final Reservation reservation = reservationService.addReservation(create);
         final URI uri = UriComponentsBuilder.fromPath("/reservations/{id}")
