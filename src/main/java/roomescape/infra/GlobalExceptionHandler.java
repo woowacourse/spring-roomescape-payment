@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import roomescape.exception.PaymentException;
-import roomescape.exception.global.GlobalExceptionCode;
 import roomescape.exception.RoomEscapeException;
+import roomescape.exception.global.GlobalExceptionCode;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

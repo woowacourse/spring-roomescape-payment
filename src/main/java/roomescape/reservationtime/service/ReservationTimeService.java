@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
+import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
-import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 
 @Service

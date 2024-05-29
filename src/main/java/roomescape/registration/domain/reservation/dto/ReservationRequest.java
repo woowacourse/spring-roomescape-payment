@@ -10,8 +10,4 @@ public record ReservationRequest(
         String paymentKey,
         String orderId,
         Integer amount) {
-
-    public ReservationRequest(LocalDate date, Long themeId, Long timeId) {
-        this(date, themeId, timeId, "test", "test", "test", 1);
-    }
 }

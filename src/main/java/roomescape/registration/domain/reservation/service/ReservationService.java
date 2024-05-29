@@ -17,7 +17,6 @@ import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;

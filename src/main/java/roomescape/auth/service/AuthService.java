@@ -5,8 +5,8 @@ import roomescape.auth.domain.Token;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.provider.model.TokenProvider;
 import roomescape.exception.RoomEscapeException;
-import roomescape.member.domain.Member;
 import roomescape.exception.model.MemberExceptionCode;
+import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 
 @Service

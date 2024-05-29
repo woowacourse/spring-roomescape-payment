@@ -26,7 +26,4 @@ public abstract class IntegrationTest {
     void init() {
         RestAssured.port = port;
     }
-
 }
-
-

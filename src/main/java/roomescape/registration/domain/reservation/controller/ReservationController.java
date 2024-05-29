@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.dto.RegistrationDto;
 
-@RestController
 @RequestMapping("/reservations")
+@RestController
 public class ReservationController {
 
     private final ReservationService reservationService;

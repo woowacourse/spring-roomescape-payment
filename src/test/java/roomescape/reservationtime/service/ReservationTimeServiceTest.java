@@ -1,7 +1,6 @@
 package roomescape.reservationtime.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,17 +20,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.exception.RoomEscapeException;
+import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
-import roomescape.vo.Name;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
-import roomescape.theme.domain.Theme;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
-import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.vo.Name;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceTest {
