@@ -1,6 +1,6 @@
 package roomescape.domain.reservation;
 
-public record ReservationWithRank(Reservation reservation, long rank) {
+public record ReservationWithRank(Reservation reservation, Long rank) {
     public boolean isReserved() {
         return reservation.isReserved();
     }

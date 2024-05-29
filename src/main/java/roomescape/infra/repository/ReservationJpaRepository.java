@@ -60,11 +60,9 @@ public interface ReservationJpaRepository extends
                 (select count(r) + 1 from Reservation r
                 where r.createdAt < mine.createdAt
                 and r.detail = mine.detail
-                and r.status = roomescape.domain.reservation.Status.WAITING))
+                and r.status = 'WAITING'))
             from Reservation mine
             where mine.member.id = :memberId
-            and mine.status in (roomescape.domain.reservation.Status.RESERVED,
-                                    roomescape.domain.reservation.Status.WAITING)
             and (mine.detail.date > current_date or (mine.detail.date = current_date
                 and mine.detail.time.startAt > current_time))
             """)
@@ -74,5 +72,5 @@ public interface ReservationJpaRepository extends
     boolean existsByDetailAndMemberAndStatusNot(ReservationDetail detail, Member member, Status status);
 
     @Override
-    boolean existsByDetailAndStatus(ReservationDetail reservationDetail, Status status);
+    boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
 }

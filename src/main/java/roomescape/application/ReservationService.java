@@ -1,7 +1,6 @@
 package roomescape.application;
 
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,18 +70,8 @@ public class ReservationService {
     public List<UserReservationResponse> findAllWithRank(Long memberId) {
         List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(memberId);
 
-        List<UserReservationResponse> reservations = reservationWithRanks.stream()
-                .filter(ReservationWithRank::isReserved)
-                .map(ReservationWithRank::reservation)
+        return reservationWithRanks.stream()
                 .map(UserReservationResponse::from)
-                .toList();
-
-        List<UserReservationResponse> waitings = reservationWithRanks.stream()
-                .filter(ReservationWithRank::isWaiting)
-                .map(UserReservationResponse::from)
-                .toList();
-
-        return Stream.concat(reservations.stream(), waitings.stream())
                 .toList();
     }
 

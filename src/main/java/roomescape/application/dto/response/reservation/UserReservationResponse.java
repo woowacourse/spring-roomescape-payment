@@ -10,26 +10,17 @@ public record UserReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        Long rank
 ) {
 
-    public static UserReservationResponse from(Reservation reservation) {
+    public static UserReservationResponse from(ReservationWithRank reservation) {
         return new UserReservationResponse(
-                reservation.getId(),
-                reservation.getDetail().getTheme().getName(),
-                reservation.getDetail().getDate(),
-                reservation.getDetail().getTime().getStartAt(),
-                "예약");
-    }
-
-    public static UserReservationResponse from(ReservationWithRank reservationWithRank) {
-        Reservation reservation = reservationWithRank.reservation();
-        long rank = reservationWithRank.rank();
-        return new UserReservationResponse(
-                reservation.getId(),
-                reservation.getDetail().getTheme().getName(),
-                reservation.getDetail().getDate(),
-                reservation.getDetail().getTime().getStartAt(),
-                String.format("%d번째 예약 대기", rank));
+                reservation.reservation().getId(),
+                reservation.reservation().getDetail().getTheme().getName(),
+                reservation.reservation().getDetail().getDate(),
+                reservation.reservation().getDetail().getTime().getStartAt(),
+                reservation.reservation().getStatus().name(),
+                reservation.rank());
     }
 }

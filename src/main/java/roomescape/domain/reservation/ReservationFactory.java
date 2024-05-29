@@ -1,6 +1,7 @@
 package roomescape.domain.reservation;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationdetail.ReservationDetail;
@@ -30,8 +31,7 @@ public class ReservationFactory {
     }
 
     private Reservation getReservation(ReservationDetail detail, Member member) {
-        // TODO: 예약, 결제 대기 모두 걸러야 함
-        if (reservationRepository.existsByDetailAndStatus(detail, Status.RESERVED)) {
+        if (reservationRepository.existsByDetailAndStatusIn(detail, List.of(Status.RESERVED, Status.PAYMENT_PENDING))) {
             return new Reservation(member, detail, Status.WAITING);
         }
         return new Reservation(member, detail, Status.RESERVED);

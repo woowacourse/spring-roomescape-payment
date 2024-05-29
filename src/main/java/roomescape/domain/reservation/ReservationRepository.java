@@ -27,7 +27,7 @@ public interface ReservationRepository {
 
     boolean existsByDetailAndMemberAndStatusNot(ReservationDetail detail, Member member, Status status);
 
-    boolean existsByDetailAndStatus(ReservationDetail reservationDetail, Status status);
+    boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
 
     Optional<Reservation> findNextWaitingReservation(ReservationDetail detail);
 }
