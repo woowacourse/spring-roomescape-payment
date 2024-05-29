@@ -1,14 +1,7 @@
 package roomescape.global.exception;
 
-public class ErrorResponse {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-    private final String message;
-
-    public ErrorResponse(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ErrorResponse(String message) {
 }
