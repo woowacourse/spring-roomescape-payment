@@ -48,8 +48,9 @@ public class MockReservationTest {
         ReservationResponse reservationResponse = new ReservationResponse(1L, memberResponse,
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 
-        given(reservationService.createByClient(any(), any())).willReturn(reservationResponse);
+        given(reservationService.checkAvailableReservation(any(), any())).willReturn(null);
         given(paymentService.payment(any())).willReturn(paymentInfo);
+        given(reservationService.confirmReservationByClient(any())).willReturn(reservationResponse);
 
         String jsonRequest = """
                  {

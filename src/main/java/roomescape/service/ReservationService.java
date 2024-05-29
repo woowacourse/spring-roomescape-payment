@@ -89,14 +89,17 @@ public class ReservationService {
         return ReservationResponse.from(createdReservation);
     }
 
-    public ReservationResponse createByClient(Long memberId, MemberReservationRequest reservationRequest) {
+    public Reservation checkAvailableReservation(Long memberId, MemberReservationRequest reservationRequest) {
         Member member = memberService.findMemberById(memberId);
         TimeSlot timeSlot = timeService.findTimeSlotById(reservationRequest.timeId());
         Theme theme = themeService.findThemeById(reservationRequest.themeId());
 
         validate(reservationRequest.date(), timeSlot, theme, member);
 
-        Reservation reservation = reservationRequest.toEntity(member, timeSlot, theme);
+        return reservationRequest.toEntity(member, timeSlot, theme);
+    }
+
+    public ReservationResponse confirmReservationByClient(Reservation reservation) {
         Reservation createdReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(createdReservation);
     }
