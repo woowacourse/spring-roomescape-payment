@@ -2,6 +2,7 @@ package roomescape.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,12 @@ public class PaymentService {
 
     private static final String AUTHORIZATION_PREFIX = "Basic ";
     private static final String TOSS_PAYMENTS_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String TOSS_PAYMENTS_TEST_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
+    private final String tossPaymentTestKey;
     private final RestClient restClient;
 
-    public PaymentService() {
+    public PaymentService(@Value("${toss-payment.test-secret-key}") String key) {
+        this.tossPaymentTestKey = key + ":";
         this.restClient = RestClient.builder()
             .baseUrl(TOSS_PAYMENTS_URL)
             .build();
@@ -26,7 +28,7 @@ public class PaymentService {
 
     public void pay(PaymentRequestDto dto) {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((TOSS_PAYMENTS_TEST_KEY + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode(tossPaymentTestKey.getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTHORIZATION_PREFIX + new String(encodedBytes);
 
         restClient.post()
