@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import roomescape.payment.exception.PaymentClientException;
+import roomescape.payment.exception.PaymentServerException;
 import roomescape.security.exception.AccessDeniedException;
 import roomescape.security.exception.UnauthorizedException;
 
@@ -98,6 +100,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("[DataIntegrityViolationException]", e);
         return new ErrorResponse("이미 존재하는 데이터입니다.");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handlePaymentClientException(PaymentClientException e) {
+        log.error("[PaymentClientException]", e);
+        return ResponseEntity.status(e.getStatusCode())
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlePaymentServerException(PaymentServerException e) {
+        log.error("[PaymentServerException]", e);
+        return new ErrorResponse("결제 승인 오류입니다. 관리자에게 문의하세요.");
     }
 
     @ExceptionHandler
