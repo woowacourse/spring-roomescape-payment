@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.reservation.dto.AdminReservationRequest;
+import roomescape.service.reservation.dto.ReservationRequest;
 
 @Sql("/truncate-with-reservations.sql")
 class AdminReservationAcceptanceTest extends AcceptanceTest {
@@ -95,6 +97,35 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
             .assertThat().statusCode(200).body("size()", is(1));
     }
 
+    @DisplayName("어드민이 예약을 취소한다.")
+    @TestFactory
+    Stream<DynamicTest> deleteReservationByAdmin() {
+        AtomicLong reservationId = new AtomicLong();
+        return Stream.of(
+            DynamicTest.dynamicTest("예약을 저장하고, 식별자를 가져온다.", () -> {
+                reservationId.set((int) RestAssured.given().contentType(ContentType.JSON)
+                    .cookie("token", guestToken)
+                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                    .when().post("/reservations")
+                    .then().extract().body().jsonPath().get("id"));
+            }),
+            DynamicTest.dynamicTest("예약을 삭제한다.", () -> {
+                RestAssured.given().log().all()
+                    .cookie("token", adminToken)
+                    .when().delete("/admin/reservations/" + reservationId)
+                    .then().log().all()
+                    .assertThat().statusCode(204);
+            }),
+            DynamicTest.dynamicTest("남은 예약 개수는 총 3개이다.", () -> {
+                RestAssured.given().log().all()
+                    .cookie("token", adminToken)
+                    .when().get("/reservations")
+                    .then().log().all()
+                    .assertThat().body("size()", is(3));
+            })
+        );
+    }
+
     @DisplayName("어드민은 이미 일정이 지난 예약을 삭제할 수 없다.")
     @TestFactory
     @Sql(value = {"/truncate-with-admin-and-guest.sql", "/insert-past-reservation.sql"})
@@ -107,6 +138,29 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
                     .when().delete("/admin/reservations/" + reservationId)
                     .then().log().all()
                     .assertThat().statusCode(400).body("message", is("이미 지난 예약은 삭제할 수 없습니다."));
+            })
+        );
+    }
+
+    @DisplayName("사용자는 예약을 취소할 수 없다.")
+    @TestFactory
+    Stream<DynamicTest> cannotDeleteReservationByGuest() {
+        AtomicLong reservationId = new AtomicLong();
+        return Stream.of(
+            DynamicTest.dynamicTest("예약을 저장하고, 식별자를 가져온다.", () -> {
+                reservationId.set((int) RestAssured.given().contentType(ContentType.JSON)
+                    .cookie("token", guestToken)
+                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                    .when().post("/reservations")
+                    .then().extract().body().jsonPath().get("id"));
+            }),
+            DynamicTest.dynamicTest("예약을 삭제한다.", () -> {
+                RestAssured.given().log().all()
+                    .cookie("token", guestToken)
+                    .when().delete("/admin/reservations/" + reservationId)
+                    .then().log().all()
+                    .assertThat().statusCode(403)
+                    .body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
             })
         );
     }
