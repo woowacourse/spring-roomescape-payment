@@ -39,3 +39,13 @@ create table if not exists reservation
     foreign key (time_id) references reservation_time (id),
     foreign key (theme_id) references theme (id)
 );
+
+create table if not exists reservation_payments
+(
+    order_id varchar(50) not null,
+    reservation_id bigint not null,
+    payment_key varchar(50) not null,
+    amount bigint not null,
+    primary key (order_id),
+    foreign key (reservation_id) references reservation (id)
+);
