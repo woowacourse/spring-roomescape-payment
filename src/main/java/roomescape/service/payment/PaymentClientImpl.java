@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -20,22 +21,23 @@ import roomescape.service.payment.dto.PaymentConfirmResponse;
 @Component
 public class PaymentClientImpl implements PaymentClient {
     private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String BASIC_DELIMITER = ":";
     private static final String AUTH_HEADER_PREFIX = "Basic ";
-
-    private final RestClient restClient;
+    private final String secretKey;
     private final ObjectMapper objectMapper;
+    private final RestClient restClient;
 
-    public PaymentClientImpl(ObjectMapper objectMapper) {
-        this.restClient = RestClient.builder().build();
+    public PaymentClientImpl(@Value("${payment.secret-key}") String secretKey,
+                             ObjectMapper objectMapper) {
+        this.secretKey = secretKey;
         this.objectMapper = objectMapper;
+        this.restClient = RestClient.builder().build();
     }
 
     @Override
     public PaymentConfirmResponse confirmPayment(PaymentConfirmRequest confirmRequest) {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((SECRET_KEY + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((secretKey + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
 
         return restClient.method(HttpMethod.POST)
