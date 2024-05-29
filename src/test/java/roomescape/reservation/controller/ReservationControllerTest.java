@@ -44,6 +44,7 @@ class ReservationControllerTest extends ControllerTest {
 
     @Autowired
     TokenProvider tokenProvider;
+
     @SpyBean
     PaymentWithRestClient paymentWithRestClient;
 
@@ -57,11 +58,11 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("사용자 예약 생성 시 201을 반환한다.")
     @Test
     void create() {
+        //given
         BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
                 .when(paymentWithRestClient)
                 .confirm(any());
 
-        //given
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeRequest("10:00"));
         ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));

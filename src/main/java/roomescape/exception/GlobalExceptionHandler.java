@@ -1,5 +1,6 @@
 package roomescape.exception;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ConflictException;
@@ -50,6 +52,14 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ExceptionResponse("중복된 데이터 요청입니다."));
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ExceptionResponse> handleHttpClientErrorException(HttpClientErrorException e) {
+        log.error(e.getMessage());
+        ClientErrorDto clientErrorDto = e.getResponseBodyAs(ClientErrorDto.class);
+        return ResponseEntity.status(e.getStatusCode())
+                .body(new ExceptionResponse(clientErrorDto.message()));
     }
 
     @ExceptionHandler(Exception.class)

@@ -42,8 +42,6 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
                                                       @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
-
-//        reservationService.validateAmount(reservationPaymentRequest); // TODO 예약 확정 전에 검증하는게 좋을듯
         ReservationResponse response = reservationService.reserve(reservationPaymentRequest, authInfo.getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);

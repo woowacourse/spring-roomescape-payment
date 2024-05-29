@@ -122,7 +122,7 @@ public class ReservationService {
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
         PaymentResponse paymentResponse = paymentWithRestClient.confirm(paymentRequest);
 
-        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) { // TODO 리팩
+        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
 
