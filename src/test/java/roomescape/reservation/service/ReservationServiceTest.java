@@ -27,7 +27,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.ReservationWithRank;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.dto.request.ReservationSaveRequest;
+import roomescape.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.reservation.dto.response.MemberReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -65,7 +65,9 @@ class ReservationServiceTest {
         Theme horror = themeRepository.save(HORROR_THEME);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        ReservationSaveRequest saveRequest = new ReservationSaveRequest(jojo.getId(), TODAY, horror.getId(), 1L);
+        ReservationPaymentRequest saveRequest = new ReservationPaymentRequest(
+                jojo.getId(), TODAY, horror.getId(), 1L, "paymentKey", "orderId", 1000L
+        );
 
         assertThatThrownBy(() -> reservationService.save(saveRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -78,11 +80,8 @@ class ReservationServiceTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        ReservationSaveRequest saveRequest = new ReservationSaveRequest(
-                jojo.getId(),
-                TODAY,
-                horror.getId(),
-                hour10.getId()
+        ReservationPaymentRequest saveRequest = new ReservationPaymentRequest(
+                jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
         );
 
         reservationService.save(saveRequest);

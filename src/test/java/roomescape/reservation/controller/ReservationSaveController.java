@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.common.config.IntegrationTest;
 import roomescape.common.util.CookieUtils;
-import roomescape.reservation.dto.request.ReservationDetailRequest;
+import roomescape.reservation.dto.request.ReservationPaymentSaveRequest;
 import roomescape.reservation.service.PaymentService;
 
 @AutoConfigureMockMvc
@@ -41,7 +41,7 @@ public class ReservationSaveController extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationDetailRequest reservationDetailRequest = new ReservationDetailRequest(
+        ReservationPaymentSaveRequest reservationPaymentSaveRequest = new ReservationPaymentSaveRequest(
                 LocalDate.now(), 1L, 1L, "paymentKey", "orderId", 1000L
         );
 
@@ -50,7 +50,7 @@ public class ReservationSaveController extends IntegrationTest {
         mockMvc.perform(post("/reservations")
                         .cookie(new Cookie(CookieUtils.TOKEN_KEY, getMemberToken()))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(reservationDetailRequest)))
+                        .content(objectMapper.writeValueAsString(reservationPaymentSaveRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string(HttpHeaders.LOCATION, "/reservations/1"));
     }

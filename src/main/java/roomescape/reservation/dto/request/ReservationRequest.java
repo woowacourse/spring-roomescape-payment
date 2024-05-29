@@ -8,19 +8,27 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 
-public record ReservationSaveRequest(
+public record ReservationRequest(
         @NotNull Long memberId,
         @NotNull LocalDate date,
         @NotNull Long themeId,
         @NotNull Long timeId
 ) {
-
-    public static ReservationSaveRequest of(ReservationDetailRequest detail, Long memberId) {
-        return new ReservationSaveRequest(
+    public static ReservationRequest of(ReservationPaymentSaveRequest detail, Long memberId) {
+        return new ReservationRequest(
                 memberId,
                 detail.date(),
                 detail.themeId(),
                 detail.timeId()
+        );
+    }
+
+    public static ReservationRequest from(ReservationPaymentRequest request) {
+        return new ReservationRequest(
+                request.memberId(),
+                request.date(),
+                request.themeId(),
+                request.timeId()
         );
     }
 

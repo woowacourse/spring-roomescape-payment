@@ -7,8 +7,8 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.request.PaymentConfirmRequest;
-import roomescape.reservation.dto.request.ReservationDetailRequest;
-import roomescape.reservation.dto.request.ReservationSaveRequest;
+import roomescape.reservation.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.dto.response.MemberReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -36,21 +36,22 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse save(ReservationDetailRequest detailRequest, long memberId) {
-        ReservationSaveRequest saveRequest = ReservationSaveRequest.of(detailRequest, memberId);
-        Reservation savedReservation = createReservation(saveRequest);
-        paymentService.confirmPayment(PaymentConfirmRequest.from(detailRequest));
+    public ReservationResponse save(ReservationPaymentRequest request) {
+        // DTO
+        ReservationRequest reservationRequest = ReservationRequest.from(request);
+        Reservation savedReservation = createReservation(reservationRequest);
+        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
 
         return ReservationResponse.toResponse(savedReservation);
     }
 
     @Transactional
-    public ReservationResponse saveByAdmin(ReservationSaveRequest saveRequest) {
+    public ReservationResponse saveByAdmin(ReservationRequest saveRequest) {
         Reservation savedReservation = createReservation(saveRequest);
         return ReservationResponse.toResponse(savedReservation);
     }
 
-    private Reservation createReservation(ReservationSaveRequest saveRequest) {
+    private Reservation createReservation(ReservationRequest saveRequest) {
         Reservation reservation = reservationFactoryService.createSuccess(saveRequest);
         reservationSchedulerService.validateSaveReservation(reservation);
         return reservationRepository.save(reservation);

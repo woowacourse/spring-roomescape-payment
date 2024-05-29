@@ -24,7 +24,6 @@ import roomescape.common.config.IntegrationTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
-import roomescape.reservation.dto.request.ReservationDetailRequest;
 import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
 
 class WaitingReservationControllerTest extends IntegrationTest {

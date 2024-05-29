@@ -1,6 +1,5 @@
 package roomescape.reservation.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
@@ -9,10 +8,10 @@ import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 
 public record WaitingReservationRequest(
-        @NotNull Long memberId,
-        @NotNull LocalDate date,
-        @NotNull Long themeId,
-        @NotNull Long timeId
+        Long memberId,
+        LocalDate date,
+        Long themeId,
+        Long timeId
 ) {
 
     public static WaitingReservationRequest of(WaitingReservationSaveRequest saveRequest, Long memberId) {

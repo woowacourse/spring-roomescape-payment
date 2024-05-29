@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.ResourcesResponse;
-import roomescape.reservation.dto.request.ReservationDetailRequest;
 import roomescape.reservation.dto.request.WaitingReservationRequest;
 import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
 import roomescape.reservation.dto.response.ReservationResponse;

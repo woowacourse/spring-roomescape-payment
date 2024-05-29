@@ -29,8 +29,8 @@ public class WaitingReservationService {
     }
 
     @Transactional
-    public ReservationResponse save(WaitingReservationRequest saveRequest) {
-        Reservation reservation = reservationFactoryService.createWaiting(saveRequest);
+    public ReservationResponse save(WaitingReservationRequest request) {
+        Reservation reservation = reservationFactoryService.createWaiting(request);
         reservationSchedulerService.validateSaveWaiting(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
 
