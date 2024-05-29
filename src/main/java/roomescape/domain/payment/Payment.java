@@ -34,11 +34,6 @@ public class Payment {
         this.approvedAt = approvedAt;
     }
 
-    public Payment(String paymentKey, Long amount) {
-        this.paymentKey = paymentKey;
-        this.amount = amount;
-    }
-
     public static Payment createEmpty() {
         return new Payment(null, 0L, null, null, null);
     }
