@@ -1,11 +1,13 @@
 package roomescape.global.restclient;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.controller.dto.PaymentRequest;
 import roomescape.reservation.controller.dto.PaymentResponse;
 
+
+@Component
 public class PaymentWithRestClient {
 
     private final RestClient restClient;
@@ -22,13 +24,5 @@ public class PaymentWithRestClient {
                 .body(paymentRequest)
                 .retrieve()
                 .body(PaymentResponse.class);
-    }
-
-    public ResponseEntity<Void> findByPaymentKey(String paymentKey) {
-        return restClient.get()
-                .uri("/{paymentKey}", paymentKey)
-                .header("Authorization", "Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6")
-                .retrieve()
-                .toBodilessEntity();
     }
 }

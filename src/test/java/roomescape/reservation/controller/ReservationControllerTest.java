@@ -5,9 +5,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
+import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.service.ReservationService;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
 import static roomescape.fixture.MemberFixture.getMemberClover;
 
@@ -40,6 +44,8 @@ class ReservationControllerTest extends ControllerTest {
 
     @Autowired
     TokenProvider tokenProvider;
+    @SpyBean
+    PaymentWithRestClient paymentWithRestClient;
 
     String token;
 
@@ -51,6 +57,10 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("사용자 예약 생성 시 201을 반환한다.")
     @Test
     void create() {
+        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+                .when(paymentWithRestClient)
+                .confirm(any());
+
         //given
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeRequest("10:00"));
@@ -60,6 +70,10 @@ class ReservationControllerTest extends ControllerTest {
         reservation.put("date", "2099-08-05");
         reservation.put("timeId", reservationTimeResponse.id());
         reservation.put("themeId", themeResponse.id());
+        reservation.put("paymentKey", "test");
+        reservation.put("orderId", "test");
+        reservation.put("amount", 1000L);
+        reservation.put("paymentType", "test");
 
         //when & then
         RestAssured.given().log().all()

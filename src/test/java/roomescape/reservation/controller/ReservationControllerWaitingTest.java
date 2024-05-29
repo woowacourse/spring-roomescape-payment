@@ -5,18 +5,21 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.service.TokenProvider;
 import roomescape.fixture.ReservationFixture;
-import roomescape.reservation.controller.dto.ReservationRequest;
+import roomescape.global.restclient.PaymentWithRestClient;
+import roomescape.reservation.controller.dto.PaymentResponse;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.util.ControllerTest;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.MemberFixture.getMemberTacan;
 
 class ReservationControllerWaitingTest extends ControllerTest {
@@ -24,11 +27,17 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @Autowired
     TokenProvider tokenProvider;
 
+    @SpyBean
+    PaymentWithRestClient paymentWithRestClient;
+
     String token;
 
     @BeforeEach
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
+        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+                .when(paymentWithRestClient)
+                .confirm(any());
     }
 
     @Test
@@ -37,17 +46,22 @@ class ReservationControllerWaitingTest extends ControllerTest {
         //given
         Reservation bookedReservation = ReservationFixture.getBookedReservation();
         ReservationSlot alreadBookedReservationSlot = bookedReservation.getReservationSlot();
-        ReservationRequest reservationRequest = new ReservationRequest(
+
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
                 alreadBookedReservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
                 alreadBookedReservationSlot.getTime().getId(),
-                alreadBookedReservationSlot.getTheme().getId()
+                alreadBookedReservationSlot.getTheme().getId(),
+                "test",
+                "test",
+                1000L,
+                "test"
         );
 
         //when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .body(reservationRequest)
+                .body(reservationPaymentRequest)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201);
@@ -56,20 +70,25 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @DisplayName("예약 대기인 예약을 삭제한다.")
     @Test
     void delete() {
+
         //given
         Reservation reservation = ReservationFixture.getBookedReservation();
         ReservationSlot bookedReservationSlot = reservation.getReservationSlot();
-        ReservationRequest reservationRequest = new ReservationRequest(
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
                 bookedReservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
                 bookedReservationSlot.getTime().getId(),
-                bookedReservationSlot.getTheme().getId()
+                bookedReservationSlot.getTheme().getId(),
+                "test",
+                "test",
+                1000L,
+                "test"
         );
 
 //        when & then
         String location = RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .body(reservationRequest)
+                .body(reservationPaymentRequest)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)

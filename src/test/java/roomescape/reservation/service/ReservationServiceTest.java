@@ -1,26 +1,17 @@
 package roomescape.reservation.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.fixture.MemberFixture.*;
-import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlot;
-import static roomescape.fixture.ReservationTimeFixture.getNoon;
-import static roomescape.fixture.ThemeFixture.getTheme1;
-import static roomescape.fixture.ThemeFixture.getTheme2;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
+import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.*;
@@ -32,7 +23,23 @@ import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.specification.ReservationSpecification;
 import roomescape.util.ServiceTest;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static roomescape.fixture.MemberFixture.*;
+import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlot;
+import static roomescape.fixture.ReservationTimeFixture.getNoon;
+import static roomescape.fixture.ThemeFixture.getTheme1;
+import static roomescape.fixture.ThemeFixture.getTheme2;
+
 @DisplayName("예약 로직 테스트")
+@ExtendWith(MockitoExtension.class)
 class ReservationServiceTest extends ServiceTest {
     @Autowired
     ReservationSlotRepository reservationSlotRepository;
@@ -46,22 +53,32 @@ class ReservationServiceTest extends ServiceTest {
     ReservationRepository reservationRepository;
     @Autowired
     ReservationService reservationService;
+    @SpyBean
+    PaymentWithRestClient paymentWithRestClient;
 
     @DisplayName("예약 생성에 성공한다.")
     @Test
     void create() {
-        //given
-        Member member = memberRepository.save(getMemberChoco());
+        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+                .when(paymentWithRestClient)
+                .confirm(any());
         String date = "2100-04-18";
         ReservationTime time = reservationTimeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
+
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "testPaymentKey",
+                "testOrderId",
+                1000L,
+                "test payment type");
+
+
         reservationSlotRepository.save(new ReservationSlot(LocalDate.parse(date), time, theme));
-        ReservationRequest reservationRequest = new ReservationRequest(date, time.getId(), theme.getId());
 
-        //when
-        ReservationResponse reservationResponse = reservationService.createReservation(
-                reservationRequest, member.getId());
-
+        ReservationResponse reservationResponse = reservationService.reserve(reservationPaymentRequest, getMemberTacan().getId());
         //then
         assertAll(() -> assertThat(reservationResponse.date()).isEqualTo(date),
                 () -> assertThat(reservationResponse.time().id()).isEqualTo(time.getId()));
