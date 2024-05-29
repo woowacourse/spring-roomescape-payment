@@ -7,7 +7,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
-import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
+import roomescape.reservation.dto.request.WaitingReservationRequest;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
 
@@ -36,7 +36,7 @@ public class ReservationFactoryService {
         return saveRequest.toReservation(member, theme, reservationTime);
     }
 
-    public Reservation createWaiting(WaitingReservationSaveRequest saveRequest) {
+    public Reservation createWaiting(WaitingReservationRequest saveRequest) {
         Member member = findMember(saveRequest.memberId());
         Theme theme = findTheme(saveRequest.themeId());
         ReservationTime reservationTime = findReservationTime(saveRequest.timeId());

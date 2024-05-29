@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
-import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
+import roomescape.reservation.dto.request.WaitingReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
@@ -29,7 +29,7 @@ public class WaitingReservationService {
     }
 
     @Transactional
-    public ReservationResponse save(WaitingReservationSaveRequest saveRequest) {
+    public ReservationResponse save(WaitingReservationRequest saveRequest) {
         Reservation reservation = reservationFactoryService.createWaiting(saveRequest);
         reservationSchedulerService.validateSaveWaiting(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);

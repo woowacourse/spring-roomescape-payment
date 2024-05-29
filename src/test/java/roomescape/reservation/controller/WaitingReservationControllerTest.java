@@ -25,6 +25,7 @@ import roomescape.common.util.CookieUtils;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 import roomescape.reservation.dto.request.ReservationDetailRequest;
+import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
 
 class WaitingReservationControllerTest extends IntegrationTest {
 
@@ -58,14 +59,14 @@ class WaitingReservationControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationDetailRequest reservationDetailRequest = new ReservationDetailRequest(LocalDate.now(), 1L, 1L);
+        WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
         String jojoToken = getToken(new Member(1L, Role.MEMBER, new MemberName(JOJO_NAME), JOJO_EMAIL, JOJO_PASSWORD));
         String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, jojoToken)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(reservationDetailRequest))
+                .body(objectMapper.writeValueAsString(saveRequest))
                 .accept(ContentType.JSON)
                 .when()
                 .post("/reservations")
@@ -76,7 +77,7 @@ class WaitingReservationControllerTest extends IntegrationTest {
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, kakiToken)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(reservationDetailRequest))
+                .body(objectMapper.writeValueAsString(saveRequest))
                 .accept(ContentType.JSON)
                 .when()
                 .post("/reservations/wait")

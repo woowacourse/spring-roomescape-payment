@@ -23,7 +23,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.dto.request.WaitingReservationSaveRequest;
+import roomescape.reservation.dto.request.WaitingReservationRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -61,7 +61,7 @@ class WaitingReservationServiceTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(
+        WaitingReservationRequest saveRequest = new WaitingReservationRequest(
                 jojo.getId(),
                 TODAY,
                 horror.getId(),
