@@ -15,6 +15,7 @@ import roomescape.domain.reservation.Status;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
+import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.service.PaymentService;
@@ -40,7 +41,9 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
-        tossPaymentService.pay(reservationRequest);
+        PaymentRequest paymentRequest = new PaymentRequest(reservationRequest.orderId(), reservationRequest.amount(),
+                reservationRequest.paymentKey());
+        tossPaymentService.pay(paymentRequest);
         ReservationResponse response = reservationService.saveReservationByClient(loginMember, reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }

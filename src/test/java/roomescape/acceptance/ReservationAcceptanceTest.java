@@ -19,6 +19,7 @@ import org.mockito.BDDMockito;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.request.reservation.ReservationRequest;
+import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.response.reservation.TossExceptionResponse;
 import roomescape.exception.PaymentException;
 
@@ -105,7 +106,9 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     void reservationPostWhenPaymentFail() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
-        BDDMockito.given(paymentService.pay(request))
+        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
+                request.paymentKey());
+        BDDMockito.given(paymentService.pay(paymentRequest))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new TossExceptionResponse("EXCEPTION", "exception")));
 
