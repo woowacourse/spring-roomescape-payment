@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doThrow;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,13 +17,16 @@ import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.ReservationTimeRepository;
 import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.reservation.slot.ThemeRepository;
+import roomescape.exception.PaymentException;
 import roomescape.exception.RoomEscapeBusinessException;
-import roomescape.service.dto.ReservationResponse;
+import roomescape.service.dto.PaymentRequest;
 import roomescape.service.dto.ReservationPaymentRequest;
+import roomescape.service.dto.ReservationResponse;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
 import roomescape.service.dto.WaitingResponse;
@@ -65,6 +69,30 @@ class ReservationServiceTest extends IntegrationTestSupport {
                 () -> assertThat(reservationResponse.theme().name()).isEqualTo(theme.getName()),
                 () -> assertThat(reservationResponse.theme().description()).isEqualTo(theme.getDescription()),
                 () -> assertThat(reservationResponse.theme().thumbnail()).isEqualTo(theme.getThumbnail())
+        );
+    }
+
+    @DisplayName("결제 오류시 예약이 저장되지 않는다.")
+    @Test
+    void saveReservationPaymentError() {
+        LocalDate date = LocalDate.parse("2025-11-11");
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("01:00")));
+        Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
+        Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
+
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
+                date, time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+
+        PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+
+        doThrow(PaymentException.class)
+                .when(paymentClient)
+                .requestApproval(paymentRequest);
+
+        assertAll(
+                () -> assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
+                        .isInstanceOf(PaymentException.class),
+                () -> assertThat(reservationRepository.findBySlot(new ReservationSlot(date, time, theme))).isEmpty()
         );
     }
 

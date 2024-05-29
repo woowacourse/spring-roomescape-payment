@@ -25,7 +25,7 @@ public abstract class IntegrationTestSupport {
     private int serverPort;
 
     @MockBean
-    private PaymentClient paymentClient;
+    protected PaymentClient paymentClient;
 
     @PostConstruct
     private void initialize() {
