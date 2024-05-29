@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -127,7 +128,7 @@ class ReservationControllerTest extends BaseControllerTest {
                     1L,
                     "test-paymentKey",
                     "test-orderId",
-                    1L,
+                    BigDecimal.valueOf(1000L),
                     "test-paymentType"
             );
 
@@ -171,7 +172,7 @@ class ReservationControllerTest extends BaseControllerTest {
                     1L,
                     "test-paymentKey",
                     "test-orderId",
-                    1L,
+                    BigDecimal.valueOf(1000L),
                     "test-paymentType"
             );
 

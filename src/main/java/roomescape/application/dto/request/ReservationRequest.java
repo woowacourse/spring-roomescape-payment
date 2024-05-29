@@ -1,5 +1,6 @@
 package roomescape.application.dto.request;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -10,7 +11,7 @@ public record ReservationRequest(
         Long timeId,
         String paymentKey,
         String orderId,
-        Long amount,
+        BigDecimal amount,
         String paymentType,
         Long memberId
 ) {

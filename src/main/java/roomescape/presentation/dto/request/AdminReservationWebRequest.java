@@ -2,6 +2,7 @@ package roomescape.presentation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public record AdminReservationWebRequest(
 
         @NotNull(message = "가격을 입력해주세요.")
         @Positive
-        Long amount,
+        BigDecimal amount,
 
         @NotNull(message = "payment type을 입력해주세요.")
         String paymentType,

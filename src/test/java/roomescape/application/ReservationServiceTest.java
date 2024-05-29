@@ -8,6 +8,7 @@ import static roomescape.fixture.Fixture.MEMBER_2;
 import static roomescape.fixture.Fixture.RESERVATION_TIME_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,7 +95,7 @@ class ReservationServiceTest extends BaseServiceTest {
                     theme.getId(),
                     "test-paymentKey",
                     "test-orderId",
-                    1L,
+                    BigDecimal.valueOf(1000L),
                     "test-paymentType",
                     member1.getId()
             );
