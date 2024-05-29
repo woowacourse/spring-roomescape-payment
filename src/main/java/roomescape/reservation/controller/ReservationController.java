@@ -20,22 +20,23 @@ import roomescape.reservation.service.ReservationService;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
-    private final ReservationService service;
 
-    public ReservationController(ReservationService service) {
-        this.service = service;
+    private final ReservationService reservationService;
+
+    public ReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
     }
 
     @GetMapping
     public List<ReservationResponse> findReservations() {
-        return service.findReservations();
+        return reservationService.findReservations();
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody ReservationCreateRequest request,
             LoggedInMember member) {
-        ReservationResponse response = service.createReservation(request, member.id());
+        ReservationResponse response = reservationService.createReservation(request, member.id());
 
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location)
@@ -45,6 +46,6 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable Long id) {
-        service.deleteReservation(id);
+        reservationService.deleteReservation(id);
     }
 }
