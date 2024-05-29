@@ -61,7 +61,7 @@ class ReservationServiceTest {
 
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(1L, Role.USER, "카키", "kaki@email.com");
         ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                LocalDate.now(), 1L, 1L);
+                LocalDate.now(), 1L, 1L, "a", "a", 1000, "a");
 
         assertThatThrownBy(() -> reservationService.save(reservationCreateRequest, loginMemberInToken))
                 .isInstanceOf(IllegalArgumentException.class);
