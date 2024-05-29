@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.*;
 import roomescape.domain.repository.*;
-import roomescape.web.auth.JwtProvider;
+import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.web.controller.request.ReservationWaitingRequest;
 
 import java.time.LocalDate;

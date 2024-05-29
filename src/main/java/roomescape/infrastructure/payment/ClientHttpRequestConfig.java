@@ -1,4 +1,4 @@
-package roomescape.web.controller.api.payment;
+package roomescape.infrastructure.payment;
 
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.ConnectionConfig;

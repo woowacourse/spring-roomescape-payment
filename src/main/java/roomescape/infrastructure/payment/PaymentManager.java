@@ -1,9 +1,9 @@
-package roomescape.web.controller.api.payment;
+package roomescape.infrastructure.payment;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.web.controller.request.PaymentApproveRequest;
+import roomescape.service.request.PaymentApproveDto;
 
 @Component
 public class PaymentManager {
@@ -16,7 +16,7 @@ public class PaymentManager {
         this.restClient = restClient;
     }
 
-    public void approve(PaymentApproveRequest request) {
+    public void approve(PaymentApproveDto request) {
         String authorizations = paymentAuthorizationGenerator.createAuthorizations();
 
         restClient.post()
@@ -26,5 +26,6 @@ public class PaymentManager {
                 .body(request)
                 .retrieve()
                 .toBodilessEntity();
+
     }
 }

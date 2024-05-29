@@ -15,6 +15,8 @@ import roomescape.service.specification.ReservationSpecification;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import roomescape.infrastructure.payment.PaymentManager;
+import roomescape.service.request.PaymentApproveDto;
 
 @Service
 public class ReservationService {
@@ -23,30 +25,37 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentManager paymentManager;
 
-    public ReservationService(
-            ReservationRepository reservationRepository,
+    public ReservationService(ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository, MemberRepository memberRepository) {
-
+            ThemeRepository themeRepository,
+            MemberRepository memberRepository,
+            PaymentManager paymentManager) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentManager = paymentManager;
     }
 
-    public ReservationDto save(ReservationSaveDto request) {
-        Member member = findMember(request.memberId());
-        ReservationDate date = new ReservationDate(request.date());
-        ReservationTime time = findTime(request.timeId());
-        Theme theme = findTheme(request.themeId());
+    public ReservationDto save(ReservationSaveDto reservationSaveDto) {
+        Member member = findMember(reservationSaveDto.memberId());
+        ReservationDate date = new ReservationDate(reservationSaveDto.date());
+        ReservationTime time = findTime(reservationSaveDto.timeId());
+        Theme theme = findTheme(reservationSaveDto.themeId());
         Reservation reservation = new Reservation(member, date, time, theme);
         validatePastReservation(reservation);
-        validateDuplication(date, request.timeId(), request.themeId());
+        validateDuplication(date, reservationSaveDto.timeId(), reservationSaveDto.themeId());
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return new ReservationDto(savedReservation);
+    }
+
+    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+        paymentManager.approve(paymentApproveDto);
+        return save(reservationSaveDto);
     }
 
     private ReservationTime findTime(Long timeId) {

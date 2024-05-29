@@ -17,10 +17,10 @@ import roomescape.service.ReservationService;
 import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.web.auth.Auth;
-import roomescape.web.controller.api.payment.PaymentManager;
+import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.web.controller.request.LoginMember;
 import roomescape.web.controller.request.MemberReservationRequest;
-import roomescape.web.controller.request.PaymentApproveRequest;
+import roomescape.service.request.PaymentApproveDto;
 import roomescape.web.controller.response.MemberReservationResponse;
 import roomescape.web.controller.response.ReservationMineResponse;
 
@@ -40,12 +40,12 @@ public class MemberReservationController {
     @PostMapping
     public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest reservationRequest,
                                                              @Valid @Auth LoginMember loginMember) {
-        PaymentApproveRequest request = new PaymentApproveRequest(reservationRequest);
+        PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
         paymentManager.approve(request);
 
         ReservationDto appResponse = reservationService.save(
                 new ReservationSaveDto(reservationRequest.date(), reservationRequest.timeId(),
-                        reservationRequest.themeId(), loginMember.id()));
+                        reservationRequest.themeId(), loginMember.id()), request);
 
         Long id = appResponse.id();
         MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);
