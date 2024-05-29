@@ -1,6 +1,5 @@
 package roomescape.infrastructure;
 
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -8,6 +7,8 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.TossPaymentClientErrorHandler;
 import roomescape.service.dto.request.PaymentRequest;
+
+import java.util.Base64;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -23,8 +24,7 @@ public class TossPaymentClient implements PaymentClient {
                              @Value("${toss.secret-key}") String secretKey) {
         this.restClient = restClient;
         this.tossPaymentClientErrorHandler = tossPaymentClientErrorHandler;
-        this.encodedSecretKey = Base64.getEncoder()
-                .encodeToString(String.format(ENCODING_FORMAT, secretKey).getBytes());
+        this.encodedSecretKey = Base64.getEncoder().encodeToString(String.format(ENCODING_FORMAT, secretKey).getBytes());
     }
 
     @Override
