@@ -172,11 +172,11 @@ class MemberReservationServiceTest extends ServiceTest {
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when
-        memberReservationService.updateStatus(memberReservation, ReservationStatus.PENDING, ReservationStatus.APPROVED);
+        memberReservationService.updateStatus(memberReservation.getReservation());
 
         //then
         assertThat(
-                memberReservationRepository.findBy(null, null, ReservationStatus.APPROVED, LocalDate.now(),
+                memberReservationRepository.findBy(null, null, ReservationStatus.NOT_PAID, LocalDate.now(),
                         LocalDate.now().plusDays(1))).hasSize(1);
     }
 

@@ -79,7 +79,7 @@ public class ReservationApplicationService {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
         reservationCommonService.delete(member, memberReservation);
-        memberReservationService.updateStatus(memberReservation, ReservationStatus.PENDING, ReservationStatus.NOT_PAID);
+        memberReservationService.updateStatus(memberReservation.getReservation());
     }
 
     @Transactional

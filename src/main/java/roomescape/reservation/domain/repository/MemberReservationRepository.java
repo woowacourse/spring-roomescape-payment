@@ -2,6 +2,7 @@ package roomescape.reservation.domain.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -48,24 +49,7 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
 
     boolean existsByReservationAndMember(Reservation reservation, Member member);
 
-    // TODO: 쿼리 변경
-    @Modifying
-    @Query(value = """
-            UPDATE MemberReservation mr
-            SET mr.reservationStatus = :toSetStatus
-            WHERE mr.reservation = :reservation
-            AND mr.reservationStatus = :toChangeStatus
-            AND mr.id IN (
-                SELECT rn_table.id
-                FROM (
-                        SELECT mr2.id as id, COUNT(*) OVER(PARTITION BY mr2.reservation.id ORDER BY mr2.createdAt) AS rn
-                        FROM MemberReservation mr2
-                    ) rn_table
-                WHERE rn_table.rn = :waitingNumber
-            )
-            """)
-    void updateStatusBy(ReservationStatus toSetStatus, Reservation reservation, ReservationStatus toChangeStatus,
-                        int waitingNumber);
-
     boolean existsByReservationAndReservationStatus(Reservation reservation, ReservationStatus reservationStatus);
+
+    Optional<MemberReservation> findFirstByReservationOrderByCreatedAt(Reservation reservation);
 }

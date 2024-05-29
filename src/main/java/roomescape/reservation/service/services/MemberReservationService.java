@@ -54,8 +54,10 @@ public class MemberReservationService {
     }
 
     @Transactional
-    public void updateStatus(MemberReservation memberReservation, ReservationStatus from, ReservationStatus to) {
-        memberReservationRepository.updateStatusBy(to, memberReservation.getReservation(), from, 1);
+    public void updateStatus(Reservation reservation) {
+        memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation).ifPresent(
+                MemberReservation::notPaid
+        );
     }
 
     @Transactional
