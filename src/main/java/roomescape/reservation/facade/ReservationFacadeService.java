@@ -1,6 +1,5 @@
 package roomescape.reservation.facade;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.PaymentRequest;
@@ -9,11 +8,9 @@ import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.service.ReservationCreateService;
 import roomescape.reservation.domain.service.ReservationService;
 import roomescape.reservation.domain.service.WaitingReservationService;
-import roomescape.reservation.dto.MemberReservationCreateRequest;
-import roomescape.reservation.dto.MemberReservationResponse;
-import roomescape.reservation.dto.MyReservationResponse;
-import roomescape.reservation.dto.ReservationCreateRequest;
-import roomescape.reservation.dto.ReservationSearchRequestParameter;
+import roomescape.reservation.dto.*;
+
+import java.util.List;
 
 @Service
 public class ReservationFacadeService {
@@ -42,7 +39,9 @@ public class ReservationFacadeService {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.of(request, member);
 
         MemberReservation savedMemberReservation = reservationCreateService.createReservation(reservationCreateRequest);
-        paymentService.confirmPayment(PaymentRequest.from(request), savedMemberReservation);
+        if (savedMemberReservation.isConfirmationStatus()) {
+            paymentService.confirmPayment(PaymentRequest.from(request), savedMemberReservation);
+        }
 
         return MemberReservationResponse.from(savedMemberReservation);
     }
