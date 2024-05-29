@@ -7,9 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import roomescape.application.dto.request.payment.PaymentCancelRequest;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
+import roomescape.domain.payment.CancelReason;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.payment.PaymentFailException;
 
@@ -39,21 +40,20 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse cancel(String paymentKey, PaymentCancelRequest request) {
+    public void cancel(Payment payment, CancelReason reason) {
         String encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
 
         try {
-            return restClient.post()
-                    .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
+            restClient.post()
+                    .uri("/v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
                     .header("Authorization", "Basic " + encoded)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
+                    .body(reason)
                     .retrieve()
                     .body(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
             PaymentErrorResult result = e.getResponseBodyAs(PaymentErrorResult.class);
             throw new PaymentFailException(result.message(), (HttpStatus) e.getStatusCode());
         }
-
     }
 }

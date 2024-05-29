@@ -59,12 +59,11 @@ public class Reservation {
         this.status = status;
     }
 
-    public Reservation approve() {
+    public void toPending() {
         if (this.isCanceled()) {
             throw new CancelReservationException("이미 취소된 예약입니다.");
         }
-        this.status = Status.RESERVED;
-        return this;
+        this.status = Status.PAYMENT_PENDING;
     }
 
     public void cancel(Long memberId) {
@@ -90,6 +89,10 @@ public class Reservation {
 
     public boolean isReserved() {
         return this.status == Status.RESERVED;
+    }
+
+    public boolean isPaymentPending() {
+        return this.status == Status.PAYMENT_PENDING;
     }
 
     public boolean isWaiting() {
