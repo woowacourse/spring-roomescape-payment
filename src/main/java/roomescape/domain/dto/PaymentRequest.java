@@ -1,4 +1,4 @@
-package roomescape.service.reservation.dto;
+package roomescape.domain.dto;
 
 public record PaymentRequest(String paymentKey, String orderId, Long amount) {
 

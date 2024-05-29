@@ -50,4 +50,8 @@ public class Payment {
     public Long getAmount() {
         return amount;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

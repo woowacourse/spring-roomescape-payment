@@ -18,3 +18,5 @@ security:
     token:
       secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
       expire-length: 3600000
+  payment:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

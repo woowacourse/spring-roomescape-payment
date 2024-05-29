@@ -1,17 +1,12 @@
 package roomescape.service.reservation;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
+import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -25,8 +20,8 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
-import roomescape.service.reservation.dto.PaymentRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
@@ -39,19 +34,17 @@ public class ReservationCreateService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final ReservationDetailRepository reservationDetailRepository;
-    private final RestClient restClient;
-    private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-        MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, RestClient restClient, PaymentRepository paymentRepository) {
+        MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.reservationDetailRepository = reservationDetailRepository;
-        this.restClient = restClient;
-        this.paymentRepository = paymentRepository;
+        this.paymentService = paymentService;
     }
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
@@ -61,17 +54,7 @@ public class ReservationCreateService {
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
         PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
-        Payment payment = restClient.post()
-            .uri("/v1/payments/confirm")
-            .contentType(APPLICATION_JSON)
-            .header("Authorization", authorizations)
-            .body(request)
-            .retrieve()
-            .body(Payment.class);
+        Payment payment = paymentService.approvePayment(request);
 
         return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
             reservationRequest.date(), payment);
@@ -85,7 +68,6 @@ public class ReservationCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         ReservationStatus reservationStatus = determineStatus(reservationDetail, member);
         Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, reservationStatus, payment));
-        paymentRepository.save(payment);
         return new ReservationResponse(reservation);
     }
 
