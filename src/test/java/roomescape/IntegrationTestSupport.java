@@ -3,10 +3,12 @@ package roomescape;
 import io.restassured.RestAssured;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.controller.member.dto.MemberLoginRequest;
+import roomescape.payment.PaymentClient;
 
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.ADMIN_PASSWORD;
@@ -22,6 +24,9 @@ public abstract class IntegrationTestSupport {
 
     @LocalServerPort
     int serverPost;
+
+    @MockBean
+    PaymentClient paymentClient;
 
     @PostConstruct
     private void initialize() {

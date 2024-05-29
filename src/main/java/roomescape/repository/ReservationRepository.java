@@ -5,12 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.Nullable;
-import roomescape.repository.dto.WaitingReservationResponse;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.repository.dto.ReservationRankResponse;
+import roomescape.repository.dto.WaitingReservationResponse;
 import roomescape.service.exception.ReservationNotFoundException;
 
 import java.time.LocalDate;
