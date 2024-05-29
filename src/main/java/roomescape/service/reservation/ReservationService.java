@@ -1,9 +1,14 @@
 package roomescape.service.reservation;
 
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -20,6 +25,8 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
+import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -32,31 +39,36 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
+    private final PaymentRestClient paymentRestClient;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            ReservationWaitingRepository reservationWaitingRepository) {
+            ReservationWaitingRepository reservationWaitingRepository, PaymentRestClient paymentRestClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
+        this.paymentRestClient = paymentRestClient;
     }
 
     public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
         return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-                adminReservationRequest.memberId(), adminReservationRequest.date());
+                adminReservationRequest.memberId(), adminReservationRequest.date(), null);
     }
 
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-                reservationRequest.date());
+                reservationRequest.date(), reservationRequest);
     }
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date) {
+
+
+    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date,
+                                                  ReservationRequest request) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Schedule schedule = new Schedule(reservationDate, reservationTime);
@@ -65,11 +77,16 @@ public class ReservationService {
         Theme theme = findThemeById(themeId);
         Member member = findMemberById(memberId);
         validateDuplicated(reservationDate, reservationTime, theme);
+
+        paymentRestClient.confirm(request);
+
         Reservation reservation = reservationRepository.save(
                 new Reservation(member, schedule, theme, ReservationStatus.RESERVED));
 
         return new ReservationResponse(reservation);
     }
+
+
 
     private ReservationTime findTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
@@ -120,7 +137,7 @@ public class ReservationService {
         long timeId = schedule.getReservationTime().getId();
         long themeId = waiting.getTheme().getId();
         long memberId = waiting.getMember().getId();
-        createReservation(timeId, themeId, memberId, date);
+        createReservation(timeId, themeId, memberId, date, null);
         reservationWaitingRepository.delete(waiting);
     }
 

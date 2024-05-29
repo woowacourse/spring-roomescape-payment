@@ -13,6 +13,7 @@ import roomescape.exception.ExceptionTemplate;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
+import roomescape.exception.PaymentException;
 import roomescape.exception.UnauthorizedException;
 
 @ControllerAdvice
@@ -46,5 +47,10 @@ public class GlobalExceptionHandler {
             return ResponseEntity.badRequest().body(new ExceptionTemplate("시간/날짜 형식이 잘못되었습니다."));
         }
         return ResponseEntity.badRequest().body(new ExceptionTemplate("잘못된 요청입니다."));
+    }
+
+    @ExceptionHandler(value = PaymentException.class)
+    public ResponseEntity<ExceptionTemplate> handlePaymentException(PaymentException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionTemplate(exception.getMessage()));
     }
 }

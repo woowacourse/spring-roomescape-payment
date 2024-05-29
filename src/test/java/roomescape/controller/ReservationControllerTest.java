@@ -2,6 +2,7 @@ package roomescape.controller;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -11,7 +12,9 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import roomescape.auth.AuthConstants;
+import roomescape.exception.PaymentException;
 import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
@@ -93,6 +96,20 @@ class ReservationControllerTest extends DataInitializedControllerTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .assertThat().statusCode(400).body("message", is("현재보다 이전으로 일정을 설정할 수 없습니다."));
+    }
+
+    @DisplayName("예약 추가 실패 테스트 - 결제 실패")
+    @Test
+    void createInvalidPaymentReservation() {
+        Mockito.when(restClient.confirm(any())).thenThrow(PaymentException.class);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
+                .body(new ReservationRequest(date, timeId, themeId))
+                .when().post("/reservations")
+                .then().log().all()
+                .assertThat().statusCode(400);
     }
 
     @DisplayName("모든 예약 내역 조회 테스트")

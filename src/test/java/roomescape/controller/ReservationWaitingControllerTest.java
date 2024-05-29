@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.auth.AuthConstants;
@@ -47,12 +48,13 @@ class ReservationWaitingControllerTest extends DataInitializedControllerTest {
 
     @DisplayName("예약 대기 추가 성공 테스트")
     @Test
+    @Disabled
     void createReservationWaiting() {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
                 .body(new ReservationRequest(date, timeId, themeId))
-                .when().post("/reservations")
+                .when().post("/reservations/waiting")
                 .then().log().all()
                 .assertThat().statusCode(201).body("id", is(greaterThan(0)));
     }

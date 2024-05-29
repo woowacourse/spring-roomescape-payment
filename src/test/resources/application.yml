@@ -10,6 +10,8 @@ spring:
     init:
       data-locations: classpath:/truncate.sql
 
+tosspay:
+  secret_key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
 datasource:
   url: jdbc:h2:mem:database
