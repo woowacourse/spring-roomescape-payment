@@ -18,25 +18,27 @@ public class PaymentClient {
         this.restClient = restClient;
     }
 
-    public void approvePayment(final PaymentRequest paymentRequest,
-                               final PaymentAuthorizationResponse paymentAuthorizationResponse) {
-        restClient.post()
+    public PaymentResponse approvePayment(final PaymentRequest paymentRequest,
+                                          final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+        return restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new PaymentErrorHandler());
+                .onStatus(new PaymentErrorHandler())
+                .body(PaymentResponse.class);
     }
 
-    public void refundPayment(final PaymentResponse paymentResponse,
-                              final PaymentAuthorizationResponse paymentAuthorizationResponse) {
-        restClient.post()
+    public PaymentResponse refundPayment(final PaymentResponse paymentResponse,
+                                         final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+        return restClient.post()
                 .uri("/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
-                .onStatus(new PaymentErrorHandler());
+                .onStatus(new PaymentErrorHandler())
+                .body(PaymentResponse.class);
     }
 }
