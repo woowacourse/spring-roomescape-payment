@@ -17,16 +17,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import roomescape.TestPaymentConfig;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.dto.LoginMemberRequest;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = TestPaymentConfig.class)
 class ReservationServiceTest extends FixtureUsingTest {
 
     @Autowired
@@ -42,7 +44,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         LocalDate.now().plusDays(1),
                         reservationTime_10_0.getId(),
                         theme1.getId()
-                ));
+                ), FakePayment.CORRECT_REQ);
 
         //then
         assertAll(
@@ -61,7 +63,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         LocalDate.now().minusDays(1),
                         reservationTime_10_0.getId(),
                         theme1.getId()
-                )))
+                ), FakePayment.CORRECT_REQ))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
     }
@@ -75,7 +77,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         LocalDate.now().minusDays(1),
                         reservationTimeIdNotExists,
                         theme1.getId()
-                )))
+                ), FakePayment.CORRECT_REQ))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
     }
@@ -89,7 +91,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         LocalDate.now().plusDays(1),
                         reservationTime_10_0.getId(),
                         themeIdNotSaved
-                )))
+                ), FakePayment.CORRECT_REQ))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
     }
@@ -170,7 +172,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                             defaultReservation.getDate(),
                             defaultReservation.getReservationTime().getId(),
                             defaultReservation.getTheme().getId()
-                    ));
+                    ), FakePayment.CORRECT_REQ);
 
             //when
             reservationService.deleteWaitingByAdmin(waitingResponse.id());
@@ -193,11 +195,14 @@ class ReservationServiceTest extends FixtureUsingTest {
     void findMembersReservationTest() {
         //given
         reservationService.saveByUser(LoginMemberRequest.from(USER2),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()));
+                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()),
+                FakePayment.CORRECT_REQ);
         ReservationResponse waitingReservation = reservationService.saveByUser(LoginMemberRequest.from(USER1),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()));
+                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()),
+                FakePayment.CORRECT_REQ);
         ReservationResponse bookedReservation = reservationService.saveByUser(LoginMemberRequest.from(USER1),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_11_0.getId(), theme2.getId()));
+                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_11_0.getId(), theme2.getId()),
+                FakePayment.CORRECT_REQ);
 
         //when
         List<ReservationDetailResponse> usersReservations = reservationService.findAllByMemberId(USER1.getId());

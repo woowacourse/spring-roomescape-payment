@@ -18,29 +18,24 @@ import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.dto.ReservationWithPaymentRequest;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
-
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Authenticated LoginMemberRequest loginMemberRequest,
             @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest
     ) {
-        paymentService.pay(PaymentRequest.from(reservationWithPaymentRequest));
-
         ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,
-                ReservationRequest.from(reservationWithPaymentRequest));
+                ReservationRequest.from(reservationWithPaymentRequest),
+                PaymentRequest.from(reservationWithPaymentRequest));
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
     }

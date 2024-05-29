@@ -17,6 +17,7 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
 import roomescape.dto.LoginMemberRequest;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
@@ -34,19 +35,22 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentClient paymentClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository, PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentClient = paymentClient;
     }
 
     public ReservationResponse saveByUser(LoginMemberRequest loginMemberRequest,
-                                          ReservationRequest reservationRequest) {
+                                          ReservationRequest reservationRequest,
+                                          PaymentRequest paymentRequest) {
         ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
         Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
@@ -54,8 +58,14 @@ public class ReservationService {
         Member requestedMember = memberRepository.findById(loginMemberRequest.id())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        return save(reservationRequest.toReservation(
-                requestedMember, requestedTime, requestedTheme));
+        Reservation beforeSaveReservation = reservationRequest.toReservation(requestedMember, requestedTime, requestedTheme);
+        if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
+            throw new RoomescapeException(PAST_TIME_RESERVATION);
+        }
+
+        paymentClient.pay(paymentRequest);
+        Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
+        return ReservationResponse.from(savedReservation);
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -66,14 +76,12 @@ public class ReservationService {
         Member requestedMember = memberRepository.findById(reservationRequest.memberId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        return save(new Reservation(
-                reservationRequest.date(), requestedTime, requestedTheme, requestedMember));
-    }
-
-    private ReservationResponse save(Reservation beforeSaveReservation) {
+        Reservation beforeSaveReservation = new Reservation(
+                reservationRequest.date(), requestedTime, requestedTheme, requestedMember);
         if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
+
         Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
         return ReservationResponse.from(savedReservation);
     }
