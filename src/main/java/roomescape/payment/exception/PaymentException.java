@@ -1,6 +1,6 @@
 package roomescape.payment.exception;
 
-import roomescape.payment.PaymentErrorResponse;
+import roomescape.payment.service.dto.PaymentErrorResponse;
 
 public class PaymentException extends RuntimeException {
     private final String code;

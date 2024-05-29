@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.PaymentErrorResponse;
-import roomescape.payment.PaymentRequest;
-import roomescape.payment.PaymentResponse;
+import roomescape.payment.service.dto.PaymentErrorResponse;
+import roomescape.payment.service.dto.PaymentRequest;
+import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentException;
 
 @Component

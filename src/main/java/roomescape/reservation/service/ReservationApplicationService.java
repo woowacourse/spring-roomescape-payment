@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.member.domain.Member;
-import roomescape.payment.PaymentRequest;
+import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
