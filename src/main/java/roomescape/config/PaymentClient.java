@@ -2,6 +2,8 @@ package roomescape.config;
 
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -18,6 +20,7 @@ import roomescape.exception.RoomescapeException;
 @Component
 public class PaymentClient {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentClient.class);
     private final String secretKey;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -29,14 +32,16 @@ public class PaymentClient {
     }
 
     public void approve(PaymentRequest paymentRequest) {
+        String uri = "/v1/payments/confirm";
         String basic = getAuthorization();
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(uri)
                 .header("Authorization", "Basic " + basic)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(new PaymentClientResponseErrorHandler())
                 .toBodilessEntity();
+        logging(uri, "POST", paymentRequest);
     }
 
     public PaymentResponse readPayment(String paymentKey) {
@@ -48,10 +53,16 @@ public class PaymentClient {
                 .body(String.class);
         try {
             JsonNode rootNode = objectMapper.readTree(response);
-            return objectMapper.treeToValue(rootNode, PaymentResponse.class);
+            PaymentResponse paymentResponse = objectMapper.treeToValue(rootNode, PaymentResponse.class);
+            logging("v1/payments/" + paymentKey, "GET", paymentResponse);
+            return paymentResponse;
         } catch (JsonProcessingException e) {
             throw new RoomescapeException(ExceptionType.INVALID_PARSE_FORMAT);
         }
+    }
+
+    private void logging(String uri, String httpMethod, Object body) {
+        log.info("URI: {}, Method: {}, Body:{} ", uri, httpMethod, body);
     }
 
     private String getAuthorization() {
