@@ -2,13 +2,16 @@ package roomescape;
 
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
-import roomescape.time.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
+import roomescape.time.domain.ReservationTime;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public class Fixtures {
@@ -129,5 +132,16 @@ public class Fixtures {
             new MemberReservation(18L, memberFixtures.get(7), reservationFixturesForPopularTheme.get(17)),
             new MemberReservation(19L, memberFixtures.get(8), reservationFixturesForPopularTheme.get(18)),
             new MemberReservation(20L, memberFixtures.get(9), reservationFixturesForPopularTheme.get(19))
-            );
+    );
+
+    public static final PaymentResponse paymentResponseFixture = new PaymentResponse(
+            "testKey",
+            "DONE",
+            "testId",
+            "test",
+            ZonedDateTime.now(),
+            ZonedDateTime.now(),
+            BigDecimal.valueOf(21000),
+            BigDecimal.valueOf(50000)
+    );
 }

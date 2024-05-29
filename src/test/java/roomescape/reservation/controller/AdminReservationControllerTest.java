@@ -3,23 +3,30 @@ package roomescape.reservation.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.Fixtures;
 import roomescape.auth.service.TokenCookieService;
+import roomescape.payment.infrastructure.TossPaymentRestClient;
 import roomescape.reservation.domain.entity.ReservationStatus;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = {"/recreate_table.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("어드민 예약 컨트롤러")
@@ -28,6 +35,8 @@ class AdminReservationControllerTest {
     @LocalServerPort
     private int port;
     private String accessToken;
+    @MockBean
+    private TossPaymentRestClient restClient;
 
     @BeforeEach
     void setUp() {
@@ -147,11 +156,10 @@ class AdminReservationControllerTest {
         assertThat(detailMessage).isEqualTo("사용자는 비어있을 수 없습니다.");
     }
 
-    // TODO: 제어할 수 없는 영역에 대한 테스트 고민 해보기
-    @Disabled
-    @DisplayName("어드민 예약 컨트롤러는 id 값에 따라 예약시 204을 응답한다.")
+    @DisplayName("어드민 예약 컨트롤러는 id 값에 따라 예약 삭제 시 204을 응답한다.")
     @Test
     void deleteReservation() {
+        // given
         RestAssured.given()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
                 .when().get("/admin/reservations")
@@ -159,12 +167,18 @@ class AdminReservationControllerTest {
                 .statusCode(200)
                 .body("size()", is(11));
 
+        Map<String, String> body = Map.of("cancelReason", "reason");
+        Mockito.when(restClient.post("/testPaymentKey/cancel", body))
+                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+
+        // when
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
                 .when().delete("/admin/reservations/1")
                 .then().log().all()
                 .statusCode(204);
 
+        // then
         RestAssured.given()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
                 .when().get("/admin/reservations")
