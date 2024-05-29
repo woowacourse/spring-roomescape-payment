@@ -1,12 +1,15 @@
 package roomescape.dto.request;
 
-import roomescape.domain.*;
-
 import java.time.LocalDate;
+import roomescape.domain.Member;
+import roomescape.domain.ReservationStatus;
+import roomescape.domain.Theme;
+import roomescape.domain.TimeSlot;
+import roomescape.domain.Waiting;
 
 public record WaitingRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
 
-    public WaitingRequest{
+    public WaitingRequest {
         isValid(memberId, date, timeId, themeId);
     }
 

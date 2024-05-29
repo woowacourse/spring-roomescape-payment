@@ -4,16 +4,20 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.*;
+import roomescape.domain.Member;
+import roomescape.domain.Reservation;
+import roomescape.domain.Theme;
+import roomescape.domain.TimeSlot;
+import roomescape.domain.Waiting;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.MemberReservationRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.ReservationMineResponse;
 import roomescape.dto.response.ReservationResponse;
-import roomescape.repository.*;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.WaitingRepository;
 
 @Service
 @Transactional
@@ -120,7 +124,8 @@ public class ReservationService {
 
         firstWaiting.ifPresent(waiting -> {
             Reservation newReservation = Reservation
-                    .createNewBooking(waiting.getMember(), reservation.getDate(), reservation.getTime(), reservation.getTheme());
+                    .createNewBooking(waiting.getMember(), reservation.getDate(), reservation.getTime(),
+                            reservation.getTheme());
             waitingRepository.delete(waiting);
             reservationRepository.save(newReservation);
         });

@@ -22,7 +22,7 @@ public class BookingController {
 
     @GetMapping("/{date}/{theme_id}")
     public ResponseEntity<List<BookResponse>> findAvaliableBooks(@PathVariable LocalDate date,
-                                                   @PathVariable(value = "theme_id") Long themeId) {
+                                                                 @PathVariable(value = "theme_id") Long themeId) {
         List<BookResponse> books = bookService.findAvaliableBooks(date, themeId);
         return ResponseEntity.ok(books);
     }
