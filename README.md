@@ -1,5 +1,6 @@
 ## 기능 요구 사항
 ### 사용자 예약 생성 및 결제
+- Request
 ```
 POST /reservations HTTP/1.1
 content-type: application/json
@@ -21,6 +22,24 @@ host: localhost:8080
         "orderId": "orderId",
         "amount": 1000,
         "paymentType": "none"
+    }
+}
+```
+- Response
+```
+HTTP/1.1 201 
+Content-Type: application/json
+{
+    "id": 2,
+    "memberName": "미아",
+    "date": "2030-04-18",
+    "time": {
+        "id": 1,
+        "startAt": "15:00"
+    },
+    "theme": {
+        "id": 1,
+        "name": "레벨2 탈출"
     }
 }
 ```
