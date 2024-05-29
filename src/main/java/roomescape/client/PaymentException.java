@@ -1,4 +1,4 @@
-package roomescape.reservation.client;
+package roomescape.client;
 
 public class PaymentException extends RuntimeException {
     private final TossErrorResponse tossErrorResponse;

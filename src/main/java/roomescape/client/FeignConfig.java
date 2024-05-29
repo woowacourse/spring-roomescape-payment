@@ -1,4 +1,4 @@
-package roomescape.reservation.client;
+package roomescape.client;
 
 import feign.Client;
 import feign.okhttp.OkHttpClient;

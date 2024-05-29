@@ -1,4 +1,4 @@
-package roomescape.reservation.client;
+package roomescape.client;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;

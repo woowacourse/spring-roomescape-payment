@@ -1,14 +1,10 @@
 package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Login;
 import roomescape.member.dto.LoginMemberInToken;
-import roomescape.reservation.client.PaymentClient;
+import roomescape.client.PaymentClient;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
