@@ -1,6 +1,10 @@
 package roomescape.controller;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
+import roomescape.controller.payment.TestPaymentConfiguration;
 import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
 import roomescape.domain.MemberRole;
@@ -12,6 +16,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static roomescape.Fixture.*;
 
+@ExtendWith(MockitoExtension.class)
+@Import(TestPaymentConfiguration.class)
 class ReservationControllerTest extends ControllerTest {
 
     @BeforeEach
