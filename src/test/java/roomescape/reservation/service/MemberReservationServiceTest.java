@@ -58,8 +58,8 @@ class MemberReservationServiceTest extends ServiceTest {
         Reservation reservation = reservationRepository.save(new Reservation(date, time, theme1));
 
         //when
-        MemberReservation memberReservation = memberReservationService.createMemberReservation(memberChoco,
-                reservation);
+        MemberReservation memberReservation = memberReservationService.createMemberReservation(
+                new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //then
         assertAll(

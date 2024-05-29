@@ -11,9 +11,6 @@ import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
 import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.reservation.service.dto.MyReservationInfo;
 import roomescape.reservation.service.dto.WaitingCreate;
@@ -71,24 +68,12 @@ public class ReservationApplicationService {
 
     @Transactional
     public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
-        ReservationTime reservationTime = reservationCommonService.getReservationTime(memberReservationCreate.timeId());
-        Theme theme = reservationCommonService.getTheme(memberReservationCreate.themeId());
-        Member member = reservationCommonService.getMember(memberReservationCreate.memberId());
-        Reservation reservation = reservationCommonService.getReservation(memberReservationCreate.date(),
-                reservationTime, theme);
-        reservationCommonService.validatePastReservation(reservation);
-        reservationCommonService.validateDuplicatedReservation(reservation, member);
-
-        if (reservationCommonService.isReservationConfirmed(reservation)) {
-            MemberReservation waiting = waitingReservationService.addWaiting(member, reservation);
-            return ReservationResponse.from(waiting.getId(), reservation, member);
-        }
-        MemberReservation memberReservation = memberReservationService.createMemberReservation(member, reservation);
-
+        MemberReservation memberReservation = reservationCommonService.getReservation(
+                memberReservationCreate.toReservationCreate());
         paymentService.approvePayment(
                 new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
                         memberReservationCreate.paymentKey()), memberReservation);
-
+        memberReservationService.createMemberReservation(memberReservation);
         return ReservationResponse.from(memberReservation);
     }
 
@@ -111,16 +96,10 @@ public class ReservationApplicationService {
 
     @Transactional
     public ReservationResponse addWaiting(WaitingCreate waitingCreate) {
-        ReservationTime reservationTime = reservationCommonService.getReservationTime(waitingCreate.timeId());
-        Theme theme = reservationCommonService.getTheme(waitingCreate.themeId());
-        Member member = reservationCommonService.getMember(waitingCreate.memberId());
-        Reservation reservation = reservationCommonService.getReservation(waitingCreate.date(), reservationTime, theme);
-
-        reservationCommonService.validatePastReservation(reservation);
-        reservationCommonService.validateDuplicatedReservation(reservation, member);
-
-        MemberReservation memberReservation = waitingReservationService.addWaiting(member, reservation);
-        return ReservationResponse.from(memberReservation.getId(), reservation, member);
+        MemberReservation memberReservation = reservationCommonService.getReservation(
+                waitingCreate.toReservationCreate());
+        memberReservationService.createMemberReservation(memberReservation);
+        return ReservationResponse.from(memberReservation);
     }
 
     @Transactional

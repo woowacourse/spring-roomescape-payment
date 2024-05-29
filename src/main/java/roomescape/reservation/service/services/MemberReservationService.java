@@ -59,9 +59,8 @@ public class MemberReservationService {
     }
 
     @Transactional
-    public MemberReservation createMemberReservation(Member member, Reservation reservation) {
-        return memberReservationRepository.save(
-                new MemberReservation(member, reservation, ReservationStatus.APPROVED));
+    public MemberReservation createMemberReservation(MemberReservation memberReservation) {
+        return memberReservationRepository.save(memberReservation);
     }
 
     @Transactional

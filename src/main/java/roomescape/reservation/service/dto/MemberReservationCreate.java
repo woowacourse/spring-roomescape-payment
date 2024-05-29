@@ -18,5 +18,14 @@ public record MemberReservationCreate(long memberId, long themeId, long timeId, 
                 memberReservationRequest.date()
         );
     }
+
+    public ReservationCreate toReservationCreate() {
+        return new ReservationCreate(
+                timeId,
+                themeId,
+                memberId,
+                date
+        );
+    }
 }
 

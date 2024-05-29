@@ -18,6 +18,7 @@ import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
+import roomescape.reservation.service.dto.ReservationCreate;
 
 @Service
 @Transactional(readOnly = true)
@@ -70,17 +71,17 @@ public class ReservationCommonService {
         }
     }
 
-    public boolean isReservationConfirmed(Reservation reservation) {
+    private boolean isReservationConfirmed(Reservation reservation) {
         return memberReservationRepository.existsByReservationAndReservationStatus(reservation,
                 ReservationStatus.APPROVED);
     }
 
-    public ReservationTime getReservationTime(long timeId) {
+    private ReservationTime getReservationTime(long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.RESERVATION_TIME_NOT_FOUND));
     }
 
-    public Theme getTheme(long themeId) {
+    private Theme getTheme(long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.THEME_NOT_FOUND));
     }
@@ -90,7 +91,7 @@ public class ReservationCommonService {
                 .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_NOT_FOUND));
     }
 
-    public Reservation getReservation(LocalDate date, ReservationTime time, Theme theme) {
+    private Reservation getReservation(LocalDate date, ReservationTime time, Theme theme) {
         return reservationRepository.findReservationByDateAndTimeAndTheme(date, time, theme)
                 .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
     }
@@ -98,5 +99,20 @@ public class ReservationCommonService {
     public MemberReservation getMemberReservation(long memberReservationId) {
         return memberReservationRepository.findById(memberReservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND));
+    }
+
+    public MemberReservation getReservation(ReservationCreate reservationCreate) {
+        ReservationTime reservationTime = getReservationTime(reservationCreate.timeId());
+        Theme theme = getTheme(reservationCreate.themeId());
+        Member member = getMember(reservationCreate.memberId());
+        Reservation reservation = getReservation(reservationCreate.date(), reservationTime, theme);
+
+        validatePastReservation(reservation);
+        validateDuplicatedReservation(reservation, member);
+
+        if (isReservationConfirmed(reservation)) {
+            return new MemberReservation(member, reservation, ReservationStatus.PENDING);
+        }
+        return new MemberReservation(member, reservation, ReservationStatus.APPROVED);
     }
 }

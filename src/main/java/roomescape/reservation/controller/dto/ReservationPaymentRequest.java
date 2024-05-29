@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record ReservationPaymentRequest (
+public record ReservationPaymentRequest(
         @NotNull(message = "멤버 예약 id는 필수 값입니다.")
         @Positive
         Long memberReservationId,
@@ -18,5 +18,5 @@ public record ReservationPaymentRequest (
         @Positive
         Long amount
 
-){
+) {
 }
