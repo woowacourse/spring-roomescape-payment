@@ -33,11 +33,8 @@ public class ReservationController {
             @RequestBody final ReservationSaveRequest request) {
         final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
         final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
-
         final PaymentDto paymentDto = PaymentDto.of(request);
         paymentService.confirmPayment(paymentDto, reservationResponse.id());
-
-
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
     }
 

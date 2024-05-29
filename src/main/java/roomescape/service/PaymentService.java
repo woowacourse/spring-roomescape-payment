@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.component.PaymentClient;
 import roomescape.domain.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
@@ -23,7 +24,7 @@ public class PaymentService {
     }
 
     public void confirmPayment(final PaymentDto paymentDto, final Long reservationId) {
-        paymentClient.confirmPayment(paymentDto);
+        paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException(reservationId + "에 해당하는 예약이 없습니다."));
         final Payment payment = paymentDto.toPayment(reservation);
