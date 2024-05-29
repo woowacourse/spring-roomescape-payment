@@ -18,9 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
+import roomescape.paymenthistory.service.PaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
-import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -40,6 +41,8 @@ class ReservationServiceTest {
     private TimeRepository timeRepository;
     @Mock
     private ThemeRepository themeRepository;
+    @Mock
+    private PaymentHistoryService paymentHistoryService;
     @InjectMocks
     private ReservationService reservationService;
 
@@ -103,25 +106,28 @@ class ReservationServiceTest {
     @DisplayName("에약을 생성할 수 있다.")
     @Test
     void createReservationTest() {
+        Member member = new Member(1L, "브라운", "brown@abc.com");
+        ReservationTime time = new ReservationTime(1L, LocalTime.of(19, 0));
+        Theme theme = new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg");
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
+
         given(memberRepository.findById(1L))
-                .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
+                .willReturn(Optional.of(member));
         given(timeRepository.findById(1L))
-                .willReturn(Optional.of(new ReservationTime(1L, LocalTime.of(19, 0))));
+                .willReturn(Optional.of(time));
         given(themeRepository.findById(1L))
-                .willReturn(Optional.of(new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")));
+                .willReturn(Optional.of(theme));
         given(reservationRepository.save(any())).willReturn(new Reservation(
-                1L, new Member(1L, "브라운", "brown@abc.com"),
-                LocalDate.of(2024, 8, 15),
-                new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")));
+                1L, member,
+                LocalDate.of(2024, 8, 15), time, theme));
+
         ReservationResponse expected = new ReservationResponse(
                 1L, new MemberResponse(1L, "브라운"), LocalDate.of(2024, 8, 15),
                 new TimeResponse(1L, LocalTime.of(19, 0)),
                 new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
 
-        ReservationResponse actual = reservationService.createReservation(request);
+        ReservationResponse actual = reservationService.createAdminReservation(request);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -130,10 +136,10 @@ class ReservationServiceTest {
     @Test
     void createReservationTest_whenMemberNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 멤버가 존재하지 않습니다.");
     }
@@ -142,12 +148,12 @@ class ReservationServiceTest {
     @Test
     void createReservationTest_whenTimeNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 예약 시간이 존재하지 않습니다.");
     }
@@ -156,14 +162,14 @@ class ReservationServiceTest {
     @Test
     void createReservationTest_whenThemeNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))
                 .willReturn(Optional.of(new ReservationTime(1L, LocalTime.of(19, 0))));
         given(themeRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 테마가 존재하지 않습니다.");
     }
@@ -172,7 +178,7 @@ class ReservationServiceTest {
     @Test
     void createReservationTest_whenDateTimeIsBefore() {
         LocalDate date = LocalDate.now().minusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))
@@ -180,7 +186,7 @@ class ReservationServiceTest {
         given(themeRepository.findById(1L))
                 .willReturn(Optional.of(new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")));
 
-        assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약은 현재 시간 이후여야 합니다.");
     }
@@ -190,7 +196,7 @@ class ReservationServiceTest {
     @Test
     void createReservationTest_whenExistsDateAndTimeAndTheme() {
         LocalDate date = LocalDate.now().plusDays(7);
-        ReservationCreateRequest request = new ReservationCreateRequest(1L, date, 1L, 1L);
+        AdminReservationCreateRequest request = new AdminReservationCreateRequest(1L, date, 1L, 1L);
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(new Member(1L, "브라운", "brown@abc.com")));
         given(timeRepository.findById(1L))
@@ -200,7 +206,7 @@ class ReservationServiceTest {
         given(reservationRepository.existsByDateAndTime_idAndTheme_id(date, 1L, 1L))
                 .willReturn(true);
 
-        assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 날짜와 시간에 이미 예약된 테마입니다.");
     }

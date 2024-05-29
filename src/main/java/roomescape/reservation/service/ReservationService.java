@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.paymenthistory.service.PaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -26,17 +28,17 @@ public class ReservationService {
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentHistoryService paymentHistoryService;
 
-    public ReservationService(ReservationRepository reservationRepository,
-                              MemberRepository memberRepository,
-                              TimeRepository timeRepository,
-                              ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository) {
+    public ReservationService(ReservationRepository reservationRepository, MemberRepository memberRepository,
+                              TimeRepository timeRepository, ThemeRepository themeRepository,
+                              WaitingRepository waitingRepository, PaymentHistoryService paymentHistoryService) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentHistoryService = paymentHistoryService;
     }
 
     public List<ReservationResponse> findReservations() {
@@ -47,7 +49,8 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findReservations(ReservationSearchRequest request) {
-        return reservationRepository.findAllByCondition(request.memberId(), request.themeId(), request.startDate(), request.endDate())
+        return reservationRepository.findAllByCondition(request.memberId(), request.themeId(), request.startDate(),
+                        request.endDate())
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -60,27 +63,49 @@ public class ReservationService {
                 .toList();
     }
 
-    public ReservationResponse createReservation(ReservationCreateRequest request) {
+    public ReservationResponse createAdminReservation(AdminReservationCreateRequest request) {
         Member member = findMemberByMemberId(request.memberId());
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
+        validate(reservation);
 
         return createReservation(reservation);
     }
 
+    @Transactional
     public ReservationResponse createReservation(ReservationCreateRequest request, Long memberId) {
         Member member = findMemberByMemberId(memberId);
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
+        validate(reservation);
 
-        return createReservation(reservation);
+        ReservationResponse reservationResponse = createReservation(reservation);
+        paymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
+
+        return reservationResponse;
+    }
+
+    private void validate(Reservation reservation) {
+        validateIsAvailable(reservation);
+        validateExists(reservation);
+    }
+
+    private void validateIsAvailable(Reservation reservation) {
+        if (reservation.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
+        }
+    }
+
+    private void validateExists(Reservation reservation) {
+        if (reservationRepository.existsByDateAndTime_idAndTheme_id(
+                reservation.getDate(), reservation.getTimeId(), reservation.getThemeId())) {
+            throw new IllegalArgumentException("해당 날짜와 시간에 이미 예약된 테마입니다.");
+        }
     }
 
     private ReservationResponse createReservation(Reservation reservation) {
-        validateIsAvailable(reservation);
-        validateExists(reservation);
         Reservation createdReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(createdReservation);
     }
@@ -98,19 +123,6 @@ public class ReservationService {
     private Theme findThemeByThemeId(Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 테마가 존재하지 않습니다."));
-    }
-
-    private void validateIsAvailable(Reservation reservation) {
-        if (reservation.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
-        }
-    }
-
-    private void validateExists(Reservation reservation) {
-        if (reservationRepository.existsByDateAndTime_idAndTheme_id(
-                reservation.getDate(), reservation.getTimeId(), reservation.getThemeId())) {
-            throw new IllegalArgumentException("해당 날짜와 시간에 이미 예약된 테마입니다.");
-        }
     }
 
     @Transactional

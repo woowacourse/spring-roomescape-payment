@@ -22,7 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.time.dto.AvailableTimeResponse;
 import roomescape.time.dto.TimeCreateRequest;
 import roomescape.time.dto.TimeResponse;
@@ -87,11 +87,13 @@ class TimeControllerTest {
         Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.of(2100, 1, 1);
         Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        TimeResponse reservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies);
-        TimeResponse notReservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_2), cookies);
+        TimeResponse reservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1),
+                cookies);
+        TimeResponse notReservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_2),
+                cookies);
 
-        ReservationCreateRequest reservationParams =
-                new ReservationCreateRequest(MEMBER_ADMIN.getId(), date, reservedTimeResponse.id(), themeId);
+        AdminReservationCreateRequest reservationParams =
+                new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, reservedTimeResponse.id(), themeId);
         RestAssuredTemplate.create(reservationParams, cookies);
 
         List<AvailableTimeResponse> expected = List.of(

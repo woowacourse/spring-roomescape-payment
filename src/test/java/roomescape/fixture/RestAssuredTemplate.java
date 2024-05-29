@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.member.domain.Member;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.dto.ThemeCreateRequest;
@@ -59,6 +60,19 @@ public class RestAssuredTemplate {
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getObject("", ReservationResponse.class);
+    }
+
+    public static ReservationResponse create(AdminReservationCreateRequest params, Cookies cookies) {
+        return RestAssured.given().log().all()
+                .cookies(cookies)
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201)
                 .extract()

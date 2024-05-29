@@ -2,6 +2,8 @@ package roomescape.waiting.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.fixture.MemberFixture.MEMBER_ADMIN;
 import static roomescape.fixture.MemberFixture.MEMBER_BRI;
 import static roomescape.fixture.MemberFixture.MEMBER_BROWN;
@@ -16,7 +18,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.fixture.CookieProvider;
@@ -24,12 +28,16 @@ import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.member.domain.Member;
+import roomescape.paymenthistory.PaymentType;
+import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.waiting.dto.WaitingCreateRequest;
 import roomescape.waiting.dto.WaitingResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@AutoConfigureMockMvc
 class WaitingControllerTest {
     @LocalServerPort
     private int port;
@@ -39,9 +47,14 @@ class WaitingControllerTest {
         RestAssured.port = port;
     }
 
+    @MockBean
+    private PaymentHistoryService paymentHistoryService;
+
     @DisplayName("예약 대기를 조회, 추가, 삭제 할 수 있다.")
     @Test
     void findCreateDeleteWaitingsTest() {
+        doNothing().when(paymentHistoryService).approvePayment(any());
+
         Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
         Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
@@ -51,7 +64,7 @@ class WaitingControllerTest {
         Member reservationMember = MEMBER_BRI;
         Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);
         ReservationCreateRequest reservationParams =
-                new ReservationCreateRequest(reservationMember.getId(), date, timeId, themeId);
+                new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 10000, PaymentType.NORMAL);
         RestAssuredTemplate.create(reservationParams, reservationMemberCookies);
 
         // 대기 추가
@@ -107,8 +120,8 @@ class WaitingControllerTest {
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         // 예약 추가
-        ReservationCreateRequest reservationParams =
-                new ReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
+        AdminReservationCreateRequest reservationParams =
+                new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
         RestAssuredTemplate.create(reservationParams, cookies);
 
         // 대기 추가
@@ -126,6 +139,8 @@ class WaitingControllerTest {
     @DisplayName("자신이 예약 대기한 방탈출에 대해 예약 대기를 할 수 없다.")
     @Test
     void createWaiting_whenDuplicateWaiting() {
+        doNothing().when(paymentHistoryService).approvePayment(any());
+
         Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
         Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
@@ -135,7 +150,7 @@ class WaitingControllerTest {
         Member reservationMember = MEMBER_BRI;
         Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);
         ReservationCreateRequest reservationParams =
-                new ReservationCreateRequest(reservationMember.getId(), date, timeId, themeId);
+                new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 10000, PaymentType.NORMAL);
         RestAssuredTemplate.create(reservationParams, reservationMemberCookies);
 
         // 대기 추가

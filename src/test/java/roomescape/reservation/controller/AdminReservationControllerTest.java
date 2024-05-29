@@ -21,7 +21,7 @@ import roomescape.auth.dto.LoginRequest;
 import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,7 +44,8 @@ class AdminReservationControllerTest {
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         // 예약 추가
-        ReservationCreateRequest params = new ReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
+        AdminReservationCreateRequest params = new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId,
+                themeId);
         ReservationResponse response = RestAssuredTemplate.create(params, cookies);
 
         // 예약 조회
@@ -69,7 +70,8 @@ class AdminReservationControllerTest {
         Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
-        ReservationCreateRequest params = new ReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
+        AdminReservationCreateRequest params = new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId,
+                themeId);
 
         // 예약 추가
         ReservationResponse response = RestAssured.given().log().all()
