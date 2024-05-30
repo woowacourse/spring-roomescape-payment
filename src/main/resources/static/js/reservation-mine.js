@@ -125,7 +125,7 @@ function render(data) {
             const cancelCell = row.insertCell(4);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '결제';
-            cancelButton.className = 'btn btn-danger';
+            cancelButton.className = 'btn btn-primary';
             cancelButton.onclick = function () {
                 reservationIdd = item.reservationId;
                 onReservationButtonClick(item.reservationId, paymentWidget);
