@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         {variantKey: "DEFAULT"}
     );
 
+
+
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
 
     function onReservationButtonClickWithPaymentWidget(event) {
@@ -62,12 +64,11 @@ function render(data) {
             const payButton = document.createElement('button');
             payButton.textContent = '결제';
             payButton.className = 'btn btn-primary';
-            payButton.id = 'reserve-button';
             payButton.onclick = function () {
                 showPaymentModal(item); // 결제 모달 창 띄우는 함수 호출
             };
             actionCell.appendChild(payButton);
-        } else if (item.status !== 'RESERVED') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드
+        } else if (item.status !== 'CANCELED') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드
             const cancelCell = row.insertCell(5);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
@@ -89,7 +90,7 @@ function showPaymentModal(item) {
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
 
-    $('#paymentModal').modal('show'); // 결제 모달을 띄우는 코드
+    $('#payment-modal').modal('show'); // 결제 모달을 띄우는 코드
 
     paymentWidget.renderPaymentMethods(
         "#payment-method",
@@ -177,6 +178,7 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
+    console.log(reservationData);
     /*
     TODO: [1단계]
         - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -184,14 +186,14 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
     const reservationPaymentRequest = {
-        date: reservationData.date,
-        themeId: reservationData.themeId,
-        timeId: reservationData.timeId,
+        reservationId: reservationData.reservationId,
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
     }
+
+    console.log(reservationPaymentRequest);
 
     const reservationURL = "/reservations";
     fetch(reservationURL, {

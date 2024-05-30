@@ -66,7 +66,43 @@
     </table>
 </div>
 
+<div class="modal fade" id="payment-modal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">결제</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="payment-button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="wrapper w-100">
+                    <div class="max-w-540 w-100">
+                        <div id="payment-method" class="w-100"></div>
+                        <div id="agreement" class="w-100"></div>
+                        <div class="btn-wrapper w-100">
+                            <button id="reserve-button" class="btn primary w-100">결제하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/user-scripts.js"></script>
 <script src="/js/reservation-mine.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Show payment modal when the payment button is clicked
+        $('#reserve-button').click(function () {
+            $('#payment-modal').modal('show');
+        });
+    });
+</script>
 </body>
 </html>
