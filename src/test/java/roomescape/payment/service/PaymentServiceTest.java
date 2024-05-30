@@ -7,6 +7,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withUnauthorizedRequest;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ class PaymentServiceTest {
     @DisplayName("결제 확인 되었을 경우 정상 처리한다.")
     @Test
     void confirmPaymentTest() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", 1000);
+        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
 
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withSuccess());
@@ -42,7 +43,7 @@ class PaymentServiceTest {
     @DisplayName("결제 확인 오류가 발생한 경우 예외를 던진다.")
     @Test
     void confirmPaymentTest_whenNotConfirmed() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", 1000);
+        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
 
         String errorResponse = """
                 {
@@ -61,7 +62,7 @@ class PaymentServiceTest {
     @DisplayName("결제 확인시 인증오류 발생한 경우 예외를 던진다.")
     @Test
     void confirmPaymentTest_whenUnauthorized() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", 1000);
+        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
 
         String errorResponse = """
                 {
