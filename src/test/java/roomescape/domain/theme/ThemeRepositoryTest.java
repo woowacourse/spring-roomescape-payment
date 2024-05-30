@@ -1,9 +1,5 @@
 package roomescape.domain.theme;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +11,11 @@ import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ThemeRepositoryTest extends BaseRepositoryTest {
 

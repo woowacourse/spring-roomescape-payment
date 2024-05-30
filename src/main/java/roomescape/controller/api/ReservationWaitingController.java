@@ -2,7 +2,6 @@ package roomescape.controller.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +17,8 @@ import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationWaitingService;
 import roomescape.service.dto.response.ReservationResponse;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/waitings")

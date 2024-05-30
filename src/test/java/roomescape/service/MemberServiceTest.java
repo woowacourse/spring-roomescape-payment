@@ -1,6 +1,5 @@
 package roomescape.service;
 
-import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,8 @@ import roomescape.domain.member.MemberRepository;
 import roomescape.service.dto.request.CreateMemberRequest;
 import roomescape.service.dto.response.MemberResponse;
 import roomescape.support.fixture.MemberFixture;
+
+import java.util.List;
 
 class MemberServiceTest extends BaseServiceTest {
 

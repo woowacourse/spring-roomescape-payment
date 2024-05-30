@@ -1,7 +1,5 @@
 package roomescape.controller.web;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -12,6 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import roomescape.controller.BaseControllerTest;
 import roomescape.controller.exception.ErrorResponse;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AdminPageControllerTest extends BaseControllerTest {
 

@@ -1,6 +1,5 @@
 package roomescape.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Email;
@@ -9,6 +8,8 @@ import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
 import roomescape.service.dto.request.CreateMemberRequest;
 import roomescape.service.dto.response.MemberResponse;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)

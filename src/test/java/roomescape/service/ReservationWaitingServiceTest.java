@@ -1,10 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +22,12 @@ import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ReservationWaitingFixture;
 import roomescape.support.fixture.ThemeFixture;
+
+import java.time.LocalDate;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationWaitingServiceTest extends BaseServiceTest {
 

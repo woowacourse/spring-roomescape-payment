@@ -1,10 +1,11 @@
 package roomescape.domain.reservationwaiting;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+
+import java.util.List;
 
 public interface ReservationWaitingRepository extends JpaRepository<ReservationWaiting, Long> {
     List<ReservationWaiting> findAllByReservation(Reservation reservation);

@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Path;
+import org.springframework.validation.BindingResult;
+
 import java.util.List;
 import java.util.Set;
-import org.springframework.validation.BindingResult;
 
 public record ErrorResponse(
         String message,
