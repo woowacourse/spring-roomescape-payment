@@ -35,7 +35,7 @@ public class UserReservationController {
     @PostMapping
     public ResponseEntity<CreateReservationResponse> save(
         @Valid @RequestBody CreateUserReservationRequest request,
-        @AuthenticationPrincipal Member member) throws Exception {
+        @AuthenticationPrincipal Member member) {
 
         paymentService.pay(request.orderId(), request.amount(), request.paymentKey());
 
