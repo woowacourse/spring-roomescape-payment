@@ -1,5 +1,7 @@
 package roomescape.advice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +19,8 @@ public class GlobalExceptionHandler {
     private static final String NULL_POINTER_EXCEPTION_ERROR_MESSAGE = "잘못된 요청입니다.";
     private static final String DATA_INTEGRITY_VIOLATION_EXCEPTION_ERROR_MESSAGE = "잘못된 요청입니다.";
     private static final String UNEXPECTED_EXCEPTION_ERROR_MESSAGE = "예상치 못한 예외가 발생했습니다. 관리자에게 문의하세요.";
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(BadArgumentRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadArgumentRequestException(BadArgumentRequestException e) {
@@ -57,6 +61,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception e) {
+        log.error("error message", e);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse(UNEXPECTED_EXCEPTION_ERROR_MESSAGE));
     }
