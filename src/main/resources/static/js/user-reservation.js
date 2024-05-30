@@ -236,10 +236,6 @@ function requestRead(endpoint) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    /*
-    TODO: [1단계]
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
