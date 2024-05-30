@@ -39,14 +39,15 @@
         "date": "2023-08-05",
         "timeId": 1,
         "themeId": 1,
-        "status": "RESERVED" 
+        "paymentKey":"tgen_20240513184816ZSAZ9",
+        "orderId":"MC4wNDYzMzA0OTc2MDgy",
+        "amount":1000
     }
     ```
   |파라미터|타입|필수여부|설명|
   |-----|---|------|---|
   |token|String|true|사용자 인증 토큰|
 
-  - `status` 필드는 `"RESERVED"`고정
 
 - Response
     ```http
@@ -344,15 +345,14 @@
     {
         "date": "2023-08-05",
         "timeId": 1,
-        "themeId": 1,
-        "status": "WAITING"
+        "themeId": 1
     }
     ```
 
   |파라미터|타입|필수여부|설명|
   |-----|---|------|---|
   |token|String|true|사용자 인증 토큰|
-  - `status` 필드는 `"WAITING"` 고정
+
 - Response
     ```http
     HTTP/1.1 201
@@ -477,15 +477,14 @@
         "memberId": 1,
         "date": "2023-08-05",
         "timeId": 1,
-        "themeId": 1,
-        "status": "RESERVED"
+        "themeId": 1
     }
     ```
 
   |파라미터|타입|필수여부|설명|
     |-----|---|------|---|
   |token|String|true|사용자 인증 토큰|
-  - `status` 필드는 `"RESERVED"` 고정
+
 
 - Response
     ```http
