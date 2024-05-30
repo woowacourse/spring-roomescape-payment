@@ -33,12 +33,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public Long registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
+    public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
         Long id = reservationRegisterService.registerReservation(
                 ReservationRequest.of(userReservationPaymentRequest, memberId));
         PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
         paymentService.pay(paymentRequest);
-        return id;
+        return findReservation(id);
     }
 
     public Long registerReservation(ReservationRequest request) {

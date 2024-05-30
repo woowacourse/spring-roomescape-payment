@@ -14,17 +14,14 @@ import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.dto.waiting.WaitingResponse;
-import roomescape.service.booking.reservation.ReservationService;
 import roomescape.service.booking.waiting.WaitingService;
 
 @Controller
 public class WaitingController {
 
-    private final ReservationService reservationService;
     private final WaitingService waitingService;
 
-    public WaitingController(ReservationService reservationService, WaitingService waitingService) {
-        this.reservationService = reservationService;
+    public WaitingController(WaitingService waitingService) {
         this.waitingService = waitingService;
     }
 
@@ -33,9 +30,8 @@ public class WaitingController {
             @RequestBody UserReservationRequest userReservationRequest,
             LoginMember loginMember) {
         ReservationRequest reservationRequest = ReservationRequest.from(userReservationRequest, loginMember.id());
-        Long savedId = waitingService.resisterWaiting(reservationRequest);
-        ReservationResponse reservationResponse = reservationService.findReservation(savedId);
-        return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);
+        ReservationResponse reservationResponse = waitingService.resisterWaiting(reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id())).body(reservationResponse);
     }
 
     @GetMapping("/admin/reservations/waiting")
