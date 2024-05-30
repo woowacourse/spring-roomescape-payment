@@ -11,8 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import roomescape.service.exception.PastReservationException;
+import roomescape.service.exception.PaymentException;
 import roomescape.service.exception.ReservationExistsException;
 import roomescape.web.exception.AuthorizationException;
 
@@ -58,9 +58,9 @@ public class ControllerAdvice {
         return ResponseEntity.internalServerError().body("예기치 못한 에러 발생   " + e.getMessage());
     }
 
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException e) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<PaymentException> handleHttpClientErrorException(PaymentException e) {
         return ResponseEntity.status(e.getStatusCode())
-                .body(e.getResponseBodyAsString());
+                .body(e);
     }
 }
