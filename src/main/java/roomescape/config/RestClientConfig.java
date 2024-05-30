@@ -12,7 +12,7 @@ public class RestClientConfig {
     @Bean
     public PaymentRestClient paymentRestClient() {
         return new PaymentRestClient(
-                RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments/confirm").build(),
+                RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments").build(),
                 new ObjectMapper()
         );
     }

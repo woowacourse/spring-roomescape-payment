@@ -7,15 +7,20 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import roomescape.domain.payment.Payment;
 import roomescape.exception.PaymentException;
 import roomescape.service.payment.dto.PaymentErrorResult;
 import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.ReservationRequest;
 
 public class PaymentRestClient {
+
+    private static final String CONFIRM_ENDPOINT = "/confirm";
+    private static final String CANCEL_ENDPOINT = "/cancel";
 
     @Value("${tosspay.secret_key}")
     private String secretKey;
@@ -32,10 +37,33 @@ public class PaymentRestClient {
         HttpHeaders headers = generateHttpHeaders();
         try {
             return restClient.post()
+                    .uri(CONFIRM_ENDPOINT)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(generatedConfirmRequestBody(request))
                     .retrieve()
                     .body(PaymentResult.class);
+        } catch (RestClientResponseException exception) {
+            String responseBody = exception.getResponseBodyAsString();
+            throw new PaymentException(parseErrorBody(responseBody));
+        }
+    }
+
+    private Map<String, Object> generatedConfirmRequestBody(ReservationRequest request) {
+        return Map.of(
+                "amount", request.amount(),
+                "orderId", request.orderId(),
+                "paymentKey", request.paymentKey()
+        );
+    }
+
+    public void cancel(Payment payment) {
+        HttpHeaders headers = generateHttpHeaders();
+        try {
+            restClient.post()
+                    .uri("/" + payment.getPaymentKey() + CANCEL_ENDPOINT)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .body(generatedCancelRequestBody())
+                    .retrieve();
         } catch (RestClientResponseException exception) {
             String responseBody = exception.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody));
@@ -51,11 +79,9 @@ public class PaymentRestClient {
         return headers;
     }
 
-    private Map<String, Object> generatedConfirmRequestBody(ReservationRequest request) {
+    private Map<String, Object> generatedCancelRequestBody() {
         return Map.of(
-                "amount", request.amount(),
-                "orderId", request.orderId(),
-                "paymentKey", request.paymentKey()
+                "cancelReason", "고객이 취소를 원함"
         );
     }
 
