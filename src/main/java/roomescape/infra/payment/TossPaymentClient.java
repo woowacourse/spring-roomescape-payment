@@ -36,7 +36,7 @@ public class TossPaymentClient implements PaymentClient {
                 .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus()
+                .onStatus(errorHandler)
                 .body(PaymentResponse.class);
     }
 
