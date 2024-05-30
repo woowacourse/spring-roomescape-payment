@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
+import roomescape.paymenthistory.dto.RestClientPaymentCancelRequest;
 import roomescape.paymenthistory.exception.PaymentException;
 
 public class PaymentRestClient {
@@ -46,12 +47,11 @@ public class PaymentRestClient {
 
     public void cancelPayment(String paymentKey) {
         String authorizations = BASIC + secretKey;
-
         restClient.post()
                 .uri("/v1/payments/" + paymentKey + "/cancel")
                 .header("Authorization", authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(CancelReason.CHANGE_MIND)
+                .body(new RestClientPaymentCancelRequest(CancelReason.CHANGE_MIND))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) ->
                         handleErrorMessage(response)
