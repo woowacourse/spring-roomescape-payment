@@ -1,6 +1,5 @@
 package roomescape.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ConflictException;
@@ -57,9 +57,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ExceptionResponse> handleHttpClientErrorException(HttpClientErrorException e) {
         log.error(e.getMessage());
-        ClientErrorDto clientErrorDto = e.getResponseBodyAs(ClientErrorDto.class);
+        RestClientErrorDto restClientErrorDto = e.getResponseBodyAs(RestClientErrorDto.class);
         return ResponseEntity.status(e.getStatusCode())
-                .body(new ExceptionResponse(clientErrorDto.message()));
+                .body(new ExceptionResponse(restClientErrorDto.message()));
+    }
+
+    @ExceptionHandler(HttpServerErrorException.class)
+    public ResponseEntity<ExceptionResponse> handleHttpServerErrorException(HttpServerErrorException e) {
+        log.error(e.getMessage());
+        RestClientErrorDto restClientErrorDto = e.getResponseBodyAs(RestClientErrorDto.class);
+        return ResponseEntity.status(e.getStatusCode())
+                .body(new ExceptionResponse(restClientErrorDto.message()));
     }
 
     @ExceptionHandler(Exception.class)
