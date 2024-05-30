@@ -50,10 +50,10 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        paymentService.payment(PaymentRequest.from(reservationSaveRequest));
         Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.payment(PaymentRequest.from(reservationSaveRequest));
 
         return ReservationResponse.toResponse(savedReservation);
     }
