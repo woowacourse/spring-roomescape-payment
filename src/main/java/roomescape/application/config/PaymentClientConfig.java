@@ -1,7 +1,7 @@
 package roomescape.application.config;
 
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import roomescape.application.payment.PaymentErrorHandler;
 
 @Configuration
+@EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClientConfig {
-    private final String paymentUrl;
-
-    public PaymentClientConfig(@Value("${payment.url}") String paymentUrl) {
-        this.paymentUrl = paymentUrl;
-    }
 
     @Bean
     public ResponseErrorHandler errorHandler() {
@@ -24,12 +20,13 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    public RestClient.Builder restClientBuilder(RestTemplateBuilder builder) {
+    public RestClient.Builder restClientBuilder(PaymentClientProperties properties,
+                                                RestTemplateBuilder builder) {
         RestTemplate template = builder
                 .setConnectTimeout(Duration.ofSeconds(3L))
                 .setReadTimeout(Duration.ofSeconds(30L))
                 .build();
         return RestClient.builder(template)
-                .baseUrl(paymentUrl);
+                .baseUrl(properties.getUrl());
     }
 }
