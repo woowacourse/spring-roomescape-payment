@@ -3,6 +3,8 @@ package roomescape.acceptance;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
@@ -12,10 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.jdbc.SqlMergeMode.MergeMode;
+import roomescape.application.dto.response.payment.PaymentResponse;
+import roomescape.domain.payment.PaymentClient;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,6 +28,10 @@ import org.springframework.test.context.jdbc.SqlMergeMode.MergeMode;
 @Sql("/init/truncate.sql")
 class MemberReservationTest {
     private static final Map<String, String> TOKEN_CACHE = new HashMap<>();
+    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     @LocalServerPort
     private int port;
@@ -30,6 +39,20 @@ class MemberReservationTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        mockPaymentClient();
+    }
+
+    private void mockPaymentClient() {
+        PaymentResponse responseBody = new PaymentResponse(
+                10000L,
+                "qwer",
+                "1234abcd",
+                "DONE",
+                "2024-08-01T00:00:00",
+                "2024-08-02T00:00:00");
+
+        when(paymentClient.confirm(any()))
+                .thenReturn(responseBody);
     }
 
     private String getToken(String email, String password) {
@@ -55,8 +78,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_noReservation_then_addReservation() {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":1, \"date\":\"%s\", \"timeId\":1}", tomorrow);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         // when, then
         given().log().all()
@@ -74,11 +108,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_reservationExists_then_addWaitingReservation() {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        Long themeId = 1L;
-        Long timeId = 1L;
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -100,16 +142,24 @@ class MemberReservationTest {
                 .body("status", equalTo("WAITING"));
     }
 
-    @DisplayName("내가 예약한 상태에서, 예약 요청을 보내면, 예약이 거절된다")
+    @DisplayName("내가 예약한 상태에서, 예약 요청을 다시 보내면, 예약이 거절된다")
     @Test
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_myReservationExists_then_rejectReservation() {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        Long themeId = 1L;
-        Long timeId = 1L;
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mangcho@woowa.net", "password"))
@@ -134,11 +184,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_myWaitingReservationExists_then_rejectReservation() {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        Long themeId = 1L;
-        Long timeId = 1L;
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -171,11 +229,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_canceledReservation_then_addReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -220,11 +286,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_anotherWaitingReservationExists_then_canNotDeleteOthersWaitingReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -256,11 +330,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_canceledWaitingReservation_then_addWaitingReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -313,11 +395,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql"})
     void when_pastTimeReservation_then_rejectReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, yesterday, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.yesterday, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         // when, then
         given().log().all()
@@ -329,16 +419,53 @@ class MemberReservationTest {
                 .statusCode(400);
     }
 
+    @DisplayName("존재하는 시간에 대한 예약 요청을 보내면, 예약된다")
+    @Test
+    @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
+    void when_reserveWithExistTime_then_rejectReservation() {
+        // given
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
+
+        // when, then
+        given().log().all()
+                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .body(requestBody).contentType("application/json")
+                .when().post("/reservations")
+                .then().log().all()
+                .assertThat()
+                .statusCode(201);
+    }
+
     @DisplayName("존재하지 않는 시간에 대한 예약 요청을 보내면, 예약이 거절된다")
     @Test
-    @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql"})
+    @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_noTimeReservation_then_rejectReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 100L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.yesterday, 100L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         // when, then
         given().log().all()
@@ -352,14 +479,22 @@ class MemberReservationTest {
 
     @DisplayName("존재하지 않는 테마에 대한 예약 요청을 보내면, 예약이 거절된다")
     @Test
-    @Sql(value = {"/test-data/members.sql", "/test-data/times.sql"})
+    @Sql(value = {"/test-data/members.sql", "/test-data/times.sql", "/test-data/themes.sql"})
     void when_noThemeReservation_then_rejectReservation() {
         // given
-        Long themeId = 100L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                100L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         // when, then
         given().log().all()
@@ -413,8 +548,8 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(200)
                 .body("size()", is(11))
-                .body("findAll { it.status == '예약' }.size()", is(8))
-                .body("findAll { it.status == '1번째 예약 대기' }.size()", is(3));
+                .body("findAll { it.status == 'RESERVED' }.size()", is(8))
+                .body("findAll { it.status == 'WAITING' }.size()", is(3));
     }
 
     @DisplayName("과거의 예약과 예약 대기는 조회되지 않는다")
@@ -430,8 +565,8 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(200)
                 .body("size()", is(11))
-                .body("findAll { it.status == '예약' }.size()", is(8))
-                .body("findAll { it.status == '1번째 예약 대기' }.size()", is(3));
+                .body("findAll { it.status == 'RESERVED' }.size()", is(8))
+                .body("findAll { it.status == 'WAITING' }.size()", is(3));
     }
 
     @DisplayName("내 예약 대기가 존재하는 경우에, 예약 대기 삭제 요청을 하면, 삭제된다")
@@ -460,16 +595,24 @@ class MemberReservationTest {
                 .statusCode(400);
     }
 
-    @DisplayName("예약으로 전환된 상태면, 예약 취소 요청하면, 거절된다")
+    @DisplayName("예약으로 전환된 상태에서, 예약 취소 요청하면, 거절된다")
     @Test
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_reservationStatusChangedIntoResolved_then_canNotDeleteWaitingReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -508,11 +651,19 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_waitingReservationExists_then_canNotDeleteResolvedReservation() {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String requestBody = String.format("{\"themeId\":%d, \"date\":\"%s\", \"timeId\":%d}",
-                themeId, tomorrow, timeId);
+        String requestBody = String.format(
+                """
+                        {
+                            "themeId": %d,
+                            "date": "%s",
+                            "timeId": %d,
+                            "orderId": "%s",
+                            "paymentKey": "%s",
+                            "paymentType": "%s"
+                        }
+                        """,
+                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+        );
 
         given().log().all()
                 .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
@@ -535,5 +686,13 @@ class MemberReservationTest {
                 .cookie("token", getToken("mangcho@woowa.net", "password"))
                 .when().delete("/reservations/1")
                 .then().log().all().statusCode(400);
+    }
+
+    private static class Fixture {
+        public static LocalDate tomorrow = LocalDate.now().plusDays(1);
+        public static LocalDate yesterday = LocalDate.now().minusDays(1);
+        public static String orderId = "1234abcd";
+        public static String paymentKey = "qwer";
+        public static String paymentType = "CREDIT_CARD";
     }
 }
