@@ -10,6 +10,8 @@ import org.springframework.web.client.ResponseErrorHandler;
 
 public class PaymentExceptionHandler implements ResponseErrorHandler {
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
@@ -18,7 +20,6 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
-        ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> properties = mapper.readValue(body, new TypeReference<>() {});
         throw new PaymentException(response.getStatusCode(), properties.get("message").toString());
     }
