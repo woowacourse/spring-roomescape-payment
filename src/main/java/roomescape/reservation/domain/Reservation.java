@@ -74,6 +74,10 @@ public class Reservation {
         return time.isBefore(currentDateTime.toLocalTime());
     }
 
+    public boolean isEqualsDate(LocalDate date) {
+        return date.equals(this.date);
+    }
+
     public Long getMemberId() {
         return member.getId();
     }

@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -68,7 +69,7 @@ public class ReservationService {
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
-        validate(reservation);
+        validateCreate(reservation);
 
         return createReservation(reservation);
     }
@@ -79,7 +80,7 @@ public class ReservationService {
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
-        validate(reservation);
+        validateCreate(reservation);
 
         ReservationResponse reservationResponse = createReservation(reservation);
         paymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
@@ -87,7 +88,7 @@ public class ReservationService {
         return reservationResponse;
     }
 
-    private void validate(Reservation reservation) {
+    private void validateCreate(Reservation reservation) {
         validateIsAvailable(reservation);
         validateExists(reservation);
     }
@@ -127,9 +128,30 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservation(Long id) {
-        waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(id)
-                .ifPresentOrElse(this::promoteWaiting, () -> cancelReservation(id));
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약은 존재하지 않습니다."));
+        validateDelete(reservation);
 
+        waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(id)
+                .ifPresentOrElse(this::promoteWaiting, () -> cancelReservation(reservation));
+
+    }
+
+    private void validateDelete(Reservation reservation) {
+        validatePastReservation(reservation);
+        validateEqualsDateReservation(reservation);
+    }
+
+    private void validatePastReservation(Reservation reservation) {
+        if (reservation.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("과거 예약에 대한 취소는 불가능합니다.");
+        }
+    }
+
+    private void validateEqualsDateReservation(Reservation reservation) {
+        if (reservation.isEqualsDate(LocalDate.now())) {
+            throw new IllegalArgumentException("당일 예약 취소는 불가능합니다.");
+        }
     }
 
     private void promoteWaiting(Waiting waiting) {
@@ -140,16 +162,13 @@ public class ReservationService {
         waitingRepository.deleteById(waiting.getId());
     }
 
-    private void cancelReservation(Long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약은 존재하지 않습니다."));
-
+    private void cancelReservation(Reservation reservation) {
         if (reservation.isNotPaidReservation()) {
-            reservationRepository.deleteById(id);
+            reservationRepository.deleteById(reservation.getId());
             return;
         }
 
-        paymentHistoryService.cancelPayment(id);
-        reservationRepository.deleteById(id);
+        paymentHistoryService.cancelPayment(reservation.getId());
+        reservationRepository.deleteById(reservation.getId());
     }
 }

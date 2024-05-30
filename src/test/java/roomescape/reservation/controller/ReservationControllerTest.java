@@ -13,6 +13,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +34,7 @@ import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.time.domain.ReservationTime;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -154,5 +156,42 @@ class ReservationControllerTest {
                 .jsonPath().getList("", ReservationResponse.class);
 
         assertThat(reservationResponses).doesNotContain(response);
+    }
+
+    @DisplayName("예약 삭제 시 과거 예약이라면 예외가 발생한다.")
+    @Test
+    @Sql(scripts = {"/init.sql", "/past-reservation-data.sql"})
+    void deleteReservation_whenPastReservation() {
+        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+
+        // 예약 삭제
+        RestAssured.given().log().all()
+                .when().delete("/reservations/" + 1L)
+                .then().log().all()
+                .statusCode(400)
+                .body("errorMessage", is("과거 예약에 대한 취소는 불가능합니다."));
+        ;
+    }
+
+    @DisplayName("예약 삭제 시 과거 예약이라면 예외가 발생한다.")
+    @Test
+    void deleteReservation_whenEqualsDateReservation() {
+        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        LocalDate todayDate = LocalDate.now();
+        ReservationTime time = new ReservationTime(LocalTime.now().plusMinutes(10));
+
+        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(time), cookies).id();
+
+        AdminReservationCreateRequest reservationParams =
+                new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), todayDate, timeId, themeId);
+        ReservationResponse response = RestAssuredTemplate.create(reservationParams, cookies);
+
+        // 예약 삭제
+        RestAssured.given().log().all()
+                .when().delete("/reservations/" + response.id())
+                .then().log().all()
+                .statusCode(400)
+                .body("errorMessage", is("당일 예약 취소는 불가능합니다."));
     }
 }
