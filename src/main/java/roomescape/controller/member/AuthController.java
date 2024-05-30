@@ -35,7 +35,6 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(3600000);
         response.addCookie(cookie);
-        response.setHeader("Keep-Alive", "timeout=60");
         return ResponseEntity.ok().body(token);
     }
 
