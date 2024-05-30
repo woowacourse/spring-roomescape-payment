@@ -1,7 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.component.PaymentClient;
+import roomescape.component.TossPaymentClient;
 import roomescape.domain.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
@@ -11,11 +11,11 @@ import roomescape.repository.ReservationRepository;
 @Service
 public class PaymentService {
 
-    private final PaymentClient paymentClient;
+    private final TossPaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
 
-    public PaymentService(final PaymentClient paymentClient,
+    public PaymentService(final TossPaymentClient paymentClient,
                           final PaymentRepository paymentRepository,
                           final ReservationRepository reservationRepository) {
         this.paymentClient = paymentClient;

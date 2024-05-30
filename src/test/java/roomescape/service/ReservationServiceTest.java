@@ -18,10 +18,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.*;
 import roomescape.dto.theme.ReservedThemeResponse;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
+import roomescape.repository.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static roomescape.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +58,7 @@ class ReservationServiceTest {
         final Theme theme = THEME_HORROR(1L);
         final Reservation reservation = new Reservation(member, LocalDate.parse(date),
                 time, theme, ReservationStatus.RESERVED);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -81,7 +79,7 @@ class ReservationServiceTest {
     @DisplayName("이전 날짜 혹은 당일 예약을 할 경우 예외가 발생한다.")
     void throwExceptionWhenCreateReservationAtInvalidDate(final int days) {
         final LocalDate date = LocalDate.now().minusDays(days);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date.toString(), 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date.toString(), 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
 
         assertThatThrownBy(() -> reservationService.createReservation(reservationDto))
@@ -96,7 +94,7 @@ class ReservationServiceTest {
         final String date = DATE_MAY_EIGHTH;
         final ReservationTime time = RESERVATION_TIME_SIX(1L);
         final Theme theme = THEME_HORROR(1L);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, time.getId(), theme.getId());
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, time.getId(), theme.getId(), PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, member.getId());
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -189,7 +187,7 @@ class ReservationServiceTest {
     void throwExceptionWhenDeleteNotExistingReservation() {
         // given
         final Long notExistingId = 1L;
-        given(reservationRepository.existsById(notExistingId)).willReturn(false);
+        given(reservationRepository.findById(notExistingId)).willThrow(IllegalArgumentException.class);
 
         // when & then
         assertThatThrownBy(() -> reservationService.delete(notExistingId))

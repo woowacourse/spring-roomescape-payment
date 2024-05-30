@@ -19,7 +19,6 @@ public class TestFixture {
     public static final String MEMBER_BROWN_EMAIL = "brown@email.com";
     public static final String MEMBER_PASSWORD = "1234";
 
-
     public static final String DATE_MAY_EIGHTH = "2034-05-08";
     public static final String DATE_MAY_NINTH = "2034-05-09";
 
@@ -33,6 +32,10 @@ public class TestFixture {
     public static final String THEME_DETECTIVE_NAME = "추리";
     public static final String THEME_DETECTIVE_DESCRIPTION = "매우 어렵습니다.";
     public static final String THEME_DETECTIVE_THUMBNAIL = "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";
+
+    public static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
+    public static final String ORDER_ID = "MC4wNDYzMzA0OTc2MDgy";
+    public static final Long AMOUNT = 1000L;
 
     public static Member ADMIN() {
         return new Member(new Name(ADMIN_NAME), ADMIN_EMAIL, ADMIN_PASSWORD, Role.ADMIN);

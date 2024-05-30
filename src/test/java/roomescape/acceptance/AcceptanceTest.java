@@ -5,9 +5,11 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.component.TossPaymentClient;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
@@ -15,6 +17,7 @@ import roomescape.dto.reservation.ReservationTimeSaveRequest;
 import roomescape.dto.reservation.ReservationWaitingSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
+import static org.mockito.ArgumentMatchers.any;
 import static roomescape.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -24,9 +27,13 @@ abstract class AcceptanceTest {
     @LocalServerPort
     private int port;
 
+    @MockBean
+    TossPaymentClient paymentClient;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        paymentClient.confirm(any());
     }
 
     protected Long saveReservationTime() {
@@ -63,7 +70,7 @@ abstract class AcceptanceTest {
     protected Long saveReservation(final Long timeId, final Long themeId, final String email) {
         final String accessToken = getAccessToken(email);
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", accessToken)
@@ -98,7 +105,7 @@ abstract class AcceptanceTest {
 
     protected Long saveReservationAndWaiting(final Long timeId, final Long themeId) {
         final ReservationSaveRequest reservationRequest
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
         RestAssured.given().log().all()
                 .cookie("token", getAccessToken(ADMIN_EMAIL))
                 .contentType(ContentType.JSON)

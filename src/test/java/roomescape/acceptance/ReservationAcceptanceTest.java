@@ -1,5 +1,9 @@
 package roomescape.acceptance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.TestFixture.*;
+
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.DisplayName;
@@ -9,10 +13,6 @@ import roomescape.dto.reservation.AdminReservationSaveRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.TestFixture.*;
-
 class ReservationAcceptanceTest extends AcceptanceTest {
 
     @Test
@@ -21,7 +21,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final ReservationResponse response = assertPostResponseWithToken(
                 request, MEMBER_TENNY_EMAIL, "/reservations", 201)
@@ -60,7 +60,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         saveReservationTime();
         final Long themeId = saveTheme();
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 400);
     }
@@ -71,7 +71,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         saveTheme();
         final Long timeId = saveReservationTime();
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 400);
     }
@@ -82,7 +82,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
         saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
-        
+
         final JsonPath jsonPath = assertGetResponse("/reservations", 200)
                 .extract().response().jsonPath();
 
@@ -93,7 +93,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
             assertThat(jsonPath.getString("theme[0].name")).isEqualTo(THEME_HORROR_NAME);
         });
     }
-    
+
     @Test
     @DisplayName("테마, 사용자, 예약 날짜로 예약 목록을 성공적으로 조회하면 200을 응답한다.")
     void respondOkWhenFilteredFindReservations() {
@@ -120,7 +120,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
             assertThat(jsonPath.getString("theme[0].name")).isEqualTo(THEME_HORROR_NAME);
         });
     }
-    
+
     @Test
     @DisplayName("예약을 성공적으로 삭제하면 204를 응답한다.")
     void respondNoContentWhenDeleteReservation() {

@@ -38,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
         logger.error(e.getMessage(), e);
-        return ResponseEntity.status(e.getCode())
+        return ResponseEntity.status(e.getHttpStatusCodeValue())
                 .body(new ErrorResponse(e.getMessage()));
     }
 

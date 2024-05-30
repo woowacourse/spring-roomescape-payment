@@ -56,7 +56,7 @@ class WaitingServiceTest {
         final Theme theme = THEME_HORROR(1L);
         final Reservation waiting = new Reservation(2L, member, LocalDate.parse(date),
                 time, theme, ReservationStatus.WAITING);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -76,7 +76,7 @@ class WaitingServiceTest {
 
         assertThat(actual.id()).isNotNull();
     }
-    
+
     @Test
     @DisplayName("사용자가 예약이 없는 건에 대해 예약 대기를 등록하려는 경우 예외가 발생한다.")
     void throwExceptionWhenDoesNotExistReservation() {
@@ -86,7 +86,7 @@ class WaitingServiceTest {
         final Theme theme = THEME_HORROR(1L);
         final Reservation waiting = new Reservation(2L, member, LocalDate.parse(date),
                 time, theme, ReservationStatus.WAITING);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -108,7 +108,7 @@ class WaitingServiceTest {
         final Theme theme = THEME_HORROR(1L);
         final Reservation waiting = new Reservation(2L, member, LocalDate.parse(date),
                 time, theme, ReservationStatus.WAITING);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -134,7 +134,7 @@ class WaitingServiceTest {
         final Theme theme = THEME_HORROR(1L);
         final Reservation waiting = new Reservation(2L, member, LocalDate.parse(date),
                 time, theme, ReservationStatus.WAITING);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L);
+        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));

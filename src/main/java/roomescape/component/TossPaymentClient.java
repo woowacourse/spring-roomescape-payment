@@ -8,20 +8,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.payment.TossPaymentError;
 import roomescape.dto.payment.PaymentDto;
+import roomescape.exception.Exceptions;
 import roomescape.exception.PaymentException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Component
-public class PaymentClient {
+public class TossPaymentClient {
 
     private static final String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentClient(final RestClient restClient, final ObjectMapper objectMapper) {
+    public TossPaymentClient(final RestClient restClient, final ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
@@ -33,11 +34,11 @@ public class PaymentClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
+                    //throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
                     final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
+                    //throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
                 .toBodilessEntity();
     }

@@ -7,12 +7,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import roomescape.component.PaymentClient;
+import roomescape.component.TossPaymentClient;
 import roomescape.dto.payment.PaymentDto;
 import roomescape.exception.PaymentException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentClientTest {
@@ -38,8 +40,8 @@ class PaymentClientTest {
     @EnumSource(value = TossErrorCode.class)
     @DisplayName("결제 승인 오류 시 예외가 발생한다.")
     void throwExceptionWhen4xxError(final TossErrorCode tossError) {
-        PaymentClient paymentClient = new PaymentClient(tossExceptionRestClient(tossError), objectMapper);
-        final PaymentDto paymentDto = new PaymentDto("tgen_20240513184816ZSAZ9", "orderId", 1000L);
+        final TossPaymentClient paymentClient = new TossPaymentClient(tossExceptionRestClient(tossError), objectMapper);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertThatThrownBy(() -> paymentClient.confirm(paymentDto))
                 .isInstanceOf(PaymentException.class)
