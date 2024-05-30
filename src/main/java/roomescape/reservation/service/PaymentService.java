@@ -9,8 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
-import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 import roomescape.common.exception.PaymentException;
+import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 
 @Service
@@ -43,7 +43,7 @@ public class PaymentService {
 
     private ErrorHandler createPaymentErrorHandler() {
         return (request, response) -> {
-            PaymentResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentResponse.class);
+            PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
             throw new PaymentException(response.getStatusCode(), errorResponse.message());
         };
     }
