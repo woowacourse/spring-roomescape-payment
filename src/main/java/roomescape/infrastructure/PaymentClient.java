@@ -28,7 +28,8 @@ public class PaymentClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new PaymentErrorHandler());
+                .onStatus(new PaymentErrorHandler())
+                .toBodilessEntity();
     }
 
     public void refundPayment(
@@ -41,6 +42,7 @@ public class PaymentClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
-                .onStatus(new PaymentErrorHandler());
+                .onStatus(new PaymentErrorHandler())
+                .toBodilessEntity();
     }
 }
