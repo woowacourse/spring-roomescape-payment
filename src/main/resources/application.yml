@@ -7,6 +7,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create
+    open-in-view: false
   datasource:
     url: jdbc:mysql://localhost:23306/roomescape?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: dev
