@@ -1,6 +1,8 @@
 package roomescape.config;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -27,16 +29,24 @@ public class PaymentConfig {
 
     @Bean
     public PaymentClient paymentClient() {
-        return new TossPaymentClient(restClient(), paymentProperties);
+        return new TossPaymentClient(restClient());
     }
 
     private RestClient restClient() {
         return RestClient
                 .builder()
-                .defaultStatusHandler(responseErrorHandler())
                 .baseUrl("https://api.tosspayments.com")
+                .defaultHeader("Authorization", createAuthorizationHeader())
+                .defaultStatusHandler(responseErrorHandler())
                 .requestFactory(clientHttpRequestFactory())
                 .build();
+    }
+
+    private String createAuthorizationHeader() {
+        byte[] encodedBytes = Base64.getEncoder()
+                .encode((paymentProperties.secretKey() + ":")
+                        .getBytes(StandardCharsets.UTF_8));
+        return  "Basic " + new String(encodedBytes);
     }
 
     private ResponseErrorHandler responseErrorHandler() {
