@@ -60,7 +60,7 @@ public class Reservation {
 
     public Long getId() {
         return id;
-    } // TODO: get 네이밍에서 없앨지 고민하기
+    }
 
     public ReservationInfo getInfo() {
         return info;

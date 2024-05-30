@@ -17,9 +17,9 @@ public class ReservationRequest {
     private final String orderId;
     private final Integer amount;
 
-    public ReservationRequest(String date, String timeId, String themeId, String paymentKey, String orderId,
-                              Integer amount) {
-        validate(date, timeId, themeId);
+    public ReservationRequest(
+            String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
+        validate(date, timeId, themeId, paymentKey, orderId, amount);
         this.date = LocalDate.parse(date);
         this.timeId = Long.parseLong(timeId);
         this.themeId = Long.parseLong(themeId);
@@ -28,20 +28,15 @@ public class ReservationRequest {
         this.amount = amount;
     }
 
-    // TODO: null 처리
-    public ReservationRequest(AdminReservationRequest request) {
-        this.date = request.getDate();
-        this.timeId = request.getTimeId();
-        this.themeId = request.getThemeId();
-        this.paymentKey = null;
-        this.orderId = null;
-        this.amount = null;
-    }
-
-    public void validate(String date, String timeId, String themeId) {
+    public void validate(
+            String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
         if (date == null || date.isBlank() ||
                 timeId == null || timeId.isBlank() ||
-                themeId == null || themeId.isBlank()) {
+                themeId == null || themeId.isBlank() ||
+                paymentKey == null || paymentKey.isBlank() ||
+                orderId == null || orderId.isBlank() ||
+                amount == null
+        ) {
             throw new InvalidRequestBodyException();
         }
         try {
@@ -69,5 +64,5 @@ public class ReservationRequest {
 
     public Long getThemeId() {
         return themeId;
-    } // TODO: getter 동작 점검하기
+    }
 }

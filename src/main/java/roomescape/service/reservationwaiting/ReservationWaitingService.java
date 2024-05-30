@@ -53,7 +53,7 @@ public class ReservationWaitingService {
         return new ReservationWaitingResponse(savedReservationWaiting);
     }
 
-    private Reservation findByInfo(ReservationInfo info) { // TODO: id값 그대로 조회할지 고민해보F
+    private Reservation findByInfo(ReservationInfo info) {
         return reservationRepository.findByInfo(info)
                 .orElseThrow(NotFoundReservationException::new);
     }
