@@ -107,17 +107,15 @@ public class ReservationService {
 
     public List<ReservationDto> findAllSearched(AdminSearchedReservationDto request) {
         Specification<Reservation> reservationSpecification = new ReservationSpecification().generate(request);
-        List<Reservation> searchedReservations = reservationRepository.findAll(reservationSpecification);
 
-        return searchedReservations.stream()
+        return reservationRepository.findAll(reservationSpecification).stream()
                 .map(ReservationDto::from)
                 .toList();
     }
 
     public List<ReservationDto> findByMemberId(Long id) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
 
-        return reservations.stream()
+        return reservationRepository.findAllByMemberId(id).stream()
                 .map(ReservationDto::from)
                 .toList();
     }
