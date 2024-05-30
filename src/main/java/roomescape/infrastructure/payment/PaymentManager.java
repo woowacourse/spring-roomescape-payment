@@ -1,5 +1,6 @@
 package roomescape.infrastructure.payment;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -21,11 +22,10 @@ public class PaymentManager {
 
         restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
-                .header("Authorization", authorizations)
+                .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
                 .toBodilessEntity();
-
     }
 }
