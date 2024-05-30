@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.*;
 
@@ -158,7 +159,7 @@ class WaitingServiceTest {
     @DisplayName("예약 대기 목록을 조회한다.")
     void findReservationWaitings() {
         // given
-        final Reservation reservation = new Reservation(TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
+        final Reservation reservation = new Reservation(MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
         given(reservationRepository.findByStatus(ReservationStatus.WAITING))
                 .willReturn(List.of(reservation));
@@ -174,7 +175,7 @@ class WaitingServiceTest {
     @DisplayName("예약 대기를 승인한다.")
     void approveReservationWaiting() {
         // given
-        final Reservation waiting = new Reservation(1L, TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
+        final Reservation waiting = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
         given(reservationRepository.findById(waiting.getId())).willReturn(Optional.of(waiting));
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatus(waiting.getTheme(), waiting.getDate(),
@@ -192,7 +193,7 @@ class WaitingServiceTest {
     @DisplayName("이미 예약이 있는 상태에서 승인을 할 경우 예외가 발생한다.")
     void throwExceptionWhenAlreadyExistsReservation() {
         // given
-        final Reservation waiting = new Reservation(1L, TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
+        final Reservation waiting = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
         given(reservationRepository.findById(waiting.getId())).willReturn(Optional.of(waiting));
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatus(waiting.getTheme(), waiting.getDate(),
@@ -208,10 +209,10 @@ class WaitingServiceTest {
     @DisplayName("예약 대기를 거절한다.")
     void rejectReservationWaiting() {
         // given
-        final Reservation waiting = new Reservation(1L, TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
+        final Reservation waiting = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
-        given(reservationRepository.existsById(waiting.getId()))
-                .willReturn(true);
+        given(reservationRepository.existsById(waiting.getId())).willReturn(true);
+        given(reservationRepository.findById(anyLong())).willReturn(Optional.of(waiting));
 
         // when & then
         assertThatCode(() -> waitingService.rejectReservationWaiting(waiting.getId()))
@@ -228,6 +229,21 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.rejectReservationWaiting(notExistingId))
+                .isInstanceOf(RoomescapeException.class);
+    }
+
+    @Test
+    @DisplayName("예약 확정 건을 거절하려는 경우 예외가 발생한다.")
+    void throwExceptionWhenRejectReservation() {
+        // given
+        final Long waitingId = 1L;
+        final Reservation reservation = new Reservation(waitingId, TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
+                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
+        given(reservationRepository.existsById(waitingId)).willReturn(true);
+        given(reservationRepository.findById(anyLong())).willReturn(Optional.of(reservation));
+
+        // when & then
+        assertThatThrownBy(() -> waitingService.rejectReservationWaiting(waitingId))
                 .isInstanceOf(RoomescapeException.class);
     }
 }

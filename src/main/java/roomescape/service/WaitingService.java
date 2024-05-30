@@ -1,14 +1,5 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_DUPLICATED;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_MY_RESERVATION;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_NO_RESERVATION;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_NOT_FOUND;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +17,8 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+
+import static roomescape.exception.RoomescapeExceptionCode.*;
 
 @Transactional
 @Service
@@ -109,10 +102,23 @@ public class WaitingService {
     }
 
     public void rejectReservationWaiting(final Long id) {
-        final boolean isExist = reservationRepository.existsById(id);
-        if (!isExist) {
+        validateExistsWaiting(id);
+        validateIsReservation(id);
+        reservationRepository.deleteById(id);
+    }
+
+    private void validateExistsWaiting(final Long id) {
+        final boolean exists = reservationRepository.existsById(id);
+        if (!exists) {
             throw new RoomescapeException(WAITING_NOT_FOUND);
         }
-        reservationRepository.deleteById(id);
+    }
+
+    private void validateIsReservation(final Long id) {
+        final Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(WAITING_NOT_FOUND));
+        if (reservation.isReserved()) {
+            throw new RoomescapeException(CANNOT_REJECT_WAITING);
+        }
     }
 }
