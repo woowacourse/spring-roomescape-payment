@@ -45,6 +45,9 @@ public class PaymentService {
                 .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             PaymentErrorMessageResponse response = e.getResponseBodyAs(PaymentErrorMessageResponse.class);
+            if (response == null) {
+                throw new RoomescapeException("결제가 승인되지 않았습니다.");
+            }
             throw new RoomescapeException(response.message());
         } catch (RestClientResponseException e) {
             throw new RoomescapeException("결제가 승인되지 않았습니다.");
