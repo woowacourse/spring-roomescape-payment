@@ -2,9 +2,9 @@ package roomescape.domain.payment;
 
 
 public class ApiCallException extends RuntimeException {
-    private final ApproveApiError apiError;
+    private final PaymentApiError apiError;
 
-    public ApiCallException(ApproveApiError apiError) {
+    public ApiCallException(PaymentApiError apiError) {
         this.apiError = apiError;
     }
 

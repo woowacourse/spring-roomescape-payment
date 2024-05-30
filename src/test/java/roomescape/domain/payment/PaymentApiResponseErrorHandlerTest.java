@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,18 @@ class PaymentApiResponseErrorHandlerTest {
                 Arguments.of(404, true),
                 Arguments.of(500, true)
         );
+    }
+
+    public static Stream<Arguments> handleErrorParameters() {
+        return Arrays.stream(PaymentApiErrorCode.values())
+                .filter(paymentApiErrorCode -> !paymentApiErrorCode.isNeedToHide())
+                .map(Arguments::of);
+    }
+
+    public static Stream<Arguments> handleErrorNeedToHideMessageParameters() {
+        return Arrays.stream(PaymentApiErrorCode.values())
+                .filter(PaymentApiErrorCode::isNeedToHide)
+                .map(Arguments::of);
     }
 
     @ParameterizedTest
@@ -70,18 +83,23 @@ class PaymentApiResponseErrorHandlerTest {
         };
     }
 
-    @Test
-    @DisplayName("API가 에러를 응답했을 때 적절한 예외가 발생하는지 확인")
-    void handleError() {
+    @ParameterizedTest
+    @MethodSource("handleErrorParameters")
+    @DisplayName("API가 메세지를 그대로 보내도 되는 알려진 에러를 응답했을 때 적절한 예외가 발생하는지 확인")
+    void handleError(PaymentApiErrorCode knownErrorCode) {
+        String message = "message";
         String errorJson = """
                 {
-                  "code": "code_e63022aece25",
-                  "message": "message_799dc46c7cf3"
-                }""";
+                  "code": "%s",
+                  "message": "%s"
+                }"""
+                .formatted(knownErrorCode, message);
+
         PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
         ClientHttpResponse response = getFakeHttpResponse(errorJson);
         Assertions.assertThatThrownBy(() -> handler.handleError(response))
-                .isInstanceOf(ApiCallException.class);
+                .isInstanceOf(ApiCallException.class)
+                .hasMessage(message);
     }
 
     private static ClientHttpResponse getFakeHttpResponse(String errorJson) {
@@ -111,5 +129,39 @@ class PaymentApiResponseErrorHandlerTest {
                 return null;
             }
         };
+    }
+
+    @ParameterizedTest
+    @MethodSource("handleErrorNeedToHideMessageParameters")
+    @DisplayName("API가 메세지를 그대로 보내면 안되는 에러를 응답했을 때 적절한 예외가 발생하는지 확인")
+    void handleErrorNeedToHideMessage(PaymentApiErrorCode knownErrorCode) {
+        String message = "message";
+        String errorJson = """
+                {
+                  "code": "%s",
+                  "message": "%s"
+                }"""
+                .formatted(knownErrorCode, message);
+
+        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
+        ClientHttpResponse response = getFakeHttpResponse(errorJson);
+        Assertions.assertThatThrownBy(() -> handler.handleError(response))
+                .isInstanceOf(ApiCallException.class)
+                .hasMessage("결제를 진행할 수 없습니다. 고객 센터로 문의해 주세요.");
+    }
+
+    @Test
+    @DisplayName("API가 알수 없는 에러를 응답했을 때 적절한 예외가 발생하는지 확인")
+    void handleUnknownError() {
+        String errorJson = """
+                {
+                  "code": "code_e63022aece25",
+                  "message": "message_799dc46c7cf3"
+                }""";
+        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
+        ClientHttpResponse response = getFakeHttpResponse(errorJson);
+        Assertions.assertThatThrownBy(() -> handler.handleError(response))
+                .isInstanceOf(ApiCallException.class)
+                .hasMessage("결제를 진행할 수 없습니다. 고객 센터로 문의해 주세요.");
     }
 }
