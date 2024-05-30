@@ -4,12 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
-import roomescape.global.util.Encoder;
-import roomescape.payment.service.dto.PaymentRequest;
-import roomescape.payment.service.dto.PaymentResponse;
-import roomescape.payment.TossPaymentProperties;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
+import roomescape.payment.service.dto.PaymentRequest;
+import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.MemberReservation;
 
 @Service

@@ -1,6 +1,9 @@
 package roomescape;
 
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -8,15 +11,15 @@ import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.domain.*;
+import roomescape.reservation.domain.MemberReservation;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Transactional
 @Component
