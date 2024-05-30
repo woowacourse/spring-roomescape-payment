@@ -44,6 +44,21 @@ public class PaymentRestClient {
                 .toBodilessEntity();
     }
 
+    public void cancelPayment(String paymentKey) {
+        String authorizations = BASIC + secretKey;
+
+        restClient.post()
+                .uri("/v1/payments/" + paymentKey + "/cancel")
+                .header("Authorization", authorizations)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(CancelReason.CHANGE_MIND)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, ((request, response) ->
+                        handleErrorMessage(response)
+                ))
+                .toBodilessEntity();
+    }
+
     private void handleErrorMessage(ClientHttpResponse httpResponse) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
