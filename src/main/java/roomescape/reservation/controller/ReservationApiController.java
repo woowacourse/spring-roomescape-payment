@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +31,15 @@ public class ReservationApiController {
 
     private final ReservationService reservationService;
     private final PaymentClient paymentClient;
+    private final String widgetSecretKey;
 
-    public ReservationApiController(ReservationService reservationService, PaymentClient paymentClient) {
+    public ReservationApiController(ReservationService reservationService,
+                                    PaymentClient paymentClient,
+                                    @Value("${toss.secret-key}") String widgetSecretKey
+    ) {
         this.reservationService = reservationService;
         this.paymentClient = paymentClient;
+        this.widgetSecretKey = widgetSecretKey;
     }
 
     @GetMapping("/reservations")
@@ -67,7 +73,6 @@ public class ReservationApiController {
     }
 
     private String getAuthorizations() {
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
