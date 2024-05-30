@@ -68,10 +68,8 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
-        if (reservationService.isNotAdminReservation(id)) {
-            paymentService.refundPayment(reservationService.findPaymentByReservationId(id));
-        }
         reservationService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent()
+                .build();
     }
 }

@@ -153,30 +153,29 @@ public class ReservationService {
     }
 
     @Transactional
-    public void delete(final Long id) {
-        Reservation delete = reservationRepository.findReservationById(id);
-        updateReservationStatus(delete);
-        reservationRepository.deleteById(id);
-        if (delete.getPayment() != null) {
-            paymentRepository.delete(delete.getPayment());
+    public void delete(final Long reservationId) {
+        Reservation reservation = reservationRepository.findReservationById(reservationId);
+        updateReservationStatus(reservation);
+        reservationRepository.deleteById(reservationId);
+
+        if (reservation.isPayed()) {
+            paymentService.refundPayment(new PaymentResponse(reservation.getPayment()));
         }
     }
 
-    private void updateReservationStatus(final Reservation delete) {
-        if (delete.getStatus().equals(Status.STANDBY)) {
+    //TODO: reservation에게 집적 묻기
+    private void updateReservationStatus(final Reservation reservation) {
+        if (reservation.getStatus().equals(Status.STANDBY)) {
             return;
         }
-        List<Reservation> reservations = reservationRepository.findAllByDateAndTimeAndThemeOrderByCreateAtAsc(
-                delete.getDate(), delete.getReservationTime(), delete.getTheme());
-        reservations.stream()
-                .filter(reservation -> reservation.getStatus().equals(Status.STANDBY))
+        reservationRepository.findAllByDateAndTimeAndThemeOrderByCreateAtAsc(
+                        reservation.getDate(),
+                        reservation.getReservationTime(),
+                        reservation.getTheme()
+                ).stream()
+                .filter(r -> r.getStatus().equals(Status.STANDBY))
                 .findFirst()
                 .ifPresent(Reservation::approve);
-    }
-
-    public PaymentResponse findPaymentByReservationId(final Long id) {
-        Reservation reservation = reservationRepository.findReservationById(id);
-        return new PaymentResponse(reservation.getPayment());
     }
 
     @Transactional(readOnly = true)
@@ -196,9 +195,5 @@ public class ReservationService {
         return reservations.stream()
                 .map(ReservationResponse::new)
                 .toList();
-    }
-
-    public Boolean isNotAdminReservation(final Long id) {
-        return reservationRepository.isNotAdminReservation(id);
     }
 }

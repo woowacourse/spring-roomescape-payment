@@ -38,5 +38,6 @@ public class PaymentService {
 
     public void refundPayment(PaymentResponse paymentResponse) {
         paymentClient.refundPayment(paymentResponse, createPaymentAuthorization());
+        paymentRepository.delete(paymentResponse.toPayment());
     }
 }

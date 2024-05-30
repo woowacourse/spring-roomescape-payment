@@ -98,8 +98,8 @@ public class Reservation {
         return id;
     }
 
-    public Long getMemberId() {
-        return member.getId();
+    public boolean isPayed() {
+        return payment != null;
     }
 
     public Member getMember() {
