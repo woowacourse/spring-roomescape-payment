@@ -84,7 +84,8 @@ class PaymentClientTest {
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
 
         assertThatCode(() -> paymentClient.requestPurchase(request))
-                .isInstanceOf(PaymentException.class);
+                .isInstanceOf(PaymentException.class)
+                .hasMessageStartingWith("카드 정보를 다시 확인해주세요.");
     }
 
     @Test
@@ -102,6 +103,7 @@ class PaymentClientTest {
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
 
         assertThatCode(() -> paymentClient.requestPurchase(request))
-                .isInstanceOf(PaymentException.class);
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제에 실패했습니다.");
     }
 }
