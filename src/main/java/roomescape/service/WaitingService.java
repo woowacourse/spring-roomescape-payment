@@ -1,7 +1,19 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
+import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.WAITING_DUPLICATED;
+import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_MY_RESERVATION;
+import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_NO_RESERVATION;
+import static roomescape.exception.RoomescapeExceptionCode.WAITING_NOT_FOUND;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -9,12 +21,11 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-
-import java.util.List;
 
 @Transactional
 @Service
@@ -38,11 +49,11 @@ public class WaitingService {
 
     public ReservationResponse createReservationWaiting(final ReservationDto reservationDto) {
         final Member member = memberRepository.findById(reservationDto.memberId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.memberId() + "에 해당하는 사용자가 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
         final ReservationTime time = reservationTimeRepository.findById(reservationDto.timeId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.timeId() + "에 해당하는 예약 시간이 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
         final Theme theme = themeRepository.findById(reservationDto.themeId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.themeId() + "에 해당하는 테마가 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
 
         final Reservation waiting = reservationDto.toModel(member, time, theme, ReservationStatus.WAITING);
         validateExistReservation(waiting);
@@ -55,7 +66,7 @@ public class WaitingService {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatus(
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED);
         if (!exists) {
-            throw new IllegalStateException("예약이 없는 건에는 예약 대기를 할 수 없습니다.");
+            throw new RoomescapeException(WAITING_FOR_NO_RESERVATION);
         }
     }
 
@@ -63,7 +74,7 @@ public class WaitingService {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED, waiting.getMember());
         if (exists) {
-            throw new IllegalStateException("이미 예약한 건에는 예약 대기를 할 수 없습니다.");
+            throw new RoomescapeException(WAITING_FOR_MY_RESERVATION);
         }
     }
 
@@ -71,7 +82,7 @@ public class WaitingService {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING, waiting.getMember());
         if (exists) {
-            throw new IllegalStateException("중복해서 예약 대기를 할 수 없습니다.");
+            throw new RoomescapeException(WAITING_DUPLICATED);
         }
     }
 
@@ -84,7 +95,7 @@ public class WaitingService {
 
     public void approveReservationWaiting(final Long waitingId) {
         final Reservation waiting = reservationRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 예약 대기가 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(WAITING_NOT_FOUND));
         validateIsApprovable(waiting);
         waiting.toReserved();
     }
@@ -93,14 +104,14 @@ public class WaitingService {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatus(
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED);
         if (exists) {
-            throw new IllegalStateException("이미 예약이 존재하여 승인이 불가능합니다.");
+            throw new RoomescapeException(RESERVATION_ALREADY_EXISTS);
         }
     }
 
     public void rejectReservationWaiting(final Long id) {
         final boolean isExist = reservationRepository.existsById(id);
         if (!isExist) {
-            throw new IllegalArgumentException("해당 ID의 예약 대기가 없습니다.");
+            throw new RoomescapeException(WAITING_NOT_FOUND);
         }
         reservationRepository.deleteById(id);
     }

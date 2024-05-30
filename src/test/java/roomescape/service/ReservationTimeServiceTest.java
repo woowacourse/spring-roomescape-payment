@@ -12,6 +12,7 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.dto.reservation.AvailableReservationTimeResponse;
 import roomescape.dto.reservation.AvailableReservationTimeSearch;
 import roomescape.dto.reservation.ReservationTimeResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
@@ -94,7 +95,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.delete(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test

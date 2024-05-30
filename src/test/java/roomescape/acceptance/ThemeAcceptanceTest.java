@@ -67,11 +67,11 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 테마를 삭제하면 400을 응답한다.")
+    @DisplayName("존재하지 않는 테마를 삭제하면 404를 응답한다.")
     void respondBadRequestWhenDeleteNotExistingTheme() {
         saveTheme();
         final Long notExistingThemeId = 0L;
 
-        assertDeleteResponse("/themes/", notExistingThemeId, 400);
+        assertDeleteResponse("/themes/", notExistingThemeId, 404);
     }
 }

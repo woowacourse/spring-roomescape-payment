@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.exception.RoomescapeException;
 
 class ReservationTimeTest {
 
@@ -23,23 +24,12 @@ class ReservationTimeTest {
                 .doesNotThrowAnyException();
     }
 
-    @Test
-    @DisplayName("예약 시간이 10분 단위가 아니면 예외가 발생한다.")
-    void throwExceptionWhenInvalidTimeUnit() {
-        // given
-        final String invalidTime = "13:01";
-
-        // when & then
-        assertThatThrownBy(() -> new ReservationTime(invalidTime))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "13-00"})
     @DisplayName("예약 시간 입력 값이 유효하지 않으면 예외가 발생한다.")
     void throwExceptionWhenCannotConvertToLocalTime(final String invalidTime) {
         assertThatThrownBy(() -> new ReservationTime(invalidTime))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

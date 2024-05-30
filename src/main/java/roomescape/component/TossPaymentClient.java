@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.payment.TossPaymentError;
 import roomescape.dto.payment.PaymentDto;
-import roomescape.exception.Exceptions;
-import roomescape.exception.PaymentException;
+import roomescape.exception.TossPaymentException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -34,11 +33,11 @@ public class TossPaymentClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    //throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
+                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
                     final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    //throw new PaymentException(response.getStatusCode(), tossPaymentError.message());
+                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
                 .toBodilessEntity();
     }

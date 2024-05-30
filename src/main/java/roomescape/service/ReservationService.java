@@ -1,7 +1,19 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.INVALID_DATE;
+import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
+import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_TIME_NOT_FOUND;
+import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -12,14 +24,11 @@ import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
 
 @Transactional
 @Service
@@ -46,11 +55,11 @@ public class ReservationService {
 
     public ReservationResponse createReservation(final ReservationDto reservationDto) {
         final Member member = memberRepository.findById(reservationDto.memberId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.memberId() + "에 해당하는 사용자가 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
         final ReservationTime time = reservationTimeRepository.findById(reservationDto.timeId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.timeId() + "에 해당하는 예약 시간이 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_TIME_NOT_FOUND));
         final Theme theme = themeRepository.findById(reservationDto.themeId())
-                .orElseThrow(() -> new IllegalArgumentException(reservationDto.themeId() + "에 해당하는 테마가 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
 
         final Reservation reservation = reservationDto.toModel(member, time, theme, ReservationStatus.RESERVED);
         validateDate(reservation.getDate());
@@ -60,7 +69,7 @@ public class ReservationService {
 
     private void validateDate(final LocalDate date) {
         if (date.isBefore(LocalDate.now()) || date.equals(LocalDate.now())) {
-            throw new IllegalArgumentException("이전 날짜 혹은 당일은 예약할 수 없습니다.");
+            throw new RoomescapeException(INVALID_DATE);
         }
     }
 
@@ -70,7 +79,7 @@ public class ReservationService {
         );
 
         if (count >= MAX_RESERVATIONS_PER_TIME) {
-            throw new IllegalArgumentException("해당 시간대에 예약이 모두 찼습니다.");
+            throw new RoomescapeException(RESERVATION_ALREADY_EXISTS);
         }
     }
 
@@ -94,9 +103,9 @@ public class ReservationService {
     }
 
     public void delete(final Long id) {
-        final boolean isExist = reservationRepository.existsById(id);
-        if (!isExist) {
-            throw new IllegalArgumentException("해당 ID의 예약이 없습니다.");
+        final boolean exists = reservationRepository.existsById(id);
+        if (!exists) {
+            throw new RoomescapeException(RESERVATION_NOT_FOUND);
         }
         reservationRepository.deleteById(id);
     }

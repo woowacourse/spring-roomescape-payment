@@ -18,6 +18,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.*;
 import roomescape.dto.theme.ReservedThemeResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.*;
 
 import java.time.LocalDate;
@@ -83,7 +84,7 @@ class ReservationServiceTest {
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
 
         assertThatThrownBy(() -> reservationService.createReservation(reservationDto))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -104,7 +105,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(reservationDto))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -187,11 +188,11 @@ class ReservationServiceTest {
     void throwExceptionWhenDeleteNotExistingReservation() {
         // given
         final Long notExistingId = 1L;
-        given(reservationRepository.findById(notExistingId)).willThrow(IllegalArgumentException.class);
+        given(reservationRepository.existsById(notExistingId)).willThrow(RoomescapeException.class);
 
         // when & then
         assertThatThrownBy(() -> reservationService.delete(notExistingId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test

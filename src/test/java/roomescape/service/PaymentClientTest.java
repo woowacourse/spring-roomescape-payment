@@ -7,11 +7,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.component.TossPaymentClient;
 import roomescape.dto.payment.PaymentDto;
-import roomescape.exception.PaymentException;
+import roomescape.exception.TossPaymentException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static roomescape.TestFixture.*;
@@ -44,7 +43,7 @@ class PaymentClientTest {
         final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertThatThrownBy(() -> paymentClient.confirm(paymentDto))
-                .isInstanceOf(PaymentException.class)
+                .isInstanceOf(TossPaymentException.class)
                 .hasMessage(tossError.message);
     }
 

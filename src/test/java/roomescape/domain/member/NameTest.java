@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.exception.RoomescapeException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +26,6 @@ class NameTest {
     @DisplayName("예약자 이름이 빈칸이거나 숫자로만 구성될 경우 예외를 발생한다.")
     void throwExceptionWhenInvalidName(final String invalidName) {
         assertThatThrownBy(() -> new Name(invalidName))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

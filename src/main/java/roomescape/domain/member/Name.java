@@ -1,10 +1,15 @@
 package roomescape.domain.member;
 
+import static roomescape.exception.RoomescapeExceptionCode.EMPTY_NAME;
+import static roomescape.exception.RoomescapeExceptionCode.INVALID_NAME_FORMAT;
+
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import roomescape.exception.RoomescapeException;
 
 @Embeddable
 public class Name {
@@ -23,11 +28,11 @@ public class Name {
 
     private void validate(final String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("예약자 이름은 비어있을 수 없습니다.");
+            throw new RoomescapeException(EMPTY_NAME);
         }
         final Matcher matcher = NAME_PATTERN.matcher(name);
         if (matcher.matches()) {
-            throw new IllegalArgumentException("예약자 이름은 숫자로만 구성될 수 없습니다.");
+            throw new RoomescapeException(INVALID_NAME_FORMAT);
         }
     }
 

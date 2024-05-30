@@ -55,25 +55,25 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 예약 시간으로 예약 생성 시 400을 응답한다.")
+    @DisplayName("존재하지 않는 예약 시간으로 예약 생성 시 404를 응답한다.")
     void respondBadRequestWhenNotExistingReservationTime() {
         saveReservationTime();
         final Long themeId = saveTheme();
         final ReservationSaveRequest request
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
-        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 400);
+        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }
 
     @Test
-    @DisplayName("존재하지 않는 테마로 예약 생성 시 400을 응답한다.")
+    @DisplayName("존재하지 않는 테마로 예약 생성 시 404를 응답한다.")
     void respondBadRequestWhenNotExistingTheme() {
         saveTheme();
         final Long timeId = saveReservationTime();
         final ReservationSaveRequest request
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
-        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 400);
+        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }
 
     @Test
@@ -132,14 +132,14 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 예약을 삭제하면 400을 응답한다.")
+    @DisplayName("존재하지 않는 예약을 삭제하면 404를 응답한다.")
     void respondBadRequestWhenDeleteNotExistingReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
         saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
         final Long notExistingReservationTimeId = 0L;
 
-        assertDeleteResponse("/reservations/", notExistingReservationTimeId, 400);
+        assertDeleteResponse("/reservations/", notExistingReservationTimeId, 404);
     }
 
     @Test

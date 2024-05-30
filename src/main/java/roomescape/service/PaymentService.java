@@ -5,6 +5,8 @@ import roomescape.component.TossPaymentClient;
 import roomescape.domain.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
+import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionCode;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
@@ -26,7 +28,7 @@ public class PaymentService {
     public void confirmPayment(final PaymentDto paymentDto, final Long reservationId) {
         paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(reservationId + "에 해당하는 예약이 없습니다."));
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
         final Payment payment = paymentDto.toPayment(reservation);
         paymentRepository.save(payment);
     }

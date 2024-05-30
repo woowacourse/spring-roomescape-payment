@@ -15,6 +15,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -96,7 +97,7 @@ class WaitingServiceTest {
         )).willReturn(false);
 
         assertThatThrownBy(() -> waitingService.createReservationWaiting(reservationDto))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -122,7 +123,7 @@ class WaitingServiceTest {
 
 
         assertThatThrownBy(() -> waitingService.createReservationWaiting(reservationDto))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -150,7 +151,7 @@ class WaitingServiceTest {
         )).willReturn(true);
 
         assertThatThrownBy(() -> waitingService.createReservationWaiting(reservationDto))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -200,7 +201,7 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.approveReservationWaiting(waiting.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -227,6 +228,6 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.rejectReservationWaiting(notExistingId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

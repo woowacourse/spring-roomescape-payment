@@ -2,9 +2,12 @@ package roomescape.auth;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Component;
-import roomescape.exception.AuthorizationException;
+import roomescape.exception.RoomescapeException;
 
 import java.util.Arrays;
+import java.util.Objects;
+
+import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
 
 @Component
 public class CookieProvider {
@@ -20,13 +23,12 @@ public class CookieProvider {
 
     public String extractToken(final Cookie[] cookies) {
         if (cookies == null) {
-            throw new AuthorizationException("로그인이 필요합니다.");
+            throw new RoomescapeException(UNAUTHORIZED);
         }
-
         return Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals(TOKEN_KEY))
+                .filter(cookie -> Objects.equals(cookie.getName(), TOKEN_KEY))
                 .findFirst()
-                .orElseThrow(() -> new AuthorizationException("로그인이 필요합니다."))
+                .orElseThrow(() -> new RoomescapeException(UNAUTHORIZED))
                 .getValue();
     }
 

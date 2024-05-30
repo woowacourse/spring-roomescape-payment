@@ -1,11 +1,14 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
+
 import org.springframework.stereotype.Service;
 import roomescape.auth.JwtTokenProvider;
 import roomescape.domain.member.Member;
 import roomescape.dto.member.MemberResponse;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 
 import java.util.List;
@@ -23,7 +26,7 @@ public class MemberService {
 
     public TokenResponse createToken(final TokenRequest request) {
         final Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException(request.email() + "에 해당하는 사용자가 없습니다"));
+                .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
         member.checkIncorrectPassword(request.password());
         final String accessToken = jwtTokenProvider.createToken(member);
         return new TokenResponse(accessToken);
@@ -31,7 +34,7 @@ public class MemberService {
 
     public MemberResponse findById(final Long id) {
         final Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(id + "에 해당하는 사용자가 없습니다"));
+                .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
         return new MemberResponse(member.getId(), member.getNameString(), member.getEmail(), member.getRole());
     }
 

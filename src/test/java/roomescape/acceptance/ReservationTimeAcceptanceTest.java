@@ -56,11 +56,11 @@ class ReservationTimeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 예약 시간을 삭제하면 400을 응답한다.")
+    @DisplayName("존재하지 않는 예약 시간을 삭제하면 404를 응답한다.")
     void respondBadRequestWhenDeleteNotExistingReservationTime() {
         final Long notExistingReservationTimeId = 0L;
 
-        assertDeleteResponse("/times/", notExistingReservationTimeId, 400);
+        assertDeleteResponse("/times/", notExistingReservationTimeId, 404);
     }
 
     @Test

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeResponse;
+import roomescape.exception.RoomescapeException;
 import roomescape.repository.ThemeRepository;
 
 import java.util.List;
@@ -87,7 +88,7 @@ class ThemeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test
@@ -112,7 +113,7 @@ class ThemeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @Test

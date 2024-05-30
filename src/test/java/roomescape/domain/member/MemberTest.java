@@ -3,7 +3,7 @@ package roomescape.domain.member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.TestFixture;
-import roomescape.exception.AuthorizationException;
+import roomescape.exception.RoomescapeException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,6 +31,6 @@ class MemberTest {
 
         // when & then
         assertThatThrownBy(() -> member.checkIncorrectPassword(inCorrectPassword))
-                .isInstanceOf(AuthorizationException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

@@ -1,15 +1,18 @@
 package roomescape.domain.reservation;
 
+import static roomescape.exception.RoomescapeExceptionCode.EMPTY_TIME;
+import static roomescape.exception.RoomescapeExceptionCode.INVALID_TIME_FORMAT;
+
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
+import roomescape.exception.RoomescapeException;
+
 @Entity
 public class ReservationTime {
-
-    private static final int AVAILABLE_TIME_UNIT = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,25 +33,18 @@ public class ReservationTime {
     }
 
     public ReservationTime(final Long id, final LocalTime startAt) {
-        validateTimeUnit(startAt);
         this.id = id;
         this.startAt = startAt;
     }
 
     private static LocalTime convertToLocalTime(final String time) {
         if (time == null || time.isEmpty()) {
-            throw new IllegalArgumentException("예약 시간이 비어 있습니다.");
+            throw new RoomescapeException(EMPTY_TIME);
         }
         try {
             return LocalTime.parse(time);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("유효하지 않은 예약 시간입니다.");
-        }
-    }
-
-    private void validateTimeUnit(final LocalTime time) {
-        if (time.getMinute() % AVAILABLE_TIME_UNIT != 0) {
-            throw new IllegalArgumentException("예약 시간은 " + AVAILABLE_TIME_UNIT + "분 단위로 등록할 수 있습니다.");
+            throw new RoomescapeException(INVALID_TIME_FORMAT);
         }
     }
 

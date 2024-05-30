@@ -1,9 +1,19 @@
 package roomescape.domain.member;
 
-import jakarta.persistence.*;
-import roomescape.exception.AuthorizationException;
+import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
 
 import java.util.Objects;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class Member {
@@ -45,9 +55,9 @@ public class Member {
         this.role = role;
     }
 
-    public void checkIncorrectPassword(final String otherPassword) {
-        if (!Objects.equals(this.getPassword(), otherPassword)) {
-            throw new AuthorizationException("잘못된 비밀번호입니다.");
+    public void checkIncorrectPassword(final String other) {
+        if (!Objects.equals(getPassword(), other)) {
+            throw new RoomescapeException(UNAUTHORIZED);
         }
     }
 
