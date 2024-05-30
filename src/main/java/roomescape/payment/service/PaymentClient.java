@@ -2,10 +2,13 @@ package roomescape.payment.service;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import roomescape.global.util.Encoder;
+import roomescape.payment.PaymentProperties;
 import roomescape.payment.service.dto.PaymentErrorResponse;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
@@ -13,35 +16,41 @@ import roomescape.payment.exception.PaymentException;
 
 @Component
 public class PaymentClient {
+    private static final String PREFIX = "Basic ";
+    private static final String PAYMENT_CONFIRM_URI = "/v1/payments/confirm";
+    private static final String PAYMENT_CANCEL_URI = "/v1/payments/%s/cancel";
     private final RestClient restClient;
 
-    public PaymentClient(RestClient restClient) {
-        this.restClient = restClient;
+    public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties) {
+        this.restClient = RestClient.builder()
+                .baseUrl("https://api.tosspayments.com")
+                .defaultHeader("Authorization", PREFIX + encoder.encode(paymentProperties.getSecretKey()))
+                .build();
     }
 
-    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest, String encodeKey) {
+    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest) {
         try {
             return restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
-                    .header("Authorization", encodeKey)
+                    .uri(PAYMENT_CONFIRM_URI)
                     .body(paymentRequest)
-                    .retrieve().toEntity(PaymentResponse.class);
+                    .retrieve()
+                    .toEntity(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
             PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(paymentResponse);
         }
     }
 
-    public ResponseEntity<PaymentResponse> cancel(String paymentKey, String encodeKey) {
+    public ResponseEntity<PaymentResponse> cancel(String paymentKey) {
         try {
             Map<String, String> params = new HashMap<>();
             String cancelReason = "단순 변심";
             params.put("cancelReason", cancelReason);
             return restClient.post()
-                    .uri(String.format("https://api.tosspayments.com/v1/payments/%s/cancel", paymentKey))
-                    .header("Authorization", encodeKey)
+                    .uri(String.format(PAYMENT_CANCEL_URI, paymentKey))
                     .body(params)
-                    .retrieve().toEntity(PaymentResponse.class);
+                    .retrieve()
+                    .toEntity(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
             PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(paymentResponse);

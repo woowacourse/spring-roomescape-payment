@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static roomescape.fixture.DateFixture.getNextDay;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -27,7 +26,6 @@ import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -57,13 +55,11 @@ class ReservationApplicationServiceTest extends ServiceTest {
         time = reservationTimeRepository.save(getNoon());
         theme1 = themeRepository.save(getTheme1());
         memberChoco = memberRepository.save(getMemberChoco());
-        String paymentKey = "tgen_20240528172021mxEG4";
         String paymentType = "카드";
         long totalAmount = 1000L;
-        PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
-        doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
+        doReturn(okResponse).when(paymentClient).confirm(any());
 
     }
 
@@ -99,7 +95,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         reservationApplicationService.deleteMemberReservation(authInfo, waitingResponse.memberReservationId());
 
         //then
-        assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).hasSize(0);
+        assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).isEmpty();
     }
 
     @DisplayName("대기 예약이 아닌 예약 삭제 시, 예외가 발생한다.")

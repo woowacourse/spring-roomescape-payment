@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -72,7 +71,7 @@ class PaymentServiceTest extends ServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
         ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
                 new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
-        doReturn(okResponse).when(paymentClient).confirm(any(), anyString());
+        doReturn(okResponse).when(paymentClient).confirm(any());
 
         //when
         paymentService.pay(paymentRequest, memberReservation);
@@ -93,7 +92,7 @@ class PaymentServiceTest extends ServiceTest {
         //given
         doThrow(new PaymentException(
                 new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
-                .when(paymentClient).confirm(any(), anyString());
+                .when(paymentClient).confirm(any());
         PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then
