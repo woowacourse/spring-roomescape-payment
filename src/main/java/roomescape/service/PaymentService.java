@@ -15,16 +15,16 @@ import roomescape.repository.ReservationRepository;
 @Service
 public class PaymentService {
 
-    private final PaymentRestClient tossPaymentRestClient;
+    private final PaymentRestClient paymentRestClient;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
 
     public PaymentService(
-            PaymentRestClient tossPaymentRestClient,
+            PaymentRestClient paymentRestClient,
             ReservationRepository reservationRepository,
             PaymentRepository paymentRepository
     ) {
-        this.tossPaymentRestClient = tossPaymentRestClient;
+        this.paymentRestClient = paymentRestClient;
         this.reservationRepository = reservationRepository;
         this.paymentRepository = paymentRepository;
     }
@@ -34,7 +34,7 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        Payment payment = tossPaymentRestClient.requestPaymentApproval(request);
+        Payment payment = paymentRestClient.requestPaymentApproval(request);
         Payment saved = paymentRepository.save(payment);
         reservation.updatePayment(payment);
 
