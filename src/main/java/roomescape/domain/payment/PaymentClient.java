@@ -3,6 +3,7 @@ package roomescape.domain.payment;
 import java.util.Base64;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.Member;
@@ -25,7 +26,7 @@ public class PaymentClient {
         String encryptedKey = Base64.getEncoder().encodeToString(approveSecretKey.getBytes());
         ApproveApiResponse response = Optional.ofNullable(restClient.post()
                         .uri("/v1/payments/confirm")
-                        .header("Authorization", "Basic " + encryptedKey)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " + encryptedKey)
                         .body(paymentApproveRequest)
                         .retrieve()
                         .onStatus(errorHandler)
