@@ -9,9 +9,9 @@ VALUES ('15:00:00'),
        ('17:00:00');
 
 INSERT INTO member(name, email, password, role)
-VALUES ('안돌', 'andole@test.com', '123', 'MEMBER'),
+VALUES ('스티치', 'lxxjn0@test.com', '123', 'MEMBER'),
        ('파랑', 'parang@test.com', '123', 'MEMBER'),
-       ('리비', 'libienz@test.com', '123', 'MEMBER'),
+       ('마크', 'mark@test.com', '123', 'MEMBER'),
        ('메이슨', 'mason@test.com', '123', 'MEMBER'),
        ('어드민', 'admin@test.com', '123', 'ADMIN');
 

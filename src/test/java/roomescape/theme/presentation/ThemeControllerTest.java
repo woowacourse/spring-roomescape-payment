@@ -56,8 +56,8 @@ class ThemeControllerTest {
     @DisplayName("테마 추가 요청을 처리할 수 있다")
     @Test
     void should_handle_post_theme_request_when_requested() throws Exception {
-        ThemeAddRequest themeAddRequest = new ThemeAddRequest("리비 테마", "리비 설명", "리비 경로");
-        ThemeResponse mockResponse = new ThemeResponse(1L, "리비 테마", "리비 설명", "리비 경로");
+        ThemeAddRequest themeAddRequest = new ThemeAddRequest("마크 테마", "마크 설명", "마크 경로");
+        ThemeResponse mockResponse = new ThemeResponse(1L, "마크 테마", "마크 설명", "마크 경로");
 
         when(themeService.saveTheme(themeAddRequest)).thenReturn(mockResponse);
 

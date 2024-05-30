@@ -43,7 +43,7 @@ class ReservationControllerE2ETest {
     @BeforeEach
     public void beforeEach() {
         RestAssured.port = serverPort;
-        Map<String, String> loginParams = Map.of("email", "andole@test.com", "password", "123");
+        Map<String, String> loginParams = Map.of("email", "lxxjn0@test.com", "password", "123");
 
         token = RestAssured.given().log().all()
                 .when().body(loginParams)

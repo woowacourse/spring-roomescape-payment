@@ -61,13 +61,13 @@ class AuthControllerTest {
     @Test
     void should_return_name_when_login_check_status_is_valid() throws Exception {
         MockCookie mockCookie = new MockCookie("token", "mock value");
-        LoginCheckResponse loginCheckResponse = new LoginCheckResponse("리비");
+        LoginCheckResponse loginCheckResponse = new LoginCheckResponse("마크");
         when(authService.checkLogin(any(Accessor.class))).thenReturn(loginCheckResponse);
 
         mockMvc.perform(get("/login/check")
                         .cookie(mockCookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("리비"));
+                .andExpect(jsonPath("$.name").value("마크"));
     }
 
     @DisplayName("로그 아웃 요청 시 쿠키를 만료시켜 로그 아웃한다")
