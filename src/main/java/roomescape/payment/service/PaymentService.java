@@ -23,7 +23,6 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    // TODO: 순서 변경
     public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         PaymentResponse response = paymentClient.confirm(paymentRequest);
         paymentRepository.save(

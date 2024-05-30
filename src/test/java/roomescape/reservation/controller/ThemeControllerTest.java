@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ class ThemeControllerTest extends ControllerTest {
     @Test
     void create() throws Exception {
         //given
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         Map<String, String> params = new HashMap<>();
         params.put("name", "siso");
@@ -58,7 +59,7 @@ class ThemeControllerTest extends ControllerTest {
     @Test
     void findAll() throws Exception {
         //given
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         //when
         doReturn(List.of(themeResponse))
@@ -77,7 +78,7 @@ class ThemeControllerTest extends ControllerTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         //when
         doNothing()
@@ -96,7 +97,7 @@ class ThemeControllerTest extends ControllerTest {
     @Test
     void delete_WithReservationTime() throws Exception {
         //given
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         //when
         doThrow(new BadRequestException(ErrorType.RESERVATION_NOT_DELETED))
@@ -115,7 +116,7 @@ class ThemeControllerTest extends ControllerTest {
     @Test
     void getAvailable() throws Exception {
         //given
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         //when
         doReturn(List.of(themeResponse))

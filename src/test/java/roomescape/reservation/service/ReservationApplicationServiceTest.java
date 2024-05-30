@@ -63,8 +63,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         memberChoco = memberRepository.save(getMemberChoco());
         String paymentType = "카드";
         BigDecimal totalAmount = BigDecimal.valueOf(15000L);
-        ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
-                new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
+        PaymentResponse okResponse =
+                new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
         doReturn(okResponse).when(paymentClient).confirm(any());
     }
 

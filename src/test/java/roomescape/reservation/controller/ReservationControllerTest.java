@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static roomescape.fixture.DateFixture.getNextDay;
 
 import jakarta.servlet.http.Cookie;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
@@ -75,7 +76,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
@@ -102,7 +103,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
@@ -129,7 +130,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
@@ -155,7 +156,7 @@ class ReservationControllerTest extends ControllerTest {
     void createReservationAfterNow() throws Exception {
         //given
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         Map<String, Object> params = new HashMap<>();
         params.put("date", LocalDate.now().minusDays(2).toString());
@@ -182,7 +183,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
@@ -215,7 +216,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
-        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(4L,
                 memberResponse,
                 getNextDay(),
