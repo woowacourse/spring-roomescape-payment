@@ -1,10 +1,6 @@
 # 방탈출 기능 요구 사항
 
-- [API 요청 폴더 바로가기](api-test)
-
 ### 📌 reservation (예약)
-
-- [예약 API 요청 파일 바로가기](api-test/reservation-api.http)
 
 ##### 예약 기능 목록
 
@@ -46,8 +42,6 @@
 
 ### 📌 theme (테마)
 
-- [테마 API 요청 파일 바로가기](api-test/theme-api.http) <br>
-
 ##### 테마 기능 목록
 
 - [x] 테마를 추가할 수 있다.
@@ -68,8 +62,6 @@
 
 ### 📌 reservationTime (예약시간)
 
-- [예약 시간 API 요청 파일 바로가기](api-test/reservationtime-api.http) <br>
-
 ##### 예약 시간 기능 목록
 
 - [x] 예약 시간을 추가할 수 있다.
@@ -84,8 +76,6 @@
 ---
 
 ### 📌 member (회원)
-
-- [사용자 API 요청 파일 바로가기](api-test/member-api.http) <br>
 
 ##### 회원 기능 목록
 
