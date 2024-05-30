@@ -47,10 +47,11 @@ public class ReservationEventHandler {
     }
 
     private void pendingNextReservation(Reservation canceledReservation) {
-        Reservation reservation = reservationRepository.findNextWaiting(canceledReservation.getDetail())
-                .orElseThrow(IllegalArgumentException::new);
-        reservation.toPending();
-        reservationRepository.save(reservation);
-        eventPublisher.publishPaymentPendingEvent(reservation);
+        reservationRepository.findNextWaiting(canceledReservation.getDetail())
+                .ifPresent(reservation -> {
+                    reservation.toPending();
+                    reservationRepository.save(reservation);
+                    eventPublisher.publishPaymentPendingEvent(reservation);
+                });
     }
 }
