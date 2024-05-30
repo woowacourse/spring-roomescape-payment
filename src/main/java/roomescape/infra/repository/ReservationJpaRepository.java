@@ -8,28 +8,20 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 
-public interface ReservationJpaRepository extends
-        ReservationRepository,
-        Repository<Reservation, Long> {
+public interface ReservationJpaRepository extends Repository<Reservation, Long> {
 
-    @Override
     Reservation save(Reservation reservation);
 
-    @Override
     Optional<Reservation> findById(Long id);
 
-    @Override
     List<Reservation> findAll();
 
-    @Override
     List<Reservation> findAllByStatus(Status status);
 
-    @Override
     @Query(""" 
             select r from Reservation r
             join fetch r.member m
@@ -44,7 +36,6 @@ public interface ReservationJpaRepository extends
             @Param("memberId") Long memberId, @Param("themeId") Long themeId
     );
 
-    @Override
     @Query("""
             select r from Reservation r
             where r.detail = :detail
@@ -54,7 +45,6 @@ public interface ReservationJpaRepository extends
             """)
     Optional<Reservation> findNextWaitingReservation(@Param("detail") ReservationDetail detail);
 
-    @Override
     @Query(""" 
             select new roomescape.domain.reservation.ReservationWithRank(mine,
                 (select count(r) + 1 from Reservation r
@@ -68,9 +58,7 @@ public interface ReservationJpaRepository extends
             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
 
-    @Override
-    boolean existsByDetailAndMemberAndStatusNot(ReservationDetail detail, Member member, Status status);
+    boolean existsByDetailAndMemberAndStatusIn(ReservationDetail detail, Member member, List<Status> status);
 
-    @Override
     boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
 }

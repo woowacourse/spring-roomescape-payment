@@ -5,29 +5,25 @@ import java.util.List;
 import java.util.Optional;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.exception.reservation.NotFoundReservationException;
 
 public interface ReservationRepository {
     Reservation save(Reservation reservation);
 
-    default Reservation getById(Long id) {
-        return findById(id)
-                .orElseThrow(NotFoundReservationException::new);
-    }
+    Reservation getReservation(Long id);
 
-    Optional<Reservation> findById(Long id);
+    Optional<Reservation> findReservation(Long id);
 
     List<Reservation> findAll();
 
-    List<Reservation> findAllByStatus(Status status);
+    List<Reservation> findAll(Status status);
 
-    List<Reservation> findByPeriodAndThemeAndMember(LocalDate start, LocalDate end, Long memberId, Long themeId);
+    List<Reservation> findReservation(LocalDate start, LocalDate end, Long memberId, Long themeId);
 
     List<ReservationWithRank> findWithRank(Long memberId);
 
-    boolean existsByDetailAndMemberAndStatusNot(ReservationDetail detail, Member member, Status status);
+    Optional<Reservation> findNextWaiting(ReservationDetail detail);
 
-    boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
+    boolean existsReservation(ReservationDetail detail, List<Status> status);
 
-    Optional<Reservation> findNextWaitingReservation(ReservationDetail detail);
+    boolean existsReservation(ReservationDetail detail, Member member, List<Status> status);
 }

@@ -4,21 +4,17 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import roomescape.exception.time.NotFoundReservationTimeException;
 
 public interface ReservationTimeRepository {
     ReservationTime save(ReservationTime time);
 
-    default ReservationTime getById(Long id) {
-        return findById(id)
-                .orElseThrow(NotFoundReservationTimeException::new);
-    }
+    ReservationTime getReservationTime(Long id);
 
-    Optional<ReservationTime> findById(Long id);
+    Optional<ReservationTime> findReservationTime(Long id);
 
     List<ReservationTime> findAll();
 
-    List<ReservationTime> findAllReservedTimeByDateAndThemeId(LocalDate date, Long themeId);
+    List<ReservationTime> findAllReservedTime(LocalDate date, Long themeId);
 
     List<ReservationTime> findAllUnAvailableTimes(LocalDate date, Long themeId);
 

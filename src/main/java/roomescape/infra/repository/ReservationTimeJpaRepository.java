@@ -8,22 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 
-public interface ReservationTimeJpaRepository extends
-        ReservationTimeRepository,
-        Repository<ReservationTime, LocalTime> {
+public interface ReservationTimeJpaRepository extends Repository<ReservationTime, LocalTime> {
 
-    @Override
     ReservationTime save(ReservationTime time);
 
-    @Override
     Optional<ReservationTime> findById(Long id);
 
-    @Override
     List<ReservationTime> findAll();
 
-    @Override
     @Query("""
             select d.time from ReservationDetail d
             where d.date = :date
@@ -39,7 +32,6 @@ public interface ReservationTimeJpaRepository extends
             @Param("themeId") Long themeId
     );
 
-    @Override
     @Query("""
             select d.time from ReservationDetail d
             where d.date = :date
@@ -55,9 +47,7 @@ public interface ReservationTimeJpaRepository extends
             @Param("themeId") Long themeId
     );
 
-    @Override
     boolean existsByStartAt(LocalTime startAt);
 
-    @Override
     void delete(ReservationTime time);
 }

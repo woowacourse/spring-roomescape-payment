@@ -5,19 +5,13 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 
-public interface ThemeJpaRepository extends
-        ThemeRepository,
-        Repository<Theme, Long> {
+public interface ThemeJpaRepository extends Repository<Theme, Long> {
 
-    @Override
     Theme save(Theme theme);
 
-    @Override
     Optional<Theme> findById(Long id);
 
-    @Override
     @Query(value = """
             select theme.id, theme.name, theme.description, theme.thumbnail
             from reservation_detail
@@ -27,11 +21,9 @@ public interface ThemeJpaRepository extends
             order by count(*) desc
             limit ?;
             """, nativeQuery = true)
-    List<Theme> findThemesByPeriodWithLimit(String startDate, String endDate, int limit);
+    List<Theme> findPopularThemes(String startDate, String endDate, int limit);
 
-    @Override
     List<Theme> findAll();
 
-    @Override
     void deleteById(Long themeId);
 }

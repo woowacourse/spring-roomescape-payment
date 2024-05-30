@@ -8,15 +8,15 @@ public interface ThemeRepository {
     Theme save(Theme theme);
 
     default Theme getById(Long id) {
-        return findById(id)
+        return findTheme(id)
                 .orElseThrow(NotFoundThemeException::new);
     }
 
-    Optional<Theme> findById(Long id);
+    Optional<Theme> findTheme(Long id);
 
-    List<Theme> findThemesByPeriodWithLimit(String startDate, String endDate, int limit);
+    List<Theme> findPopularThemes(String startDate, String endDate, int limit);
 
     List<Theme> findAll();
 
-    void deleteById(Long themeId);
+    void delete(Long themeId);
 }
