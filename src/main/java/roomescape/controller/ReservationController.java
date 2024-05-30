@@ -1,7 +1,6 @@
 package roomescape.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,21 +14,21 @@ import roomescape.annotation.Auth;
 import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
+import roomescape.service.MyReservationService;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
-import roomescape.service.ReservationWaitingService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
-    private final ReservationWaitingService waitingService;
+    private final MyReservationService myReservationService;
     private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, ReservationWaitingService waitingService,
+    public ReservationController(ReservationService reservationService, MyReservationService myReservationService,
                                  PaymentService paymentService) {
         this.reservationService = reservationService;
-        this.waitingService = waitingService;
+        this.myReservationService = myReservationService;
         this.paymentService = paymentService;
     }
 
@@ -51,12 +50,7 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public List<LoginMemberReservationResponse> findLoginMemberReservations(@Auth long memberId) {
-        List<LoginMemberReservationResponse> reservations = reservationService.findByMemberId(memberId);
-        List<LoginMemberReservationResponse> waitings = waitingService.findByMemberId(memberId);
-
-        List<LoginMemberReservationResponse> response = new ArrayList<>(reservations);
-        response.addAll(waitings);
-        return response;
+        return myReservationService.findLoginMemberReservations(memberId);
     }
 
     @DeleteMapping("/{id}")

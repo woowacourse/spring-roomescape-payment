@@ -11,14 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationWaiting;
-import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationWaitingResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationWaitingRepository;
 import roomescape.service.finder.ReservationFinder;
-import roomescape.service.mapper.LoginMemberReservationResponseMapper;
 import roomescape.service.mapper.ReservationWaitingResponseMapper;
 
 @Service
@@ -62,17 +60,6 @@ public class ReservationWaitingService {
     public List<ReservationWaitingResponse> findAll() {
         return waitingRepository.findAll().stream()
                 .map(ReservationWaitingResponseMapper::toResponseWithoutPriority)
-                .toList();
-    }
-
-    public List<LoginMemberReservationResponse> findByMemberId(long memberId) {
-        List<ReservationWaiting> allByMemberId = waitingRepository.findAllByMemberId(memberId);
-        return allByMemberId.stream()
-                .map(waiting -> {
-                    int priority = waiting.calculatePriority(allByMemberId);
-                    return ReservationWaitingResponseMapper.toResponse(waiting, priority);
-                })
-                .map(LoginMemberReservationResponseMapper::from)
                 .toList();
     }
 

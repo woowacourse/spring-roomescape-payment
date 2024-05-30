@@ -76,8 +76,7 @@ class PaymentApiResponseErrorHandlerTest {
         String errorJson = """
                 {
                   "code": "code_e63022aece25",
-                  "message": "message_799dc46c7cf3",
-                  "orderId": "orderId_6de8cfc232b7"
+                  "message": "message_799dc46c7cf3"
                 }""";
         PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
         ClientHttpResponse response = getFakeHttpResponse(errorJson);

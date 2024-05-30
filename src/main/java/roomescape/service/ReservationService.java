@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationWaiting;
-import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
@@ -20,7 +19,6 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationWaitingRepository;
 import roomescape.service.finder.ReservationFinder;
-import roomescape.service.mapper.LoginMemberReservationResponseMapper;
 import roomescape.service.mapper.ReservationResponseMapper;
 
 @Service
@@ -60,13 +58,6 @@ public class ReservationService {
         return reservationRepository.findByMemberAndThemeBetweenDates(memberId, themeId, start, end)
                 .stream()
                 .map(ReservationResponseMapper::toResponse)
-                .toList();
-    }
-
-    public List<LoginMemberReservationResponse> findByMemberId(long memberId) {
-        return reservationRepository.findByMemberId(memberId)
-                .stream()
-                .map(LoginMemberReservationResponseMapper::toResponse)
                 .toList();
     }
 
