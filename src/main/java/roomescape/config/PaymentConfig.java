@@ -13,22 +13,15 @@ import roomescape.service.PaymentClient;
 public class PaymentConfig {
 
     @Bean
-    public ClientHttpRequestFactory getTimeoutFactory() {
+    public PaymentClient getTossPaymentClient() {
         SimpleClientHttpRequestFactory timeoutFactory = new SimpleClientHttpRequestFactory();
         timeoutFactory.setConnectTimeout(Duration.ofSeconds(5));
         timeoutFactory.setReadTimeout(Duration.ofSeconds(30));
-
-        return timeoutFactory;
-    }
-
-    @Bean
-    public PaymentClient getTossPaymentClient(ClientHttpRequestFactory timeoutFactory) {
 
         RestClient restClient = RestClient.builder()
                 .baseUrl("https://api.tosspayments.com")
                 .requestFactory(timeoutFactory)
                 .build();
-
         return new TossPaymentClient(restClient);
     }
 }
