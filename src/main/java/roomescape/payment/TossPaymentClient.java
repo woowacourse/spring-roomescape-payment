@@ -1,6 +1,7 @@
 package roomescape.payment;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
@@ -30,7 +31,7 @@ public class TossPaymentClient implements PaymentClient {
 
         restClient.post()
                 .uri("/v1/payments/confirm")
-                .header("Authorization", secret)
+                .header(HttpHeaders.AUTHORIZATION, secret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest);
     }
