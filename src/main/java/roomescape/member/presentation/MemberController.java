@@ -2,9 +2,7 @@ package roomescape.member.presentation;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,11 +17,6 @@ public class MemberController {
 
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
-    }
-
-    @GetMapping("/members")
-    public ResponseEntity<List<MemberResponse>> readAll() {
-        return ResponseEntity.ok(memberService.findAll());
     }
 
     @PostMapping("/members")
