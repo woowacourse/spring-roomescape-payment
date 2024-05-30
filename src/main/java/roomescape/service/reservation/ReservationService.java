@@ -79,7 +79,6 @@ public class ReservationService {
         return new ReservationResponse(reservation);
     }
 
-
     private ReservationTime findTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
@@ -115,21 +114,18 @@ public class ReservationService {
     }
 
     private void cancelReservation(Reservation reservation) {
-        Member member = reservation.getMember();
         Theme theme = reservation.getTheme();
         Schedule schedule = reservation.getSchedule();
         reservationRepository.delete(reservation);
-        reservationWaitingRepository.findTopByMemberAndThemeAndScheduleOrderByCreatedAt(member, theme, schedule)
+        reservationWaitingRepository.findTopByThemeAndScheduleOrderByCreatedAt(theme, schedule)
                 .ifPresent(this::convertFirstPriorityWaitingToReservation);
     }
 
     private void convertFirstPriorityWaitingToReservation(ReservationWaiting waiting) {
-        Schedule schedule = waiting.getSchedule();
-        LocalDate date = schedule.getDate();
-        long timeId = schedule.getReservationTime().getId();
-        long themeId = waiting.getTheme().getId();
-        long memberId = waiting.getMember().getId();
-        createReservation(timeId, themeId, memberId, date, null);
+        Reservation reservation = new Reservation(
+                waiting.getMember(), waiting.getSchedule(), waiting.getTheme(), ReservationStatus.RESERVED
+        );
+        reservationRepository.save(reservation);
         reservationWaitingRepository.delete(waiting);
     }
 
@@ -138,7 +134,6 @@ public class ReservationService {
                 .ifPresent(reservation -> reservation.checkCancelAuthority(memberId));
         deleteById(reservationId);
     }
-
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
         ReservationDate dateFrom = ReservationDate.of(reservationFilterRequest.dateFrom());

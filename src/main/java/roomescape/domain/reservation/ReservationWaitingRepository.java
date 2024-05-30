@@ -25,6 +25,6 @@ public interface ReservationWaitingRepository extends JpaRepository<ReservationW
 
     boolean existsByMemberAndThemeAndSchedule(Member member, Theme theme, Schedule schedule);
 
-    Optional<ReservationWaiting> findTopByMemberAndThemeAndScheduleOrderByCreatedAt(Member member, Theme theme,
-                                                                                    Schedule schedule);
+    Optional<ReservationWaiting> findTopByThemeAndScheduleOrderByCreatedAt(Theme theme,
+                                                                           Schedule schedule);
 }
