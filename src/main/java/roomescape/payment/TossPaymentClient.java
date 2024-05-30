@@ -11,7 +11,8 @@ import roomescape.payment.dto.PaymentConfirmResponse;
 
 public class TossPaymentClient {
 
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final String KEY_DELIMITER = ":";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final RestClient restClient;
@@ -21,9 +22,10 @@ public class TossPaymentClient {
     }
 
     public PaymentConfirmResponse confirmPayments(PaymentConfirmRequest request) {
+        String secretKey = WIDGET_SECRET_KEY + KEY_DELIMITER;
 
         return restClient.post().uri("/v1/payments/confirm")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString(WIDGET_SECRET_KEY.getBytes()))
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString(secretKey.getBytes()))
                 .body(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
