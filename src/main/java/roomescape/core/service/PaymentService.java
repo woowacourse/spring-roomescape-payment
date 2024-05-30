@@ -1,5 +1,6 @@
 package roomescape.core.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import roomescape.core.domain.Payment;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
@@ -23,6 +24,7 @@ public class PaymentService {
         return new PaymentAuthorizationResponse(paymentAuthorizationProvider.getAuthorization());
     }
 
+    @Transactional
     public Payment save(final PaymentRequest paymentRequest) {
         Payment payment = new Payment(
                 paymentRequest.getPaymentKey(), paymentRequest.getAmount(), paymentRequest.getOrderId());

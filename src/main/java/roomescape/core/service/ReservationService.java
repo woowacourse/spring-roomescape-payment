@@ -156,6 +156,7 @@ public class ReservationService {
                 .ifPresent(Reservation::approve);
     }
 
+    @Transactional(readOnly = true)
     public PaymentResponse findPaymentByDeleteReservation(final Long id) {
         Reservation delete = reservationRepository.findReservationById(id);
         return new PaymentResponse(delete.getPayment().getPaymentKey());
@@ -180,6 +181,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public Boolean isNotAdminReservation(final Long id) {
         return reservationRepository.isNotAdminReservation(id);
     }
