@@ -133,4 +133,8 @@ public class Reservation {
     public ReservationStatus getStatus() {
         return status;
     }
+
+    public Payment getPayment() {
+        return payment;
+    }
 }
