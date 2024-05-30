@@ -25,11 +25,11 @@ public class PaymentConfig {
     private String widgetSecretKey;
 
     @Bean
-    public PaymentService paymentService() {
+    public PaymentService paymentService(RestClient.Builder restClientBuilder) {
         byte[] encodedBytes = Base64.getEncoder().encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorization = "Basic " + new String(encodedBytes);
 
-        RestClient restClient = RestClient.builder()
+        RestClient restClient = restClientBuilder
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, authorization)
                 .defaultStatusHandler(HttpStatusCode::isError, ((request, response) -> {
