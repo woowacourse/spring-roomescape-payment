@@ -7,6 +7,7 @@ import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND
 import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_TIME_NOT_FOUND;
 import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,16 +37,19 @@ public class ReservationService {
     private static final int MAX_RESERVATIONS_PER_TIME = 1;
     private static final int INCREMENT_VALUE_FOR_RANK = 1;
 
+    private final Clock clock;
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
 
     public ReservationService(
+            final Clock clock,
             final ReservationRepository reservationRepository,
             final MemberRepository memberRepository,
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository) {
+        this.clock = clock;
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -67,7 +71,8 @@ public class ReservationService {
     }
 
     private void validateDate(final LocalDate date) {
-        if (date.isBefore(LocalDate.now()) || date.equals(LocalDate.now())) {
+        final LocalDate now = LocalDate.now(clock);
+        if (date.isBefore(now) || date.equals(now)) {
             throw new RoomescapeException(INVALID_DATE);
         }
     }

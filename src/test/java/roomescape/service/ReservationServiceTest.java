@@ -21,18 +21,23 @@ import roomescape.dto.theme.ReservedThemeResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.*;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static roomescape.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
+
+    @Mock
+    private Clock clock;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -63,6 +68,8 @@ class ReservationServiceTest {
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
+        given(clock.instant()).willReturn(Instant.parse("2024-05-10T19:19:00Z"));
+        given(clock.getZone()).willReturn(ZoneId.of("Asia/Seoul"));
         given(reservationRepository.save(reservation))
                 .willReturn(new Reservation(1L, reservation.getMember(), reservation.getDate(),
                         reservation.getTime(), reservation.getTheme(), ReservationStatus.RESERVED));
@@ -99,6 +106,8 @@ class ReservationServiceTest {
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
+        given(clock.instant()).willReturn(Instant.parse("2024-05-10T19:19:00Z"));
+        given(clock.getZone()).willReturn(ZoneId.of("Asia/Seoul"));
         given(reservationRepository.countByDateAndTimeIdAndThemeId(date, time.getId(), theme.getId()))
                 .willReturn(1);
 
@@ -196,21 +205,23 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("특정 사용자의 예약 및 예약 대기 목록을 조회한다.")
-    void findMyReservations() {
+    void findMyReservations2() {
         // given
         final LoginMember loginMember = new LoginMember(1L, MEMBER_TENNY_NAME, MEMBER_TENNY_EMAIL, Role.MEMBER);
         final Reservation memberReservation = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation reservation = new Reservation(2L, ADMIN(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation waiting = new Reservation(3L, MEMBER_MIA(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
         final Reservation memberWaiting = new Reservation(4L, MEMBER_TENNY(), DATE_MAY_NINTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
         given(reservationRepository.findByMemberId(loginMember.id()))
                 .willReturn(List.of(memberReservation, memberWaiting));
-        given(reservationRepository.findAll())
-                .willReturn(List.of(memberReservation, reservation, waiting, memberWaiting));
+        given(reservationRepository.countByDateAndThemeIdAndTimeIdAndStatusAndIdLessThan(
+                memberReservation.getDate(), memberReservation.getTheme().getId(),
+                memberReservation.getTime().getId(), memberReservation.getStatus(), memberReservation.getId()))
+                .willReturn(0L);
+        given(reservationRepository.countByDateAndThemeIdAndTimeIdAndStatusAndIdLessThan(
+                memberWaiting.getDate(), memberWaiting.getTheme().getId(),
+                memberWaiting.getTime().getId(), memberWaiting.getStatus(), memberWaiting.getId()))
+                .willReturn(1L);
 
         // when
         final List<MyReservationWithRankResponse> actual = reservationService.findMyReservationsAndWaitings(loginMember);
