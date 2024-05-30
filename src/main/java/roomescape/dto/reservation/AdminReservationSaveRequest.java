@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 public record AdminReservationSaveRequest(
         Long memberId,
-        String date,
+        LocalDate date,
         Long timeId,
         Long themeId
 ) {
@@ -26,7 +26,6 @@ public record AdminReservationSaveRequest(
         final Member member = new Member(memberResponse.id(), new Name(memberResponse.name()), memberResponse.email());
         final ReservationTime time = new ReservationTime(timeResponse.id(), timeResponse.startAt());
         final Theme theme = new Theme(themeResponse.id(), themeResponse.name(), themeResponse.description(), themeResponse.thumbnail());
-        final LocalDate date = LocalDateConverter.toLocalDate(this.date);
         return new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
     }
 }
