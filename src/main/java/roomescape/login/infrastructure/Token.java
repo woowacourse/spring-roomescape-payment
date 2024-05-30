@@ -1,4 +1,4 @@
-package roomescape.auth.infrastructure;
+package roomescape.login.infrastructure;
 
 public class Token {
 

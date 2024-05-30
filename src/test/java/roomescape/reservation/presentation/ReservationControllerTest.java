@@ -24,9 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.auth.AdminHandlerInterceptor;
-import roomescape.auth.AuthenticatedMemberArgumentResolver;
-import roomescape.auth.dto.Accessor;
+import roomescape.admin.AdminHandlerInterceptor;
+import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.login.dto.Accessor;
 import roomescape.reservation.service.ReservationService;
 
 @WebMvcTest(ReservationController.class)
@@ -42,15 +42,15 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockBean
-    private AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
+    private LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;
 
     @BeforeEach
     void loginSetUp() {
-        when(authenticatedMemberArgumentResolver.supportsParameter(any(MethodParameter.class))).thenReturn(true);
-        when(authenticatedMemberArgumentResolver.resolveArgument(
+        when(loginMemberArgumentResolver.supportsParameter(any(MethodParameter.class))).thenReturn(true);
+        when(loginMemberArgumentResolver.resolveArgument(
                 any(MethodParameter.class),
                 any(ModelAndViewContainer.class),
                 any(NativeWebRequest.class),

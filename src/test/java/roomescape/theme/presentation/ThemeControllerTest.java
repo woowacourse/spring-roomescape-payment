@@ -18,8 +18,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.auth.AdminHandlerInterceptor;
-import roomescape.auth.AuthenticatedMemberArgumentResolver;
+import roomescape.admin.AdminHandlerInterceptor;
+import roomescape.login.LoginMemberArgumentResolver;
 import roomescape.theme.dto.ThemeAddRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
@@ -37,7 +37,7 @@ class ThemeControllerTest {
     private ThemeService themeService;
 
     @MockBean
-    private AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
+    private LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;

@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.auth.AdminHandlerInterceptor;
-import roomescape.auth.AuthenticatedMemberArgumentResolver;
+import roomescape.admin.AdminHandlerInterceptor;
+import roomescape.login.LoginMemberArgumentResolver;
 
 @WebMvcTest(ClientViewController.class)
 class ClientViewControllerTest {
@@ -20,7 +20,7 @@ class ClientViewControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
+    private LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;

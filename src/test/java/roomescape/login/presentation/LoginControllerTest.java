@@ -1,4 +1,4 @@
-package roomescape.auth.presentation;
+package roomescape.login.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -19,15 +19,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.auth.AdminHandlerInterceptor;
-import roomescape.auth.AuthenticatedMemberArgumentResolver;
-import roomescape.auth.dto.Accessor;
-import roomescape.auth.dto.LoginCheckResponse;
-import roomescape.auth.dto.LoginRequest;
-import roomescape.auth.service.AuthService;
+import roomescape.admin.AdminHandlerInterceptor;
+import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.login.dto.Accessor;
+import roomescape.login.dto.LoginCheckResponse;
+import roomescape.login.dto.LoginRequest;
+import roomescape.login.service.AuthService;
 
-@WebMvcTest(AuthController.class)
-class AuthControllerTest {
+@WebMvcTest(LoginController.class)
+class LoginControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,7 +39,7 @@ class AuthControllerTest {
     private AuthService authService;
 
     @MockBean
-    private AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
+    private LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;

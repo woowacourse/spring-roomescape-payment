@@ -4,8 +4,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import roomescape.auth.infrastructure.Token;
 import roomescape.global.exception.IllegalRequestException;
+import roomescape.login.infrastructure.Token;
 
 public class CookieUtils {
 

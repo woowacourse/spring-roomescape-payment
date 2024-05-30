@@ -13,14 +13,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
-import roomescape.auth.dto.Accessor;
-import roomescape.auth.infrastructure.JwtTokenProvider;
+import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.login.dto.Accessor;
+import roomescape.login.infrastructure.JwtTokenProvider;
 import roomescape.member.service.MemberService;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticatedMemberArgumentResolverTest {
+class LoginMemberArgumentResolverConfigTest {
     @InjectMocks
-    private AuthenticatedMemberArgumentResolver resolver;
+    private LoginMemberArgumentResolver resolver;
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;

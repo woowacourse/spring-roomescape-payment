@@ -1,4 +1,4 @@
-package roomescape.reservation.presentation;
+package roomescape.admin.presentation;
 
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.Authenticated;
-import roomescape.auth.dto.Accessor;
+import roomescape.auth.AdminOnly;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
@@ -27,20 +26,23 @@ public class AdminReservationController {
     }
 
     @PostMapping("/admin/reservations")
+    @AdminOnly
     public ResponseEntity<ReservationResponse> saveReservation(
-            @Authenticated Accessor accessor,
-            @Valid @RequestBody ReservationRequest reservationRequest) {
+            @Valid @RequestBody ReservationRequest reservationRequest
+    ) {
         ReservationResponse saveResponse = reservationService.saveReservation(reservationRequest);
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);
     }
 
     @GetMapping("/admin/reservations/waitings")
+    @AdminOnly
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
         return ResponseEntity.ok(reservationService.findReservationsOnWaiting());
     }
 
     @DeleteMapping("/admin/reservations/{id}")
+    @AdminOnly
     public ResponseEntity<Void> removeWaiting(@PathVariable("id") Long id) {
         reservationService.removeReservation(id);
         return ResponseEntity.noContent().build();

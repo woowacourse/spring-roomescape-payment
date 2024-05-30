@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
-import roomescape.auth.dto.Accessor;
+import roomescape.login.dto.Accessor;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;

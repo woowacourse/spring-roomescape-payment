@@ -1,13 +1,13 @@
-package roomescape.auth.service;
+package roomescape.login.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.auth.dto.Accessor;
-import roomescape.auth.dto.LoginCheckResponse;
-import roomescape.auth.dto.LoginRequest;
-import roomescape.auth.infrastructure.JwtTokenProvider;
-import roomescape.auth.infrastructure.Token;
 import roomescape.global.exception.AuthenticationException;
+import roomescape.login.dto.Accessor;
+import roomescape.login.dto.LoginCheckResponse;
+import roomescape.login.dto.LoginRequest;
+import roomescape.login.infrastructure.JwtTokenProvider;
+import roomescape.login.infrastructure.Token;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;

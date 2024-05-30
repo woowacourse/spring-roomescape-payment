@@ -1,4 +1,4 @@
-package roomescape.auth;
+package roomescape.login;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -7,18 +7,19 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.auth.dto.Accessor;
-import roomescape.auth.infrastructure.JwtTokenProvider;
+import roomescape.auth.Authenticated;
 import roomescape.global.util.CookieUtils;
+import roomescape.login.dto.Accessor;
+import roomescape.login.infrastructure.JwtTokenProvider;
 import roomescape.member.service.MemberService;
 
 @Component
-public class AuthenticatedMemberArgumentResolver implements HandlerMethodArgumentResolver {
+public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberService memberService;
 
-    public AuthenticatedMemberArgumentResolver(JwtTokenProvider jwtTokenProvider, MemberService memberService) {
+    public LoginMemberArgumentResolver(JwtTokenProvider jwtTokenProvider, MemberService memberService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.memberService = memberService;
     }

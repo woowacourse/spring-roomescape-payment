@@ -1,4 +1,4 @@
-package roomescape.auth.dto;
+package roomescape.login.dto;
 
 public record LoginCheckResponse(String name) {
 

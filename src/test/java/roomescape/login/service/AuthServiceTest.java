@@ -1,4 +1,4 @@
-package roomescape.auth.service;
+package roomescape.login.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,10 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.auth.dto.Accessor;
-import roomescape.auth.dto.LoginRequest;
-import roomescape.auth.infrastructure.JwtTokenProvider;
 import roomescape.global.exception.AuthenticationException;
+import roomescape.login.dto.Accessor;
+import roomescape.login.dto.LoginRequest;
+import roomescape.login.infrastructure.JwtTokenProvider;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
