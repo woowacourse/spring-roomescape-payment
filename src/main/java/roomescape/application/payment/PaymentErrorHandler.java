@@ -1,5 +1,6 @@
 package roomescape.application.payment;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
@@ -8,7 +9,8 @@ import roomescape.application.payment.dto.response.ErrorResponse;
 import roomescape.exception.payment.PaymentException;
 
 public class PaymentErrorHandler implements ResponseErrorHandler {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
