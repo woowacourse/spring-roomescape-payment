@@ -17,7 +17,7 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
-import roomescape.service.PaymentService;
+import roomescape.service.TossPaymentService;
 import roomescape.service.UserReservationService;
 
 @RestController
@@ -25,11 +25,12 @@ import roomescape.service.UserReservationService;
 public class UserReservationController {
 
     private final UserReservationService userReservationService;
-    private final PaymentService paymentService;
+    private final TossPaymentService tossPaymentService;
 
-    public UserReservationController(UserReservationService userReservationService, PaymentService paymentService) {
+    public UserReservationController(UserReservationService userReservationService,
+        TossPaymentService tossPaymentService) {
         this.userReservationService = userReservationService;
-        this.paymentService = paymentService;
+        this.tossPaymentService = tossPaymentService;
     }
 
     @PostMapping
@@ -37,7 +38,7 @@ public class UserReservationController {
         @Valid @RequestBody CreateUserReservationRequest request,
         @AuthenticationPrincipal Member member) {
 
-        paymentService.pay(request.orderId(), request.amount(), request.paymentKey());
+        tossPaymentService.pay(request.orderId(), request.amount(), request.paymentKey());
 
         CreateReservationResponse response = userReservationService.reserve(
             member.getId(),

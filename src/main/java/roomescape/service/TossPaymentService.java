@@ -16,14 +16,14 @@ import roomescape.service.config.TossPaymentConfigProperties;
 import roomescape.service.dto.PaymentRequestDto;
 
 @Service
-public class PaymentService {
+public class TossPaymentService {
 
     private static final String AUTHORIZATION_PREFIX = "Basic ";
 
     private final TossPaymentConfigProperties properties;
     private final RestClient restClient;
 
-    public PaymentService(TossPaymentConfigProperties properties) {
+    public TossPaymentService(TossPaymentConfigProperties properties) {
         this.properties = properties;
         this.restClient = RestClient.builder()
             .baseUrl(properties.getPaymentApprovalUrl())

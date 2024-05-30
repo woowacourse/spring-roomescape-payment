@@ -24,9 +24,9 @@ import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
+import roomescape.service.TossPaymentService;
 import roomescape.service.UserReservationService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -49,7 +49,7 @@ class UserReservationControllerTest {
     private UserReservationService userReservationService;
 
     @MockBean
-    private PaymentService paymentService;
+    private TossPaymentService tossPaymentService;
 
     private static final Long USER_ID = 1L;
     private static final Long ANOTHER_USER_ID = 2L;
@@ -84,7 +84,7 @@ class UserReservationControllerTest {
     @Test
     void save() {
         doNothing()
-            .when(paymentService)
+            .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
@@ -157,7 +157,7 @@ class UserReservationControllerTest {
     @Test
     void save_TimeIdNotFound() {
         doNothing()
-            .when(paymentService)
+            .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
@@ -177,7 +177,7 @@ class UserReservationControllerTest {
     @Test
     void save_ThemeIdNotFound() {
         doNothing()
-            .when(paymentService)
+            .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
@@ -197,7 +197,7 @@ class UserReservationControllerTest {
     @Test
     void save_Duplication() {
         doNothing()
-            .when(paymentService)
+            .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
         userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
