@@ -16,18 +16,19 @@ public class TossPaymentClient implements PaymentClient {
     private static final String SECRET_KEY_PREFIX = "Basic ";
 
     private final RestClient restClient;
-    private final TossPaymentClientErrorHandler tossPaymentClientErrorHandler;
+    private final TossPaymentClientErrorHandler errorHandler;
     private final TossPaymentProperties properties;
     private final String encodedSecretKey;
 
-    public TossPaymentClient(RestClient restClient,
-                             TossPaymentClientErrorHandler tossPaymentClientErrorHandler,
-                             TossPaymentProperties properties) {
+    public TossPaymentClient(RestClient restClient, TossPaymentClientErrorHandler errorHandler, TossPaymentProperties properties) {
         this.restClient = restClient;
-        this.tossPaymentClientErrorHandler = tossPaymentClientErrorHandler;
+        this.errorHandler = errorHandler;
         this.properties = properties;
-        this.encodedSecretKey = Base64.getEncoder()
-                .encodeToString(String.format(ENCODING_FORMAT, properties.getSecretKey()).getBytes());
+        this.encodedSecretKey = getEncodedSecretKey(properties.getSecretKey());
+    }
+
+    private String getEncodedSecretKey(String secretKey) {
+        return Base64.getEncoder().encodeToString(String.format(ENCODING_FORMAT, secretKey).getBytes());
     }
 
     @Override
@@ -38,7 +39,7 @@ public class TossPaymentClient implements PaymentClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(tossPaymentClientErrorHandler)
+                .onStatus(errorHandler)
                 .toBodilessEntity();
     }
 }
