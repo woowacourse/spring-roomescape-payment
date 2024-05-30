@@ -1,6 +1,8 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -14,6 +16,8 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.payment.PaymentConfirmErrorCode;
+import roomescape.exception.payment.PaymentConfirmException;
 
 class ReservationIntegrationTest extends IntegrationTest {
     @Nested
@@ -117,8 +121,9 @@ class ReservationIntegrationTest extends IntegrationTest {
         }
 
         @Test
-        void 로그인한_사용자_이름으로_예약을_추가할_수_있다() {
+        void 결제_성공_시_예약을_추가할_수_있다() {
             params.put("date", "2000-04-07");
+            paymentClient.confirmPayment(any());
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())
@@ -129,6 +134,21 @@ class ReservationIntegrationTest extends IntegrationTest {
                     .statusCode(201)
                     .header("Location", "/reservations/1")
                     .body("id", is(1));
+        }
+
+        @Test
+        void 결제_실패_시_예약을_추가할_수_없다() {
+            params.put("date", "2000-04-07");
+            given(paymentClient.confirmPayment(any()))
+                    .willThrow(new PaymentConfirmException(PaymentConfirmErrorCode.UNKNOWN_PAYMENT_ERROR));
+
+            RestAssured.given().log().all()
+                    .cookies(cookieProvider.createUserCookies())
+                    .contentType(ContentType.JSON)
+                    .body(params)
+                    .when().post("/reservations")
+                    .then().log().all()
+                    .statusCode(500);
         }
 
         @Test

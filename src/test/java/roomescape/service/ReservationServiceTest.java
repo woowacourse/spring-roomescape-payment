@@ -134,7 +134,7 @@ class ReservationServiceTest extends ServiceTest {
         }
 
         @Test
-        void 결제_없이_예약을_추가할_수_있다() {
+        void 예약을_추가할_수_있다() {
             ReservationSaveInput request = new ReservationSaveInput(
                     LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
             ReservationResponse response = reservationService.saveReservationWithoutPayment(request, member);
