@@ -32,4 +32,6 @@ security:
     expiration-time: 3600000 # 1 hour
 
 toss:
+  payment-uri: https://api.tosspayments.com/v1/payments
+  confirm-path: /confirm
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

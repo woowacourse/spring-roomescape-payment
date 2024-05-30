@@ -33,4 +33,6 @@ security:
     expiration-time: 3600000 # 1 hour
 
 toss:
+  payment-uri: https://api.tosspayments.com/v1/payments
+  confirm-path: /confirm
   secret-key: jerry-prin-secret-key
