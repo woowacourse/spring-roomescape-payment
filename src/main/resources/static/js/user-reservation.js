@@ -1,7 +1,7 @@
 const THEME_API_ENDPOINT = '/themes';
 const RESERVATION_TIME_AVAILABLE_API_ENDPOINT = '/times/available';
 const RESERVATION_API_ENDPOINT = '/reservations';
-
+const WAITING_API_ENDPOINT = '/waitings';
 document.addEventListener('DOMContentLoaded', () => {
   requestRead(THEME_API_ENDPOINT)
   .then(renderTheme)
@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   flatpickr("#datepicker", {
     inline: true,
     onChange: function (selectedDates, dateStr, instance) {
-      if (dateStr === '') return;
+      if (dateStr === '') {
+        return;
+      }
       checkDate();
     }
   });
@@ -29,22 +31,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('theme-slots').addEventListener('click', event => {
     if (event.target.classList.contains('theme-slot')) {
-      document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
+      document.querySelectorAll('.theme-slot').forEach(
+          slot => slot.classList.remove('active'));
       event.target.classList.add('active');
       checkDateAndTheme();
     }
   });
 
   document.getElementById('time-slots').addEventListener('click', event => {
-    if (event.target.classList.contains('time-slot') && !event.target.classList.contains('disabled')) {
-      document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('active'));
+    if (event.target.classList.contains('time-slot')
+        && !event.target.classList.contains('disabled')) {
+      document.querySelectorAll('.time-slot').forEach(
+          slot => slot.classList.remove('active'));
       event.target.classList.add('active');
       checkDateAndThemeAndTime();
     }
   });
 
-  document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-  document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+  document.getElementById('reserve-button').addEventListener('click',
+      onReservationButtonClickWithPaymentWidget);
+  document.getElementById('wait-button').addEventListener('click',
+      onWaitButtonClick);
+
   function onReservationButtonClickWithPaymentWidget(event) {
     onReservationButtonClick(event, paymentWidget);
   }
@@ -67,7 +75,8 @@ function renderTheme(themes) {
 
 function createSlot(type, text, id, booked) {
   const div = document.createElement('div');
-  div.className = type + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
+  div.className = type
+      + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
   div.textContent = text;
   div.setAttribute('data-' + type + '-id', id);
   if (type === 'time') {
@@ -110,13 +119,15 @@ function fetchAvailableTimes(date, themeId) {
   const queryString = `date=${date}&themeId=${themeId}`;
   const url = `${RESERVATION_TIME_AVAILABLE_API_ENDPOINT}?${queryString}`;
 
-  fetch(url,  {
+  fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   }).then(response => {
-    if (response.status === 200) return response.json();
+    if (response.status === 200) {
+      return response.json();
+    }
     return response.json().then(data => {
       throw new Error(data.message || 'Reservation failed');
     });
@@ -176,8 +187,10 @@ function checkDateAndThemeAndTime() {
 
 function onReservationButtonClick(event, paymentWidget) {
   const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+  const selectedThemeId = document.querySelector(
+      '.theme-slot.active')?.getAttribute('data-theme-id');
+  const selectedTimeId = document.querySelector(
+      '.time-slot.active')?.getAttribute('data-time-id');
 
   if (selectedDate && selectedThemeId && selectedTimeId) {
 
@@ -261,8 +274,10 @@ async function fetchReservationPayment(paymentData, reservationData) {
 
 function onWaitButtonClick() {
   const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+  const selectedThemeId = document.querySelector(
+      '.theme-slot.active')?.getAttribute('data-theme-id');
+  const selectedTimeId = document.querySelector(
+      '.time-slot.active')?.getAttribute('data-time-id');
 
   if (selectedDate && selectedThemeId && selectedTimeId) {
     const reservationData = {
@@ -274,7 +289,7 @@ function onWaitButtonClick() {
     /*
     TODO: [3단계] 예약 대기 생성 요청 API 호출
      */
-    fetch(RESERVATION_API_ENDPOINT, {
+    fetch(WAITING_API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -282,9 +297,11 @@ function onWaitButtonClick() {
       body: JSON.stringify(reservationData)
     })
     .then(response => {
-      if (!response.ok) return response.json().then(data => {
-        throw new Error(data.message || 'Reservation Waiting failed');
-      });
+      if (!response.ok) {
+        return response.json().then(data => {
+          throw new Error(data.message || 'Reservation Waiting failed');
+        });
+      }
       return response.json();
     })
     .then(data => {
@@ -296,14 +313,17 @@ function onWaitButtonClick() {
       console.error(error);
     });
   } else {
-    alert("Please select a date, theme, and time before making a reservation waiting.");
+    alert(
+        "Please select a date, theme, and time before making a reservation waiting.");
   }
 }
 
 function requestRead(endpoint) {
   return fetch(endpoint)
   .then(response => {
-    if (response.status === 200) return response.json();
+    if (response.status === 200) {
+      return response.json();
+    }
     throw new Error('Read failed');
   });
 }
