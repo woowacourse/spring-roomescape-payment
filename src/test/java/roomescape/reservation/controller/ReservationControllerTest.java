@@ -1,14 +1,17 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -17,6 +20,7 @@ import io.restassured.http.ContentType;
 import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.SaveReservationRequest;
+import roomescape.reservation.service.PaymentService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -28,9 +32,13 @@ class ReservationControllerTest {
     @LocalServerPort
     int randomServerPort;
 
+    @MockBean
+    private PaymentService paymentService;
+
     @BeforeEach
     public void initReservation() {
         RestAssured.port = randomServerPort;
+        Mockito.when(paymentService.requestTossPayment(any())).thenReturn(null);
     }
 
     @DisplayName("전체 예약 정보를 조회한다.")
