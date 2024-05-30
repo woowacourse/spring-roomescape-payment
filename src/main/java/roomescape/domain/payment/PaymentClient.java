@@ -1,7 +1,8 @@
 package roomescape.domain.payment;
 
+import static roomescape.domain.payment.PaymentApiErrorCode.UNKNOWN;
+
 import java.util.Base64;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -23,14 +24,20 @@ public class PaymentClient {
 
     public Payment approve(PaymentApproveRequest paymentApproveRequest, Member member) {
         String encryptedKey = Base64.getEncoder().encodeToString(approveSecretKey.getBytes());
-        ApproveApiResponse response = Optional.ofNullable(restClient.post()
-                        .uri("/v1/payments/confirm")
-                        .header("Authorization", "Basic " + encryptedKey)
-                        .body(paymentApproveRequest)
-                        .retrieve()
-                        .onStatus(errorHandler)
-                        .body(ApproveApiResponse.class))
-                .orElseThrow(() -> new ApiCallException("알 수 없는 오류가 발생했습니다."));
+        ApproveApiResponse response = restClient.post()
+                .uri("/v1/payments/confirm")
+                .header("Authorization", "Basic " + encryptedKey)
+                .body(paymentApproveRequest)
+                .retrieve()
+                .onStatus(errorHandler)
+                .body(ApproveApiResponse.class);
+        validateNullResponse(response);
         return new Payment(response.orderId(), response.paymentKey(), response.amount());
+    }
+
+    private static void validateNullResponse(ApproveApiResponse response) {
+        if (response == null) {
+            throw new ApiCallException(new PaymentApiError(UNKNOWN, "결제를 진행할 수 없습니다. 고객 센터로 문의해 주세요."));
+        }
     }
 }
