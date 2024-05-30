@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.service.TokenProvider;
 import roomescape.fixture.ReservationFixture;
-import roomescape.global.restclient.PaymentWithRestClient;
-import roomescape.reservation.controller.dto.PaymentResponse;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
@@ -28,7 +28,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
     TokenProvider tokenProvider;
 
     @SpyBean
-    PaymentWithRestClient paymentWithRestClient;
+    PaymentClient paymentClient;
 
     String token;
 
@@ -36,7 +36,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
         BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
-                .when(paymentWithRestClient)
+                .when(paymentClient)
                 .confirm(any());
     }
 

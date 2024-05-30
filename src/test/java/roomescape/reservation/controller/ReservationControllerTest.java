@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
-import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.service.MemberService;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.ReservationTimeService;
@@ -46,7 +47,7 @@ class ReservationControllerTest extends ControllerTest {
     TokenProvider tokenProvider;
 
     @SpyBean
-    PaymentWithRestClient paymentWithRestClient;
+    PaymentClient paymentClient;
 
     String token;
 
@@ -60,8 +61,16 @@ class ReservationControllerTest extends ControllerTest {
     void create() {
         //given
         BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
-                .when(paymentWithRestClient)
+                .when(paymentClient)
                 .confirm(any());
+
+//        given(paymentClient.confirm(any(PaymentRequest.class)))
+//                .willReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
+
+/*
+        Mockito.when(paymentClient.confirm(any()))
+                .thenReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
+*/
 
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeRequest("10:00"));

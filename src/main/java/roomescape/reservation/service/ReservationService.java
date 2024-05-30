@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
-import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -30,19 +32,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final ReservationSlotRepository reservationSlotRepository;
     private final ReservationRepository reservationRepository;
-    private final PaymentWithRestClient paymentWithRestClient;
+    private final PaymentClient paymentClient;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               ReservationSlotRepository reservationSlotRepository,
-                              ReservationRepository reservationRepository, PaymentWithRestClient paymentWithRestClient) {
+                              ReservationRepository reservationRepository, PaymentClient paymentClient) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationSlotRepository = reservationSlotRepository;
         this.reservationRepository = reservationRepository;
-        this.paymentWithRestClient = paymentWithRestClient;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional(readOnly = true)
@@ -120,7 +122,7 @@ public class ReservationService {
         ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
         ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        PaymentResponse paymentResponse = paymentWithRestClient.confirm(paymentRequest);
+        PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
 
         if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -13,9 +11,10 @@ import org.springframework.data.jpa.domain.Specification;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
-import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -56,13 +55,13 @@ class ReservationServiceTest extends ServiceTest {
     @Autowired
     ReservationService reservationService;
     @SpyBean
-    PaymentWithRestClient paymentWithRestClient;
+    PaymentClient paymentClient;
 
     @DisplayName("예약 생성에 성공한다.")
     @Test
     void create() {
         BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
-                .when(paymentWithRestClient)
+                .when(paymentClient)
                 .confirm(any());
 
         String date = "2100-04-18";

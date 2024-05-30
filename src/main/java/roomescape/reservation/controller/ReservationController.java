@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
-import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingReservationService;
