@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.common.exception.UnAuthorizationException;
 
@@ -52,6 +53,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpClientErrorException ex) {
+        logger.warning(EXCEPTION_PREFIX + ex.getMessage());
+
+        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpServerErrorException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
 
         PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
