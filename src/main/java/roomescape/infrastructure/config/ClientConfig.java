@@ -1,4 +1,4 @@
-package roomescape.web.config;
+package roomescape.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
