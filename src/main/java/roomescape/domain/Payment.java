@@ -1,6 +1,9 @@
 package roomescape.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
@@ -11,6 +14,7 @@ public class Payment {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Reservation reservation;
 
     private String paymentKey;
