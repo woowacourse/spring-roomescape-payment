@@ -1,6 +1,6 @@
 package roomescape.security.authentication;
 
-import roomescape.security.exception.UnauthorizedException;
+import roomescape.exception.UnauthorizedException;
 
 public class AnonymousAuthentication implements Authentication {
 

@@ -1,11 +1,10 @@
-package roomescape.infrastructure;
+package roomescape.infrastructure.payment;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.PaymentClient;
-import roomescape.payment.TossPaymentClientErrorHandler;
+import roomescape.service.PaymentClient;
 import roomescape.service.dto.request.PaymentRequest;
 
 import java.util.Base64;

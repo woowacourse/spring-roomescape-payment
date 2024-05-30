@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.infrastructure.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.client.MockClientHttpResponse;
-import roomescape.payment.exception.PaymentClientException;
-import roomescape.payment.exception.PaymentServerException;
+import roomescape.exception.PaymentClientException;
+import roomescape.exception.PaymentServerException;
 
 import java.io.IOException;
 import java.util.stream.Stream;

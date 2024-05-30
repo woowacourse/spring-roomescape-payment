@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
+import roomescape.security.AuthenticationHolder;
 import roomescape.security.authentication.AnonymousAuthentication;
 import roomescape.security.authentication.Authentication;
-import roomescape.security.authentication.AuthenticationHolder;
 import roomescape.service.AuthService;
 
 @Component

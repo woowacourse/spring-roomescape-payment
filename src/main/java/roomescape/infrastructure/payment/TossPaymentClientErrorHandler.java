@@ -1,11 +1,11 @@
-package roomescape.payment;
+package roomescape.infrastructure.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.payment.exception.PaymentClientException;
-import roomescape.payment.exception.PaymentServerException;
+import roomescape.exception.PaymentClientException;
+import roomescape.exception.PaymentServerException;
 
 import java.io.IOException;
 import java.util.Arrays;

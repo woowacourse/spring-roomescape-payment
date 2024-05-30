@@ -8,7 +8,6 @@ import roomescape.domain.member.MemberRepository;
 import roomescape.security.authentication.AnonymousAuthentication;
 import roomescape.security.authentication.Authentication;
 import roomescape.security.authentication.DefaultAuthentication;
-import roomescape.security.provider.TokenProvider;
 import roomescape.service.dto.request.CreateTokenRequest;
 import roomescape.service.dto.response.TokenResponse;
 

@@ -1,4 +1,4 @@
-package roomescape.security.provider;
+package roomescape.service;
 
 public interface TokenProvider {
 

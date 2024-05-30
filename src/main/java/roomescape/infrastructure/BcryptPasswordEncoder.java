@@ -1,6 +1,7 @@
-package roomescape.service;
+package roomescape.infrastructure;
 
 import org.mindrot.jbcrypt.BCrypt;
+import roomescape.service.PasswordEncoder;
 
 public class BcryptPasswordEncoder implements PasswordEncoder {
 

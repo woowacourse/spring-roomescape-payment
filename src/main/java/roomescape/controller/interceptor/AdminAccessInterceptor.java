@@ -4,9 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import roomescape.exception.AccessDeniedException;
+import roomescape.security.AuthenticationHolder;
 import roomescape.security.authentication.Authentication;
-import roomescape.security.authentication.AuthenticationHolder;
-import roomescape.security.exception.AccessDeniedException;
 
 @Component
 public class AdminAccessInterceptor implements HandlerInterceptor {

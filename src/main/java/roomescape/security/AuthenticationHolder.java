@@ -1,4 +1,6 @@
-package roomescape.security.authentication;
+package roomescape.security;
+
+import roomescape.security.authentication.Authentication;
 
 public class AuthenticationHolder {
 

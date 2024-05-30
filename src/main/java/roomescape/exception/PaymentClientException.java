@@ -1,4 +1,4 @@
-package roomescape.payment.exception;
+package roomescape.exception;
 
 import org.springframework.http.HttpStatusCode;
 

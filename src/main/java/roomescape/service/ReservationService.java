@@ -13,7 +13,6 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;

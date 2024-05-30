@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.infrastructure.payment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
