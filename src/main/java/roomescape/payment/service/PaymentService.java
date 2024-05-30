@@ -17,16 +17,16 @@ public class PaymentService {
 
     private final PaymentCredentialRepository paymentCredentialRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
-    private final PaymentGateway paymentGateway;
+    private final PaymentGateway tossPaymentGateway;
 
     public PaymentService(
             final PaymentCredentialRepository paymentCredentialRepository,
             final PaymentHistoryRepository paymentHistoryRepository,
-            final PaymentGateway paymentGateway
+            final PaymentGateway tossPaymentGateway
     ) {
         this.paymentCredentialRepository = paymentCredentialRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
-        this.paymentGateway = paymentGateway;
+        this.tossPaymentGateway = tossPaymentGateway;
     }
 
     public void saveCredential(final SavePaymentCredentialRequest request) {
@@ -43,7 +43,7 @@ public class PaymentService {
     ) {
         matchPaymentCredential(orderId, amount);
 
-        final PaymentConfirmResponse confirmResponse = paymentGateway.confirm(orderId, amount, paymentKey);
+        final PaymentConfirmResponse confirmResponse = tossPaymentGateway.confirm(orderId, amount, paymentKey);
         final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(member);
 
         paymentHistoryRepository.save(paymentHistory);
