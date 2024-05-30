@@ -11,5 +11,5 @@ jwt:
   expire-in-millis: 1800000
 
 payment:
-  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  secret: testtesttesttesttesttesttesttesttesttesttest
   url: https://test.wib.aru
