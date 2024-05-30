@@ -9,7 +9,6 @@ import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,19 +111,15 @@ public class ReservationService {
 
     public List<MyReservationWithRankResponse> findMyReservationsAndWaitings(final LoginMember loginMember) {
         final List<Reservation> reservationsByMemberId = reservationRepository.findByMemberId(loginMember.id());
-        final List<Reservation> reservations = reservationRepository.findAll();
         return reservationsByMemberId.stream()
-                .map(reservation -> new MyReservationWithRankResponse(reservation, calculateRank(reservations, reservation)))
+                .map(reservation -> new MyReservationWithRankResponse(reservation, calculateRank(reservation)))
                 .toList();
     }
 
-    private Long calculateRank(final List<Reservation> reservations, final Reservation reservation) {
-        return reservations.stream()
-                .filter(r -> Objects.equals(r.getDate(), reservation.getDate()) &&
-                        Objects.equals(r.getTheme().getId(), reservation.getTheme().getId()) &&
-                        Objects.equals(r.getTime().getId(), reservation.getTime().getId()) &&
-                        r.getStatus() == reservation.getStatus() &&
-                        r.getId() < reservation.getId())
-                .count() + INCREMENT_VALUE_FOR_RANK;
+    private Long calculateRank(final Reservation reservation) {
+        return reservationRepository.countByDateAndThemeIdAndTimeIdAndStatusAndIdLessThan(
+                reservation.getDate(), reservation.getTheme().getId(),
+                reservation.getTime().getId(), reservation.getStatus(), reservation.getId()
+        ) + INCREMENT_VALUE_FOR_RANK;
     }
 }
