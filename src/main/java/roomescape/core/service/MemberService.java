@@ -69,7 +69,7 @@ public class MemberService {
 
     @Transactional
     public MemberResponse create(final MemberRequest request) {
-        final Member member = new Member(request.getName(),request.getEmail(),
+        final Member member = new Member(request.getName(), request.getEmail(),
                 request.getPassword(), Role.USER);
         try {
             final Member savedMember = memberRepository.save(member);

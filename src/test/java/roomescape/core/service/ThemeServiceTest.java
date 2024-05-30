@@ -17,7 +17,6 @@ import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.core.dto.theme.ThemeResponse;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationRepository;
-import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -26,9 +25,6 @@ import roomescape.utils.TestFixture;
 class ThemeServiceTest {
     @Autowired
     private ThemeService themeService;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -95,16 +91,14 @@ class ThemeServiceTest {
     }
 
     private void createReservations() {
-        final ReservationTime reservationTimeAfterOneMinute =
-                testFixture.persistReservationTimeAfterMinute(
-                1);
+        final ReservationTime reservationTimeAfterOneMinute
+                = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation oneMinuteAfterReservation = new Reservation(getMember(),
                 TestFixture.getTodayDate(),
                 reservationTimeAfterOneMinute, getTheme());
 
-        final ReservationTime reservationTimeAfterTwoMinute =
-                testFixture.persistReservationTimeAfterMinute(
-                2);
+        final ReservationTime reservationTimeAfterTwoMinute
+                = testFixture.persistReservationTimeAfterMinute(2);
         final Reservation twoMinuteAfterReservation = new Reservation(getMember(),
                 TestFixture.getTodayDate(),
                 reservationTimeAfterTwoMinute, getTheme());
