@@ -3,6 +3,7 @@ package roomescape.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -20,6 +21,7 @@ import roomescape.service.response.ReservationWaitingWithRankDto;
 import roomescape.web.exception.AuthorizationException;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationWaitingService {
 
     private final ReservationRepository reservationRepository;
@@ -28,12 +30,11 @@ public class ReservationWaitingService {
     private final MemberRepository memberRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
 
-    public ReservationWaitingService(
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            ReservationWaitingRepository reservationWaitingRepository) {
+    public ReservationWaitingService(ReservationRepository reservationRepository,
+                                     ReservationTimeRepository reservationTimeRepository,
+                                     ThemeRepository themeRepository,
+                                     MemberRepository memberRepository,
+                                     ReservationWaitingRepository reservationWaitingRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;

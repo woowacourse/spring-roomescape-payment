@@ -10,6 +10,7 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationAndWaitingService {
 
     private final ReservationRepository reservationRepository;
@@ -42,8 +43,7 @@ public class ReservationAndWaitingService {
                 waiting.getMember(),
                 waiting.getDate(),
                 waiting.getTime(),
-                waiting.getTheme()
-        );
+                waiting.getTheme());
         reservationWaitingRepository.deleteById(waiting.getId());
         reservationRepository.save(reservation);
     }

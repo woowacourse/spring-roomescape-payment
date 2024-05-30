@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -22,12 +23,13 @@ import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final MemberRepository memberRepository;
     private final PaymentManager paymentManager;
 
     public ReservationService(ReservationRepository reservationRepository,
@@ -42,6 +44,7 @@ public class ReservationService {
         this.paymentManager = paymentManager;
     }
 
+    @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
         Member member = findMember(reservationSaveDto.memberId());
         ReservationDate date = new ReservationDate(reservationSaveDto.date());
@@ -56,9 +59,12 @@ public class ReservationService {
         return ReservationDto.from(savedReservation);
     }
 
+    @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+        ReservationDto reservationDto = save(reservationSaveDto);
         paymentManager.approve(paymentApproveDto);
-        return save(reservationSaveDto);
+
+        return reservationDto;
     }
 
     private ReservationTime findTime(Long timeId) {
@@ -88,6 +94,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void delete(Long id) {
         reservationRepository.deleteById(id);
     }
