@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
-import roomescape.service.payment.dto.PaymentConfirmFailResponse;
-import roomescape.service.payment.dto.PaymentConfirmRequest;
-import roomescape.service.payment.dto.PaymentConfirmResponse;
+import roomescape.service.payment.dto.PaymentConfirmFailOutput;
+import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 @Component
 public class PaymentClientImpl implements PaymentClient {
@@ -35,7 +35,7 @@ public class PaymentClientImpl implements PaymentClient {
     }
 
     @Override
-    public PaymentConfirmResponse confirmPayment(PaymentConfirmRequest confirmRequest) {
+    public PaymentConfirmOutput confirmPayment(PaymentConfirmInput confirmRequest) {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
@@ -52,12 +52,12 @@ public class PaymentClientImpl implements PaymentClient {
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
                     throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
                 })
-                .body(PaymentConfirmResponse.class);
+                .body(PaymentConfirmOutput.class);
     }
 
     private PaymentConfirmErrorCode getPaymentConfirmErrorCode(final ClientHttpResponse response) throws IOException {
-        PaymentConfirmFailResponse confirmFailResponse = objectMapper.readValue(
-                response.getBody(), PaymentConfirmFailResponse.class);
+        PaymentConfirmFailOutput confirmFailResponse = objectMapper.readValue(
+                response.getBody(), PaymentConfirmFailOutput.class);
         return PaymentConfirmErrorCode.findByName(confirmFailResponse.code());
     }
 }

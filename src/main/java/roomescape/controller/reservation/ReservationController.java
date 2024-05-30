@@ -15,12 +15,14 @@ import roomescape.controller.auth.RoleAllowed;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.service.member.MemberService;
+import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.ReservationSaveInput;
 
 @RestController
 public class ReservationController {
@@ -54,14 +56,21 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest request,
                                                                @LoginMember Member member) {
-        ReservationResponse response = reservationService.saveReservation(request, member);
+        ReservationSaveInput reservationSaveInput = request.toReservationSaveInput();
+        PaymentConfirmInput paymentConfirmInput = request.toPaymentConfirmInput();
+
+        ReservationResponse response = reservationService.saveReservationWithPayment(
+                reservationSaveInput, paymentConfirmInput, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
     @RoleAllowed(MemberRole.ADMIN)
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> saveAdminReservation(@RequestBody AdminReservationRequest request) {
-        ReservationResponse response = reservationService.saveAdminReservation(request);
+        ReservationSaveInput reservationSaveInput = request.toReservationSaveInput();
+        Member member = memberService.findById(request.getMemberId());
+
+        ReservationResponse response = reservationService.saveReservationWithoutPayment(reservationSaveInput, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 

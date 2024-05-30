@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -25,7 +24,6 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.exception.member.NotFoundMemberException;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.InvalidReservationMemberException;
@@ -33,12 +31,12 @@ import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.exception.time.NotFoundTimeException;
 import roomescape.service.payment.PaymentClient;
-import roomescape.service.reservation.dto.AdminReservationRequest;
+import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationMineResponse;
-import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.ReservationSaveInput;
 
 @Service
 @Transactional
@@ -47,7 +45,6 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final MemberRepository memberRepository;
     private final PaymentClient paymentClient;
     private final Clock clock;
 
@@ -55,14 +52,12 @@ public class ReservationService {
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
                               PaymentClient paymentClient,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
         this.paymentClient = paymentClient;
         this.clock = clock;
     }
@@ -96,33 +91,26 @@ public class ReservationService {
         return new ReservationMineListResponse(myReservations);
     }
 
-    public ReservationResponse saveReservation(ReservationRequest request, Member member) {
-        ReservationTime time = findReservationTimeById(request.getTimeId());
-        Theme theme = findThemeById(request.getThemeId());
-        Reservation reservation = request.toReservation(time, theme, member);
+    public ReservationResponse saveReservationWithPayment(
+            ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
+        Reservation savedReservation = saveReservation(reservationSaveInput, member);
+        paymentClient.confirmPayment(paymentConfirmInput);
+        return new ReservationResponse(savedReservation);
+    }
+
+    public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {
+        Reservation savedReservation = saveReservation(reservationSaveInput, member);
+        return new ReservationResponse(savedReservation);
+    }
+
+    private Reservation saveReservation(ReservationSaveInput input, Member member) {
+        ReservationTime time = findReservationTimeById(input.timeId());
+        Theme theme = findThemeById(input.themeId());
+        Reservation reservation = input.toReservation(time, theme, member);
         validateDuplicateReservation(reservation);
         validateDateTimeReservation(reservation);
 
-        paymentClient.confirmPayment(request.toPaymentRequest());
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
-    }
-
-    public ReservationResponse saveAdminReservation(AdminReservationRequest request) {
-        Member member = findMemberById(request.getMemberId());
-        ReservationTime time = findReservationTimeById(request.getTimeId());
-        Theme theme = findThemeById(request.getThemeId());
-        Reservation reservation = request.toReservation(time, theme, member);
-        validateDuplicateReservation(reservation);
-        validateDateTimeReservation(reservation); // TODO: 중복 로직 제거
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
-    }
-
-    private Member findMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(NotFoundMemberException::new);
+        return reservationRepository.save(reservation);
     }
 
     private ReservationTime findReservationTimeById(long id) {

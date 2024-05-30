@@ -2,7 +2,7 @@ package roomescape.service.payment.dto;
 
 import roomescape.service.payment.PaymentStatus;
 
-public record PaymentConfirmResponse(
+public record PaymentConfirmOutput(
         String paymentKey,
         String orderId,
         String orderName,

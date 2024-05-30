@@ -2,10 +2,6 @@ package roomescape.service.reservation.dto;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import roomescape.domain.member.Member;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservationtime.ReservationTime;
-import roomescape.domain.theme.Theme;
 import roomescape.exception.common.InvalidRequestBodyException;
 
 public class AdminReservationRequest {
@@ -33,8 +29,8 @@ public class AdminReservationRequest {
         }
     }
 
-    public Reservation toReservation(ReservationTime reservationTime, Theme theme, Member member) {
-        return new Reservation(date, reservationTime, theme, member);
+    public ReservationSaveInput toReservationSaveInput() {
+        return new ReservationSaveInput(date, timeId, themeId);
     }
 
     public LocalDate getDate() {

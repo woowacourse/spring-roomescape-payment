@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.config.TestConfig;
 import roomescape.helper.CookieProvider;
 import roomescape.helper.DatabaseCleaner;
 import roomescape.helper.domain.MemberFixture;
@@ -22,7 +20,6 @@ import roomescape.helper.domain.ThemeFixture;
 import roomescape.helper.domain.WaitingFixture;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Import(TestConfig.class)
 @ActiveProfiles("test")
 abstract class ServiceTest {
     @Autowired

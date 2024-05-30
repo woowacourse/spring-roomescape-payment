@@ -23,8 +23,8 @@ import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
-import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.ReservationSaveInput;
 
 class ReservationServiceTest extends ServiceTest {
     @Autowired
@@ -125,22 +125,19 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTime time;
         Theme theme;
         Member member;
-        String timeId;
-        String themeId;
 
         @BeforeEach
         void setUp() {
             time = timeFixture.createFutureTime();
             theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            timeId = time.getId().toString();
-            themeId = theme.getId().toString();
         }
 
         @Test
-        void 예약을_추가할_수_있다() {
-            ReservationRequest request = new ReservationRequest("2000-04-07", timeId, themeId, "", "", 0);
-            ReservationResponse response = reservationService.saveReservation(request, member);
+        void 결제_없이_예약을_추가할_수_있다() {
+            ReservationSaveInput request = new ReservationSaveInput(
+                    LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
+            ReservationResponse response = reservationService.saveReservationWithoutPayment(request, member);
 
             assertThat(response.getMember().getName())
                     .isEqualTo(member.getName().getName());
@@ -149,18 +146,18 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 시간대와_테마가_똑같은_중복된_예약_추가시_예외가_발생한다() {
             Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
-            ReservationRequest request = new ReservationRequest(
-                    reservation.getDate().toString(), timeId, themeId, "", "", 0);
+            ReservationSaveInput input = new ReservationSaveInput(reservation.getDate(), time.getId(), theme.getId());
 
-            assertThatThrownBy(() -> reservationService.saveReservation(request, member))
+            assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(DuplicatedReservationException.class);
         }
 
         @Test
         void 지나간_날짜와_시간에_대한_예약_추가시_예외가_발생한다() {
-            ReservationRequest request = new ReservationRequest("2000-04-06", timeId, themeId, "", "", 0);
+            ReservationSaveInput input = new ReservationSaveInput(
+                    LocalDate.of(2000, 4, 6), time.getId(), theme.getId());
 
-            assertThatThrownBy(() -> reservationService.saveReservation(request, member))
+            assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(InvalidDateTimeReservationException.class);
         }
     }
