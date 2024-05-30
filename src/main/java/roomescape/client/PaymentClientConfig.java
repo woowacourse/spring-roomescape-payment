@@ -1,13 +1,13 @@
 package roomescape.client;
 
 import feign.Client;
+import feign.codec.ErrorDecoder;
 import feign.okhttp.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import feign.codec.ErrorDecoder;
 
 @Configuration
-public class FeignConfig {
+public class PaymentClientConfig {
 
     @Bean
     public ErrorDecoder errorDecoder() {
@@ -15,7 +15,7 @@ public class FeignConfig {
     }
 
     @Bean
-    Client client(){
+    Client client() {
         return new OkHttpClient();
     }
 }
