@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.controller.PaymentController;
+import roomescape.service.PaymentService;
 import roomescape.controller.dto.TokenRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -29,7 +29,7 @@ public abstract class IntegrationTestSupport {
     private int serverPort;
 
     @MockBean
-    protected PaymentController paymentController;
+    protected PaymentService paymentService;
 
     @PostConstruct
     private void initialize() {

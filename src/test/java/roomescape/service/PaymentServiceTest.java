@@ -1,4 +1,4 @@
-package roomescape.controller;
+package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -9,11 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.web.client.RestTemplate;
+import roomescape.controller.HeaderGenerator;
 import roomescape.controller.dto.PaymentApproveRequest;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
 import roomescape.exception.customexception.ThirdPartyAPIException;
@@ -21,10 +20,10 @@ import roomescape.exception.customexception.ThirdPartyAPIException;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
-class PaymentControllerTest {
+class PaymentServiceTest {
 
     @Autowired
-    private PaymentController paymentController;
+    private PaymentService paymentService;
 
     @Test
     @DisplayName("400에러 반환시 custom exception으로 예외가 전환된다.")
@@ -40,7 +39,7 @@ class PaymentControllerTest {
             return headers;
         };
 
-        assertThatThrownBy(() -> paymentController.approve(headerGenerator, request))
+        assertThatThrownBy(() -> paymentService.pay(headerGenerator, request))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -58,7 +57,7 @@ class PaymentControllerTest {
             return headers;
         };
 
-        assertThatThrownBy(() -> paymentController.approve(headerGenerator, request))
+        assertThatThrownBy(() -> paymentService.pay(headerGenerator, request))
                 .isInstanceOf(ThirdPartyAPIException.class);
     }
 }

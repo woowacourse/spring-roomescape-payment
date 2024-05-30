@@ -1,26 +1,39 @@
 package roomescape.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.controller.HeaderGeneratorImpl;
+import roomescape.controller.dto.PaymentApproveRequest;
+import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
-import roomescape.domain.repository.*;
-import roomescape.domain.reservation.*;
+import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+import roomescape.domain.repository.ThemeRepository;
+import roomescape.domain.repository.WaitingRepository;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationSlot;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.Theme;
+import roomescape.domain.reservation.Waiting;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.request.ReservationConditionRequest;
 import roomescape.service.dto.request.ReservationSaveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.ReservationResponses;
 import roomescape.service.dto.response.UserReservationResponse;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 @Transactional
 public class ReservationService {
+
+    private final PaymentService paymentService;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
@@ -28,17 +41,27 @@ public class ReservationService {
     private final ReservationTimeRepository timeRepository;
 
     public ReservationService(
+            PaymentService paymentService,
             WaitingRepository waitingRepository,
             ReservationRepository reservationRepository,
             MemberRepository memberRepository,
             ThemeRepository themeRepository,
             ReservationTimeRepository timeRepository
     ) {
+        this.paymentService = paymentService;
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
         this.timeRepository = timeRepository;
+    }
+
+    public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
+        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
+        paymentService.pay(new HeaderGeneratorImpl(), paymentApproveRequest);
+
+        ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
+        return saveReservation(reservationSaveRequest);
     }
 
     public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
