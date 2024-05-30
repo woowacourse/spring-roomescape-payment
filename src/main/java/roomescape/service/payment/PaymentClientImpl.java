@@ -56,8 +56,8 @@ public class PaymentClientImpl implements PaymentClient {
     }
 
     private PaymentConfirmErrorCode getPaymentConfirmErrorCode(final ClientHttpResponse response) throws IOException {
-        PaymentConfirmFailResponse confirmFailResponse = objectMapper.readValue(response.getBody(),
-                PaymentConfirmFailResponse.class);
+        PaymentConfirmFailResponse confirmFailResponse = objectMapper.readValue(
+                response.getBody(), PaymentConfirmFailResponse.class);
         return PaymentConfirmErrorCode.findByName(confirmFailResponse.code());
     }
 }
