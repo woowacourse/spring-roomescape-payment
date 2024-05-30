@@ -40,7 +40,7 @@ public class ReservationController {
                 .body(savedReservationResponse);
     }
 
-    @PostMapping("admin/reservations")
+    @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByAdmin(
             @RequestBody AdminReservationRequest reservationRequest) {
         ReservationResponse reservationResponse = reservationService.saveByAdmin(reservationRequest);
