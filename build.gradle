@@ -24,6 +24,9 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
 
+    //HttpComponentsClientHttpRequestFactory
+    implementation "org.apache.httpcomponents.client5:httpclient5"
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
 }
