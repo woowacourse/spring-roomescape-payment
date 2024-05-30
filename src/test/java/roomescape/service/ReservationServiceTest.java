@@ -8,10 +8,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.TestFixture;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationTimeResponse;
@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.ADMIN;
 import static roomescape.TestFixture.ADMIN_NAME;
@@ -35,13 +36,17 @@ import static roomescape.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.TestFixture.DATE_MAY_NINTH;
 import static roomescape.TestFixture.DATE_MAY_ONE;
 import static roomescape.TestFixture.MEMBER_CAT;
+import static roomescape.TestFixture.MEMBER_CAT_NAME;
+import static roomescape.TestFixture.RESERVATION_TIME_ONE;
 import static roomescape.TestFixture.RESERVATION_TIME_SEVEN;
 import static roomescape.TestFixture.RESERVATION_TIME_SIX;
 import static roomescape.TestFixture.START_AT_SEVEN;
 import static roomescape.TestFixture.START_AT_SIX;
+import static roomescape.TestFixture.THEME_ANIME;
 import static roomescape.TestFixture.THEME_ANIME_NAME;
 import static roomescape.TestFixture.THEME_COMIC;
 import static roomescape.TestFixture.THEME_COMIC_NAME;
+import static roomescape.domain.member.Role.ADMIN;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -62,9 +67,9 @@ class ReservationServiceTest {
     @DisplayName("예약을 생성한다.")
     void create() {
         // given
-        final Reservation reservation = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC());
+        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
         given(reservationRepository.save(reservation))
-                .willReturn(new Reservation(reservation.getMember(), reservation.getDate(), reservation.getTime(), reservation.getTheme()));
+                .willReturn(new Reservation(reservation.getMember(), reservation.getDate(), reservation.getTime(), reservation.getTheme(), "결제완"));
 
         // when
         final ReservationResponse response = reservationService.create(reservation);
@@ -79,7 +84,7 @@ class ReservationServiceTest {
     @DisplayName("예약 날짜가 현재 날짜 이후가 아닌 경우 예외가 발생한다.")
     void throwExceptionWhenInvalidDate(final LocalDate invalidDate) {
         ReservationTime oneHourBefore = new ReservationTime(LocalTime.now().minusHours(1L).toString());
-        assertThatThrownBy(() -> reservationService.create(new Reservation(TestFixture.MEMBER_CAT(), invalidDate, oneHourBefore, TestFixture.THEME_COMIC())))
+        assertThatThrownBy(() -> reservationService.create(new Reservation(MEMBER_CAT(), invalidDate, oneHourBefore, THEME_COMIC(), "결제완")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -88,7 +93,7 @@ class ReservationServiceTest {
     void throwExceptionWhenCreateDuplicatedReservation() {
         // given
         final Theme theme = THEME_COMIC(1L);
-        final Reservation reservation = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), theme);
+        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), theme, "결제완");
         given(reservationRepository.existsByDateAndTime_IdAndTheme_Id(DATE_MAY_EIGHTH, RESERVATION_TIME_SIX().getId(), theme.getId()))
                 .willReturn(true);
 
@@ -101,8 +106,8 @@ class ReservationServiceTest {
     @DisplayName("모든 예약 목록을 조회한다.")
     void findAllReservations() {
         // given
-        final Reservation reservation1 = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC());
-        final Reservation reservation2 = new Reservation(ADMIN(), DATE_MAY_EIGHTH, RESERVATION_TIME_SEVEN(), TestFixture.THEME_ANIME());
+        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
+        final Reservation reservation2 = new Reservation(ADMIN(), DATE_MAY_EIGHTH, RESERVATION_TIME_SEVEN(), THEME_ANIME(), "결제완");
         given(reservationRepository.findAll())
                 .willReturn(List.of(reservation1, reservation2));
 
@@ -113,7 +118,7 @@ class ReservationServiceTest {
         assertAll(() -> {
             assertThat(reservations).hasSize(2)
                     .extracting(ReservationResponse::name)
-                    .containsExactly(TestFixture.MEMBER_CAT_NAME, ADMIN_NAME);
+                    .containsExactly(MEMBER_CAT_NAME, ADMIN_NAME);
             assertThat(reservations).extracting(ReservationResponse::date)
                     .containsExactly(DATE_MAY_EIGHTH, DATE_MAY_EIGHTH);
             assertThat(reservations).extracting(ReservationResponse::time)
@@ -129,8 +134,8 @@ class ReservationServiceTest {
     @DisplayName("검색 조건에 따른 예약 목록을 조회한다.")
     void findAllByFilterParameter() {
         // given
-        final Reservation reservation1 = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC());
-        final Reservation reservation2 = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_NINTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC());
+        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
+        final Reservation reservation2 = new Reservation(MEMBER_CAT(), DATE_MAY_NINTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
         final ReservationFilterParam reservationFilterParam = new ReservationFilterParam(
                 1L, 1L, LocalDate.parse("2034-05-08"), LocalDate.parse("2034-05-28")
         );
@@ -146,7 +151,7 @@ class ReservationServiceTest {
         assertAll(() -> {
             assertThat(reservations).hasSize(2)
                     .extracting(ReservationResponse::name)
-                    .containsExactly(TestFixture.MEMBER_CAT_NAME, TestFixture.MEMBER_CAT_NAME);
+                    .containsExactly(MEMBER_CAT_NAME, MEMBER_CAT_NAME);
             assertThat(reservations).extracting(ReservationResponse::time)
                     .extracting(ReservationTimeResponse::startAt)
                     .containsExactly(START_AT_SIX, START_AT_SIX);
@@ -162,7 +167,7 @@ class ReservationServiceTest {
         // given
         final Long existingId = 1L;
         given(reservationRepository.findById(existingId)).willReturn(
-                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_ONE, RESERVATION_TIME_SEVEN(), THEME_COMIC()))
+                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_ONE, RESERVATION_TIME_SEVEN(), THEME_COMIC(), "결제완"))
         );
 
         // when & then
@@ -178,6 +183,20 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.delete(notExistingId))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("예약자가 일치 하지 않으면 예외가 발생한다")
+    void throwExceptionWhenNotEqualMemberAndReservationMember() {
+        // given
+        given(reservationRepository.findById(anyLong())).willReturn(
+                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_NINTH, RESERVATION_TIME_ONE(), THEME_COMIC(), "dummyKey"))
+        );
+        LoginMember loginMember = new LoginMember(0L, ADMIN_NAME, ADMIN);
+
+        // when & then
+        assertThatThrownBy(() -> reservationService.checkMyReservation(anyLong(), loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

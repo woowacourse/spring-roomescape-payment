@@ -12,7 +12,8 @@ public record MyReservationResponse(
         String theme,
         LocalDate date,
         String time,
-        String status
+        String status,
+        String paymentKey
 ) {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -25,7 +26,8 @@ public record MyReservationResponse(
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getStartAt().format(FORMATTER),
-                RESERVED
+                RESERVED,
+                reservation.getPaymentKey()
         );
     }
 
@@ -36,7 +38,8 @@ public record MyReservationResponse(
                 waiting.getThemeName(),
                 waiting.getDate(),
                 waiting.getStartAt().format(FORMATTER),
-                String.format(WAITING_WITH_RANK, waitingWithRank.getRank())
+                String.format(WAITING_WITH_RANK, waitingWithRank.getRank()),
+                null
         );
     }
 }

@@ -3,6 +3,8 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
+import roomescape.dto.auth.LoginMember;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.MyReservationResponse;
 import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
@@ -57,8 +59,7 @@ public class ReservationService {
     }
 
     public ReservationResponse delete(final Long id) {
-        final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 예약이 없습니다."));
+        final Reservation reservation = findReservation(id);
         reservationRepository.deleteById(id);
         return ReservationResponse.from(reservation);
     }
@@ -68,5 +69,24 @@ public class ReservationService {
         return reservations.stream()
                 .map(MyReservationResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public MyReservationResponse updatePayment(Long id, PaymentResponse paymentResponse) {
+        final Reservation reservation = findReservation(id);
+        reservation.updatePaymentKey(paymentResponse.paymentKey());
+        return MyReservationResponse.from(reservation);
+    }
+
+    public void checkMyReservation(Long id, LoginMember loginMember) {
+        Reservation reservation = findReservation(id);
+        if (reservation.isNotReservedBy(loginMember.id())) {
+            throw new IllegalArgumentException("예약자가 일치하지 않습니다.");
+        }
+    }
+
+    private Reservation findReservation(Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 id의 예약이 있습니다."));
     }
 }

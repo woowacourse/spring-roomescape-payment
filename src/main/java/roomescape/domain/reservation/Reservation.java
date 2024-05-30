@@ -36,15 +36,19 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @Column
+    private String paymentKey;
+
     protected Reservation() {
     }
 
-    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final String paymentKey) {
         this.id = null;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.paymentKey = paymentKey;
     }
 
     public boolean hasSameDateTime(final LocalDate date, final ReservationTime time) {
@@ -54,6 +58,14 @@ public class Reservation {
     public boolean isAvailable() {
         LocalDate now = LocalDate.now();
         return now.isBefore(date) || (now.equals(date) && time.isAvailable());
+    }
+
+    public boolean isNotReservedBy(Long id) {
+        return !this.member.getId().equals(id);
+    }
+
+    public void updatePaymentKey(String paymentKey) {
+        this.paymentKey = paymentKey;
     }
 
     public Long getReservationTimeId() {
@@ -94,6 +106,10 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 
     @Override

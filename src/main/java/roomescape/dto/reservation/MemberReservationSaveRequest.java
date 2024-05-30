@@ -15,7 +15,7 @@ public record MemberReservationSaveRequest(
 ) {
 
     public ReservationSaveRequest generateReservationSaveRequest(MemberResponse memberResponse) {
-        return new ReservationSaveRequest(memberResponse.id(), date, timeId, themeId);
+        return new ReservationSaveRequest(memberResponse.id(), date, timeId, themeId, null);
     }
 
     public PaymentRequest toPaymentRequest() {

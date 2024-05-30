@@ -4,16 +4,21 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import roomescape.client.PaymentClient;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.TestFixture.DUMMY_PAYMENT_RESPONSE;
 import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
 import static roomescape.TestFixture.MEMBER_PASSWORD;
 import static roomescape.TestFixture.START_AT_SIX;
@@ -27,9 +32,15 @@ abstract class AcceptanceTest {
     @LocalServerPort
     private int port;
 
+    @MockBean
+    private PaymentClient paymentClient;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+
+        given(paymentClient.pay(any()))
+                .willReturn(DUMMY_PAYMENT_RESPONSE());
     }
 
     protected Long saveReservationTime() {

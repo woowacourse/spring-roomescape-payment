@@ -49,7 +49,7 @@ class ReservationRepositoryTest {
         member = memberRepository.save(MEMBER_BROWN());
         reservationTime = reservationTimeRepository.save(RESERVATION_TIME_SIX());
         theme = themeRepository.save(TestFixture.THEME_COMIC());
-        reservation = reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme));
+        reservation = reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, "결제완"));
         testEntityManager.clear();
     }
 
@@ -57,7 +57,7 @@ class ReservationRepositoryTest {
     @DisplayName("예약을 저장한다.")
     void save() {
         // given
-        final Reservation reservation = new Reservation(member, DATE_MAY_NINTH, reservationTime, theme);
+        final Reservation reservation = new Reservation(member, DATE_MAY_NINTH, reservationTime, theme, "결제완");
 
         // when
         final Reservation actual = reservationRepository.save(reservation);

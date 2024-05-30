@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,13 +71,23 @@ public class ReservationController {
         final ReservationTimeResponse reservationTimeResponse = reservationTimeService.findById(request.timeId());
         final ThemeResponse themeResponse = themeService.findById(request.themeId());
 
-        final Reservation reservation = saveRequest.toReservation(memberResponse, themeResponse, reservationTimeResponse);
-
         final PaymentRequest paymentRequest = request.toPaymentRequest();
-        final PaymentResponse pay = paymentClient.pay(paymentRequest);
+        final PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
+
+        final Reservation reservation = saveRequest.toReservation(memberResponse, themeResponse, reservationTimeResponse, paymentResponse);
 
         final ReservationResponse response = reservationService.create(reservation);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<MyReservationResponse> payReservation(@AuthenticationPrincipal final LoginMember loginMember,
+                                                                @PathVariable final Long id,
+                                                                @RequestBody final PaymentRequest request) {
+        reservationService.checkMyReservation(id, loginMember);
+        PaymentResponse paymentResponse = paymentClient.pay(request);
+        MyReservationResponse reservationResponse = reservationService.updatePayment(id, paymentResponse);
+        return ResponseEntity.ok(reservationResponse);
     }
 
     @GetMapping
