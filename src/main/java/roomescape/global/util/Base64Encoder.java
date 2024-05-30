@@ -2,9 +2,6 @@ package roomescape.global.util;
 
 import java.util.Base64;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class Base64Encoder implements Encoder {
     @Override
     public String encode(String key) {
