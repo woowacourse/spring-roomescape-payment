@@ -57,10 +57,10 @@ CREATE TABLE IF NOT EXISTS payment
     id                    BIGINT        NOT NULL AUTO_INCREMENT,
     payment_key           VARCHAR(1023) NOT NULL,
     payment_type          VARCHAR(255)  NOT NULL,
-    amount                DECIMAL       NOT NULL,
+    price                DECIMAL       NOT NULL,
     member_reservation_id BIGINT        NOT NULL,
     created_at timestamp(6) NOT NULL,
     updated_at timestamp(6) NOT NULL,
-    FOREIGN KEY (member_reservation_id) REFERENCES member (id),
+    FOREIGN KEY (member_reservation_id) REFERENCES member_reservation (id),
     PRIMARY KEY (id)
 );
