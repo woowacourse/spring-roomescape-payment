@@ -31,6 +31,6 @@ public class PaymentClient {
                         .onStatus(errorHandler)
                         .body(ApproveApiResponse.class))
                 .orElseThrow(() -> new ApiCallException("알 수 없는 오류가 발생했습니다."));
-        return new Payment(response.orderId(), response.paymentKey(), response.amount(), member);
+        return new Payment(response.orderId(), response.paymentKey(), response.amount());
     }
 }
