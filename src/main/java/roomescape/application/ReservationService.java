@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.dto.request.payment.PaymentRequest;
+import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.ReservationSearchCondition;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
@@ -61,6 +62,19 @@ public class ReservationService {
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
         reservationRepository.save(reservation);
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse paymentForPending(ReservationPaymentRequest request, Long memberId) {
+        Reservation reservation = reservationRepository.getReservation(request.reservationId());
+        reservation.isOwner(memberId);
+
+        PaymentRequest paymentRequest = request.toPaymentRequest();
+        PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+        Payment payment = paymentRepository.save(paymentResponse.toPayment());
+        reservation.setPayment(payment);
+        reservation.toReserved();
         return ReservationResponse.from(reservation);
     }
 

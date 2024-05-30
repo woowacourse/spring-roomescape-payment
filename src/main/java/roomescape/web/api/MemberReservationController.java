@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.CancelService;
 import roomescape.application.ReservationService;
 import roomescape.application.dto.request.member.MemberInfo;
-import roomescape.application.dto.request.reservation.ReservationRequest;
+import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
@@ -33,6 +33,15 @@ public class MemberReservationController {
         ReservationResponse response = reservationService.saveReservation(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
+    }
+
+    @PostMapping("/reservations/payment")
+    public ResponseEntity<ReservationResponse> paymentForPending(
+            @RequestBody ReservationPaymentRequest request,
+            MemberInfo memberInfo
+    ) {
+        ReservationResponse response = reservationService.paymentForPending(request, memberInfo.id());
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/reservations-mine")
