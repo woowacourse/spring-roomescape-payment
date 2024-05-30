@@ -12,16 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.core.domain.Payment;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
-import roomescape.infrastructure.PaymentClient;
 
 @RestController
 @RequestMapping("/reservations")
@@ -29,13 +28,10 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final PaymentService paymentService;
-    private final PaymentClient paymentClient;
 
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService,
-                                 final PaymentClient paymentClient) {
+    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
         this.reservationService = reservationService;
         this.paymentService = paymentService;
-        this.paymentClient = paymentClient;
     }
 
     @PostMapping
@@ -44,11 +40,11 @@ public class ReservationController {
         final PaymentRequest paymentRequest = new PaymentRequest(memberRequest.getPaymentKey(),
                 memberRequest.getOrderId(), memberRequest.getAmount());
 
-        paymentClient.approvePayment(paymentRequest, paymentService.createPaymentAuthorization());
-        Payment payment = paymentService.save(paymentRequest);
+        PaymentResponse paymentResponse = paymentService.approvePayment(paymentRequest);
 
         final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
-                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus(), payment.getId());
+                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus(),
+                paymentResponse.getId());
         final ReservationResponse result = reservationService.create(request);
         return ResponseEntity.created(URI.create("/reservations/" + result.getId()))
                 .body(result);
@@ -78,12 +74,11 @@ public class ReservationController {
     public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findAllByMember(loginMember));
     }
-
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
         if (reservationService.isNotAdminReservation(id)) {
-            paymentClient.refundPayment(reservationService.findPaymentByDeleteReservation(id),
-                    paymentService.createPaymentAuthorization());
+            paymentService.refundPayment(reservationService.findPaymentByReservationId(id));
         }
         reservationService.delete(id);
         return ResponseEntity.noContent().build();

@@ -4,29 +4,39 @@ import org.springframework.stereotype.Service;
 import roomescape.core.domain.Payment;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.repository.PaymentRepository;
 import roomescape.infrastructure.PaymentAuthorizationProvider;
+import roomescape.infrastructure.PaymentClient;
 
 @Service
 public class PaymentService {
 
     private final PaymentAuthorizationProvider paymentAuthorizationProvider;
     private final PaymentRepository paymentRepository;
+    private final PaymentClient paymentClient;
 
     public PaymentService(PaymentAuthorizationProvider paymentAuthorizationProvider,
-                          PaymentRepository paymentRepository) {
+                          PaymentRepository paymentRepository, PaymentClient paymentClient) {
         this.paymentAuthorizationProvider = paymentAuthorizationProvider;
         this.paymentRepository = paymentRepository;
+        this.paymentClient = paymentClient;
+    }
+
+    public PaymentResponse approvePayment(final PaymentRequest paymentRequest) {
+        paymentClient.approvePayment(paymentRequest, createPaymentAuthorization());
+
+        Payment payment = new Payment(
+                paymentRequest.getPaymentKey(), paymentRequest.getAmount(), paymentRequest.getOrderId());
+
+        return new PaymentResponse(paymentRepository.save(payment));
     }
 
     public PaymentAuthorizationResponse createPaymentAuthorization() {
         return new PaymentAuthorizationResponse(paymentAuthorizationProvider.getAuthorization());
     }
 
-    public Payment save(final PaymentRequest paymentRequest) {
-        Payment payment = new Payment(
-                paymentRequest.getPaymentKey(), paymentRequest.getAmount(), paymentRequest.getOrderId());
-
-        return paymentRepository.save(payment);
+    public void refundPayment(PaymentResponse paymentResponse) {
+        paymentClient.refundPayment(paymentResponse, createPaymentAuthorization());
     }
 }

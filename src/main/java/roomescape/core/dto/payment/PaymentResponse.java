@@ -1,18 +1,38 @@
 package roomescape.core.dto.payment;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import jakarta.validation.constraints.NotBlank;
+import roomescape.core.domain.Payment;
 
 public class PaymentResponse {
-    @NotBlank(message = "paymentKey 는 비어있을 수 없습니다.")
-    private String paymentKey;
 
-    @JsonCreator
-    public PaymentResponse(String paymentKey) {
+    private Long id;
+    private String paymentKey;
+    private Long amount;
+    private String orderId;
+
+    public PaymentResponse(Long id, String paymentKey, Long amount, String orderId) {
+        this.id = id;
         this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.orderId = orderId;
+    }
+
+    public PaymentResponse(Payment payment) {
+        this(payment.getId(), payment.getPaymentKey(), payment.getAmount(), payment.getOrderId());
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public String getOrderId() {
+        return orderId;
     }
 }

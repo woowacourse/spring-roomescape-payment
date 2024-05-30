@@ -24,7 +24,6 @@ import roomescape.core.repository.ThemeRepository;
 
 @Service
 public class ReservationService {
-    private static final Integer rankOfBooked = 0;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -156,9 +155,9 @@ public class ReservationService {
                 .ifPresent(Reservation::approve);
     }
 
-    public PaymentResponse findPaymentByDeleteReservation(final Long id) {
-        Reservation delete = reservationRepository.findReservationById(id);
-        return new PaymentResponse(delete.getPayment().getPaymentKey());
+    public PaymentResponse findPaymentByReservationId(final Long id) {
+        Reservation reservation = reservationRepository.findReservationById(id);
+        return new PaymentResponse(reservation.getPayment());
     }
 
     @Transactional(readOnly = true)
