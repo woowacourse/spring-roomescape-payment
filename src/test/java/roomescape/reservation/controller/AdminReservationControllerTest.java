@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.auth.dto.LoginRequest;
 import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
@@ -27,6 +26,7 @@ import roomescape.reservation.dto.ReservationResponse;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class AdminReservationControllerTest {
+
     @LocalServerPort
     private int port;
 
@@ -95,17 +95,5 @@ class AdminReservationControllerTest {
                 .getList("", ReservationResponse.class);
 
         assertThat(reservationResponses).containsExactlyInAnyOrder(response);
-    }
-
-    private Cookies makeAdminCookie() {
-        LoginRequest request = new LoginRequest("admin@abc.com", "1234");
-
-        return RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract().detailedCookies();
     }
 }
