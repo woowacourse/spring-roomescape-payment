@@ -1,20 +1,17 @@
 package roomescape.payment.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.JsonParseException;
+import roomescape.exception.PaymentErrorResponse;
 import roomescape.exception.PaymentFailException;
 import roomescape.payment.dto.PaymentRequest;
 
@@ -23,39 +20,38 @@ public class PaymentService {
 
     private static final String KEY_PREFIX = "Basic ";
 
-    private final RestClient restClient;
     private final String paymentSecretKey;
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public PaymentService(RestClient restClient, @Value("${payment.secret-key}") String paymentSecretKey) {
-        this.restClient = restClient;
+    public PaymentService(
+            @Value("${payment.secret-key}") String paymentSecretKey,
+            RestClient restClient,
+            ObjectMapper objectMapper
+    ) {
         this.paymentSecretKey = paymentSecretKey;
+        this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public void payment(PaymentRequest paymentRequest) {
         restClient.post()
                 .uri("/v1/payments/confirm")
-                .header("Authorization", createAuthorizations())
+                .header(HttpHeaders.AUTHORIZATION, createAuthorizations())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handleClientErrorResponse(response))
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handlePaymentErrorResponse(response))
                 .toBodilessEntity();
     }
 
     private String createAuthorizations() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((paymentSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return KEY_PREFIX + new String(encodedBytes);
+        return KEY_PREFIX + new String(Base64.getEncoder().encode((paymentSecretKey + ":").getBytes(StandardCharsets.UTF_8)));
     }
 
-    private void handleClientErrorResponse(ClientHttpResponse response) throws IOException {
-        JSONParser parser = new JSONParser();
-        Reader reader = new InputStreamReader(response.getBody(), StandardCharsets.UTF_8);
-        try {
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            throw new PaymentFailException((String) jsonObject.get("code"), (String) jsonObject.get("message"));
-        } catch (ParseException exception) {
-            throw new JsonParseException(exception.getMessage());
-        }
+    private void handlePaymentErrorResponse(ClientHttpResponse response) throws IOException {
+        PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+
+        throw new PaymentFailException(paymentErrorResponse.code(), paymentErrorResponse.message());
     }
 }

@@ -30,12 +30,8 @@ public class ExceptionApiController {
 
     @ExceptionHandler(PaymentFailException.class)
     public ResponseEntity<PaymentErrorResponse> paymentFailExHandler(PaymentFailException exception) {
-        return ResponseEntity.badRequest().body(new PaymentErrorResponse(exception.getCode(), exception.getMessage()));
-    }
+        System.out.println(String.format("%s : %s",exception.getCode(), exception.getMessage()));
 
-    @ExceptionHandler(JsonParseException.class)
-    public ResponseEntity<String> jsonParseExHandler(JsonParseException exception) {
-        exception.printStackTrace();
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        return ResponseEntity.badRequest().body(new PaymentErrorResponse(exception.getCode(), exception.getMessage()));
     }
 }
