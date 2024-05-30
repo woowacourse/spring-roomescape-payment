@@ -5,10 +5,6 @@ spring:
       hibernate:
         format_sql: true
   sql.init.mode: never
-  cloud:
-    openfeign:
-      okhttp:
-        enabled: true
 
 jwt:
   secret: testtesttesttesttesttesttesttesttesttesttest
@@ -16,4 +12,4 @@ jwt:
 
 payment:
   secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  url: https://api.tosspayments.com/v1/payments/confirm
+  url: https://test.wib.aru
