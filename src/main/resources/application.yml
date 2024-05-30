@@ -28,8 +28,8 @@ security:
     expiration-time: 3600000 # 1 hour
 
 client:
-  connection-timeout-ms: 5000
-  read-timeout-ms: 30000
+  connection-timeout-second: 5
+  read-timeout-second: 30
 
 payment:
   base-url: https://api.tosspayments.com
