@@ -53,7 +53,7 @@ public class ReservationCommonService {
     }
 
     public void validateMemberReservation(MemberReservation memberReservation, Member member) {
-        if (!memberReservation.getMember().equals(member)) {
+        if (memberReservation.isNotEqualMember(member)) {
             throw new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER);
         }
     }

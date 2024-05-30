@@ -64,6 +64,9 @@ public class MemberReservation extends BaseEntity {
         this.reservationStatus = ReservationStatus.NOT_PAID;
     }
 
+    public boolean isNotEqualMember(Member member) {
+        return !this.member.equals(member);
+    }
     public boolean canDelete(Member member) {
         return member.isAdmin() || isRegisteredMember(member);
     }
