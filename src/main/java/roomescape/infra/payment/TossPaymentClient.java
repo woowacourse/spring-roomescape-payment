@@ -21,12 +21,12 @@ public class TossPaymentClient implements PaymentClient {
     public TossPaymentClient(
             @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
-            RestClient.Builder restClient,
+            RestClient restClient,
             TossPaymentResponseErrorHandler errorHandler
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
         this.errorHandler = errorHandler;
-        this.restClient = restClient.baseUrl(paymentBaseUrl).build();
+        this.restClient = restClient.mutate().baseUrl(paymentBaseUrl).build();
     }
 
     public PaymentApiResponse confirmPayment(PaymentApiRequest paymentApiRequest) {
