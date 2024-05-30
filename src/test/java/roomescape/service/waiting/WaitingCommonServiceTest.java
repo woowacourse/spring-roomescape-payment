@@ -33,10 +33,10 @@ import roomescape.service.reservation.dto.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql("/truncate-with-time-and-theme.sql")
-class WaitingServiceTest {
+class WaitingCommonServiceTest {
 
     @Autowired
-    private WaitingService waitingService;
+    private WaitingCommonService waitingCommonService;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -68,7 +68,7 @@ class WaitingServiceTest {
     @Sql({"/truncate-with-time-and-theme.sql", "/insert-past-waiting.sql"})
     void findAllWaitings() {
         //when
-        List<ReservationResponse> reservations = waitingService.findAll();
+        List<ReservationResponse> reservations = waitingCommonService.findAll();
 
         //then
         assertThat(reservations).hasSize(1);
@@ -83,7 +83,7 @@ class WaitingServiceTest {
         Reservation target = reservationRepository.save(reservation);
 
         //when
-        assertThatThrownBy(() -> waitingService.deleteWaitingById(target.getId(), member.getId()))
+        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), member.getId()))
             .isInstanceOf(InvalidReservationException.class)
             .hasMessage("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
     }
@@ -96,7 +96,7 @@ class WaitingServiceTest {
         Reservation target = reservationRepository.save(reservation);
 
         //when
-        assertThatThrownBy(() -> waitingService.deleteWaitingById(target.getId(), anotherMember.getId()))
+        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), anotherMember.getId()))
             .isInstanceOf(ForbiddenException.class)
             .hasMessage("예약 대기를 삭제할 권한이 없습니다.");
     }

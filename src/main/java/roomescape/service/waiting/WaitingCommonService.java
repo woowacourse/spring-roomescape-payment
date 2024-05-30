@@ -15,12 +15,12 @@ import roomescape.service.reservation.dto.ReservationResponse;
 
 @Service
 @Transactional(readOnly = true)
-public class WaitingService {
+public class WaitingCommonService {
 
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
 
-    public WaitingService(ReservationRepository reservationRepository, MemberRepository memberRepository) {
+    public WaitingCommonService(ReservationRepository reservationRepository, MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
     }

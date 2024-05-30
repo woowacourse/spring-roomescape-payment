@@ -9,26 +9,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
 import roomescape.service.reservation.dto.ReservationResponse;
-import roomescape.service.waiting.WaitingService;
+import roomescape.service.waiting.WaitingCommonService;
 
 @RestController
 @RequestMapping("/waitings")
 public class WaitingController {
 
-    private final WaitingService waitingService;
+    private final WaitingCommonService waitingCommonService;
 
-    public WaitingController(WaitingService waitingService) {
-        this.waitingService = waitingService;
+    public WaitingController(WaitingCommonService waitingCommonService) {
+        this.waitingCommonService = waitingCommonService;
     }
 
     @GetMapping
     public List<ReservationResponse> findAll() {
-        return waitingService.findAll();
+        return waitingCommonService.findAll();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable("id") long reservationId, @LoginMemberId long memberId) {
-        waitingService.deleteWaitingById(reservationId, memberId);
+        waitingCommonService.deleteWaitingById(reservationId, memberId);
         return ResponseEntity.noContent().build();
     }
 }
