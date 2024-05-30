@@ -133,8 +133,9 @@ public class ReservationService {
     }
 
     private void promoteWaiting(Waiting waiting) {
+        paymentHistoryService.cancelPayment(waiting.getReservation().getId());
+        
         Reservation promotedReservation = waiting.promoteToReservation();
-
         reservationRepository.save(promotedReservation);
         waitingRepository.deleteById(waiting.getId());
     }
