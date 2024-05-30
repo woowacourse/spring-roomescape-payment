@@ -1,5 +1,6 @@
 package roomescape.exception;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
@@ -41,8 +42,10 @@ public class RestTemplateResponseExceptionHandler implements ResponseErrorHandle
     private ThirdPartyErrorResponse getResponseBody(ClientHttpResponse response) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(
-                    FileCopyUtils.copyToByteArray(response.getBody()),
+            return objectMapper
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .readValue(
+                    response.getBody(),
                     ThirdPartyErrorResponse.class);
         } catch (IOException exception) {
             throw new RuntimeException(exception);

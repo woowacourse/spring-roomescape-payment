@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import roomescape.config.objectmapper.CustomLocalDateDeserializer;
 import roomescape.config.objectmapper.CustomLocalDateSerializer;
@@ -18,6 +19,7 @@ import roomescape.exception.RestTemplateResponseExceptionHandler;
 
 @Configuration
 public class SpringConfig {
+
     @Bean
     ObjectMapper objectMapper() {
         return JsonMapper.builder()
@@ -29,8 +31,14 @@ public class SpringConfig {
     }
 
     @Bean
+    HttpComponentsClientHttpRequestFactory requestFactory() {
+        return new HttpComponentsClientHttpRequestFactory();
+    }
+
+    @Bean
     RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
+                .requestFactory(this::requestFactory)
                 .errorHandler(new RestTemplateResponseExceptionHandler())
                 .build();
     }
