@@ -1,4 +1,4 @@
-package roomescape.domain.theme;
+package roomescape.infrastructure.theme;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.jdbc.SqlGroup;
+import roomescape.domain.theme.Theme;
+import roomescape.domain.theme.ThemeRepository;
 
 import java.time.LocalDate;
 import java.util.List;

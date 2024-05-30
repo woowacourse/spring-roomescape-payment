@@ -1,4 +1,4 @@
-package roomescape.infrastructure;
+package roomescape.infrastructure.payment;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
