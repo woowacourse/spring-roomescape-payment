@@ -1,13 +1,16 @@
-package roomescape.config;
+package roomescape.application.config;
 
+import java.time.Duration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 import roomescape.application.payment.PaymentErrorHandler;
 
 @Configuration
-public class ClientConfig {
+public class PaymentClientConfig {
 
     @Bean
     public ResponseErrorHandler errorHandler() {
@@ -16,7 +19,10 @@ public class ClientConfig {
 
     @Bean
     public RestClient restClient() {
-        return RestClient.builder()
+        RestTemplate template = new RestTemplateBuilder()
+                .setConnectTimeout(Duration.ofSeconds(3L))
+                .setReadTimeout(Duration.ofSeconds(30L))
                 .build();
+        return RestClient.create(template);
     }
 }

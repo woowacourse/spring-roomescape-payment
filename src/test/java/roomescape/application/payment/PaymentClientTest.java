@@ -19,10 +19,10 @@ import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
-import roomescape.config.ClientConfig;
+import roomescape.application.config.PaymentClientConfig;
 import roomescape.exception.payment.PaymentException;
 
-@RestClientTest({PaymentClient.class, ClientConfig.class})
+@RestClientTest({PaymentClient.class, PaymentClientConfig.class})
 class PaymentClientTest {
 
     @Value("${payment.url}")
