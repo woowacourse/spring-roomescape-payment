@@ -1,6 +1,7 @@
 const THEME_API_ENDPOINT = '/themes';
 const RESERVATION_TIME_AVAILABLE_API_ENDPOINT = '/times/available';
 const RESERVATION_API_ENDPOINT = '/reservations';
+const WAITING_API_ENDPOINT = `/waitings`;
 
 document.addEventListener('DOMContentLoaded', () => {
   requestRead(THEME_API_ENDPOINT)
@@ -274,7 +275,7 @@ function onWaitButtonClick() {
     /*
     TODO: [3단계] 예약 대기 생성 요청 API 호출
      */
-    fetch(RESERVATION_API_ENDPOINT, {
+    fetch(WAITING_API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
