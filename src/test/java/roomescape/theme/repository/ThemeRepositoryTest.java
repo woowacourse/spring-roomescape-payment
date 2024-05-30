@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.test.RepositoryTest;
 import roomescape.theme.domain.Theme;
@@ -37,12 +38,18 @@ class ThemeRepositoryTest extends RepositoryTest {
 
         ReservationTime time = timeRepository.save(TIME_1);
         LocalDate date = LocalDate.now();
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(1), time, theme2));
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(2), time, theme2));
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(3), time, theme2));
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(4), time, theme3));
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(5), time, theme3));
-        reservationRepository.save(new Reservation(MEMBER_BRI, date.minusDays(6), time, theme1));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(1), time, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(2), time, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(3), time, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(4), time, theme3, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(5), time, theme3, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.minusDays(6), time, theme1, ReservationStatus.RESERVED));
 
         LocalDate startDate = date.minusDays(6);
         LocalDate endDate = date.minusDays(1);

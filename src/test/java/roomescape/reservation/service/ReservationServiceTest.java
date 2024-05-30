@@ -20,6 +20,7 @@ import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.paymenthistory.service.PaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationResponse;
@@ -54,12 +55,14 @@ class ReservationServiceTest {
                         1L, new Member(1L, "브라운", "brown@abc.com"),
                         LocalDate.of(2024, 8, 15),
                         new ReservationTime(1L, LocalTime.of(19, 0)),
-                        new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")),
+                        new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                        ReservationStatus.RESERVED),
                 new Reservation(
                         2L, new Member(2L, "브리", "bri@abc.com"),
                         LocalDate.of(2024, 8, 20),
                         new ReservationTime(1L, LocalTime.of(19, 0)),
-                        new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"))));
+                        new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                        ReservationStatus.RESERVED)));
         List<ReservationResponse> expected = List.of(
                 new ReservationResponse(
                         1L, new MemberResponse(1L, "브라운"),
@@ -86,12 +89,14 @@ class ReservationServiceTest {
                 new Member(1L, "브라운", "brown@abc.com"),
                 LocalDate.of(2100, 1, 1),
                 new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
+                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                ReservationStatus.RESERVED);
         Reservation reservation2 = new Reservation(
                 2L, new Member(1L, "브라운", "bri@abc.com"),
                 LocalDate.of(2100, 3, 1),
                 new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨1 탈출", "레벨1 탈출하기", "https://img.jpg"));
+                new Theme(1L, "레벨1 탈출", "레벨1 탈출하기", "https://img.jpg"),
+                ReservationStatus.RESERVED);
         given(reservationRepository.findByMember_id(member.getId()))
                 .willReturn(List.of(reservation1, reservation2));
 
@@ -120,7 +125,7 @@ class ReservationServiceTest {
                 .willReturn(Optional.of(theme));
         given(reservationRepository.save(any())).willReturn(new Reservation(
                 1L, member,
-                LocalDate.of(2024, 8, 15), time, theme));
+                LocalDate.of(2024, 8, 15), time, theme, ReservationStatus.RESERVED));
 
         ReservationResponse expected = new ReservationResponse(
                 1L, new MemberResponse(1L, "브라운"), LocalDate.of(2024, 8, 15),

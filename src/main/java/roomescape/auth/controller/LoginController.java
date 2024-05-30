@@ -14,6 +14,7 @@ import roomescape.auth.service.AuthService;
 
 @RestController
 public class LoginController {
+
     private final TokenCookieManager tokenCookieManager;
     private final AuthService authService;
 

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.test.RepositoryTest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -39,10 +40,14 @@ class ReservationRepositoryTest extends RepositoryTest {
         Theme theme1 = themeRepository.save(THEME_1);
         Theme theme2 = themeRepository.save(THEME_2);
 
-        Reservation reservation1 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_1));
-        Reservation reservation2 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_2, THEME_1));
-        Reservation reservation3 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_2));
-        Reservation reservation4 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_2, THEME_2));
+        Reservation reservation1 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_1, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation2 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_2, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation3 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_1, THEME_2, ReservationStatus.RESERVED));
+        Reservation reservation4 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_2, THEME_2, ReservationStatus.RESERVED));
 
         // when
         List<Reservation> actual = reservationRepository.findAllByCondition(null, theme1.getId(), null, null);
@@ -61,14 +66,18 @@ class ReservationRepositoryTest extends RepositoryTest {
         Theme theme1 = themeRepository.save(THEME_1);
         Theme theme2 = themeRepository.save(THEME_2);
 
-        Reservation reservation1 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_1));
-        Reservation reservation2 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_2, THEME_1));
-        Reservation reservation3 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_2));
-        Reservation reservation4 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_2, THEME_2));
-
+        Reservation reservation1 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_1, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation2 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_2, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation3 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_1, THEME_2, ReservationStatus.RESERVED));
+        Reservation reservation4 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_2, THEME_2, ReservationStatus.RESERVED));
 
         // when
-        List<Reservation> actual = reservationRepository.findAllByCondition(MEMBER_BRI.getId(), theme2.getId(), date, date);
+        List<Reservation> actual = reservationRepository.findAllByCondition(MEMBER_BRI.getId(), theme2.getId(), date,
+                date);
 
         // then
         assertThat(actual).containsExactlyInAnyOrder(reservation3, reservation4);
@@ -82,9 +91,12 @@ class ReservationRepositoryTest extends RepositoryTest {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
 
-        Reservation reservation1 = reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_1));
-        Reservation reservation2 = reservationRepository.save(new Reservation(MEMBER_BRI, date.plusDays(1), TIME_1, THEME_1));
-        Reservation reservation3 = reservationRepository.save(new Reservation(MEMBER_BROWN, date.plusDays(2), TIME_1, THEME_1));
+        Reservation reservation1 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, TIME_1, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation2 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.plusDays(1), TIME_1, THEME_1, ReservationStatus.RESERVED));
+        Reservation reservation3 = reservationRepository.save(
+                new Reservation(MEMBER_BROWN, date.plusDays(2), TIME_1, THEME_1, ReservationStatus.RESERVED));
 
         // when
         List<Reservation> actual = reservationRepository.findByMember_id(MEMBER_BRI.getId());
@@ -101,7 +113,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
 
-        reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_1));
+        reservationRepository.save(new Reservation(MEMBER_BRI, date, TIME_1, THEME_1, ReservationStatus.RESERVED));
 
         boolean actual = reservationRepository.existsByDateAndTime_idAndTheme_id(date, time.getId(), theme.getId());
 

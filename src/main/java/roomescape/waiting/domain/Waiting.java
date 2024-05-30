@@ -15,6 +15,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 
 @Entity
 @Table(name = "waiting", uniqueConstraints = @UniqueConstraint(columnNames = {"reservation_id", "member_id"}))
@@ -61,7 +62,8 @@ public class Waiting {
                 member,
                 reservation.getDate(),
                 reservation.getTime(),
-                reservation.getTheme()
+                reservation.getTheme(),
+                ReservationStatus.PAYMENT_PENDING
         );
     }
 
@@ -83,8 +85,12 @@ public class Waiting {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Waiting waiting = (Waiting) o;
 
@@ -99,10 +105,10 @@ public class Waiting {
     @Override
     public String toString() {
         return "Waiting{" +
-               "id=" + id +
-               ", reservation=" + reservation +
-               ", member=" + member +
-               ", createdAt=" + createdAt +
-               '}';
+                "id=" + id +
+                ", reservation=" + reservation +
+                ", member=" + member +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.test.RepositoryTest;
 import roomescape.theme.domain.Theme;
@@ -42,7 +43,8 @@ class WaitingRepositoryTest extends RepositoryTest {
         Theme theme = themeRepository.save(THEME_1);
         LocalDate date = LocalDate.now();
 
-        Reservation reservation = reservationRepository.save(new Reservation(MEMBER_BRI, date, time, theme));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
         Waiting firstWaiting = waitingRepository.save(new Waiting(reservation, MEMBER_BROWN));
         Waiting secondWaiting = waitingRepository.save(new Waiting(reservation, MEMBER_DUCK));
 
@@ -58,8 +60,10 @@ class WaitingRepositoryTest extends RepositoryTest {
         Theme theme = themeRepository.save(THEME_1);
         LocalDate date = LocalDate.now();
 
-        Reservation reservation1 = reservationRepository.save(new Reservation(MEMBER_BRI, date, time, theme));
-        Reservation reservation2 = reservationRepository.save(new Reservation(MEMBER_BRI, date.plusDays(1), time, theme));
+        Reservation reservation1 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
+        Reservation reservation2 = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date.plusDays(1), time, theme, ReservationStatus.RESERVED));
 
         Member waitingMember = MEMBER_BROWN;
         Waiting waiting1 = waitingRepository.save(new Waiting(reservation1, waitingMember));
@@ -76,7 +80,8 @@ class WaitingRepositoryTest extends RepositoryTest {
         Theme theme = themeRepository.save(THEME_1);
         LocalDate date = LocalDate.now();
 
-        Reservation reservation = reservationRepository.save(new Reservation(MEMBER_BRI, date, time, theme));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
 
         Member waitingMember = MEMBER_BROWN;
         waitingRepository.save(new Waiting(reservation, waitingMember));
@@ -92,7 +97,8 @@ class WaitingRepositoryTest extends RepositoryTest {
         Theme theme = themeRepository.save(THEME_1);
         LocalDate date = LocalDate.now();
 
-        Reservation reservation = reservationRepository.save(new Reservation(MEMBER_BRI, date, time, theme));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
 
         assertThat(waitingRepository.existsByReservation_idAndMember_id(reservation.getId(), MEMBER_BROWN.getId()))
                 .isFalse();

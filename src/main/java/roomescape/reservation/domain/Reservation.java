@@ -2,6 +2,8 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,21 +37,27 @@ public class Reservation {
     @ManyToOne(optional = false)
     @JoinColumn(name = "theme_id")
     private Theme theme;
+    @Enumerated(value = EnumType.STRING)
+    private ReservationStatus reservationStatus;
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme,
+                       ReservationStatus reservationStatus) {
         this.id = null;
         this.member = Objects.requireNonNull(member);
         this.date = Objects.requireNonNull(date);
         this.time = Objects.requireNonNull(time);
         this.theme = Objects.requireNonNull(theme);
+        this.reservationStatus = reservationStatus;
     }
 
-    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme,
+                       ReservationStatus reservationStatus) {
         this.id = Objects.requireNonNull(id);
         this.member = Objects.requireNonNull(member);
         this.date = Objects.requireNonNull(date);
         this.time = Objects.requireNonNull(time);
         this.theme = Objects.requireNonNull(theme);
+        this.reservationStatus = reservationStatus;
     }
 
     protected Reservation() {
@@ -125,6 +133,7 @@ public class Reservation {
                 ", date=" + date +
                 ", time=" + time +
                 ", theme=" + theme +
+                ", reservationStatus=" + reservationStatus +
                 '}';
     }
 }

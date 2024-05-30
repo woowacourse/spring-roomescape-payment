@@ -19,6 +19,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
@@ -44,14 +45,12 @@ class WaitingServiceTest {
     @DisplayName("나의 예약 대기 목록을 조회할 수 있다.")
     @Test
     void findMyWaitingTest() {
-        LocalDate date = LocalDate.now().plusDays(7);
-        WaitingCreateRequest request = new WaitingCreateRequest(date, 1L, 1L);
         Reservation reservation = new Reservation(
                 1L,
                 new Member(1L, "브라운", "brown@abc.com"),
                 LocalDate.of(2024, 8, 15),
                 new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
+                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
         Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
         WaitingWithOrder waitingWithOrder = new WaitingWithOrder(new Waiting(reservation, waitingMember), 1L);
 
@@ -75,7 +74,7 @@ class WaitingServiceTest {
                 new Member(1L, "브라운", "brown@abc.com"),
                 LocalDate.of(2024, 8, 15),
                 new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
+                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
         Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
 
         given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))
@@ -102,12 +101,6 @@ class WaitingServiceTest {
     void createWaitingTest_whenReservationNotExist() {
         LocalDate date = LocalDate.now().plusDays(7);
         WaitingCreateRequest request = new WaitingCreateRequest(date, 1L, 1L);
-        Reservation reservation = new Reservation(
-                1L,
-                new Member(1L, "브라운", "brown@abc.com"),
-                LocalDate.of(2024, 8, 15),
-                new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
         Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
 
         given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))
@@ -128,7 +121,7 @@ class WaitingServiceTest {
                 new Member(1L, "브라운", "brown@abc.com"),
                 LocalDate.of(2024, 8, 15),
                 new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
+                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
         Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
 
         given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))

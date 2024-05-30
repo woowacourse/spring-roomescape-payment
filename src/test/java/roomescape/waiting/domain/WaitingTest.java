@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -23,7 +24,8 @@ class WaitingTest {
     @DisplayName("자신이 예약한 방탈출에 대해 에약 대기 시, 예외를 던진다.")
     @Test
     void validateWaitingTest_whenDuplicate() {
-        assertThatThrownBy(() -> new Waiting(new Reservation(member, date, time, theme), member))
+        assertThatThrownBy(
+                () -> new Waiting(new Reservation(member, date, time, theme, ReservationStatus.RESERVED), member))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("자신이 예약한 방탈출에 대해 예약 대기를 할 수 없습니다.");
     }

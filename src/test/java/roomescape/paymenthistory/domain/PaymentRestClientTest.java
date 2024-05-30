@@ -13,6 +13,7 @@ import roomescape.fixture.TimeFixture;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
 import roomescape.paymenthistory.exception.PaymentException;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 
 @SpringBootTest
 class PaymentRestClientTest {
@@ -25,7 +26,7 @@ class PaymentRestClientTest {
     void approvePaymentTest_whenInvalidSecretKeyd() {
         PaymentCreateRequest paymentCreateRequest = new PaymentCreateRequest(
                 "tgen_20240528211", "MC40MTMwMTk0ODU0ODU4", 1000, new Reservation(1L, MemberFixture.MEMBER_BRI,
-                LocalDate.now().plusDays(1), TimeFixture.TIME_1, ThemeFixture.THEME_1));
+                LocalDate.now().plusDays(1), TimeFixture.TIME_1, ThemeFixture.THEME_1, ReservationStatus.RESERVED));
 
         assertThatThrownBy(
                 () -> paymentRestClient.approvePayment(paymentCreateRequest))

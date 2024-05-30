@@ -6,6 +6,7 @@ import roomescape.member.domain.Member;
 import roomescape.paymenthistory.PaymentType;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -21,7 +22,7 @@ public record ReservationCreateRequest(
         PaymentType paymentType
 ) {
     public Reservation createReservation(Member member, ReservationTime time, Theme theme) {
-        return new Reservation(member, date, time, theme);
+        return new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
     }
 
     public PaymentCreateRequest createPaymentRequest(Reservation reservation) {

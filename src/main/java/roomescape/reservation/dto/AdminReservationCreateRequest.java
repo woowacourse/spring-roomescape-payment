@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -14,6 +15,6 @@ public record AdminReservationCreateRequest(
         Long timeId,
         Long themeId) {
     public Reservation createReservation(Member member, ReservationTime time, Theme theme) {
-        return new Reservation(member, date, time, theme);
+        return new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
     }
 }
