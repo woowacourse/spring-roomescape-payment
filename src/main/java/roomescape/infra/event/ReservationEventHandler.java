@@ -3,6 +3,7 @@ package roomescape.infra.event;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,14 @@ public class ReservationEventHandler {
     private final CancelEventPublisher eventPublisher;
     private final ReservationRepository reservationRepository;
 
+    @Value("${payment-timeout}")
+    private int paymentTimeout;
+
     @EventListener
     public void handlePaymentPendingEvent(PaymentPendingEvent event) {
         taskScheduler.schedule(
                 () -> checkPaymentStatusAndProcess(event),
-                Instant.now().plus(1, ChronoUnit.MINUTES)
+                Instant.now().plus(paymentTimeout, ChronoUnit.MINUTES)
         );
     }
 
