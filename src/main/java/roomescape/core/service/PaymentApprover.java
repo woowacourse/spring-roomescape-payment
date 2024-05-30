@@ -1,7 +1,7 @@
 package roomescape.core.service;
 
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
@@ -9,12 +9,12 @@ import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.PaymentException;
 import roomescape.infrastructure.PaymentSecretKeyEncoder;
 
-@Service
-public class PaymentService {
+@Component
+public class PaymentApprover {
     private final RestClient restClient;
     private final PaymentSecretKeyEncoder paymentSecretKeyEncoder;
 
-    public PaymentService(RestClient restClient, PaymentSecretKeyEncoder paymentSecretKeyEncoder) {
+    public PaymentApprover(RestClient restClient, PaymentSecretKeyEncoder paymentSecretKeyEncoder) {
         this.restClient = restClient;
         this.paymentSecretKeyEncoder = paymentSecretKeyEncoder;
     }

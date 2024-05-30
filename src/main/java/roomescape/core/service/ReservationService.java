@@ -36,20 +36,20 @@ public class ReservationService {
             = "본인의 예약만 취소할 수 있습니다.";
     protected static final String NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE = "관리자만 예약을 취소할 수 있습니다.";
 
-    private final PaymentService paymentService;
+    private final PaymentApprover paymentApprover;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(final PaymentService paymentService,
+    public ReservationService(final PaymentApprover paymentApprover,
                               final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository) {
-        this.paymentService = paymentService;
+        this.paymentApprover = paymentApprover;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -67,7 +67,7 @@ public class ReservationService {
     public ReservationResponse createAndPay(final ReservationRequest reservationRequest,
                                             final PaymentConfirmRequest paymentRequest) {
         final Reservation reservation = saveAndGetReservation(reservationRequest);
-        PaymentConfirmResponse paymentResponse = paymentService.confirmPayment(paymentRequest);
+        PaymentConfirmResponse paymentResponse = paymentApprover.confirmPayment(paymentRequest);
         reservation.setPayment(paymentResponse.toPayment());
         return new ReservationResponse(reservation);
     }
