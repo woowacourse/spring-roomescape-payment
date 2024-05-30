@@ -16,10 +16,9 @@ import roomescape.domain.payment.PaymentClient;
 @Profile("!local")
 public class TossPaymentClient implements PaymentClient {
 
+    private final RestClient restClient;
     @Value("${security.payment.secret-key}")
     private String WIDGET_SECRET_KEY;
-
-    private final RestClient restClient;
 
     public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;

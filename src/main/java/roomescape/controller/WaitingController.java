@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
-import roomescape.service.reservation.WaitingService;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.waiting.WaitingService;
 
 @RestController
 @RequestMapping("/waitings")

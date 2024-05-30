@@ -1,4 +1,4 @@
-package roomescape.service.reservation;
+package roomescape.service.waiting;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
