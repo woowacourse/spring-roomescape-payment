@@ -3,10 +3,11 @@ package roomescape.domain.schedule;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.ManyToOne;
+import roomescape.exception.InvalidReservationException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import roomescape.exception.InvalidReservationException;
 
 @Embeddable
 public class Schedule {

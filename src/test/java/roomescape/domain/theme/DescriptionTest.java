@@ -1,10 +1,10 @@
 package roomescape.domain.theme;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.exception.InvalidReservationException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class DescriptionTest {
 
@@ -16,7 +16,7 @@ class DescriptionTest {
 
         //when&then
         assertThatThrownBy(() -> new Description(description))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("설명은 100자를 초과할 수 없습니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("설명은 100자를 초과할 수 없습니다.");
     }
 }

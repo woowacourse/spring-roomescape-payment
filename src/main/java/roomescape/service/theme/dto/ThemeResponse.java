@@ -6,6 +6,6 @@ public record ThemeResponse(long id, String name, String description, String thu
 
     public ThemeResponse(Theme theme) {
         this(theme.getId(), theme.getName().getValue(), theme.getDescription().getValue(),
-            theme.getThumbnail().getValue());
+                theme.getThumbnail().getValue());
     }
 }

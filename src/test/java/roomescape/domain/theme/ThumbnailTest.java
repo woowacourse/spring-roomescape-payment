@@ -1,10 +1,10 @@
 package roomescape.domain.theme;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.exception.InvalidReservationException;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ThumbnailTest {
 
@@ -12,7 +12,7 @@ class ThumbnailTest {
     @Test
     void invalidThumbnail() {
         assertThatThrownBy(() -> new Thumbnail("http.jpg"))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("올바르지 않은 썸네일 형식입니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("올바르지 않은 썸네일 형식입니다.");
     }
 }

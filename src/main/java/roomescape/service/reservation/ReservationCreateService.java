@@ -1,6 +1,5 @@
 package roomescape.service.reservation;
 
-import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.dto.PaymentRequest;
@@ -25,6 +24,8 @@ import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 public class ReservationCreateService {
@@ -37,8 +38,8 @@ public class ReservationCreateService {
     private final PaymentService paymentService;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
-        ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-        MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, PaymentService paymentService) {
+                                    ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
+                                    MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -49,7 +50,7 @@ public class ReservationCreateService {
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
         return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-            adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
+                adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
@@ -57,7 +58,7 @@ public class ReservationCreateService {
         Payment payment = paymentService.approvePayment(request);
 
         return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-            reservationRequest.date(), payment);
+                reservationRequest.date(), payment);
     }
 
     private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date, Payment payment) {
@@ -74,23 +75,23 @@ public class ReservationCreateService {
 
     private ReservationTime findTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
-            .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
+                .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
     }
 
     private Theme findThemeById(long themeId) {
         return themeRepository.findById(themeId)
-            .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 테마입니다."));
     }
 
     private Member findMemberById(long memberId) {
         return memberRepository.findById(memberId)
-            .orElseThrow(() -> new InvalidMemberException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new InvalidMemberException("존재하지 않는 회원입니다."));
     }
 
     private ReservationDetail getReservationDetail(ReservationDate reservationDate, ReservationTime reservationTime, Theme theme) {
         Schedule schedule = new Schedule(reservationDate, reservationTime);
         return reservationDetailRepository.findByScheduleAndTheme(schedule, theme)
-            .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(schedule, theme)));
+                .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(schedule, theme)));
     }
 
     private void validateDuplication(ReservationDetail reservationDetail) {

@@ -1,9 +1,5 @@
 package roomescape.service.reservation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +12,11 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationCommonServiceTest extends ReservationServiceTest {
 
@@ -42,7 +43,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(), null, null,
-            null);
+                null);
 
         //when
         List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
@@ -59,7 +60,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
         reservationRepository.save(reservation);
         long notMemberThemeId = theme.getId() + 1;
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(),
-            notMemberThemeId, null, null);
+                notMemberThemeId, null, null);
 
         //when
         List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
@@ -110,7 +111,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationCommonService.deleteById(id))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
     }
 }

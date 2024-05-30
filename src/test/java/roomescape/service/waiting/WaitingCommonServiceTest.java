@@ -1,11 +1,5 @@
 package roomescape.service.waiting;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +24,13 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql("/truncate-with-time-and-theme.sql")
@@ -58,7 +59,7 @@ class WaitingCommonServiceTest {
         ReservationDate reservationDate = ReservationDate.of(LocalDate.now().plusDays(1));
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
+                "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
         member = memberRepository.save(new Member("lini", "lini@email.com", "lini123", Role.GUEST));
         anotherMember = memberRepository.save(new Member("pedro", "pedro@email.com", "pedro123", Role.GUEST));
         reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
@@ -85,8 +86,8 @@ class WaitingCommonServiceTest {
 
         //when
         assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), member.getId()))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
     }
 
     @DisplayName("사용자가 본인 외 예약 대기를 삭제하려고 하면 예외가 발생한다.")
@@ -98,7 +99,7 @@ class WaitingCommonServiceTest {
 
         //when
         assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), anotherMember.getId()))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessage("예약 대기를 삭제할 권한이 없습니다.");
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("예약 대기를 삭제할 권한이 없습니다.");
     }
 }

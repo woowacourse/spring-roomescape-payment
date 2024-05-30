@@ -1,6 +1,5 @@
 package roomescape.config;
 
-import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,6 +9,8 @@ import roomescape.auth.LoginMemberIdArgumentResolver;
 import roomescape.auth.MemberHandlerInterceptor;
 import roomescape.auth.TokenProvider;
 import roomescape.service.member.MemberService;
+
+import java.util.List;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -25,16 +26,16 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MemberHandlerInterceptor(tokenProvider, memberService))
-            .addPathPatterns("/reservations/**")
-            .addPathPatterns("/reservation/**")
-            .addPathPatterns("/members/reservations")
-            .addPathPatterns("/logout")
-            .addPathPatterns("/waitings/**");
+                .addPathPatterns("/reservations/**")
+                .addPathPatterns("/reservation/**")
+                .addPathPatterns("/members/reservations")
+                .addPathPatterns("/logout")
+                .addPathPatterns("/waitings/**");
         registry.addInterceptor(new AdminRoleHandlerInterceptor(tokenProvider, memberService))
-            .addPathPatterns("/admin/**")
-            .addPathPatterns("/members")
-            .addPathPatterns("/times/**")
-            .excludePathPatterns("/times/available");
+                .addPathPatterns("/admin/**")
+                .addPathPatterns("/members")
+                .addPathPatterns("/times/**")
+                .excludePathPatterns("/times/available");
     }
 
     @Override

@@ -1,7 +1,5 @@
 package roomescape.config;
 
-import java.time.format.DateTimeParseException;
-import java.util.Optional;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
-import roomescape.exception.ExceptionTemplate;
-import roomescape.exception.ForbiddenException;
-import roomescape.exception.InvalidMemberException;
-import roomescape.exception.InvalidReservationException;
-import roomescape.exception.UnauthorizedException;
+import roomescape.exception.*;
+
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,8 +36,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<ExceptionTemplate> handleValidationException(MethodArgumentNotValidException exception) {
         String message = Optional.ofNullable(exception.getBindingResult().getFieldError())
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .orElse("요청 형식이 잘못되었습니다.");
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("요청 형식이 잘못되었습니다.");
         return ResponseEntity.badRequest().body(new ExceptionTemplate(message));
     }
 

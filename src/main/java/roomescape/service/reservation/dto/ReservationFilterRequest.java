@@ -1,13 +1,14 @@
 package roomescape.service.reservation.dto;
 
-import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+
 public record ReservationFilterRequest(
-    Long memberId,
-    Long themeId,
-    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateFrom,
-    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateTo
+        Long memberId,
+        Long themeId,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateFrom,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateTo
 ) {
 
 }

@@ -1,12 +1,5 @@
 package roomescape.service.schedule;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +26,14 @@ import roomescape.service.schedule.dto.AvailableReservationTimeResponse;
 import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
 import roomescape.service.schedule.dto.ReservationTimeReadRequest;
 import roomescape.service.schedule.dto.ReservationTimeResponse;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql("/truncate-with-guests.sql")
@@ -64,8 +65,8 @@ class ReservationTimeServiceTest {
 
         //then
         assertAll(
-            () -> assertThat(result.id()).isNotZero(),
-            () -> assertThat(result.startAt()).isEqualTo(startAt)
+                () -> assertThat(result.id()).isNotZero(),
+                () -> assertThat(result.startAt()).isEqualTo(startAt)
         );
     }
 
@@ -94,8 +95,8 @@ class ReservationTimeServiceTest {
 
         //when&then
         assertThatThrownBy(() -> reservationTimeService.create(reservationTimeCreateRequest))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이미 같은 시간이 존재합니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 같은 시간이 존재합니다.");
     }
 
     @DisplayName("예약이 존재하는 시간으로 삭제를 시도하면 예외를 발생시킨다.")
@@ -105,7 +106,7 @@ class ReservationTimeServiceTest {
         ReservationDate reservationDate = ReservationDate.of(LocalDate.MAX);
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
+                "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
         Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
@@ -114,8 +115,8 @@ class ReservationTimeServiceTest {
         //when&then
         long timeId = reservationTime.getId();
         assertThatThrownBy(() -> reservationTimeService.deleteById(timeId))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("해당 시간에 예약(대기)이 존재해서 삭제할 수 없습니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("해당 시간에 예약(대기)이 존재해서 삭제할 수 없습니다.");
     }
 
     @DisplayName("해당 테마와 날짜에 예약이 가능한 시간 목록을 조회한다.")
@@ -126,9 +127,9 @@ class ReservationTimeServiceTest {
         LocalTime time = LocalTime.of(10, 0);
         ReservationTime bookedReservationTime = reservationTimeRepository.save(new ReservationTime(time));
         ReservationTime notBookedReservationTime = reservationTimeRepository.save(
-            new ReservationTime(time.plusHours(5)));
+                new ReservationTime(time.plusHours(5)));
         Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
+                "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
         Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, bookedReservationTime), theme));
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
@@ -136,19 +137,19 @@ class ReservationTimeServiceTest {
 
         //when
         List<AvailableReservationTimeResponse> result = reservationTimeService.findAvailableTimes(
-            new ReservationTimeReadRequest(reservationDate.getValue(), theme.getId()));
+                new ReservationTimeReadRequest(reservationDate.getValue(), theme.getId()));
 
         //then
         boolean isBookedOfBookedTime = result.stream()
-            .filter(bookedTime -> bookedTime.id() == bookedReservationTime.getId())
-            .findFirst().get().alreadyBooked();
+                .filter(bookedTime -> bookedTime.id() == bookedReservationTime.getId())
+                .findFirst().get().alreadyBooked();
         boolean isBookedOfUnBookedTime = result.stream()
-            .filter(unbookedTime -> unbookedTime.id() == notBookedReservationTime.getId())
-            .findFirst().get().alreadyBooked();
+                .filter(unbookedTime -> unbookedTime.id() == notBookedReservationTime.getId())
+                .findFirst().get().alreadyBooked();
         assertAll(
-            () -> assertThat(result).hasSize(2),
-            () -> assertThat(isBookedOfUnBookedTime).isFalse(),
-            () -> assertThat(isBookedOfBookedTime).isTrue()
+                () -> assertThat(result).hasSize(2),
+                () -> assertThat(isBookedOfUnBookedTime).isFalse(),
+                () -> assertThat(isBookedOfBookedTime).isTrue()
         );
     }
 }

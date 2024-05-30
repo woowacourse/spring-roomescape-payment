@@ -1,12 +1,12 @@
 package roomescape.domain.member;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.exception.InvalidMemberException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class PasswordTest {
 
@@ -16,8 +16,8 @@ class PasswordTest {
     @ValueSource(strings = {"linin", "linirinilinir"})
     void invalidPassword(String password) {
         assertThatThrownBy(() -> Password.of(password))
-            .isInstanceOf(InvalidMemberException.class)
-            .hasMessage("비밀번호는 6자 이상 12자 이하여야 합니다.");
+                .isInstanceOf(InvalidMemberException.class)
+                .hasMessage("비밀번호는 6자 이상 12자 이하여야 합니다.");
     }
 
 }

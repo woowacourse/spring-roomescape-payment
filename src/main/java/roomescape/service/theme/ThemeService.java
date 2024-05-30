@@ -1,7 +1,5 @@
 package roomescape.service.theme;
 
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
@@ -11,6 +9,9 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,8 +45,8 @@ public class ThemeService {
 
     public List<ThemeResponse> findAll() {
         return themeRepository.findAll().stream()
-            .map(ThemeResponse::new)
-            .toList();
+                .map(ThemeResponse::new)
+                .toList();
     }
 
     @Transactional

@@ -4,11 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Date;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.exception.UnauthorizedException;
+
+import java.util.Date;
 
 @Component
 @EnableConfigurationProperties(TokenProperties.class)
@@ -25,13 +26,13 @@ public class TokenProvider {
         Date validity = new Date(now.getTime() + tokenProperties.expireLength());
 
         return Jwts.builder()
-            .claim("id", member.getId())
-            .claim("role", member.getRole().name())
-            .claim("email", member.getEmail().getValue())
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, tokenProperties.secretKey().getBytes())
-            .compact();
+                .claim("id", member.getId())
+                .claim("role", member.getRole().name())
+                .claim("email", member.getEmail().getValue())
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, tokenProperties.secretKey().getBytes())
+                .compact();
     }
 
     public String extractMemberEmail(String token) {
@@ -47,9 +48,9 @@ public class TokenProvider {
     public Claims getPayload(String token) {
         try {
             Claims claims = Jwts.parser()
-                .setSigningKey(tokenProperties.secretKey().getBytes())
-                .parseClaimsJws(token)
-                .getBody();
+                    .setSigningKey(tokenProperties.secretKey().getBytes())
+                    .parseClaimsJws(token)
+                    .getBody();
             validateExpiration(claims);
             return claims;
         } catch (JwtException | IllegalArgumentException e) {

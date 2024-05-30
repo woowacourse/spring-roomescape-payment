@@ -1,16 +1,17 @@
 package roomescape.domain.reservation;
 
-import java.util.List;
-import java.util.Optional;
 import roomescape.domain.dto.ReservationWithRank;
 import roomescape.domain.schedule.ReservationDate;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface ReservationRepository {
 
     Reservation save(Reservation reservation);
 
     List<Reservation> findBy(Long memberId, Long themeId,
-        ReservationDate dateFrom, ReservationDate dateTo);
+                             ReservationDate dateFrom, ReservationDate dateTo);
 
     boolean existsByDetailIdAndMemberId(Long reservationDetailId, Long memberId);
 

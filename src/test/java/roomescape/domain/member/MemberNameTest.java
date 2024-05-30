@@ -1,12 +1,12 @@
 package roomescape.domain.member;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.exception.InvalidReservationException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class MemberNameTest {
 
@@ -16,7 +16,7 @@ class MemberNameTest {
     @ValueSource(strings = {"linirinilinirinilinirinilinirini"})
     void invalidNameLength(String name) {
         assertThatThrownBy(() -> new Member(name, "lini@email.com", "lini123", Role.GUEST))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이름은 1자 이상, 20자 이하여야 합니다.");
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이름은 1자 이상, 20자 이하여야 합니다.");
     }
 }

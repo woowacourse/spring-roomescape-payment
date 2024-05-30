@@ -1,6 +1,5 @@
 package roomescape.service.waiting;
 
-import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -30,11 +29,11 @@ public class WaitingCreateService {
     private final ReservationDetailRepository reservationDetailRepository;
 
     public WaitingCreateService(
-        ReservationRepository reservationRepository,
-        ReservationTimeRepository reservationTimeRepository,
-        ThemeRepository themeRepository,
-        MemberRepository memberRepository,
-        ReservationDetailRepository reservationDetailRepository
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            MemberRepository memberRepository,
+            ReservationDetailRepository reservationDetailRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -57,23 +56,23 @@ public class WaitingCreateService {
 
     private ReservationTime findTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
-            .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
+                .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
     }
 
     private Theme findThemeById(long themeId) {
         return themeRepository.findById(themeId)
-            .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 테마입니다."));
     }
 
     private Member findMemberById(long memberId) {
         return memberRepository.findById(memberId)
-            .orElseThrow(() -> new InvalidMemberException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new InvalidMemberException("존재하지 않는 회원입니다."));
     }
 
     private ReservationDetail getReservationDetail(ReservationDate reservationDate, ReservationTime reservationTime, Theme theme) {
         Schedule schedule = new Schedule(reservationDate, reservationTime);
         return reservationDetailRepository.findByScheduleAndTheme(schedule, theme)
-            .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(schedule, theme)));
+                .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(schedule, theme)));
     }
 
     private void validateDuplication(ReservationDetail reservationDetail, Member member) {

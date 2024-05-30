@@ -1,6 +1,5 @@
 package roomescape.service.waiting;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -12,6 +11,8 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,20 +28,20 @@ public class WaitingCommonService {
 
     public List<ReservationResponse> findAll() {
         return reservationRepository.findAllByStatus(ReservationStatus.WAITING).stream()
-            .map(ReservationResponse::new)
-            .toList();
+                .map(ReservationResponse::new)
+                .toList();
     }
 
     @Transactional
     public void deleteWaitingById(long reservationId, long memberId) {
         Member member = getById(memberId);
         reservationRepository.findById(reservationId)
-            .ifPresent(reservation -> deleteIfAvailable(member, reservation));
+                .ifPresent(reservation -> deleteIfAvailable(member, reservation));
     }
 
     private Member getById(long memberId) {
         return memberRepository.findById(memberId)
-            .orElseThrow(() -> new InvalidMemberException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new InvalidMemberException("회원 정보를 찾을 수 없습니다."));
     }
 
     private void deleteIfAvailable(Member member, Reservation reservation) {
