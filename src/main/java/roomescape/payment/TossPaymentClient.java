@@ -9,7 +9,7 @@ import roomescape.payment.dto.PaymentRequest;
 
 import java.util.Base64;
 
-public class TossPaymentClient implements PaymentClient{
+public class TossPaymentClient implements PaymentClient {
 
     @Value("${payments.toss.secret-key}")
     private String secretKey;
@@ -27,8 +27,8 @@ public class TossPaymentClient implements PaymentClient{
 
     @Override
     public ResponseEntity<Void> postPayment(final PaymentRequest paymentRequest) {
-        final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey+password).getBytes());
-        
+        final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
+
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", secret)
