@@ -24,4 +24,10 @@ public class PaymentHistoryService {
         paymentHistoryRepository.save(new PaymentHistory(paymentCreateRequest.Reservation(),
                 paymentCreateRequest.paymentKey()));
     }
+
+    public void cancelPayment(Long reservationId) {
+        PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation_Id(reservationId);
+        restClient.cancelPayment(paymentHistory.getPaymentKey());
+        paymentHistoryRepository.deleteByReservation_Id(paymentHistory.getReservationId());
+    }
 }

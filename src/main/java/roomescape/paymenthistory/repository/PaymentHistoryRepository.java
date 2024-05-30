@@ -1,8 +1,13 @@
 package roomescape.paymenthistory.repository;
 
-import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.Repository;
 import roomescape.paymenthistory.domain.PaymentHistory;
 
-// TODO: Repository<T, R> 로 바꾸기
-public interface PaymentHistoryRepository extends ListCrudRepository<PaymentHistory, Long> {
+public interface PaymentHistoryRepository extends Repository<PaymentHistory, Long> {
+
+    void save(PaymentHistory paymentHistory);
+
+    PaymentHistory findByReservation_Id(Long reservationId);
+
+    void deleteByReservation_Id(Long reservationId);
 }

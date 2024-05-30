@@ -128,7 +128,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long id) {
         waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(id)
-                .ifPresentOrElse(this::promoteWaiting, () -> reservationRepository.deleteById(id));
+                .ifPresentOrElse(this::promoteWaiting, () -> cancelReservation(id));
 
     }
 
@@ -137,5 +137,10 @@ public class ReservationService {
 
         reservationRepository.save(promotedReservation);
         waitingRepository.deleteById(waiting.getId());
+    }
+
+    private void cancelReservation(Long id) {
+        paymentHistoryService.cancelPayment(id);
+        reservationRepository.deleteById(id);
     }
 }
