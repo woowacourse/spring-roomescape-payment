@@ -16,6 +16,7 @@ import roomescape.auth.Authenticated;
 import roomescape.auth.dto.Accessor;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
@@ -72,7 +73,7 @@ public class ReservationController {
                 memberReservationWithPaymentAddRequest.timeId()
         );
 
-        tossPaymentClient.confirmPayments(new PaymentConfirmRequest(
+        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(new PaymentConfirmRequest(
                 memberReservationWithPaymentAddRequest.paymentKey(),
                 memberReservationWithPaymentAddRequest.orderId(),
                 memberReservationWithPaymentAddRequest.amount()

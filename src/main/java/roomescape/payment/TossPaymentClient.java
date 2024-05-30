@@ -20,9 +20,9 @@ public class TossPaymentClient {
         this.restClient = restClient;
     }
 
-    public void confirmPayments(PaymentConfirmRequest request) {
+    public PaymentConfirmResponse confirmPayments(PaymentConfirmRequest request) {
 
-        restClient.post().uri("/v1/payments/confirm")
+        return restClient.post().uri("/v1/payments/confirm")
                 .header("Authorization", "Basic " + Base64.getEncoder().encodeToString(WIDGET_SECRET_KEY.getBytes()))
                 .body(request)
                 .retrieve()
@@ -30,6 +30,7 @@ public class TossPaymentClient {
                     ErrorResponse errorResponse = objectMapper.readValue(res.getBody(), ErrorResponse.class);
                     throw new PaymentFailException(errorResponse.message());
                 })
-                .toEntity(PaymentConfirmResponse.class);
+                .toEntity(PaymentConfirmResponse.class)
+                .getBody();
     }
 }
