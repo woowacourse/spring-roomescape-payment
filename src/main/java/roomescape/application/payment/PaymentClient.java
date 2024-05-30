@@ -1,6 +1,7 @@
 package roomescape.application.payment;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -34,7 +35,7 @@ public class PaymentClient {
     public Payment requestPurchase(PaymentRequest request) {
         return client.post()
                 .uri(url)
-                .header("Authorization", authorizationSecret)
+                .header(HttpHeaders.AUTHORIZATION, authorizationSecret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
