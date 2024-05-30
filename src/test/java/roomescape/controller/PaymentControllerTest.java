@@ -5,14 +5,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import roomescape.IntegrationTestSupport;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.controller.dto.PaymentApproveRequest;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
 import roomescape.exception.customexception.ThirdPartyAPIException;
 
-class PaymentControllerTest extends IntegrationTestSupport {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+class PaymentControllerTest {
 
     @Autowired
     private PaymentController paymentController;

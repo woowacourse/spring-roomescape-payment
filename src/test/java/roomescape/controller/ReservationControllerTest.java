@@ -2,19 +2,18 @@ package roomescape.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
+import roomescape.exception.customexception.RoomEscapeBusinessException;
 import roomescape.service.dto.response.ReservationResponses;
 
 import java.time.LocalDate;
@@ -24,8 +23,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
+@ExtendWith(MockitoExtension.class)
 class ReservationControllerTest extends IntegrationTestSupport {
 
     String createdId;
@@ -122,7 +123,6 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .getObject(".", ReservationResponses.class)
                             .reservationResponses()
                             .size();
-
                     assertThat(size).isEqualTo(adminReservationSize + 1);
                 }),
                 dynamicTest("예약을 삭제한다.", () -> {
@@ -231,5 +231,44 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .statusCode(204);
                 })
         );
+    }
+
+    @DisplayName("결제에 실패할 시, 예약에 실패한다")
+    @Test
+    void paymentFail() {
+        Map<String, Object> params = Map.of(
+                "date", "2025-10-06",
+                "timeId", 1L,
+                "themeId", 1L
+        );
+
+        Mockito.when(paymentController.approve(any(), any()))
+                .thenThrow(RoomEscapeBusinessException.class);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", USER_TOKEN)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @DisplayName("결제에 성공할 시, 예약에 성공한다")
+    @Test
+    void paymentSuccess() {
+        Map<String, Object> params = Map.of(
+                "date", "2025-10-06",
+                "timeId", 1L,
+                "themeId", 1L
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", USER_TOKEN)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
     }
 }

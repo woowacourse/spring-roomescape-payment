@@ -4,9 +4,11 @@ import io.restassured.RestAssured;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.controller.PaymentController;
 import roomescape.controller.dto.TokenRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -25,6 +27,9 @@ public abstract class IntegrationTestSupport {
 
     @LocalServerPort
     private int serverPort;
+
+    @MockBean
+    protected PaymentController paymentController;
 
     @PostConstruct
     private void initialize() {
