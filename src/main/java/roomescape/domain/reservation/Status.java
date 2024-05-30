@@ -9,6 +9,6 @@ public enum Status {
     PAYMENT_PENDING;
 
     public static List<Status> getStatusWithoutCancel() {
-        return List.of(RESERVED, PAYMENT_PENDING);
+        return List.of(RESERVED, PAYMENT_PENDING, WAITING);
     }
 }
