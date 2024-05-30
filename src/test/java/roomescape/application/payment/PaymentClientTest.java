@@ -10,7 +10,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.application.config.PaymentClientConfig;
+import roomescape.application.config.PaymentClientProperties;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
 import roomescape.exception.payment.PaymentException;
@@ -28,8 +28,8 @@ import roomescape.exception.payment.PaymentException;
 class PaymentClientTest {
     private final String uri = "/v1/payments/confirm";
 
-    @Value("${payment.url}")
-    private String baseUrl;
+    @Autowired
+    private PaymentClientProperties properties;
 
     @Autowired
     private MockRestServiceServer server;
@@ -48,7 +48,7 @@ class PaymentClientTest {
                         "status": "DONE"
                     }
                 """;
-        server.expect(manyTimes(), requestTo(baseUrl + uri))
+        server.expect(manyTimes(), requestTo(properties.getUrl() + uri))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
@@ -72,7 +72,7 @@ class PaymentClientTest {
                 body.getBytes(),
                 HttpStatus.BAD_REQUEST
         );
-        server.expect(manyTimes(), requestTo(baseUrl + uri))
+        server.expect(manyTimes(), requestTo(properties.getUrl() + uri))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond((req) -> response);
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
@@ -89,7 +89,7 @@ class PaymentClientTest {
                 body.getBytes(),
                 HttpStatus.OK
         );
-        server.expect(manyTimes(), requestTo(baseUrl + uri))
+        server.expect(manyTimes(), requestTo(properties.getUrl() + uri))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond((req) -> response);
 
