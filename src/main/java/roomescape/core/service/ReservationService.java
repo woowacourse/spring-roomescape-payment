@@ -153,7 +153,7 @@ public class ReservationService {
         updateReservationStatus(reservation);
         reservationRepository.deleteById(reservationId);
 
-        if (reservation.isPayed()) {
+        if (reservation.isPaid()) {
             paymentService.refundPayment(new PaymentResponse(reservation.getPayment()));
         }
     }

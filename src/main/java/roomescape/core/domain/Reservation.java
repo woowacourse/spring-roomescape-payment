@@ -106,7 +106,7 @@ public class Reservation {
         return id;
     }
 
-    public boolean isPayed() {
+    public boolean isPaid() {
         return payment != null;
     }
 
