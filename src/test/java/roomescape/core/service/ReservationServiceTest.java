@@ -7,18 +7,26 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentConfirmRequest;
+import roomescape.core.dto.payment.PaymentConfirmResponse;
+import roomescape.core.dto.reservation.PaidReservationResponse;
+import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
 import roomescape.core.repository.WaitingRepository;
+import roomescape.infrastructure.PaymentApprover;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
 
@@ -26,6 +34,9 @@ import roomescape.utils.TestFixture;
 class ReservationServiceTest {
     @Autowired
     private ReservationService reservationService;
+
+    @MockBean
+    private PaymentApprover paymentApprover;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -64,6 +75,36 @@ class ReservationServiceTest {
                 () -> assertThat(response.getDate()).isEqualTo(request.getDate()),
                 () -> assertThat(response.getMember().getId()).isEqualTo(request.getMemberId()),
                 () -> assertThat(response.getTime().getId()).isEqualTo(request.getTimeId())
+        );
+    }
+
+    @Test
+    @DisplayName("asd")
+    void asd() {
+        final String date = TestFixture.getTomorrowDate();
+        final ReservationPaymentRequest request
+                = new ReservationPaymentRequest(date, 1L, 1L, "1", "1", 1);
+        final ReservationRequest reservationRequest
+                = new ReservationRequest(1L, date, 1L, 1L);
+        final PaymentConfirmRequest paymentRequest
+                = new PaymentConfirmRequest(request);
+
+        Mockito.when(paymentApprover.confirmPayment(paymentRequest))
+                .thenReturn(new PaymentConfirmResponse(new Payment("1", "1", 1L)));
+
+        final PaidReservationResponse response
+                = reservationService.createAndPay(reservationRequest, paymentRequest);
+        final ReservationResponse reservationResponse = response.getReservationResponse();
+        final PaymentConfirmResponse paymentResponse = response.getPaymentConfirmResponse();
+
+        assertAll(
+                () -> assertThat(reservationResponse.getTheme().getId()).isEqualTo(1L),
+                () -> assertThat(reservationResponse.getDate()).isEqualTo(date),
+                () -> assertThat(reservationResponse.getMember().getId()).isEqualTo(1L),
+                () -> assertThat(reservationResponse.getTime().getId()).isEqualTo(1L),
+                () -> assertThat(paymentResponse.getPaymentKey()).isEqualTo("1"),
+                () -> assertThat(paymentResponse.getOrderId()).isEqualTo("1"),
+                () -> assertThat(paymentResponse.getTotalAmount()).isEqualTo(1)
         );
     }
 

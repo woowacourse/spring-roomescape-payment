@@ -32,15 +32,16 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<PaidReservationResponse> create(
-            @Valid @RequestBody final ReservationPaymentRequest memberRequest,
+            @Valid @RequestBody final ReservationPaymentRequest request,
             final LoginMember member) {
-        final PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(memberRequest);
-        final ReservationRequest request = new ReservationRequest(member.getId(),
-                memberRequest.getDate(), memberRequest.getTimeId(), memberRequest.getThemeId());
+        final PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request);
+        final ReservationRequest reservationRequest = new ReservationRequest(member.getId(),
+                request.getDate(), request.getTimeId(), request.getThemeId());
 
         final PaidReservationResponse response
-                = reservationService.createAndPay(request, paymentRequest);
-        return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
+                = reservationService.createAndPay(reservationRequest, paymentRequest);
+        return ResponseEntity
+                .created(URI.create("/reservations/" + response.getReservationResponse().getId()))
                 .body(response);
     }
 
