@@ -1,14 +1,9 @@
 package roomescape.service.reservation;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -26,7 +21,6 @@ import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.payment.PaymentRestClient;
-import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -66,7 +60,6 @@ public class ReservationService {
     }
 
 
-
     private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date,
                                                   ReservationRequest request) {
         ReservationDate reservationDate = ReservationDate.of(date);
@@ -85,7 +78,6 @@ public class ReservationService {
 
         return new ReservationResponse(reservation);
     }
-
 
 
     private ReservationTime findTimeById(long timeId) {
