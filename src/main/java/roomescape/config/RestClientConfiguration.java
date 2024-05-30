@@ -11,8 +11,11 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfiguration {
-    private static final int CONNECT_TIMEOUT = 3;
-    private static final int READ_TIMEOUT = 40;
+    private final PaymentConnectionProperties paymentConnectionProperties;
+
+    public RestClientConfiguration(PaymentConnectionProperties paymentConnectionProperties) {
+        this.paymentConnectionProperties = paymentConnectionProperties;
+    }
 
     @Bean
     RestClient.Builder builder() {
@@ -22,8 +25,8 @@ public class RestClientConfiguration {
 
     ClientHttpRequestFactory factory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT));
+                .withConnectTimeout(Duration.ofSeconds(paymentConnectionProperties.getConnectionTimeout()))
+                .withReadTimeout(Duration.ofSeconds(paymentConnectionProperties.getReadTimeout()));
         return ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory::new, settings);
     }
 }
