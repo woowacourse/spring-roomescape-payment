@@ -18,8 +18,8 @@ import org.junit.jupiter.api.TestFactory;
 import org.mockito.BDDMockito;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
-import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.TossExceptionResponse;
 import roomescape.exception.PaymentException;
 
