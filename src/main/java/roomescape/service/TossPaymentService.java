@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestClientResponseException;
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.service.client.TossPaymentRestClient;
@@ -35,7 +34,7 @@ public class TossPaymentService {
                 throw new RoomescapeException("결제가 승인되지 않았습니다.");
             }
             throw new RoomescapeException(response.message());
-        } catch (RestClientResponseException e) {
+        } catch (Exception e) {
             throw new RoomescapeException("결제가 승인되지 않았습니다.");
         }
     }
