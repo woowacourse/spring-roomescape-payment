@@ -2,7 +2,10 @@ package roomescape.controller;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import static roomescape.Fixture.TEST_ORDER_AMOUNT;
+import static roomescape.Fixture.TEST_ORDER_ID;
+import static roomescape.Fixture.TEST_PAYMENT_KEY;
+import static roomescape.Fixture.TEST_PAYMENT_TYPE;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -12,18 +15,9 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.auth.AuthConstants;
 import roomescape.service.auth.dto.LoginRequest;
-import roomescape.service.payment.PaymentRestClient;
-import roomescape.service.payment.dto.PaymentResult;
-import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
@@ -75,7 +69,7 @@ class AdminReservationControllerTest extends DataInitializedControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, adminToken)
                 .body(new AdminReservationRequest(date, memberId, timeId, themeId))
-                .when().post("/reservations")
+                .when().post("/admin/reservations")
                 .then().log().all()
                 .assertThat().statusCode(201).body("id", is(greaterThan(0)));
     }
@@ -86,7 +80,8 @@ class AdminReservationControllerTest extends DataInitializedControllerTest {
         //given
         var id = RestAssured.given().contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, guestToken)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(date, timeId, themeId, TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT,
+                        TEST_PAYMENT_TYPE))
                 .when().post("/reservations")
                 .then().extract().body().jsonPath().get("id");
 

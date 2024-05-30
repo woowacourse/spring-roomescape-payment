@@ -2,6 +2,10 @@ package roomescape.controller;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static roomescape.Fixture.TEST_ORDER_AMOUNT;
+import static roomescape.Fixture.TEST_ORDER_ID;
+import static roomescape.Fixture.TEST_PAYMENT_KEY;
+import static roomescape.Fixture.TEST_PAYMENT_TYPE;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -46,7 +50,8 @@ class ReservationWaitingControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(date, timeId, themeId, TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT,
+                        TEST_PAYMENT_TYPE))
                 .when().post("/reservations")
                 .then().log().all();
     }
@@ -57,7 +62,8 @@ class ReservationWaitingControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(date, timeId, themeId, TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT,
+                        TEST_PAYMENT_TYPE))
                 .when().post("/reservations/waiting")
                 .then().log().all()
                 .assertThat().statusCode(201).body("id", is(greaterThan(0)));

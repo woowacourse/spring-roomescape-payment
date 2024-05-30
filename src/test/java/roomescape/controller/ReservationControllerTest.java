@@ -3,6 +3,10 @@ package roomescape.controller;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static roomescape.Fixture.TEST_ORDER_AMOUNT;
+import static roomescape.Fixture.TEST_ORDER_ID;
+import static roomescape.Fixture.TEST_PAYMENT_KEY;
+import static roomescape.Fixture.TEST_PAYMENT_TYPE;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -55,7 +59,10 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations")
                 .then().log().all()
                 .assertThat().statusCode(201).body("id", is(greaterThan(0)));
@@ -68,14 +75,20 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations");
 
         //when&then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations")
                 .then().log().all()
                 .assertThat().statusCode(400)
@@ -92,7 +105,8 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(invalidDate, timeId, themeId))
+                .body(new ReservationRequest(invalidDate, timeId, themeId, TEST_PAYMENT_KEY, TEST_ORDER_ID,
+                        TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE))
                 .when().post("/reservations")
                 .then().log().all()
                 .assertThat().statusCode(400).body("message", is("현재보다 이전으로 일정을 설정할 수 없습니다."));
@@ -106,7 +120,10 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations")
                 .then().log().all()
                 .assertThat().statusCode(400);
@@ -118,7 +135,10 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         //given
         RestAssured.given().contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations");
 
         //when & then
@@ -135,7 +155,10 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         //given
         var id = RestAssured.given().contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations")
                 .then().extract().body().jsonPath().get("id");
 
@@ -159,7 +182,10 @@ class ReservationControllerTest extends DataInitializedControllerTest {
         //given
         var id = RestAssured.given().contentType(ContentType.JSON)
                 .cookie(AuthConstants.AUTH_COOKIE_NAME, token)
-                .body(new ReservationRequest(date, timeId, themeId))
+                .body(new ReservationRequest(
+                        date, timeId, themeId,
+                        TEST_PAYMENT_KEY, TEST_ORDER_ID, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE
+                ))
                 .when().post("/reservations")
                 .then().extract().body().jsonPath().get("id");
 

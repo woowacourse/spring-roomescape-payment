@@ -27,4 +27,9 @@ public class Fixture {
     public static final Member member2 = new Member("pedro", "pedro@email.com", "pedro123", Role.MEMBER);
     public static final Member member3 = new Member("lini", "lini@email.com", "lini123", Role.MEMBER);
 
+    public static final String TEST_PAYMENT_KEY = "TEST_PAYMENT_KEY";
+    public static final String TEST_ORDER_ID = "TEST_ORDER_ID";
+    public static final long TEST_ORDER_AMOUNT = 2_000_000L;
+    public static final String TEST_PAYMENT_TYPE = "TEST_PAYMENT_TYPE";
+
 }

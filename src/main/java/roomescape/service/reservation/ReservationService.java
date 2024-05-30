@@ -50,33 +50,36 @@ public class ReservationService {
     }
 
     public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
-        return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-                adminReservationRequest.memberId(), adminReservationRequest.date(), null);
+        ReservationRequest reservationRequest = ReservationRequest.fromAdminRequest(adminReservationRequest);
+        Reservation reservation = generateValidReservation(reservationRequest, adminReservationRequest.memberId());
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return new ReservationResponse(savedReservation);
     }
 
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
-        return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-                reservationRequest.date(), reservationRequest);
+        Reservation reservation = generateValidReservation(reservationRequest, memberId);
+        paymentRestClient.confirm(reservationRequest);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return new ReservationResponse(savedReservation);
     }
 
+    private Reservation generateValidReservation(ReservationRequest reservationRequest, long memberId) {
+        LocalDate date = reservationRequest.date();
+        long timeId = reservationRequest.timeId();
+        long themeId = reservationRequest.themeId();
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date,
-                                                  ReservationRequest request) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Schedule schedule = new Schedule(reservationDate, reservationTime);
         schedule.validateFuture();
 
         Theme theme = findThemeById(themeId);
-        Member member = findMemberById(memberId);
         validateDuplicated(reservationDate, reservationTime, theme);
+        Member member = findMemberById(memberId);
 
-        paymentRestClient.confirm(request);
-
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, schedule, theme, ReservationStatus.RESERVED));
-
-        return new ReservationResponse(reservation);
+        return new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
     }
 
     private ReservationTime findTimeById(long timeId) {

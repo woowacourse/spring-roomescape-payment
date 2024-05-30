@@ -2,7 +2,6 @@ package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.Fixture;
 import roomescape.domain.member.Member;
@@ -32,14 +29,10 @@ import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
-import roomescape.exception.PaymentException;
 import roomescape.service.ServiceTestBase;
 import roomescape.service.member.dto.MemberReservationResponse;
-import roomescape.service.payment.PaymentRestClient;
-import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
-import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @ExtendWith(SpringExtension.class)
@@ -59,9 +52,6 @@ class ReservationServiceTest extends ServiceTestBase {
     private Member member;
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
-
-    @MockBean
-    private PaymentRestClient restClient;
 
     @BeforeEach
     void setUp() {
@@ -146,11 +136,11 @@ class ReservationServiceTest extends ServiceTestBase {
     @Test
     void findReservationsOf() {
         // given
-        ReservationTime reservationTime = reservationTimeRepository.save(
+        reservationTime = reservationTimeRepository.save(
                 new ReservationTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS))
         );
-        Theme theme = themeRepository.save(Fixture.theme);
-        Member member = memberRepository.save(Fixture.member);
+        theme = themeRepository.save(Fixture.theme);
+        member = memberRepository.save(Fixture.member);
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.today), reservationTime);
 
         reservationRepository.save(
@@ -183,7 +173,6 @@ class ReservationServiceTest extends ServiceTestBase {
     @DisplayName("예약 삭제 시 해당 일정과 테마에 대기가 등록돼 있다면 첫 번째 대기를 예약으로 승격한다.")
     @Test
     void convertWaitingToReservationWhenReservationCanceled() {
-        Mockito.when(restClient.confirm(any(ReservationRequest.class))).thenReturn(any(PaymentResult.class));
         // given
         LocalDate date = Fixture.tomorrow;
         Schedule schedule = new Schedule(ReservationDate.of(date), reservationTime);

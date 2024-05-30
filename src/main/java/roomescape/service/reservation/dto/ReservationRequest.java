@@ -14,7 +14,10 @@ public record ReservationRequest(
         @NotBlank(message = "결제 수단이 유효하지 않습니다.") String paymentType
 ) {
 
-    public ReservationRequest(LocalDate date, Long timeId, Long themeId) {
-        this(date, timeId, themeId, "", "", 0, "");
+    public static ReservationRequest fromAdminRequest(AdminReservationRequest request) {
+        return new ReservationRequest(
+                request.date(), request.timeId(), request.themeId(),
+                "PAID_BY_ADMIN", "ORDER_BY_ADMIN", 0, "BY_ADMIN"
+        );
     }
 }
