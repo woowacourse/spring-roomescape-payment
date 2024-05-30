@@ -2,6 +2,7 @@ package roomescape.service.reservation;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -112,5 +113,11 @@ public class ReservationWaitingService {
                     paymentRestClient.cancel(waiting.getPayment());
                 });
         deleteById(waitingId);
+    }
+
+    @Scheduled(cron = "${resetwaiting.schedule.cron}")
+    private void deleteTodayWaiting() {
+        List<ReservationWaiting> waitingOfToday = reservationWaitingRepository.findBySchedule_Date(LocalDate.now());
+        waitingOfToday.forEach(w -> deleteById(w.getId()));
     }
 }

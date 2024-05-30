@@ -21,7 +21,7 @@ public record ReservationWaitingResponse(
         this(
                 waiting.getId(),
                 waiting.getMemberName(),
-                waiting.getDate(),
+                waiting.getScheduleDate(),
                 new ReservationTimeResponse(waiting.getReservationTime()),
                 new ThemeResponse(waiting.getTheme()),
                 waiting.getCreatedAt()

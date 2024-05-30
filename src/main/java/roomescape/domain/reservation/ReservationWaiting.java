@@ -89,7 +89,7 @@ public class ReservationWaiting {
         return payment;
     }
 
-    public LocalDate getDate() {
+    public LocalDate getScheduleDate() {
         return schedule.getDate();
     }
 

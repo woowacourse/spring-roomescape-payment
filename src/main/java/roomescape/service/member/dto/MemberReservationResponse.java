@@ -30,7 +30,7 @@ public record MemberReservationResponse(
         return new MemberReservationResponse(
                 waiting.getId(),
                 waiting.getTheme().getName().getValue(),
-                waiting.getDate(),
+                waiting.getScheduleDate(),
                 waiting.getSchedule().getTime(),
                 waitingWithRank.rank() + "번째 예약대기"
         );
