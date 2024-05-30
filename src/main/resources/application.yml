@@ -19,6 +19,7 @@ security:
       expire-length: 3600000
   toss:
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    base-url: https://api.tosspayments.com/v1/payments
 logging:
   level:
     org:

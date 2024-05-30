@@ -21,9 +21,11 @@ public class TossPaymentsClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentsClient(@Value("${security.toss.secret-key}") String secretKey, ObjectMapper objectMapper) {
+    public TossPaymentsClient(@Value("${security.toss.secret-key}") String secretKey,
+                              @Value("${security.toss.base-url}") String baseUrl,
+                              ObjectMapper objectMapper) {
         this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(baseUrl)
                 .defaultHeader(AUTHORIZATION, encodeSecretKey(secretKey))
                 .build();
         this.objectMapper = objectMapper;
