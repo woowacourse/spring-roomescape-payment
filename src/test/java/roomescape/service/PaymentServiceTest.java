@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -21,6 +22,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.PaymentConfig;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
+import roomescape.exception.PaymentException;
 
 @RestClientTest(PaymentConfig.class)
 class PaymentServiceTest {
@@ -35,11 +37,11 @@ class PaymentServiceTest {
     void paymentSuccess() {
         PaymentRequest request = new PaymentRequest("randomOrderId", 10000, "randomPaymentKey");
         String expectedResponse = """
-        {
-            "paymentKey" : "randomPaymentKey",
-            "totalAmount" : 10000
-        }
-        """;
+                {
+                    "paymentKey" : "randomPaymentKey",
+                    "totalAmount" : 10000
+                }
+                """;
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
@@ -51,5 +53,25 @@ class PaymentServiceTest {
                 () -> assertThat(result.paymentKey()).isEqualTo("randomPaymentKey"),
                 () -> assertThat(result.totalAmount()).isEqualTo(10000)
         );
+    }
+
+    @DisplayName("결제 승인 요청이 실패하면 예외를 던진다.")
+    @Test
+    void paymentFailure() {
+        PaymentRequest request = new PaymentRequest("randomOrderId", 10000, "randomPaymentKey");
+        String expectedResponse = """
+                {
+                    "code": "NOT_FOUND_PAYMENT",
+                    "message": "존재하지 않는 결제 입니다."
+                }
+                """;
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(expectedResponse));
+
+        assertThatThrownBy(() -> paymentService.pay(request))
+                .isInstanceOf(PaymentException.class);
     }
 }
