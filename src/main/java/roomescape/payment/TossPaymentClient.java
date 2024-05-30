@@ -2,7 +2,6 @@ package roomescape.payment;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
@@ -26,15 +25,13 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public ResponseEntity<Void> postPayment(final PaymentRequest paymentRequest) {
+    public void postPayment(final PaymentRequest paymentRequest) {
         final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
 
-        return restClient.post()
+        restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", secret)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
-                .retrieve()
-                .toBodilessEntity();
+                .body(paymentRequest);
     }
 }
