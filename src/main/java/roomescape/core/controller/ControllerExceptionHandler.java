@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import roomescape.core.dto.exception.ExceptionResponse;
 import roomescape.exception.PaymentException;
+import roomescape.exception.PaymentServerException;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
@@ -66,9 +67,17 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleRuntimeException(final RuntimeException exception) {
+    public ResponseEntity<ProblemDetail> handlePaymentServerException(
+            final PaymentServerException exception) {
         return ResponseEntity.internalServerError()
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
                         exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> handleRuntimeException(final RuntimeException exception) {
+        return ResponseEntity.internalServerError()
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "서버에 문제가 있습니다. 잠시 후 다시 시도해주세요."));
     }
 }
