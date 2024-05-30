@@ -15,7 +15,7 @@ public enum Role {
                 .orElseThrow(() -> new UnauthenticatedUserException("일치하는 권한이 없습니다."));
     }
 
-    public boolean isAdmin() {
-        return this == ADMIN;
+    public boolean isUser() {
+        return this == USER;
     }
 }

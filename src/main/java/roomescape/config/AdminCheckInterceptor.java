@@ -25,7 +25,7 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
         String token = CookieUtils.extractTokenFromCookie(cookies);
 
         LoginMember loginMember = jwtTokenProvider.getMember(token);
-        if (!loginMember.role().isAdmin()) {
+        if (loginMember.role().isUser()) {
             throw new NoAdminPrivilegeException("접근 권한이 없습니다.");
         }
         return true;

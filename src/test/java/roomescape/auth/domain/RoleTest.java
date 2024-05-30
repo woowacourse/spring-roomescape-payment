@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Test;
 
 class RoleTest {
 
-    @DisplayName("ADMIN 권한 인지 확인한다.")
+    @DisplayName("USER 권한 인지 확인한다.")
     @Test
     void isAdmin() {
         Role admin = Role.ADMIN;
         Role member = Role.USER;
 
         assertAll(
-                () -> assertThat(admin.isAdmin()).isTrue(),
-                () -> assertThat(member.isAdmin()).isFalse()
+                () -> assertThat(admin.isUser()).isFalse(),
+                () -> assertThat(member.isUser()).isTrue()
         );
     }
 }
