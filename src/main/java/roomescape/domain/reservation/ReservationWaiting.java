@@ -7,11 +7,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
@@ -35,10 +37,20 @@ public class ReservationWaiting {
     @Embedded
     private Schedule schedule;
 
+    @OneToOne
+    private Payment payment;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     protected ReservationWaiting() {
+    }
+
+    public ReservationWaiting(Member member, Theme theme, Schedule schedule, Payment payment) {
+        this.member = member;
+        this.theme = theme;
+        this.schedule = schedule;
+        this.payment = payment;
     }
 
     public ReservationWaiting(Member member, Theme theme, Schedule schedule) {
