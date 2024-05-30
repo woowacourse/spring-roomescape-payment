@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionApiController {
@@ -29,8 +30,8 @@ public class ExceptionApiController {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<String> paymentExHandler(PaymentException exception) {
+    public ResponseEntity<PaymentErrorResponse> paymentExHandler(PaymentException exception) {
         return ResponseEntity.status(exception.getStatusCode())
-                .body(exception.getMessage());
+                .body(new PaymentErrorResponse(exception.getMessage()));
     }
 }

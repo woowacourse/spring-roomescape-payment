@@ -1,7 +1,6 @@
 package roomescape.reservation.controller.dto.response;
 
-public record PaymentResponse(
-        String code,
+public record PaymentErrorResponse(
         String message
 ) {
 }
