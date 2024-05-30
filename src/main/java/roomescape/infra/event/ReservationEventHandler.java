@@ -27,7 +27,7 @@ public class ReservationEventHandler {
     }
 
     private void checkPaymentStatusAndProcess(PaymentPendingEvent event) {
-        reservationRepository.findById(event.getReservationId())
+        reservationRepository.findReservation(event.getReservationId())
                 .filter(Reservation::isPaymentPending)
                 .ifPresent(this::handlePaymentFailure);
     }
@@ -43,7 +43,7 @@ public class ReservationEventHandler {
     }
 
     private void pendingNextReservation(Reservation canceledReservation) {
-        Reservation reservation = reservationRepository.findNextWaitingReservation(canceledReservation.getDetail())
+        Reservation reservation = reservationRepository.findNextWaiting(canceledReservation.getDetail())
                 .orElseThrow(IllegalArgumentException::new);
         reservation.toPending();
         reservationRepository.save(reservation);

@@ -10,8 +10,8 @@ public class ReservationDetailFactory {
     private final ThemeRepository themeRepository;
 
     public ReservationDetail createReservationDetail(LocalDate date, Long timeId, Long themeId) {
-        ReservationTime time = reservationTimeRepository.getById(timeId);
+        ReservationTime time = reservationTimeRepository.getReservationTime(timeId);
         Theme theme = themeRepository.getById(themeId);
-        return reservationDetailRepository.getByDateAndTimeAndTheme(date, time, theme);
+        return reservationDetailRepository.getReservationDetail(date, time, theme);
     }
 }

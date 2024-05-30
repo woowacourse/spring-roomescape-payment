@@ -23,6 +23,7 @@ import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailFactory;
+import roomescape.exception.member.AuthenticationFailureException;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class ReservationService {
 
     @Transactional
     public synchronized ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
-        Member member = memberRepository.getById(memberId);
+        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationFailureException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
@@ -54,7 +55,8 @@ public class ReservationService {
 
     @Transactional
     public synchronized ReservationResponse saveReservationByAdmin(ReservationRequest request) {
-        Member member = memberRepository.getById(request.memberId());
+        Member member = memberRepository.findMember(request.memberId())
+                .orElseThrow(AuthenticationFailureException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
@@ -63,14 +65,14 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllReservationsWithoutCancel() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.RESERVED);
+        List<Reservation> reservations = reservationRepository.findAll(Status.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
     public List<ReservationResponse> findAllReservationByConditions(ReservationSearchCondition condition) {
-        List<Reservation> reservations = reservationRepository.findByPeriodAndThemeAndMember(
+        List<Reservation> reservations = reservationRepository.findReservation(
                 condition.start(), condition.end(), condition.memberId(), condition.themeId());
         return reservations.stream()
                 .map(ReservationResponse::from)
@@ -86,7 +88,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllWaitings() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.WAITING);
+        List<Reservation> reservations = reservationRepository.findAll(Status.WAITING);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();

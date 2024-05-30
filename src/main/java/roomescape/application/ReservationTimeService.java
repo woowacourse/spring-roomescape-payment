@@ -58,7 +58,7 @@ public class ReservationTimeService {
     }
 
     private ReservationTime findReservationTimeById(Long id) {
-        return reservationTimeRepository.findById(id)
+        return reservationTimeRepository.findReservationTime(id)
                 .orElseThrow(NotFoundTimeException::new);
     }
 }

@@ -35,7 +35,7 @@ public class ThemeService {
         LocalDate endDate = rankingPolicy.getEndDateAsString();
         int limit = rankingPolicy.exposureSize();
 
-        List<Theme> themes = themeRepository.findThemesByPeriodWithLimit(
+        List<Theme> themes = themeRepository.findPopularThemes(
                 startDate.toString(), endDate.toString(), limit);
 
         return themes.stream()
@@ -45,7 +45,7 @@ public class ThemeService {
 
     public void deleteTheme(Long id) {
         try {
-            themeRepository.deleteById(id);
+            themeRepository.delete(id);
         } catch (DataIntegrityViolationException e) {
             throw new ReservationReferencedThemeException();
         }

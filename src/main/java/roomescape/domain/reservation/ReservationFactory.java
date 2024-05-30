@@ -25,13 +25,13 @@ public class ReservationFactory {
     }
 
     private void rejectDuplicateReservation(ReservationDetail detail, Member member) {
-        if (reservationRepository.existsByDetailAndMemberAndStatusNot(detail, member, Status.CANCELED)) {
+        if (reservationRepository.existsReservation(detail, member, Status.getStatusWithoutCancel())) {
             throw new DuplicatedReservationException();
         }
     }
 
     private Reservation getReservation(ReservationDetail detail, Member member) {
-        if (reservationRepository.existsByDetailAndStatusIn(detail, List.of(Status.RESERVED, Status.PAYMENT_PENDING))) {
+        if (reservationRepository.existsReservation(detail, List.of(Status.RESERVED, Status.PAYMENT_PENDING))) {
             return new Reservation(member, detail, Status.WAITING);
         }
         return new Reservation(member, detail, Status.RESERVED);

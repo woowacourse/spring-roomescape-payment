@@ -28,12 +28,12 @@ class ReservationTimeRepositoryTest {
         Long themeId = 1L;
 
         // when
-        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTimeByDateAndThemeId(
+        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTime(
                 date, themeId);
 
         // then
-        assertThat(reservedTimes.size())
-                .isEqualTo(8);
+        assertThat(reservedTimes)
+                .hasSize(8);
     }
 
 }
