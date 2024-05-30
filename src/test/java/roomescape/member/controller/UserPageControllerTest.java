@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
 
-class MemberPageControllerTest extends IntegrationTest {
+class UserPageControllerTest extends IntegrationTest {
 
     @DisplayName("/signup을 요청하면 html을 반환한다.")
     @Test

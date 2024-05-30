@@ -54,7 +54,9 @@ public class ReservationService {
         Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentService.pay(PaymentRequest.from(reservationSaveRequest));
+        if (loginMember.role().isUser()) {
+            paymentService.pay(PaymentRequest.from(reservationSaveRequest));
+        }
 
         return ReservationResponse.toResponse(savedReservation);
     }

@@ -3,7 +3,8 @@
 - [API 요청 폴더 바로가기](api-test)
 
 ### 📌 reservation (예약)
-- [예약 API 요청 파일 바로가기](api-test/reservation-api.http)
+- [전체 회원 예약 API 요청 파일 바로가기](api-test/reservation-api.http)
+- [관리자용 API 요청 파일 바로가기](api-test/admin-reservation-api.http)
 
 ##### 예약 기능 목록
 - [x] 예약을 추가할 수 있다.

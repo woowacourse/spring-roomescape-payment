@@ -2,10 +2,6 @@
 
 GET http://localhost:8080/reservations
 
-### 테마 아이디, 회원 아이디, 기간 조건 별 조회 API (dateFrom과 dateTo 파라미터 값 설정 필요)
-
-GET http://localhost:8080/reservations/search?themeId=1&memberId=1&dateFrom=2024-05-19&dateTo=2024-05-21
-
 ### 사용자 별 예약 조회 API
 
 GET http://localhost:8080/reservations/mine
@@ -16,9 +12,12 @@ POST http://localhost:8080/reservations
 Content-Type: application/json
 
 {
-  "date": "2024-05-26",
+  "date": "2024-05-31",
   "timeId": 1,
-  "themeId": 1
+  "themeId": 1,
+  "paymentKey": "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+  "orderId": "testId",
+  "amount": 1000
 }
 
 ### 사용자 예약 대기 추가 API
@@ -35,22 +34,6 @@ Content-Type: application/json
 ### 예약 취소 API
 
 PATCH http://localhost:8080/reservations/29
-
-### 관리자 예약 추가 API
-
-POST http://localhost:8080/admin/reservations
-Content-Type: application/json
-
-{
-  "date": "2024-05-12",
-  "themeId": 1,
-  "timeId": 1,
-  "memberId": 1
-}
-
-### 관리자 예약 대기 조회
-
-GET http://localhost:8080/admin/reservations/waiting
 
 ### 예약 삭제 API
 

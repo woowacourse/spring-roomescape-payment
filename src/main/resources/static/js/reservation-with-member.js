@@ -200,7 +200,7 @@ function applyFilter(event) {
     'dateTo': dateTo,
   });
 
-  fetch(`/reservations/search?${queryParams.toString()}`, {
+  fetch(`/admin/reservations/search?${queryParams.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

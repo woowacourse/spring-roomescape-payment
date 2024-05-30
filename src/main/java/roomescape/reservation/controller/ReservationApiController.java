@@ -48,23 +48,7 @@ public class ReservationApiController {
         return ResponseEntity.ok(new MultipleResponses<>(memberReservationResponses));
     }
 
-    @GetMapping("/reservations/search")
-    public ResponseEntity<MultipleResponses<ReservationResponse>> findAllBySearchCond(
-            @Valid @ModelAttribute ReservationSearchConditionRequest reservationSearchConditionRequest
-    ) {
-        List<ReservationResponse> reservationResponses = reservationService.findAllBySearchCondition(reservationSearchConditionRequest);
-
-        return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
-    }
-
-    @GetMapping("/admin/reservations/waiting")
-    public ResponseEntity<MultipleResponses<ReservationWaitingResponse>> findWaitingReservations() {
-        List<ReservationWaitingResponse> waitingReservations = reservationService.findWaitingReservations();
-
-        return ResponseEntity.ok(new MultipleResponses<>(waitingReservations));
-    }
-
-    @PostMapping(path = {"/reservations", "/admin/reservations"})
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
