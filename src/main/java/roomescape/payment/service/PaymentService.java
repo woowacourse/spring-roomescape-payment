@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.PaymentErrorResponse;
+import roomescape.exception.ErrorResponse;
 import roomescape.exception.PaymentFailException;
 import roomescape.payment.dto.PaymentRequest;
 
@@ -50,7 +50,7 @@ public class PaymentService {
     }
 
     private void handlePaymentErrorResponse(ClientHttpResponse response) throws IOException {
-        PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+        ErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody(), ErrorResponse.class);
 
         throw new PaymentFailException(paymentErrorResponse.code(), paymentErrorResponse.message());
     }
