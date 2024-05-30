@@ -14,7 +14,6 @@ public interface ThemeJpaRepository extends JpaRepository<Theme, Long>, ThemeRep
 
     boolean existsByName(ThemeName name);
 
-    //TODO: 테스트 추가
     @Query(value = """
             SELECT t.id, t.name, t.description, t.thumbnail, COUNT(r.id) AS reservation_count
             FROM theme t
