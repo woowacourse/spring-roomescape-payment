@@ -58,45 +58,33 @@ public class ReservationService {
                                                          final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
                 createMyReservationRequest);
-        return CreateReservationResponse.from(createReservationWithPayment(createReservationRequest));
+        Reservation reservation = convertToReservation(createReservationRequest);
+        paymentService.createPayment(ConfirmPaymentRequest.from(createMyReservationRequest));
+        return CreateReservationResponse.from(reservationRepository.save(reservation));
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(createReservationByAdminRequest);
-        return CreateReservationResponse.from(createReservation(createReservationRequest));
+        Reservation reservation = convertToReservation(createReservationRequest);
+        return CreateReservationResponse.from(reservationRepository.save(reservation));
     }
 
-    public Reservation createReservation(final CreateReservationRequest createReservationRequest) {
+    public Reservation convertToReservation(final CreateReservationRequest createReservationRequest) {
         ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
         Theme theme = themeRepository.getById(createReservationRequest.themeId());
         Member member = memberRepository.getById(createReservationRequest.memberId());
 
-        checkAlreadyExistReservation(createReservationRequest, createReservationRequest.date(), theme.getName(),
-                reservationTime.getStartAt());
-        Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
-        return reservationRepository.save(reservation);
-    }
-
-    public Reservation createReservationWithPayment(final CreateReservationRequest createReservationRequest) {
-        ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
-        Theme theme = themeRepository.getById(createReservationRequest.themeId());
-        Member member = memberRepository.getById(createReservationRequest.memberId());
-
-        checkAlreadyExistReservation(createReservationRequest, createReservationRequest.date(), theme.getName(),
-                reservationTime.getStartAt());
-        Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
-
-        paymentService.createPayment(ConfirmPaymentRequest.from(createReservationRequest));
-        return reservationRepository.save(reservation);
+        checkAlreadyExistReservation(createReservationRequest, theme.getName(), reservationTime.getStartAt());
+        return createReservationRequest.toReservation(member, reservationTime, theme);
     }
 
     private void checkAlreadyExistReservation(final CreateReservationRequest createReservationRequest,
-                                              final LocalDate date, final String themeName, final LocalTime time) {
+                                              final String themeName, final LocalTime time) {
         if (reservationRepository.existsByDateAndReservationTimeIdAndThemeId(
                 createReservationRequest.date(),
                 createReservationRequest.timeId(),
                 createReservationRequest.themeId())) {
-            throw new IllegalArgumentException("이미 " + date + "의 " + themeName + " 테마에는 " + time
+            throw new IllegalArgumentException("이미 " + createReservationRequest.date() + "의 " + themeName + " 테마에는 " + time
                     + " 시의 예약이 존재하여 예약을 생성할 수 없습니다.");
         }
     }

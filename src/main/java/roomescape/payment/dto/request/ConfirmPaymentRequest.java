@@ -1,14 +1,14 @@
 package roomescape.payment.dto.request;
 
-import roomescape.reservation.dto.request.CreateReservationRequest;
+import roomescape.reservation.dto.request.CreateMyReservationRequest;
 
 public record ConfirmPaymentRequest(String paymentKey,
                                     String orderId,
                                     Long amount) {
-    public static ConfirmPaymentRequest from(CreateReservationRequest request) {
+    public static ConfirmPaymentRequest from(final CreateMyReservationRequest createMyReservationRequest) {
         return new ConfirmPaymentRequest(
-                request.paymentKey(),
-                request.orderId(),
-                request.amount());
+                createMyReservationRequest.paymentKey(),
+                createMyReservationRequest.orderId(),
+                createMyReservationRequest.amount());
     }
 }
