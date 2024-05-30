@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
+import roomescape.service.waiting.dto.WaitingRequest;
 
 @Sql("/truncate-with-time-and-theme.sql")
 class MemberAcceptanceTest extends AcceptanceTest {
@@ -99,8 +100,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest1Token)
-                    .body(new ReservationRequest(anotherDate, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(anotherDate, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -134,8 +135,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -143,8 +144,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", adminToken)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),

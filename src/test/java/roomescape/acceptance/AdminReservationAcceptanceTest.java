@@ -18,7 +18,7 @@ import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 
-@Sql("/truncate-with-reservations.sql")
+@Sql("/truncate-with-time-and-theme.sql")
 class AdminReservationAcceptanceTest extends AcceptanceTest {
 
     private LocalDate date;
@@ -62,6 +62,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("조건별 예약 내역 조회 테스트 - 사용자, 테마")
     @Test
+    @Sql("/truncate-with-reservations.sql")
     void findByMemberAndTheme() {
         //when & then
         RestAssured.given().log().all()
@@ -75,6 +76,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("조건별 예약 내역 조회 테스트 - 시작 날짜")
     @Test
+    @Sql("/truncate-with-reservations.sql")
     void findByDateFrom() {
         //when & then
         RestAssured.given().log().all()
@@ -87,6 +89,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("조건별 예약 내역 조회 테스트 - 테마")
     @Test
+    @Sql("/truncate-with-reservations.sql")
     void findByTheme() {
         //when & then
         RestAssured.given().log().all()
@@ -116,12 +119,12 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
                     .then().log().all()
                     .assertThat().statusCode(204);
             }),
-            DynamicTest.dynamicTest("남은 예약 개수는 총 3개이다.", () -> {
+            DynamicTest.dynamicTest("남은 예약 개수는 총 0개이다.", () -> {
                 RestAssured.given().log().all()
                     .cookie("token", adminToken)
                     .when().get("/reservations")
                     .then().log().all()
-                    .assertThat().body("size()", is(3));
+                    .assertThat().body("size()", is(0));
             })
         );
     }

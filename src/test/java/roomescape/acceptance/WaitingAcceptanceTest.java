@@ -283,7 +283,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("guest1 동일한 테마와 일정으로 예약 대기를 요청하면, 예외가 발생한다.", () -> {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .cookie("token", guest2Token)
+                    .cookie("token", guest1Token)
                     .body(new WaitingRequest(date, timeId, themeId))
                     .when().post("/waitings")
                     .then().log().all()
