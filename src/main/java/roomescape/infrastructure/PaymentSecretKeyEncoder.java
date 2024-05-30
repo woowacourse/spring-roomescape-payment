@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentSecretKeyEncoder {
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw";
 
     public String getEncodedSecretKey() {
         final Base64.Encoder encoder = Base64.getEncoder();
