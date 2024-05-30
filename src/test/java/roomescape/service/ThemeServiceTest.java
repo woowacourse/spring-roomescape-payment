@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.ThemeRequest;
 import roomescape.model.Theme;
-import roomescape.repository.ThemeRepository;
 
 import java.util.List;
 
@@ -15,28 +14,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
+@Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
 class ThemeServiceTest {
 
-    @Autowired
-    ThemeRepository themeRepository;
+    private ThemeService themeService;
 
     @Autowired
-    ThemeService themeService;
-
-    @Autowired
-    public ThemeServiceTest(ThemeRepository themeRepository, ThemeService themeService) {
-        this.themeRepository = themeRepository;
+    public ThemeServiceTest(ThemeService themeService) {
         this.themeService = themeService;
     }
 
     @DisplayName("테마를 조회한다.")
     @Test
     void should_find_all_themes() {
-        themeRepository.save(new Theme("리사", "공포", "image.jpg"));
-        themeRepository.save(new Theme("네오", "스릴러", "image1.jpg"));
-
-        assertThat(themeService.findAllThemes()).hasSize(2);
+        assertThat(themeService.findAllThemes()).hasSize(3);
     }
 
     @DisplayName("테마를 저장한다.")
@@ -46,22 +37,19 @@ class ThemeServiceTest {
 
         themeService.addTheme(themeRequest);
 
-        assertThat(themeService.findAllThemes()).hasSize(1);
+        assertThat(themeService.findAllThemes()).hasSize(4);
     }
 
     @DisplayName("테마를 삭제한다.")
     @Test
     void should_delete_theme() {
-        themeRepository.save(new Theme(1L, "리사", "공포", "image.jpg"));
-        themeRepository.save(new Theme(2L, "네오", "스릴러", "image1.jpg"));
+        themeService.deleteTheme(3L);
 
-        themeService.deleteTheme(1L);
-
-        assertThat(themeService.findAllThemes()).hasSize(1);
+        assertThat(themeService.findAllThemes()).hasSize(2);
     }
 
     @DisplayName("최근 일주일 간 가장 인기 있는 테마 10개를 조회한다.")
-    @Sql({"/test_data.sql", "/theme-data.sql"})
+    @Sql({"/initialize_table.sql", "/theme_data.sql"})
     @Test
     void should_find_popular_theme_of_week() {
         List<Theme> popularThemes = themeService.findPopularThemes();

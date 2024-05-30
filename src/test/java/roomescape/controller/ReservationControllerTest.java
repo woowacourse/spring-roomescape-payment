@@ -25,7 +25,7 @@ import static org.mockito.Mockito.doNothing;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/test_data.sql", "/controller-test-data.sql"})
+@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 class ReservationControllerTest {
 
     @LocalServerPort

@@ -12,7 +12,7 @@ import roomescape.model.ReservationTime;
 import java.time.LocalTime;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql({"/test_data.sql", "/controller-test-data.sql"})
+@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 class ReservationTimeControllerTest {
     @DisplayName("모든 예약 시간을 조회한다")
     @Test

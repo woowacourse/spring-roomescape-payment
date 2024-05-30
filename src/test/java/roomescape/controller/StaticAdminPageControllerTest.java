@@ -9,8 +9,8 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.MemberLoginRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
-@Sql("/controller-test-data.sql")
+@Sql(scripts = "/initialize_table.sql")
+@Sql("/controller_test_data.sql")
 class StaticAdminPageControllerTest {
 
     @DisplayName("관리자 권한이 아니면 403을 반환한다.")

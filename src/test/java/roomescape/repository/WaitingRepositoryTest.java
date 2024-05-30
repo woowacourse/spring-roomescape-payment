@@ -1,7 +1,5 @@
 package roomescape.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,63 +8,40 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.model.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.model.Role.MEMBER;
 
 @DataJpaTest
-@Sql(scripts = "/test_data.sql")
+@Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
 class WaitingRepositoryTest {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private MemberRepository memberRepository;
     @Autowired
     private WaitingRepository waitingRepository;
 
     @DisplayName("예약 대기를 추가한다")
     @Test
     void should_add_waiting() {
-        LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
+        LocalDate day = LocalDate.now().plusDays(2);
+        ReservationTime time = reservationTimeRepository.findById(1L).get();
+        Theme theme = themeRepository.findById(1L).get();
+        Member member = memberRepository.findById(1L).get();
 
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
+        waitingRepository.save(new Waiting(day, time, theme, member));
 
-        waitingRepository.save(new Waiting(day, time2, theme, member));
-
-        assertThat(waitingRepository.count()).isEqualTo(1);
+        assertThat(waitingRepository.count()).isEqualTo(3);
     }
 
     @DisplayName("예약 대기를 삭제한다")
     @Test
     void should_delete_waiting() {
-        LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
-
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
-
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-        Waiting waiting2 = new Waiting(day, time2, theme, member);
-
-        entityManager.persist(waiting1);
-        entityManager.persist(waiting2);
-
-        waitingRepository.deleteById(1L);
+        waitingRepository.deleteById(2L);
 
         assertThat(waitingRepository.count()).isEqualTo(1);
     }
@@ -74,46 +49,15 @@ class WaitingRepositoryTest {
     @DisplayName("아이디에 해당하는 예약 대기가 존재하면 참을 반환한다.")
     @Test
     void should_return_true_when_id_exist() {
-        LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
-
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
-
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-        Waiting waiting2 = new Waiting(day, time2, theme, member);
-
-        entityManager.persist(waiting1);
-        entityManager.persist(waiting2);
-
         boolean exists = waitingRepository.existsById(1L);
+
         assertThat(exists).isTrue();
     }
 
     @DisplayName("사용자 아이디에 해당하는 예약 대기를 반환한다.")
     @Test
     void should_return_member_waiting() {
-        LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
-
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
-
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-        Waiting waiting2 = new Waiting(day, time2, theme, member);
-
-        entityManager.persist(waiting1);
-        entityManager.persist(waiting2);
+        Member member = memberRepository.findById(2L).get();
 
         List<WaitingWithRank> waiting = waitingRepository.findWaitingWithRankByMemberId(member.getId());
         assertThat(waiting).hasSize(2);
@@ -123,47 +67,19 @@ class WaitingRepositoryTest {
     @Test
     void should_return_true_when_date_and_time_and_theme_and_member_exist() {
         LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
+        ReservationTime time = reservationTimeRepository.findById(1L).get();
+        Theme theme = themeRepository.findById(1L).get();
+        Member member = memberRepository.findById(2L).get();
 
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
-
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-        Waiting waiting2 = new Waiting(day, time2, theme, member);
-
-        entityManager.persist(waiting1);
-        entityManager.persist(waiting2);
-
-        boolean exists = waitingRepository.existsWaitingByThemeAndDateAndTimeAndMember(theme, day, time1, member);
+        boolean exists = waitingRepository.existsWaitingByThemeAndDateAndTimeAndMember(theme, day, time, member);
         assertThat(exists).isTrue();
     }
 
     @DisplayName("모든 예약 대기를 조회한다.")
     @Test
     void should_get_all_waiting() {
-        LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
-
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
-
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-        Waiting waiting2 = new Waiting(day, time2, theme, member);
-
-        entityManager.persist(waiting1);
-        entityManager.persist(waiting2);
-
         List<Waiting> reservations = waitingRepository.findAll();
+
         assertThat(reservations).hasSize(2);
     }
 
@@ -171,23 +87,11 @@ class WaitingRepositoryTest {
     @Test
     void should_return_waiting_when_given_theme_and_date_and_time_and_member() {
         LocalDate day = LocalDate.now().plusDays(1);
-        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
-        ReservationTime time2 = new ReservationTime(LocalTime.of(11, 0));
-        Theme theme = new Theme("무빈테마", "무빈테마설명", "무빈테마썸네일");
-        Member member = new Member("무빈", MEMBER, "email@email.com", "password");
+        ReservationTime time = reservationTimeRepository.findById(1L).get();
+        Theme theme = themeRepository.findById(1L).get();
 
-        entityManager.persist(time1);
-        entityManager.persist(time2);
-        entityManager.persist(theme);
-        entityManager.persist(member);
 
-        Waiting waiting1 = new Waiting(day, time1, theme, member);
-
-        entityManager.persist(waiting1);
-
-        Waiting expectWaiting1 = waitingRepository.findFirstByThemeAndDateAndTime(theme, day, time1).get();
-        assertThat(expectWaiting1.getId()).isEqualTo(waiting1.getId());
-        Optional<Waiting> expectWaiting2 = waitingRepository.findFirstByThemeAndDateAndTime(theme, day, time2);
-        assertThat(expectWaiting2).isEmpty();
+        Waiting waiting = waitingRepository.findFirstByThemeAndDateAndTime(theme, day, time).get();
+        assertThat(waiting.getId()).isEqualTo(1L);
     }
 }

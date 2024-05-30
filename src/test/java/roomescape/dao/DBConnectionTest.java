@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
+@Sql(scripts = "/initialize_table.sql")
 class DBConnectionTest {
 
     @Autowired

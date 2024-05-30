@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql({"/test_data.sql", "/controller-test-data.sql"})
-class StaticMemberPageControllerTest {
+@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
+class wStaticMemberPageControllerTest {
     @DisplayName("로그인 폼이 있는 페이지를 응답한다.")
     @Test
     void should_response_login_when_request_get_login() {

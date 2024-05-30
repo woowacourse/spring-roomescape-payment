@@ -13,8 +13,8 @@ import java.time.LocalDate;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
-@Sql("/controller-test-data.sql")
+@Sql(scripts = "/initialize_table.sql")
+@Sql("/controller_test_data.sql")
 class WaitingControllerTest {
 
     @DisplayName("예약 대기를 추가할 수 있다.")

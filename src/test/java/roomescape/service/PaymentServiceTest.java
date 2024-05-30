@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
+@Sql(scripts = "/initialize_table.sql")
 public class PaymentServiceTest {
 
     private PaymentService paymentService;

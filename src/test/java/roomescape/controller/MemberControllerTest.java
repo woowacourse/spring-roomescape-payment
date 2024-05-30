@@ -13,8 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/test_data.sql")
-@Sql("/controller-test-data.sql")
+@Sql(scripts = "/initialize_table.sql")
+@Sql("/controller_test_data.sql")
 class MemberControllerTest {
 
     @DisplayName("로그인 요청시 쿠키를 응답한다.")
