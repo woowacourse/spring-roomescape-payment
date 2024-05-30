@@ -6,16 +6,16 @@ import static org.mockito.Mockito.doNothing;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import roomescape.infrastructure.payment.PaymentManager;
+import roomescape.service.PaymentClient;
 
 @TestConfiguration
 public class TestPaymentConfiguration {
 
     @MockBean
-    private PaymentManager paymentManager;
+    private PaymentClient paymentClient;
 
     @PostConstruct
     private void initMock() {
-        doNothing().when(paymentManager).approve(any());
+        doNothing().when(paymentClient).approve(any());
     }
 }

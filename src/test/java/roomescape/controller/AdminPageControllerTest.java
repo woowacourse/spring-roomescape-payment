@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.domain.MemberRole;
 
 class AdminPageControllerTest extends ControllerTest {
+
     @BeforeEach
     void setInitialData() {
         jdbcTemplate.update(

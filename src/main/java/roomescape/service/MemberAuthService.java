@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import jakarta.servlet.http.Cookie;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,18 @@ import roomescape.domain.MemberPassword;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
+import roomescape.web.auth.CookieHandler;
 
 @Service
 @Transactional(readOnly = true)
 public class MemberAuthService {
-    private final MemberRepository memberRepository;
 
-    public MemberAuthService(MemberRepository memberRepository) {
+    private final MemberRepository memberRepository;
+    private final CookieHandler cookieHandler;
+
+    public MemberAuthService(MemberRepository memberRepository, CookieHandler cookieHandler) {
         this.memberRepository = memberRepository;
+        this.cookieHandler = cookieHandler;
     }
 
     @Transactional
@@ -54,5 +59,13 @@ public class MemberAuthService {
             return true;
         }
         throw new IllegalArgumentException("이메일 또는 비밀번호가 잘못되었습니다.");
+    }
+
+    public Cookie createCookieByToken(String token) {
+        return cookieHandler.createCookieByToken(token);
+    }
+
+    public String extractTokenFromCookies(Cookie[] cookies) {
+        return cookieHandler.extractTokenFromCookies(cookies);
     }
 }

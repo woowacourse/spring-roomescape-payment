@@ -14,6 +14,8 @@ import roomescape.web.exception.AuthorizationException;
 @EnableConfigurationProperties(JwtProperties.class)
 public class JwtProvider {
 
+    private static final int ONE_MINUTE = 60000;
+
     private final JwtProperties jwtProperties;
 
     public JwtProvider(JwtProperties jwtProperties) {
@@ -24,7 +26,7 @@ public class JwtProvider {
     public String createToken(String email) {
         Claims claims = Jwts.claims().setSubject(email);
         Date now = new Date();
-        Date validity = new Date(now.getTime() + jwtProperties.expireLength());
+        Date validity = new Date(now.getTime() + jwtProperties.expireLength() * ONE_MINUTE);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -41,7 +43,7 @@ public class JwtProvider {
             return Jwts.builder()
                     .setClaims(claims)
                     .setIssuedAt(claims.getIssuedAt())
-                    .setExpiration(new Date(claims.getIssuedAt().getTime() - jwtProperties.expireLength()))
+                    .setExpiration(new Date(claims.getIssuedAt().getTime() - jwtProperties.expireLength() * ONE_MINUTE))
                     .signWith(SignatureAlgorithm.HS256, jwtProperties.secretKey())
                     .compact();
         }

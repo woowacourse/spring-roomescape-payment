@@ -14,7 +14,6 @@ import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
-import roomescape.web.auth.CookieHandler;
 import roomescape.web.controller.request.MemberSignUpRequest;
 import roomescape.web.controller.request.TokenRequest;
 import roomescape.web.controller.response.MemberResponse;
@@ -35,7 +34,7 @@ public class MemberAuthController {
                                       HttpServletResponse response) {
         if (memberAuthService.isExistsMemberByEmailAndPassword(request.email(), request.password())) {
             String token = jwtProvider.createToken(request.email());
-            response.addCookie(CookieHandler.createCookieByToken(token));
+            response.addCookie(memberAuthService.createCookieByToken(token));
         }
         return ResponseEntity.ok().build();
     }
@@ -45,7 +44,7 @@ public class MemberAuthController {
         if (request.getCookies() == null) {
             throw new IllegalArgumentException("쿠키가 없습니다. 다시 로그인 해주세요.");
         }
-        String token = CookieHandler.extractTokenFromCookies(request.getCookies());
+        String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
         MemberDto appResponse = memberAuthService.findMemberByEmail(email);
         MemberResponse response = new MemberResponse(appResponse.id(), appResponse.name(), appResponse.role());
@@ -64,9 +63,9 @@ public class MemberAuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        String token = CookieHandler.extractTokenFromCookies(request.getCookies());
+        String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String expiredToken = jwtProvider.createExpiredToken(token);
-        response.addCookie(CookieHandler.createCookieByToken(expiredToken));
+        response.addCookie(memberAuthService.createCookieByToken(expiredToken));
         return ResponseEntity.ok().build();
     }
 

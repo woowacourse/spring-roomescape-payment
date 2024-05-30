@@ -40,7 +40,7 @@ public class MemberHandlerMethodArgumentResolver implements HandlerMethodArgumen
         if (request.getCookies() == null) {
             throw new IllegalArgumentException("쿠키가 없습니다. 다시 로그인 해주세요.");
         }
-        String token = CookieHandler.extractTokenFromCookies(request.getCookies());
+        String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
         MemberDto appResponse = memberAuthService.findMemberByEmail(email);
 
