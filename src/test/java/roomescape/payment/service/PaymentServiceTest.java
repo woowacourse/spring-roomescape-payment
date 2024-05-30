@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -21,16 +20,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.global.entity.Price;
-import roomescape.payment.service.dto.PaymentErrorResponse;
-import roomescape.payment.service.dto.PaymentRequest;
-import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.exception.PaymentException;
+import roomescape.payment.service.dto.PaymentErrorResponse;
+import roomescape.payment.service.dto.PaymentRequest;
+import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -96,7 +95,8 @@ class PaymentServiceTest extends ServiceTest {
         doThrow(new PaymentException(
                 new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
                 .when(paymentClient).confirm(any());
-        PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
+        PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz",
+                "tgen_20240528172021mxEG4");
 
         //when&then
         assertThatThrownBy(() -> paymentService.pay(paymentRequest, memberReservation))

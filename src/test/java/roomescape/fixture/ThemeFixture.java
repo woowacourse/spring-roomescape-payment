@@ -1,8 +1,7 @@
 package roomescape.fixture;
 
-import roomescape.reservation.domain.Theme;
-
 import java.math.BigDecimal;
+import roomescape.reservation.domain.Theme;
 
 public class ThemeFixture {
     public static Theme getTheme1() {

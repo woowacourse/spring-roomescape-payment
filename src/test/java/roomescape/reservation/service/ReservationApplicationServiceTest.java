@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static roomescape.fixture.DateFixture.getNextDay;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -15,7 +14,6 @@ import static roomescape.fixture.ThemeFixture.getTheme1;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -29,7 +27,6 @@ import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;

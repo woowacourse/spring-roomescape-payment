@@ -2,6 +2,7 @@ package roomescape.payment.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.fixture.MemberFixture;
@@ -11,8 +12,6 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.global.entity.Price;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.ReservationStatus;
-
-import java.math.BigDecimal;
 
 @DisplayName("결제 도메인 테스트")
 class PaymentTest {

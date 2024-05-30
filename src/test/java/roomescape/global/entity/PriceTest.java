@@ -1,12 +1,11 @@
 package roomescape.global.entity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("가격 도메인 테스트")
 class PriceTest {

@@ -1,10 +1,10 @@
 package roomescape.global.util.encoders;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.global.util.Encoder;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Base64 인코더 테스트")
 class Base64EncoderTest {

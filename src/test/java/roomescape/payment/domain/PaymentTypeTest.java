@@ -1,10 +1,9 @@
 package roomescape.payment.domain;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("결제 타입 도메인 테스트")
 class PaymentTypeTest {
