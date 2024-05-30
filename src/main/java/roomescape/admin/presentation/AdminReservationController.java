@@ -25,6 +25,12 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping("/admin/reservations")
+    @AdminOnly
+    public ResponseEntity<List<ReservationResponse>> getReservationList() {
+        return ResponseEntity.ok(reservationService.findAllReservation());
+    }
+
     @PostMapping("/admin/reservations")
     @AdminOnly
     public ResponseEntity<ReservationResponse> saveReservation(
