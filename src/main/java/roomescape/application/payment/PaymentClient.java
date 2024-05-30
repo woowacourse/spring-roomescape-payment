@@ -17,12 +17,10 @@ public class PaymentClient {
 
     private final RestClient client;
     private final ResponseErrorHandler handler;
-    private final String url;
     private final String authorizationSecret;
 
     public PaymentClient(RestClient.Builder builder,
                          ResponseErrorHandler handler,
-                         @Value("${payment.url}") String url,
                          @Value("${payment.secret}") String secret) {
         this.authorizationSecret = String.format(
                 BASIC_AUTH_FORMAT,
@@ -30,12 +28,11 @@ public class PaymentClient {
         );
         this.client = builder.build();
         this.handler = handler;
-        this.url = url;
     }
 
     public Payment requestPurchase(PaymentRequest request) {
         Payment payment = client.post()
-                .uri(url)
+                .uri("/v1/payments/confirm")
                 .header(HttpHeaders.AUTHORIZATION, authorizationSecret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
