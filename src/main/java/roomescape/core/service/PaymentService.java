@@ -1,7 +1,6 @@
 package roomescape.core.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.core.domain.Payment;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;
@@ -16,8 +15,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
-    public PaymentService(PaymentAuthorizationProvider paymentAuthorizationProvider,
-                          PaymentRepository paymentRepository, PaymentClient paymentClient) {
+    public PaymentService(
+            PaymentAuthorizationProvider paymentAuthorizationProvider,
+            PaymentRepository paymentRepository,
+            PaymentClient paymentClient
+    ) {
         this.paymentAuthorizationProvider = paymentAuthorizationProvider;
         this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
@@ -26,10 +28,7 @@ public class PaymentService {
     public PaymentResponse approvePayment(final PaymentRequest paymentRequest) {
         paymentClient.approvePayment(paymentRequest, createPaymentAuthorization());
 
-        Payment payment = new Payment(
-                paymentRequest.getPaymentKey(), paymentRequest.getAmount(), paymentRequest.getOrderId());
-
-        return new PaymentResponse(paymentRepository.save(payment));
+        return new PaymentResponse(paymentRepository.save(paymentRequest.toPayment()));
     }
 
     public PaymentAuthorizationResponse createPaymentAuthorization() {

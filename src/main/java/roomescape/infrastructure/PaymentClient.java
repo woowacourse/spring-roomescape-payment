@@ -18,8 +18,10 @@ public class PaymentClient {
         this.restClient = restClient;
     }
 
-    public void approvePayment(final PaymentRequest paymentRequest,
-                               final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+    public void approvePayment(
+            PaymentRequest paymentRequest,
+            PaymentAuthorizationResponse paymentAuthorizationResponse
+    ) {
         restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
@@ -29,8 +31,10 @@ public class PaymentClient {
                 .onStatus(new PaymentErrorHandler());
     }
 
-    public void refundPayment(final PaymentResponse paymentResponse,
-                              final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+    public void refundPayment(
+            PaymentResponse paymentResponse,
+            PaymentAuthorizationResponse paymentAuthorizationResponse
+    ) {
         restClient.post()
                 .uri("/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())

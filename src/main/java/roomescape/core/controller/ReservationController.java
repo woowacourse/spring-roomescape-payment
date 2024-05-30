@@ -16,7 +16,6 @@ import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationResponse;
-import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
 
 @RestController
@@ -24,11 +23,9 @@ import roomescape.core.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
+    public ReservationController(final ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @PostMapping
@@ -56,9 +53,11 @@ public class ReservationController {
             @RequestParam(required = false, name = "memberId") final Long memberId,
             @RequestParam(required = false, name = "themeId") final Long themeId,
             @RequestParam(required = false, name = "dateFrom") final String dateFrom,
-            @RequestParam(required = false, name = "dateTo") final String dateTo) {
+            @RequestParam(required = false, name = "dateTo") final String dateTo
+    ) {
         return ResponseEntity.ok(
-                reservationService.findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo));
+                reservationService.findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo)
+        );
     }
 
     @GetMapping("/mine")

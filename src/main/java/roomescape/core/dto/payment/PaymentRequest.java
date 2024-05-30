@@ -2,6 +2,7 @@ package roomescape.core.dto.payment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import roomescape.core.domain.Payment;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 
 public class PaymentRequest {
@@ -26,6 +27,10 @@ public class PaymentRequest {
                 memberReservationRequest.getOrderId(),
                 memberReservationRequest.getAmount()
         );
+    }
+
+    public Payment toPayment() {
+        return new Payment(paymentKey, amount, orderId);
     }
 
     public String getPaymentKey() {
