@@ -3,6 +3,7 @@ package roomescape.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,8 @@ public class SpringConfig {
     RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 .requestFactory(this::requestFactory)
+                .setReadTimeout(Duration.ofSeconds(1))
+                .setConnectTimeout(Duration.ofSeconds(3))
                 .errorHandler(new RestTemplateResponseExceptionHandler())
                 .build();
     }
