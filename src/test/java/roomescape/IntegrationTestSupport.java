@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import roomescape.controller.dto.TokenRequest;
-import roomescape.infrastructure.PaymentClient;
+import roomescape.domain.payment.PaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class IntegrationTestSupport {

@@ -5,19 +5,21 @@ import java.util.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.PaymentException;
 import roomescape.service.dto.PaymentRequest;
 
-public class PaymentClient {
+public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final PaymentProperties paymentProperties;
 
-    public PaymentClient(RestClient restClient, PaymentProperties paymentProperties) {
+    public TossPaymentClient(RestClient restClient, PaymentProperties paymentProperties) {
         this.restClient = restClient;
         this.paymentProperties = paymentProperties;
     }
 
+    @Override
     public void requestApproval(PaymentRequest request) {
         String authorizations = createAuthorizationHeader();
         try {
