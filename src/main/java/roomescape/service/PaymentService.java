@@ -3,6 +3,7 @@ package roomescape.service;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -37,7 +38,7 @@ public class PaymentService {
                 .uri(TOSS_PAYMENTS_URL)
                 .body(new PaymentRequestDto(orderId, amount, paymentKey))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", authorizations)
+                .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException e) {
