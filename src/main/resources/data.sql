@@ -6,7 +6,7 @@ INSERT INTO reservation_time(start_at) VALUES ('10:00');
 
 INSERT INTO member(name, email, password, role) VALUES('어드민', 'admin@email.com', 'admin123', 'ADMIN');
 INSERT INTO member(name, email, password, role) VALUES('리니', 'lini@email.com', 'lini123', 'GUEST');
-INSERT INTO member(name, email, password, role) VALUES('페드로', 'pedro@email.com', 'pedro123', 'GUEST');
+INSERT INTO member(name, email, password, role) VALUES('피케이', 'pk@email.com', 'pkpk123', 'GUEST');
 INSERT INTO member(name, email, password, role) VALUES('제이', 'junho@email.com', 'junho123', 'GUEST');
 INSERT INTO member(name, email, password, role) VALUES('미르', 'duho@email.com', 'duho123', 'GUEST');
 
