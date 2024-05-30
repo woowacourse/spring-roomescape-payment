@@ -19,7 +19,8 @@ import roomescape.domain.exception.DomainValidationException;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorResponse;
-import roomescape.exception.PaymentException;
+import roomescape.infra.payment.exception.PaymentClientException;
+import roomescape.infra.payment.exception.PaymentServerException;
 import roomescape.exception.TokenException;
 import roomescape.exception.UnauthorizedException;
 
@@ -124,13 +125,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
-        log.error("[PaymentException]", e);
+    @ExceptionHandler(PaymentClientException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentClientException(PaymentClientException e) {
+        log.error("[PaymentClientException]", e);
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(e.getStatusCode())
                 .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentServerException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentServerException(PaymentServerException e) {
+        log.error("[PaymentServerException]", e);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("결제 승인 중 서버 에러가 발생했습니다."));
     }
 
     @ExceptionHandler(Exception.class)

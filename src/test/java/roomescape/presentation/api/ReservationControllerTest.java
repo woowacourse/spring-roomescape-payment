@@ -38,7 +38,6 @@ import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
 import roomescape.application.dto.response.PaymentResponse;
-import roomescape.infra.TossPaymentClient;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.ReservationWebRequest;
 
