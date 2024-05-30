@@ -24,9 +24,8 @@ public class PaymentService {
     }
 
     public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
-        PaymentResponse response = paymentClient.confirm(paymentRequest).getBody();
-        paymentRepository.save(
-                Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
+        PaymentResponse response = paymentClient.confirm(paymentRequest);
+        paymentRepository.save(Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
     }
 
     public void refund(long memberReservationId) {

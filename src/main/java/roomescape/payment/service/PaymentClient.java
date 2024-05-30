@@ -1,6 +1,5 @@
 package roomescape.payment.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,26 +27,28 @@ public class PaymentClient {
                 .build();
     }
 
-    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse confirm(PaymentRequest paymentRequest) {
         try {
             return restClient.post()
                     .uri(PAYMENT_CONFIRM_URI)
                     .body(paymentRequest)
                     .retrieve()
-                    .toEntity(PaymentResponse.class);
+                    .toEntity(PaymentResponse.class)
+                    .getBody();
         } catch (HttpClientErrorException e) {
             PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(paymentResponse);
         }
     }
 
-    public ResponseEntity<PaymentResponse> cancel(String paymentKey) {
+    public PaymentResponse cancel(String paymentKey) {
         try {
             return restClient.post()
                     .uri(String.format(PAYMENT_CANCEL_URI, paymentKey))
                     .body(new PaymentCancelRequest())
                     .retrieve()
-                    .toEntity(PaymentResponse.class);
+                    .toEntity(PaymentResponse.class)
+                    .getBody();
         } catch (HttpClientErrorException e) {
             PaymentErrorResponse paymentResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(paymentResponse);

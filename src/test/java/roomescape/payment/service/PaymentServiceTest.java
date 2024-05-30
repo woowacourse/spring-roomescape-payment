@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.service.dto.PaymentErrorResponse;
@@ -69,8 +68,7 @@ class PaymentServiceTest extends ServiceTest {
         String paymentType = "카드";
         long totalAmount = 1000L;
         PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
-        ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
-                new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
+        PaymentResponse okResponse = new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
         doReturn(okResponse).when(paymentClient).confirm(any());
 
         //when
@@ -92,7 +90,8 @@ class PaymentServiceTest extends ServiceTest {
         //given
         doThrow(new PaymentException(
                 new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
-                .when(paymentClient).confirm(any());
+                .when(paymentClient)
+                .confirm(any());
         PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then

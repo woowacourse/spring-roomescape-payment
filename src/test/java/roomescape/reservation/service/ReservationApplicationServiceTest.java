@@ -14,13 +14,14 @@ import static roomescape.fixture.ThemeFixture.getTheme1;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import java.time.LocalDate;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
@@ -57,10 +58,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         memberChoco = memberRepository.save(getMemberChoco());
         String paymentType = "카드";
         long totalAmount = 1000L;
-        ResponseEntity<PaymentResponse> okResponse = ResponseEntity.ok(
-                new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType));
+        PaymentResponse okResponse = new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
         doReturn(okResponse).when(paymentClient).confirm(any());
-
     }
 
 
@@ -73,8 +72,10 @@ class ReservationApplicationServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.addWaiting(
-                new WaitingCreate(memberChoco.getId(), reservation.getDate(), reservation.getTime().getId(),
-                        reservation.getTheme().getId())))
+                new WaitingCreate(memberChoco.getId(), reservation.getDate(), reservation.getTime()
+                        .getId(),
+                        reservation.getTheme()
+                                .getId())))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
@@ -128,7 +129,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
                 new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
                         10000L, date)
         )).isInstanceOf(
-                BadRequestException.class).hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
+                        BadRequestException.class)
+                .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 
     @DisplayName("기존 예약이 삭제 될 경우, 대기하는 다음 예약이 자동으로 승인된다.")
