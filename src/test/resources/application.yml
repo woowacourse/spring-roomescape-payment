@@ -15,7 +15,7 @@ spring:
         format_sql: true
         use_sql_comments: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     open-in-view: false
     show_sql: true
 
@@ -37,3 +37,5 @@ custom:
     jwt:
       token-secret-key: "YWNjZXNzLXRva2VuLXBhY2staXQtaXMtc28tYmVhdXRpZnVsLXByb2plY3Qtc3ByaW5nLWJvb3QtcmVhY3QtaXMtcGFjay1pdC10ZWNoLXN0YWNrLXRoaXMtYWNjZXNzLXRva2VuLWdlbmVyYXRlLWJ5LWVkZ2FyNmJmCg=="
       token-expiration-period: 604800000  # 7 DAY
+  pg:
+    widget-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
