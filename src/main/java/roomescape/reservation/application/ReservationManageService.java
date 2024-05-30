@@ -3,6 +3,8 @@ package roomescape.reservation.application;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
@@ -14,9 +16,12 @@ public abstract class ReservationManageService {
     protected static final int MAX_RESERVATION_NUMBER_IN_TIME_SLOT = 1;
 
     protected final ReservationRepository reservationRepository;
+    private final TossPaymentsClient tossPaymentsClient;
 
-    public ReservationManageService(ReservationRepository reservationRepository) {
+    public ReservationManageService(ReservationRepository reservationRepository,
+                                    TossPaymentsClient tossPaymentsClient) {
         this.reservationRepository = reservationRepository;
+        this.tossPaymentsClient = tossPaymentsClient;
     }
 
     abstract protected void correctReservationStatus(int bookingCount, Reservation reservation);
@@ -32,6 +37,13 @@ public abstract class ReservationManageService {
         validateReservationDate(reservation);
         validateDuplicatedReservation(reservation);
         return reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public Reservation createWithPayment(Reservation reservation, PaymentConfirmRequest paymentConfirmRequest) {
+        Reservation savedReservation = create(reservation);
+        tossPaymentsClient.confirm(paymentConfirmRequest);
+        return savedReservation;
     }
 
     private void validateReservationDate(Reservation reservation) {

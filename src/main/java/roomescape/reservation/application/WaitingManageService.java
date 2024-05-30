@@ -3,14 +3,15 @@ package roomescape.reservation.application;
 import org.springframework.stereotype.Service;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.TossPaymentsClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
 
 @Service
 public class WaitingManageService extends ReservationManageService {
-    public WaitingManageService(ReservationRepository reservationRepository) {
-        super(reservationRepository);
+    public WaitingManageService(ReservationRepository reservationRepository, TossPaymentsClient tossPaymentsClient) {
+        super(reservationRepository, tossPaymentsClient);
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import roomescape.acceptance.TestClientConfiguration;
 import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
@@ -20,7 +21,6 @@ import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.TossPaymentsClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
@@ -59,7 +59,7 @@ import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_ME
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
-@Import(TestWebMvcConfiguration.class)
+@Import({TestWebMvcConfiguration.class, TestClientConfiguration.class})
 @WebMvcTest(
         value = ReservationController.class,
         excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE,
@@ -89,9 +89,6 @@ class ReservationControllerTest extends ControllerTest {
 
     @MockBean
     private ThemeService themeService;
-
-    @MockBean
-    private TossPaymentsClient tossPaymentsClient;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
