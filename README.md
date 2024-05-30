@@ -172,10 +172,9 @@
   }
   ```
   
-### 예약 및 예약 대기 추가 - 사용자
+### 예약 추가 - 사용자
 - http method: POST
 - uri: /reservations
-- description: 예약이 이미 존재한다면, 자동으로 예약 대기로 추가된다.
 - request
   ```
   POST /reservations HTTP/1.1
@@ -266,7 +265,69 @@
     HTTP/1.1 400
 
     {
+    "message": "이미 예약(대기)가 존재하여 예약이 불가능합니다."
+    }
+    ```
+
+### 예약 대기 추가 - 사용자
+- http method: POST
+- uri: /waitings
+- request
+  ```
+  POST /reservations HTTP/1.1
+  content-type: application/json
+  cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
+  host: localhost:8080
+
+  {
+    "date": "2024-03-01",
+    "themeId": 1,
+    "timeId": 1
+  }
+  ```
+- response
+  - 추가 성공
+    ```
+    HTTP/1.1 201 
+    Location: /reservations/1
+    Content-Type: application/json
+  
+    {
+        "id": 1,
+        "date": "2023-08-05",
+        "status": "예약",
+        "time" : {
+            "id": 1.
+            "startAt": "10:00"
+        },
+        "theme": {
+            "id": 1,
+            "name": "레벨2 탈출",
+            "description": "우테코 레벨2를 탈출하는 내용입니다.",
+            "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+        },
+        "member": {
+          "id": 1,
+          "name": "lini",
+          "email": "lini@email.com"
+        },
+        "status": "예약"
+    }
+    ```
+  - 추가 실패 : 이미 예약 혹은 예약 대기가 존재 오류
+    ```
+    HTTP/1.1 400
+
+    {
     "message": "이미 예약(대기) 상태입니다."
+    }
+    ```
+  - 추가 실패 : 예약이 없는데, 예약 대기 시도 오류
+    ```
+    HTTP/1.1 400
+
+    {
+    "message": "존재하는 예약이 없습니다. 예약으로 다시 시도해주세요."
     }
     ```
 
