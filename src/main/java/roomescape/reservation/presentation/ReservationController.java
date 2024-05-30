@@ -29,8 +29,7 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final TossPaymentClient tossPaymentClient;
 
-    public ReservationController(final ReservationService reservationService,
-            final TossPaymentClient tossPaymentClient) {
+    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient) {
         this.reservationService = reservationService;
         this.tossPaymentClient = tossPaymentClient;
     }
