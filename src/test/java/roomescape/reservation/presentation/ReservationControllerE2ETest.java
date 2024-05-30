@@ -3,6 +3,8 @@ package roomescape.reservation.presentation;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -14,13 +16,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.payment.TossPaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationControllerE2ETest {
 
@@ -29,10 +39,17 @@ class ReservationControllerE2ETest {
     @LocalServerPort
     int serverPort;
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TossPaymentClient tossPaymentClient;
+
     @BeforeEach
     public void beforeEach() {
         RestAssured.port = serverPort;
         Map<String, String> loginParams = Map.of("email", "andole@test.com", "password", "123");
+
         token = RestAssured.given().log().all()
                 .when().body(loginParams)
                 .contentType(ContentType.JSON).post("/login")
@@ -65,8 +82,14 @@ class ReservationControllerE2ETest {
                 "date", "2025-08-05",
                 "timeId", "1",
                 "themeId", "1",
-                "memberId", "1"
+                "memberId", "1",
+                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "orderId", "testOrderId",
+                "amount", "1000"
         );
+
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse(null, null));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -166,15 +189,24 @@ class ReservationControllerE2ETest {
                 "date", "2025-05-01",
                 "timeId", "1",
                 "themeId", "1",
-                "memberId", "1"
+                "memberId", "1",
+                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "orderId", "testOrderId",
+                "amount", "1000"
         );
 
         Map<String, String> reservationParams2 = Map.of(
                 "date", "2025-05-01",
                 "timeId", "1",
                 "themeId", "1",
-                "memberId", "2"
+                "memberId", "2",
+                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "orderId", "testOrderId",
+                "amount", "1000"
         );
+
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse(null, null));
 
         return Stream.of(
                 dynamicTest("예약을 추가한다", () -> {
