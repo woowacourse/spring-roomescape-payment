@@ -3,11 +3,10 @@ package roomescape.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import roomescape.config.objectmapper.CustomLocalDateDeserializer;
 import roomescape.config.objectmapper.CustomLocalDateSerializer;
@@ -32,16 +31,17 @@ public class SpringConfig {
     }
 
     @Bean
-    HttpComponentsClientHttpRequestFactory requestFactory() {
-        return new HttpComponentsClientHttpRequestFactory();
+    SimpleClientHttpRequestFactory requestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(1000);
+        factory.setConnectTimeout(3000);
+        return factory;
     }
 
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 .requestFactory(this::requestFactory)
-                .setReadTimeout(Duration.ofSeconds(1))
-                .setConnectTimeout(Duration.ofSeconds(3))
                 .errorHandler(new RestTemplateResponseExceptionHandler())
                 .build();
     }
