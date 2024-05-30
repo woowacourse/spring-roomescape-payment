@@ -1,4 +1,4 @@
-package roomescape.core.service;
+package roomescape.infrastructure;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,6 @@ import org.springframework.web.client.RestClient;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.PaymentException;
-import roomescape.infrastructure.PaymentSecretKeyEncoder;
 
 @Component
 public class PaymentApprover {
