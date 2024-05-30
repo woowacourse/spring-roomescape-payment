@@ -8,6 +8,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.exception.payment.PaymentException;
 import roomescape.util.Base64Utils;
 
 @Component
@@ -33,7 +34,7 @@ public class PaymentClient {
     }
 
     public Payment requestPurchase(PaymentRequest request) {
-        return client.post()
+        Payment payment = client.post()
                 .uri(url)
                 .header(HttpHeaders.AUTHORIZATION, authorizationSecret)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -41,5 +42,10 @@ public class PaymentClient {
                 .retrieve()
                 .onStatus(handler)
                 .body(Payment.class);
+
+        if (payment == null) {
+            throw new PaymentException("결제에 실패했습니다.");
+        }
+        return payment;
     }
 }

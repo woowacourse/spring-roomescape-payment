@@ -77,4 +77,22 @@ class PaymentClientTest {
         assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class);
     }
+
+    @Test
+    @DisplayName("ResponseBody가 비어있을 경우, 예외를 반환한다.")
+    void errorOnEmptyResponseBody() {
+        String body = "";
+        MockClientHttpResponse response = new MockClientHttpResponse(
+                body.getBytes(),
+                HttpStatus.OK
+        );
+        server.expect(manyTimes(), requestTo(url))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond((req) -> response);
+
+        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+
+        assertThatCode(() -> paymentClient.requestPurchase(request))
+                .isInstanceOf(PaymentException.class);
+    }
 }
