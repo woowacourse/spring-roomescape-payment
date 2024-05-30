@@ -102,14 +102,16 @@ public class TestFixture {
     }
 
     public static String getTomorrowDate() {
-        return LocalDate.now()
-                .plusDays(1)
-                .format(DateTimeFormatter.ISO_DATE);
+        return getDateAfter(1);
     }
 
     public static String getDayAfterTomorrowDate() {
+        return getDateAfter(2);
+    }
+
+    private static String getDateAfter(final int daysToAdd) {
         return LocalDate.now()
-                .plusDays(2)
+                .plusDays(daysToAdd)
                 .format(DateTimeFormatter.ISO_DATE);
     }
 
