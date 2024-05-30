@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class TokenService {
 
     private static final String MEMBER_ID = "member_id";
-    private static final String secretKey = "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E="; // TODO: yaml
+    private static final String secretKey = "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=";
 
     public String createToken(long id, LocalDateTime createdAt, Duration tokenLifeTime) {
         LocalDateTime rawExpiredTime = createdAt.plus(tokenLifeTime);

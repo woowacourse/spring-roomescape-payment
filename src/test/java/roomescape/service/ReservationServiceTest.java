@@ -121,8 +121,7 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(DEFAULT_THEME);
         LocalDate date = LocalDate.now().plusDays(1);
 
-        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(),
-                theme.getId());
+        ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(), theme.getId());
         reservationService.save(reservationRequest);
         assertThatThrownBy(() -> reservationService.save(reservationRequest))
                 .isInstanceOf(RoomescapeException.class)
