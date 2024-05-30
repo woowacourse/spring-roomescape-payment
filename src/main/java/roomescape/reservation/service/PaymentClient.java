@@ -17,6 +17,8 @@ import roomescape.reservation.dto.PaymentConfirmRequest;
 @Component
 public class PaymentClient {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String BASE_URL = "https://api.tosspayments.com";
     private static final String CONFIRM_URI = "/v1/payments/confirm";
     private static final String AUTH_TYPE = "Basic ";
@@ -30,8 +32,6 @@ public class PaymentClient {
     }
 
     public void requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
-        ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         restClient.post()
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -39,7 +39,7 @@ public class PaymentClient {
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    PaymentErrorResponse errorResponse = objectMapper.readValue(res.getBody(),
+                    PaymentErrorResponse errorResponse = OBJECT_MAPPER.readValue(res.getBody(),
                             PaymentErrorResponse.class);
                     throw new IllegalRequestException(errorResponse.getMessage());
                 })
