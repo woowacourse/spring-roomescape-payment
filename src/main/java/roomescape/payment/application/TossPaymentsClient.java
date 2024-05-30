@@ -2,7 +2,10 @@ package roomescape.payment.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -12,6 +15,7 @@ import roomescape.payment.dto.TossPaymentsErrorResponse;
 import roomescape.payment.exception.PaymentServerException;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Base64;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -27,8 +31,15 @@ public class TossPaymentsClient {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader(AUTHORIZATION, encodeSecretKey(secretKey))
+                .requestFactory(clientHttpRequestFactory())
                 .build();
         this.objectMapper = objectMapper;
+    }
+
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withReadTimeout(Duration.ofSeconds(30));
+        return ClientHttpRequestFactories.get(settings);
     }
 
     private String encodeSecretKey(String secretKey) {
