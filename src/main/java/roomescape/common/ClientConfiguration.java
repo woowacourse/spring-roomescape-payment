@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.client.PaymentProperties;
 
@@ -28,7 +29,7 @@ public class ClientConfiguration {
 
         return RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader("Authorization", authorizations)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
                 .build();
     }
 }
