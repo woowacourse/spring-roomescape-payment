@@ -94,13 +94,25 @@ public class ReservationAcceptanceTest {
                             .statusCode(204);
                 }),
 
-                dynamicTest("예약이 승견된다.", () -> {
+                dynamicTest("대기가 승격된다.", () -> {
                     Reservation reservation = reservationRepository.findById(expectedReservationId).get();
 
                     assertThat(reservation.getMember().getId())
                             .isEqualTo(MEMBER_BROWN.getId());
                     assertThat(reservation.getReservationStatus())
                             .isEqualTo(ReservationStatus.PAYMENT_PENDING);
+                }),
+
+                dynamicTest("예약으로 승격된 대기가 결제 대기 상태인 경우에도 지울 수 있다.", () -> {
+                    Reservation reservation = reservationRepository.findById(expectedReservationId).get();
+
+                    assertThat(reservation.isNotPaidReservation())
+                            .isTrue();
+
+                    RestAssured.given().log().all()
+                            .when().delete("/reservations/" + expectedReservationId)
+                            .then().log().all()
+                            .statusCode(204);
                 })
         );
     }

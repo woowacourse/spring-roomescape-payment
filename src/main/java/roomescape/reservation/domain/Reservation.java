@@ -110,6 +110,10 @@ public class Reservation {
         return reservationStatus;
     }
 
+    public boolean isNotPaidReservation() {
+        return reservationStatus.equals(ReservationStatus.PAYMENT_PENDING);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

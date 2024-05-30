@@ -134,13 +134,21 @@ public class ReservationService {
 
     private void promoteWaiting(Waiting waiting) {
         paymentHistoryService.cancelPayment(waiting.getReservation().getId());
-        
+
         Reservation promotedReservation = waiting.promoteToReservation();
         reservationRepository.save(promotedReservation);
         waitingRepository.deleteById(waiting.getId());
     }
 
     private void cancelReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약은 존재하지 않습니다."));
+
+        if (reservation.isNotPaidReservation()) {
+            reservationRepository.deleteById(id);
+            return;
+        }
+
         paymentHistoryService.cancelPayment(id);
         reservationRepository.deleteById(id);
     }
