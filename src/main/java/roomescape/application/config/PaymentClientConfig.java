@@ -24,8 +24,8 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    public RestClient.Builder restClientBuilder() {
-        RestTemplate template = new RestTemplateBuilder()
+    public RestClient.Builder restClientBuilder(RestTemplateBuilder builder) {
+        RestTemplate template = builder
                 .setConnectTimeout(Duration.ofSeconds(3L))
                 .setReadTimeout(Duration.ofSeconds(30L))
                 .build();
