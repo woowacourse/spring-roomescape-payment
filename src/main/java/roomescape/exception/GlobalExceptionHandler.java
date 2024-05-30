@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.dto.ErrorResponse;
 
 @ControllerAdvice
-public class RoomescapeExceptionHandler {
+public class GlobalExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final StringWriter stringWriter = new StringWriter();
@@ -40,7 +39,7 @@ public class RoomescapeExceptionHandler {
     public ResponseEntity<ErrorResponse> handle(PaymentException e) {
         logger.error(getStackTrace(e));
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(e.getStatus())
                 .body(new ErrorResponse(e.getMessage()));
     }
 

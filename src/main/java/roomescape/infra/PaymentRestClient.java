@@ -7,23 +7,16 @@ import org.springframework.web.client.RestClient;
 import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.service.TossPaymentResponse;
-import roomescape.exception.PaymentClientErrorHandler;
-import roomescape.exception.PaymentServerErrorHandler;
+import roomescape.exception.PaymentErrorHandler;
 
 public class PaymentRestClient {
 
     private final RestClient restClient;
-    private final PaymentClientErrorHandler paymentClientErrorHandler;
-    private final PaymentServerErrorHandler paymentServerErrorHandler;
+    private final PaymentErrorHandler paymentErrorHandler;
 
-    public PaymentRestClient(
-            RestClient restClient,
-            PaymentClientErrorHandler paymentClientErrorHandler,
-            PaymentServerErrorHandler paymentServerErrorHandler
-    ) {
+    public PaymentRestClient(RestClient restClient, PaymentErrorHandler paymentErrorHandler) {
         this.restClient = restClient;
-        this.paymentClientErrorHandler = paymentClientErrorHandler;
-        this.paymentServerErrorHandler = paymentServerErrorHandler;
+        this.paymentErrorHandler = paymentErrorHandler;
     }
 
     public Payment requestPaymentApproval(PaymentRequest request) {
@@ -38,8 +31,7 @@ public class PaymentRestClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
-                .onStatus(paymentClientErrorHandler)
-                .onStatus(paymentServerErrorHandler)
+                .onStatus(paymentErrorHandler)
                 .body(TossPaymentResponse.class);
 
         return response.toPayment();
