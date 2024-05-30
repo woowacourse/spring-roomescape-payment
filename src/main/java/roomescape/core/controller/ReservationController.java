@@ -13,11 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.core.dto.member.LoginMember;
-import roomescape.core.dto.payment.PaymentRequest;
-import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
-import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
@@ -36,18 +33,12 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
-            @Valid @RequestBody final MemberReservationRequest memberRequest, final LoginMember member) {
-        final PaymentRequest paymentRequest = new PaymentRequest(memberRequest.getPaymentKey(),
-                memberRequest.getOrderId(), memberRequest.getAmount());
-
-        PaymentResponse paymentResponse = paymentService.approvePayment(paymentRequest);
-
-        final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
-                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus(),
-                paymentResponse.getId());
-        final ReservationResponse result = reservationService.create(request);
-        return ResponseEntity.created(URI.create("/reservations/" + result.getId()))
-                .body(result);
+            @Valid @RequestBody MemberReservationRequest memberReservationRequest,
+            LoginMember loginMember
+    ) {
+        ReservationResponse reservationResponse = reservationService.create(memberReservationRequest, loginMember);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.getId()))
+                .body(reservationResponse);
     }
 
     @GetMapping
@@ -74,7 +65,7 @@ public class ReservationController {
     public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findAllByMember(loginMember));
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
         if (reservationService.isNotAdminReservation(id)) {

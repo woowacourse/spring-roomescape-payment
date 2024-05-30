@@ -15,7 +15,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.core.domain.Status;
-import roomescape.core.dto.reservation.ReservationRequest;
+import roomescape.core.dto.reservation.AdminReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.core.utils.e2eTest;
@@ -179,8 +179,8 @@ class AdminControllerTest {
     @Test
     @DisplayName("예약자를 지정해서 예약을 생성할 수 있다.")
     void createReservationAsAdmin() {
-        ReservationRequest request = new ReservationRequest(
-                2L, TOMORROW_DATE, 1L, 1L, Status.BOOKED.getValue(), null);
+        AdminReservationRequest request = new AdminReservationRequest(
+                2L, TOMORROW_DATE, 1L, 1L, Status.BOOKED.getValue());
 
         ValidatableResponse failResponse = e2eTest.post(request, "/admin/reservations", accessToken);
         failResponse.statusCode(201);

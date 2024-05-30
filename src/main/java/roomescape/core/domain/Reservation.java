@@ -57,6 +57,12 @@ public class Reservation {
         this(null, member, date, time, theme, status, createAt, payment);
     }
 
+    public Reservation(
+            Member member, String date, ReservationTime time, Theme theme, Status status, LocalDateTime createAt
+    ) {
+        this(null, member, date, time, theme, status, createAt, null);
+    }
+
     private LocalDate parseDate(final String date) {
         try {
             return LocalDate.parse(date);

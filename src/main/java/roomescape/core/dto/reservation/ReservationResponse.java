@@ -12,16 +12,16 @@ public class ReservationResponse {
     private ReservationTimeResponse time;
     private ThemeResponse theme;
 
-    public ReservationResponse(final Reservation reservation) {
-        this(reservation.getId(), reservation);
-    }
-
     public ReservationResponse(final Long id, final Reservation reservation) {
         this.id = id;
         this.date = reservation.getDateString();
         this.member = new MemberResponse(reservation.getMember());
         this.time = new ReservationTimeResponse(reservation.getReservationTime());
         this.theme = new ThemeResponse(reservation.getTheme());
+    }
+
+    public ReservationResponse(final Reservation reservation) {
+        this(reservation.getId(), reservation);
     }
 
     public Long getId() {

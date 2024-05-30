@@ -6,15 +6,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
-import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;
+import roomescape.core.dto.reservation.AdminReservationRequest;
+import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
-import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.PaymentRepository;
@@ -30,64 +31,82 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(final ReservationRepository reservationRepository,
-                              final ReservationTimeRepository reservationTimeRepository,
-                              final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository, PaymentRepository paymentRepository) {
+    public ReservationService(
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            MemberRepository memberRepository,
+            PaymentRepository paymentRepository,
+            PaymentService paymentService
+    ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentRepository = paymentRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional
-    public ReservationResponse create(final ReservationRequest request) {
-        final Member member = getMember(request);
-        final ReservationTime reservationTime = getReservationTime(request);
-        final Theme theme = getTheme(request);
-        final Payment payment = getPayment(request);
-        final Reservation reservation = new Reservation(
-                member, request.getDate(), reservationTime, theme, Status.findStatus(request.getStatus()),
-                LocalDateTime.now(), payment);
+    public ReservationResponse create(MemberReservationRequest memberReservationRequest, LoginMember loginMember) {
+        PaymentResponse paymentResponse = paymentService.approvePayment(new PaymentRequest(memberReservationRequest));
 
-        validateDuplicateReservation(Status.findStatus(request.getStatus()), reservation);
+        final Reservation reservation = new Reservation(
+                getMember(loginMember.getId()),
+                memberReservationRequest.getDate(),
+                getReservationTime(memberReservationRequest.getTimeId()),
+                getTheme(memberReservationRequest.getThemeId()),
+                Status.findStatus(memberReservationRequest.getStatus()),
+                LocalDateTime.now(),
+                paymentResponse.toPayment()
+        );
+        validateDuplicateReservation(reservation);
         reservation.validateDateAndTime();
 
-        final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation.getId(), savedReservation);
+        return new ReservationResponse(reservationRepository.save(reservation));
     }
 
-    private Member getMember(final ReservationRequest request) {
-        return memberRepository.findById(request.getMemberId())
+    @Transactional
+    public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
+        final Reservation reservation = new Reservation(
+                getMember(adminReservationRequest.getMemberId()),
+                adminReservationRequest.getDate(),
+                getReservationTime(adminReservationRequest.getTimeId()),
+                getTheme(adminReservationRequest.getThemeId()),
+                Status.findStatus(adminReservationRequest.getStatus()),
+                LocalDateTime.now()
+        );
+        validateDuplicateReservation(reservation);
+        reservation.validateDateAndTime();
+
+        return new ReservationResponse(reservationRepository.save(reservation));
+    }
+
+    private Member getMember(final Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
-    private ReservationTime getReservationTime(final ReservationRequest request) {
-        return reservationTimeRepository.findById(request.getTimeId())
+    private ReservationTime getReservationTime(final Long timeId) {
+        return reservationTimeRepository.findById(timeId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
-    private Theme getTheme(final ReservationRequest request) {
-        return themeRepository.findById(request.getThemeId())
+    private Theme getTheme(final Long themeId) {
+        return themeRepository.findById(themeId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
-    private Payment getPayment(ReservationRequest request) {
-        if (request.getPaymentId() == null) {
-            return null;
-        }
-        return paymentRepository.findById(request.getPaymentId()).orElseThrow(IllegalArgumentException::new);
-    }
-
-    private void validateDuplicateReservation(final Status status, final Reservation reservation) {
+    //TODO: getter 쓰지 말고 reservation에게 직접 물어보기
+    private void validateDuplicateReservation(final Reservation reservation) {
         int count = 0;
-        if (status == Status.BOOKED) {
+        if (reservation.getStatus() == Status.BOOKED) {
             count = reservationRepository.countByDateAndTimeAndTheme(
                     reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
         }
-        if (status == Status.STANDBY) {
+        if (reservation.getStatus() == Status.STANDBY) {
             count = reservationRepository.countByMemberAndDateAndTimeAndTheme(
                     reservation.getMember(), reservation.getDate(), reservation.getReservationTime(),
                     reservation.getTheme()

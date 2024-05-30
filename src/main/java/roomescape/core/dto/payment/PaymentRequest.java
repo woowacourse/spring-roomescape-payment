@@ -2,6 +2,7 @@ package roomescape.core.dto.payment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import roomescape.core.dto.reservation.MemberReservationRequest;
 
 public class PaymentRequest {
     @NotBlank(message = "paymentKey 는 비어있을 수 없습니다.")
@@ -17,6 +18,14 @@ public class PaymentRequest {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+    }
+
+    public PaymentRequest(MemberReservationRequest memberReservationRequest) {
+        this(
+                memberReservationRequest.getPaymentKey(),
+                memberReservationRequest.getOrderId(),
+                memberReservationRequest.getAmount()
+        );
     }
 
     public String getPaymentKey() {

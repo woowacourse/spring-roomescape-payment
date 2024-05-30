@@ -20,6 +20,10 @@ public class PaymentResponse {
         this(payment.getId(), payment.getPaymentKey(), payment.getAmount(), payment.getOrderId());
     }
 
+    public Payment toPayment() {
+        return new Payment(id, paymentKey, amount, orderId);
+    }
+
     public Long getId() {
         return id;
     }
