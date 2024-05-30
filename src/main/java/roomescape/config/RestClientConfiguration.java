@@ -6,6 +6,8 @@ import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfiguration {
@@ -13,10 +15,15 @@ public class RestClientConfiguration {
     private static final int READ_TIMEOUT = 40;
 
     @Bean
+    RestClient.Builder builder() {
+        return RestClient.builder()
+                .requestFactory(factory());
+    }
+
     ClientHttpRequestFactory factory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT))
                 .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT));
-        return ClientHttpRequestFactories.get(settings);
+        return ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory::new, settings);
     }
 }

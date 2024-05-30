@@ -4,14 +4,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.exception.PaymentException;
+import roomescape.payment.exception.PaymentUnauthorizedException;
 
 @Service
 public class PaymentService {
@@ -22,10 +23,9 @@ public class PaymentService {
     private final RestClient restClient;
     private final String authorizationKey;
 
-    public PaymentService(ClientHttpRequestFactory factory,
+    public PaymentService(RestClient.Builder builder,
                           @Value("${payment.secret-key}") String secretKey) {
-        this.restClient = RestClient.builder()
-                .requestFactory(factory)
+        this.restClient = builder
                 .baseUrl(BASE_URL)
                 .build();
         this.authorizationKey = initializeAuthorizationKey(secretKey);
@@ -47,6 +47,9 @@ public class PaymentService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new PaymentUnauthorizedException();
+            }
             PaymentErrorResponse errorResponse = exception.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(exception.getStatusCode(), errorResponse.message());
         }
