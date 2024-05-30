@@ -69,14 +69,16 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
-        paymentClient.requestConfirmPayment(request.extractPaymentInformation());
         ReservationRequest reservationRequest = new ReservationRequest(
                 request.date(),
                 memberId,
                 request.timeId(),
                 request.themeId()
         );
-        return saveReservation(reservationRequest);
+        ReservationResponse reservationResponse = saveReservation(reservationRequest);
+        paymentClient.requestConfirmPayment(request.extractPaymentInformation());
+
+        return reservationResponse;
     }
 
     @Transactional

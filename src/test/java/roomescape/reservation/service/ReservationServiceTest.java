@@ -117,6 +117,7 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인되지 않으면 멤버의 예약 저장에 실패한다")
     @Test
     void should_throw_exception_when_reservation_not_confirmed_payments() {
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         doThrow(IllegalRequestException.class)
                 .when(paymentClient)
                 .requestConfirmPayment(any(PaymentConfirmRequest.class));
