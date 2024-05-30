@@ -1,5 +1,6 @@
 package roomescape.service.reservation;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
@@ -88,6 +89,9 @@ public class ReservationWaitingService {
 
     private void validate(ReservationDate date, ReservationTime reservationTime, Theme theme, Member member,
                           Schedule schedule) {
+        if (date.isToday()) {
+            throw new InvalidReservationException("방문 당일에는 예약 대기를 등록할 수 없습니다.");
+        }
         if (!reservationRepository.existsByScheduleDateAndScheduleTimeIdAndThemeId(date, reservationTime.getId(),
                 theme.getId())) {
             throw new InvalidReservationException("현재 해당 테마가 예약 가능하므로 예약 대기는 등록할 수 없습니다.");

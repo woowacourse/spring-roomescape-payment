@@ -21,6 +21,10 @@ public class ReservationDate {
         return new ReservationDate(date);
     }
 
+    public boolean isToday() {
+        return value.equals(LocalDate.now());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(value);
