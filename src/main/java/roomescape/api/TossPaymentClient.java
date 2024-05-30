@@ -32,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
         try {
             restClient.post()
                     .uri("v1/payments/confirm")
-                    .header("Authorization", "authorizations")
+                    .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
