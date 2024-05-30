@@ -1,9 +1,7 @@
 package roomescape.payment.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -14,6 +12,9 @@ import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class PaymentClient {
     private static final String PREFIX = "Basic ";
@@ -21,9 +22,9 @@ public class PaymentClient {
     private static final String PAYMENT_CANCEL_URI = "/v1/payments/%s/cancel";
     private final RestClient restClient;
 
-    public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties) {
-
+    public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties,ClientHttpRequestFactory factory) {
         this.restClient = RestClient.builder()
+                .requestFactory(factory)
                 .baseUrl(paymentProperties.getHostName())
                 .defaultHeader("Authorization", PREFIX + encoder.encode(paymentProperties.getSecretKey()))
                 .build();
