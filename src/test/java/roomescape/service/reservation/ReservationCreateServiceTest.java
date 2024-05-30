@@ -56,29 +56,6 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
         );
     }
 
-    @DisplayName("사용자가 새로운 예약 대기를 저장한다.")
-    @Test
-    void createMemberWaiting() {
-        //given
-        ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-            reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
-        reservationCreateService.createMemberReservation(reservationRequest, member.getId());
-
-        ReservationRequest anotherReservationRequest = new ReservationRequest(reservationDetail.getDate(),
-            reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
-
-        //when
-        ReservationResponse result = reservationCreateService.createMemberReservation(anotherReservationRequest, anotherMember.getId());
-
-        //then
-        assertAll(
-            () -> assertThat(result.id()).isNotZero(),
-            () -> assertThat(result.time().id()).isEqualTo(reservationDetail.getReservationTime().getId()),
-            () -> assertThat(result.theme().id()).isEqualTo(theme.getId()),
-            () -> assertThat(result.status()).isEqualTo(ReservationStatus.WAITING.getDescription())
-        );
-    }
-
     @DisplayName("사용자가 이미 예약인 상태에서 예약 요청을 한다면 예외가 발생한다.")
     @Test
     void cannotCreateByExistingMemberReservation() {
@@ -89,23 +66,6 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
-    }
-
-    @DisplayName("사용자가 이미 예약 대기인 상태에서 예약 요청을 한다면 예외가 발생한다.")
-    @Test
-    void cannotCreateByExistingMemberWaiting() {
-        //given
-        ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-            reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
-        reservationCreateService.createMemberReservation(reservationRequest, member.getId());
-        ReservationRequest anotherReservationRequest = new ReservationRequest(reservationDetail.getDate(),
-            reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
-        reservationCreateService.createMemberReservation(anotherReservationRequest, anotherMember.getId());
-
-        //when & then
-        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, anotherMember.getId()))
             .isInstanceOf(InvalidReservationException.class)
             .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
     }

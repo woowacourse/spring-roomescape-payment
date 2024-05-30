@@ -2,10 +2,10 @@ package roomescape.service.waiting;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,17 +27,16 @@ import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.waiting.dto.WaitingRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql("/truncate-with-time-and-theme.sql")
-class WaitingCommonServiceTest {
-
+class WaitingCreateServiceTest {
 
     @Autowired
-    private WaitingCommonService waitingCommonService;
+    private WaitingCreateService waitingCreateService;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -64,41 +63,38 @@ class WaitingCommonServiceTest {
         reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
     }
 
-    @DisplayName("모든 예약 대기 내역을 조회한다.")
+    @DisplayName("사용자가 새로운 예약 대기를 저장한다.")
     @Test
-    @Sql({"/truncate-with-time-and-theme.sql", "/insert-past-waiting.sql"})
-    void findAllWaitings() {
+    void createMemberWaiting() {
+        //given
+        WaitingRequest waitingRequest = new WaitingRequest(reservationDetail.getDate(),
+            reservationDetail.getReservationTime().getId(), theme.getId());
+        reservationRepository.save(new Reservation(anotherMember, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty()));
+
         //when
-        List<ReservationResponse> reservations = waitingCommonService.findAll();
+        ReservationResponse result = waitingCreateService.createWaiting(waitingRequest, member.getId());
 
         //then
-        assertThat(reservations).hasSize(1);
+        assertAll(
+            () -> assertThat(result.id()).isNotZero(),
+            () -> assertThat(result.time().id()).isEqualTo(reservationDetail.getReservationTime().getId()),
+            () -> assertThat(result.theme().id()).isEqualTo(theme.getId()),
+            () -> assertThat(result.status()).isEqualTo(ReservationStatus.WAITING.getDescription())
+        );
     }
 
-
-    @DisplayName("사용자가 예약 대기를 삭제하려고 할 때 예약으로 바뀌었다면 예외가 발생한다.")
+    @DisplayName("사용자가 이미 예약인 상태에서 예약 대기 요청을 한다면 예외가 발생한다.")
     @Test
-    void cannotDeleteWaitingByIdIfReserved() {
+    void cannotCreateByExistingMemberWaiting() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        Reservation target = reservationRepository.save(reservation);
+        WaitingRequest waitingRequest = new WaitingRequest(reservationDetail.getDate(),
+            reservationDetail.getReservationTime().getId(), theme.getId());
+        reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty()));
 
-        //when
-        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), member.getId()))
+        //when & then
+        assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))
             .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
+            .hasMessage("이미 예약(대기) 상태입니다.");
     }
 
-    @DisplayName("사용자가 본인 외 예약 대기를 삭제하려고 하면 예외가 발생한다.")
-    @Test
-    void cannotDeleteWaitingByIdIfNotOwner() {
-        //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
-        Reservation target = reservationRepository.save(reservation);
-
-        //when
-        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), anotherMember.getId()))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessage("예약 대기를 삭제할 권한이 없습니다.");
-    }
 }
