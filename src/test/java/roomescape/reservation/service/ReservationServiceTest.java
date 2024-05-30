@@ -79,7 +79,7 @@ class ReservationServiceTest {
         ReservationSaveRequest reservationSaveRequest =
                 new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
 
-        doThrow(PaymentFailException.class).when(paymentService).payment(PaymentRequest.from(reservationSaveRequest));
+        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
 
         assertThatThrownBy(() -> reservationService.saveReservationSuccess(reservationSaveRequest, loginMember))
                 .isInstanceOf(PaymentFailException.class);

@@ -37,7 +37,8 @@ public class ReservationService {
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            MemberRepository memberRepository, PaymentService paymentService
+            MemberRepository memberRepository,
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -53,7 +54,7 @@ public class ReservationService {
         Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentService.payment(PaymentRequest.from(reservationSaveRequest));
+        paymentService.pay(PaymentRequest.from(reservationSaveRequest));
 
         return ReservationResponse.toResponse(savedReservation);
     }

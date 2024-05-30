@@ -34,7 +34,7 @@ public class PaymentService {
         this.objectMapper = objectMapper;
     }
 
-    public void payment(PaymentRequest paymentRequest) {
+    public void pay(PaymentRequest paymentRequest) {
         restClient.post()
                 .uri("/v1/payments/confirm")
                 .header(HttpHeaders.AUTHORIZATION, createAuthorizations())

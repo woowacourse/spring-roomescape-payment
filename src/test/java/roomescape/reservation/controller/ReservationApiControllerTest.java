@@ -87,7 +87,7 @@ class ReservationApiControllerTest extends IntegrationTest {
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
 
-        doNothing().when(paymentService).payment(PaymentRequest.from(reservationSaveRequest));
+        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
