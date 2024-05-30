@@ -22,8 +22,9 @@ public class PaymentClient {
     private final RestClient restClient;
 
     public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties) {
+
         this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com")
+                .baseUrl(paymentProperties.getHostName())
                 .defaultHeader("Authorization", PREFIX + encoder.encode(paymentProperties.getSecretKey()))
                 .build();
     }
