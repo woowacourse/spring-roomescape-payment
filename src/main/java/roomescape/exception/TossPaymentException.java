@@ -15,7 +15,8 @@ public class TossPaymentException extends RoomescapeException {
         this.message = message;
     }
 
-    public HttpStatusCode getStatusCode() {
+    @Override
+    public HttpStatusCode getHttpStatusCode() {
         return statusCode;
     }
 
