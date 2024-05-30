@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
+import roomescape.core.dto.reservation.PaidReservationResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
@@ -30,14 +31,14 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
+    public ResponseEntity<PaidReservationResponse> create(
             @Valid @RequestBody final ReservationPaymentRequest memberRequest,
             final LoginMember member) {
         final PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(memberRequest);
         final ReservationRequest request = new ReservationRequest(member.getId(),
                 memberRequest.getDate(), memberRequest.getTimeId(), memberRequest.getThemeId());
 
-        final ReservationResponse response
+        final PaidReservationResponse response
                 = reservationService.createAndPay(request, paymentRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);
@@ -50,10 +51,10 @@ public class ReservationController {
 
     @GetMapping(params = {"memberId", "themeId", "dateFrom", "dateTo"})
     public ResponseEntity<List<ReservationResponse>> findAllByMemberAndThemeAndPeriod(
-            @RequestParam(required = false, name = "memberId") final Long memberId,
-            @RequestParam(required = false, name = "themeId") final Long themeId,
-            @RequestParam(required = false, name = "dateFrom") final String dateFrom,
-            @RequestParam(required = false, name = "dateTo") final String dateTo) {
+            @RequestParam(name = "memberId") final Long memberId,
+            @RequestParam(name = "themeId") final Long themeId,
+            @RequestParam(name = "dateFrom") final String dateFrom,
+            @RequestParam(name = "dateTo") final String dateTo) {
         return ResponseEntity.ok(reservationService
                 .findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo));
     }

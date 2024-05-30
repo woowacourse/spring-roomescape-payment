@@ -24,6 +24,15 @@ public class MyReservationResponse {
         this.status = status;
     }
 
+    public static MyReservationResponse from(final Reservation reservation) {
+        final Theme theme = reservation.getTheme();
+        final ReservationTime time = reservation.getReservationTime();
+        final String status = "예약";
+
+        return new MyReservationResponse(reservation.getId(), theme.getName(),
+                reservation.getDateString(), time.getStartAtString(), status);
+    }
+
     public static MyReservationResponse from(final WaitingWithRank waitingWithRank) {
         final Waiting waiting = waitingWithRank.getWaiting();
         final Theme theme = waiting.getTheme();
@@ -33,15 +42,6 @@ public class MyReservationResponse {
 
         return new MyReservationResponse(waiting.getId(), theme.getName(),
                 date.format(DateTimeFormatter.ISO_DATE), time.getStartAtString(), status);
-    }
-
-    public static MyReservationResponse from(final Reservation reservation) {
-        final Theme theme = reservation.getTheme();
-        final ReservationTime time = reservation.getReservationTime();
-        final String status = "예약";
-
-        return new MyReservationResponse(reservation.getId(), theme.getName(),
-                reservation.getDateString(), time.getStartAtString(), status);
     }
 
     public Long getId() {

@@ -2,7 +2,6 @@ package roomescape.core.dto.reservation;
 
 import roomescape.core.domain.Reservation;
 import roomescape.core.dto.member.MemberResponse;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservationtime.ReservationTimeResponse;
 import roomescape.core.dto.theme.ThemeResponse;
 
@@ -12,7 +11,6 @@ public class ReservationResponse {
     private final MemberResponse member;
     private final ReservationTimeResponse time;
     private final ThemeResponse theme;
-    private final PaymentConfirmResponse payment;
 
     public ReservationResponse(final Reservation reservation) {
         this.id = reservation.getId();
@@ -20,9 +18,6 @@ public class ReservationResponse {
         this.member = new MemberResponse(reservation.getMember());
         this.time = new ReservationTimeResponse(reservation.getReservationTime());
         this.theme = new ThemeResponse(reservation.getTheme());
-        this.payment = reservation.getPayment()
-                .map(PaymentConfirmResponse::new)
-                .orElse(null);
     }
 
     public Long getId() {
@@ -43,9 +38,5 @@ public class ReservationResponse {
 
     public ThemeResponse getTheme() {
         return theme;
-    }
-
-    public PaymentConfirmResponse getPayment() {
-        return payment;
     }
 }

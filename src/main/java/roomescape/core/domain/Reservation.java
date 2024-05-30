@@ -8,12 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
 
 @Entity
 public class Reservation {
@@ -41,31 +39,21 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
     public Reservation() {
     }
 
     public Reservation(final Member member, final String date, final ReservationTime time,
                        final Theme theme) {
-        this(null, member, date, time, theme, null);
-    }
-
-    public Reservation(final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final Payment payment) {
-        this(null, member, date, time, theme, payment);
+        this(null, member, date, time, theme);
     }
 
     public Reservation(final Long id, final Member member, final String date,
-                       final ReservationTime time, final Theme theme, final Payment payment) {
+                       final ReservationTime time, final Theme theme) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);
         this.time = time;
         this.theme = theme;
-        this.payment = payment;
     }
 
     private LocalDate parseDate(final String date) {
@@ -95,10 +83,6 @@ public class Reservation {
         return date.isEqual(LocalDate.now(kst));
     }
 
-    public void setPayment(final Payment payment) {
-        this.payment = payment;
-    }
-
     public Long getId() {
         return id;
     }
@@ -121,9 +105,5 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
-    }
-
-    public Optional<Payment> getPayment() {
-        return Optional.ofNullable(payment);
     }
 }
