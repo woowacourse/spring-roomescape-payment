@@ -4,7 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.config.TestConfig;
 import roomescape.reservation.dto.ReservationDto;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.model.Reservation;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@Import(TestConfig.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationServiceTest {
@@ -47,7 +50,15 @@ class ReservationServiceTest {
     void saveReservationTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(date, 3L, 1L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                date,
+                3L,
+                1L,
+                1L,
+                "test-order-id",
+                10000L,
+                "test_payment_key"
+        );
 
         // When
         final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
@@ -67,7 +78,15 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenSaveReservationWithNotExistReservationTimeTest() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now(), 3L, 9L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                LocalDate.now(),
+                3L,
+                9L,
+                1L,
+                "test_order_id",
+                10000L,
+                "test_payment_key"
+        );
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -107,7 +126,15 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenPastDateOrTime() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now().minusDays(3), 3L, 1L, 1L);
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                LocalDate.now().minusDays(3),
+                3L,
+                1L,
+                1L,
+                "test_order_id",
+                10000L,
+                "test_payment_key"
+        );
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
@@ -123,7 +150,10 @@ class ReservationServiceTest {
                 LocalDate.now().plusDays(2),
                 3L,
                 4L,
-                9L
+                9L,
+                "test_order_id",
+                10000L,
+                "test_payment_key"
         );
 
         // When & Then

@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.auth.token.TokenProvider;
+import roomescape.config.TestConfig;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationTimeResponse;
@@ -25,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
+@Import(TestConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AdminReservationControllerTest {
@@ -59,7 +62,10 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
-                1L
+                1L,
+                "test-order-id",
+                10000L,
+                "test_payment_key"
         );
 
         RestAssured.given().log().all()
@@ -79,7 +85,10 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 null,
                 1L,
-                1L
+                1L,
+                "test_order_id",
+                10000L,
+                "test_payment_key"
         );
 
         RestAssured.given().log().all()

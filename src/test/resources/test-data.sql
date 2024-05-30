@@ -121,3 +121,9 @@ INSERT INTO reservation_waiting(member_id, date, time_id, theme_id, created_at)
 VALUES (3, CAST(TIMESTAMPADD(DAY, 6, NOW()) AS DATE), 3, 8, CAST(TIMESTAMPADD(MINUTE, 50, CURRENT_TIMESTAMP()) AS DATETIME));
 INSERT INTO reservation_waiting(member_id, date, time_id, theme_id, created_at)
 VALUES (2, CAST(TIMESTAMPADD(DAY, 6, NOW()) AS DATE), 3, 8, CAST(TIMESTAMPADD(MINUTE, 1, CURRENT_TIMESTAMP()) AS DATETIME));
+
+/**
+  임시 결제 정보
+ */
+INSERT INTO payment_credential(order_id, amount)
+VALUES ('test-order-id', 10000);
