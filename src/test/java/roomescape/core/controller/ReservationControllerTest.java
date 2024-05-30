@@ -26,7 +26,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.core.domain.Status;
 import roomescape.core.dto.auth.TokenRequest;
-import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.utils.e2eTest;
@@ -62,10 +61,10 @@ class ReservationControllerTest {
 
         accessToken = getAccessToken();
 
-        BDDMockito.doReturn(new PaymentResponse(PAYMENT_KEY))
+        BDDMockito.doNothing()
                 .when(paymentClient).approvePayment(any(), any());
 
-        BDDMockito.doReturn(new PaymentResponse(PAYMENT_KEY))
+        BDDMockito.doNothing()
                 .when(paymentClient).refundPayment(any(), any());
     }
 
