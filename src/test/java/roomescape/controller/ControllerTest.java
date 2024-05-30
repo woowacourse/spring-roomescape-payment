@@ -21,8 +21,10 @@ abstract class ControllerTest {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+
     @Autowired
     private JwtProvider jwtProvider;
+
     @LocalServerPort
     private int port;
 

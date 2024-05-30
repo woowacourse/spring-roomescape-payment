@@ -14,11 +14,11 @@ import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
-import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.PaymentApproveDto;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaymentApproveSuccessDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
 
@@ -30,13 +30,13 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentManager paymentManager;
+    private final PaymentClient paymentManager;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
-                              PaymentManager paymentManager) {
+                              PaymentClient paymentManager) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -62,7 +62,7 @@ public class ReservationService {
     @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         ReservationDto reservationDto = save(reservationSaveDto);
-        paymentManager.approve(paymentApproveDto);
+        PaymentApproveSuccessDto paymentApproveSuccessDto = paymentManager.approve(paymentApproveDto);
 
         return reservationDto;
     }

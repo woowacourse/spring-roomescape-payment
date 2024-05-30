@@ -17,6 +17,9 @@ security:
   jwt:
     token:
       secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
-      expire-length: 3600000
+      expire-length: 5
 payment:
+  connection-timeout: 10
+  read-timeout: 30
+  base-url: https://api.tosspayments.com/v1/payments
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

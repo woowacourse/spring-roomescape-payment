@@ -1,48 +1,32 @@
 package roomescape.infrastructure.payment;
 
-import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.core5.http.io.SocketConfig;
-import org.apache.hc.core5.util.Timeout;
+import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class ClientHttpRequestConfig {
 
-    private static final int CONNECTION_TIMEOUT = 10;
-    private static final int READ_TIMEOUT = 30;
+    private final int connectTimeoutSeconds;
+    private final int readTimeoutSeconds;
 
-    @Bean
-    protected ClientHttpRequestFactory clientHttpRequestFactory() {
-        ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(CONNECTION_TIMEOUT))
-                .build();
-
-        SocketConfig socketConfig = SocketConfig.custom()
-                .setSoTimeout(Timeout.ofSeconds(READ_TIMEOUT))
-                .build();
-
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultSocketConfig(socketConfig);
-        connectionManager.setDefaultConnectionConfig(connectionConfig);
-
-        HttpClient httpClient = HttpClientBuilder.create()
-                .setConnectionManager(connectionManager)
-                .build();
-
-        return new HttpComponentsClientHttpRequestFactory(httpClient);
+    public ClientHttpRequestConfig(@Value("${payment.connection-timeout}") int connectTimeoutSeconds,
+                                   @Value("${payment.read-timeout}") int readTimeoutSeconds) {
+        this.connectTimeoutSeconds = connectTimeoutSeconds;
+        this.readTimeoutSeconds = readTimeoutSeconds;
     }
 
     @Bean
     public RestClient restClient() {
-        return RestClient.create(new RestTemplate(clientHttpRequestFactory()));
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(connectTimeoutSeconds));
+        factory.setReadTimeout(Duration.ofSeconds(readTimeoutSeconds));
+        return RestClient.builder()
+                .requestFactory(factory)
+                .build();
     }
 }
 
