@@ -79,7 +79,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
     @DisplayName("결제 오류시 예약이 저장되지 않는다.")
     @Test
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void saveReservationPaymentError() {
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L,
                 LocalDate.parse("2025-11-11"), 1L, 1L, 1000, "orderId", "paymentKey");
