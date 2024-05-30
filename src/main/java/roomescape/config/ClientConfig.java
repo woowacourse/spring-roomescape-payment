@@ -16,16 +16,11 @@ public class ClientConfig {
             @Value("${client.connection-timeout-second}") int connectionTimeoutSecond,
             @Value("${client.read-timeout-second}") int readTimeoutSecond
     ) {
-        RestTemplate restTemplate = createRestTemplate(connectionTimeoutSecond, readTimeoutSecond);
-
-        return RestClient.builder(restTemplate)
-                .build();
-    }
-
-    private RestTemplate createRestTemplate(int connectionTimeoutSecond, int readTimeoutSecond) {
-        return new RestTemplateBuilder()
+        RestTemplate restTemplate = new RestTemplateBuilder()
                 .setConnectTimeout(Duration.ofSeconds(connectionTimeoutSecond))
                 .setReadTimeout(Duration.ofSeconds(readTimeoutSecond))
                 .build();
+
+        return RestClient.create(restTemplate);
     }
 }
