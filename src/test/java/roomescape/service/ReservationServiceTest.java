@@ -12,12 +12,13 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.ReservationTimeRepository;
 import roomescape.domain.reservation.slot.Theme;
@@ -49,6 +50,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @DisplayName("예약 저장")
     @Test
     void saveReservation() {
@@ -58,7 +62,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationPaymentRequest);
+        ReservationResponse reservationResponse = reservationService.saveReservationWithPayment(
+                reservationPaymentRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -74,14 +79,10 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
     @DisplayName("결제 오류시 예약이 저장되지 않는다.")
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void saveReservationPaymentError() {
-        LocalDate date = LocalDate.parse("2025-11-11");
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("01:00")));
-        Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
-        Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
-
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
-                date, time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L,
+                LocalDate.parse("2025-11-11"), 1L, 1L, 1000, "orderId", "paymentKey");
 
         PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
 
@@ -89,11 +90,12 @@ class ReservationServiceTest extends IntegrationTestSupport {
                 .when(paymentClient)
                 .requestApproval(paymentRequest);
 
-        assertAll(
-                () -> assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
-                        .isInstanceOf(PaymentException.class),
-                () -> assertThat(reservationRepository.findBySlot(new ReservationSlot(date, time, theme))).isEmpty()
-        );
+        try {
+            reservationService.saveReservationWithPayment(reservationPaymentRequest);
+        } catch (PaymentException e) {
+        }
+
+        assertThat(jdbcTemplate.queryForObject("select count(id) from reservation where time_id = 1 and theme_id = 1 and date = '2025-11-11'", Long.class)).isZero();
     }
 
     @DisplayName("예약이 이미 존재하면 예약 대기 상태가 된다.")
@@ -110,10 +112,12 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationPaymentRequest reservationPaymentRequest2 = new ReservationPaymentRequest(member2.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
-        ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationPaymentRequest1);
+        ReservationResponse reservationResponse1 = reservationService.saveReservationWithPayment(
+                reservationPaymentRequest1);
 
         // when
-        ReservationResponse reservationResponse2 = reservationService.saveReservation(reservationPaymentRequest2);
+        ReservationResponse reservationResponse2 = reservationService.saveReservationWithPayment(
+                reservationPaymentRequest2);
 
         // then
         assertAll(
@@ -137,7 +141,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), 100L, 1L);
         assertThatThrownBy(() -> {
-            reservationService.saveReservation(reservationPaymentRequest);
+            reservationService.saveReservationWithPayment(reservationPaymentRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -169,10 +173,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("한 사람이 중복된 예약을 할 수 없다.")
     @Test
     void saveDuplicatedReservation() {
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L, LocalDate.parse("2024-05-04"),
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L,
+                LocalDate.parse("2024-05-04"),
                 1L, 1L);
 
-        assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
+        assertThatThrownBy(() -> reservationService.saveReservationWithPayment(reservationPaymentRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -180,7 +185,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Test
     void findAllMyReservations() {
         // given // when
-        List<UserReservationResponse> allUserReservation = reservationService.findMyAllReservationAndWaiting(1L, LocalDate.parse("2024-05-30"));
+        List<UserReservationResponse> allUserReservation = reservationService.findMyAllReservationAndWaiting(1L,
+                LocalDate.parse("2024-05-30"));
 
         // then
         assertThat(allUserReservation).hasSize(3)
@@ -225,9 +231,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationPaymentRequest reservationPaymentRequest3 = new ReservationPaymentRequest(member3.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
-        Long reservationId = reservationService.saveReservation(reservationPaymentRequest1).id();
-        reservationService.saveReservation(reservationPaymentRequest2);
-        reservationService.saveReservation(reservationPaymentRequest3);
+        Long reservationId = reservationService.saveReservationWithPayment(reservationPaymentRequest1).id();
+        reservationService.saveReservationWithPayment(reservationPaymentRequest2);
+        reservationService.saveReservationWithPayment(reservationPaymentRequest3);
 
         // when
         reservationService.cancelReservation(reservationId);

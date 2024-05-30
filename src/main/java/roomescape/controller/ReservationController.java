@@ -38,7 +38,7 @@ public class ReservationController {
             @RequestBody @Valid UserReservationSaveRequest userReservationSaveRequest
     ) {
         ReservationPaymentRequest reservationPaymentRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        ReservationResponse reservationResponse = reservationService.saveReservation(
+        ReservationResponse reservationResponse = reservationService.saveReservationWithPayment(
                 reservationPaymentRequest);
         if (reservationResponse.status() == ReservationStatus.BOOKED) {
             return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))

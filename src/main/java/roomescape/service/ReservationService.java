@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +26,7 @@ import roomescape.service.dto.ReservationConditionRequest;
 import roomescape.service.dto.ReservationPaymentRequest;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
+import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
 import roomescape.service.dto.WaitingResponse;
 import roomescape.service.dto.WaitingSaveRequest;
@@ -56,18 +56,6 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservation(ReservationRequest reservationRequest) {
-        return saveReservationWithPayment(reservationRequest, freePayment());
-    }
-
-    @Transactional
-    public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
-        return saveReservationWithPayment(reservationPaymentRequest.toReservationRequest(), reservationRequest -> {
-            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
-            paymentClient.requestApproval(paymentRequest);
-        });
-    }
-
-    private ReservationResponse saveReservationWithPayment(ReservationRequest reservationRequest, Consumer<ReservationRequest> payment) {
         Member member = findMemberById(reservationRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
         Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
@@ -80,14 +68,20 @@ public class ReservationService {
             return ReservationResponse.createByWaiting(waiting);
         }
 
-        payment.accept(reservationRequest);
-
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
         return ReservationResponse.createByReservation(savedReservation);
     }
 
-    private Consumer<ReservationRequest> freePayment() {
-        return request -> {};
+    @Transactional
+    public ReservationResponse saveReservationWithPayment(ReservationPaymentRequest reservationPaymentRequest) {
+        ReservationResponse reservationResponse = saveReservation(reservationPaymentRequest.toReservationRequest());
+
+        if (reservationResponse.status() == ReservationStatus.BOOKED) {
+            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+            paymentClient.requestApproval(paymentRequest);
+        }
+
+        return reservationResponse;
     }
 
     @Transactional
