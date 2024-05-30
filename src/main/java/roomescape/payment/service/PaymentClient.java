@@ -7,13 +7,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.global.util.Encoder;
 import roomescape.payment.PaymentProperties;
+import roomescape.payment.service.dto.PaymentCancelRequest;
 import roomescape.payment.service.dto.PaymentErrorResponse;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class PaymentClient {
@@ -22,7 +20,7 @@ public class PaymentClient {
     private static final String PAYMENT_CANCEL_URI = "/v1/payments/%s/cancel";
     private final RestClient restClient;
 
-    public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties,ClientHttpRequestFactory factory) {
+    public PaymentClient(final Encoder encoder, final PaymentProperties paymentProperties, ClientHttpRequestFactory factory) {
         this.restClient = RestClient.builder()
                 .requestFactory(factory)
                 .baseUrl(paymentProperties.getHostName())
@@ -45,12 +43,9 @@ public class PaymentClient {
 
     public ResponseEntity<PaymentResponse> cancel(String paymentKey) {
         try {
-            Map<String, String> params = new HashMap<>();
-            String cancelReason = "단순 변심";
-            params.put("cancelReason", cancelReason);
             return restClient.post()
                     .uri(String.format(PAYMENT_CANCEL_URI, paymentKey))
-                    .body(params)
+                    .body(new PaymentCancelRequest())
                     .retrieve()
                     .toEntity(PaymentResponse.class);
         } catch (HttpClientErrorException e) {
