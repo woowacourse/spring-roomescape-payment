@@ -7,6 +7,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ class PaymentClientTest {
 
     @Autowired
     private PaymentClient paymentClient;
+
+    @AfterEach
+    void resetMockServer() {
+        server.reset();
+    }
 
     @Test
     @DisplayName("Payment 객체를 올바르게 반환한다.")
