@@ -1,20 +1,15 @@
 package roomescape.service.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
 @ConfigurationProperties(prefix = "toss-payment")
 public class TossPaymentConfigProperties {
 
-    private String paymentApprovalUrl;
-    private String testSecretKey;
+    private final String paymentApprovalUrl;
+    private final String testSecretKey;
 
-    public void setPaymentApprovalUrl(String paymentApprovalUrl) {
+    public TossPaymentConfigProperties(String paymentApprovalUrl, String testSecretKey) {
         this.paymentApprovalUrl = paymentApprovalUrl;
-    }
-
-    public void setTestSecretKey(String testSecretKey) {
         this.testSecretKey = testSecretKey + ":";
     }
 
