@@ -1,45 +1,37 @@
 package roomescape.service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
+import roomescape.service.conponent.PaymentWithRestClient;
 import roomescape.service.dto.PaymentRequestDto;
 
 @Service
 public class PaymentService {
 
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final String TOSS_PAYMENTS_URL = "https://api.tosspayments.com/v1/payments/confirm";
+    public static final String AUTHORIZATION = "Authorization";
 
-    private final String tossPaymentTestKey;
-    private final RestClient restClient;
+    private final PaymentWithRestClient paymentWithRestClient;
 
-    public PaymentService(@Value("${toss-payment.test-secret-key}") String key) {
-        this.tossPaymentTestKey = key + ":";
-        this.restClient = RestClient.builder()
-            .baseUrl(TOSS_PAYMENTS_URL)
-            .build();
+    public PaymentService(PaymentWithRestClient paymentWithRestClient) {
+        this.paymentWithRestClient = paymentWithRestClient;
     }
 
     public void pay(String orderId, long amount, String paymentKey) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode(tossPaymentTestKey.getBytes(StandardCharsets.UTF_8));
-        String authorizations = AUTHORIZATION_PREFIX + new String(encodedBytes);
+        RestClient restClient = paymentWithRestClient.getRestClient();
 
         try {
             restClient.post()
-                .uri(TOSS_PAYMENTS_URL)
-                .body(new PaymentRequestDto(orderId, amount, paymentKey))
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", authorizations)
-                .retrieve()
-                .toBodilessEntity();
+                    .uri(paymentWithRestClient.getPaymentServerURL())
+                    .body(new PaymentRequestDto(orderId, amount, paymentKey))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(AUTHORIZATION, paymentWithRestClient.getAuthorizations())
+                    .retrieve()
+                    .toBodilessEntity();
         } catch (HttpClientErrorException e) {
             PaymentErrorMessageResponse response = e.getResponseBodyAs(PaymentErrorMessageResponse.class);
             throw new RoomescapeException(response.message());
