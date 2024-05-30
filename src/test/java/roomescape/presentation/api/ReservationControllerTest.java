@@ -37,7 +37,7 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
-import roomescape.application.dto.response.PaymentResponse;
+import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.ReservationWebRequest;
 
@@ -115,7 +115,7 @@ class ReservationControllerTest extends BaseControllerTest {
             String token = tokenProvider.createToken(user.getId().toString());
 
             // given
-            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             ReservationTime time = reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.MEMBER_2;
+import static roomescape.fixture.Fixture.PAYMENT_REQUEST;
 import static roomescape.fixture.Fixture.RESERVATION_TIME_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
@@ -20,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import roomescape.application.dto.request.PaymentRequest;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.MemberResponse;
+import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.application.dto.response.ThemeResponse;
@@ -38,7 +41,6 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
-import roomescape.application.dto.response.PaymentResponse;
 
 class ReservationServiceTest extends BaseServiceTest {
 
@@ -83,7 +85,7 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("성공한다.")
         void success() {
-            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
@@ -93,10 +95,7 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
-                    "test-paymentKey",
-                    "test-orderId",
-                    BigDecimal.valueOf(1000L),
-                    "test-paymentType",
+                    PAYMENT_REQUEST,
                     member1.getId()
             );
             ReservationResponse response = reservationService.addReservation(request);
@@ -123,10 +122,7 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
-                    null,
-                    null,
-                    null,
-                    null,
+                    PAYMENT_REQUEST,
                     member1.getId()
             );
 
@@ -148,10 +144,7 @@ class ReservationServiceTest extends BaseServiceTest {
                     reservationDate,
                     time1.getId(),
                     theme.getId(),
-                    null,
-                    null,
-                    null,
-                    null,
+                    PAYMENT_REQUEST,
                     member1.getId()
 
             );

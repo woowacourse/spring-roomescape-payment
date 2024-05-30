@@ -9,10 +9,7 @@ public record ReservationRequest(
         LocalDate date,
         Long themeId,
         Long timeId,
-        String paymentKey,
-        String orderId,
-        BigDecimal amount,
-        String paymentType,
+        PaymentRequest payment,
         Long memberId
 ) {
 }

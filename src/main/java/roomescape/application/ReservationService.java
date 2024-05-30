@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.request.PaymentRequest;
+import roomescape.application.dto.request.PaymentApiRequest;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
@@ -63,7 +63,8 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        paymentClient.confirmPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        PaymentApiRequest paymentApiRequest = PaymentApiRequest.from(request.payment());
+        paymentClient.confirmPayment(paymentApiRequest);
 
         return ReservationResponse.from(savedReservation);
     }

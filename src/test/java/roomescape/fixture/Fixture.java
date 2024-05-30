@@ -1,7 +1,9 @@
 package roomescape.fixture;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.application.dto.request.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.detail.ReservationDetail;
@@ -44,4 +46,11 @@ public class Fixture {
 
     public static final Member MEMBER_1 = new Member("user1@gmail.com", "password", "user1", Role.USER);
     public static final Member MEMBER_2 = new Member("user2@gmail.com", "password", "user2", Role.USER);
+
+    public static final PaymentRequest PAYMENT_REQUEST = new PaymentRequest(
+            "test-paymentKey",
+            "test-orderId",
+            BigDecimal.valueOf(1000L),
+            "test-paymentType"
+    );
 }

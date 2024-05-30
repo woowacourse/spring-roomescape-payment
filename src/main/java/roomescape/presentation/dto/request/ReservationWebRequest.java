@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import roomescape.application.dto.request.PaymentRequest;
 import roomescape.application.dto.request.ReservationRequest;
 
 public record ReservationWebRequest(
@@ -35,15 +36,14 @@ public record ReservationWebRequest(
 ) {
 
     public ReservationRequest toReservationRequest(Clock clock, Long memberId) {
+        PaymentRequest payment = new PaymentRequest(paymentKey, orderId, amount, paymentType);
+
         return new ReservationRequest(
                 LocalDateTime.now(clock),
                 date,
                 themeId,
                 timeId,
-                paymentKey,
-                orderId,
-                amount,
-                paymentType,
+                payment,
                 memberId
         );
     }
