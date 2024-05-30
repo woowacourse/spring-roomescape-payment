@@ -103,7 +103,10 @@ public class ReservationWaitingService {
 
     public void deleteById(long waitingId, long memberId) {
         reservationWaitingRepository.findById(waitingId)
-                .ifPresent(waiting -> waiting.checkCancelAuthority(memberId));
+                .ifPresent(waiting -> {
+                    waiting.checkCancelAuthority(memberId);
+                    paymentRestClient.cancel(waiting.getPayment());
+                });
         deleteById(waitingId);
     }
 }

@@ -85,6 +85,10 @@ public class ReservationWaiting {
         return schedule;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     public LocalDate getDate() {
         return schedule.getDate();
     }
