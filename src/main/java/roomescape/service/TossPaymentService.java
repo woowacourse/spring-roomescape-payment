@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClientResponseException;
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.service.client.TossPaymentRestClient;
-import roomescape.service.dto.PaymentRequestDto;
+import roomescape.service.dto.TossPaymentRequestDto;
 
 @Service
 public class TossPaymentService {
@@ -25,7 +25,7 @@ public class TossPaymentService {
         try {
             restClient.build()
                 .post()
-                .body(new PaymentRequestDto(orderId, amount, paymentKey))
+                .body(new TossPaymentRequestDto(orderId, amount, paymentKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toBodilessEntity();
