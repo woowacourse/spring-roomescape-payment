@@ -11,7 +11,7 @@ public record UserReservationRequest(
         @NotNull(message = "날짜에 빈값은 허용하지 않습니다.") LocalDate date,
         @Positive(message = "타임 아이디는 1이상의 정수만 허용합니다.") Long timeId,
         @Positive(message = "테마 아이디는 1이상의 정수만 허용합니다.") Long themeId,
-        @Positive(message = "금액은 1이상의 정수만 허용합니다.") Long amount,
+        Long amount,
         String orderId,
         String paymentKey,
         String paymentType
