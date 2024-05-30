@@ -3,8 +3,8 @@ package roomescape.payment.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
@@ -36,17 +36,17 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    public ResponseEntity<PaymentResponse> confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse confirm(PaymentRequest paymentRequest) {
         return restClient.post()
                 .uri(tossPaymentProperties.getConfirmUrl())
-                .header("Authorization", getEncodeKey())
+                .header(HttpHeaders.AUTHORIZATION, getEncodeKey())
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, handleError())
-                .toEntity(PaymentResponse.class);
+                .body(PaymentResponse.class);
     }
 
-    public ResponseEntity<PaymentResponse> cancel(String paymentKey) {
+    public PaymentResponse cancel(String paymentKey) {
         Map<String, String> params = new HashMap<>();
         String cancelReason = "단순 변심";
         params.put("cancelReason", cancelReason);
@@ -57,7 +57,7 @@ public class PaymentClient {
                 .body(params)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, handleError())
-                .toEntity(PaymentResponse.class);
+                .body(PaymentResponse.class);
     }
 
     private ErrorHandler handleError() {
