@@ -14,8 +14,6 @@ public interface ReservationRepository {
 
     boolean existsByDetailIdAndMemberId(Long reservationDetailId, Long memberId);
 
-    boolean existsByDetailIdAndStatus(Long reservationDetailId, ReservationStatus status);
-
     boolean existsByDetailThemeId(long themeId);
 
     boolean existsByDetailScheduleTimeId(long timeId);
@@ -29,4 +27,6 @@ public interface ReservationRepository {
     Optional<Reservation> findById(long id);
 
     void deleteById(long id);
+
+    boolean existsByDetailId(Long id);
 }

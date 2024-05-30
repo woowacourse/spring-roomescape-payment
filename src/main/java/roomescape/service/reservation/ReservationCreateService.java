@@ -66,8 +66,9 @@ public class ReservationCreateService {
         Theme theme = findThemeById(themeId);
         Member member = findMemberById(memberId);
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
-        ReservationStatus reservationStatus = determineStatus(reservationDetail, member);
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, reservationStatus, payment));
+        validateDuplication(reservationDetail);
+
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment));
         return new ReservationResponse(reservation);
     }
 
@@ -92,14 +93,10 @@ public class ReservationCreateService {
             .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(schedule, theme)));
     }
 
-    private ReservationStatus determineStatus(ReservationDetail reservationDetail, Member member) {
-        if (reservationRepository.existsByDetailIdAndMemberId(reservationDetail.getId(), member.getId())) {
-            throw new InvalidReservationException("이미 예약(대기) 상태입니다.");
+    private void validateDuplication(ReservationDetail reservationDetail) {
+        if (reservationRepository.existsByDetailId(reservationDetail.getId())) {
+            throw new InvalidReservationException("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
         }
-        if (reservationRepository.existsByDetailIdAndStatus(reservationDetail.getId(), ReservationStatus.RESERVED)) {
-            return ReservationStatus.WAITING;
-        }
-        return ReservationStatus.RESERVED;
     }
 }
 

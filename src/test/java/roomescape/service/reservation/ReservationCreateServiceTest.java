@@ -90,7 +90,7 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
         //when & then
         assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
             .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이미 예약(대기) 상태입니다.");
+            .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
     }
 
     @DisplayName("사용자가 이미 예약 대기인 상태에서 예약 요청을 한다면 예외가 발생한다.")
@@ -107,7 +107,7 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
         //when & then
         assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, anotherMember.getId()))
             .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("이미 예약(대기) 상태입니다.");
+            .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
     }
 
     @DisplayName("존재하지 않는 시간으로 예약을 추가하면 예외를 발생시킨다.")
