@@ -1,8 +1,8 @@
 insert into members (email, name, password, role)
-values ('mrmrmr@woowa.net', '미르', 'anything', 'admin'),
-       ('mangcho@woowa.net', '망쵸', 'nothing', 'normal'),
-       ('fram@woowa.net', '프람', 'something', 'normal'),
-       ('pobi@woowa.net', '포비', 'everything', 'admin');
+values ('sun@woowa.net', '썬', 'password', 'admin'),
+       ('duck@woowa.net', '오리', 'password', 'admin'),
+       ('jazz@woowa.net', '재즈', 'password', 'normal'),
+       ('mang@woowa.net', '망쵸', 'password', 'normal');
 
 insert into theme (name, description, thumbnail)
 values ('세렌디피티: 뜻밖의 행운',
