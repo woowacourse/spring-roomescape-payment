@@ -147,14 +147,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     userReservationSize = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
-                            .when().get("/reservations-mine?date=" + LocalDate.now())
+                            .when().get("/reservations-mine?date=" + "2025-10-05")
                             .then().log().all()
                             .statusCode(200).extract()
                             .response().jsonPath().getList("$").size();
                 }),
                 dynamicTest("예약을 추가한다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", LocalDate.now(),
+                            "date", "2025-10-05",
                             "timeId", 1L,
                             "themeId", 1L,
                             "amount", 1000,
@@ -173,7 +173,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     UserReservationResponse userReservationResponse = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
-                            .when().get("/reservations-mine?date=" + LocalDate.now())
+                            .when().get("/reservations-mine?date=" + "2025-10-05")
                             .then().log().all()
                             .statusCode(200)
                             .body("size()", is(userReservationSize + 1))
@@ -181,7 +181,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
 
                     assertAll(
                             () -> assertThat(userReservationResponse.theme()).isEqualTo("이름1"),
-                            () -> assertThat(userReservationResponse.date()).isEqualTo(LocalDate.now()),
+                            () -> assertThat(userReservationResponse.date()).isEqualTo("2025-10-05"),
                             () -> assertThat(userReservationResponse.time()).isEqualTo(LocalTime.of(9, 0, 0)),
                             () -> assertThat(userReservationResponse.status()).isEqualTo(ReservationStatus.BOOKED.getValue())
                     );
@@ -240,14 +240,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     userReservationSize = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
-                            .when().get("/reservations-mine?date=" + LocalDate.now())
+                            .when().get("/reservations-mine?date=" + "2025-10-05")
                             .then().log().all()
                             .statusCode(200).extract()
                             .response().jsonPath().getList("$").size();
                 }),
                 dynamicTest("예약을 추가한다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", LocalDate.now(),
+                            "date", "2025-10-05",
                             "timeId", 1L,
                             "themeId", 1L,
                             "amount", 1000,
@@ -266,7 +266,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     UserReservationResponse userReservationResponse = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
-                            .when().get("/reservations-mine?date=" + LocalDate.now())
+                            .when().get("/reservations-mine?date=" + "2025-10-05")
                             .then().log().all()
                             .statusCode(200)
                             .body("size()", is(userReservationSize + 1))
@@ -274,14 +274,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
 
                     assertAll(
                             () -> assertThat(userReservationResponse.theme()).isEqualTo("이름1"),
-                            () -> assertThat(userReservationResponse.date()).isEqualTo(LocalDate.now()),
+                            () -> assertThat(userReservationResponse.date()).isEqualTo("2025-10-05"),
                             () -> assertThat(userReservationResponse.time()).isEqualTo(LocalTime.of(9, 0, 0)),
                             () -> assertThat(userReservationResponse.status()).isEqualTo(ReservationStatus.BOOKED.getValue())
                     );
                 }),
                 dynamicTest("한사람이 중복 예약을 생성할 수 없다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", LocalDate.now(),
+                            "date", "2025-10-05",
                             "timeId", 1L,
                             "themeId", 1L);
 
@@ -295,7 +295,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 }),
                 dynamicTest("어드민이 예약 대기를 추가한다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", LocalDate.now(),
+                            "date", "2025-10-05",
                             "timeId", 1L,
                             "themeId", 1L);
 
