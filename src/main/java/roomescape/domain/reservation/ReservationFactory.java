@@ -3,10 +3,12 @@ package roomescape.domain.reservation;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.exception.reservation.DuplicatedReservationException;
 
+@Component
 @RequiredArgsConstructor
 public class ReservationFactory {
     private final ReservationRepository reservationRepository;

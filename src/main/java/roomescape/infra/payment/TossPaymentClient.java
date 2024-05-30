@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.application.dto.request.payment.PaymentRequest;
@@ -14,6 +15,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.payment.PaymentFailException;
 
+@Component
 @RequiredArgsConstructor
 public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
