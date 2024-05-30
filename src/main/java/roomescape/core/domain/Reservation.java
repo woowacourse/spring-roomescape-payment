@@ -42,7 +42,7 @@ public class Reservation {
     private Theme theme;
 
     @OneToOne
-    @JoinColumn(name = "payment_key")
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     public Reservation() {
