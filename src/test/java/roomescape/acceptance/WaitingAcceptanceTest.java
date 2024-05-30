@@ -1,7 +1,12 @@
 package roomescape.acceptance;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
@@ -9,15 +14,11 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
-
-import java.time.LocalDate;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.is;
+import roomescape.service.waiting.dto.WaitingRequest;
 
 @Sql("/truncate-with-time-and-theme.sql")
 class WaitingAcceptanceTest extends AcceptanceTest {
+
     private LocalDate date;
     private long timeId;
     private long themeId;
@@ -65,8 +66,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().body("status", is("예약대기"));
             }),
@@ -79,7 +80,6 @@ class WaitingAcceptanceTest extends AcceptanceTest {
             })
         );
     }
-
 
     @DisplayName("사용자는 본인의 것이 아닌 예약 대기를 삭제할 수 없다.")
     @TestFactory
@@ -99,8 +99,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 reservationId.set((int) RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().extract().body().jsonPath().get("id"));
             }),
             DynamicTest.dynamicTest("guest1이 guest2의 예약 대기를 삭제하려고 하면 예외가 발생한다.", () -> {
@@ -130,8 +130,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -179,8 +179,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -228,8 +228,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", guest2Token)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -237,8 +237,8 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", adminToken)
-                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                    .when().post("/reservations")
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
                     .then().log().all()
                     .assertThat().statusCode(201).body("status", is("예약대기"));
             }),
@@ -265,6 +265,45 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                     .when().delete("/waitings/" + reservationId)
                     .then().log().all()
                     .assertThat().statusCode(400).body("message", is("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요."));
+            })
+        );
+    }
+
+    @DisplayName("예약이나 예약 대기가 존재한다면 예약 대기 요청을 할 수 없다.")
+    @TestFactory
+    Stream<DynamicTest> cannotCreateWaitingByAlreadyReserved() {
+        return Stream.of(
+            DynamicTest.dynamicTest("예약을 생성한다.", () -> {
+                RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .cookie("token", guest1Token)
+                    .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                    .when().post("/reservations");
+            }),
+            DynamicTest.dynamicTest("guest1 동일한 테마와 일정으로 예약 대기를 요청하면, 예외가 발생한다.", () -> {
+                RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .cookie("token", guest2Token)
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
+                    .then().log().all()
+                    .assertThat().body("message", is("이미 예약(대기) 상태입니다."));
+            })
+        );
+    }
+
+    @DisplayName("예약이 없는데 예약 대기 요청을 할 수 없다.")
+    @TestFactory
+    Stream<DynamicTest> cannotCreateWaitingByNoReservation() {
+        return Stream.of(
+            DynamicTest.dynamicTest("guest1 예약이 없는 테마와 일정으로 예약 대기를 요청하면, 예외가 발생한다.", () -> {
+                RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .cookie("token", guest2Token)
+                    .body(new WaitingRequest(date, timeId, themeId))
+                    .when().post("/waitings")
+                    .then().log().all()
+                    .assertThat().body("message", is("존재하는 예약이 없습니다. 예약으로 다시 시도해주세요."));
             })
         );
     }
