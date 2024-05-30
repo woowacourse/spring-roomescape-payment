@@ -12,21 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import java.util.Collections;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.admin.AdminHandlerInterceptor;
 import roomescape.login.LoginMemberArgumentResolver;
-import roomescape.login.dto.Accessor;
 import roomescape.reservation.service.ReservationService;
 
 @WebMvcTest(ReservationController.class)
@@ -46,16 +40,6 @@ class ReservationControllerTest {
 
     @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;
-
-    @BeforeEach
-    void loginSetUp() {
-        when(loginMemberArgumentResolver.supportsParameter(any(MethodParameter.class))).thenReturn(true);
-        when(loginMemberArgumentResolver.resolveArgument(
-                any(MethodParameter.class),
-                any(ModelAndViewContainer.class),
-                any(NativeWebRequest.class),
-                any(WebDataBinderFactory.class))).thenReturn(new Accessor(1L));
-    }
 
     @DisplayName("전체 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
