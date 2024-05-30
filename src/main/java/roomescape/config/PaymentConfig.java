@@ -6,16 +6,15 @@ import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.PaymentExceptionHandler;
 import roomescape.infrastructure.PaymentProperties;
-import roomescape.infrastructure.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -28,18 +27,25 @@ public class PaymentConfig {
     }
 
     @Bean
-    public PaymentClient paymentClient() {
-        return new TossPaymentClient(restClient());
+    public RestClient restClient(RestClient.Builder restClientBuilder) {
+        return restClientBuilder.build();
     }
 
-    private RestClient restClient() {
-        return RestClient
-                .builder()
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return (restClientBuilder) -> restClientBuilder
+                .requestFactory(clientHttpRequestFactory())
                 .baseUrl("https://api.tosspayments.com")
                 .defaultHeader("Authorization", createAuthorizationHeader())
-                .defaultStatusHandler(responseErrorHandler())
-                .requestFactory(clientHttpRequestFactory())
-                .build();
+                .defaultStatusHandler(responseErrorHandler());
+    }
+
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(3L))
+                .withReadTimeout(Duration.ofSeconds(30L));
+
+        return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 
     private String createAuthorizationHeader() {
@@ -51,13 +57,5 @@ public class PaymentConfig {
 
     private ResponseErrorHandler responseErrorHandler() {
         return new PaymentExceptionHandler();
-    }
-
-    private ClientHttpRequestFactory clientHttpRequestFactory() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(3L))
-                .withReadTimeout(Duration.ofSeconds(30L));
-
-        return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
