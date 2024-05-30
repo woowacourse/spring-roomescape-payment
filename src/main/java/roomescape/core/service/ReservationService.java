@@ -99,14 +99,13 @@ public class ReservationService {
                 .orElseThrow(IllegalArgumentException::new);
     }
 
-    //TODO: getter 쓰지 말고 reservation에게 직접 물어보기
     private void validateDuplicateReservation(final Reservation reservation) {
         int count = 0;
-        if (reservation.getStatus() == Status.BOOKED) {
+        if (reservation.isBooked()) {
             count = reservationRepository.countByDateAndTimeAndTheme(
                     reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
         }
-        if (reservation.getStatus() == Status.STANDBY) {
+        if (reservation.isStandBy()) {
             count = reservationRepository.countByMemberAndDateAndTimeAndTheme(
                     reservation.getMember(), reservation.getDate(), reservation.getReservationTime(),
                     reservation.getTheme()
@@ -163,9 +162,8 @@ public class ReservationService {
         }
     }
 
-    //TODO: reservation에게 집적 묻기
     private void updateReservationStatus(final Reservation reservation) {
-        if (reservation.getStatus().equals(Status.STANDBY)) {
+        if (reservation.isStandBy()) {
             return;
         }
         reservationRepository.findAllByDateAndTimeAndThemeOrderByCreateAtAsc(
@@ -173,7 +171,7 @@ public class ReservationService {
                         reservation.getReservationTime(),
                         reservation.getTheme()
                 ).stream()
-                .filter(r -> r.getStatus().equals(Status.STANDBY))
+                .filter(r -> r.isStandBy())
                 .findFirst()
                 .ifPresent(Reservation::approve);
     }

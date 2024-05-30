@@ -94,6 +94,14 @@ public class Reservation {
         this.status = Status.BOOKED;
     }
 
+    public boolean isStandBy() {
+        return status == Status.STANDBY;
+    }
+
+    public boolean isBooked() {
+        return status == Status.BOOKED;
+    }
+
     public Long getId() {
         return id;
     }
