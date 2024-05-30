@@ -6,7 +6,6 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.Member;
 import roomescape.dto.PaymentApproveRequest;
 
 @Component
@@ -22,7 +21,7 @@ public class PaymentClient {
         this.errorHandler = errorHandler;
     }
 
-    public Payment approve(PaymentApproveRequest paymentApproveRequest, Member member) {
+    public Payment approve(PaymentApproveRequest paymentApproveRequest) {
         String encryptedKey = Base64.getEncoder().encodeToString(approveSecretKey.getBytes());
         ApproveApiResponse response = restClient.post()
                 .uri("/v1/payments/confirm")
