@@ -10,14 +10,11 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
+    @Value("${security.jwt.token.secret-key}")
     private String secretKey;
-    private long validityInMilliseconds;
 
-    public JwtTokenProvider(@Value("${security.jwt.token.secret-key}") final String secretKey,
-                            @Value("${security.jwt.token.expire-length}") final long validityInMilliseconds) {
-        this.secretKey = secretKey;
-        this.validityInMilliseconds = validityInMilliseconds;
-    }
+    @Value("${security.jwt.token.expire-length}")
+    private long validityInMilliseconds;
 
     public String createToken(final Member member) {
         final Date now = new Date();
