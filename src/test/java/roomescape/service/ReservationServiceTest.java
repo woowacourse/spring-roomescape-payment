@@ -140,7 +140,6 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 예약을_추가할_수_있다() {
             ReservationRequest request = new ReservationRequest("2000-04-07", timeId, themeId, "", "", 0);
-
             ReservationResponse response = reservationService.saveReservation(request, member);
 
             assertThat(response.getMember().getName())
@@ -150,7 +149,8 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 시간대와_테마가_똑같은_중복된_예약_추가시_예외가_발생한다() {
             Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
-            ReservationRequest request = new ReservationRequest(reservation.getDate().toString(), timeId, themeId, "", "", 0);
+            ReservationRequest request = new ReservationRequest(
+                    reservation.getDate().toString(), timeId, themeId, "", "", 0);
 
             assertThatThrownBy(() -> reservationService.saveReservation(request, member))
                     .isInstanceOf(DuplicatedReservationException.class);

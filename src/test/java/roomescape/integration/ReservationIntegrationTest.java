@@ -111,6 +111,9 @@ class ReservationIntegrationTest extends IntegrationTest {
             member = memberFixture.createUserMember();
             params.put("themeId", time.getId().toString());
             params.put("timeId", theme.getId().toString());
+            params.put("paymentKey", "testPaymentKey");
+            params.put("orderId", "testOrderId");
+            params.put("amount", "1000");
         }
 
         @Test
