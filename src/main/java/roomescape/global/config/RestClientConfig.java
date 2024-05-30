@@ -10,10 +10,12 @@ import java.time.Duration;
 
 @Configuration
 public class RestClientConfig {
+    private static final int TIMEOUT_SECONDS = 5;
     @Bean
     public ClientHttpRequestFactory getRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withReadTimeout(Duration.ofMinutes(5));
+                .withConnectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                .withReadTimeout(Duration.ofSeconds(TIMEOUT_SECONDS));
         return ClientHttpRequestFactories.get(settings);
     }
 }
