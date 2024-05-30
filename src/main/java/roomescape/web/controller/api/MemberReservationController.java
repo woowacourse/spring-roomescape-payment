@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.ReservationService;
 import roomescape.service.request.PaymentApproveDto;
 import roomescape.service.request.ReservationSaveDto;
@@ -27,11 +26,9 @@ import roomescape.web.controller.response.ReservationMineResponse;
 public class MemberReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentManager paymentManager;
 
-    public MemberReservationController(ReservationService reservationService, PaymentManager paymentManager) {
+    public MemberReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentManager = paymentManager;
     }
 
     @PostMapping
@@ -39,7 +36,6 @@ public class MemberReservationController {
             @Valid @RequestBody MemberReservationRequest reservationRequest,
             @Valid @Auth LoginMember loginMember) {
         PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
-        paymentManager.approve(request);
 
         ReservationDto appResponse = reservationService.save(
                 new ReservationSaveDto(reservationRequest.date(),
