@@ -1,5 +1,7 @@
 const THEME_API_ENDPOINT = '/themes';
 const RESERVATION_TIME_AVAILABLE_API_ENDPOINT = '/times/available';
+const RESERVATION_ENDPOINT = "/reservations";
+const RESERVATION_WAITING_ENDPOINT = RESERVATION_ENDPOINT + "/waiting"
 
 document.addEventListener('DOMContentLoaded', () => {
   requestRead(THEME_API_ENDPOINT)
@@ -43,9 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-  document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+  document.getElementById('wait-button').addEventListener('click', onWaitButtonClickWithPaymentWidget);
   function onReservationButtonClickWithPaymentWidget(event) {
-    onReservationButtonClick(event, paymentWidget);
+    onPayRequestButtonClick(event, paymentWidget, RESERVATION_ENDPOINT);
+  }
+  function onWaitButtonClickWithPaymentWidget(event) {
+    onPayRequestButtonClick(event, paymentWidget, RESERVATION_WAITING_ENDPOINT);
   }
 });
 
@@ -173,7 +178,7 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+function onPayRequestButtonClick(event, paymentWidget, paymentRequestURL) {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
@@ -206,7 +211,7 @@ function onReservationButtonClick(event, paymentWidget) {
       amount: amount,
     }).then(function (data) {
       console.debug(data);
-      fetchReservationPayment(data, reservationData);
+      fetchReservationPayment(data, reservationData, paymentRequestURL);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
@@ -235,7 +240,9 @@ function fetchReservationOrderIdAndAmount(orderId, amount) {
 }
 
 
-async function fetchReservationPayment(paymentData, reservationData) {
+
+
+async function fetchReservationPayment(paymentData, reservationData, paymentRequestURL) {
   /*
   TODO: [1단계]
       - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -252,8 +259,8 @@ async function fetchReservationPayment(paymentData, reservationData) {
     paymentType: paymentData.paymentType,
   }
 
-  const reservationURL = "/reservations";
-  fetch(reservationURL, {
+
+  fetch(paymentRequestURL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -275,47 +282,51 @@ async function fetchReservationPayment(paymentData, reservationData) {
     console.error(error.message);
   });
 }
-
-function onWaitButtonClick() {
-  const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
-  if (selectedDate && selectedThemeId && selectedTimeId) {
-    const reservationData = {
-      date: selectedDate,
-      themeId: selectedThemeId,
-      timeId: selectedTimeId
-    };
-
-    /*
-    [3단계] 예약 대기 생성 요청 API 호출
-     */
-    fetch('/reservations/waiting', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reservationData)
-    })
-        .then(response => {
-          if (!response.ok) return response.json().then(data => {
-            throw new Error(data.message || 'Reservation waiting failed');
-          });
-          return response.json();
-        })
-        .then(data => {
-          alert('Reservation waiting successful!');
-          location.reload();
-        })
-        .catch(error => {
-          alert(error.message);
-          console.error(error);
-        });
-  } else {
-    alert("Please select a date, theme, and time before making a reservation waiting.");
-  }
-}
+//
+// function onWaitButtonClick() {
+//   const selectedDate = document.getElementById("datepicker").value;
+//   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+//   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+//
+//   if (selectedDate && selectedThemeId && selectedTimeId) {
+//     const reservationData = {
+//       date: selectedDate,
+//       themeId: selectedThemeId,
+//       timeId: selectedTimeId,
+//       paymentKey: paymentData.paymentKey,
+//       orderId: paymentData.orderId,
+//       amount: paymentData.amount,
+//       paymentType: paymentData.paymentType,
+//     };
+//
+//     /*
+//     [3단계] 예약 대기 생성 요청 API 호출
+//      */
+//     fetch('/reservations/waiting', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(reservationData)
+//     })
+//         .then(response => {
+//           if (!response.ok) return response.json().then(data => {
+//             throw new Error(data.message || 'Reservation waiting failed');
+//           });
+//           return response.json();
+//         })
+//         .then(data => {
+//           alert('Reservation waiting successful!');
+//           location.reload();
+//         })
+//         .catch(error => {
+//           alert(error.message);
+//           console.error(error);
+//         });
+//   } else {
+//     alert("Please select a date, theme, and time before making a reservation waiting.");
+//   }
+// }
 
 function requestRead(endpoint) {
   return fetch(endpoint)
