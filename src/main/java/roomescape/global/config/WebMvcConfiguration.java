@@ -19,6 +19,9 @@ import roomescape.payment.TossPaymentClient;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
+    private static final int CONNECTION_TIMEOUT_DURATION = 5;
+    private static final int READ_TIMEOUT_DURATION = 45;
+
     private final AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
     private final AdminHandlerInterceptor adminHandlerInterceptor;
 
@@ -53,8 +56,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(5))
-                .withReadTimeout(Duration.ofSeconds(45));
+                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT_DURATION))
+                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT_DURATION));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
