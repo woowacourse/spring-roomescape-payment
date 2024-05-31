@@ -1,5 +1,9 @@
 package roomescape.reservation.domain;
 
+import static roomescape.reservation.domain.Status.PAYMENT_PENDING;
+import static roomescape.reservation.domain.Status.SUCCESS;
+import static roomescape.reservation.domain.Status.WAIT;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -81,21 +85,20 @@ public class Reservation {
     }
 
     public void updatePaymentPending() {
-        if (status.isSuccess()) {
+        if (status == SUCCESS) {
             throw new IllegalArgumentException("이미 확정된 예약입니다.");
         }
-        if (status.isPaymentPending()) {
+        if (status == PAYMENT_PENDING) {
             throw new IllegalArgumentException("이미 결제 대기된 예약입니다.");
         }
-        status = Status.PAYMENT_PENDING;
     }
 
     public boolean isSuccessReservation() {
-        return status.isSuccess();
+        return status == SUCCESS;
     }
 
     public boolean isWaitingReservation() {
-        return status.isWait();
+        return status == WAIT;
     }
 
     public Long getId() {
