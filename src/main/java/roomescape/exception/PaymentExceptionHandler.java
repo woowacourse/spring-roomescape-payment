@@ -1,12 +1,10 @@
 package roomescape.exception;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
+import roomescape.infrastructure.ResponseBodyExtractor;
+
+import java.io.IOException;
 
 public class PaymentExceptionHandler implements ResponseErrorHandler {
 
@@ -17,9 +15,7 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> properties = mapper.readValue(body, new TypeReference<>() {});
-        throw new PaymentException(response.getStatusCode(), properties.get("message").toString());
+        String message = ResponseBodyExtractor.extract(response.getBody(), "message");
+        throw new PaymentException(response.getStatusCode(), message);
     }
 }
