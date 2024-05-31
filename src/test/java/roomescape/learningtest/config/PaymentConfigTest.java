@@ -29,10 +29,9 @@ class PaymentConfigTest {
         @RestController
         class TimeoutController {
             @GetMapping("/timeout")
-            void timeout() {
+            void timeout() throws InterruptedException {
                 log.info("start");
-                for (int i = 0; i < Integer.MAX_VALUE; i++) {
-                }
+                Thread.sleep(10000);
                 log.info("end");
             }
         }
