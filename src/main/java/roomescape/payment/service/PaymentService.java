@@ -1,19 +1,22 @@
 package roomescape.payment.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.exception.PaymentException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
-import roomescape.payment.exception.RestClientTimeOutException;
 
 @Service
 public class PaymentService {
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final RestClient restClient;
 
     public PaymentService(RestClient restClient) {
@@ -28,18 +31,29 @@ public class PaymentService {
                     .body(confirmRequest)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (HttpClientErrorException exception) {
-            handleClientException(exception);
+        } catch (HttpClientErrorException | HttpServerErrorException exception) {
+            handleClientException(confirmRequest, exception);
         } catch (ResourceAccessException exception) {
-            throw new RestClientTimeOutException(exception);
+            log.error(exception.getMessage(), exception);
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 요청 시간이 만료되었습니다.");
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제를 실패 했습니다.");
         }
     }
 
-    private void handleClientException(HttpClientErrorException exception) {
+    private void handleClientException(PaymentConfirmRequest confirmRequest, HttpStatusCodeException exception) {
         if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            throw new PaymentUnauthorizedException();
+            log.error("토스 결제 인증 에러: paymentKey = {}", confirmRequest.paymentKey(), exception);
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "토스 결제 인증 에러입니다.");
         }
+        log.error("토스 결제 에러 message: paymentKey = {}, message = {}, body = {}",
+                confirmRequest.paymentKey(), exception.getMessage(), exception.getResponseBodyAsString());
+
         PaymentErrorResponse errorResponse = exception.getResponseBodyAs(PaymentErrorResponse.class);
+        if (errorResponse == null) {
+            throw new PaymentException(exception.getStatusCode(), exception.getMessage());
+        }
         throw new PaymentException(exception.getStatusCode(), errorResponse.message());
     }
 }

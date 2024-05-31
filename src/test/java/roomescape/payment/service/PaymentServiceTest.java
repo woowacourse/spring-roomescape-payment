@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
 
 @RestClientTest(value = PaymentService.class)
 @Import(PaymentRestClientConfiguration.class)
@@ -75,6 +74,7 @@ class PaymentServiceTest {
                 .andRespond(withUnauthorizedRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> paymentService.confirmPayment(request))
-                .isInstanceOf(PaymentUnauthorizedException.class);
+                .isInstanceOf(PaymentException.class)
+                .hasMessageContaining("토스 결제 인증 에러입니다.");
     }
 }
