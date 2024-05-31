@@ -11,7 +11,8 @@ import roomescape.service.PaymentClient;
 public class PaymentConfig {
 
     @Bean
-    public PaymentClient getTossPaymentClient(@Value("${security.api.toss.secret-key}") String widgetSecretKey) {
-        return new TossPaymentClient(RestClient.builder().baseUrl("https://api.tosspayments.com").build(), widgetSecretKey);
+    public PaymentClient getTossPaymentClient(@Value("${security.api.toss.secret-key}") String widgetSecretKey,
+                                              @Value("${security.api.toss.url}") String url) {
+        return new TossPaymentClient(RestClient.builder().baseUrl(url).build(), widgetSecretKey);
     }
 }
