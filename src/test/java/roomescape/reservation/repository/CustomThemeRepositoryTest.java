@@ -15,7 +15,7 @@ import roomescape.reservation.model.ReservationDate;
 import roomescape.reservation.model.Theme;
 
 @SpringBootTest
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class CustomThemeRepositoryTest {
 
     @Autowired

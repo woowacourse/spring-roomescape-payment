@@ -27,7 +27,7 @@ import roomescape.reservation.repository.ReservationWaitingRepository;
 
 @SpringBootTest
 @Import(TestPaymentGatewayConfig.class)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class ReservationServiceTest {
 
     @Autowired

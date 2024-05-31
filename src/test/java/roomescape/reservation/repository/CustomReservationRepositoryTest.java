@@ -14,7 +14,7 @@ import roomescape.reservation.dto.SearchReservationsParams;
 import roomescape.reservation.model.Reservation;
 
 @SpringBootTest
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class CustomReservationRepositoryTest {
 
     @Autowired

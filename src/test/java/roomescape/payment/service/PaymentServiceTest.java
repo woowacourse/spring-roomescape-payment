@@ -24,7 +24,7 @@ import roomescape.payment.repository.PaymentHistoryRepository;
 
 @SpringBootTest
 @Import(TestPaymentGatewayConfig.class)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class PaymentServiceTest {
 
     @Autowired

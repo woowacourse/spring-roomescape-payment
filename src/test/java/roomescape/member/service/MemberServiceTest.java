@@ -19,7 +19,7 @@ import roomescape.member.dto.SaveMemberRequest;
 import roomescape.member.model.MemberRole;
 
 @SpringBootTest
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class MemberServiceTest {
 
     @Autowired
@@ -32,7 +32,7 @@ class MemberServiceTest {
         final List<MemberDto> members = memberService.getMembers();
 
         // Then
-        assertThat(members.size()).isEqualTo(5);
+        assertThat(members).hasSize(5);
     }
 
     @DisplayName("회원 정보를 저장한다.")

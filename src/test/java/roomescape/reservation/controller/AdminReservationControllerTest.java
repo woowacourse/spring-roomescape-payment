@@ -29,7 +29,7 @@ import roomescape.reservation.dto.ThemeResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestPaymentGatewayConfig.class)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class AdminReservationControllerTest {
 
     @Autowired
@@ -118,7 +118,7 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ReservationResponse.class);
 
-        assertThat(reservations).hasSize(16);
+        assertThat(reservations).hasSize(15);
     }
 
     @DisplayName("관리자가 아닌 클라이언트가 예약 정보를 삭제하려고 하면 에러 코드가 응답된다.")

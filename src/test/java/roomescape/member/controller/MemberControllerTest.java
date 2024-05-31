@@ -15,7 +15,7 @@ import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class MemberControllerTest {
 
     @Autowired

@@ -16,7 +16,7 @@ import roomescape.member.model.MemberEmail;
 import roomescape.member.model.MemberRole;
 
 @SpringBootTest
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class InMemoryMemberRepositoryTest {
 
     @Autowired

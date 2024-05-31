@@ -1,2 +1,2 @@
-INSERT INTO payment_credential (id, order_id, amount)
-VALUES (1, 'orderId', 1000);
+INSERT INTO payment_credential (order_id, amount)
+VALUES ('orderId', 1000);
