@@ -17,7 +17,7 @@ class MemberServiceTest extends BaseServiceTest {
 
     @BeforeEach
     void setUp() {
-        SignupRequest request = new SignupRequest(CommonFixture.NAME, CommonFixture.EMAIL, CommonFixture.PASSWORD);
+        SignupRequest request = new SignupRequest(CommonFixture.username, CommonFixture.userMangEmail, CommonFixture.password);
         memberService.signup(request);
     }
 
@@ -25,7 +25,7 @@ class MemberServiceTest extends BaseServiceTest {
     @Test
     void when_loginSuccess_then_getToken() {
         // given
-        LoginRequest request = new LoginRequest(CommonFixture.EMAIL, CommonFixture.PASSWORD);
+        LoginRequest request = new LoginRequest(CommonFixture.userMangEmail, CommonFixture.password);
 
         // when, then
         Assertions.assertThatCode(() -> memberService.login(request))
@@ -36,7 +36,7 @@ class MemberServiceTest extends BaseServiceTest {
     @Test
     void when_loginFail_then_throwException() {
         // given
-        LoginRequest request = new LoginRequest(CommonFixture.EMAIL, "wrong_password");
+        LoginRequest request = new LoginRequest(CommonFixture.userMangEmail, "wrong_password");
 
         // when, then
         Assertions.assertThatThrownBy(() -> memberService.login(request))
@@ -47,7 +47,7 @@ class MemberServiceTest extends BaseServiceTest {
     @Test
     void when_withdrawal_then_cannotLogin() {
         // given
-        LoginRequest request = new LoginRequest(CommonFixture.EMAIL, CommonFixture.PASSWORD);
+        LoginRequest request = new LoginRequest(CommonFixture.userMangEmail, CommonFixture.password);
 
         // when
         memberService.findAllMember().stream()

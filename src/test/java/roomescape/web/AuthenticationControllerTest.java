@@ -35,7 +35,7 @@ class AuthenticationControllerTest extends ControllerTest {
     @Test
     void when_login_then_getToken() throws Exception {
         // given
-        String loginRequest = "{\"email\": \"mrmrmrmr@woowa.net\", \"password\": \"password\"}";
+        String loginRequest = "{\"email\": \"sun@woowa.net\", \"password\": \"password\"}";
 
         // when, then
         mockMvc.perform(post("/login")

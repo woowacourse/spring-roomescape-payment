@@ -94,7 +94,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -124,7 +124,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -134,7 +134,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -164,7 +164,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -173,7 +173,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -202,7 +202,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -210,7 +210,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -219,7 +219,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -248,7 +248,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -257,7 +257,7 @@ class MemberReservationTest {
                 .body("status", equalTo("RESERVED"));
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -267,7 +267,7 @@ class MemberReservationTest {
 
         // when
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().delete("/reservations/" + 2)
                 .then().log().all()
@@ -276,7 +276,7 @@ class MemberReservationTest {
 
         // then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -306,7 +306,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -314,7 +314,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         given().log().all()
-                .cookie("token", getToken("picachu@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userJazzEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -323,7 +323,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/2")
                 .then().log().all()
                 .assertThat()
@@ -351,7 +351,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -360,7 +360,7 @@ class MemberReservationTest {
                 .body("status", equalTo("RESERVED"));
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -369,7 +369,7 @@ class MemberReservationTest {
                 .body("status", equalTo("WAITING"));
 
         given().log().all()
-                .cookie("token", getToken("picachu@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userJazzEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -379,7 +379,7 @@ class MemberReservationTest {
 
         // when
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 2)
                 .then().log().all()
                 .assertThat()
@@ -387,7 +387,7 @@ class MemberReservationTest {
 
         // then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -418,7 +418,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -448,7 +448,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -478,7 +478,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -508,7 +508,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -525,7 +525,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + reservationId)
                 .then().log().all()
                 .assertThat()
@@ -538,7 +538,7 @@ class MemberReservationTest {
     void when_cancelPastTimeReservation_then_nothingHappens() {
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/1")
                 .then().log().all()
                 .assertThat()
@@ -552,7 +552,7 @@ class MemberReservationTest {
     void when_getReservations_then_returnReservations() {
         // when, then
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .assertThat()
@@ -569,7 +569,7 @@ class MemberReservationTest {
     void when_getReservations_then_doesNotReturnPastReservations() {
         // when, then
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .assertThat()
@@ -585,7 +585,7 @@ class MemberReservationTest {
     void when_myWaitingReservationExists_then_deleteWaitingReservation() {
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
                 .assertThat()
@@ -598,7 +598,7 @@ class MemberReservationTest {
     void when_noWaitingReservation_then_canNotDeleteWaitingReservation() {
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
                 .assertThat()
@@ -626,7 +626,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -634,7 +634,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -643,14 +643,14 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().delete("/admin/reservations/" + 1)
                 .then().log().all()
                 .assertThat()
                 .statusCode(204);
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
                 .assertThat()
@@ -678,7 +678,7 @@ class MemberReservationTest {
         );
 
         given().log().all()
-                .cookie("token", getToken("mrmrmrmr@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -686,7 +686,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
                 .then().log().all()
@@ -695,7 +695,7 @@ class MemberReservationTest {
 
         // when, then
         given().log().all()
-                .cookie("token", getToken("mangcho@woowa.net", "password"))
+                .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/1")
                 .then().log().all().statusCode(400);
     }
