@@ -28,6 +28,7 @@ public class RestTemplateResponseExceptionHandler implements ResponseErrorHandle
     public void handleError(ClientHttpResponse response) {
         try {
             if (response.getStatusCode().is4xxClientError()) {
+                // TODO 외부 호출 시 발생하는 에러인데 businessException이 맞을까?
                 throw new RoomEscapeBusinessException(getResponseBody(response).message());
             }
 

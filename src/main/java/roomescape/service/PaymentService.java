@@ -13,8 +13,9 @@ import roomescape.controller.dto.PaymentApproveRequest;
 
 @Service
 public class PaymentService {
-    private static final String PAYMENT_APPROVE_ENDPOINT = "https://api.tosspayments.com/v1/payments/confirm";
-
+    // TODO HeadGenerator 받지 않기
+    @Value("${payment.end-point")
+    private String PAYMENT_APPROVE_ENDPOINT;
     @Value("${payment.secret-key}")
     private String secretKey;
     private final RestTemplate restTemplate;

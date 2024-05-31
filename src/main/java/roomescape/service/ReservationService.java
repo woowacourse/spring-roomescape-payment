@@ -33,6 +33,7 @@ import roomescape.service.dto.response.UserReservationResponse;
 @Transactional
 public class ReservationService {
 
+    //TODO 결제 성공했는데 예약 실패 시 -> 결제 취소
     private final PaymentService paymentService;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
