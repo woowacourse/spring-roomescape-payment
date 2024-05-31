@@ -19,7 +19,8 @@ import roomescape.util.CookieParser;
 public class AuthController {
 
     private static final String AUTHENTICATION_COOKIE_NAME = "token";
-    private static final int AUTHENTICATION_COOKIE_MAX_AGE = 60 * 60 * 24;
+    private static final int DAY = 60 * 60 * 24;
+    private static final int AUTHENTICATION_COOKIE_MAX_AGE = DAY;
 
     private final AuthService authService;
 
