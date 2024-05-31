@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.service.EncodingService;
 import roomescape.reservation.domain.entity.MemberReservation;
 
 import java.math.BigDecimal;
@@ -47,9 +48,13 @@ public class Payment {
         this(null, paymentKey, orderId, amount, null, memberReservation);
     }
 
-    public static Payment of(PaymentResponse paymentResponse, MemberReservation memberReservation) {
+    public static Payment of(PaymentResponse paymentResponse,
+                             MemberReservation memberReservation,
+                             EncodingService encodingService
+    ) {
+        String encryptedPaymentKey = encodingService.encrypt(paymentResponse.paymentKey());
         return new Payment(
-                paymentResponse.paymentKey(),
+                encryptedPaymentKey,
                 paymentResponse.orderId(),
                 paymentResponse.totalAmount(),
                 memberReservation

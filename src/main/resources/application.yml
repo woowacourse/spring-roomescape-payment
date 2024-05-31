@@ -10,7 +10,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-    #        format_sql: true
+        format_sql: true
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
@@ -21,3 +21,7 @@ jwt:
 
 toss:
   secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+jasypt:
+  encryptor:
+    password: paymentKeyPassword

@@ -16,17 +16,22 @@ public class PaymentService {
 
     private final TossPaymentRestClient restClient;
     private final PaymentRepository paymentRepository;
+    private final EncodingService encodingService;
 
-    public PaymentService(PaymentRepository paymentRepository, TossPaymentRestClient restClient) {
+    public PaymentService(PaymentRepository paymentRepository,
+                          TossPaymentRestClient restClient,
+                          EncodingService encodingService
+    ) {
         this.paymentRepository = paymentRepository;
         this.restClient = restClient;
+        this.encodingService = encodingService;
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
         PaymentResponse response = restClient.post("/confirm", request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
-        Payment payment = Payment.of(response, memberReservation);
+        Payment payment = Payment.of(response, memberReservation, encodingService);
         paymentRepository.save(payment);
     }
 
@@ -39,7 +44,8 @@ public class PaymentService {
     }
 
     private void postCancelPaymentRequest(Payment payment) {
-        String uri = "/" + payment.getPaymentKey() + "/cancel";
+        String plainPaymentKey = encodingService.decrypt(payment.getPaymentKey());
+        String uri = "/" + plainPaymentKey + "/cancel";
         Map<String, String> body = Map.of("cancelReason", "고객 변심");
         restClient.post(uri, body);
     }
