@@ -47,8 +47,8 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
 
     @Query(""" 
             select new roomescape.domain.reservation.ReservationWithRank(mine,
-                (select count(r) + 1 from Reservation r
-                where r.createdAt < mine.createdAt
+                (select count(r) from Reservation r
+                where r.createdAt <= mine.createdAt
                 and r.detail = mine.detail
                 and r.status = 'WAITING'))
             from Reservation mine
