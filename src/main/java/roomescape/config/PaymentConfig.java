@@ -1,6 +1,5 @@
 package roomescape.config;
 
-import java.time.Duration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -11,8 +10,13 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentExceptionHandler;
-import roomescape.infrastructure.PaymentProperties;
 import roomescape.infrastructure.PaymentClient;
+import roomescape.infrastructure.PaymentProperties;
+import roomescape.infrastructure.TossPaymentClient;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Base64;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -26,27 +30,34 @@ public class PaymentConfig {
 
     @Bean
     public PaymentClient paymentClient() {
-        return new PaymentClient(restClient(), paymentProperties);
+        return new TossPaymentClient(restClient());
     }
 
     private RestClient restClient() {
         return RestClient
                 .builder()
-                .defaultStatusHandler(responseErrorHandler())
                 .baseUrl("https://api.tosspayments.com")
-                .requestFactory(clientHttpRequestFactory())
+                .defaultHeader("Authorization", authorizationHeader())
+                .defaultStatusHandler(exceptionHandler())
+                .requestFactory(requestFactory())
                 .build();
     }
 
-    private ResponseErrorHandler responseErrorHandler() {
+    private ResponseErrorHandler exceptionHandler() {
         return new PaymentExceptionHandler();
     }
 
-    private ClientHttpRequestFactory clientHttpRequestFactory() {
+    private String authorizationHeader() {
+        byte[] encodedBytes = Base64.getEncoder()
+                .encode((paymentProperties.secretKey() + ":")
+                        .getBytes(StandardCharsets.UTF_8));
+        return  "Basic " + new String(encodedBytes);
+    }
+
+    private ClientHttpRequestFactory requestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(3L))
                 .withReadTimeout(Duration.ofSeconds(30L));
-
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
