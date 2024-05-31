@@ -64,5 +64,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             FROM Reservation r 
             WHERE r.id = :reservationId
             """)
-    Boolean isNotAdminReservation(@Param("reservationId") Long reservationId);
+    Boolean isNotAdminReservation(@Param("reservationId") final Long reservationId);
 }

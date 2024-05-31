@@ -57,9 +57,8 @@ public class Reservation {
         this(null, member, date, time, theme, status, createAt, payment);
     }
 
-    public Reservation(
-            Member member, String date, ReservationTime time, Theme theme, Status status, LocalDateTime createAt
-    ) {
+    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
+                       final Status status, final LocalDateTime createAt) {
         this(null, member, date, time, theme, status, createAt, null);
     }
 

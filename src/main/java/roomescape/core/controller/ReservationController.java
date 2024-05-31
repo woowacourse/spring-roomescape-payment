@@ -53,8 +53,7 @@ public class ReservationController {
             @RequestParam(required = false, name = "memberId") final Long memberId,
             @RequestParam(required = false, name = "themeId") final Long themeId,
             @RequestParam(required = false, name = "dateFrom") final String dateFrom,
-            @RequestParam(required = false, name = "dateTo") final String dateTo
-    ) {
+            @RequestParam(required = false, name = "dateTo") final String dateTo) {
         return ResponseEntity.ok(
                 reservationService.findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo)
         );

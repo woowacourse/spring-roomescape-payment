@@ -15,18 +15,15 @@ public class PaymentRequest {
     @NotNull(message = "amount 는 null일 수 없습니다.")
     private Long amount;
 
-    public PaymentRequest(String paymentKey, String orderId, Long amount) {
+    public PaymentRequest(final String paymentKey, final String orderId, final Long amount) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
     }
 
-    public PaymentRequest(MemberReservationRequest memberReservationRequest) {
-        this(
-                memberReservationRequest.getPaymentKey(),
-                memberReservationRequest.getOrderId(),
-                memberReservationRequest.getAmount()
-        );
+    public PaymentRequest(final MemberReservationRequest memberReservationRequest) {
+        this(memberReservationRequest.getPaymentKey(), memberReservationRequest.getOrderId(),
+                memberReservationRequest.getAmount());
     }
 
     public Payment toPayment() {

@@ -15,11 +15,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
-    public PaymentService(
-            PaymentAuthorizationProvider paymentAuthorizationProvider,
-            PaymentRepository paymentRepository,
-            PaymentClient paymentClient
-    ) {
+    public PaymentService(final PaymentAuthorizationProvider paymentAuthorizationProvider,
+                          final PaymentRepository paymentRepository, final PaymentClient paymentClient) {
         this.paymentAuthorizationProvider = paymentAuthorizationProvider;
         this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;

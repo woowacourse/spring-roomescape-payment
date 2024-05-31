@@ -27,11 +27,9 @@ public class AdminController {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
 
-    public AdminController(
-            ReservationService reservationService,
-            ReservationTimeService reservationTimeService,
-            ThemeService themeService
-    ) {
+    public AdminController(final ReservationService reservationService,
+                           final ReservationTimeService reservationTimeService,
+                           final ThemeService themeService) {
         this.reservationService = reservationService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
@@ -64,7 +62,7 @@ public class AdminController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
-            @Valid @RequestBody AdminReservationRequest adminReservationRequest) {
+            @Valid @RequestBody final AdminReservationRequest adminReservationRequest) {
         ReservationResponse reservationResponse = reservationService.create(adminReservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.getId()))
                 .body(reservationResponse);

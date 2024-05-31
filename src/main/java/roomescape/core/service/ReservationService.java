@@ -31,13 +31,11 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final PaymentService paymentService;
 
-    public ReservationService(
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            PaymentService paymentService
-    ) {
+    public ReservationService(final ReservationRepository reservationRepository,
+                              final ReservationTimeRepository reservationTimeRepository,
+                              final ThemeRepository themeRepository,
+                              final MemberRepository memberRepository,
+                              final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -46,8 +44,10 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse create(MemberReservationRequest memberReservationRequest, LoginMember loginMember) {
-        PaymentResponse paymentResponse = paymentService.approvePayment(new PaymentRequest(memberReservationRequest));
+    public ReservationResponse create(final MemberReservationRequest memberReservationRequest,
+                                      final LoginMember loginMember) {
+        final PaymentResponse paymentResponse =
+                paymentService.approvePayment(new PaymentRequest(memberReservationRequest));
 
         final Reservation reservation = new Reservation(
                 getMember(loginMember.getId()),
@@ -65,15 +65,15 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
+    public ReservationResponse create(final AdminReservationRequest adminReservationRequest) {
         final Reservation reservation = new Reservation(
                 getMember(adminReservationRequest.getMemberId()),
                 adminReservationRequest.getDate(),
                 getReservationTime(adminReservationRequest.getTimeId()),
                 getTheme(adminReservationRequest.getThemeId()),
                 Status.findStatus(adminReservationRequest.getStatus()),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
+
         validateDuplicateReservation(reservation);
         reservation.validateDateAndTime();
 
