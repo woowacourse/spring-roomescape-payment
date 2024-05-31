@@ -4,15 +4,19 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
+@EnableConfigurationProperties(PaymentProperties.class)
 public class PaymentRestClientConfiguration {
     private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     private static final String AUTHORIZATION_PREFIX = "Basic ";
@@ -25,15 +29,16 @@ public class PaymentRestClientConfiguration {
     }
 
     @Bean
-    public PaymentService paymentService() {
-        return new PaymentService(createRestClientBuilder(), initializeAuthorizationKey());
+    public RestClient createRestClientBuilder(RestClient.Builder restClientBuilder) {
+        return restClientBuilder.build();
     }
 
-    private RestClient createRestClientBuilder() {
-        return RestClient.builder()
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> restClientBuilder
                 .requestFactory(clientFactory())
                 .baseUrl(BASE_URL)
-                .build();
+                .defaultHeader(HttpHeaders.AUTHORIZATION, initializeAuthorizationKey());
     }
 
     private ClientHttpRequestFactory clientFactory() {
