@@ -19,24 +19,24 @@ import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.service.ReservationService;
-import roomescape.infrastructure.PaymentProvider;
+import roomescape.infrastructure.PaymentClient;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentProvider paymentProvider;
+    private final PaymentClient paymentClient;
 
     public ReservationController(final ReservationService reservationService,
-                                 final PaymentProvider paymentProvider) {
+                                 final PaymentClient paymentClient) {
         this.reservationService = reservationService;
-        this.paymentProvider = paymentProvider;
+        this.paymentClient = paymentClient;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
                                                       final LoginMember member) {
-        final PaymentConfirmResponse confirmResponse = paymentProvider.getPaymentConfirmResponse(request);
+        final PaymentConfirmResponse confirmResponse = paymentClient.getPaymentConfirmResponse(request);
 
         final ReservationRequest reservationRequest = new ReservationRequest(member.getId(), request.getDate(),
                 request.getTimeId(), request.getThemeId(), confirmResponse.getPaymentKey(),
