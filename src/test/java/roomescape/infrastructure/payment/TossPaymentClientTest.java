@@ -1,4 +1,4 @@
-package roomescape.application.payment;
+package roomescape.infrastructure.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,12 +21,14 @@ import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.application.config.PaymentClientConfig;
 import roomescape.application.config.PaymentClientProperties;
+import roomescape.application.payment.PaymentClient;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
 import roomescape.exception.payment.PaymentException;
 
-@RestClientTest(PaymentClientConfig.class)
-class PaymentClientTest {
+@RestClientTest(PaymentClient.class)
+@Import(PaymentClientConfig.class)
+class TossPaymentClientTest {
 
     @Autowired
     private PaymentClientProperties properties;

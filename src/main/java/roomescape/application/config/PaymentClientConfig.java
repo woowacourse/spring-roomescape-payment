@@ -14,6 +14,7 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.application.payment.PaymentClient;
 import roomescape.application.payment.PaymentErrorHandler;
+import roomescape.infrastructure.payment.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentClientProperties.class)
@@ -46,6 +47,6 @@ public class PaymentClientConfig {
 
     @Bean
     public PaymentClient tossPaymentClient(RestClient.Builder builder) {
-        return new PaymentClient(builder.build());
+        return new TossPaymentClient(builder.build());
     }
 }
