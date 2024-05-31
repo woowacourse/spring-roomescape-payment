@@ -1,8 +1,10 @@
 package roomescape.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 import static roomescape.fixture.PaymentFixture.DEFAULT_APPROVE_REQUEST;
+import static roomescape.fixture.PaymentFixture.DEFAULT_APPROVE_RESPONSE;
 
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -45,5 +47,19 @@ class PaymentServiceTest {
 
         Assertions.assertThatThrownBy(() -> paymentService.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER.getId()))
                 .isInstanceOf(RoomescapeException.class);
+    }
+
+    @Test
+    @DisplayName("정상적인 상황에서 결제 정보가 잘 저장되는지 확인")
+    void approveSuccess() {
+        PaymentClient paymentClient = Mockito.mock(PaymentClient.class);
+        Mockito.when(paymentClient.approve(DEFAULT_APPROVE_REQUEST))
+                .thenReturn(DEFAULT_APPROVE_RESPONSE);
+
+        PaymentRepository paymentRepository = new CollectionPaymentRepository();
+        MemberRepository memberRepository = new CollectionMemberRepository(List.of(DEFAULT_MEMBER));
+        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository);
+
+        assertDoesNotThrow(() -> paymentService.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER.getId()));
     }
 }
