@@ -28,8 +28,15 @@ public record CreateReservationRequest(
         @NotNull
         Long amount) {
 
-        public static CreateReservationRequest from(UserCreateReservationRequest request, LoginMember loginMember) {
-                return new CreateReservationRequest(loginMember.id(),
-                        request.themeId(), request.date(), request.timeId(), request.paymentKey(), request.orderId(), request.amount());
-        }
+    public static CreateReservationRequest from(UserCreateReservationRequest request, LoginMember loginMember) {
+        return new CreateReservationRequest(
+                loginMember.id(),
+                request.themeId(),
+                request.date(),
+                request.timeId(),
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
+        );
+    }
 }
