@@ -1,17 +1,22 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
+import roomescape.common.exception.PaymentExceptionCode;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
 @Service
 public class PaymentService {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -34,7 +39,10 @@ public class PaymentService {
     private ErrorHandler createPaymentErrorHandler() {
         return (request, response) -> {
             PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-            throw new PaymentException(response.getStatusCode(), errorResponse.message());
+            log.error("토스 결제 중 에러 발생 : {}", errorResponse);
+            PaymentExceptionCode translatedExceptionCode = PaymentExceptionCode.from(errorResponse.code());
+
+            throw new PaymentException(translatedExceptionCode);
         };
     }
 }

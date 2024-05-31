@@ -4,12 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionApiController {
@@ -36,9 +37,14 @@ public class ExceptionApiController {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<PaymentErrorResponse> paymentExHandler(PaymentException exception) {
+    public ResponseEntity<ProblemDetail> paymentExHandler(PaymentException exception) {
         log.error("[PaymentException]", exception);
-        return ResponseEntity.status(exception.getStatusCode())
-                .body(new PaymentErrorResponse(exception.getMessage()));
+
+        return createErrorResponse(exception.getStatus(), exception.getMessage());
+    }
+
+    private ResponseEntity<ProblemDetail> createErrorResponse(HttpStatus httpStatus, String errorMessage) {
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, errorMessage);
+        return new ResponseEntity<>(problemDetail, httpStatus);
     }
 }

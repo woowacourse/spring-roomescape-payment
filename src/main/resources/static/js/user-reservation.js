@@ -223,7 +223,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         if (!response.ok) {
             return response.json().then(errorBody => {
                 console.log(errorBody);
-                window.alert("예약 결제 실패 메시지 : " + errorBody.message);
+                window.alert("예약 결제 실패 메시지 : " + errorBody.detail);
             });
         } else {
             response.json().then(successBody => {
