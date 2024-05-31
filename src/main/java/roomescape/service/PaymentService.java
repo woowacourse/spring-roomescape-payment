@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
-import roomescape.exception.PaymentClientException;
+import roomescape.exception.InvalidPaymentInformationException;
 import roomescape.exception.PaymentException;
-import roomescape.exception.PaymentServerException;
+import roomescape.exception.PaymentServerErrorException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -32,10 +32,10 @@ public class PaymentService {
                 .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new PaymentClientException();
+                    throw new InvalidPaymentInformationException();
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentServerException();
+                    throw new PaymentServerErrorException();
                 }).toBodilessEntity();
     }
 
