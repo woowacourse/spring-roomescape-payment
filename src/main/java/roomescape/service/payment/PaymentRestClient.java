@@ -70,7 +70,7 @@ public class PaymentRestClient {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Basic " + header);
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + header);
         return headers;
     }
 
