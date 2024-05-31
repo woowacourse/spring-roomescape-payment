@@ -14,11 +14,11 @@ import roomescape.core.dto.payment.PaymentResponse;
 @Component
 public class PaymentClient {
 
+    private final RestClient restClient;
     @Value("${toss.payments.api.confirm-url}")
     private String confirmUrl;
     @Value("${toss.payments.api.refund-url-template}")
     private String refundUrlTemplate;
-    private final RestClient restClient;
 
     public PaymentClient(RestClient restClient) {
         this.restClient = restClient;
