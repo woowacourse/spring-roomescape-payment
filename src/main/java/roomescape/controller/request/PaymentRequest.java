@@ -1,11 +1,11 @@
 package roomescape.controller.request;
 
-import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotEmpty;
 
 public record PaymentRequest(
-        @Nonnull
+        @NotEmpty
         String paymentKey,
-        @Nonnull
+        @NotEmpty
         String orderId,
         Long amount) {
 }
