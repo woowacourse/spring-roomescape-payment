@@ -1,6 +1,7 @@
 package roomescape.infrastructure;
 
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,11 @@ import roomescape.core.dto.payment.PaymentResponse;
 
 @Component
 public class PaymentClient {
+
+    @Value("${toss.payments.api.confirm-url}")
+    private String confirmUrl;
+    @Value("${toss.payments.api.refund-url-template}")
+    private String refundUrlTemplate;
     private final RestClient restClient;
 
     public PaymentClient(RestClient restClient) {
@@ -23,7 +29,7 @@ public class PaymentClient {
             PaymentAuthorizationResponse paymentAuthorizationResponse
     ) {
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(confirmUrl)
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
@@ -36,8 +42,10 @@ public class PaymentClient {
             PaymentResponse paymentResponse,
             PaymentAuthorizationResponse paymentAuthorizationResponse
     ) {
+        String refundUrl = refundUrlTemplate.replace("{paymentKey}", paymentResponse.getPaymentKey());
+
         restClient.post()
-                .uri("/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
+                .uri(refundUrl)
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))

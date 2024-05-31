@@ -18,6 +18,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
         return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
     }
 
+    // TODO: 토스에서 제공한 메시지를 그대로 넘겨주지 말고, 클라이언트에 필요한 메시지로 변환하여 제공하기
     @Override
     public void handleError(final ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is5xxServerError()) {
