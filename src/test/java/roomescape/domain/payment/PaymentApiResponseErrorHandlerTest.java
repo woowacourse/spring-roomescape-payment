@@ -1,5 +1,7 @@
 package roomescape.domain.payment;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +20,11 @@ import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 
 class PaymentApiResponseErrorHandlerTest {
-    private final PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler();
+    private final PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(
+            new PaymentErrorParser(
+                    new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            )
+    );
 
     public static Stream<Arguments> hasErrorParameter() {
         return Stream.of(

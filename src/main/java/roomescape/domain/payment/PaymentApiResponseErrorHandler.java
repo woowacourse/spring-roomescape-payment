@@ -1,7 +1,5 @@
 package roomescape.domain.payment;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +11,12 @@ import roomescape.exception.RoomescapeException;
 
 @Component
 public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
-    private final PaymentErrorParser errorParser = new PaymentErrorParser(new ObjectMapper().configure(
-            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
+    private final PaymentErrorParser errorParser;
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public PaymentApiResponseErrorHandler(PaymentErrorParser errorParser) {
+        this.errorParser = errorParser;
+    }
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {

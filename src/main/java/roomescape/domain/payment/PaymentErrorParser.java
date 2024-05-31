@@ -5,7 +5,9 @@ import static roomescape.domain.payment.PaymentApiErrorCode.UNKNOWN;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PaymentErrorParser {
     private final ObjectMapper objectMapper;
 
