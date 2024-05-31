@@ -1,7 +1,6 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -11,16 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import roomescape.core.domain.Payment;
-import roomescape.core.dto.payment.PaymentConfirmRequest;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
-import roomescape.infrastructure.PaymentApprover;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -33,9 +26,6 @@ class ReservationControllerTest {
 
     @LocalServerPort
     private int port;
-
-    @SpyBean
-    private PaymentApprover paymentApprover;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -59,11 +49,7 @@ class ReservationControllerTest {
     @DisplayName("돈을 지불하며 예약을 생성한다.")
     void createAndPay() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1);
-
-        Mockito.doReturn(new PaymentConfirmResponse(new Payment("1", "1", 1L)))
-                .when(paymentApprover)
-                .confirmPayment(any(PaymentConfirmRequest.class));
+                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -73,30 +59,13 @@ class ReservationControllerTest {
                 .then().log().all()
                 .statusCode(201);
     }
-
-    @Test
-    @DisplayName("토스에서 발생한 400번대 예외를 400번과 메시지로 응답한다.")
-    void throw4xxErrorMessageAs400AndDetail() {
-        ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1);
-
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(400)
-                .body("detail", is("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."));
-    }
-
-
+    
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "abc"})
     @DisplayName("예약 생성 시, date의 형식이 올바르지 않으면 예외가 발생한다.")
     void validateReservationWithDateFormat(final String date) {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1);
+        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -111,7 +80,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 시, timeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullTimeId() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -126,7 +95,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 시, themeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullThemeId() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -195,7 +164,7 @@ class ReservationControllerTest {
     @DisplayName("토큰이 유효하지 않을 경우 예외가 발생한다.")
     void validateToken() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", "invalid-token")

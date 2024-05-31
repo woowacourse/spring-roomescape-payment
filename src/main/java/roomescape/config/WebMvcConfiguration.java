@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -35,6 +36,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    @Profile("!test")
     public RestClient restClient() {
         final JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
         factory.setReadTimeout(Duration.ofSeconds(5));

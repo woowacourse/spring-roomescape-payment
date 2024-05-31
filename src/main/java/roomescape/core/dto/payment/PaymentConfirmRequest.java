@@ -3,7 +3,7 @@ package roomescape.core.dto.payment;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 
 public class PaymentConfirmRequest {
-    private Integer amount;
+    private Long amount;
     private String orderId;
     private String paymentKey;
 
@@ -16,7 +16,7 @@ public class PaymentConfirmRequest {
     public PaymentConfirmRequest() {
     }
 
-    public Integer getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
