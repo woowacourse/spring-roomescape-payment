@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.core.controller.PaymentErrorHandler;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;

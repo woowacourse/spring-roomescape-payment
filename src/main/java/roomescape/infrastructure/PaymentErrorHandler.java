@@ -1,4 +1,4 @@
-package roomescape.core.controller;
+package roomescape.infrastructure;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
