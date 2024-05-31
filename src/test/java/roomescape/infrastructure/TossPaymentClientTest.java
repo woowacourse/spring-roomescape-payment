@@ -63,7 +63,7 @@ class TossPaymentClientTest {
         // when // then
         assertThatThrownBy(() -> paymentClient.requestApproval(paymentRequest))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
+                .hasMessage("결제에 실패했습니다.");
     }
 
     @DisplayName("결제 승인 요청시 TimeOut되면 PaymentException이 발생한다.")
@@ -80,7 +80,7 @@ class TossPaymentClientTest {
         // when // then
         assertThatThrownBy(() -> paymentClient.requestApproval(paymentRequest))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("결제 서버의 연결 가능 시간이 초과되었습니다.");
+                .hasMessage("결제 서버와 연결이 되지 않습니다.");
 
     }
 }

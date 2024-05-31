@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
 public class PaymentExceptionHandler implements ResponseErrorHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -24,7 +27,10 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        logger.error("토스 결제 오류 : {}", body);
+
         Map<String, Object> properties = mapper.readValue(body, new TypeReference<>() {});
-        throw new PaymentException(response.getStatusCode(), properties.get("message").toString());
+        String errorCode = (String) properties.get("code");
+        throw new PaymentException(PaymentErrorMessage.from(errorCode));
     }
 }
