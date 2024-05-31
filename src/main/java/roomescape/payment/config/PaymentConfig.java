@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

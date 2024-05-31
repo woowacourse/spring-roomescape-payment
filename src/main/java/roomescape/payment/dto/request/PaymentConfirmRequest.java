@@ -1,4 +1,6 @@
-package roomescape.reservation.service.dto.request;
+package roomescape.payment.dto.request;
+
+import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 
 public record PaymentConfirmRequest(
         String paymentKey,

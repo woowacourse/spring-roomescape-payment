@@ -1,4 +1,4 @@
-package roomescape.reservation.controller.dto.response;
+package roomescape.payment.dto.resonse;
 
 public record PaymentErrorResponse(
         String message

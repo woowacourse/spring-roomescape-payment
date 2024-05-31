@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatusCode;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
-import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
-import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
 @Service
 public class PaymentService {

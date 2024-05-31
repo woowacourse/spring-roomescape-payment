@@ -19,8 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.common.config.IntegrationTest;
 import roomescape.common.util.CookieUtils;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
-import roomescape.reservation.service.PaymentService;
 
 @AutoConfigureMockMvc
 public class ReservationSaveController extends IntegrationTest {
