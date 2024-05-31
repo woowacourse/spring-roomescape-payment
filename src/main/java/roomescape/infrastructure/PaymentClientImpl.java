@@ -12,11 +12,11 @@ import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.exception.PaymentException;
 
 @Component
-public class PaymentProvider {
+public class PaymentClientImpl implements PaymentClient {
     private final PaymentSecretKeyEncoder encoder;
     private final RestClient restClient;
 
-    public PaymentProvider(final PaymentSecretKeyEncoder encoder, final RestClient restClient) {
+    public PaymentClientImpl(final PaymentSecretKeyEncoder encoder, final RestClient restClient) {
         this.encoder = encoder;
         this.restClient = restClient;
     }
