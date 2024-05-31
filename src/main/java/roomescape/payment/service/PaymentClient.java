@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
+import roomescape.global.util.Authorization;
 import roomescape.global.util.Encoder;
 import roomescape.payment.TossPaymentProperties;
 import roomescape.payment.exception.PaymentException;
@@ -22,16 +23,19 @@ public class PaymentClient {
 
     private final Encoder encoder;
 
+    private final Authorization authorization;
+
     private final TossPaymentProperties tossPaymentProperties;
 
     private final ObjectMapper objectMapper;
 
     public PaymentClient(RestClient restClient,
-                         Encoder encoder,
+                         Encoder encoder, Authorization authorization,
                          TossPaymentProperties tossPaymentProperties,
                          ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.encoder = encoder;
+        this.authorization = authorization;
         this.tossPaymentProperties = tossPaymentProperties;
         this.objectMapper = objectMapper;
     }
@@ -39,7 +43,7 @@ public class PaymentClient {
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
         return restClient.post()
                 .uri(tossPaymentProperties.getConfirmUrl())
-                .header(HttpHeaders.AUTHORIZATION, getEncodeKey())
+                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, handleError())
@@ -53,7 +57,7 @@ public class PaymentClient {
 
         return restClient.post()
                 .uri(String.format(tossPaymentProperties.getCancelUrl(), paymentKey))
-                .header("Authorization", getEncodeKey())
+                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
                 .body(params)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, handleError())
@@ -66,7 +70,7 @@ public class PaymentClient {
         };
     }
 
-    private String getEncodeKey() {
-        return encoder.encode(tossPaymentProperties.getSecretKey());
+    private String getAuthorizationHeader() {
+        return authorization.getHeader(encoder.encode(tossPaymentProperties.getSecretKey()));
     }
 }

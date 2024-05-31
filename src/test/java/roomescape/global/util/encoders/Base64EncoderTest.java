@@ -15,7 +15,7 @@ class Base64EncoderTest {
         //given
         Encoder encoder = new Base64Encoder();
         String key = "myKey";
-        String expectedEncodedValue = "Basic bXlLZXk6";
+        String expectedEncodedValue = "bXlLZXk6";
 
         //when
         String encodedValue = encoder.encode(key);

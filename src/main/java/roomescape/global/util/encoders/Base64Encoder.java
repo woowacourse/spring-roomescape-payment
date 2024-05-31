@@ -7,12 +7,9 @@ import roomescape.global.util.Encoder;
 @Component
 public class Base64Encoder implements Encoder {
 
-    private static final String PREFIX = "Basic ";
-
     @Override
     public String encode(String key) {
-        String encodedValue = base64Encode(addColon(key));
-        return PREFIX + encodedValue;
+        return base64Encode(addColon(key));
     }
 
     private String addColon(String key) {
