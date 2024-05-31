@@ -11,4 +11,8 @@ public class PaymentException extends RuntimeException {
     public PaymentException(PaymentErrorResult paymentErrorResult) {
         super(paymentErrorResult.message());
     }
+
+    public PaymentException(PaymentErrorResult paymentErrorResult, Throwable cause) {
+        super(paymentErrorResult.message(), cause);
+    }
 }

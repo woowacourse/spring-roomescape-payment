@@ -43,9 +43,9 @@ public class PaymentRestClient {
                     .body(amount)
                     .retrieve()
                     .body(PaymentResult.class);
-        } catch (HttpClientErrorException exception) {
-            String responseBody = exception.getResponseBodyAsString();
-            throw new PaymentException(parseErrorBody(responseBody));
+        } catch (HttpClientErrorException e) {
+            String responseBody = e.getResponseBodyAsString();
+            throw new PaymentException(parseErrorBody(responseBody), e);
         }
     }
 
@@ -59,9 +59,9 @@ public class PaymentRestClient {
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(cancelReason)
                     .retrieve();
-        } catch (HttpClientErrorException exception) {
-            String responseBody = exception.getResponseBodyAsString();
-            throw new PaymentException(parseErrorBody(responseBody));
+        } catch (HttpClientErrorException e) {
+            String responseBody = e.getResponseBodyAsString();
+            throw new PaymentException(parseErrorBody(responseBody), e);
         }
     }
 
