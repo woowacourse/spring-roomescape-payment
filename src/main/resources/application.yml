@@ -46,6 +46,7 @@ payment:
     base-url: https://dev-api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true
@@ -95,6 +96,7 @@ payment:
     base-url: https://dev-api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true
@@ -144,6 +146,7 @@ payment:
     base-url: https://api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true

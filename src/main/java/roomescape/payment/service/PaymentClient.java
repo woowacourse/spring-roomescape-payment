@@ -1,13 +1,18 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
+import org.springframework.web.client.RestClientException;
+import roomescape.exception.ErrorType;
+import roomescape.exception.InternalException;
 import roomescape.global.util.Authorization;
 import roomescape.global.util.Encoder;
 import roomescape.payment.TossPaymentProperties;
@@ -42,27 +47,43 @@ public class PaymentClient {
     }
 
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
-        return restClient.post()
-                .uri(tossPaymentProperties.getConfirmUrl())
-                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
-                .body(paymentRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, handleError())
-                .body(PaymentResponse.class);
+        try {
+            return restClient.post()
+                    .uri(tossPaymentProperties.getConfirmUrl())
+                    .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
+                    .body(paymentRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, handleError())
+                    .body(PaymentResponse.class);
+        } catch (RestClientException e) {
+            handlerTimeoutPayment(paymentRequest.paymentKey(), e);
+            throw new InternalException(ErrorType.NETWORK_ERROR);
+        }
     }
 
     public PaymentResponse cancel(String paymentKey) {
         Map<String, String> params = new HashMap<>();
         String cancelReason = "단순 변심";
         params.put("cancelReason", cancelReason);
+        try {
+            return restClient.post()
+                    .uri(String.format(tossPaymentProperties.getCancelUrl(), paymentKey))
+                    .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
+                    .body(params)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, handleError())
+                    .body(PaymentResponse.class);
+        } catch (RestClientException e) {
+            handlerTimeoutPayment(paymentKey, e);
+            throw new InternalException(ErrorType.NETWORK_ERROR);
+        }
+    }
 
-        return restClient.post()
-                .uri(String.format(tossPaymentProperties.getCancelUrl(), paymentKey))
-                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
-                .body(params)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, handleError())
-                .body(PaymentResponse.class);
+    private void handlerTimeoutPayment(String paymentKey, RestClientException e) {
+        if (e.getCause() instanceof SocketTimeoutException) {
+            cancelPaymentIfConfirmed(paymentKey);
+            throw new InternalException(ErrorType.PAYMENT_ERROR);
+        }
     }
 
     private ErrorHandler handleError() {
@@ -73,5 +94,21 @@ public class PaymentClient {
 
     private String getAuthorizationHeader() {
         return authorization.getHeader(encoder.encode(tossPaymentProperties.getSecretKey()));
+    }
+
+    private void cancelPaymentIfConfirmed(String paymentKey) {
+        if (isPaymentConfirmed(paymentKey)) {
+            cancel(paymentKey);
+        }
+    }
+
+    private boolean isPaymentConfirmed(String paymentKey) {
+        PaymentResponse response = restClient.get()
+                .uri(String.format(tossPaymentProperties.getCancelUrl(), paymentKey))
+                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, handleError())
+                .body(PaymentResponse.class);
+        return Objects.equals(response.status(), "DONE");
     }
 }
