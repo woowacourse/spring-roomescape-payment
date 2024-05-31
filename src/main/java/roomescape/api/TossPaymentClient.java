@@ -1,8 +1,9 @@
 package roomescape.api;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.PaymentErrorResponse;
 import roomescape.dto.PaymentRequest;
@@ -15,12 +16,9 @@ import java.util.Base64;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+    private final String authorizations;
 
-    @Value("${security.api.toss.secret-key}")
-    private String widgetSecretKey;
-    String authorizations;
-
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient, String widgetSecretKey) {
         this.restClient = restClient;
         Base64.Encoder encoder = Base64.getEncoder();
         authorizations = "Basic " + new String(
@@ -37,8 +35,10 @@ public class TossPaymentClient implements PaymentClient {
                     .body(paymentRequest)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new PaymentException(e.getStatusCode(), e.getResponseBodyAs(PaymentErrorResponse.class).message());
+        } catch (Exception e) {
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류로 결제에 실패했습니다.");
         }
     }
 }
