@@ -29,9 +29,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor);
     }
-
-    @Bean
-    public RestClient paymentClient() {
-        return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
-    }
 }
