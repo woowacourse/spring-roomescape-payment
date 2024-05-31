@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.member.controller.AdminMemberReservationRequest;
 import roomescape.member.domain.Member;
 import roomescape.payment.service.PaymentService;
 import roomescape.payment.service.dto.PaymentRequest;
@@ -29,6 +30,7 @@ public class ReservationApplicationService {
     private final MemberReservationService memberReservationService;
 
     private final WaitingReservationService waitingReservationService;
+
     private final PaymentService paymentService;
 
     public ReservationApplicationService(ReservationCommonService reservationCommonService,
@@ -79,9 +81,17 @@ public class ReservationApplicationService {
     }
 
     @Transactional
+    public ReservationResponse createMemberReservation(AdminMemberReservationRequest reservationRequest) {
+        MemberReservation memberReservation = reservationCommonService.create(reservationRequest.toReservationCreate());
+        memberReservation.notPaid();
+        return ReservationResponse.from(memberReservation);
+    }
+
+    @Transactional
     public void deleteMemberReservation(AuthInfo authInfo, long memberReservationId) {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
+        paymentService.refund(memberReservationId);
         reservationCommonService.delete(member, memberReservation);
         memberReservationService.updateStatus(memberReservation.getReservation());
     }
@@ -106,8 +116,6 @@ public class ReservationApplicationService {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
         waitingReservationService.validateWaitingReservation(memberReservation);
-
-        paymentService.refund(memberReservationId);
         reservationCommonService.delete(member, memberReservation);
     }
 

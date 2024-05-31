@@ -24,8 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.domain.PaymentType;
+import roomescape.payment.domain.repository.PaymentHistoryRepository;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -51,6 +58,12 @@ class ReservationApplicationServiceTest extends ServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
 
     @Autowired
     private ReservationApplicationService reservationApplicationService;
@@ -88,15 +101,21 @@ class ReservationApplicationServiceTest extends ServiceTest {
     void deleteWaiting() {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
-        LocalDate date = getNextDay();
-        ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
-                new WaitingCreate(memberClover.getId(), date, time.getId(), theme1.getId())
-        );
+        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        MemberReservation memberReservation1 = memberReservationRepository.save(
+                new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+        MemberReservation memberReservation2 = memberReservationRepository.save(
+                new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
 
-        //when
+        String paymentKey = "paymentKey";
+        Price price = new Price(BigDecimal.valueOf(1000));
+        paymentRepository.save(
+                new Payment(paymentKey, PaymentType.CARD, price, memberReservation1));
         AuthInfo authInfo = new AuthInfo(memberClover.getId(), memberClover.getName(), memberClover.getEmail(),
                 memberClover.getRole());
-        reservationApplicationService.deleteMemberReservation(authInfo, waitingResponse.memberReservationId());
+
+        //when
+        reservationApplicationService.deleteWaiting(authInfo, memberReservation2.getId());
 
         //then
         assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).hasSize(0);
@@ -144,6 +163,12 @@ class ReservationApplicationServiceTest extends ServiceTest {
         Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
         MemberReservation firstReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+
+        String paymentKey = "paymentKey";
+        Price price = new Price(BigDecimal.valueOf(1000));
+        paymentRepository.save(
+                new Payment(paymentKey, PaymentType.CARD, price, firstReservation));
+        paymentHistoryRepository.save(new PaymentHistory(paymentKey, PaymentType.CARD, PaymentStatus.PAID, price, memberChoco));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
 

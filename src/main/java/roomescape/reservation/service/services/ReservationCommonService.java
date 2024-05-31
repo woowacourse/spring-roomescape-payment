@@ -9,6 +9,7 @@ import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -34,16 +35,20 @@ public class ReservationCommonService {
 
     private final MemberReservationRepository memberReservationRepository;
 
+    private final PaymentRepository paymentRepository;
+
     public ReservationCommonService(ReservationRepository reservationRepository,
                                     ReservationTimeRepository reservationTimeRepository,
                                     ThemeRepository themeRepository,
                                     MemberRepository memberRepository,
-                                    MemberReservationRepository memberReservationRepository) {
+                                    MemberReservationRepository memberReservationRepository,
+                                    PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.memberReservationRepository = memberReservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public void validateDuplicatedReservation(Reservation reservation, Member member) {
@@ -62,6 +67,7 @@ public class ReservationCommonService {
         if (!memberReservation.canDelete(member)) {
             throw new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER);
         }
+        paymentRepository.deleteByMemberReservationId(memberReservation.getId());
         memberReservationRepository.deleteById(memberReservation.getId());
     }
 

@@ -155,7 +155,7 @@ class MemberReservationServiceTest extends ServiceTest {
 
         //then
         assertThat(
-                memberReservationRepository.findBy(null, null, ReservationStatus.NOT_PAID, LocalDate.now(),
+                memberReservationRepository.findBy(null, null, LocalDate.now(),
                         LocalDate.now().plusDays(1))).hasSize(1);
     }
 

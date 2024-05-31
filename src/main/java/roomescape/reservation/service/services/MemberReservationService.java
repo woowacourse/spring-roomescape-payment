@@ -33,7 +33,6 @@ public class MemberReservationService {
         return memberReservationRepository.findBy(
                         request.getMemberId(),
                         request.getThemeId(),
-                        ReservationStatus.APPROVED,
                         request.getStartDate(),
                         request.getEndDate())
                 .stream()

@@ -29,6 +29,7 @@ import roomescape.exception.ErrorType;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.reservation.controller.dto.ThemeResponse;
+import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.util.ControllerTest;
 
 @DisplayName("예약 API 통합 테스트")
@@ -59,7 +60,7 @@ class ReservationControllerTest extends ControllerTest {
         //when
         doReturn(reservationResponse)
                 .when(reservationApplicationService)
-                .createMemberReservation(any());
+                .createMemberReservation(any(MemberReservationCreate.class));
 
         //then
         mockMvc.perform(
@@ -166,7 +167,7 @@ class ReservationControllerTest extends ControllerTest {
         //when
         doThrow(new BadRequestException(ErrorType.INVALID_REQUEST_ERROR))
                 .when(reservationApplicationService)
-                .createMemberReservation(any());
+                .createMemberReservation(any(MemberReservationCreate.class));
 
         //then
         mockMvc.perform(

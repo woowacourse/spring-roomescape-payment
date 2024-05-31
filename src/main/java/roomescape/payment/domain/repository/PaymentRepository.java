@@ -8,4 +8,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByPaymentKey(String paymentKey);
 
     Optional<Payment> findByMemberReservationId(long memberReservationId);
+
+    void deleteByMemberReservationId(long memberReservationId);
 }
