@@ -88,7 +88,7 @@ class ReservationControllerTest {
 
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2030, 8, 5), 6L, 10L,
-                "asdfsdf", "dfadf", 1999999);
+                "asdfsdf", "dfadf", 1999999L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -143,7 +143,7 @@ class ReservationControllerTest {
 
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2030, 8, 5), 6L, 10L,
-                "asdfsdf", "dfadf", 1999999);
+                "asdfsdf", "dfadf", 1999999L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
