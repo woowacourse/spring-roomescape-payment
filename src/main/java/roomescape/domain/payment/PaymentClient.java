@@ -4,6 +4,8 @@ import static roomescape.domain.payment.PaymentApiErrorCode.UNKNOWN;
 
 import java.time.Duration;
 import java.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -19,9 +21,10 @@ public class PaymentClient {
     private final RestClient restClient = RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
             .requestFactory(ClientHttpRequestFactories.get(ClientHttpRequestFactorySettings.DEFAULTS.withConnectTimeout(
-                    Duration.ofMillis(3)).withReadTimeout(Duration.ofMillis(3))))
+                    Duration.ofSeconds(3)).withReadTimeout(Duration.ofSeconds(3))))
             .build();
     private final PaymentApiResponseErrorHandler errorHandler;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Value("${payment.approve.key}")
     private String approveSecretKey;
 
@@ -30,9 +33,11 @@ public class PaymentClient {
     }
 
     public Payment approve(PaymentApproveRequest paymentApproveRequest) {
+        logger.info("payment API call Request = {}", paymentApproveRequest);
         try {
             return approveInternal(paymentApproveRequest);
         } catch (ResourceAccessException e) {
+            logger.error("payment API call ERROR");
             throw new ApiCallException(UNKNOWN_API_ERROR, e);
         }
     }
@@ -47,7 +52,8 @@ public class PaymentClient {
                 .onStatus(errorHandler)
                 .body(ApproveApiResponse.class);
         validateNullResponse(response);
-        return new Payment(response.orderId(), response.paymentKey(), response.amount());
+        logger.info("payment API call Response = {}", response);
+        return new Payment(response.orderId(), response.paymentKey(), response.totalAmount());
     }
 
     private static void validateNullResponse(ApproveApiResponse response) {
