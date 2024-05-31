@@ -1,12 +1,13 @@
 package roomescape.controller;
 
-import static org.hamcrest.Matchers.is;
-
 import io.restassured.RestAssured;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.IntegrationTestSupport;
+
+import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
 
 class AdminReservationControllerTest extends IntegrationTestSupport {
 

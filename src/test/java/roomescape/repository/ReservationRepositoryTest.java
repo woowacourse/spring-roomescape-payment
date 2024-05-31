@@ -1,14 +1,5 @@
 package roomescape.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,12 +15,16 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.WaitingRepository;
 import roomescape.domain.reservation.dto.ReservationReadOnly;
-import roomescape.domain.reservation.slot.ReservationSlot;
-import roomescape.domain.reservation.slot.ReservationTime;
-import roomescape.domain.reservation.slot.ReservationTimeRepository;
-import roomescape.domain.reservation.slot.Theme;
-import roomescape.domain.reservation.slot.ThemeRepository;
+import roomescape.domain.reservation.slot.*;
 import roomescape.service.dto.ReservationConditionRequest;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 class ReservationRepositoryTest extends IntegrationTestSupport {
@@ -45,9 +40,6 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private WaitingRepository waitingRepository;
 
     @DisplayName("예약 생성")
     @Test
@@ -166,4 +158,3 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
         );
     }
 }
-

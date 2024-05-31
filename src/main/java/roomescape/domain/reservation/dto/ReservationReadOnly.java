@@ -1,9 +1,10 @@
 package roomescape.domain.reservation.dto;
 
-import java.time.LocalDate;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.Theme;
+
+import java.time.LocalDate;
 
 public record ReservationReadOnly(
         Long id,

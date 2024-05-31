@@ -1,7 +1,5 @@
 package roomescape.service;
 
-import java.util.Comparator;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
@@ -14,6 +12,9 @@ import roomescape.service.dto.ReservationTimeBookedRequest;
 import roomescape.service.dto.ReservationTimeBookedResponse;
 import roomescape.service.dto.ReservationTimeResponse;
 import roomescape.service.dto.ReservationTimeSaveRequest;
+
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class ReservationTimeService {

@@ -24,5 +24,3 @@ payment:
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace
-
-

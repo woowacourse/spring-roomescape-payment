@@ -1,11 +1,12 @@
 package roomescape.domain.reservation;
 
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.dto.WaitingReadOnly;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
@@ -32,6 +33,4 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
         group by w.reservation
     """)
     List<WaitingRank> findRankByMemberAndDateGreaterThanEqual(Member member, LocalDate date);
-
-
 }

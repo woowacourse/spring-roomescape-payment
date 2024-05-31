@@ -1,6 +1,5 @@
 package roomescape.service;
 
-import java.util.List;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +10,8 @@ import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.PopularThemeRequest;
 import roomescape.service.dto.ThemeResponse;
 import roomescape.service.dto.ThemeSaveRequest;
+
+import java.util.List;
 
 @Service
 public class ThemeService {

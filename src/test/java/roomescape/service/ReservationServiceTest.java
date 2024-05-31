@@ -1,14 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doThrow;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +8,18 @@ import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.slot.ReservationSlot;
-import roomescape.domain.reservation.slot.ReservationTime;
-import roomescape.domain.reservation.slot.ReservationTimeRepository;
-import roomescape.domain.reservation.slot.Theme;
-import roomescape.domain.reservation.slot.ThemeRepository;
+import roomescape.domain.reservation.slot.*;
 import roomescape.exception.PaymentException;
 import roomescape.exception.RoomEscapeBusinessException;
-import roomescape.service.dto.PaymentRequest;
-import roomescape.service.dto.ReservationPaymentRequest;
-import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationStatus;
-import roomescape.service.dto.UserReservationResponse;
-import roomescape.service.dto.WaitingResponse;
+import roomescape.service.dto.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doThrow;
 
 @Transactional
 class ReservationServiceTest extends IntegrationTestSupport {

@@ -2,7 +2,6 @@ package roomescape.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,12 +10,13 @@ import roomescape.infrastructure.AuthenticationExtractor;
 import roomescape.service.AuthService;
 import roomescape.service.dto.LoginMember;
 
+import java.io.IOException;
+
 public class CheckLoginInterceptor implements HandlerInterceptor {
 
     public static final String LOGIN_MEMBER_REQUEST = "loginMember";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final AuthService authService;
     private final AuthenticationExtractor authenticationExtractor;
 

@@ -1,16 +1,13 @@
 package roomescape.infrastructure;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import io.jsonwebtoken.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import roomescape.domain.auth.TokenProvider;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @EnableConfigurationProperties(TokenProperties.class)
@@ -55,4 +52,3 @@ public class JwtTokenProvider implements TokenProvider {
         }
     }
 }
-

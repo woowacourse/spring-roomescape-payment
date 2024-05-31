@@ -1,12 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.tuple;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +10,12 @@ import roomescape.service.dto.ReservationTimeBookedRequest;
 import roomescape.service.dto.ReservationTimeBookedResponse;
 import roomescape.service.dto.ReservationTimeResponse;
 import roomescape.service.dto.ReservationTimeSaveRequest;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 class ReservationTimeServiceTest extends IntegrationTestSupport {
@@ -99,4 +98,3 @@ class ReservationTimeServiceTest extends IntegrationTestSupport {
                 );
     }
 }
-

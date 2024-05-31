@@ -1,6 +1,5 @@
 package roomescape.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -8,6 +7,8 @@ import roomescape.domain.member.MemberRepository;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.MemberJoinRequest;
 import roomescape.service.dto.MemberResponse;
+
+import java.util.List;
 
 @Service
 public class MemberService {

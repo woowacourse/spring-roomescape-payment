@@ -1,17 +1,18 @@
 package roomescape.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import roomescape.IntegrationTestSupport;
+
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class ThemeControllerTest extends IntegrationTestSupport {
 
