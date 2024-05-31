@@ -8,6 +8,10 @@ public class PaymentException extends RuntimeException {
     private final HttpStatusCode httpStatusCode;
 
     public PaymentException(HttpStatusCode httpStatusCode, String errorMessage) {
+        this(httpStatusCode, errorMessage, null);
+    }
+    public PaymentException(HttpStatusCode httpStatusCode, String errorMessage, Throwable cause) {
+        super(cause);
         this.httpStatusCode = httpStatusCode;
         this.errorMessage = errorMessage;
     }
