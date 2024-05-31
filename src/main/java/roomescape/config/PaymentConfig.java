@@ -48,10 +48,9 @@ public class PaymentConfig {
     }
 
     private String authorizationHeader() {
-        byte[] encodedBytes = Base64.getEncoder()
-                .encode((paymentProperties.secretKey() + ":")
-                        .getBytes(StandardCharsets.UTF_8));
-        return  "Basic " + new String(encodedBytes);
+        String credentials = paymentProperties.secretKey() + ":";
+        return Base64.getEncoder()
+                .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     }
 
     private ClientHttpRequestFactory requestFactory() {
