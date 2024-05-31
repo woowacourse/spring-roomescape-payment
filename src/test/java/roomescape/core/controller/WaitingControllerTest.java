@@ -1,22 +1,16 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
-import roomescape.infrastructure.PaymentProvider;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -36,15 +30,6 @@ class WaitingControllerTest {
 
     @Autowired
     private TestFixture testFixture;
-
-    @MockBean
-    private PaymentProvider paymentProvider;
-
-    @PostConstruct
-    public void init() {
-        when(paymentProvider.getPaymentConfirmResponse(any()))
-                .thenReturn(new PaymentConfirmResponse(1000, "orderId", "paymentKey"));
-    }
 
     @BeforeEach
     void setUp() {
