@@ -11,12 +11,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
@@ -27,6 +30,9 @@ import roomescape.core.dto.payment.PaymentConfirmResponse;
 @Component
 @Profile("test")
 public class TestClient implements RestClient {
+    public static String RESPONSE_4XX_KEY = "Payment key for response 4XX";
+    public static String RESPONSE_5XX_KEY = "Payment key for response 5XX";
+
     @Override
     public RequestHeadersUriSpec<?> get() {
         return null;
@@ -84,7 +90,17 @@ public class TestClient implements RestClient {
 
         @Override
         public RequestBodySpec body(Object body) {
-            return new TestRequestBodyUriSpec((PaymentConfirmRequest) body);
+            PaymentConfirmRequest request = (PaymentConfirmRequest) body;
+            if (request.getPaymentKey().equals(RESPONSE_4XX_KEY)) {
+                HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+                e.setBodyConvertFunction(obj -> null);
+                throw e;
+            }
+            if (request.getPaymentKey().equals(RESPONSE_5XX_KEY)) {
+                throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new TestRequestBodyUriSpec(request);
         }
 
         @Override
