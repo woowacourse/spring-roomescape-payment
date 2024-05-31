@@ -20,10 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
-import roomescape.TestPaymentConfig;
+import roomescape.config.TestPaymentConfig;
 import roomescape.domain.Duration;
 import roomescape.domain.Email;
 import roomescape.domain.Member;
@@ -41,7 +42,8 @@ import roomescape.repository.ThemeRepository;
 import roomescape.service.FakePayment;
 import roomescape.service.JwtGenerator;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TestPaymentConfig.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(TestPaymentConfig.class)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 public class ReservationControllerTest {
