@@ -1,8 +1,8 @@
 package roomescape.domain;
 
-import static roomescape.exception.ExceptionType.EMPTY_DESCRIPTION;
-import static roomescape.exception.ExceptionType.EMPTY_NAME;
-import static roomescape.exception.ExceptionType.EMPTY_THUMBNAIL;
+import static roomescape.exception.RoomescapeExceptionType.EMPTY_DESCRIPTION;
+import static roomescape.exception.RoomescapeExceptionType.EMPTY_NAME;
+import static roomescape.exception.RoomescapeExceptionType.EMPTY_THUMBNAIL;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

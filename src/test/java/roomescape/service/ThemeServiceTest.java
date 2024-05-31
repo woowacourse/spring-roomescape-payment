@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static roomescape.Fixture.defaultMember;
-import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
-import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_THEME;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

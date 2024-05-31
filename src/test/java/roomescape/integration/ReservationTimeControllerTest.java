@@ -2,8 +2,8 @@ package roomescape.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
+import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_TIME;
+import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_RESERVATION_TIME;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

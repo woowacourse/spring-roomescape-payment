@@ -1,6 +1,6 @@
 package roomescape.config;
 
-import static roomescape.exception.ExceptionType.REQUIRED_LOGIN;
+import static roomescape.exception.RoomescapeExceptionType.REQUIRED_LOGIN;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

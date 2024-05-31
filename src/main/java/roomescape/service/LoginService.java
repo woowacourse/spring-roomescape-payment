@@ -1,8 +1,8 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.REQUIRED_LOGIN;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.RoomescapeExceptionType.REQUIRED_LOGIN;
+import static roomescape.exception.RoomescapeExceptionType.WRONG_PASSWORD;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

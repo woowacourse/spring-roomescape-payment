@@ -1,6 +1,6 @@
 package roomescape.domain;
 
-import static roomescape.exception.ExceptionType.EMPTY_TIME;
+import static roomescape.exception.RoomescapeExceptionType.EMPTY_TIME;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,8 +1,8 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.RoomescapeExceptionType.WRONG_PASSWORD;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

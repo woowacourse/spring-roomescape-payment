@@ -1,8 +1,8 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
-import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_THEME;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

@@ -7,7 +7,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.Password;
 
-public enum ExceptionType {
+public enum RoomescapeExceptionType {
     EMPTY_NAME(BAD_REQUEST, "이름은 필수 값입니다."),
     EMPTY_TIME(BAD_REQUEST, "시작 시간은 필수 값입니다."),
     EMPTY_DATE(BAD_REQUEST, "날짜는 필수값 입니다."),
@@ -40,7 +40,7 @@ public enum ExceptionType {
     private final HttpStatus status;
     private final String message;
 
-    ExceptionType(HttpStatus status, String message) {
+    RoomescapeExceptionType(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
     }

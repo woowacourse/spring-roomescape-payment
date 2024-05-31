@@ -1,6 +1,6 @@
 package roomescape.domain;
 
-import static roomescape.exception.ExceptionType.INVALID_NAME;
+import static roomescape.exception.RoomescapeExceptionType.INVALID_NAME;
 
 import jakarta.persistence.Embeddable;
 import java.util.Objects;

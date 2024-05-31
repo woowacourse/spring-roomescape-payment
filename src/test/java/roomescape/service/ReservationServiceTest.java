@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,11 +21,10 @@ import roomescape.TestPaymentConfig;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
-import roomescape.exception.ExceptionType;
+import roomescape.exception.RoomescapeExceptionType;
 import roomescape.exception.RoomescapeException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = TestPaymentConfig.class)
@@ -147,7 +146,7 @@ class ReservationServiceTest extends FixtureUsingTest {
             assertThatThrownBy(() ->
                     reservationService.deleteByUser(LoginMemberRequest.from(notUsedMember), 1L))
                     .isInstanceOf(RoomescapeException.class)
-                    .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
+                    .hasMessage(RoomescapeExceptionType.FORBIDDEN_DELETE.getMessage());
 
             assertThat(reservationRepository.findAll()).isNotEmpty();
         }
@@ -158,7 +157,7 @@ class ReservationServiceTest extends FixtureUsingTest {
             assertThatThrownBy(() ->
                     reservationService.deleteByUser(LoginMemberRequest.from(ADMIN), 1L))
                     .isInstanceOf(RoomescapeException.class)
-                    .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
+                    .hasMessage(RoomescapeExceptionType.FORBIDDEN_DELETE.getMessage());
 
             assertThat(reservationRepository.findAll()).isNotEmpty();
         }

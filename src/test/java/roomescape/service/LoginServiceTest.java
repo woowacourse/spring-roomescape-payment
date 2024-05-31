@@ -3,8 +3,8 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.RoomescapeExceptionType.WRONG_PASSWORD;
 
 import io.jsonwebtoken.Claims;
 import java.util.Map;

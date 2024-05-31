@@ -1,10 +1,10 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.RoomescapeExceptionType.FORBIDDEN_DELETE;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

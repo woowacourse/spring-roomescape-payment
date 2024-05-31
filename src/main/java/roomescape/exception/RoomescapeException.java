@@ -3,18 +3,18 @@ package roomescape.exception;
 import org.springframework.http.HttpStatus;
 
 public class RoomescapeException extends RuntimeException {
-    private final ExceptionType exceptionType;
+    private final RoomescapeExceptionType roomescapeExceptionType;
 
-    public RoomescapeException(ExceptionType exceptionType) {
-        this.exceptionType = exceptionType;
+    public RoomescapeException(RoomescapeExceptionType roomescapeExceptionType) {
+        this.roomescapeExceptionType = roomescapeExceptionType;
     }
 
     @Override
     public String getMessage() {
-        return exceptionType.getMessage();
+        return roomescapeExceptionType.getMessage();
     }
 
     public HttpStatus getHttpStatus() {
-        return exceptionType.getStatus();
+        return roomescapeExceptionType.getStatus();
     }
 }

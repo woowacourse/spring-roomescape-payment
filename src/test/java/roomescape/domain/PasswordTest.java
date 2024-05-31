@@ -2,7 +2,7 @@ package roomescape.domain;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.exception.ExceptionType.INVALID_PASSWORD;
+import static roomescape.exception.RoomescapeExceptionType.INVALID_PASSWORD;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

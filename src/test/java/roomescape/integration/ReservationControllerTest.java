@@ -2,8 +2,8 @@ package roomescape.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.RoomescapeExceptionType.FORBIDDEN_DELETE;
+import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
