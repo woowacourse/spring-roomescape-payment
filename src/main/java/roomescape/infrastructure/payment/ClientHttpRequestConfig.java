@@ -6,6 +6,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.util.Timeout;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -40,10 +41,10 @@ public class ClientHttpRequestConfig {
     }
 
     @Bean
-    public RestClient restClient() {
-        return RestClient.builder()
-                .requestFactory(clientHttpRequestFactory())
-                .build();
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> RestClient
+                .builder()
+                .requestFactory(clientHttpRequestFactory());
     }
 }
 
