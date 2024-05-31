@@ -17,10 +17,6 @@ import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.ReservationRequest;
 
 public class PaymentRestClient {
-
-    private static final String CONFIRM_ENDPOINT = "/confirm";
-    private static final String CANCEL_ENDPOINT = "/cancel";
-
     @Value("${tosspay.secret_key}")
     private String secretKey;
 
@@ -36,7 +32,7 @@ public class PaymentRestClient {
         HttpHeaders headers = generateHttpHeaders();
         try {
             return restClient.post()
-                    .uri(CONFIRM_ENDPOINT)
+                    .uri("/confirm")
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(generatedConfirmRequestBody(request))
                     .retrieve()
@@ -59,7 +55,7 @@ public class PaymentRestClient {
         HttpHeaders headers = generateHttpHeaders();
         try {
             restClient.post()
-                    .uri("/" + payment.getPaymentKey() + CANCEL_ENDPOINT)
+                    .uri(String.format("/%s/cancel", payment.getPaymentKey()))
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(generatedCancelRequestBody())
                     .retrieve();
