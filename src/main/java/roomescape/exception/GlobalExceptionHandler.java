@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.*;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ConflictException;
@@ -54,20 +53,19 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse("중복된 데이터 요청입니다."));
     }
 
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<ExceptionResponse> handleHttpClientErrorException(HttpClientErrorException e) {
+    @ExceptionHandler(HttpStatusCodeException.class)
+    public ResponseEntity<ExceptionResponse> handleHttpStatusCodeException(HttpStatusCodeException e) {
         log.error(e.getMessage());
         RestClientErrorDto restClientErrorDto = e.getResponseBodyAs(RestClientErrorDto.class);
         return ResponseEntity.status(e.getStatusCode())
                 .body(new ExceptionResponse(restClientErrorDto.message()));
     }
 
-    @ExceptionHandler(HttpServerErrorException.class)
-    public ResponseEntity<ExceptionResponse> handleHttpServerErrorException(HttpServerErrorException e) {
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<ExceptionResponse> handleRestClientExceptionException(RestClientException e) {
         log.error(e.getMessage());
-        RestClientErrorDto restClientErrorDto = e.getResponseBodyAs(RestClientErrorDto.class);
-        return ResponseEntity.status(e.getStatusCode())
-                .body(new ExceptionResponse(restClientErrorDto.message()));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponse("서버에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요."));
     }
 
     @ExceptionHandler(Exception.class)
