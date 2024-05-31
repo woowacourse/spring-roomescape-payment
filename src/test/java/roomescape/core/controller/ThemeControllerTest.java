@@ -21,7 +21,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.core.domain.Status;
-import roomescape.core.dto.payment.PaymentResponse;
+import roomescape.core.dto.payment.TossPaymentResponse;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.utils.e2eTest;
@@ -56,7 +56,7 @@ class ThemeControllerTest {
 
         accessToken = getAccessToken();
 
-        BDDMockito.doReturn(new PaymentResponse(PAYMENT_KEY))
+        BDDMockito.doReturn(new TossPaymentResponse(PAYMENT_KEY))
                 .when(paymentClient).approvePayment(any(), any());
     }
 

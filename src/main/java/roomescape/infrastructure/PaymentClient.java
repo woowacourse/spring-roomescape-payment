@@ -6,8 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
-import roomescape.core.dto.payment.PaymentRequest;
-import roomescape.core.dto.payment.PaymentResponse;
+import roomescape.core.dto.payment.TossPaymentRequest;
+import roomescape.core.dto.payment.TossPaymentResponse;
 
 @Component
 public class PaymentClient {
@@ -17,27 +17,27 @@ public class PaymentClient {
         this.restClient = restClient;
     }
 
-    public PaymentResponse approvePayment(final PaymentRequest paymentRequest,
-                                          final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+    public TossPaymentResponse approvePayment(final TossPaymentRequest tossPaymentRequest,
+                                              final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         return restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(paymentRequest)
+                .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
-                .body(PaymentResponse.class);
+                .body(TossPaymentResponse.class);
     }
 
-    public PaymentResponse refundPayment(final PaymentResponse paymentResponse,
-                                         final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+    public TossPaymentResponse refundPayment(final TossPaymentResponse tossPaymentResponse,
+                                             final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         return restClient.post()
-                .uri("https://api.tosspayments.com/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
+                .uri("https://api.tosspayments.com/v1/payments/" + tossPaymentResponse.getPaymentKey() + "/cancel")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
-                .body(PaymentResponse.class);
+                .body(TossPaymentResponse.class);
     }
 }

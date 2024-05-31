@@ -12,7 +12,7 @@ import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
-import roomescape.core.dto.payment.PaymentResponse;
+import roomescape.core.dto.payment.TossPaymentResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
@@ -157,9 +157,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public PaymentResponse findPaymentByDeleteReservation(final Long id) {
+    public TossPaymentResponse findPaymentByDeleteReservation(final Long id) {
         Reservation delete = reservationRepository.findReservationById(id);
-        return new PaymentResponse(delete.getPayment().getPaymentKey());
+        return new TossPaymentResponse(delete.getPayment().getPaymentKey());
     }
 
     @Transactional(readOnly = true)
