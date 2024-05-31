@@ -79,8 +79,8 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("asd")
-    void asd() {
+    @DisplayName("예약을 생성하고 결제한다.")
+    void createAndPay() {
         final String date = TestFixture.getTomorrowDate();
         final ReservationPaymentRequest request
                 = new ReservationPaymentRequest(date, 1L, 1L, "1", "1", 1);
