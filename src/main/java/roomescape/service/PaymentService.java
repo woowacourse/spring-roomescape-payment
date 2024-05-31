@@ -2,12 +2,11 @@ package roomescape.service;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import roomescape.controller.HeaderGenerator;
+import roomescape.exception.customexception.api.ApiException;
 import roomescape.service.dto.request.PaymentApproveRequest;
 import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.response.PaymentApproveResponse;
@@ -30,6 +29,7 @@ public class PaymentService {
 
     private static HttpHeaders HEADER;
 
+
     private final RestTemplate restTemplate;
 
     public PaymentService(RestTemplate restTemplate) {
@@ -51,20 +51,31 @@ public class PaymentService {
     }
 
     public PaymentApproveResponse pay(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
-        return restTemplate.postForEntity(
+        ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 PAYMENT_APPROVE_ENDPOINT,
                 new HttpEntity<>(paymentApproveRequest, HEADER),
                 PaymentApproveResponse.class
-        ).getBody();
+        );
+
+        validateStatusCode(response.getStatusCode());
+        return response.getBody();
     }
 
     public PaymentCancelResponse cancel(PaymentCancelRequest paymentCancelRequest) {
         HEADER.add("cancelReason", paymentCancelRequest.cancelReason());
 
-        return restTemplate.postForEntity(
+        ResponseEntity<PaymentCancelResponse> response = restTemplate.postForEntity(
                 String.format(PAYMENT_CANCEL_ENDPOINT, paymentCancelRequest.paymentKey()),
                 new HttpEntity<>(HEADER),
                 PaymentCancelResponse.class
-        ).getBody();
+        );
+        validateStatusCode(response.getStatusCode());
+        return response.getBody();
+    }
+
+    private void validateStatusCode(HttpStatusCode code) {
+        if (!code.is2xxSuccessful()) {
+            throw new ApiException("결제 요청 과정에서 문제가 발생했습니다.");
+        }
     }
 }
