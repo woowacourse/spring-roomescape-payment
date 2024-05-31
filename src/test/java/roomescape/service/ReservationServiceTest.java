@@ -187,7 +187,7 @@ class ReservationServiceTest {
         given(reservationRepository.existsById(existingId)).willReturn(true);
 
         // when & then
-        assertThatCode(() -> reservationService.delete(existingId))
+        assertThatCode(() -> reservationService.deleteReservation(existingId))
                 .doesNotThrowAnyException();
     }
 
@@ -199,7 +199,7 @@ class ReservationServiceTest {
         given(reservationRepository.existsById(notExistingId)).willThrow(RoomescapeException.class);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.delete(notExistingId))
+        assertThatThrownBy(() -> reservationService.deleteReservation(notExistingId))
                 .isInstanceOf(RoomescapeException.class);
     }
 

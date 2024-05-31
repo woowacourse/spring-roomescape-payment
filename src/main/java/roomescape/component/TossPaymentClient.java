@@ -1,6 +1,7 @@
 package roomescape.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -16,7 +17,8 @@ import java.util.Base64;
 @Component
 public class TossPaymentClient {
 
-    private static final String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${toss.secret-key}")
+    private String widgetSecretKey;
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;

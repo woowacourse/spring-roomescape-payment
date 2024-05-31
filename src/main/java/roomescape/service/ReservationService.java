@@ -106,7 +106,7 @@ public class ReservationService {
                 .toList();
     }
 
-    public void delete(final Long id) {
+    public void deleteReservation(final Long id) {
         final boolean exists = reservationRepository.existsById(id);
         if (!exists) {
             throw new RoomescapeException(RESERVATION_NOT_FOUND);
