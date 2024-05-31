@@ -36,8 +36,8 @@ public class PaymentConfig {
                         .requestFactory(createHttpRequestFactory())
                         .defaultHeader(HttpHeaders.AUTHORIZATION, createTossAuthorizations())
                         .baseUrl("https://api.tosspayments.com")
-                        .build(),
-                errorHandler()
+                        .defaultStatusHandler(new TossPayErrorHandler())
+                        .build()
         );
     }
 
@@ -53,9 +53,5 @@ public class PaymentConfig {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((paymentProperties.getTossSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
         return TOSS_KEY_PREFIX + new String(encodedBytes);
-    }
-
-    private TossPayErrorHandler errorHandler() {
-        return new TossPayErrorHandler();
     }
 }
