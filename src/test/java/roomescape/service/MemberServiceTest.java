@@ -29,11 +29,11 @@ class MemberServiceTest {
     @DisplayName("아이디와 비밀번호가 같은 유저가 존재하면 해당 유저를 반환한다.")
     @Test
     void should_find_member_when_member_exist() {
-        MemberLoginRequest request = new MemberLoginRequest("1111", "sun@email.com");
+        MemberLoginRequest request = new MemberLoginRequest("1111", "otter@email.com");
 
         Member findMember = memberService.findMemberByEmailAndPassword(request);
 
-        assertThat(findMember.getName()).isEqualTo("썬");
+        assertThat(findMember.getName()).isEqualTo("수달");
     }
 
     @DisplayName("아이디와 비밀번호 같은 유저가 없으면 예외가 발생한다.")
@@ -50,7 +50,7 @@ class MemberServiceTest {
     void should_find_member_name_when_give_id() {
         String memberNameById = memberService.findMemberNameById(1L);
 
-        assertThat(memberNameById).isEqualTo("썬");
+        assertThat(memberNameById).isEqualTo("수달");
     }
 
     @DisplayName("주어진 아이디에 해당하는 사용자가 없으면 예외가 발생한다.")

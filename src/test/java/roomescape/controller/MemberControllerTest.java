@@ -20,7 +20,7 @@ class MemberControllerTest {
     @DisplayName("로그인 요청시 쿠키를 응답한다.")
     @Test
     void should_response_cookie_when_login() {
-        MemberLoginRequest request = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest request = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()
@@ -39,7 +39,7 @@ class MemberControllerTest {
     @DisplayName("요청시 쿠키를 제공하면 이름을 반환한다.")
     @Test
     void should_response_member_name_when_given_cookie() {
-        MemberLoginRequest request = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest request = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()
@@ -57,7 +57,7 @@ class MemberControllerTest {
                 .then().statusCode(200)
                 .extract().jsonPath().get("name");
 
-        assertThat(name).isEqualTo("썬");
+        assertThat(name).isEqualTo("수달");
     }
 
     @DisplayName("모든 사용자들을 반환한다.")

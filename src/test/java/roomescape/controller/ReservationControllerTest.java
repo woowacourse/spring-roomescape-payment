@@ -76,7 +76,7 @@ class ReservationControllerTest {
     void should_insert_reservation_whenT_member_request() {
         doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
 
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()
@@ -131,7 +131,7 @@ class ReservationControllerTest {
     void should_add_reservation_when_admin_request() {
         doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
 
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()
@@ -182,7 +182,7 @@ class ReservationControllerTest {
     @DisplayName("로그인 정보에 따른 예약 내역을 조회한다.")
     @Test
     void should_find_member_reservation() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()

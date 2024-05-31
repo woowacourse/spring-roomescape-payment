@@ -20,7 +20,7 @@ class JwtTokenProviderTest {
     @DisplayName("주어진 사용자로 토큰을 생성한다.")
     @Test
     void should_create_token_when_given_member() {
-        Member member = new Member(1L, "썬", MEMBER, "sun@email.com", "1234");
+        Member member = new Member(1L, "수달", MEMBER, "otter@email.com", "1234");
 
         String token = jwtTokenProvider.createToken(member);
 
@@ -30,7 +30,7 @@ class JwtTokenProviderTest {
     @DisplayName("주어진 토큰으로 payload를 반환한다.")
     @Test
     void should_get_payload_when_given_token() {
-        Member member = new Member(1L, "썬", MEMBER, "sun@email.com", "1234");
+        Member member = new Member(1L, "수달", MEMBER, "otter@email.com", "1234");
         String token = jwtTokenProvider.createToken(member);
 
         Claims claims = jwtTokenProvider.getPayload(token);

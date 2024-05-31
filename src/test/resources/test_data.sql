@@ -4,7 +4,7 @@ INSERT INTO reservation_time (start_at)
 VALUES ('11:00');
 
 INSERT INTO member (name, role, email, password)
-VALUES ('썬', 'MEMBER', 'sun@email.com', '1111');
+VALUES ('수달', 'MEMBER', 'otter@email.com', '1111');
 INSERT INTO member (name, role, email, password)
 VALUES ('배키', 'MEMBER', 'dmsgml@email.com', '2222');
 

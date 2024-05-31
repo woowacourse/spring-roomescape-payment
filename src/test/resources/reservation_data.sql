@@ -7,7 +7,7 @@ INSERT INTO theme (name, description, thumbnail)
 VALUES ('name2', 'description2', 'thumbnail2');
 
 INSERT INTO member (name, role, email, password)
-VALUES ('썬', 'MEMBER', 'sun@email.com', '1111');
+VALUES ('수달', 'MEMBER', 'otter@email.com', '1111');
 INSERT INTO member (name, role, email, password)
 VALUES ('배키', 'MEMBER', 'dmsgml@email.com', '2222');
 

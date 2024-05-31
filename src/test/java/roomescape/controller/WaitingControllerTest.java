@@ -20,7 +20,7 @@ class WaitingControllerTest {
     @DisplayName("예약 대기를 추가할 수 있다.")
     @Test
     void should_add_waiting_when_request() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()
@@ -46,7 +46,7 @@ class WaitingControllerTest {
     @DisplayName("존재하는 예약 대기라면 예약 대기를 삭제할 수 있다.")
     @Test
     void should_delete_waiting_when_waiting_exist() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
 
         String cookie = RestAssured
                 .given().log().all()

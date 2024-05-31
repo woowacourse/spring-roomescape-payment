@@ -22,7 +22,7 @@ class MemberRepositoryTest {
     @DisplayName("아이디와 비밀번호로 사용자를 조회한다.")
     @Test
     void should_find_member_when_given_email_and_password() {
-        Member member = memberRepository.findByEmailAndPassword("sun@email.com", "1111").get();
+        Member member = memberRepository.findByEmailAndPassword("otter@email.com", "1111").get();
 
         assertThat(member.getId()).isEqualTo(1L);
     }

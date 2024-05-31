@@ -117,7 +117,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 현재 이름(썬)으로 예약 내역이 이미 존재합니다.");
+                .hasMessage("[ERROR] 현재 이름(수달)으로 예약 내역이 이미 존재합니다.");
     }
 
     @DisplayName("이미 사용자가 예약 대기한 날짜, 테마, 시간에 예약 대기를 추가하는 경우 예외를 발생한다.")

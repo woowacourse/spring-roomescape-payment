@@ -119,7 +119,7 @@ class ReservationServiceTest {
     void should_throw_exception_when_previous_date() {
         ReservationRequest request =
                 new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234L);
-        Member member = new Member("썬", MEMBER, "sun@email.com", "1111");
+        Member member = new Member("수달", MEMBER, "otter@email.com", "1111");
 
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(BadRequestException.class)
