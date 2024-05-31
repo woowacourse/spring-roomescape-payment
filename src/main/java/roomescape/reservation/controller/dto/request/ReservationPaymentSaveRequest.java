@@ -5,10 +5,10 @@ import java.time.LocalDate;
 
 public record ReservationPaymentSaveRequest(
         @NotNull LocalDate date,
-        @NotNull Long themeId,
-        @NotNull Long timeId,
+        @NotNull long themeId,
+        @NotNull long timeId,
         @NotNull String paymentKey,
         @NotNull String orderId,
-        @NotNull Long amount
+        @NotNull long amount
 ) {
 }
