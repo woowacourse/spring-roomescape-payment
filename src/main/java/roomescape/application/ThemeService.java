@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.theme.ReservationReferencedThemeException;
@@ -14,9 +15,11 @@ import roomescape.application.policy.RankingPolicy;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ThemeService {
     private final ThemeRepository themeRepository;
 
+    @Transactional
     public ThemeResponse saveTheme(ThemeRequest request) {
         Theme theme = request.toTheme();
         Theme savedTheme = themeRepository.save(theme);
@@ -43,6 +46,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional
     public void deleteTheme(Long id) {
         try {
             themeRepository.delete(id);
