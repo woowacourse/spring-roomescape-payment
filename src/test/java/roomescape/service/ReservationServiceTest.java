@@ -134,8 +134,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void timeForSaveReservationNotFound() {
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
-                LocalDate.parse("2025-11-11"), 100L, 1L);
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                member.getId(), LocalDate.parse("2025-11-11"), 100L, 1L,
+                1000, "orderId", "paymentKey");
         assertThatThrownBy(() -> {
             reservationService.saveReservation(reservationPaymentRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
@@ -169,8 +170,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("한 사람이 중복된 예약을 할 수 없다.")
     @Test
     void saveDuplicatedReservation() {
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L, LocalDate.parse("2024-05-04"),
-                1L, 1L);
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                1L, LocalDate.parse("2024-05-04"), 1L, 1L,
+                1000, "orderId", "paymentKey");
 
         assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);

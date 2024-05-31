@@ -303,7 +303,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/waiting")
                             .then().log().all()
                             .statusCode(201).extract().header("location").split("/")[3];
                 }),
@@ -317,7 +317,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .extract().as(UserReservationResponse[].class);
 
                     UserReservationResponse userReservationResponse = Arrays.stream(responses)
-                            .filter(resposne -> resposne.id() == Long.parseLong(adminReservationId))
+                            .filter(response -> response.id() == Long.parseLong(adminReservationId))
                             .findAny().get();
 
                     assertAll(

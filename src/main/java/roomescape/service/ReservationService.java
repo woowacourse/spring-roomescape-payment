@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Service
@@ -43,56 +44,48 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservation(ReservationRequest reservationRequest) {
-        return saveReservationWithPayment(reservationRequest, freePayment());
+        Runnable payment = () -> {};
+        return saveReservation(reservationRequest, payment);
     }
 
     @Transactional
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
         ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
-        return saveReservationWithPayment(reservationRequest, payment(reservationPaymentRequest));
+        PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+        Runnable payment = () -> paymentClient.requestApproval(paymentRequest);
+        return saveReservation(reservationRequest, payment);
     }
 
-    private Runnable freePayment() {
-        return () -> {};
-    }
-
-    private Runnable payment(ReservationPaymentRequest reservationPaymentRequest) {
-        return () -> {
-            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
-            paymentClient.requestApproval(paymentRequest);
-        };
-    }
-
-    private ReservationResponse saveReservationWithPayment(ReservationRequest reservationRequest, Runnable pay) {
+    private ReservationResponse saveReservation(ReservationRequest reservationRequest, Runnable payment) {
         Member member = findMemberById(reservationRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
-        Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
-
-        if (optionalReservation.isPresent()) {
-            Reservation reservation = optionalReservation.get();
-            Waiting waiting = reservation.addWaiting(member);
-
-            waitingRepository.save(waiting);
-            return ReservationResponse.createByWaiting(waiting);
-        }
-
-        pay.run();
-
-        Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
-        return ReservationResponse.createByReservation(savedReservation);
+        return trySave(member, slot, () -> {
+            payment.run();
+            Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
+            return ReservationResponse.createByReservation(savedReservation);
+        });
     }
 
     @Transactional
     public ReservationResponse saveWaiting(WaitingSaveRequest waitingSaveRequest) {
         Member member = findMemberById(waitingSaveRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(waitingSaveRequest.toSlotRequest());
-        Reservation reservation = reservationRepository.findBySlot(slot)
-                .orElseThrow(() -> new RoomEscapeBusinessException("예약이 존재하지 않습니다."));
+        return trySave(member, slot, () -> {
+            throw new RoomEscapeBusinessException("해당 대기에 대한 예약이 존재하지 않습니다.");
+        }); // TODO: WaitingResponse 분리? => private 메서드 추출 못 함
+    }
 
-        Waiting waiting = reservation.addWaiting(member);
-
-        waitingRepository.save(waiting);
-        return ReservationResponse.createByWaiting(waiting);
+    private ReservationResponse trySave(Member member,
+                                        ReservationSlot slot,
+                                        Supplier<ReservationResponse> progressWhenReservationNotExist) {
+        Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            Waiting waiting = reservation.addWaiting(member);
+            waitingRepository.save(waiting);
+            return ReservationResponse.createByWaiting(waiting);
+        }
+        return progressWhenReservationNotExist.get();
     }
 
     @Transactional(readOnly = true)
