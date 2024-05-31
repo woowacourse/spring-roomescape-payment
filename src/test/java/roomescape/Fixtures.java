@@ -2,6 +2,7 @@ package roomescape;
 
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.Reservation;
@@ -143,5 +144,11 @@ public class Fixtures {
             ZonedDateTime.now(),
             BigDecimal.valueOf(21000),
             BigDecimal.valueOf(50000)
+    );
+
+    public static final PaymentRequest paymentRequestFixture = new PaymentRequest(
+            "paymentKey",
+            "orderId",
+            BigDecimal.valueOf(21000)
     );
 }

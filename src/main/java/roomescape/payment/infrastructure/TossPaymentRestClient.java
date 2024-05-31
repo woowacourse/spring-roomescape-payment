@@ -71,4 +71,8 @@ public class TossPaymentRestClient {
             throw new IllegalStateException("토스 API와 통신하던 중 문제가 발생하였습니다.");
         }
     }
+
+    RestClient getRestClient() {
+        return restClient;
+    }
 }
