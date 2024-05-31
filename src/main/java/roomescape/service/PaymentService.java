@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.dto.ApproveApiResponse;
 import roomescape.dto.PaymentApproveRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
@@ -28,7 +29,8 @@ public class PaymentService {
 
     public void approve(PaymentApproveRequest paymentApproveRequest, long memberId) {
         memberRepository.findById(memberId).orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
-        Payment payment = paymentClient.approve(paymentApproveRequest);
+        ApproveApiResponse approve = paymentClient.approve(paymentApproveRequest);
+        Payment payment = new Payment(approve.orderId(), approve.paymentKey(), approve.totalAmount());
         paymentRepository.save(payment);
     }
 }

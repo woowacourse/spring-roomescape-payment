@@ -1,8 +1,6 @@
 package roomescape.domain.payment;
 
-import java.util.Set;
-
-public enum PaymentApiErrorCode {
+enum PaymentApiErrorCode {
     UNKNOWN,
     ALREADY_PROCESSED_PAYMENT,
     PROVIDER_ERROR,
@@ -50,14 +48,4 @@ public enum PaymentApiErrorCode {
     FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING,
     FAILED_INTERNAL_SYSTEM_PROCESSING,
     UNKNOWN_PAYMENT_ERROR;
-    private static final Set<PaymentApiErrorCode> needToHideCodes = Set.of(INVALID_REQUEST, NOT_FOUND_TERMINAL_ID,
-            INVALID_API_KEY, UNAUTHORIZED_KEY,
-            INVALID_UNREGISTERED_SUBMALL, NOT_REGISTERED_BUSINESS,
-            INVALID_AUTHORIZE_AUTH, INCORRECT_BASIC_AUTH_FORMAT, FDS_ERROR, NOT_FOUND_PAYMENT,
-            NOT_FOUND_PAYMENT_SESSION
-    );
-
-    boolean isNeedToHide() {
-        return needToHideCodes.contains(this);
-    }
 }

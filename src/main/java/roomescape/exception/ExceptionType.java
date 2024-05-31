@@ -36,7 +36,13 @@ public enum ExceptionType {
     WAITING_WITHOUT_MEMBER(CONFLICT, "예약 대기는 회원이 있어야만 생성할 수 있습니다."),
     WAITING_AT_ALREADY_RESERVATION(CONFLICT, "예약이 되어있는 회원이 예약 대기를 생성할 수 없습니다."),
     DUPLICATE_WAITING(BAD_REQUEST, "같은 테마와 날짜, 시간에 예약 대기는 한번만 생성할 수 있습니다."),
-    NOT_FOUND_RESERVATION(BAD_REQUEST, "없는 예약입니다.");
+    NOT_FOUND_RESERVATION(BAD_REQUEST, "없는 예약입니다."),
+    PAYMENT_FAIL_CAUSE_BALANCE(FORBIDDEN, "한도가 초과되거나 잔액이 부족하여 결제에 실패했습니다."),
+    PAYMENT_FAIL_CAUSE_CARD_COMPANY(FORBIDDEN, "카드사에서 결제를 거부했습니다. 카드사에 문의하세요."),
+    PAYMENT_FAIL_CAUSE_INVALID_PASSWORD(FORBIDDEN, "비밀번호가 잘못되었습니다."),
+    PAYMENT_FAIL_CAUSE_EXCEED_MAX_ONE_DAY_AMOUNT(FORBIDDEN, "일일 한도를 초과하여 결제에 실패했습니다."),
+    PAYMENT_FAIL_CAUSE_INVALID_STOPPED_CARD(FORBIDDEN, "정지된 카드라 결제에 실패하였습니다."),
+    PAYMENT_FAIL_CAUSE_HIDDEN(INTERNAL_SERVER_ERROR, "결제에 실패하였습니다. 고객센터로 문의해주세요.");
 
     private final HttpStatus status;
     private final String message;
