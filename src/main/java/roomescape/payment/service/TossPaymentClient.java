@@ -28,7 +28,7 @@ public class TossPaymentClient {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createAuthorizations())
                 .requestFactory(ClientHttpRequestFactories.get(ClientHttpRequestFactorySettings.DEFAULTS
                         .withConnectTimeout(Duration.ofSeconds(5))
-                        .withReadTimeout(Duration.ofSeconds(5))))
+                        .withReadTimeout(Duration.ofSeconds(30))))
                 .build();
     }
 
