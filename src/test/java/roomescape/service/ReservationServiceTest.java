@@ -87,7 +87,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
         doThrow(PaymentException.class)
                 .when(paymentClient)
-                .requestApproval(paymentRequest);
+                .confirm(paymentRequest);
 
         assertAll(
                 () -> assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))

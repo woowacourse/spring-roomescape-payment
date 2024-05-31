@@ -4,5 +4,5 @@ import roomescape.service.dto.PaymentRequest;
 
 public interface PaymentClient {
 
-    void requestApproval(PaymentRequest request);
+    void confirm(PaymentRequest request);
 }

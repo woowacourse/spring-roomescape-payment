@@ -52,7 +52,7 @@ public class ReservationService {
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
         ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
         PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
-        Runnable payment = () -> paymentClient.requestApproval(paymentRequest);
+        Runnable payment = () -> paymentClient.confirm(paymentRequest);
         return saveReservation(reservationRequest, payment);
     }
 

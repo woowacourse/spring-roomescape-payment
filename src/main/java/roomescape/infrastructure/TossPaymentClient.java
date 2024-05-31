@@ -14,7 +14,7 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
     }
 
-    public void requestApproval(PaymentRequest request) {
+    public void confirm(PaymentRequest request) {
         try {
             restClient.post()
                     .uri("/v1/payments/confirm")
