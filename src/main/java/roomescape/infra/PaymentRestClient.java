@@ -2,7 +2,6 @@ package roomescape.infra;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Base64.Encoder;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.Payment;
@@ -12,11 +11,11 @@ import roomescape.exception.PaymentErrorHandler;
 
 public class PaymentRestClient {
 
+    private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
-    private static final String AUTHORIZATIONS_HEADER_PREFIX = "Basic ";
-    private static final Encoder ENCODER = Base64.getEncoder();
-    private static final String BASE64_DELIMITER = ":";
+    private static final String DELIMITER = ":";
+    private static final String AUTHORIZATION_HEADER_VALUE = "Basic "
+            + new String(Base64.getEncoder().encode((WIDGET_SECRET_KEY + DELIMITER).getBytes(StandardCharsets.UTF_8)));
 
     private final RestClient restClient;
     private final PaymentErrorHandler paymentErrorHandler;
@@ -28,7 +27,7 @@ public class PaymentRestClient {
 
     public Payment requestPaymentApproval(PaymentRequest request) {
         TossPaymentResponse response = restClient.post()
-                .header(AUTHORIZATION_HEADER_NAME, getAuthorizationsHeader())
+                .header(AUTHORIZATION_HEADER_KEY, AUTHORIZATION_HEADER_VALUE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
@@ -38,10 +37,4 @@ public class PaymentRestClient {
         return response.toPayment();
     }
 
-    private String getAuthorizationsHeader() {
-        byte[] encodedBytes = ENCODER.encode((WIDGET_SECRET_KEY + BASE64_DELIMITER)
-                .getBytes(StandardCharsets.UTF_8));
-
-        return AUTHORIZATIONS_HEADER_PREFIX + new String(encodedBytes);
-    }
 }
