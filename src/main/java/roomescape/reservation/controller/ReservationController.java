@@ -1,7 +1,9 @@
 package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -110,5 +112,13 @@ public class ReservationController {
                                               @PathVariable("id") @Min(1) long reservationMemberId) {
         reservationApplicationService.deleteWaiting(authInfo, reservationMemberId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<BigDecimal> getAvailable(
+            @RequestParam("date") @Future LocalDate date,
+            @RequestParam("themeId") @Min(1) long themeId,
+            @RequestParam("timeId") @Min(1) long timeId) {
+        return ResponseEntity.ok().body(reservationApplicationService.getPrice(date, themeId, timeId));
     }
 }

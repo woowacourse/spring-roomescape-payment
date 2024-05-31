@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +123,10 @@ public class ReservationApplicationService {
         Member member = reservationCommonService.getMember(authInfo.getId());
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         waitingReservationService.denyWaiting(member, memberReservation);
+    }
+
+    public BigDecimal getPrice(LocalDate date, long themeId, long timeId) {
+        return reservationCommonService.getReservation(date, timeId, themeId).getPrice();
     }
 }
 

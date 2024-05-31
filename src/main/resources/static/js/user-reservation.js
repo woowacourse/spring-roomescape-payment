@@ -130,6 +130,29 @@ function renderAvailableTimes(times) {
     });
 }
 
+function fetchPrice(date, themeId, timeId) {
+    fetch(`/reservations/price?date=${date}&themeId=${themeId}&timeId=${timeId}`, { // 예약 가격 조회 API endpoint
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => {
+        if (response.status === 200) return response.json();
+        throw new Error('Read failed');
+    }).then(renderPrice)
+        .catch(error => console.error("Error fetching available times:", error));
+}
+
+function renderPrice(price) {
+    const summarySection = document.getElementById("price");
+
+    summarySection.innerHTML = '';
+    const a = document.createElement('a');
+    a.className = 'price' + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
+    a.textContent = price;
+    summarySection.appendChild(a);
+}
+
 function checkDateAndThemeAndTime() {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeElement = document.querySelector('.theme-slot.active');
@@ -137,15 +160,23 @@ function checkDateAndThemeAndTime() {
     const reserveButton = document.getElementById("reserve-button");
     const waitButton = document.getElementById("wait-button");
 
+    let price;
     if (selectedDate && selectedThemeElement && selectedTimeElement) {
         if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
             // 선택된 시간이 이미 예약된 경우
             reserveButton.classList.add("disabled");
             waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
+            const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
+            const selectedTimeId = selectedTimeElement.getAttribute('data-time-id');
+            fetchPrice(selectedDate, selectedThemeId, selectedTimeId);
+
         } else {
             // 선택된 시간이 예약 가능한 경우
             reserveButton.classList.remove("disabled");
             waitButton.classList.add("disabled"); // 예약 대기 버튼 비활성화
+            const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
+            const selectedTimeId = selectedTimeElement.getAttribute('data-time-id');
+            fetchPrice(selectedDate, selectedThemeId, selectedTimeId);
         }
     } else {
         // 날짜, 테마, 시간 중 하나라도 선택되지 않은 경우
@@ -159,7 +190,7 @@ function onReservationButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
+    const price = document.getElementById('price');
     if (selectedDate && selectedThemeId && selectedTimeId) {
 
         const reservationData = {
@@ -177,7 +208,7 @@ function onReservationButtonClick(event, paymentWidget) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+            amount: price,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
@@ -192,7 +223,7 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    
+
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,

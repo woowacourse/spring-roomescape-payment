@@ -96,6 +96,13 @@ public class ReservationCommonService {
                 .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
     }
 
+    public Reservation getReservation(LocalDate date, long timeId, long themeId) {
+        ReservationTime time = getReservationTime(timeId);
+        Theme theme = getTheme(themeId);
+        return reservationRepository.findReservationByDateAndTimeAndTheme(date, time, theme)
+                .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
+    }
+
     public MemberReservation getMemberReservation(long memberReservationId) {
         return memberReservationRepository.findById(memberReservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND));
