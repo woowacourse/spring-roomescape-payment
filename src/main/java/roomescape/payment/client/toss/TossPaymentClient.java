@@ -1,7 +1,8 @@
-package roomescape.payment.client;
+package roomescape.payment.client.toss;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
 import roomescape.payment.model.Payment;
 

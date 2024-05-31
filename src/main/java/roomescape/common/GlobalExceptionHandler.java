@@ -19,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.common.exception.UnAuthorizationException;
+import roomescape.payment.client.toss.TossClientErrorResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

@@ -1,4 +1,4 @@
-package roomescape.common;
+package roomescape.payment.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -6,16 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.client.PaymentProperties;
 
 @Configuration
-public class RestClientConfiguration {
+public class PaymentRestClientConfiguration {
 
     private static final String BASIC_PREFIX = "Basic ";
 
     private final PaymentProperties paymentProperties;
 
-    public RestClientConfiguration(final PaymentProperties paymentProperties) {
+    public PaymentRestClientConfiguration(final PaymentProperties paymentProperties) {
         this.paymentProperties = paymentProperties;
     }
 
