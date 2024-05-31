@@ -1,5 +1,6 @@
 package roomescape.payment.service;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import roomescape.payment.dto.PaymentRequest;
 
@@ -12,7 +13,7 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public void pay(PaymentRequest paymentRequest) {
+    public void pay(@Valid PaymentRequest paymentRequest) {
         tossPaymentClient.requestPayment(paymentRequest);
     }
 }
