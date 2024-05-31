@@ -3,7 +3,9 @@ package roomescape.payment.infrastructure;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentConfirmFailException;
@@ -30,8 +32,8 @@ public class TossPaymentGateway implements PaymentGateway {
     ) {
         return restClient.post()
                 .uri("/confirm")
-                .header("Content-Type", "application/json")
-                .header("Authorization", generateAuthorizations())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, generateAuthorizations())
                 .body(new PaymentConfirmRequest(orderId, amount, paymentKey))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
