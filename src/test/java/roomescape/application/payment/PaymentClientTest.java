@@ -87,4 +87,23 @@ class PaymentClientTest {
                 .isInstanceOf(PaymentException.class)
                 .hasMessageStartingWith("카드 정보를 다시 확인해주세요.");
     }
+
+    @Test
+    @DisplayName("ResponseBody가 비어있을 경우, 예외를 반환한다.")
+    void errorOnEmptyResponseBody() {
+        String body = "";
+        MockClientHttpResponse response = new MockClientHttpResponse(
+                body.getBytes(),
+                HttpStatus.OK
+        );
+        server.expect(manyTimes(), requestTo(properties.getUrl() + "/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond((req) -> response);
+
+        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+
+        assertThatCode(() -> paymentClient.requestPurchase(request))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제에 실패했습니다.");
+    }
 }
