@@ -1,39 +1,29 @@
 package roomescape.service;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.controller.HeaderGeneratorImpl;
+import roomescape.controller.dto.UserReservationSaveRequest;
+import roomescape.domain.member.Member;
+import roomescape.domain.repository.*;
+import roomescape.domain.reservation.*;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
+import roomescape.service.dto.request.*;
+import roomescape.service.dto.response.PaymentApproveResponse;
+import roomescape.service.dto.response.ReservationResponse;
+import roomescape.service.dto.response.ReservationResponses;
+import roomescape.service.dto.response.UserReservationResponse;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.HeaderGeneratorImpl;
-import roomescape.service.dto.request.PaymentApproveRequest;
-import roomescape.controller.dto.UserReservationSaveRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
-import roomescape.domain.repository.WaitingRepository;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationSlot;
-import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.reservation.Theme;
-import roomescape.domain.reservation.Waiting;
-import roomescape.exception.customexception.business.RoomEscapeBusinessException;
-import roomescape.service.dto.request.LoginMember;
-import roomescape.service.dto.request.ReservationConditionRequest;
-import roomescape.service.dto.request.ReservationSaveRequest;
-import roomescape.service.dto.response.ReservationResponse;
-import roomescape.service.dto.response.ReservationResponses;
-import roomescape.service.dto.response.UserReservationResponse;
 
 @Service
 @Transactional
 public class ReservationService {
-
-    //TODO 결제 성공했는데 예약 실패 시 -> 결제 취소
     private final PaymentService paymentService;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
@@ -57,12 +47,17 @@ public class ReservationService {
         this.timeRepository = timeRepository;
     }
 
-    public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
+    public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest) {
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-        paymentService.pay(new HeaderGeneratorImpl(), paymentApproveRequest);
-
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        return saveReservation(reservationSaveRequest);
+        PaymentApproveResponse payResponse = paymentService.pay(new HeaderGeneratorImpl(), paymentApproveRequest);
+
+        try {
+            return saveReservation(reservationSaveRequest);
+        } catch (RoomEscapeBusinessException | DataAccessException exception) {
+            paymentService.cancel(new PaymentCancelRequest(payResponse.paymentKey(), "예약이 정상적으로 처리되지 않음"));
+            throw new RoomEscapeBusinessException(exception.getMessage());
+        }
     }
 
     public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {

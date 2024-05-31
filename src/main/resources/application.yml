@@ -24,7 +24,8 @@ security:
 
 payment:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  end-point: https://api.tosspayments.com/v1/payments/confirm
+  approve-end-point: https://api.tosspayments.com/v1/payments/confirm
+  cancle-end-point: https://api.tosspayments.com/v1/payments/%s/cancle
 
 logging:
   level:
