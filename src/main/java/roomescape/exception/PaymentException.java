@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatusCode;
 
 public class PaymentException extends RuntimeException {
 
-    private final String errorMessage;
     private final HttpStatusCode httpStatusCode;
+    private final String errorMessage;
 
-    public PaymentException(PaymentExceptionType paymentExceptionType, Throwable cause) {
+    public PaymentException(HttpStatusCode httpStatusCode, String errorMessage, Throwable cause) {
         super(cause);
-        this.httpStatusCode = paymentExceptionType.getHttpStatus();
-        this.errorMessage = paymentExceptionType.getMessage();
+        this.httpStatusCode = httpStatusCode;
+        this.errorMessage = errorMessage;
     }
 
     public String getErrorMessage() {

@@ -1,4 +1,4 @@
-package roomescape.exception;
+package roomescape.api;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import java.util.Arrays;
 import org.springframework.http.HttpStatusCode;
 
-public enum PaymentExceptionType {
+public enum TossPaymentExceptionType {
 
     PROVIDER_ERROR(BAD_REQUEST, "PROVIDER_ERROR", "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
     EXCEED_MAX_CARD_INSTALLMENT_PLAN(BAD_REQUEST, "EXCEED_MAX_CARD_INSTALLMENT_PLAN",
@@ -90,13 +90,13 @@ public enum PaymentExceptionType {
     private final String errorCode;
     private final String message;
 
-    PaymentExceptionType(HttpStatusCode httpStatus, String errorCode, String message) {
+    TossPaymentExceptionType(HttpStatusCode httpStatus, String errorCode, String message) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
         this.message = message;
     }
 
-    public static PaymentExceptionType findBy(String errorCode) {
+    public static TossPaymentExceptionType findBy(String errorCode) {
         return Arrays.stream(values())
                 .filter(paymentExceptionType -> paymentExceptionType.getErrorCode().equals(errorCode))
                 .findFirst()

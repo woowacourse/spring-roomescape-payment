@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.exception.PaymentExceptionType.INVALID_REQUEST;
+import static roomescape.api.TossPaymentExceptionType.INVALID_REQUEST;
 
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
@@ -20,6 +20,6 @@ public class FakePayment implements PaymentClient {
                 && CORRECT_REQ.amount() == paymentRequest.amount()) {
             return;
         }
-        throw new PaymentException(INVALID_REQUEST, new RuntimeException());
+        throw new PaymentException(INVALID_REQUEST.getHttpStatus(), INVALID_REQUEST.getMessage(), new RuntimeException());
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.PaymentErrorResponse;
 import roomescape.exception.PaymentException;
-import roomescape.exception.PaymentExceptionType;
+import roomescape.api.TossPaymentExceptionType;
 
 public class TossExceptionApi {
     private final RestClient restClient;
@@ -28,7 +28,8 @@ public class TossExceptionApi {
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             PaymentErrorResponse errorResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
-            throw new PaymentException(PaymentExceptionType.findBy(errorResponse.code() ), e);
+            TossPaymentExceptionType tossPaymentExceptionType = TossPaymentExceptionType.findBy(errorResponse.code());
+            throw new PaymentException(tossPaymentExceptionType.getHttpStatus(), tossPaymentExceptionType.getMessage(), e);
         }
     }
 }
