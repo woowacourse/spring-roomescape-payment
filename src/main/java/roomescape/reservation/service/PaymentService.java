@@ -2,11 +2,16 @@ package roomescape.reservation.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
@@ -25,20 +30,27 @@ public class PaymentService {
             @Value("${payment.secret-key}") String encodedSecretKey,
             ObjectMapper objectMapper
     ) {
-        this.restClient = RestClient.builder().baseUrl(paymentBaseUrl).build();
+        this.restClient = RestClient.builder()
+                .baseUrl(paymentBaseUrl)
+                .requestFactory(getClientHttpRequestFactory())
+                .build();
         this.encodedSecretKey = encodeSecretKey(encodedSecretKey);
         this.objectMapper = objectMapper;
     }
 
     public void confirmPayment(PaymentConfirmRequest paymentRequest) {
-        restClient.post()
-                .uri("/v1/payments/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", encodedSecretKey)
-                .body(paymentRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
-                .body(PaymentErrorResponse.class);
+        try {
+            restClient.post()
+                    .uri("/v1/payments/confirm")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", encodedSecretKey)
+                    .body(paymentRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
+                    .body(PaymentErrorResponse.class);
+        } catch (ResourceAccessException exception) {
+            throw new RuntimeException();
+        }
     }
 
     private ErrorHandler createPaymentErrorHandler() {
@@ -46,6 +58,13 @@ public class PaymentService {
             PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
             throw new PaymentException(response.getStatusCode(), errorResponse.message());
         };
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofMillis(1))
+                .withReadTimeout(Duration.ofSeconds(30));
+        return ClientHttpRequestFactories.get(settings);
     }
 
     private static String encodeSecretKey(String secretKey) {
