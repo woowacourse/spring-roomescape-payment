@@ -21,7 +21,7 @@ import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.Waiting;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.request.ReservationConditionRequest;
 import roomescape.service.dto.request.ReservationSaveRequest;

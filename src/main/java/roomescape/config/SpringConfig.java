@@ -15,7 +15,7 @@ import roomescape.config.objectmapper.CustomLocalTimeSerializer;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.exception.RestTemplateResponseExceptionHandler;
+import roomescape.exception.ApiExceptionHandler;
 
 @Configuration
 public class SpringConfig {
@@ -42,7 +42,7 @@ public class SpringConfig {
     RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 .requestFactory(this::requestFactory)
-                .errorHandler(new RestTemplateResponseExceptionHandler())
+                .errorHandler(new ApiExceptionHandler())
                 .build();
     }
 }

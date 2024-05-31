@@ -7,7 +7,7 @@ import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.ReservationTimeBookedRequest;
 import roomescape.service.dto.request.ReservationTimeSaveRequest;
 import roomescape.service.dto.response.ReservationTimeBookedResponse;

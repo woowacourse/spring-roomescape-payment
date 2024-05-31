@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.response.ReservationResponses;
 
 import java.time.LocalDate;

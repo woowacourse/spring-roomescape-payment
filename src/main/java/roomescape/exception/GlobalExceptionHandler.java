@@ -11,7 +11,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import roomescape.exception.customexception.*;
+import roomescape.exception.customexception.api.AbstractApiException;
+import roomescape.exception.customexception.api.ApiBadRequestException;
+import roomescape.exception.customexception.api.ApiException;
+import roomescape.exception.customexception.business.AbstractBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
+import roomescape.exception.customexception.security.AbstractSecurityException;
+import roomescape.exception.customexception.security.AuthenticationException;
+import roomescape.exception.customexception.security.AuthorizationException;
 import roomescape.exception.dto.ErrorResponse;
 
 import java.util.stream.Collectors;
@@ -37,8 +44,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER, e.getMessage());
     }
 
-    @ExceptionHandler(ThirdPartyAPIException.class)
-    public ResponseEntity<Object> handleThirdPartyAPIException(ThirdPartyAPIException e) {
+    @ExceptionHandler(ApiBadRequestException.class)
+    public ResponseEntity<Object> handleApiBadRequestException(ApiException e) {
+        logger.error(e.getMessage(), e);
+        return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER, e.getMessage());
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<Object> handleApiException(ApiException e) {
         logger.error(e.getMessage(), e);
         return makeErrorResponseEntity(ErrorCode.INTERNAL_SERVER, e.getMessage());
     }
@@ -68,6 +81,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AbstractSecurityException.class)
     public ResponseEntity<Object> handleBusinessException(AbstractSecurityException e) {
         return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER);
+    }
+
+    @ExceptionHandler(AbstractApiException.class)
+    public ResponseEntity<Object> handleApiException(AbstractApiException e) {
+        return makeErrorResponseEntity(ErrorCode.INTERNAL_SERVER);
     }
 
     @ExceptionHandler(RuntimeException.class)

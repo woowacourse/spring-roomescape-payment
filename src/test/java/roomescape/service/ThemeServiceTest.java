@@ -14,7 +14,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.PopularThemeRequest;
 import roomescape.service.dto.request.ThemeSaveRequest;
 import roomescape.service.dto.response.ThemeResponse;

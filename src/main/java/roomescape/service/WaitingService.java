@@ -9,7 +9,7 @@ import roomescape.domain.repository.WaitingRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.Waiting;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.WaitingRequest;
 import roomescape.service.dto.response.WaitingResponse;
 import roomescape.service.dto.response.WaitingResponses;

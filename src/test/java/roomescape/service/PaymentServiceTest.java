@@ -14,8 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.controller.HeaderGenerator;
 import roomescape.controller.dto.PaymentApproveRequest;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
-import roomescape.exception.customexception.ThirdPartyAPIException;
+import roomescape.exception.customexception.business.RoomEscapeBusinessException;
+import roomescape.exception.customexception.api.ApiException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -58,6 +58,6 @@ class PaymentServiceTest {
         };
 
         assertThatThrownBy(() -> paymentService.pay(headerGenerator, request))
-                .isInstanceOf(ThirdPartyAPIException.class);
+                .isInstanceOf(ApiException.class);
     }
 }
