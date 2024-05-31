@@ -32,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
             throw e;
         } catch (ResourceAccessException e) {
             logger.error(e.getMessage(), e);
-            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버의 연결 가능 시간이 초과되었습니다.");
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버와 연결이 되지 않습니다.");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제를 할 수 없습니다.");
