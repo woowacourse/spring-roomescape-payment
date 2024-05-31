@@ -17,6 +17,10 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
         return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
     }
 
+    /**
+     * 토스 예외 문서
+     * https://docs.tosspayments.com/reference/error-codes#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
+     */
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
