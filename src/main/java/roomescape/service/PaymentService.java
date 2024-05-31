@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.exception.PaymentClientException;
 import roomescape.exception.PaymentException;
+import roomescape.exception.PaymentServerException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -30,10 +32,10 @@ public class PaymentService {
                 .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new PaymentException("결제 정보가 일치하지 않습니다.");
+                    throw new PaymentClientException();
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentException("결제 시스템이 원활하게 동작하지 않습니다.");
+                    throw new PaymentServerException();
                 }).toBodilessEntity();
     }
 
