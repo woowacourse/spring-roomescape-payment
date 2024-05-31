@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.exception.TossPayErrorHandler;
 import roomescape.payment.client.TossPayRestClient;
 
 @Configuration
@@ -35,7 +36,8 @@ public class PaymentConfig {
                         .requestFactory(createHttpRequestFactory())
                         .defaultHeader(HttpHeaders.AUTHORIZATION, createTossAuthorizations())
                         .baseUrl("https://api.tosspayments.com")
-                        .build()
+                        .build(),
+                errorHandler()
         );
     }
 
@@ -51,5 +53,9 @@ public class PaymentConfig {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((paymentProperties.getTossSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
         return TOSS_KEY_PREFIX + new String(encodedBytes);
+    }
+
+    private TossPayErrorHandler errorHandler() {
+        return new TossPayErrorHandler();
     }
 }
