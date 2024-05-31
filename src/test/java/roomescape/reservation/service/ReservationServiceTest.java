@@ -74,6 +74,7 @@ class ReservationServiceTest {
     void paymentFailExceptionTest() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
+        memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest =
