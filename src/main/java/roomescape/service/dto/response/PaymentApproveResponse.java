@@ -1,4 +1,4 @@
-package roomescape.controller;
+package roomescape.service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

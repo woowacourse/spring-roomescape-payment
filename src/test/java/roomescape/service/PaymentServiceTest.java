@@ -13,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.controller.HeaderGenerator;
-import roomescape.controller.dto.PaymentApproveRequest;
+import roomescape.service.dto.request.PaymentApproveRequest;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.exception.customexception.api.ApiException;
 
