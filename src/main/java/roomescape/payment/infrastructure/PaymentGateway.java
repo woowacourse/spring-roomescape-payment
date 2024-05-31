@@ -1,4 +1,4 @@
-package roomescape.payment.pg;
+package roomescape.payment.infrastructure;
 
 import roomescape.payment.dto.PaymentConfirmResponse;
 

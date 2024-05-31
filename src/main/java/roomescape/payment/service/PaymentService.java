@@ -6,9 +6,9 @@ import roomescape.exception.PaymentCredentialMissMatchException;
 import roomescape.member.model.Member;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
+import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.payment.model.PaymentCredential;
 import roomescape.payment.model.PaymentHistory;
-import roomescape.payment.pg.PaymentGateway;
 import roomescape.payment.repository.PaymentCredentialRepository;
 import roomescape.payment.repository.PaymentHistoryRepository;
 

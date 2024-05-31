@@ -1,4 +1,4 @@
-package roomescape.payment.pg;
+package roomescape.payment.infrastructure;
 
 import java.util.Map;
 import org.springframework.boot.test.context.TestComponent;

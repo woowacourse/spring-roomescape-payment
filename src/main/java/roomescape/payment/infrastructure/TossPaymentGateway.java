@@ -1,4 +1,4 @@
-package roomescape.payment.pg;
+package roomescape.payment.infrastructure;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
