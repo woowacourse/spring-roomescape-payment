@@ -10,8 +10,8 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.auth.domain.Role;
-import roomescape.exception.ExpiredTokenException;
-import roomescape.exception.UnauthenticatedUserException;
+import roomescape.auth.exception.ExpiredTokenException;
+import roomescape.auth.exception.UnauthenticatedUserException;
 import roomescape.member.domain.Member;
 import roomescape.auth.dto.LoginMember;
 

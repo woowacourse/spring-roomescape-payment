@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
-import roomescape.exception.PaymentFailException;
+import roomescape.payment.exception.PaymentFailException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.PaymentRequest;

@@ -1,4 +1,4 @@
-package roomescape.exception;
+package roomescape.auth.exception;
 
 public class ExpiredTokenException extends UnauthenticatedUserException {
 

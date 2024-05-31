@@ -1,7 +1,7 @@
 package roomescape.auth.domain;
 
 import java.util.Arrays;
-import roomescape.exception.UnauthenticatedUserException;
+import roomescape.auth.exception.UnauthenticatedUserException;
 
 public enum Role {
     USER,

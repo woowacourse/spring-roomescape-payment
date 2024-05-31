@@ -3,6 +3,8 @@ package roomescape.exception;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import roomescape.auth.exception.NoAdminPrivilegeException;
+import roomescape.auth.exception.UnauthenticatedUserException;
 
 @ControllerAdvice
 public class PageControllerAdvice {

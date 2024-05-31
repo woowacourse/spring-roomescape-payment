@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.payment.exception.PaymentFailException;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ApiControllerAdvice {
@@ -33,15 +34,15 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(PaymentFailException.class)
     public ResponseEntity<ErrorResponse> paymentFailExHandler(PaymentFailException exception) {
-        LOGGER.error("토스 결제 에러 | code : {} | message : {} |", exception.getCode(), exception.getMessage());
+        LOGGER.error("토스 결제 에러 | code : {} | message : {} |", exception.getCode(), exception.getMessage(), exception);
 
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(exception.getHttpStatus())
                 .body(new ErrorResponse(exception.getCode(), exception.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> serverExHandler(Exception exception) {
-        LOGGER.error("서버 에러 : {}", exception.getMessage());
+        LOGGER.error("서버 에러 : {}", exception.getMessage(), exception);
 
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), exception.getMessage()));
