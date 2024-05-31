@@ -20,7 +20,7 @@ import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.dto.response.WaitingWithRanksResponse;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.system.auth.annotation.Admin;
 import roomescape.system.auth.annotation.MemberId;

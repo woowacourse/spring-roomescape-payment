@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.payment;
 
 
 import java.nio.charset.StandardCharsets;
