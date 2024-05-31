@@ -105,8 +105,8 @@ public class ReservationApplicationService {
         Member member = reservationCommonService.getMember(authInfo.getId());
         waitingReservationService.validateWaitingReservation(memberReservation);
 
-        reservationCommonService.delete(member, memberReservation);
         paymentService.refund(memberReservationId);
+        reservationCommonService.delete(member, memberReservation);
     }
 
     @Transactional

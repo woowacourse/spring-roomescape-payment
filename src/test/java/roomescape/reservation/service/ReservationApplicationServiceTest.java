@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;

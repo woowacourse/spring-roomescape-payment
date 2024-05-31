@@ -30,7 +30,8 @@ public class PaymentClient {
     private final ObjectMapper objectMapper;
 
     public PaymentClient(RestClient restClient,
-                         Encoder encoder, Authorization authorization,
+                         Encoder encoder,
+                         Authorization authorization,
                          TossPaymentProperties tossPaymentProperties,
                          ObjectMapper objectMapper) {
         this.restClient = restClient;

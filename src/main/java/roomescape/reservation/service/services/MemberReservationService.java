@@ -61,9 +61,8 @@ public class MemberReservationService {
 
     @Transactional
     public void updateStatus(Reservation reservation) {
-        memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation).ifPresent(
-                MemberReservation::notPaid
-        );
+        memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation)
+                .ifPresent(MemberReservation::notPaid);
     }
 
     @Transactional

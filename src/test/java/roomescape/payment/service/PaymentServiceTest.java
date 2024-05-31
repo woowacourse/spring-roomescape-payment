@@ -19,12 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.PaymentType;
+import roomescape.payment.domain.repository.PaymentHistoryRepository;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.service.dto.PaymentErrorResponse;
@@ -52,6 +54,8 @@ class PaymentServiceTest extends ServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
 
     @BeforeEach
     void setUp() {
@@ -101,5 +105,75 @@ class PaymentServiceTest extends ServiceTest {
         //when&then
         assertThatThrownBy(() -> paymentService.pay(paymentRequest, memberReservation))
                 .isInstanceOf(PaymentException.class);
+    }
+
+    @DisplayName("결제 환불에 성공한다.")
+    @Test
+    void refund() {
+        //given
+        String paymentKey = "paymentKey";
+        PaymentType paymentType = PaymentType.CARD;
+        PaymentStatus paymentStatus = PaymentStatus.PAID;
+        Price price = new Price(BigDecimal.valueOf(10000));
+        paymentRepository.save(new Payment(paymentKey, paymentType, price, memberReservation));
+        paymentHistoryRepository.save(new PaymentHistory(paymentKey, paymentType, paymentStatus, price, memberChoco));
+
+        //when
+        paymentService.refund(memberReservation.getId());
+
+        //then
+        Optional<Payment> payment = paymentRepository.findByPaymentKey(paymentKey);
+        assertThat(payment.isPresent()).isFalse();
+    }
+
+    @DisplayName("결제에 성공하면, 히스토리가 생성된다.")
+    @Test
+    void createHistory() {
+        //given
+        String paymentKey = "tgen_20240528172021mxEG4";
+        String paymentType = "카드";
+        BigDecimal totalAmount = BigDecimal.valueOf(1000L);
+        PaymentRequest paymentRequest = new PaymentRequest(totalAmount, "MC45NTg4ODYxMzA5MTAz", paymentKey);
+        PaymentResponse okResponse =
+                new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
+        doReturn(okResponse).when(paymentClient).confirm(any());
+
+        //when
+        paymentService.pay(paymentRequest, memberReservation);
+
+        //then
+        Optional<PaymentHistory> paymentHistory = paymentHistoryRepository.findPaymentHistoryByPaymentKey(
+                paymentKey);
+
+        assertAll(
+                () -> assertThat(paymentHistory).isNotNull(),
+                () -> assertThat(paymentHistory.get().getPaymentType()).isEqualTo(PaymentType.from(paymentType)),
+                () -> assertThat(paymentHistory.get().getPaymentStatus()).isEqualTo(PaymentStatus.PAID)
+        );
+    }
+
+    @DisplayName("결제 환불 시, 히스토리가 갱신된다.")
+    @Test
+    void updateHistory() {
+        //given
+        String paymentKey = "paymentKey";
+        PaymentType paymentType = PaymentType.CARD;
+        PaymentStatus paymentStatus = PaymentStatus.PAID;
+        Price price = new Price(BigDecimal.valueOf(10000));
+        paymentRepository.save(new Payment(paymentKey, paymentType, price, memberReservation));
+        paymentHistoryRepository.save(new PaymentHistory(paymentKey, paymentType, paymentStatus, price, memberChoco));
+
+        //when
+        paymentService.refund(memberReservation.getId());
+
+        //then
+        Optional<PaymentHistory> paymentHistory = paymentHistoryRepository.findPaymentHistoryByPaymentKey(
+                paymentKey);
+
+        assertAll(
+                () -> assertThat(paymentHistory).isNotNull(),
+                () -> assertThat(paymentHistory.get().getPaymentType()).isEqualTo(paymentType),
+                () -> assertThat(paymentHistory.get().getPaymentStatus()).isEqualTo(PaymentStatus.CANCELLED)
+        );
     }
 }
