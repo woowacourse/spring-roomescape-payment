@@ -41,7 +41,13 @@ public class ReservationDetail {
         this(null, date, time, theme);
     }
 
-    public boolean isBefore(LocalDateTime dateTime) {
+    public void validatePastTime() {
+        if (isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException(String.format("이미 지난 시간입니다. 입력한 예약 시간: %s", this.getDateTime()));
+        }
+    }
+
+    private boolean isBefore(LocalDateTime dateTime) {
         return LocalDateTime.of(date, time.getStartAt())
                 .isBefore(dateTime);
     }

@@ -32,10 +32,11 @@ import roomescape.exception.member.AuthenticationFailureException;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
-    private final ReservationFactory reservationFactory;
-    private final ReservationDetailFactory reservationDetailFactory;
     private final PaymentClient paymentRestClient;
     private final PaymentRepository paymentRepository;
+
+    private final ReservationFactory reservationFactory;
+    private final ReservationDetailFactory reservationDetailFactory;
 
     @Transactional
     public synchronized ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
@@ -68,11 +69,12 @@ public class ReservationService {
     @Transactional
     public ReservationResponse paymentForPending(ReservationPaymentRequest request, Long memberId) {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
-        reservation.isOwner(memberId);
+        reservation.validateOwner(memberId);
 
         PaymentRequest paymentRequest = request.toPaymentRequest();
         PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
         Payment payment = paymentRepository.save(paymentResponse.toPayment());
+
         reservation.setPayment(payment);
         reservation.toReserved();
         return ReservationResponse.from(reservation);

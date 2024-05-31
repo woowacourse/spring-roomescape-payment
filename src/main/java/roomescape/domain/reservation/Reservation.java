@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.reservation.CancelReservationException;
 
 @Entity
@@ -62,20 +63,20 @@ public class Reservation {
 
     public void toPending() {
         if (this.isCanceled()) {
-            throw new CancelReservationException("이미 취소된 예약입니다.");
+            throw new CancelReservationException();
         }
         this.status = Status.PAYMENT_PENDING;
     }
 
     public void toReserved() {
         if (this.isCanceled()) {
-            throw new CancelReservationException("이미 취소된 예약입니다.");
+            throw new CancelReservationException();
         }
         this.status = Status.RESERVED;
     }
 
     public void cancel(Long memberId) {
-        if (this.isNotOwner(memberId)) {
+        if (!member.hasSameId(memberId)) {
             throw new CancelReservationException("다른 회원의 예약을 취소할 수 없습니다.");
         }
         this.status = Status.CANCELED;
@@ -83,17 +84,15 @@ public class Reservation {
 
     public void cancelByAdmin() {
         if (this.isCanceled()) {
-            throw new CancelReservationException("이미 취소된 예약입니다.");
+            throw new CancelReservationException();
         }
         this.status = Status.CANCELED;
     }
 
-    public boolean isOwner(Long id) {
-        return this.member.getId().equals(id);
-    }
-
-    public boolean isNotOwner(Long id) {
-        return !this.member.getId().equals(id);
+    public void validateOwner(Long memberId) {
+        if (member.hasSameId(memberId)) {
+            throw new AuthenticationFailureException();
+        }
     }
 
     public boolean isReserved() {

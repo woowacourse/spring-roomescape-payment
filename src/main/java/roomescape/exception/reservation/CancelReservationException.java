@@ -5,7 +5,7 @@ import roomescape.exception.CustomException;
 
 public class CancelReservationException extends CustomException {
     public CancelReservationException() {
-        super("예약을 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        super("이미 취소된 예약입니다.", HttpStatus.BAD_REQUEST);
     }
 
     public CancelReservationException(String message) {

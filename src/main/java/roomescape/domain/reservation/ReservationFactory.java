@@ -1,6 +1,5 @@
 package roomescape.domain.reservation;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,16 +13,9 @@ public class ReservationFactory {
     private final ReservationRepository reservationRepository;
 
     public Reservation createReservation(ReservationDetail detail, Member member) {
-        rejectPastReservation(detail);
+        detail.validatePastTime();
         rejectDuplicateReservation(detail, member);
         return getReservation(detail, member);
-    }
-
-    private void rejectPastReservation(ReservationDetail detail) {
-        LocalDateTime now = LocalDateTime.now();
-        if (detail.isBefore(now)) {
-            throw new IllegalArgumentException(String.format("이미 지난 시간입니다. 입력한 예약 시간: %s", detail.getDateTime()));
-        }
     }
 
     private void rejectDuplicateReservation(ReservationDetail detail, Member member) {
