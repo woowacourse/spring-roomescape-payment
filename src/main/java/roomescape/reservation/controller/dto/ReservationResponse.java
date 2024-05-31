@@ -34,7 +34,7 @@ public record ReservationResponse(
                 reservationSlot.getDate(),
                 ReservationTimeResponse.from(reservationSlot.getTime()),
                 ThemeResponse.from(reservationSlot.getTheme()),
-                reservation.getAMOUNT()
+                reservation.getAmount()
         );
     }
 }
