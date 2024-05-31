@@ -4,18 +4,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.payment.dto.PaymentConfirmRequest;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
 import roomescape.exception.PaymentConfirmFailException;
-import roomescape.domain.payment.dto.PaymentConfirmRequest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import static roomescape.domain.config.PaymentConfig.PG_API_BASE_URL;
+import static roomescape.domain.config.PaymentConfig.PG_CONFIRM_API_URL;
 
 @Component
 public class TossPaymentGateway implements PaymentGateway {
 
     private final RestClient restClient = RestClient.builder()
-            .baseUrl("https://api.tosspayments.com/v1/payments")
+            .baseUrl(PG_API_BASE_URL)
             .build();
 
     @Value("${custom.pg.widget-secret-key}")
@@ -27,7 +30,7 @@ public class TossPaymentGateway implements PaymentGateway {
             final String paymentKey
     ) {
         return restClient.post()
-                .uri("/confirm")
+                .uri(PG_CONFIRM_API_URL)
                 .header("Content-Type", "application/json")
                 .header("Authorization", generateAuthorizations())
                 .body(new PaymentConfirmRequest(orderId, amount, paymentKey))
