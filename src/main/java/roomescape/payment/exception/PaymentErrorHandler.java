@@ -7,11 +7,11 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.exception.ErrorResponse;
 
-public class TossPaymentErrorHandler implements ResponseErrorHandler {
+public class PaymentErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
-    public TossPaymentErrorHandler() {
+    public PaymentErrorHandler() {
         this.objectMapper = new ObjectMapper();
     }
 
