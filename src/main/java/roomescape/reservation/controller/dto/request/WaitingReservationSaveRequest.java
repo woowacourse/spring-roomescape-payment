@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public record WaitingReservationSaveRequest(
         @NotNull LocalDate date,
-        @NotNull long themeId,
-        @NotNull long timeId
+        @NotNull Long themeId,
+        @NotNull Long timeId
 ) {
 }

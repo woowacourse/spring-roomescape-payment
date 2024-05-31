@@ -10,10 +10,10 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 
 public record ReservationSaveRequest(
-        @NotNull long memberId,
+        @NotNull Long memberId,
         @NotNull LocalDate date,
-        @NotNull long themeId,
-        @NotNull long timeId
+        @NotNull Long themeId,
+        @NotNull Long timeId
 ) {
     public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, long memberId) {
         return new ReservationSaveRequest(
