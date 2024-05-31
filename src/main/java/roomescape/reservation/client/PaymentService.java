@@ -1,9 +1,12 @@
-package roomescape.reservation.service;
+package roomescape.reservation.client;
+
+import static roomescape.reservation.client.errorcode.PaymentConfirmErrorCode.findByErrorCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -15,6 +18,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
+import roomescape.reservation.client.errorcode.PaymentConfirmErrorCode;
 import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 
@@ -56,13 +60,21 @@ public class PaymentService {
     private ErrorHandler createPaymentErrorHandler() {
         return (request, response) -> {
             PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-            throw new PaymentException(response.getStatusCode(), errorResponse.message());
+            throwByCustomErrorResponse(errorResponse);
+            throw new PaymentException(HttpStatusCode.valueOf(400), errorResponse.message());
         };
+    }
+
+    private static void throwByCustomErrorResponse(PaymentErrorResponse errorResponse) {
+        Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(errorResponse.code());
+        if (customErrorCode.isPresent()) {
+            throw customErrorCode.get().getException();
+        }
     }
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofMillis(1))
+                .withConnectTimeout(Duration.ofSeconds(30))
                 .withReadTimeout(Duration.ofSeconds(30));
         return ClientHttpRequestFactories.get(settings);
     }

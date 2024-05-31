@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.reservation.client.PaymentService;
 import roomescape.reservation.controller.dto.request.ReservationSaveRequest;
 import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.controller.dto.response.MemberReservationResponse;
