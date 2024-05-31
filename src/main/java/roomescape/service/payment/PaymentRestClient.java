@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.PaymentException;
@@ -43,7 +44,7 @@ public class PaymentRestClient {
                     .body(amount)
                     .retrieve()
                     .body(PaymentResult.class);
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             String responseBody = e.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody), e);
         }
@@ -59,7 +60,7 @@ public class PaymentRestClient {
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(cancelReason)
                     .retrieve();
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             String responseBody = e.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody), e);
         }
