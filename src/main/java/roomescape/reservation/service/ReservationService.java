@@ -1,10 +1,8 @@
 package roomescape.reservation.service;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
@@ -32,20 +30,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final ReservationSlotRepository reservationSlotRepository;
     private final ReservationRepository reservationRepository;
-    private final RestClient restClient;
+    private final PaymentWithRestClient paymentWithRestClient;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               ReservationSlotRepository reservationSlotRepository,
                               ReservationRepository reservationRepository,
-                              RestClient restClient) {
+                              PaymentWithRestClient paymentWithRestClient) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationSlotRepository = reservationSlotRepository;
         this.reservationRepository = reservationRepository;
-        this.restClient = restClient;
+        this.paymentWithRestClient = paymentWithRestClient;
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +73,7 @@ public class ReservationService {
         ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
         ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        PaymentResponse paymentResponse = confirm(paymentRequest);
+        PaymentResponse paymentResponse = paymentWithRestClient.confirm(paymentRequest);
 
         if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
@@ -105,16 +103,6 @@ public class ReservationService {
         Reservation reservation = reservationRepository.save(
                 new Reservation(member, reservationSlot, reservationStatus));
         return ReservationResponse.from(reservation.getId(), reservationSlot, member);
-    }
-
-    private PaymentResponse confirm(PaymentRequest paymentRequest) {
-        return restClient.post()
-                .uri("/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6")
-                .body(paymentRequest)
-                .retrieve()
-                .body(PaymentResponse.class);
     }
 
     private void validateReservation(ReservationSlot reservationSlot, Member member) {
