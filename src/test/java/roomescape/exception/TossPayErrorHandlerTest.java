@@ -22,7 +22,7 @@ class TossPayErrorHandlerTest {
         tossPayErrorHandler = new TossPayErrorHandler();
     }
 
-    @DisplayName("토스 서버로부터 400대, 500대 응답이 오면 예외로 판단한다.")
+    @DisplayName("토스 서버로부터 200대 이외의 응답이 오면 예외로 판단한다.")
     @ParameterizedTest
     @CsvSource(value = {"400,true", "401,true", "500,true", "200,false"})
     void determineException(int statusCode, boolean expected) throws IOException {

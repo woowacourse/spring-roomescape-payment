@@ -6,6 +6,7 @@ import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -30,15 +31,17 @@ public class PaymentConfig {
     }
 
     @Bean
-    public TossPayRestClient tossPayRestClient() {
-        return new TossPayRestClient(
-                RestClient.builder()
-                        .requestFactory(createHttpRequestFactory())
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, createTossAuthorizations())
-                        .baseUrl("https://api.tosspayments.com")
-                        .defaultStatusHandler(new TossPayErrorHandler())
-                        .build()
-        );
+    public TossPayRestClient tossPayRestClient(RestClient.Builder builder) {
+        return new TossPayRestClient(builder.build());
+    }
+
+    @Bean
+    public RestClientCustomizer tossPayRestClientCustomizer() {
+        return builder -> builder
+                .requestFactory(createHttpRequestFactory())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, createTossAuthorizations())
+                .baseUrl("https://api.tosspayments.com")
+                .defaultStatusHandler(new TossPayErrorHandler());
     }
 
     private ClientHttpRequestFactory createHttpRequestFactory() {
