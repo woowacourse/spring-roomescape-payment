@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Service
@@ -47,19 +46,24 @@ public class ReservationService {
         return saveReservationWithPayment(reservationRequest, freePayment());
     }
 
-    private Consumer<ReservationRequest> freePayment() {
-        return request -> {};
-    }
-
     @Transactional
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
-        return saveReservationWithPayment(reservationPaymentRequest.toReservationRequest(), reservationRequest -> {
-            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
-            paymentClient.requestApproval(paymentRequest);
-        });
+        ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
+        return saveReservationWithPayment(reservationRequest, payment(reservationPaymentRequest));
     }
 
-    private ReservationResponse saveReservationWithPayment(ReservationRequest reservationRequest, Consumer<ReservationRequest> payment) {
+    private Runnable freePayment() {
+        return () -> {};
+    }
+
+    private Runnable payment(ReservationPaymentRequest reservationPaymentRequest) {
+        return () -> {
+            PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+            paymentClient.requestApproval(paymentRequest);
+        };
+    }
+
+    private ReservationResponse saveReservationWithPayment(ReservationRequest reservationRequest, Runnable pay) {
         Member member = findMemberById(reservationRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
         Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
@@ -72,7 +76,7 @@ public class ReservationService {
             return ReservationResponse.createByWaiting(waiting);
         }
 
-        payment.accept(reservationRequest);
+        pay.run();
 
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
         return ReservationResponse.createByReservation(savedReservation);
