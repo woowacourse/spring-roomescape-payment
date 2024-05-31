@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.BadRequestException;
-import roomescape.payment.dto.PaymentFailure;
 import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.TossFailure;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -20,17 +20,19 @@ public class TossPaymentRestClient {
     private final RestClient restClient;
 
     public TossPaymentRestClient(ObjectMapper objectMapper,
-                                 @Value("${toss.secret}") String tossSecretKey
+                                 @Value("${toss.secret}") String tossSecretKey,
+                                 @Value("${toss.url.base}") String baseUrl,
+                                 @Value("${toss.url.payment-prefix}") String paymentPrefix
     ) {
         String authorizationToken = Base64.getEncoder()
                 .encodeToString((tossSecretKey + ":").getBytes());
 
         this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(baseUrl + paymentPrefix)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + authorizationToken)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
-                    throw new BadRequestException(paymentFailure.message());
+                    TossFailure tossFailure = objectMapper.readValue(response.getBody(), TossFailure.class);
+                    throw new BadRequestException(tossFailure.message());
                 }))
                 .build();
     }
