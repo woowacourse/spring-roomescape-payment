@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpClientErrorException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
 
-        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
+        TossClientErrorResponse response = ex.getResponseBodyAs(TossClientErrorResponse.class);
         return ResponseEntity.status(ex.getStatusCode())
                 .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
     }
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> catchHttpServerErrorException(HttpServerErrorException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
 
-        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
+        TossClientErrorResponse response = ex.getResponseBodyAs(TossClientErrorResponse.class);
         return ResponseEntity.status(ex.getStatusCode())
                 .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
     }
