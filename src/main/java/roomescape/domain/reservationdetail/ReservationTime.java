@@ -31,7 +31,7 @@ public class ReservationTime {
     }
 
     public ReservationTime(LocalTime startAt) {
-        this(null, startAt);
+        this(null, startAt.withNano(0));
     }
 
     public boolean isAlreadyBooked(List<ReservationTime> reservedTimes) {
