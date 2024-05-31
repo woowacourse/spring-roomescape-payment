@@ -3,11 +3,11 @@ package roomescape.infra.payment.exception;
 import org.springframework.http.HttpStatusCode;
 import roomescape.exception.ApplicationException;
 
-public class PaymentClientException extends ApplicationException {
+public class PaymentConfirmException extends ApplicationException {
 
     private final HttpStatusCode statusCode;
 
-    public PaymentClientException(String message, HttpStatusCode statusCode) {
+    public PaymentConfirmException(String message, HttpStatusCode statusCode) {
         super(message);
         this.statusCode = statusCode;
     }

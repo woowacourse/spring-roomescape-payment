@@ -16,13 +16,13 @@ public class TossPaymentClient implements PaymentClient {
 
     private final String encodedSecretKey;
     private final RestClient restClient;
-    private final TossPaymentResponseErrorHandler errorHandler;
+    private final TossPaymentConfirmErrorHandler errorHandler;
 
     public TossPaymentClient(
             @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
             RestClient restClient,
-            TossPaymentResponseErrorHandler errorHandler
+            TossPaymentConfirmErrorHandler errorHandler
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
         this.errorHandler = errorHandler;
