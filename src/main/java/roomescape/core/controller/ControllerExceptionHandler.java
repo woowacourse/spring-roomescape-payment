@@ -32,8 +32,9 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleJwtException(final JwtException exception) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+    public ResponseEntity<ProblemDetail> handleJwtException(final JwtException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage()));
     }
 
     @ExceptionHandler
@@ -50,8 +51,9 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handlePaymentException(final PaymentException exception) {
-        return ResponseEntity.status(exception.getStatusCode()).body(exception.getMessage());
+    public ResponseEntity<ProblemDetail> handlePaymentException(final PaymentException exception) {
+        return ResponseEntity.internalServerError()
+                .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(), exception.getMessage()));
     }
 
     @ExceptionHandler
