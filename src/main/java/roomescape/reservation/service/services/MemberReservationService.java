@@ -55,7 +55,8 @@ public class MemberReservationService {
                 memberReservation.getReservation().getThemeName(),
                 memberReservation.getReservation().getDate(),
                 memberReservation.getReservation().getTimeValue(),
-                new WaitingResponse(memberReservation.getReservationStatus(), rank));
+                new WaitingResponse(memberReservation.getReservationStatus(), rank),
+                memberReservation.getPrice());
     }
 
     @Transactional

@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.global.entity.BaseEntity;
 import roomescape.member.domain.Member;
@@ -70,6 +71,10 @@ public class MemberReservation extends BaseEntity {
 
     private boolean isRegisteredMember(Member member) {
         return this.member.equals(member);
+    }
+
+    public BigDecimal getPrice() {
+        return this.reservation.getPrice();
     }
 
     public Long getId() {
