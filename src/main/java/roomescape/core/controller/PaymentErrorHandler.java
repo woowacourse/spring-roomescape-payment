@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.core.exception.PaymentException;
@@ -37,7 +38,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
         try {
             jsonObject = (JSONObject) parser.parse(reader);
         } catch (ParseException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 API 호출이 실패했습니다.");
         }
         return jsonObject;
     }
