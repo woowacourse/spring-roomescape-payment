@@ -13,7 +13,6 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.application.payment.PaymentClient;
-import roomescape.application.payment.PaymentErrorHandler;
 import roomescape.infrastructure.payment.TossPaymentClient;
 
 @Configuration
@@ -31,6 +30,7 @@ public class PaymentClientConfig {
                 .requestFactory(createPaymentClientRequestFactory())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, properties.getBasicKey())
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .requestInterceptor(new PaymentTimeoutHandlerInterceptor())
                 .baseUrl(properties.getUrl())
                 .defaultStatusHandler(new PaymentErrorHandler());
     }
