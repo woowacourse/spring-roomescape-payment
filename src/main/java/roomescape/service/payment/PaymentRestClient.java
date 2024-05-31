@@ -30,11 +30,17 @@ public class PaymentRestClient {
 
     public PaymentResult confirm(ReservationRequest request) {
         HttpHeaders headers = generateHttpHeaders();
+        Map<String, Object> amount = Map.of(
+                "amount", request.amount(),
+                "orderId", request.orderId(),
+                "paymentKey", request.paymentKey()
+        );
+
         try {
             return restClient.post()
                     .uri("/confirm")
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .body(generatedConfirmRequestBody(request))
+                    .body(amount)
                     .retrieve()
                     .body(PaymentResult.class);
         } catch (RestClientResponseException exception) {
@@ -43,21 +49,15 @@ public class PaymentRestClient {
         }
     }
 
-    private Map<String, Object> generatedConfirmRequestBody(ReservationRequest request) {
-        return Map.of(
-                "amount", request.amount(),
-                "orderId", request.orderId(),
-                "paymentKey", request.paymentKey()
-        );
-    }
-
     public void cancel(Payment payment) {
         HttpHeaders headers = generateHttpHeaders();
+        Map<String, String> cancelReason = Map.of("cancelReason", "고객이 취소를 원함");
+
         try {
             restClient.post()
                     .uri(String.format("/%s/cancel", payment.getPaymentKey()))
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .body(generatedCancelRequestBody())
+                    .body(cancelReason)
                     .retrieve();
         } catch (RestClientResponseException exception) {
             String responseBody = exception.getResponseBodyAsString();
@@ -72,12 +72,6 @@ public class PaymentRestClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Basic " + header);
         return headers;
-    }
-
-    private Map<String, Object> generatedCancelRequestBody() {
-        return Map.of(
-                "cancelReason", "고객이 취소를 원함"
-        );
     }
 
     private PaymentErrorResult parseErrorBody(String responseBody) {
