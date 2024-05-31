@@ -12,7 +12,6 @@ import roomescape.payment.client.PaymentProperties;
 public class RestClientConfiguration {
 
     private static final String BASIC_PREFIX = "Basic ";
-    private static final String NO_PASSWORD_SUFFIX = ":";
 
     private final PaymentProperties paymentProperties;
 
@@ -23,7 +22,7 @@ public class RestClientConfiguration {
     @Bean
     public RestClient restClient() {
         byte[] encodedBytes = Base64.getEncoder()
-                .encode((paymentProperties.getSecretKey() + NO_PASSWORD_SUFFIX)
+                .encode((paymentProperties.getSecretKey() + paymentProperties.getPassword())
                         .getBytes(StandardCharsets.UTF_8));
 
         String authorizations = BASIC_PREFIX + new String(encodedBytes);
