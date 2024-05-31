@@ -1,5 +1,6 @@
 package roomescape.infrastructure.payment;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import roomescape.service.dto.request.PaymentRequest;
 import java.util.Base64;
 
 @Component
+@EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentClient implements PaymentClient {
 
     private static final String ENCODING_FORMAT = "%s:";
