@@ -16,7 +16,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
 import roomescape.global.exception.PaymentErrorResponse;
-import roomescape.reservation.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmRequest;
 
 @Component
 public class PaymentClient {
