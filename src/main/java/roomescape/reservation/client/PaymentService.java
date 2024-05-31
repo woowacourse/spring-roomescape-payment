@@ -18,9 +18,11 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
+import roomescape.reservation.client.errorcode.PaymentConfirmCustomException;
 import roomescape.reservation.client.errorcode.PaymentConfirmErrorCode;
 import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
+import roomescape.reservation.service.dto.response.PaymentConfirmResponse;
 
 @Service
 public class PaymentService {
@@ -59,16 +61,18 @@ public class PaymentService {
 
     private ErrorHandler createPaymentErrorHandler() {
         return (request, response) -> {
-            PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-            throwByCustomErrorResponse(errorResponse);
-            throw new PaymentException(HttpStatusCode.valueOf(400), errorResponse.message());
+            PaymentConfirmResponse confirmResponse = objectMapper.readValue(
+                    response.getBody(), PaymentConfirmResponse.class
+            );
+            throwByCustomErrorResponse(confirmResponse);
+            throw new PaymentException(HttpStatusCode.valueOf(400), confirmResponse.message());
         };
     }
 
-    private static void throwByCustomErrorResponse(PaymentErrorResponse errorResponse) {
-        Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(errorResponse.code());
+    private static void throwByCustomErrorResponse(PaymentConfirmResponse confirmResponse) {
+        Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(confirmResponse.code());
         if (customErrorCode.isPresent()) {
-            throw customErrorCode.get().getException();
+            throw new PaymentConfirmCustomException(customErrorCode.get(), confirmResponse.message());
         }
     }
 

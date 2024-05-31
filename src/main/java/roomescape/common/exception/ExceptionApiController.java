@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.reservation.client.errorcode.PaymentConfirmCustomException;
 import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -46,9 +47,17 @@ public class ExceptionApiController {
                 .body(new PaymentErrorResponse(exception.getMessage()));
     }
 
+    @ExceptionHandler(PaymentConfirmCustomException.class)
+    public ResponseEntity<String> paymentConfirmCustomException(
+            PaymentConfirmCustomException exception
+    ) {
+        logger.error(exception.getMessage(), exception);
+        return ResponseEntity.status(500).body("서버 내부 오류입니다.");
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> exceptionHandler(RuntimeException exception) {
         logger.error(exception.getMessage(), exception);
-        return ResponseEntity.status(500).body("내부 서버 오류입니다.");
+        return ResponseEntity.status(500).body("서버 내부 오류입니다.");
     }
 }
