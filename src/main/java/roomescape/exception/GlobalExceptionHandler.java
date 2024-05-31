@@ -26,8 +26,6 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<TossExceptionResponse> exceptionHandler(PaymentException exception) {
         logError(exception);
-        System.out.println(
-                "exception.getTossExceptionResponse().toString() = " + exception.getTossExceptionResponse().toString());
         return ResponseEntity.status(exception.getHttpStatus())
                 .body(exception.getTossExceptionResponse());
     }
