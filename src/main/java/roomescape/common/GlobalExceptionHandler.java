@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpServerErrorException ex) {
+    public ResponseEntity<ProblemDetail> catchHttpServerErrorException(HttpServerErrorException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
 
         PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
