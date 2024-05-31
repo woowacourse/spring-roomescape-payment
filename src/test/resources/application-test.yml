@@ -18,3 +18,14 @@ spring:
   sql:
     init:
       data-locations: classpath:data-test.sql
+security:
+  jwt:
+    token:
+      secret-key: secretkeyofspringroomescapewaitingmissionstep1
+toss:
+  payments:
+    base-url: https://api.tosspayments.com
+    api:
+      confirm-url: /v1/payments/confirm
+      refund-url-template: /v1/payments/{paymentKey}/cancel
+    widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
