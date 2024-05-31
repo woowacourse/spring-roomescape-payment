@@ -5,7 +5,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.auth.token.TokenProvider;
+import roomescape.domain.auth.token.TokenProvider;
 import roomescape.exception.UnauthorizedException;
 import roomescape.util.CookieParser;
 

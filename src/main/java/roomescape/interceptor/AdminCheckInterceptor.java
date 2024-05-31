@@ -3,9 +3,9 @@ package roomescape.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.auth.token.TokenProvider;
+import roomescape.domain.auth.token.TokenProvider;
 import roomescape.exception.AccessDeniedException;
-import roomescape.member.model.MemberRole;
+import roomescape.domain.member.model.MemberRole;
 import roomescape.util.CookieParser;
 
 public class AdminCheckInterceptor implements HandlerInterceptor {
