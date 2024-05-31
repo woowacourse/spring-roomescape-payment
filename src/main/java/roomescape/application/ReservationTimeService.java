@@ -21,6 +21,16 @@ import roomescape.exception.time.ReservationReferencedTimeException;
 public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
 
+    @Transactional
+    public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
+        if (reservationTimeRepository.existsByStartAt(request.startAt())) {
+            throw new DuplicatedTimeException();
+        }
+        ReservationTime reservationTime = request.toReservationTime();
+        ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
+        return ReservationTimeResponse.from(savedReservationTime);
+    }
+
     public List<ReservationTimeResponse> findAllReservationTime() {
         List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         return reservationTimes.stream()
@@ -35,16 +45,6 @@ public class ReservationTimeService {
         return totalTimes.stream()
                 .map(time -> AvailableReservationTimeResponse.of(time, reservedTimes))
                 .toList();
-    }
-
-    @Transactional
-    public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
-        if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            throw new DuplicatedTimeException();
-        }
-        ReservationTime reservationTime = request.toReservationTime();
-        ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
-        return ReservationTimeResponse.from(savedReservationTime);
     }
 
     @Transactional
