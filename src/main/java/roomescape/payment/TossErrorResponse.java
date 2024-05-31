@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.payment;
 
 public record TossErrorResponse(
         String code,

@@ -14,8 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.client.PaymentClient;
 import roomescape.config.ControllerConfig;
+import roomescape.payment.PaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 @WebMvcTest(ReservationApiController.class)

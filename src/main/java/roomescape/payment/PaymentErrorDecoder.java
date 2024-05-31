@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;

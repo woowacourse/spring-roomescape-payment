@@ -1,0 +1,34 @@
+package roomescape.payment;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import roomescape.reservation.dto.request.PaymentRequest;
+import roomescape.reservation.dto.request.ReservationCreateRequest;
+
+@Service
+public class PaymentService {
+
+    private final String widgetSecretKey;
+    private final PaymentClient paymentClient;
+
+    public PaymentService(
+            @Value("${toss.secret-key}") String widgetSecretKey,
+            PaymentClient paymentClient
+    ) {
+        this.widgetSecretKey = widgetSecretKey;
+        this.paymentClient = paymentClient;
+    }
+
+    public void pay(ReservationCreateRequest reservationCreateRequest) {
+        paymentClient.paymentReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest))
+                .getBody();
+    }
+
+    private String getAuthorizations() {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encodedBytes);
+    }
+}

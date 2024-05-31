@@ -16,6 +16,18 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+      client:
+        config:
+          paymentClient:
+            read-timeout: 5000
+            connect-timeout: 5000
+
+toss:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
 security:
   jwt:

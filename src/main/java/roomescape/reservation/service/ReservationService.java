@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
@@ -28,28 +29,34 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository
+    public ReservationService(ReservationRepository reservationRepository,
+                              ReservationTimeRepository reservationTimeRepository,
+                              ThemeRepository themeRepository,
+                              MemberRepository memberRepository,
+                              PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
+    @Transactional
     public Long save(ReservationCreateRequest reservationCreateRequest, LoginMemberInToken loginMemberInToken) {
         if (reservationRepository.existsByDateAndReservationTimeIdAndThemeId(reservationCreateRequest.date(),
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {
             Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken,
                     Status.WAITING);
+            paymentService.pay(reservationCreateRequest);
+
             return reservationRepository.save(reservation).getId();
         }
 
         Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken, Status.SUCCESS);
+        paymentService.pay(reservationCreateRequest);
         return reservationRepository.save(reservation).getId();
     }
 

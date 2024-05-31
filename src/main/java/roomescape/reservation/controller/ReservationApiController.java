@@ -2,10 +2,7 @@ package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Login;
-import roomescape.client.PaymentClient;
 import roomescape.member.dto.LoginMemberInToken;
-import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
-import roomescape.reservation.dto.response.PaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.service.ReservationService;
@@ -30,16 +24,9 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
-    private final PaymentClient paymentClient;
-    private final String widgetSecretKey;
 
-    public ReservationApiController(ReservationService reservationService,
-                                    PaymentClient paymentClient,
-                                    @Value("${toss.secret-key}") String widgetSecretKey
-    ) {
+    public ReservationApiController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentClient = paymentClient;
-        this.widgetSecretKey = widgetSecretKey;
     }
 
     @GetMapping("/reservations")
@@ -63,19 +50,10 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        PaymentResponse paymentResponse = paymentClient.paymentReservation(getAuthorizations(),
-                PaymentRequest.toRequest(reservationCreateRequest)).getBody();
-
         Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
         ReservationResponse reservationResponse = reservationService.findById(id);
 
         return ResponseEntity.created(URI.create("/reservations/" + id)).body(reservationResponse);
-    }
-
-    private String getAuthorizations() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
     }
 
     @GetMapping("/reservations/waiting")
