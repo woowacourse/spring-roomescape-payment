@@ -1,9 +1,6 @@
 package roomescape.reservation.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -17,16 +14,10 @@ import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 public class PaymentService {
 
     private final RestClient restClient;
-    private final String encodedSecretKey;
     private final ObjectMapper objectMapper;
 
-    public PaymentService(
-            @Value("${payment.base-url}") String paymentBaseUrl,
-            @Value("${payment.secret-key}") String encodedSecretKey,
-            ObjectMapper objectMapper
-    ) {
-        this.restClient = RestClient.builder().baseUrl(paymentBaseUrl).build();
-        this.encodedSecretKey = encodeSecretKey(encodedSecretKey);
+    public PaymentService(RestClient restClient, ObjectMapper objectMapper) {
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
@@ -34,11 +25,10 @@ public class PaymentService {
         restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", encodedSecretKey)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
-                .body(PaymentErrorResponse.class);
+                .toBodilessEntity();
     }
 
     private ErrorHandler createPaymentErrorHandler() {
@@ -46,11 +36,5 @@ public class PaymentService {
             PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
             throw new PaymentException(response.getStatusCode(), errorResponse.message());
         };
-    }
-
-    private static String encodeSecretKey(String secretKey) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
     }
 }
