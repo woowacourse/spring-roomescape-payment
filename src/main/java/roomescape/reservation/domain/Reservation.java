@@ -91,6 +91,7 @@ public class Reservation {
         if (status == PAYMENT_PENDING) {
             throw new IllegalArgumentException("이미 결제 대기된 예약입니다.");
         }
+        this.status = PAYMENT_PENDING;
     }
 
     public boolean isSuccessReservation() {
