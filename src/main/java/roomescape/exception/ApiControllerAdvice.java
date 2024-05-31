@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(annotations = RestController.class)
-public class ExceptionApiController {
+public class ApiControllerAdvice {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionApiController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiControllerAdvice.class);
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {

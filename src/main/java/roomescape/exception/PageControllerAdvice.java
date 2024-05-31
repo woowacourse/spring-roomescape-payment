@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ExceptionPageController {
+public class PageControllerAdvice {
 
     @ExceptionHandler(NoAdminPrivilegeException.class)
     public String noAdminPrivilegeExHandler(HttpServletResponse response) {
