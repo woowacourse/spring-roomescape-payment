@@ -18,7 +18,7 @@ public record MemberJoinRequest(
         @Size(max = 15)
         String name
 ) {
-        public Member toUserMember() {
-                return Member.createUser(name, email, password);
-        }
+    public Member toUserMember() {
+        return Member.createUser(name, email, password);
+    }
 }

@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import roomescape.controller.dto.TokenRequest;
+import roomescape.controller.dto.LoginRequest;
 import roomescape.infrastructure.PaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,7 +33,7 @@ public abstract class IntegrationTestSupport {
 
         ADMIN_TOKEN = RestAssured
                 .given().log().all()
-                .body(new TokenRequest(ADMIN_EMAIL, ADMIN_PASSWORD))
+                .body(new LoginRequest(ADMIN_EMAIL, ADMIN_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/login")
@@ -41,7 +41,7 @@ public abstract class IntegrationTestSupport {
 
         USER_TOKEN = RestAssured
                 .given().log().all()
-                .body(new TokenRequest(USER_EMAIL, USER_PASSWORD))
+                .body(new LoginRequest(USER_EMAIL, USER_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/login")

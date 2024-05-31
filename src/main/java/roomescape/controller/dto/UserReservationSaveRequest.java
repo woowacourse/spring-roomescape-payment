@@ -3,10 +3,12 @@ package roomescape.controller.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import java.time.LocalDate;
 import roomescape.service.dto.ReservationPaymentRequest;
+
+import java.time.LocalDate;
 
 public record UserReservationSaveRequest(
         @NotNull
@@ -22,14 +24,17 @@ public record UserReservationSaveRequest(
         @Positive
         Long themeId,
 
+        @NotNull
+        @Positive
         Integer amount,
 
+        @NotBlank
         String orderId,
 
+        @NotBlank
         String paymentKey
 ) {
-
-    public ReservationPaymentRequest toReservationSaveRequest(Long memberId) {
+    public ReservationPaymentRequest toReservationPaymentRequest(Long memberId) {
         return new ReservationPaymentRequest(memberId, date, timeId, themeId, amount, orderId, paymentKey);
     }
 }

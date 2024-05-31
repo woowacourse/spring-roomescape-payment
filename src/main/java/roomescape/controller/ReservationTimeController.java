@@ -29,7 +29,8 @@ public class ReservationTimeController {
     }
 
     @GetMapping("/booked")
-    public ResponseEntity<List<ReservationTimeBookedResponse>> getTimesWithBooked(@ModelAttribute @Valid ReservationTimeBookedRequest reservationTimeBookedRequest) {
+    public ResponseEntity<List<ReservationTimeBookedResponse>> getTimesWithBooked(
+            @ModelAttribute @Valid ReservationTimeBookedRequest reservationTimeBookedRequest) {
         List<ReservationTimeBookedResponse> reservationTimeBookedResponses = reservationTimeService.getTimesWithBooked(reservationTimeBookedRequest);
         return ResponseEntity.ok(reservationTimeBookedResponses);
     }

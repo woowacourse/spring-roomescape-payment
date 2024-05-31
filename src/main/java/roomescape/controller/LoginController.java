@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import roomescape.controller.dto.TokenRequest;
+import roomescape.controller.dto.LoginRequest;
 import roomescape.infrastructure.Login;
 import roomescape.service.AuthService;
 import roomescape.service.MemberService;
@@ -31,8 +31,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public void login(@RequestBody TokenRequest tokenRequest, HttpServletResponse response) {
-        MemberResponse memberResponse = memberService.findByEmailAndPassword(tokenRequest.email(), tokenRequest.password());
+    public void login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        MemberResponse memberResponse = memberService.findByEmailAndPassword(loginRequest.email(), loginRequest.password());
         String accessToken = authService.createToken(memberResponse);
 
         Cookie cookie = new Cookie(authService.getTokenName(), accessToken);
@@ -53,7 +53,6 @@ public class LoginController {
     public void logout(HttpServletResponse response) {
         Cookie cookie = new Cookie(authService.getTokenName(), null);
         cookie.setMaxAge(0);
-
         response.addCookie(cookie);
     }
 }

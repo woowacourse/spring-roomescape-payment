@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import java.time.LocalDate;
 import roomescape.service.dto.WaitingSaveRequest;
+
+import java.time.LocalDate;
 
 public record UserWaitingSaveRequest(
         @NotNull

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import roomescape.IntegrationTestSupport;
-import roomescape.controller.dto.TokenRequest;
+import roomescape.controller.dto.LoginRequest;
 import roomescape.service.dto.MemberResponse;
 
 class LoginControllerTest extends IntegrationTestSupport {
@@ -25,7 +25,7 @@ class LoginControllerTest extends IntegrationTestSupport {
                 dynamicTest("이메일, 패스워드로 로그인한다.", () -> {
                     accessToken = RestAssured
                             .given().log().all()
-                            .body(new TokenRequest(ADMIN_EMAIL, ADMIN_PASSWORD))
+                            .body(new LoginRequest(ADMIN_EMAIL, ADMIN_PASSWORD))
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .accept(MediaType.APPLICATION_JSON_VALUE)
                             .when().post("/login")

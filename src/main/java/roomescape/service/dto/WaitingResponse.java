@@ -1,9 +1,10 @@
 package roomescape.service.dto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import roomescape.domain.reservation.dto.WaitingReadOnly;
 import roomescape.domain.reservation.slot.ReservationSlot;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public record WaitingResponse(
         Long id,
@@ -12,7 +13,6 @@ public record WaitingResponse(
         LocalDate date,
         LocalTime startAt
 ) {
-
     public static WaitingResponse from(WaitingReadOnly waiting) {
         ReservationSlot slot = waiting.slot();
         return new WaitingResponse(

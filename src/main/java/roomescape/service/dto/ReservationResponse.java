@@ -2,11 +2,11 @@ package roomescape.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Waiting;
 import roomescape.domain.reservation.slot.ReservationSlot;
+
+import java.time.LocalDate;
 
 public record ReservationResponse(
         Long id,
@@ -17,7 +17,6 @@ public record ReservationResponse(
         ThemeResponse theme,
         ReservationStatus status
 ) {
-
     public static ReservationResponse createByWaiting(Waiting waiting) {
         ReservationSlot slot = waiting.getReservation().getSlot();
 
@@ -40,9 +39,5 @@ public record ReservationResponse(
                 new ThemeResponse(reservation.getSlot().getTheme()),
                 ReservationStatus.BOOKED
         );
-    }
-
-    public LocalDateTime getDateTime() {
-        return LocalDateTime.of(date, time.startAt());
     }
 }

@@ -2,9 +2,10 @@ package roomescape.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import roomescape.domain.reservation.dto.ReservationReadOnly;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import roomescape.domain.reservation.dto.ReservationReadOnly;
 
 public record ReservationBookedResponse(
         Long id,
@@ -15,7 +16,6 @@ public record ReservationBookedResponse(
         ThemeResponse theme,
         String status
 ) {
-
     public static ReservationBookedResponse from(ReservationReadOnly reservation) {
         return new ReservationBookedResponse(
                 reservation.id(),

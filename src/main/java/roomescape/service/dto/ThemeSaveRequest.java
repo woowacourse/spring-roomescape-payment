@@ -17,7 +17,6 @@ public record ThemeSaveRequest(
         @Size(max = 255)
         String thumbnail
 ) {
-
     public Theme toTheme() {
         return new Theme(name, description, thumbnail);
     }
