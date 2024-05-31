@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
+import roomescape.payment.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWithWaiting;
