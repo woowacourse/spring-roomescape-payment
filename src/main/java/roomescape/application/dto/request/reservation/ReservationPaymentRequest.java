@@ -4,7 +4,7 @@ import roomescape.application.dto.request.payment.PaymentRequest;
 
 public record ReservationPaymentRequest(
         Long reservationId,
-        Long amount,
+        int amount,
         String orderId,
         String paymentKey
 ) {

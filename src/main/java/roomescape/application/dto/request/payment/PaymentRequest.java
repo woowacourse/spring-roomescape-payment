@@ -1,7 +1,7 @@
 package roomescape.application.dto.request.payment;
 
 public record PaymentRequest(
-        Long amount,
+        int amount,
         String orderId,
         String paymentKey
 ) {

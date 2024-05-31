@@ -15,4 +15,5 @@ spring:
 
 payments:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  password: ":"
 payment-timeout: 60
