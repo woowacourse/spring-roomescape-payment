@@ -87,9 +87,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = {IllegalArgumentException.class, Exception.class})
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception e) {
-        e.printStackTrace();
-        logger.error(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception exception) {
+        logger.error(exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse("서버에 오류가 발생했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(data);
     }
