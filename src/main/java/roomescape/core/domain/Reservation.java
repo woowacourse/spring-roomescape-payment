@@ -37,7 +37,7 @@ public class Reservation {
     @OneToOne(fetch = FetchType.LAZY)
     private Payment payment;
 
-    public Reservation() {
+    protected Reservation() {
     }
 
     public Reservation(final Long id, final Member member, final String date, final ReservationTime time,

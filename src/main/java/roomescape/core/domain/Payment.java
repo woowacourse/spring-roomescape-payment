@@ -22,6 +22,9 @@ public class Payment {
     @Column(unique = true, nullable = false)
     private String orderId;
 
+    protected Payment() {
+    }
+
     public Payment(Long id, String paymentKey, Long amount, String orderId) {
         this.id = id;
         this.paymentKey = paymentKey;
@@ -31,9 +34,6 @@ public class Payment {
 
     public Payment(String paymentKey, Long amount, String orderId) {
         this(null, paymentKey, amount, orderId);
-    }
-
-    public Payment() {
     }
 
     public Long getId() {

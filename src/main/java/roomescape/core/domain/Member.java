@@ -23,7 +23,7 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(final String name, final String email, final String password, final Role role) {
