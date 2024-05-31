@@ -30,7 +30,7 @@ public class PaymentClient {
     ) {
         restClient.post()
                 .uri(confirmUrl)
-                .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
+                .header(HttpHeaders.AUTHORIZATION, paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
                 .retrieve()
