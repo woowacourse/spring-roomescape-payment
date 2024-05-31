@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 
 class PaymentApiResponseErrorHandlerTest {
+    private final PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(
+            new PaymentErrorParser(new ObjectMapper()));
 
     public static Stream<Arguments> hasErrorParameter() {
         return Stream.of(
@@ -46,8 +48,6 @@ class PaymentApiResponseErrorHandlerTest {
     @MethodSource("hasErrorParameter")
     @DisplayName("API 응답 상태 코드에 따라 에러 여부를 잘 판단하는지 확인")
     void hasError(int statusCode, boolean expected) throws IOException {
-        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
-
         ClientHttpResponse fakeHttpResponse = getFakeHttpResponse(statusCode);
         boolean hasError = handler.hasError(fakeHttpResponse);
 
@@ -95,7 +95,6 @@ class PaymentApiResponseErrorHandlerTest {
                 }"""
                 .formatted(knownErrorCode, message);
 
-        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
         ClientHttpResponse response = getFakeHttpResponse(errorJson);
         Assertions.assertThatThrownBy(() -> handler.handleError(response))
                 .isInstanceOf(ApiCallException.class)
@@ -143,7 +142,6 @@ class PaymentApiResponseErrorHandlerTest {
                 }"""
                 .formatted(knownErrorCode, message);
 
-        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
         ClientHttpResponse response = getFakeHttpResponse(errorJson);
         Assertions.assertThatThrownBy(() -> handler.handleError(response))
                 .isInstanceOf(ApiCallException.class)
@@ -158,7 +156,6 @@ class PaymentApiResponseErrorHandlerTest {
                   "code": "code_e63022aece25",
                   "message": "message_799dc46c7cf3"
                 }""";
-        PaymentApiResponseErrorHandler handler = new PaymentApiResponseErrorHandler(new ObjectMapper());
         ClientHttpResponse response = getFakeHttpResponse(errorJson);
         Assertions.assertThatThrownBy(() -> handler.handleError(response))
                 .isInstanceOf(ApiCallException.class)

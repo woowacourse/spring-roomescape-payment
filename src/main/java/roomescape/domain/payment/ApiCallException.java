@@ -8,9 +8,9 @@ public class ApiCallException extends RuntimeException {
         this.apiError = apiError;
     }
 
-    public ApiCallException(String message) {
-        super(message);
-        this.apiError = null;
+    public ApiCallException(PaymentApiError apiError, Throwable cause) {
+        super(cause);
+        this.apiError = apiError;
     }
 
     @Override
