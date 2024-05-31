@@ -23,6 +23,8 @@ import roomescape.domain.MemberName;
 import roomescape.domain.MemberPassword;
 import roomescape.domain.MemberRole;
 import roomescape.domain.repository.MemberRepository;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
 
@@ -61,7 +63,9 @@ class MemberAuthServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> memberAuthService.signUp(request))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.DUPLICATED_MEMBER);
     }
 
     @DisplayName("이메일을 통해 회원을 조회한다.")

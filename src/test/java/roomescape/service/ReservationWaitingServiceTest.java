@@ -30,10 +30,10 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
 import roomescape.domain.repository.ThemeRepository;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationWaitingSaveDto;
 import roomescape.service.response.ReservationWaitingDto;
 import roomescape.service.response.ReservationWaitingWithRankDto;
-import roomescape.web.exception.AuthorizationException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -110,7 +110,7 @@ class ReservationWaitingServiceTest {
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("본인이 예약한 날짜, 시간, 테마에 대해서는 대기를 생성할 수 없습니다.");
     }
 
@@ -126,7 +126,7 @@ class ReservationWaitingServiceTest {
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("예약이 존재하지 않는 날짜, 시간, 테마에 대해서는 대기를 생성할 수 없습니다.");
     }
 
@@ -146,7 +146,7 @@ class ReservationWaitingServiceTest {
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("동일한 사용자의 중복된 예약 대기를 생성할 수 없습니다. ");
     }
 
@@ -164,7 +164,7 @@ class ReservationWaitingServiceTest {
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("지나간 시간에 대한 에약 대기는 생성할 수 없습니다.");
     }
 
@@ -220,7 +220,7 @@ class ReservationWaitingServiceTest {
 
         assertThatThrownBy(() ->
                 reservationWaitingService.deleteMemberWaiting(member.getId(), 1L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("예약 대기 삭제 실패: 대기를 찾을 수 없습니다.");
     }
 
@@ -239,7 +239,7 @@ class ReservationWaitingServiceTest {
 
         assertThatThrownBy(() ->
                 reservationWaitingService.deleteMemberWaiting(reservedMember.getId(), savedWaiting.getId()))
-                .isInstanceOf(AuthorizationException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessageContaining("예약 대기 삭제 권한이 없는 사용자입니다.");
     }
 }

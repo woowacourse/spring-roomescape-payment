@@ -7,6 +7,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
 import roomescape.service.response.MemberDto;
@@ -35,10 +37,10 @@ public class MemberHandlerMethodArgumentResolver implements HandlerMethodArgumen
                                   WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         if (request == null) {
-            throw new IllegalArgumentException("요청이 없습니다. 다시 로그인 해주세요.");
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "요청이 없습니다. 다시 로그인 해주세요.");
         }
         if (request.getCookies() == null) {
-            throw new IllegalArgumentException("쿠키가 없습니다. 다시 로그인 해주세요.");
+            throw new RoomescapeException(RoomescapeErrorCode.UNAUTHORIZED, "쿠키가 없습니다. 다시 로그인 해주세요.");
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);

@@ -52,6 +52,6 @@ class AdminPageControllerTest extends ControllerTest {
                 .cookie(COOKIE_NAME, getUserToken())
                 .when().get(endPoint)
                 .then().log().all()
-                .statusCode(401);
+                .statusCode(403);
     }
 }

@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
-import roomescape.service.exception.ReservationExistsException;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ThemeSaveDto;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +52,7 @@ class ThemeServiceTest {
     @ValueSource(strings = {"ftp://hello.jpg"})
     void save_IllegalThumbnail(String thumbnail) {
         assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, thumbnail)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("이름이 동일한 방탈출 테마를 저장하면 예외가 발생한다.")
@@ -62,7 +62,7 @@ class ThemeServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, validThumbnail)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("테마 사용하는 예약이 존재하면 삭제 불가")
@@ -73,6 +73,6 @@ class ThemeServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> themeService.delete(themeId))
-                .isInstanceOf(ReservationExistsException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

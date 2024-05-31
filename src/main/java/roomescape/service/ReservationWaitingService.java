@@ -15,10 +15,11 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
 import roomescape.domain.repository.ThemeRepository;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationWaitingSaveDto;
 import roomescape.service.response.ReservationWaitingDto;
 import roomescape.service.response.ReservationWaitingWithRankDto;
-import roomescape.web.exception.AuthorizationException;
 
 @Service
 @Transactional(readOnly = true)
@@ -74,12 +75,12 @@ public class ReservationWaitingService {
         Long timeId = waiting.getTime().getId();
         Long themeId = waiting.getTheme().getId();
         Reservation reservation = reservationRepository.findByDateAndTimeIdAndThemeId(date, timeId, themeId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format(
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_RESERVATION, String.format(
                         "예약이 존재하지 않는 날짜, 시간, 테마에 대해서는 대기를 생성할 수 없습니다. {date: %s, timeId: %d, themeId: %d}",
                         date.getDate(), timeId, themeId)));
 
         if (waiting.hasSameMemberWith(reservation)) {
-            throw new IllegalArgumentException(String.format(
+            throw new RoomescapeException(RoomescapeErrorCode.ALREADY_RESERVED, String.format(
                     "본인이 예약한 날짜, 시간, 테마에 대해서는 대기를 생성할 수 없습니다. {date: %s, timeId: %d, themeId: %d}",
                     date.getDate(), timeId, themeId));
         }
@@ -94,7 +95,7 @@ public class ReservationWaitingService {
                 timeId, themeId);
 
         if (isWaitingExist) {
-            throw new IllegalArgumentException(String.format(
+            throw new RoomescapeException(RoomescapeErrorCode.DUPLICATED_RESERVATION, String.format(
                     "동일한 사용자의 중복된 예약 대기를 생성할 수 없습니다. {date: %s, timeId: %d, themeId: %d}",
                     date.getDate(), timeId, themeId));
         }
@@ -108,10 +109,10 @@ public class ReservationWaitingService {
 
     public void deleteMemberWaiting(Long memberId, Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_WAITING,
                         String.format("사용자 예약 대기 삭제 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
         if (!waiting.hasMemberId(memberId)) {
-            throw new AuthorizationException(
+            throw new RoomescapeException(RoomescapeErrorCode.FORBIDDEN,
                     String.format("예약 대기 삭제 권한이 없는 사용자입니다. (id: %d)", memberId));
         }
         reservationWaitingRepository.deleteById(waitingId);
@@ -126,7 +127,7 @@ public class ReservationWaitingService {
 
     public ReservationWaitingDto denyWaiting(Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_WAITING,
                         String.format("예약 대기 상태 변경 실패: 대기를 찾을 수 없습니다. (id: %d)", waitingId)));
         waiting.setDeniedAt(LocalDateTime.now());
         ReservationWaiting updatedWaiting = reservationWaitingRepository.save(waiting);

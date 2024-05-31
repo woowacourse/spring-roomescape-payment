@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class ReservationWaiting {
@@ -78,7 +80,7 @@ public class ReservationWaiting {
                                          ReservationTime time) {
         LocalDateTime waitingDateTime = LocalDateTime.of(date.getDate(), time.getStartAt());
         if (waitingDateTime.isBefore(now)) {
-            throw new IllegalArgumentException(
+            throw new RoomescapeException(RoomescapeErrorCode.PAST_REQUEST,
                     String.format("지나간 시간에 대한 에약 대기는 생성할 수 없습니다. (dateTime: %s)", waitingDateTime)
             );
         }

@@ -73,7 +73,7 @@ class ThemeControllerTest extends ControllerTest {
                 .statusCode(400);
     }
 
-    @DisplayName("중복된 데이터를 추가한다 -> 400")
+    @DisplayName("중복된 데이터를 추가한다 -> 409")
     @Test
     void create_Duplicate() {
         ThemeRequest request = new ThemeRequest("방탈출1", "설명1", "https://url1");
@@ -83,7 +83,7 @@ class ThemeControllerTest extends ControllerTest {
                 .body(request)
                 .when().post("/themes")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
     }
 
     @DisplayName("요청이 잘못된 형식일 경우 -> 400")
@@ -99,7 +99,7 @@ class ThemeControllerTest extends ControllerTest {
                 .statusCode(400);
     }
 
-    @DisplayName("예약이 존재한 상태에서 테마를 삭제한다 -> 400")
+    @DisplayName("예약이 존재한 상태에서 테마를 삭제한다 -> 409")
     @Test
     void delete_ReservationExists() {
         jdbcTemplate.update("INSERT INTO reservation_time(start_at) VALUES (?)", "12:00");
@@ -111,7 +111,7 @@ class ThemeControllerTest extends ControllerTest {
         RestAssured.given().log().all()
                 .when().delete("/themes/1")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
     }
 
     @DisplayName("상위 10개 인기 테마를 조회 한다. -> 200")

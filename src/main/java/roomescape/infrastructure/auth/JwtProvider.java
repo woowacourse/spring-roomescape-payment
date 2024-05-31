@@ -8,7 +8,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
-import roomescape.web.exception.AuthorizationException;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Component
 @EnableConfigurationProperties(JwtProperties.class)
@@ -47,7 +48,7 @@ public class JwtProvider {
                     .signWith(SignatureAlgorithm.HS256, jwtProperties.secretKey())
                     .compact();
         }
-        throw new AuthorizationException("토큰이 만료되었습니다. 다시 로그인해주세요.");
+        throw new RoomescapeException(RoomescapeErrorCode.TOKEN_EXPIRED, "토큰이 만료되었습니다. 다시 로그인해주세요.");
     }
 
     public String getPayload(String token) {
@@ -55,7 +56,7 @@ public class JwtProvider {
             return getClaims(token)
                     .getSubject();
         }
-        throw new AuthorizationException("토큰이 만료되었습니다. 다시 로그인해주세요.");
+        throw new RoomescapeException(RoomescapeErrorCode.TOKEN_EXPIRED, "토큰이 만료되었습니다. 다시 로그인해주세요.");
     }
 
     private boolean validateToken(String token) {

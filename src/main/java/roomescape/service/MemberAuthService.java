@@ -10,6 +10,8 @@ import roomescape.domain.MemberEmail;
 import roomescape.domain.MemberName;
 import roomescape.domain.MemberPassword;
 import roomescape.domain.repository.MemberRepository;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;
 import roomescape.web.auth.CookieHandler;
@@ -29,7 +31,7 @@ public class MemberAuthService {
     @Transactional
     public MemberDto signUp(MemberSignUpDto request) {
         if (memberRepository.existsByEmail(new MemberEmail(request.email()))) {
-            throw new IllegalStateException("해당 이메일의 회원이 이미 존재합니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.DUPLICATED_MEMBER, "해당 이메일의 회원이 이미 존재합니다.");
         }
 
         Member newMember = Member.createUser(
@@ -58,7 +60,7 @@ public class MemberAuthService {
         if (memberRepository.existsByEmailAndPassword(new MemberEmail(email), new MemberPassword(password))) {
             return true;
         }
-        throw new IllegalArgumentException("이메일 또는 비밀번호가 잘못되었습니다.");
+        throw new RoomescapeException(RoomescapeErrorCode.UNAUTHORIZED, "이메일 또는 비밀번호가 잘못되었습니다.");
     }
 
     public Cookie createCookieByToken(String token) {

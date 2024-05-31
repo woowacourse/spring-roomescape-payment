@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class Theme {
@@ -46,7 +48,7 @@ public class Theme {
 
     private void validateThumbnail(String thumbnail) {
         if (thumbnail == null || !thumbnail.startsWith("https://")) {
-            throw new IllegalArgumentException("잘못된 형식의 썸네일 url입니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "잘못된 형식의 썸네일 url입니다.");
         }
     }
 

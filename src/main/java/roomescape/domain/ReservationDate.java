@@ -4,6 +4,8 @@ import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Embeddable
 public class ReservationDate {
@@ -25,7 +27,7 @@ public class ReservationDate {
         try {
             return LocalDate.parse(rawDate);
         } catch (DateTimeParseException | NullPointerException e) {
-            throw new IllegalArgumentException("잘못된 날짜 형식을 입력하셨습니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "잘못된 날짜 형식을 입력하셨습니다.");
         }
     }
 

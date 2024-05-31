@@ -12,7 +12,6 @@ import static roomescape.Fixture.VALID_THEME;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
-import roomescape.service.exception.PastReservationException;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.response.ReservationTimeDto;
@@ -90,7 +89,7 @@ class ReservationServiceTest {
     @Test
     void save_TimeIdDoesntExist() {
         assertThatThrownBy(() -> reservationService.save(new ReservationSaveDto("2030-12-31", 1L, 1L, 1L)))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
@@ -110,7 +109,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(
                 () -> reservationService.save(new ReservationSaveDto(rawDate, timeId, themeId, memberId)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 어제 날짜에 대한 예약을 생성하면 예외가 발생한다.")
@@ -128,7 +127,7 @@ class ReservationServiceTest {
         assertThatThrownBy(
                 () -> reservationService.save(
                         new ReservationSaveDto(yesterday.toString(), timeId, themeId, memberId))
-        ).isInstanceOf(PastReservationException.class);
+        ).isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 같은 날짜에 대한 과거 시간 예약을 생성하면 예외가 발생한다.")
@@ -147,9 +146,8 @@ class ReservationServiceTest {
         when(memberRepository.findById(memberId))
                 .thenReturn(Optional.of(VALID_MEMBER));
 
-        assertThatThrownBy(
-                () -> reservationService.save(
-                        new ReservationSaveDto(today.toString(), timeId, themeId, memberId))
-        ).isInstanceOf(PastReservationException.class);
+        assertThatThrownBy(() ->
+                reservationService.save(new ReservationSaveDto(today.toString(), timeId, themeId, memberId)))
+                .isInstanceOf(RoomescapeException.class);
     }
 }

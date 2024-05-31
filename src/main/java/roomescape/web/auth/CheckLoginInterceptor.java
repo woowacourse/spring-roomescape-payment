@@ -4,10 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
 import roomescape.service.response.MemberDto;
-import roomescape.web.exception.AuthorizationException;
 
 @Component
 public class CheckLoginInterceptor implements HandlerInterceptor {
@@ -25,13 +26,13 @@ public class CheckLoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (request.getCookies() == null) {
-            throw new IllegalArgumentException("쿠키가 없습니다. 다시 로그인 해주세요.");
+            throw new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TOKEN, "쿠키가 없습니다. 다시 로그인 해주세요.");
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
         MemberDto appResponse = memberAuthService.findMemberByEmail(email);
         if (token == null || !appResponse.role().equals(ADMIN)) {
-            throw new AuthorizationException("접근 권한이 없습니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.FORBIDDEN, "접근 권한이 없습니다.");
         }
 
         return true;

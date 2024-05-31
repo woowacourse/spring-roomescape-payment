@@ -68,7 +68,7 @@ class ReservationTimeController extends ControllerTest {
 
     }
 
-    @DisplayName("예약이 존재하는 시간 삭제 -> 400")
+    @DisplayName("예약이 존재하는 시간 삭제 -> 409")
     @Test
     void delete_ReservationExists() {
         jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)", "방탈출1", "설명1",
@@ -81,7 +81,7 @@ class ReservationTimeController extends ControllerTest {
         RestAssured.given().log().all()
                 .when().delete("/times/1")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
 
     }
 

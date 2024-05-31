@@ -46,7 +46,7 @@ class MemberAuthControllerTest extends ControllerTest {
     @DisplayName("존재하지 않는 회원으로 로그인을 한다. -> 401")
     @Test
     void login_NotMemberEmail() {
-        TokenRequest request = new TokenRequest("회원아님@naver.com",
+        TokenRequest request = new TokenRequest("notMember@naver.com",
                 VALID_USER_PASSWORD.getPassword());
 
         RestAssured.given().log().all()
@@ -54,7 +54,7 @@ class MemberAuthControllerTest extends ControllerTest {
                 .body(request)
                 .when().post("/login")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(401);
     }
 
     @DisplayName("올바르지 않는 이메일 형식으로 로그인을 한다. -> 400")
@@ -98,13 +98,13 @@ class MemberAuthControllerTest extends ControllerTest {
                 .statusCode(200);
     }
 
-    @DisplayName("로그인 되어 있지 않은 회원을 조회한다. -> 400")
+    @DisplayName("로그인 되어 있지 않은 회원을 조회한다. -> 401")
     @Test
     void findNotLoginMember() {
         RestAssured.given().log().all()
                 .when().get("/login/check")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(401);
     }
 
     @DisplayName("토큰이 만료된 회원을 조회한다. -> 401")
@@ -131,7 +131,7 @@ class MemberAuthControllerTest extends ControllerTest {
                 .statusCode(201);
     }
 
-    @DisplayName("이미 존재하는 이메일로 회원 가입을 한다. -> 401")
+    @DisplayName("이미 존재하는 이메일로 회원 가입을 한다. -> 409")
     @Test
     void signUp_ExistsEmail() {
         MemberSignUpRequest request = new MemberSignUpRequest(VALID_USER_NAME.getName(),
@@ -142,7 +142,7 @@ class MemberAuthControllerTest extends ControllerTest {
                 .body(request)
                 .when().post("/signup")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
     }
 
     @DisplayName("잘못된 형식의 이름으로 회원 가입을 한다. -> 400")

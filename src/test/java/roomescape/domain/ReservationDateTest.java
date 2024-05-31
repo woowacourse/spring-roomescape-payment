@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.exception.RoomescapeException;
 
 public class ReservationDateTest {
 
@@ -22,6 +23,6 @@ public class ReservationDateTest {
     @ValueSource(strings = {"024-04-04", "2024-13-10", "2025-04-31"})
     void createByIllegalData(String input) {
         assertThatThrownBy(() -> new ReservationDate(input))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

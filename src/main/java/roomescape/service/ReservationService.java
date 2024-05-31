@@ -1,7 +1,6 @@
 package roomescape.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,8 @@ import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
-import roomescape.service.exception.PastReservationException;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.PaymentApproveDto;
 import roomescape.service.request.ReservationSaveDto;
@@ -69,28 +69,31 @@ public class ReservationService {
 
     private ReservationTime findTime(Long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new NoSuchElementException("예약에 대한 예약시간이 존재하지 않습니다."));
+                .orElseThrow(
+                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TIME, "예약에 대한 예약시간이 존재하지 않습니다."));
     }
 
     private Theme findTheme(Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new NoSuchElementException("예약에 대한 테마가 존재하지 않습니다."));
+                .orElseThrow(
+                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_THEME, "예약에 대한 테마가 존재하지 않습니다."));
     }
 
     private Member findMember(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException(memberId + "|예약에 대한 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_MEMBER,
+                        memberId + "|예약에 대한 사용자가 존재하지 않습니다."));
     }
 
     private void validatePastReservation(Reservation reservation) {
         if (reservation.isPast()) {
-            throw new PastReservationException();
+            throw new RoomescapeException(RoomescapeErrorCode.PAST_REQUEST, "과거의 시간으로 예약할 수 없습니다.");
         }
     }
 
     private void validateDuplication(ReservationDate date, Long timeId, Long themeId) {
         if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new IllegalArgumentException("이미 존재하는 예약 정보 입니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.ALREADY_RESERVED, "이미 존재하는 예약 정보 입니다.");
         }
     }
 

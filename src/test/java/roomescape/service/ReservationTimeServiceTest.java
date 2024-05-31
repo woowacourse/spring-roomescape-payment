@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.service.exception.ReservationExistsException;
+import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationTimeSaveDto;
 import roomescape.service.response.ReservationTimeDto;
 
@@ -56,7 +56,7 @@ class ReservationTimeServiceTest {
     @NullAndEmptySource
     void save_IllegalTimeFormat(String time) {
         assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveDto(time)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 이미 존재하는 시간을 추가할 수 없다.")
@@ -68,7 +68,7 @@ class ReservationTimeServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveDto(rawTime)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 시간을 사용하는 예약이 존재하는 경우 시간을 삭제할 수 없다.")
@@ -79,6 +79,6 @@ class ReservationTimeServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> reservationTimeService.delete(timeId))
-                .isInstanceOf(ReservationExistsException.class);
+                .isInstanceOf(RoomescapeException.class);
     }
 }

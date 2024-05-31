@@ -35,13 +35,14 @@ public class MemberReservationController {
     public ResponseEntity<MemberReservationResponse> reserve(
             @Valid @RequestBody MemberReservationRequest reservationRequest,
             @Valid @Auth LoginMember loginMember) {
-        PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
+        PaymentApproveDto paymentApproveDto = PaymentApproveDto.from(reservationRequest);
 
         ReservationDto appResponse = reservationService.save(
                 new ReservationSaveDto(reservationRequest.date(),
                         reservationRequest.timeId(),
                         reservationRequest.themeId(),
-                        loginMember.id()), request);
+                        loginMember.id()),
+                paymentApproveDto);
 
         Long id = appResponse.id();
         MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);

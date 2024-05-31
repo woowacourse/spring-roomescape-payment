@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
 import roomescape.service.request.MemberSignUpDto;
@@ -42,7 +44,7 @@ public class MemberAuthController {
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> findMember(HttpServletRequest request) {
         if (request.getCookies() == null) {
-            throw new IllegalArgumentException("쿠키가 없습니다. 다시 로그인 해주세요.");
+            throw new RoomescapeException(RoomescapeErrorCode.UNAUTHORIZED, "로그인한 회원만 접근 가능합니다.");
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);

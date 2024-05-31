@@ -75,31 +75,31 @@ class ReservationControllerTest extends ControllerTest {
                 .statusCode(400);
     }
 
-    @DisplayName("실패: 존재하지 않는 테마에 대한 예약  -> 400")
+    @DisplayName("실패: 존재하지 않는 테마에 대한 예약  -> 404")
     @Test
     void reserve_NoSuchTheme() {
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 200L, "paymentKey", "orderId",
                 1000L);
         ReservationSteps.createReservation(request, getUserToken())
-                .statusCode(400);
+                .statusCode(404);
     }
 
-    @DisplayName("실패: 존재하지 않는 예약 시간에 대한 예약  -> 400")
+    @DisplayName("실패: 존재하지 않는 예약 시간에 대한 예약  -> 404")
     @Test
     void reserve_NoSuchTime() {
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 100L, 1L, "paymentKey", "orderId",
                 1000L);
         ReservationSteps.createReservation(request, getUserToken())
-                .statusCode(400);
+                .statusCode(404);
     }
 
-    @DisplayName("과거 시간에 예약을 넣을 경우 -> 400")
+    @DisplayName("과거 시간에 예약을 넣을 경우 -> 409")
     @Test
     void reserve_PastTime() {
-        MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 100L, 1L, "paymentKey", "orderId",
+        MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 1L, 1L, "paymentKey", "orderId",
                 1000L);
         ReservationSteps.createReservation(request, getUserToken())
-                .statusCode(400);
+                .statusCode(409);
     }
 
     @DisplayName("내 예약을 조회한다. -> 200")

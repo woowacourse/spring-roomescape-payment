@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class ReservationTime {
@@ -34,7 +36,7 @@ public class ReservationTime {
         try {
             return LocalTime.parse(rawTime);
         } catch (DateTimeParseException | NullPointerException e) {
-            throw new IllegalArgumentException("잘못된 시간 형식을 입력하셨습니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "잘못된 시간 형식을 입력하셨습니다.");
         }
     }
 

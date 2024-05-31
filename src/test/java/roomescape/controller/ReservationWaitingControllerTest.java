@@ -50,7 +50,7 @@ public class ReservationWaitingControllerTest extends ControllerTest {
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
 
-    @DisplayName("로그인 되지 않은 사용자가 예약 대기를 저장한다. -> 400")
+    @DisplayName("로그인 되지 않은 사용자가 예약 대기를 저장한다. -> 401")
     @Test
     void unAuthorizedWaiting() {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
@@ -68,7 +68,7 @@ public class ReservationWaitingControllerTest extends ControllerTest {
                 .body(request)
                 .when().post("/reservation-waitings")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(401);
     }
 
     @DisplayName("사용자 예약 대기를 저장한다. -> 201")
