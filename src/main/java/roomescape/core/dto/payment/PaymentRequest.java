@@ -3,6 +3,9 @@ package roomescape.core.dto.payment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+/**
+ * @see <a href="https://docs.tosspayments.com/reference#request-body-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0">토스 결제 승인 요청 api docs</a>
+ */
 public class PaymentRequest {
     @NotBlank(message = "paymentKey 는 비어있을 수 없습니다.")
     private String paymentKey;
