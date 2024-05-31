@@ -26,6 +26,8 @@ toss:
   url:
     base: https://api.tosspayments.com
     payment-prefix: /v1/payments
+    confirm-payment: /confirm
+    cancel-payment: /%s/cancel
   secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
 jasypt:

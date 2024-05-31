@@ -1,5 +1,6 @@
 package roomescape.payment.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import roomescape.exception.PaymentFailureException;
 import roomescape.payment.domain.Payment;
@@ -17,6 +18,10 @@ public class PaymentService {
     private final TossPaymentRestClient restClient;
     private final PaymentRepository paymentRepository;
     private final EncodingService encodingService;
+    @Value("${toss.url.confirm-payment}")
+    private String confirmUrl;
+    @Value("${toss.url.cancel-payment}")
+    private String cancelUrl;
 
     public PaymentService(PaymentRepository paymentRepository,
                           TossPaymentRestClient restClient,
@@ -28,7 +33,7 @@ public class PaymentService {
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
-        PaymentResponse response = restClient.post("/confirm", request)
+        PaymentResponse response = restClient.post(confirmUrl, request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
         Payment payment = Payment.of(response, memberReservation, encodingService);
@@ -45,7 +50,7 @@ public class PaymentService {
 
     private void postCancelPaymentRequest(Payment payment) {
         String plainPaymentKey = encodingService.decrypt(payment.getPaymentKey());
-        String uri = "/" + plainPaymentKey + "/cancel";
+        String uri = String.format(cancelUrl, plainPaymentKey);
         Map<String, String> body = Map.of("cancelReason", "고객 변심");
         restClient.post(uri, body);
     }
