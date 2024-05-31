@@ -8,8 +8,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.PaymentException;
 import roomescape.service.payment.dto.PaymentErrorResult;
@@ -43,7 +43,7 @@ public class PaymentRestClient {
                     .body(amount)
                     .retrieve()
                     .body(PaymentResult.class);
-        } catch (RestClientResponseException exception) {
+        } catch (HttpClientErrorException exception) {
             String responseBody = exception.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody));
         }
@@ -59,7 +59,7 @@ public class PaymentRestClient {
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(cancelReason)
                     .retrieve();
-        } catch (RestClientResponseException exception) {
+        } catch (HttpClientErrorException exception) {
             String responseBody = exception.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody));
         }
