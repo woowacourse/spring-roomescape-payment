@@ -14,23 +14,28 @@ import roomescape.exception.PaymentException;
 @Component
 public class TossPaymentClient {
 
-    @Value("${secret-key}")
-    private String secretKey;
+    private static final String BASIC = "Basic";
+    private static final String API_DELIMITER = ":";
+
+    private final String secretKey;
+    private final String confirmUrl;
     private final RestClient restClient;
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(@Value("${api.toss.secret-key}") String secretKey,
+                             @Value("${api.toss.url.confirm}") String confirmUrl,
+                             RestClient restClient
+    ) {
+        this.secretKey = secretKey;
+        this.confirmUrl = confirmUrl;
         this.restClient = restClient;
     }
 
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
-        String authorizationKey = secretKey + ":";
-
         try {
             return restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
+                    .uri(confirmUrl)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Basic " + Base64.getEncoder()
-                            .encodeToString(authorizationKey.getBytes()))
+                    .header("Authorization", createAuthorizationHeader())
                     .body(paymentRequest)
                     .retrieve()
                     .body(PaymentResponse.class);
@@ -38,5 +43,9 @@ public class TossPaymentClient {
             PaymentErrorResponse errorResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             throw new PaymentException(errorResponse.message(), e.getStatusCode());
         }
+    }
+
+    private String createAuthorizationHeader() {
+        return BASIC + Base64.getEncoder().encodeToString((secretKey + API_DELIMITER).getBytes());
     }
 }
