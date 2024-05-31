@@ -1,5 +1,7 @@
 package roomescape.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,16 +13,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        e.printStackTrace();
+        logger.info(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse("[Request Error] " + e.getMessage()));
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> httpClientErrorException(HttpClientErrorException e) {
-        e.printStackTrace();
+        logger.info(e.getMessage(), e);
         ErrorResponse errorResponse = e.getResponseBodyAs(ErrorResponse.class);
         if (errorResponse == null) {
             return ResponseEntity.status(e.getStatusCode())
@@ -32,28 +36,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<ErrorResponse> externalApiException(ExternalApiException e) {
-        e.printStackTrace();
+        logger.info(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ErrorResponse("[External Error] " + e.getMessage()));
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(AuthorizationException e) {
-        e.printStackTrace();
+        logger.info(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse("[Authorization Error] " + e.getMessage()));
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException e) {
-        e.printStackTrace();
+        logger.info(e.getMessage(), e);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("[Data Access Error] " + e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        e.printStackTrace();
+        logger.error(e.getMessage(), e);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("[Server Error] " + e.getMessage()));
     }
