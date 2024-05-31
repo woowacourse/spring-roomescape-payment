@@ -7,25 +7,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlMergeMode;
-import org.springframework.test.context.jdbc.SqlMergeMode.MergeMode;
 import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.fixture.CommonFixture;
+import roomescape.support.DatabaseCleanerExtension;
 
 
+@ExtendWith(DatabaseCleanerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@SqlMergeMode(MergeMode.MERGE)
-@Sql("/init/truncate.sql")
 class MemberReservationTest {
     private static final Map<String, String> TOKEN_CACHE = new HashMap<>();
     private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
@@ -89,7 +88,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         // when, then
@@ -119,7 +119,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -158,7 +159,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -195,7 +197,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -240,7 +243,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -297,7 +301,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -341,7 +346,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -406,7 +412,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.yesterday, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.yesterday, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         // when, then
@@ -435,7 +442,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         // when, then
@@ -464,7 +472,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.yesterday, 100L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.yesterday, 100L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         // when, then
@@ -493,7 +502,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                100L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                100L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         // when, then
@@ -611,7 +621,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -662,7 +673,8 @@ class MemberReservationTest {
                             "paymentType": "%s"
                         }
                         """,
-                1L, Fixture.tomorrow, 1L, Fixture.orderId, Fixture.paymentKey, Fixture.paymentType
+                1L, CommonFixture.tomorrow, 1L, CommonFixture.orderId, CommonFixture.paymentKey,
+                CommonFixture.paymentType
         );
 
         given().log().all()
@@ -686,13 +698,5 @@ class MemberReservationTest {
                 .cookie("token", getToken("mangcho@woowa.net", "password"))
                 .when().delete("/reservations/1")
                 .then().log().all().statusCode(400);
-    }
-
-    private static class Fixture {
-        public static LocalDate tomorrow = LocalDate.now().plusDays(1);
-        public static LocalDate yesterday = LocalDate.now().minusDays(1);
-        public static String orderId = "1234abcd";
-        public static String paymentKey = "qwer";
-        public static String paymentType = "CREDIT_CARD";
     }
 }

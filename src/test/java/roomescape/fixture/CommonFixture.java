@@ -8,6 +8,7 @@ public class CommonFixture {
     public static final String EMAIL = "mangcho@woowa.net";
     public static final String PASSWORD = "password";
     public static final LocalTime now = LocalTime.now().withNano(0);
+    public static final LocalDate yesterday = LocalDate.now().minusDays(1);
     public static final LocalDate today = LocalDate.now();
     public static final LocalDate tomorrow = LocalDate.now().plusDays(1);
     public static final Long amount = 1000L;
