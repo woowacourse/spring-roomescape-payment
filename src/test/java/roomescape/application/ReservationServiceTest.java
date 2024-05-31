@@ -2,14 +2,18 @@ package roomescape.application;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
+import roomescape.application.dto.request.reservation.ReservationSearchCondition;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
+import roomescape.application.dto.response.reservation.UserReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -42,7 +46,8 @@ class ReservationServiceTest extends BaseServiceTest {
     private Member user;
     private Member admin;
     private ReservationTime time;
-    private ReservationDetail detail;
+    private ReservationDetail detail1;
+    private ReservationDetail detail2;
     private Theme theme;
 
     @BeforeEach
@@ -51,8 +56,10 @@ class ReservationServiceTest extends BaseServiceTest {
         admin = memberRepository.save(MemberFixture.admin());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
-        detail = reservationDetailRepository.save(DetailFixture.createReservationDetail(
+        detail1 = reservationDetailRepository.save(DetailFixture.createReservationDetail(
                 CommonFixture.tomorrow, time, theme));
+        detail2 = reservationDetailRepository.save(DetailFixture.createReservationDetail(
+                CommonFixture.yesterday, time, theme));
     }
 
     @DisplayName("예약 성공 시, 결제가 진행되고, 예약 상태로 전환된다")
@@ -119,7 +126,7 @@ class ReservationServiceTest extends BaseServiceTest {
     void when_paymentForPending_then_changeToReservedStatus() {
         // given
         Reservation pendingReservation = reservationRepository.save(
-                new Reservation(admin, detail, Status.PAYMENT_PENDING));
+                new Reservation(admin, detail1, Status.PAYMENT_PENDING));
 
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 pendingReservation.getId(),
@@ -135,6 +142,93 @@ class ReservationServiceTest extends BaseServiceTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThat(reservation.getPayment()).isNotEmpty();
+        });
+    }
+
+    @DisplayName("예약 상태의 예약을 모두 조회한다")
+    @Test
+    void when_findAllReservedReservations_then_returnAllReservedReservation() {
+        // given
+        reservationRepository.save(new Reservation(admin, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(admin, detail1, Status.RESERVED));
+        reservationRepository.save(new Reservation(user, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail2, Status.WAITING));
+        reservationRepository.save(new Reservation(user, detail2, Status.WAITING));
+
+        // when
+        List<ReservationResponse> response = reservationService.findAllReservedReservations();
+
+        // then
+        Assertions.assertThat(response).hasSize(1);
+    }
+
+    @DisplayName("대기 상태의 예약을 모두 조회한다")
+    @Test
+    void when_findAllWaitings_then_returnAllWaitingReservation() {
+        // given
+        reservationRepository.save(new Reservation(admin, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(admin, detail1, Status.RESERVED));
+        reservationRepository.save(new Reservation(user, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail2, Status.WAITING));
+        reservationRepository.save(new Reservation(user, detail2, Status.WAITING));
+
+        // when
+        List<ReservationResponse> response = reservationService.findAllWaitings();
+
+        // then
+        Assertions.assertThat(response).hasSize(4);
+    }
+
+    @DisplayName("조건에 맞는 예약을 모두 조회한다")
+    @Test
+    void when_findAllReservationByConditions_then_returnAllReservationByConditions() {
+        // given
+        reservationRepository.save(new Reservation(admin, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(admin, detail1, Status.RESERVED));
+        reservationRepository.save(new Reservation(user, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail2, Status.WAITING));
+        reservationRepository.save(new Reservation(user, detail2, Status.RESERVED));
+
+        // when
+        List<ReservationResponse> response = reservationService.findAllReservationByConditions(
+                new ReservationSearchCondition(CommonFixture.yesterday, CommonFixture.today, user.getId(),
+                        theme.getId()));
+
+        // then
+        Assertions.assertThat(response).hasSize(1);
+    }
+
+    @DisplayName("사용자의 예약을 순번과 함께 조회한다")
+    @Test
+    void when_findAllWithRank_then_returnAllWithRank() {
+        // given
+        reservationRepository.save(new Reservation(admin, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(user, detail1, Status.CANCELED));
+        reservationRepository.save(new Reservation(admin, detail1, Status.RESERVED));
+        reservationRepository.save(new Reservation(user, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail1, Status.WAITING));
+        reservationRepository.save(new Reservation(admin, detail2, Status.WAITING));
+        reservationRepository.save(new Reservation(user, detail2, Status.RESERVED));
+
+        // when
+        List<UserReservationResponse> response = reservationService.findAllWithRank(user.getId());
+
+        // then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response).hasSize(3);
+            softly.assertThat(response.get(0).rank()).isEqualTo(0);
+            softly.assertThat(response.get(1).rank()).isEqualTo(0);
+            softly.assertThat(response.get(2).rank()).isEqualTo(1);
         });
     }
 
