@@ -21,7 +21,7 @@ public class PaymentClient {
     public PaymentResponse approvePayment(final PaymentRequest paymentRequest,
                                           final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         return restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
@@ -33,7 +33,7 @@ public class PaymentClient {
     public PaymentResponse refundPayment(final PaymentResponse paymentResponse,
                                          final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         return restClient.post()
-                .uri("/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
+                .uri("https://api.tosspayments.com/v1/payments/" + paymentResponse.getPaymentKey() + "/cancel")
                 .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
