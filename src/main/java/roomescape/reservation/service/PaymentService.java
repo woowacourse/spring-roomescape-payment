@@ -27,14 +27,14 @@ public class PaymentService {
 
     public PaymentService(
             @Value("${payment.base-url}") String paymentBaseUrl,
-            @Value("${payment.secret-key}") String encodedSecretKey,
+            @Value("${payment.secret-key}") String secretKey,
             ObjectMapper objectMapper
     ) {
         this.restClient = RestClient.builder()
                 .baseUrl(paymentBaseUrl)
                 .requestFactory(getClientHttpRequestFactory())
                 .build();
-        this.encodedSecretKey = encodeSecretKey(encodedSecretKey);
+        this.encodedSecretKey = encodeSecretKey(secretKey);
         this.objectMapper = objectMapper;
     }
 
