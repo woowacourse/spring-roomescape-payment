@@ -3,10 +3,14 @@ package roomescape.reservation.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
@@ -28,7 +32,12 @@ public class PaymentClient {
     private final RestClient restClient;
 
     public PaymentClient() {
-        this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofMinutes(1))
+                .withReadTimeout(Duration.ofMinutes(3));
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+
+        this.restClient = RestClient.builder().baseUrl(BASE_URL).requestFactory(requestFactory).build();
     }
 
     public void requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
