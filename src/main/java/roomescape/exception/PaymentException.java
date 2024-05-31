@@ -24,21 +24,19 @@ public class PaymentException extends RuntimeException {
     );
 
     private final HttpStatus status;
-    private final String code;
 
-    private PaymentException(HttpStatus status, String code, String message) {
+    private PaymentException(HttpStatus status, String message) {
         super(message);
         this.status = status;
-        this.code = code;
     }
 
     public static PaymentException from(ClientHttpResponse response) throws IOException {
         PaymentErrorResponse paymentErrorResponse = OBJECT_MAPPER.readValue(response.getBody(), PaymentErrorResponse.class);
 
         if (SERVER_ERROR_CODES.contains(paymentErrorResponse.code())) {
-            return new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, paymentErrorResponse.code(), "결제 서버에 문제가 발생했습니다.");
+            return new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버에 문제가 발생했습니다.");
         }
-        return new PaymentException(HttpStatus.BAD_REQUEST, paymentErrorResponse.code(), paymentErrorResponse.message());
+        return new PaymentException(HttpStatus.BAD_REQUEST, paymentErrorResponse.message());
     }
 
     public HttpStatus getStatus() {
