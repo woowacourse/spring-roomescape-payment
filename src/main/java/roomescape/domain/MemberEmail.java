@@ -13,7 +13,7 @@ public class MemberEmail {
 
     private String email;
 
-    public MemberEmail() {
+    protected MemberEmail() {
     }
 
     public MemberEmail(String email) {

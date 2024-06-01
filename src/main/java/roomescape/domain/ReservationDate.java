@@ -12,7 +12,7 @@ public class ReservationDate {
 
     private LocalDate date;
 
-    public ReservationDate() {
+    protected ReservationDate() {
     }
 
     public ReservationDate(String date) {

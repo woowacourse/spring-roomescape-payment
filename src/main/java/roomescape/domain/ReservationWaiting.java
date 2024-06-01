@@ -39,7 +39,7 @@ public class ReservationWaiting {
 
     private LocalDateTime deniedAt;
 
-    public ReservationWaiting() {
+    protected ReservationWaiting() {
     }
 
     public ReservationWaiting(LocalDateTime now,
@@ -75,9 +75,7 @@ public class ReservationWaiting {
         this.deniedAt = deniedAt;
     }
 
-    private static void validateDateTime(LocalDateTime now,
-                                         ReservationDate date,
-                                         ReservationTime time) {
+    private void validateDateTime(LocalDateTime now, ReservationDate date, ReservationTime time) {
         LocalDateTime waitingDateTime = LocalDateTime.of(date.getDate(), time.getStartAt());
         if (waitingDateTime.isBefore(now)) {
             throw new RoomescapeException(RoomescapeErrorCode.PAST_REQUEST,

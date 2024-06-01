@@ -33,7 +33,7 @@ public class Member {
     @Column(nullable = false)
     private MemberRole role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(MemberName name, MemberEmail email, MemberPassword password, MemberRole role) {
