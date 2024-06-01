@@ -20,7 +20,7 @@ public class PaymentRestClientConfiguration {
     }
 
     @Bean
-    public RestClient restClient() {
+    public RestClient tossRestClient() {
         byte[] encodedBytes = Base64.getEncoder()
                 .encode((paymentProperties.getSecretKey() + paymentProperties.getPassword())
                         .getBytes(StandardCharsets.UTF_8));
