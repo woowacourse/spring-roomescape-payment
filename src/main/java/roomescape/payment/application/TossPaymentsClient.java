@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @Component
 public class TossPaymentsClient {
-
     private final RestClient restClient;
     private final String confirmApiPath;
     private final ObjectMapper objectMapper;

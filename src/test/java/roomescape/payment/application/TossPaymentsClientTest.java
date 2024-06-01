@@ -23,7 +23,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RestClientTest
 @Import(TossRestClientConfiguration.class)
 class TossPaymentsClientTest {
-
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MockRestServiceServer mockServer;
     private final TossPaymentsClient paymentsClient;
