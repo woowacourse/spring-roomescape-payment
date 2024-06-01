@@ -17,32 +17,32 @@ import roomescape.payment.dto.PaymentErrorResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .build();
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(final AuthorizationException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
     }
 
     @ExceptionHandler(TossPaymentException.class)
-    public ResponseEntity<PaymentErrorResponse> handleHttpClientErrorException(final TossPaymentException e) {
-        logger.error(e.getMessage(), e);
+    public ResponseEntity<PaymentErrorResponse> handleTossPaymentException(final TossPaymentException e) {
+        log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(e.getErrorResponse());
     }
 
     @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleRoomescapeException(final RoomescapeException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             final MethodArgumentNotValidException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -58,21 +58,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             final HttpMessageNotReadableException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(final NoResourceFoundException e) {
-        logger.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return ResponseEntity.notFound()
                 .build();
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e) {
-        logger.error(e.getMessage(), e);
+        log.error(e.getMessage(), e);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("예기치 않은 오류가 발생했습니다."));
     }
