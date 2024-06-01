@@ -26,15 +26,24 @@ public class TossPaymentsClient {
     private static final int READ_TIMEOUT_SECOND = 30;
 
     private final RestClient restClient;
+    private final String confirmApiPath;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentsClient(@Value("${security.toss.secret-key}") String secretKey, ObjectMapper objectMapper) {
-        this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+    public TossPaymentsClient(@Value("${pg.toss.secret-key}") String secretKey,
+                              @Value("${pg.toss.base-url}") String baseUrl,
+                              @Value("${pg.toss.confirm-api-path}") String confirmApiPath,
+                              ObjectMapper objectMapper) {
+        this.restClient = createRestClient(secretKey, baseUrl);
+        this.confirmApiPath = confirmApiPath;
+        this.objectMapper = objectMapper;
+    }
+
+    private RestClient createRestClient(String secretKey, String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
                 .defaultHeader(AUTHORIZATION, encodeSecretKey(secretKey))
                 .requestFactory(getRequestFactory())
                 .build();
-        this.objectMapper = objectMapper;
     }
 
     private String encodeSecretKey(String secretKey) {
@@ -51,7 +60,7 @@ public class TossPaymentsClient {
 
     public void confirm(PaymentConfirmRequest request) {
         restClient.post()
-                .uri("/confirm")
+                .uri(confirmApiPath)
                 .body(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
