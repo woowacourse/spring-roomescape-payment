@@ -1,9 +1,11 @@
 package roomescape.service.response;
 
+import java.math.BigDecimal;
+
 public record PaymentApproveSuccessAppResponse(
         String paymentKey,
         String orderId,
-        Long totalAmount,
+        BigDecimal totalAmount,
         String status,
         String requestedAt,
         String approvedAt

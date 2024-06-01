@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import jakarta.annotation.PostConstruct;
+import java.math.BigDecimal;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.service.PaymentClient;
@@ -22,7 +23,7 @@ public class TestPaymentConfiguration {
                 new PaymentApproveSuccessAppResponse(
                         "paymentKey",
                         "orderId",
-                        1000L,
+                        BigDecimal.valueOf(1000),
                         "DONE",
                         "2022-06-01T00:00:00+09:00",
                         "2022-06-01T00:00:00+09:00"
