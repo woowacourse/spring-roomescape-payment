@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class PaymentClient {
         restClient.post()
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", createAuthorizationValue())
+                .header(HttpHeaders.AUTHORIZATION, createAuthorizationValue())
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
