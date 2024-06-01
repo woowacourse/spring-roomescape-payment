@@ -9,6 +9,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
 import roomescape.service.config.TossPaymentConfigProperties;
 
 @Component
@@ -20,16 +21,17 @@ public class TossPaymentRestClient {
 
     private final TossPaymentConfigProperties properties;
     private final String authorizationKey;
+    private final RestClient.Builder builder;
 
-    public TossPaymentRestClient(TossPaymentConfigProperties properties) {
+    public TossPaymentRestClient(TossPaymentConfigProperties properties, Builder builder) {
         this.properties = properties;
         this.authorizationKey = AUTHORIZATION_PREFIX + new String(Base64.getEncoder()
             .encode(properties.getTestSecretKey().getBytes(UTF_8)));
+        this.builder = builder;
     }
 
     public RestClient build() {
-        return RestClient.builder()
-            .baseUrl(properties.getPaymentApprovalUrl())
+        return builder.baseUrl(properties.getPaymentApprovalUrl())
             .requestFactory(timeoutFactory())
             .defaultHeader(HttpHeaders.AUTHORIZATION, authorizationKey)
             .build();
