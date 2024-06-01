@@ -19,7 +19,8 @@ INSERT INTO payment (payment_key, amount, order_id)
 VALUES ('payment_key1', 1000, 'order_id1'),
        ('payment_key2', 1000, 'order_id2'),
        ('payment_key3', 1000, 'order_id3'),
-       ('payment_key4', 1000, 'order_id4');
+       ('payment_key4', 1000, 'order_id4'),
+       ('payment_key5', 1000, 'order_id5');
 
 INSERT INTO reservation (date, member_id, time_id, theme_id, status, create_at, payment_id)
 VALUES ('2024-05-07', 1, 1, 1, 'BOOKED', '2024-05-07T11:44:30.000000', 1),
