@@ -1,35 +1,37 @@
 package roomescape.service;
 
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
-import roomescape.service.client.TossPaymentRestClient;
+import roomescape.service.config.TossPaymentConfigProperties;
 import roomescape.service.dto.TossPaymentRequestDto;
+import roomescape.service.dto.TossPaymentResponseDto;
 
 @Service
 public class TossPaymentService {
 
-    private final TossPaymentRestClient restClient;
+    private final TossPaymentConfigProperties properties;
+    private final RestTemplate restTemplate;
 
-    public TossPaymentService(TossPaymentRestClient restClient) {
-        this.restClient = restClient;
+    public TossPaymentService(TossPaymentConfigProperties properties, RestTemplate restTemplate) {
+        this.properties = properties;
+        this.restTemplate = restTemplate;
     }
 
     @Transactional
     public void pay(String orderId, long amount, String paymentKey) {
         try {
-            restClient.build()
-                .post()
-                .body(new TossPaymentRequestDto(orderId, amount, paymentKey))
-                .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toBodilessEntity();
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            TossPaymentResponseDto responseDto = restTemplate.postForEntity(
+                properties.getPaymentApprovalUrl(),
+                new TossPaymentRequestDto(orderId, amount, paymentKey),
+                TossPaymentResponseDto.class
+            ).getBody();
+        } catch (RestClientResponseException e) {
+            // TODO: response body 못 받아오고 있음
             PaymentErrorMessageResponse response = e.getResponseBodyAs(PaymentErrorMessageResponse.class);
             if (response == null) {
                 throw new RoomescapeException("결제가 승인되지 않았습니다.");
