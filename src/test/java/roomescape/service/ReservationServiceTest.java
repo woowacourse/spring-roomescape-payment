@@ -24,6 +24,7 @@ import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ReservationWaitingFixture;
 import roomescape.support.fixture.ThemeFixture;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -92,7 +93,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 theme.getId(),
                 member.getId()
         );
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000);
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.TEN);
 
         ReservationResponse response = reservationService.addReservation(createReservationRequest, paymentRequest);
 

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.request.PaymentRequest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ReservationRequest(
@@ -30,7 +31,7 @@ public record ReservationRequest(
         @NotNull(message = "결제 금액을 입력해주세요.")
         @Positive(message = "결제 금액은 양수만 가능합니다.")
         @Max(value = Integer.MAX_VALUE, message = "결제 금액은 2,147,483,647 이하여야 합니다.")
-        Integer amount
+        BigDecimal amount
 ) {
 
     public CreateReservationRequest toCreateReservationRequest(long memberId) {
