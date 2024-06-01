@@ -2,9 +2,8 @@ package roomescape.controller.api;
 
 import static org.hamcrest.Matchers.contains;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -52,10 +54,10 @@ class UserReservationTimeControllerTest {
         LoginRequest user = new LoginRequest("user@a.com", "123a!");
 
         userToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(user)
-            .when().post("/login")
-            .then().extract().cookie("token");
+                .contentType(ContentType.JSON)
+                .body(user)
+                .when().post("/login")
+                .then().extract().cookie("token");
     }
 
     @DisplayName("성공: 날짜, 테마 ID로부터 예약 시간 및 가능 여부 반환")
@@ -67,14 +69,14 @@ class UserReservationTimeControllerTest {
         adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
 
         RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .queryParam("date", "2060-01-01")
-            .queryParam("id", 1L)
-            .when().get("/times/available")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 2))
-            .body("startAt", contains("10:00", "23:00"))
-            .body("alreadyBooked", contains(true, false));
+                .cookie("token", userToken)
+                .queryParam("date", "2060-01-01")
+                .queryParam("id", 1L)
+                .when().get("/times/available")
+                .then().log().all()
+                .statusCode(200)
+                .body("id", contains(1, 2))
+                .body("startAt", contains("10:00", "23:00"))
+                .body("alreadyBooked", contains(true, false));
     }
 }

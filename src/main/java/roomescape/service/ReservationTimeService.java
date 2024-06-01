@@ -3,8 +3,10 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.controller.dto.CreateTimeResponse;
 import roomescape.controller.dto.FindTimeAndAvailabilityResponse;
 import roomescape.controller.dto.FindTimeResponse;
@@ -21,7 +23,7 @@ public class ReservationTimeService {
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeService(ReservationTimeRepository reservationTimeRepository,
-        ReservationRepository reservationRepository) {
+                                  ReservationRepository reservationRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
@@ -51,8 +53,8 @@ public class ReservationTimeService {
     public List<FindTimeResponse> findAll() {
         List<ReservationTime> times = reservationTimeRepository.findAllByOrderByStartAtAsc();
         return times.stream()
-            .map(FindTimeResponse::from)
-            .toList();
+                .map(FindTimeResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -60,17 +62,17 @@ public class ReservationTimeService {
         List<ReservationTime> times = reservationTimeRepository.findAll();
 
         List<Reservation> reservations =
-            reservationRepository.findAllByDateAndThemeIdOrderByTimeStartAtAsc(date, themeId);
+                reservationRepository.findAllByDateAndThemeIdOrderByTimeStartAtAsc(date, themeId);
 
         List<ReservationTime> reservedTimes = reservations.stream()
-            .map(Reservation::getTime)
-            .toList();
+                .map(Reservation::getTime)
+                .toList();
 
         return times.stream()
-            .map(time -> new FindTimeAndAvailabilityResponse(
-                time.getId(),
-                time.getStartAt(),
-                reservedTimes.contains(time)
-            )).toList();
+                .map(time -> new FindTimeAndAvailabilityResponse(
+                        time.getId(),
+                        time.getStartAt(),
+                        reservedTimes.contains(time)
+                )).toList();
     }
 }

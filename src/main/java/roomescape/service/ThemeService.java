@@ -2,8 +2,10 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.controller.dto.CreateThemeResponse;
 import roomescape.controller.dto.FindThemeResponse;
 import roomescape.domain.theme.Theme;
@@ -51,8 +53,8 @@ public class ThemeService {
     public List<FindThemeResponse> findAll() {
         List<Theme> themes = themeRepository.findAll();
         return themes.stream()
-            .map(FindThemeResponse::from)
-            .toList();
+                .map(FindThemeResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +63,7 @@ public class ThemeService {
         LocalDate end = LocalDate.now().minusDays(POPULAR_END_DATE);
         List<Theme> themes = themeRepository.findPopular(start, end, POPULAR_THEME_COUNT);
         return themes.stream()
-            .map(FindThemeResponse::from)
-            .toList();
+                .map(FindThemeResponse::from)
+                .toList();
     }
 }

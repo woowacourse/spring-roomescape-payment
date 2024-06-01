@@ -1,8 +1,10 @@
 package roomescape.service;
 
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.controller.dto.FindMemberResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.exception.RoomescapeException;
@@ -21,13 +23,13 @@ public class MemberService {
     public List<FindMemberResponse> findAll() {
         List<Member> members = memberRepository.findAll();
         return members.stream()
-            .map(FindMemberResponse::from)
-            .toList();
+                .map(FindMemberResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-            .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
     }
 }

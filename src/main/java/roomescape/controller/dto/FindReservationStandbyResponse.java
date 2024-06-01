@@ -1,8 +1,10 @@
 package roomescape.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import roomescape.domain.reservation.Reservation;
 
 public record FindReservationStandbyResponse(Long id,
@@ -13,11 +15,11 @@ public record FindReservationStandbyResponse(Long id,
 
     public static FindReservationStandbyResponse from(Reservation reservation) {
         return new FindReservationStandbyResponse(
-            reservation.getId(),
-            reservation.getMember().getName(),
-            reservation.getTheme().getName(),
-            reservation.getDate(),
-            reservation.getTime().getStartAt()
+                reservation.getId(),
+                reservation.getMember().getName(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt()
         );
     }
 }

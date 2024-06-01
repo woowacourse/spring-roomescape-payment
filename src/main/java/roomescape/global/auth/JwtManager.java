@@ -1,16 +1,19 @@
 package roomescape.global.auth;
 
+import java.util.Date;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.Date;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.global.exception.AuthorizationException;
 
@@ -27,10 +30,10 @@ public class JwtManager {
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-            .setSubject(member.getId().toString())
-            .setExpiration(validity)
-            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
-            .compact();
+                .setSubject(member.getId().toString())
+                .setExpiration(validity)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .compact();
     }
 
     public Long parseToken(HttpServletRequest request) {
@@ -53,10 +56,10 @@ public class JwtManager {
     private Long parse(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+                    .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
             return Long.valueOf(claims.getSubject());
         } catch (ExpiredJwtException e) {
             throw new AuthorizationException("토큰이 만료되었습니다.");

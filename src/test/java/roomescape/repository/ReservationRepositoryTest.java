@@ -2,7 +2,6 @@ package roomescape.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+
+import io.restassured.RestAssured;
 import roomescape.repository.dto.ReservationWithRank;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -37,29 +38,29 @@ class ReservationRepositoryTest {
     @Test
     void findReservationsWithRankByMemberId() {
         jdbcTemplate.update("""
-            INSERT INTO member(name, email, password, role)
-            VALUES ('러너덕', 'deock@a.com', '123a!', 'USER'),
-                   ('트레', 'tre@a.com', '123a!', 'USER'),
-                   ('안돌', 'andol@a.com', '123a!', 'USER'),
-                   ('제이', 'jay@a.com', '123a!', 'USER'),
-                   ('포비', 'poby@a.com', '123a!', 'USER');
-                   
-            INSERT INTO theme(name, description, thumbnail)
-            VALUES ('테마1', 'd1', 'https://test.com/test1.jpg');
-                   
-            INSERT INTO reservation_time(start_at)
-            VALUES ('08:00');
-                   
-            INSERT INTO reservation(member_id, reserved_date, created_at, time_id, theme_id, status)
-            VALUES (1, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -5, CURRENT_DATE), 1, 1, 'RESERVED'),
-                   (2, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -4, CURRENT_DATE), 1, 1, 'STANDBY'),
-                   (3, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -1, CURRENT_DATE), 1, 1, 'STANDBY'),
-                   (4, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -2, CURRENT_DATE), 1, 1, 'STANDBY'),
-                   (5, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, 'STANDBY');
-            """);
+                INSERT INTO member(name, email, password, role)
+                VALUES ('러너덕', 'deock@a.com', '123a!', 'USER'),
+                       ('트레', 'tre@a.com', '123a!', 'USER'),
+                       ('안돌', 'andol@a.com', '123a!', 'USER'),
+                       ('제이', 'jay@a.com', '123a!', 'USER'),
+                       ('포비', 'poby@a.com', '123a!', 'USER');
+                       
+                INSERT INTO theme(name, description, thumbnail)
+                VALUES ('테마1', 'd1', 'https://test.com/test1.jpg');
+                       
+                INSERT INTO reservation_time(start_at)
+                VALUES ('08:00');
+                       
+                INSERT INTO reservation(member_id, reserved_date, created_at, time_id, theme_id, status)
+                VALUES (1, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -5, CURRENT_DATE), 1, 1, 'RESERVED'),
+                       (2, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -4, CURRENT_DATE), 1, 1, 'STANDBY'),
+                       (3, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -1, CURRENT_DATE), 1, 1, 'STANDBY'),
+                       (4, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -2, CURRENT_DATE), 1, 1, 'STANDBY'),
+                       (5, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, 'STANDBY');
+                """);
 
         assertThat(reservationRepository.findReservationsWithRankByMemberId(5L))
-            .extracting(ReservationWithRank::rank)
-            .containsExactly(2L);
+                .extracting(ReservationWithRank::rank)
+                .containsExactly(2L);
     }
 }

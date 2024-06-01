@@ -1,7 +1,9 @@
 package roomescape.controller.api;
 
-import jakarta.validation.Valid;
 import java.time.Duration;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import roomescape.controller.dto.LoginCheckResponse;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
@@ -31,14 +34,14 @@ public class LoginController {
         String token = loginService.login(request.email(), request.password());
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
-            .httpOnly(true)
-            .path("/")
-            .maxAge(Duration.ofMinutes(30))
-            .build();
+                .httpOnly(true)
+                .path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .build();
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .build();
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @GetMapping("/check")

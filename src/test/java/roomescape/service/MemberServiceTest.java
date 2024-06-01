@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+
+import io.restassured.RestAssured;
 import roomescape.controller.dto.FindMemberResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -46,8 +47,8 @@ class MemberServiceTest {
         memberRepository.save(new Member("안돌", "andole@test.com", "123a!", Role.USER));
 
         assertThat(memberService.findAll())
-            .extracting(FindMemberResponse::id)
-            .containsExactly(1L, 2L, 3L);
+                .extracting(FindMemberResponse::id)
+                .containsExactly(1L, 2L, 3L);
     }
 
     @DisplayName("성공: ID로 멤버 조회")
@@ -59,11 +60,11 @@ class MemberServiceTest {
 
         Member member = memberService.findById(2L);
         assertAll(
-            () -> assertThat(member.getId()).isEqualTo(2L),
-            () -> assertThat(member.getName()).isEqualTo("트레"),
-            () -> assertThat(member.getEmail()).isEqualTo("tre@test.com"),
-            () -> assertThat(member.getPassword()).isEqualTo("123a!"),
-            () -> assertThat(member.getRole()).isEqualTo("USER")
+                () -> assertThat(member.getId()).isEqualTo(2L),
+                () -> assertThat(member.getName()).isEqualTo("트레"),
+                () -> assertThat(member.getEmail()).isEqualTo("tre@test.com"),
+                () -> assertThat(member.getPassword()).isEqualTo("123a!"),
+                () -> assertThat(member.getRole()).isEqualTo("USER")
         );
     }
 
@@ -71,7 +72,7 @@ class MemberServiceTest {
     @Test
     void name() {
         assertThatThrownBy(() -> memberService.findById(1L))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
     }
 }

@@ -2,8 +2,10 @@ package roomescape.global.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import roomescape.domain.member.Member;
 import roomescape.global.exception.AuthorizationException;
 import roomescape.service.MemberService;

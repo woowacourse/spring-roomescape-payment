@@ -1,5 +1,8 @@
 package roomescape.domain.reservation;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,8 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.theme.Theme;
 
@@ -55,12 +57,12 @@ public class Reservation {
     private ReservationStatus status;
 
     public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time, Theme theme,
-        ReservationStatus status) {
+                       ReservationStatus status) {
         this(null, Member, date, createdAt, time, theme, status);
     }
 
     public Reservation(Long id, Member Member, LocalDate date, LocalDateTime createdAt,
-        ReservationTime time, Theme theme, ReservationStatus status) {
+                       ReservationTime time, Theme theme, ReservationStatus status) {
 
         this.id = id;
         this.member = Member;

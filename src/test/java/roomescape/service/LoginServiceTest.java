@@ -3,7 +3,6 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+
+import io.restassured.RestAssured;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.global.exception.AuthorizationException;
@@ -41,7 +42,7 @@ class LoginServiceTest {
     void login() {
         memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
         assertThatCode(() -> loginService.login("deock@test.com", "123a!"))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("실패: 비밀번호 불일치")
@@ -49,8 +50,8 @@ class LoginServiceTest {
     void login_InvalidPassword() {
         memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
         assertThatThrownBy(() -> loginService.login("deock@test.com", "123b!"))
-            .isInstanceOf(AuthorizationException.class)
-            .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
+                .isInstanceOf(AuthorizationException.class)
+                .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
     }
 
     @DisplayName("실패: 존재하지 않는 이메일")
@@ -58,8 +59,8 @@ class LoginServiceTest {
     void login_NoSuchMember() {
         memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
         assertThatThrownBy(() -> loginService.login("duck@test.com", "123a!"))
-            .isInstanceOf(AuthorizationException.class)
-            .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
+                .isInstanceOf(AuthorizationException.class)
+                .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
     }
 
 }

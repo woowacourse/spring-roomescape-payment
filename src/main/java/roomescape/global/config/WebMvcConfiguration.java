@@ -1,6 +1,7 @@
 package roomescape.global.config;
 
 import java.util.List;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,9 +16,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final HandlerInterceptor checkUserInterceptor;
 
     public WebMvcConfiguration(
-        HandlerMethodArgumentResolver authenticationPrincipalArgumentResolver,
-        HandlerInterceptor checkRoleInterceptor,
-        HandlerInterceptor checkUserInterceptor) {
+            HandlerMethodArgumentResolver authenticationPrincipalArgumentResolver,
+            HandlerInterceptor checkRoleInterceptor,
+            HandlerInterceptor checkUserInterceptor) {
 
         this.argumentResolver = authenticationPrincipalArgumentResolver;
         this.checkRoleInterceptor = checkRoleInterceptor;
@@ -27,12 +28,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(checkRoleInterceptor)
-            .addPathPatterns("/admin/**");
+                .addPathPatterns("/admin/**");
 
         registry.addInterceptor(checkUserInterceptor)
-            .addPathPatterns("/reservation")
-            .addPathPatterns("/reservations")
-            .addPathPatterns("/login/check");
+                .addPathPatterns("/reservation")
+                .addPathPatterns("/reservations")
+                .addPathPatterns("/login/check");
     }
 
     @Override

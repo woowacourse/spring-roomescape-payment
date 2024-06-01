@@ -6,8 +6,8 @@ public record FindMemberResponse(Long id, String name) {
 
     public static FindMemberResponse from(Member member) {
         return new FindMemberResponse(
-            member.getId(),
-            member.getName()
+                member.getId(),
+                member.getName()
         );
     }
 }

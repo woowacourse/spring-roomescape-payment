@@ -6,10 +6,10 @@ public record FindThemeResponse(Long id, String name, String description, String
 
     public static FindThemeResponse from(Theme theme) {
         return new FindThemeResponse(
-            theme.getId(),
-            theme.getName(),
-            theme.getDescription(),
-            theme.getThumbnail()
+                theme.getId(),
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
         );
     }
 }

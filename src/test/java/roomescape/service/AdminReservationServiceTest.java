@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+
+import io.restassured.RestAssured;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.FindReservationResponse;
 import roomescape.controller.dto.FindReservationStandbyResponse;
@@ -81,16 +83,16 @@ class AdminReservationServiceTest {
     @Test
     void save_MemberIdDoesntExist() {
         assertThatThrownBy(() -> adminReservationService.reserve(3L, date, timeId, themeId))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
     }
 
     @DisplayName("실패: 존재하지 않는 시간 ID 입력 시 예외가 발생한다.")
     @Test
     void save_TimeIdDoesntExist() {
         assertThatThrownBy(() -> adminReservationService.reserve(userId, date, 2L, themeId))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
     }
 
     @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
@@ -99,8 +101,8 @@ class AdminReservationServiceTest {
         adminReservationService.reserve(userId, date, timeId, themeId);
 
         assertThatThrownBy(() -> adminReservationService.reserve(userId, date, timeId, themeId))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("해당 시간에 예약이 이미 존재합니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("해당 시간에 예약이 이미 존재합니다.");
     }
 
     @DisplayName("실패: 과거 날짜 예약 생성하면 예외 발생 -- 어제")
@@ -109,8 +111,8 @@ class AdminReservationServiceTest {
         LocalDate yesterday = LocalDate.now().minusDays(1);
 
         assertThatThrownBy(() -> adminReservationService.reserve(userId, yesterday, timeId, themeId))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("과거 예약을 추가할 수 없습니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("과거 예약을 추가할 수 없습니다.");
     }
 
     @DisplayName("실패: 같은 날짜, 과거 시간 예약 생성하면 예외 발생 -- 1분 전")
@@ -123,8 +125,8 @@ class AdminReservationServiceTest {
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
 
         assertThatThrownBy(() -> adminReservationService.reserve(userId, today, savedTime.getId(), themeId))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("과거 예약을 추가할 수 없습니다.");
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("과거 예약을 추가할 수 없습니다.");
     }
 
     @DisplayName("성공: 예약 삭제")
@@ -137,8 +139,8 @@ class AdminReservationServiceTest {
         adminReservationService.deleteById(2L);
 
         assertThat(adminReservationService.findAllReserved())
-            .extracting(FindReservationResponse::id)
-            .containsExactly(1L, 3L);
+                .extracting(FindReservationResponse::id)
+                .containsExactly(1L, 3L);
     }
 
     @DisplayName("성공: 다른 회원의 예약대기 삭제")
@@ -148,7 +150,7 @@ class AdminReservationServiceTest {
         userReservationService.standby(userId, date, timeId, themeId);
 
         assertThatCode(() -> adminReservationService.deleteStandby(2L))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("성공: 전체 예약 조회")
@@ -159,8 +161,8 @@ class AdminReservationServiceTest {
         adminReservationService.reserve(adminId, LocalDate.parse("2060-01-03"), timeId, themeId);
 
         assertThat(adminReservationService.findAllReserved())
-            .extracting(FindReservationResponse::id)
-            .containsExactly(1L, 2L, 3L);
+                .extracting(FindReservationResponse::id)
+                .containsExactly(1L, 2L, 3L);
     }
 
     @DisplayName("성공: 전체 대기 조회")
@@ -170,8 +172,8 @@ class AdminReservationServiceTest {
         userReservationService.standby(userId, date, timeId, themeId);
 
         assertThat(adminReservationService.findAllStandby())
-            .extracting(FindReservationStandbyResponse::id)
-            .containsExactly(2L);
+                .extracting(FindReservationStandbyResponse::id)
+                .containsExactly(2L);
     }
 
     @DisplayName("성공: 검색 필터에 따라 조회")
@@ -185,10 +187,10 @@ class AdminReservationServiceTest {
         adminReservationService.reserve(userId, LocalDate.parse("2060-01-06"), 1L, 2L);
 
         List<FindReservationResponse> reservations = adminReservationService.findAllByFilter(
-            2L, userId, LocalDate.parse("2060-01-01"), LocalDate.parse("2060-01-06"));
+                2L, userId, LocalDate.parse("2060-01-01"), LocalDate.parse("2060-01-06"));
 
         assertThat(reservations)
-            .extracting(FindReservationResponse::id)
-            .containsExactly(4L, 6L);
+                .extracting(FindReservationResponse::id)
+                .containsExactly(4L, 6L);
     }
 }

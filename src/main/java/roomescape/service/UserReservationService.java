@@ -6,8 +6,10 @@ import static roomescape.domain.reservation.ReservationStatus.STANDBY;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
@@ -31,9 +33,9 @@ public class UserReservationService {
     private final MemberRepository memberRepository;
 
     public UserReservationService(
-        ReservationRepository reservationRepository,
-        ReservationTimeRepository reservationTimeRepository,
-        ThemeRepository themeRepository, MemberRepository memberRepository) {
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository, MemberRepository memberRepository) {
 
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -54,13 +56,13 @@ public class UserReservationService {
     }
 
     private CreateReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
-        ReservationStatus status) {
+                                           ReservationStatus status) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
         ReservationTime time = reservationTimeRepository.findById(timeId)
-            .orElseThrow(() -> new RoomescapeException("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다."));
         Theme theme = themeRepository.findById(themeId)
-            .orElseThrow(() -> new RoomescapeException("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
         LocalDateTime createdAt = LocalDateTime.now();
 
         Reservation reservation = new Reservation(member, date, createdAt, time, theme, status);
@@ -77,12 +79,12 @@ public class UserReservationService {
 
     private void validateAlreadyBookedByMember(Long memberId, LocalDate date, Long timeId, Long themeId) {
         if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-            memberId, date, timeId, themeId, RESERVED)) {
+                memberId, date, timeId, themeId, RESERVED)) {
             throw new RoomescapeException("이미 예약하셨습니다. 대기 없이 이용 가능합니다.");
         }
 
         if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-            memberId, date, timeId, themeId, STANDBY)) {
+                memberId, date, timeId, themeId, STANDBY)) {
             throw new RoomescapeException("이미 대기중인 예약입니다.");
         }
     }
@@ -99,7 +101,7 @@ public class UserReservationService {
     @Transactional
     public void deleteStandby(Long id, Member member) {
         Reservation reservation = reservationRepository.findByIdAndStatus(id, STANDBY)
-            .orElseThrow(() -> new RoomescapeException("예약대기가 존재하지 않아 삭제할 수 없습니다."));
+                .orElseThrow(() -> new RoomescapeException("예약대기가 존재하지 않아 삭제할 수 없습니다."));
 
         if (member.isNotAdmin() && reservation.isNotReservedBy(member)) {
             throw new RoomescapeException("자신의 예약만 삭제할 수 있습니다.");
@@ -111,19 +113,19 @@ public class UserReservationService {
 
     private void approveNextWaiting(Reservation reservation) {
         reservationRepository.findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId()
         ).ifPresent(Reservation::reserve);
     }
 
     @Transactional(readOnly = true)
     public List<FindMyReservationResponse> findMyReservationsWithRank(Long memberId) {
         List<ReservationWithRank> reservations =
-            reservationRepository.findReservationsWithRankByMemberId(memberId);
+                reservationRepository.findReservationsWithRankByMemberId(memberId);
 
         return reservations.stream()
-            .map(data -> FindMyReservationResponse.from(data.reservation(), data.rank()))
-            .toList();
+                .map(data -> FindMyReservationResponse.from(data.reservation(), data.rank()))
+                .toList();
     }
 }
