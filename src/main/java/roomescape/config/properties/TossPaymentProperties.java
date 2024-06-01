@@ -18,12 +18,12 @@ public class TossPaymentProperties implements PaymentProperties {
     }
 
     @Override
-    public String getSecretKey() {
-        return secretKey.getSecretKey();
+    public SecretKey getSecretKey() {
+        return secretKey;
     }
 
     @Override
-    public String getPaymentUrl() {
-        return paymentUrl.getPaymentUrl();
+    public PaymentUrl getPaymentUrl() {
+        return paymentUrl;
     }
 }

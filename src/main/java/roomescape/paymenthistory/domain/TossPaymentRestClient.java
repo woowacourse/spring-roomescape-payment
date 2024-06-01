@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.config.RestClientConfigFactory;
+import roomescape.config.RestClientConfigMaker;
 import roomescape.config.properties.PaymentProperties;
 import roomescape.config.properties.TossPaymentProperties;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
@@ -30,7 +30,7 @@ public class TossPaymentRestClient {
     private final String secretKey;
 
     public TossPaymentRestClient(PaymentProperties properties) {
-        this.restClient = RestClientConfigFactory.restClient(properties.getPaymentUrl());
+        this.restClient = new RestClientConfigMaker(properties.getPaymentUrl()).makeRestClient();
         this.secretKey = new String(
                 Base64.getEncoder().encode((properties.getSecretKey() + ":").getBytes(StandardCharsets.UTF_8)));
     }

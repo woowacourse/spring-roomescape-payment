@@ -1,8 +1,11 @@
 package roomescape.config.properties;
 
+import roomescape.paymenthistory.domain.PaymentUrl;
+import roomescape.paymenthistory.domain.SecretKey;
+
 public interface PaymentProperties {
 
-    String getSecretKey();
+    SecretKey getSecretKey();
 
-    String getPaymentUrl();
+    PaymentUrl getPaymentUrl();
 }
