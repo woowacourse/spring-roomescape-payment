@@ -27,8 +27,8 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.paymenthistory.PaymentType;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.payment.PaymentType;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationCreateRequest;
@@ -48,7 +48,7 @@ public class ReservationAcceptanceTest {
     private ReservationRepository reservationRepository;
 
     @MockBean
-    private PaymentHistoryService paymentHistoryService;
+    private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
@@ -59,7 +59,7 @@ public class ReservationAcceptanceTest {
     @TestFactory
     @DisplayName("예약 삭제 시 예약 대기가 존재한다면 첫번째 예약 대기가 예약으로 승격된다.")
     Stream<DynamicTest> deleteReservation_whenWaitingExists() {
-        doNothing().when(paymentHistoryService).approvePayment(any());
+        doNothing().when(paymentService).approvePayment(any());
 
         Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);

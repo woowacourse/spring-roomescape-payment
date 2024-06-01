@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.domain;
+package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import roomescape.reservation.domain.Reservation;
 
 @Entity
 @Table(name = "payment_history", uniqueConstraints = @UniqueConstraint(columnNames = "reservation_id"))
-public class PaymentHistory {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,12 +26,12 @@ public class PaymentHistory {
     @Column(name = "payment_key")
     private String paymentKey;
 
-    public PaymentHistory(Reservation reservation, String paymentKey) {
+    public Payment(Reservation reservation, String paymentKey) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
     }
 
-    protected PaymentHistory() {
+    protected Payment() {
     }
 
     public Long getId() {
@@ -58,7 +58,7 @@ public class PaymentHistory {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PaymentHistory that = (PaymentHistory) o;
+        Payment that = (Payment) o;
         return Objects.equals(id, that.id);
     }
 
@@ -69,10 +69,10 @@ public class PaymentHistory {
 
     @Override
     public String toString() {
-        return "PaymentHistory{" +
-                "id=" + id +
-                ", reservation=" + reservation +
-                ", paymentKey='" + paymentKey + '\'' +
-                '}';
+        return "Payment{" +
+               "id=" + id +
+               ", reservation=" + reservation +
+               ", paymentKey='" + paymentKey + '\'' +
+               '}';
     }
 }

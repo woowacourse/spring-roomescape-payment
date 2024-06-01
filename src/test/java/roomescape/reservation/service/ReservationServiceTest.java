@@ -19,7 +19,7 @@ import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
@@ -44,7 +44,7 @@ class ReservationServiceTest {
     @Mock
     private ThemeRepository themeRepository;
     @Mock
-    private PaymentHistoryService paymentHistoryService;
+    private PaymentService paymentService;
     @InjectMocks
     private ReservationService reservationService;
 

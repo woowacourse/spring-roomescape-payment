@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.domain;
+package roomescape.payment.domain;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,8 +12,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
-import roomescape.paymenthistory.dto.PaymentCreateRequest;
-import roomescape.paymenthistory.dto.RestClientPaymentCancelRequest;
+import roomescape.payment.dto.PaymentCreateRequest;
+import roomescape.payment.dto.RestClientPaymentCancelRequest;
 
 public class PaymentRestClient {
 

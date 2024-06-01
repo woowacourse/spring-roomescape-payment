@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.domain;
+package roomescape.payment.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -11,7 +11,7 @@ import roomescape.advice.exception.RoomEscapeException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.paymenthistory.dto.PaymentCreateRequest;
+import roomescape.payment.dto.PaymentCreateRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 

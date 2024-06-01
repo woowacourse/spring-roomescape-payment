@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.domain;
+package roomescape.payment.domain;
 
 public enum CancelReason {
 

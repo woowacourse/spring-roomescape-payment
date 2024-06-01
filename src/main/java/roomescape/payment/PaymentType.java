@@ -1,4 +1,4 @@
-package roomescape.paymenthistory;
+package roomescape.payment;
 
 public enum PaymentType {
 

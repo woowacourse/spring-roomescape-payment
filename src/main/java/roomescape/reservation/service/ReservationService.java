@@ -9,7 +9,7 @@ import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
@@ -31,17 +31,17 @@ public class ReservationService {
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentHistoryService paymentHistoryService;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository, MemberRepository memberRepository,
                               TimeRepository timeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository, PaymentHistoryService paymentHistoryService) {
+                              WaitingRepository waitingRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentHistoryService = paymentHistoryService;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findReservations() {
@@ -85,7 +85,7 @@ public class ReservationService {
         validateCreate(reservation);
 
         ReservationResponse reservationResponse = createReservation(reservation);
-        paymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
+        paymentService.approvePayment(request.createPaymentRequest(reservation));
 
         return reservationResponse;
     }
@@ -161,7 +161,7 @@ public class ReservationService {
     }
 
     private void promoteWaiting(Waiting waiting) {
-        paymentHistoryService.cancelPayment(waiting.getReservation().getId());
+        paymentService.cancelPayment(waiting.getReservation().getId());
 
         Reservation promotedReservation = waiting.promoteToReservation();
         reservationRepository.save(promotedReservation);
@@ -174,7 +174,7 @@ public class ReservationService {
             return;
         }
 
-        paymentHistoryService.cancelPayment(reservation.getId());
+        paymentService.cancelPayment(reservation.getId());
         reservationRepository.deleteById(reservation.getId());
     }
 }

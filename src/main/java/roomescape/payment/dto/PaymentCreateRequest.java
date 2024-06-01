@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.dto;
+package roomescape.payment.dto;
 
 import roomescape.reservation.domain.Reservation;
 

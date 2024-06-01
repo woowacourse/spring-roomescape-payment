@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.paymenthistory.domain.PaymentRestClient;
+import roomescape.payment.domain.PaymentRestClient;
 
 @Configuration
 public class BeanConfiguration {

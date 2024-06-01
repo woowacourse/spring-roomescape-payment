@@ -1,4 +1,4 @@
-package roomescape.paymenthistory.service;
+package roomescape.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doNothing;
@@ -14,27 +14,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.paymenthistory.domain.PaymentHistory;
-import roomescape.paymenthistory.domain.PaymentRestClient;
-import roomescape.paymenthistory.dto.PaymentCreateRequest;
-import roomescape.paymenthistory.repository.PaymentHistoryRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRestClient;
+import roomescape.payment.dto.PaymentCreateRequest;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 
 @ExtendWith(MockitoExtension.class)
-class PaymentHistoryServiceTest {
+class PaymentServiceTest {
 
     private static final Reservation RESERVATION = new Reservation(1L,
             MemberFixture.MEMBER_BRI, LocalDate.now().plusDays(1), TimeFixture.TIME_1, ThemeFixture.THEME_1,
             ReservationStatus.RESERVED);
 
     @InjectMocks
-    private PaymentHistoryService paymentHistoryService;
+    private PaymentService paymentService;
 
     @Mock
     private PaymentRestClient paymentRestClient;
     @Mock
-    private PaymentHistoryRepository paymentHistoryRepository;
+    private PaymentRepository paymentRepository;
 
 
     @DisplayName("결제를 승인한다.")
@@ -45,7 +45,7 @@ class PaymentHistoryServiceTest {
 
         doNothing().when(paymentRestClient).approvePayment(paymentCreateRequest);
 
-        assertThatCode(() -> paymentHistoryService.approvePayment(paymentCreateRequest))
+        assertThatCode(() -> paymentService.approvePayment(paymentCreateRequest))
                 .doesNotThrowAnyException();
     }
 
@@ -53,10 +53,10 @@ class PaymentHistoryServiceTest {
     @Test
     void cancelPayment() {
         doNothing().when(paymentRestClient).cancelPayment("paymentKey");
-        when(paymentHistoryRepository.findByReservation_Id(1L))
-                .thenReturn(new PaymentHistory(RESERVATION, "paymentKey"));
+        when(paymentRepository.findByReservation_Id(1L))
+                .thenReturn(new Payment(RESERVATION, "paymentKey"));
 
-        assertThatCode(() -> paymentHistoryService.cancelPayment(1L))
+        assertThatCode(() -> paymentService.cancelPayment(1L))
                 .doesNotThrowAnyException();
     }
 }
