@@ -10,9 +10,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
 import roomescape.paymenthistory.dto.RestClientPaymentCancelRequest;
-import roomescape.paymenthistory.exception.PaymentException;
 
 public class PaymentRestClient {
 
@@ -67,9 +68,10 @@ public class PaymentRestClient {
         String code = rootNode.path("code").asText();
 
         if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
-                code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
-            throw new PaymentException.PaymentServerError("내부 서버 에러가 발생했습니다. 관리자에게 문의해주세요.");
+            code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
+            throw new RoomEscapeException(
+                    "내부 서버 에러가 발생했습니다. 관리자에게 문의해주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
         }
-        throw new PaymentException(rootNode.path("message").asText(), httpResponse.getStatusCode());
+        throw new RoomEscapeException(rootNode.path("message").asText(), ExceptionTitle.ILLEGAL_USER_REQUEST);
     }
 }

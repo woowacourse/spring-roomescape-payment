@@ -3,6 +3,8 @@ package roomescape.theme.service;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.dto.ThemeCreateRequest;
@@ -46,7 +48,7 @@ public class ThemeService {
 
     private void validateExists(Theme theme) {
         if (themeRepository.existsByName(new ThemeName(theme.getName()))) {
-            throw new IllegalArgumentException("테마 이름은 중복될 수 없습니다.");
+            throw new RoomEscapeException("테마 이름은 중복될 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 

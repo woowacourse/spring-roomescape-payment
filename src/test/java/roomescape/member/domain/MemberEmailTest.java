@@ -1,11 +1,12 @@
 package roomescape.member.domain;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import roomescape.advice.exception.RoomEscapeException;
 
 class MemberEmailTest {
     @DisplayName("이메일 형식이 일치하지 않으면, 예외를 던진다.")
@@ -13,7 +14,7 @@ class MemberEmailTest {
     @CsvSource({"abc@acac", "acac.com", "avd@@ac.com"})
     void validateTest_whenFormatNotMatch(String email) {
         assertThatThrownBy(() -> new MemberEmail(email))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("이메일 형식이 일치하지 않습니다.");
     }
 

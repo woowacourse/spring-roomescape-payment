@@ -3,14 +3,12 @@ package roomescape.advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.advice.dto.ErrorResponse;
-import roomescape.auth.exception.AdminAuthorizationException;
-import roomescape.auth.exception.AuthenticationException;
-import roomescape.paymenthistory.exception.PaymentException;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,52 +18,44 @@ public class GlobalExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+    @ExceptionHandler(RoomEscapeException.class)
+    public ResponseEntity<ProblemDetail> handleRoomEscapeException(RoomEscapeException e) {
         logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.badRequest()
-                .body(new ErrorResponse(e.getMessage()));
+        return ResponseEntity.status(e.getStatus())
+                .body(e.getProblemDetail());
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException e) {
+    public ResponseEntity<ProblemDetail> handleNullPointerException(NullPointerException e) {
         logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.badRequest()
-                .body(new ErrorResponse(NULL_POINTER_EXCEPTION_ERROR_MESSAGE));
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e) {
-        logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(AdminAuthorizationException.class)
-    public ResponseEntity<ErrorResponse> handleAdminAuthorizationException(AdminAuthorizationException e) {
-        logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(e.getMessage()));
+        ProblemDetail problemDetail = createProblemDetail(
+                NULL_POINTER_EXCEPTION_ERROR_MESSAGE, ExceptionTitle.ILLEGAL_USER_REQUEST);
+        return ResponseEntity.status(problemDetail.getStatus())
+                .body(problemDetail);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.badRequest()
-                .body(new ErrorResponse(DATA_INTEGRITY_VIOLATION_EXCEPTION_ERROR_MESSAGE));
+        ProblemDetail problemDetail = createProblemDetail(
+                DATA_INTEGRITY_VIOLATION_EXCEPTION_ERROR_MESSAGE, ExceptionTitle.ILLEGAL_USER_REQUEST);
+        return ResponseEntity.status(problemDetail.getStatus())
+                .body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception e) {
+    public ResponseEntity<ProblemDetail> handleUnexpectedException(Exception e) {
         logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.internalServerError()
-                .body(new ErrorResponse(UNEXPECTED_EXCEPTION_ERROR_MESSAGE));
+        ProblemDetail problemDetail = createProblemDetail(
+                UNEXPECTED_EXCEPTION_ERROR_MESSAGE, ExceptionTitle.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(problemDetail.getStatus())
+                .body(problemDetail);
     }
 
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
-        logger.error(e.getMessage(), e.getStackTrace(), e);
-        return ResponseEntity.status(e.getHttpStatusCode())
-                .body(new ErrorResponse(e.getMessage()));
+    private ProblemDetail createProblemDetail(String message, ExceptionTitle title) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(title.getStatusCode(), message);
+        problemDetail.setTitle(title.getTitle());
+
+        return problemDetail;
     }
 }

@@ -3,6 +3,8 @@ package roomescape.time.service;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.time.domain.ReservationTime;
 import roomescape.time.dto.AvailableTimeResponse;
 import roomescape.time.dto.TimeCreateRequest;
@@ -41,7 +43,7 @@ public class TimeService {
 
     private void validateExists(ReservationTime time) {
         if (timeRepository.existsByStartAt(time.getStartAt())) {
-            throw new IllegalArgumentException("예약 시간은 중복될 수 없습니다.");
+            throw new RoomEscapeException("예약 시간은 중복될 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 

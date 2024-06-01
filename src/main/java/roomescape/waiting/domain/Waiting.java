@@ -13,6 +13,8 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -52,7 +54,8 @@ public class Waiting {
 
     private void validateDuplicate(Reservation reservation, Member member) {
         if (member.equals(reservation.getMember())) {
-            throw new IllegalArgumentException("자신이 예약한 방탈출에 대해 예약 대기를 할 수 없습니다.");
+            throw new RoomEscapeException(
+                    "자신이 예약한 방탈출에 대해 예약 대기를 할 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 
@@ -105,10 +108,10 @@ public class Waiting {
     @Override
     public String toString() {
         return "Waiting{" +
-                "id=" + id +
-                ", reservation=" + reservation +
-                ", member=" + member +
-                ", createdAt=" + createdAt +
-                '}';
+               "id=" + id +
+               ", reservation=" + reservation +
+               ", member=" + member +
+               ", createdAt=" + createdAt +
+               '}';
     }
 }

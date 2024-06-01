@@ -8,8 +8,8 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.auth.exception.JwtAuthenticationException;
-import roomescape.auth.exception.JwtExpiredException;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 @Component
 public class TokenProvider {
@@ -33,13 +33,13 @@ public class TokenProvider {
         try {
             return parseId(token);
         } catch (ExpiredJwtException exception) {
-            throw new JwtExpiredException();
+            throw new RoomEscapeException("토큰이 만료되었습니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         } catch (MalformedJwtException exception) {
-            throw new JwtAuthenticationException("토큰의 형식이 잘못되었습니다.");
+            throw new RoomEscapeException("토큰의 형식이 잘못되었습니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         } catch (InvalidClaimException exception) {
-            throw new JwtAuthenticationException("필요한 정보를 포함하고 있지 않습니다.");
+            throw new RoomEscapeException("토큰이 필요한 정보를 포함하고 있지 않습니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         } catch (JwtException exception) {
-            throw new JwtAuthenticationException("해당 토큰은 잘못된 토큰입니다.");
+            throw new RoomEscapeException("토큰이 잘못된 토큰입니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         }
     }
 

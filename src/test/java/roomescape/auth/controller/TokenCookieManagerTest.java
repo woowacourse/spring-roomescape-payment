@@ -8,7 +8,7 @@ import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
-import roomescape.auth.exception.NotLoginAuthenticationException;
+import roomescape.advice.exception.RoomEscapeException;
 
 class TokenCookieManagerTest {
     private final TokenCookieManager tokenCookieManager = new TokenCookieManager();
@@ -32,7 +32,8 @@ class TokenCookieManagerTest {
                 new Cookie("not", "thing"), new Cookie("notThing", "exist")};
 
         assertThatThrownBy(() -> tokenCookieManager.getToken(cookies))
-                .isInstanceOf(NotLoginAuthenticationException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("인증이 되지 않은 유저입니다.");
     }
 
     @DisplayName("쿠키가 null인 경우, 예외를 발생시킨다.")
@@ -41,7 +42,8 @@ class TokenCookieManagerTest {
         Cookie[] cookies = null;
 
         assertThatThrownBy(() -> tokenCookieManager.getToken(cookies))
-                .isInstanceOf(NotLoginAuthenticationException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("인증이 되지 않은 유저입니다.");
     }
 
     @DisplayName("토큰을 통해 쿠키를 만들 수 있다.")

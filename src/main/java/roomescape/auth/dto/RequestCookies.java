@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import roomescape.auth.exception.NotLoginAuthenticationException;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 public class RequestCookies {
 
@@ -13,7 +14,7 @@ public class RequestCookies {
 
     public RequestCookies(Cookie[] values) {
         if (values == null) {
-            throw new NotLoginAuthenticationException();
+            throw new RoomEscapeException("인증이 되지 않은 유저입니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         }
         this.values = Arrays.asList(values);
     }

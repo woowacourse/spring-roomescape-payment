@@ -3,6 +3,8 @@ package roomescape.waiting.service;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -51,12 +53,14 @@ public class WaitingService {
 
     private Reservation findReservationByDateAndTimeAndTheme(LocalDate date, Long timeId, Long themeId) {
         return reservationRepository.findByDateAndTime_idAndTheme_id(date, timeId, themeId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약에 대해 대기할 수 없습니다."));
+                .orElseThrow(() -> new RoomEscapeException(
+                        "존재하지 않는 예약에 대해 대기할 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     private Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 멤버가 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     private Waiting createWaiting(Waiting waiting) {
@@ -66,7 +70,7 @@ public class WaitingService {
 
     private void validateDuplicateWaiting(Waiting waiting) {
         if (isDuplicateWaiting(waiting)) {
-            throw new IllegalArgumentException("중복으로 예약 대기를 할 수 없습니다.");
+            throw new RoomEscapeException("중복으로 예약 대기를 할 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 

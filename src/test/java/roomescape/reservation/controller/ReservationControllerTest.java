@@ -127,7 +127,7 @@ class ReservationControllerTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("인자 중 null 값이 존재합니다."));
+                .body("detail", is("인자 중 null 값이 존재합니다."));
     }
 
     @DisplayName("예약 삭제 시 예약 대기가 존재하지 않는다면 삭제된다.")
@@ -169,7 +169,7 @@ class ReservationControllerTest {
                 .when().delete("/reservations/" + 1L)
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("과거 예약에 대한 취소는 불가능합니다."));
+                .body("detail", is("과거 예약에 대한 취소는 불가능합니다."));
         ;
     }
 
@@ -192,6 +192,6 @@ class ReservationControllerTest {
                 .when().delete("/reservations/" + response.id())
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("당일 예약 취소는 불가능합니다."));
+                .body("detail", is("당일 예약 취소는 불가능합니다."));
     }
 }

@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.auth.controller.TokenCookieManager;
 import roomescape.auth.dto.LoggedInMember;
-import roomescape.auth.exception.AdminAuthorizationException;
 import roomescape.auth.service.AuthService;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +53,7 @@ class AdminAuthorizationInterceptorTest {
         given(authService.findLoggedInMember(any())).willReturn(member);
 
         assertThatThrownBy(() -> adminAuthorizationInterceptor.preHandle(request, response, null))
-                .isInstanceOf(AdminAuthorizationException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("관리자만 접근할 수 있습니다.");
     }
 }

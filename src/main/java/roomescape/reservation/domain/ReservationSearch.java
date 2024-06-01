@@ -1,6 +1,8 @@
 package roomescape.reservation.domain;
 
 import java.time.LocalDate;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 public class ReservationSearch {
 
@@ -11,7 +13,7 @@ public class ReservationSearch {
 
     public ReservationSearch(Long themeId, Long memberId, LocalDate startDate, LocalDate endDate) {
         if (themeId == null && memberId == null && startDate == null && endDate == null) {
-            throw new IllegalArgumentException("검색 조건은 1개 이상 있어야 합니다.");
+            throw new RoomEscapeException("검색 조건은 1개 이상 있어야 합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
         this.themeId = themeId;
         this.memberId = memberId;

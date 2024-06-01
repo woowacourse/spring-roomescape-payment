@@ -7,11 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
-import roomescape.paymenthistory.exception.PaymentException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 
@@ -30,7 +30,7 @@ class PaymentRestClientTest {
 
         assertThatThrownBy(
                 () -> paymentRestClient.approvePayment(paymentCreateRequest))
-                .isInstanceOf(PaymentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
     }
 }

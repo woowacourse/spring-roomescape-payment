@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.dto.ThemeCreateRequest;
@@ -80,7 +81,7 @@ class ThemeServiceTest {
                 .willReturn(true);
 
         assertThatThrownBy(() -> themeService.createTheme(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("테마 이름은 중복될 수 없습니다.");
     }
 }

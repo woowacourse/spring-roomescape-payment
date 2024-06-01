@@ -4,7 +4,8 @@ import jakarta.servlet.http.Cookie;
 import java.util.Arrays;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import roomescape.auth.exception.NotLoginAuthenticationException;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 @Component
 public class TokenCookieManager {
@@ -14,13 +15,14 @@ public class TokenCookieManager {
 
     public String getToken(Cookie[] cookies) {
         if (cookies == null) {
-            throw new NotLoginAuthenticationException();
+            throw new RoomEscapeException("인증이 되지 않은 유저입니다.", ExceptionTitle.AUTHENTICATION_FAILED);
         }
         return Arrays.stream(cookies)
                 .filter(cookie -> ACCESS_TOKEN_KEY.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findAny()
-                .orElseThrow(NotLoginAuthenticationException::new);
+                .orElseThrow(() ->
+                        new RoomEscapeException("인증이 되지 않은 유저입니다.", ExceptionTitle.AUTHENTICATION_FAILED));
     }
 
     public ResponseCookie createResponseCookie(String token) {

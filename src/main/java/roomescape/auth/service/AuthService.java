@@ -1,6 +1,8 @@
 package roomescape.auth.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.member.domain.Member;
@@ -22,14 +24,16 @@ public class AuthService {
         MemberEmail email = new MemberEmail(request.email());
         MemberPassword password = new MemberPassword(request.password());
         Member member = memberRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 멤버가 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
         return tokenProvider.createToken(member.getId());
     }
 
     public LoggedInMember findLoggedInMember(String token) {
         Long memberId = tokenProvider.findMemberId(token);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 멤버가 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
         return LoggedInMember.from(member);
     }
 }

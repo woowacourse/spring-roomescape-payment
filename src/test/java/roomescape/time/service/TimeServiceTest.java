@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.time.domain.ReservationTime;
 import roomescape.time.dto.AvailableTimeResponse;
 import roomescape.time.dto.TimeCreateRequest;
@@ -81,7 +82,7 @@ class TimeServiceTest {
                 .willReturn(true);
 
         assertThatThrownBy(() -> timeService.createTime(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("예약 시간은 중복될 수 없습니다.");
     }
 }

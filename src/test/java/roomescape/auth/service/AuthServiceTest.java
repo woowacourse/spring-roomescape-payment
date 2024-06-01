@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.member.domain.Member;
@@ -40,7 +41,7 @@ class AuthServiceTest {
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.createToken(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("해당 멤버가 존재하지 않습니다.");
     }
 

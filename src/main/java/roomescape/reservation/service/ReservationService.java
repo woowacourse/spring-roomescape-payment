@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.paymenthistory.service.PaymentHistoryService;
@@ -95,14 +97,14 @@ public class ReservationService {
 
     private void validateIsAvailable(Reservation reservation) {
         if (reservation.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
+            throw new RoomEscapeException("예약은 현재 시간 이후여야 합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 
     private void validateExists(Reservation reservation) {
         if (reservationRepository.existsByDateAndTime_idAndTheme_id(
                 reservation.getDate(), reservation.getTimeId(), reservation.getThemeId())) {
-            throw new IllegalArgumentException("해당 날짜와 시간에 이미 예약된 테마입니다.");
+            throw new RoomEscapeException("해당 날짜와 시간에 이미 예약된 테마입니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 
@@ -113,23 +115,27 @@ public class ReservationService {
 
     private Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 멤버가 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     private ReservationTime findTimeByTimeId(Long timeId) {
         return timeRepository.findById(timeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약 시간이 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 예약 시간이 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     private Theme findThemeByThemeId(Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 테마가 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 테마가 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     @Transactional
     public void deleteReservation(Long id) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약은 존재하지 않습니다."));
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 예약은 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
         validateDelete(reservation);
 
         waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(id)
@@ -144,13 +150,13 @@ public class ReservationService {
 
     private void validatePastReservation(Reservation reservation) {
         if (reservation.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("과거 예약에 대한 취소는 불가능합니다.");
+            throw new RoomEscapeException("과거 예약에 대한 취소는 불가능합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 
     private void validateEqualsDateReservation(Reservation reservation) {
         if (reservation.isEqualsDate(LocalDate.now())) {
-            throw new IllegalArgumentException("당일 예약 취소는 불가능합니다.");
+            throw new RoomEscapeException("당일 예약 취소는 불가능합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
         }
     }
 

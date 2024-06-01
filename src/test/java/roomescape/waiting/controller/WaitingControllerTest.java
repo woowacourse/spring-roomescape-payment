@@ -133,7 +133,7 @@ class WaitingControllerTest {
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("자신이 예약한 방탈출에 대해 예약 대기를 할 수 없습니다."));
+                .body("detail", is("자신이 예약한 방탈출에 대해 예약 대기를 할 수 없습니다."));
     }
 
     @DisplayName("자신이 예약 대기한 방탈출에 대해 예약 대기를 할 수 없다.")
@@ -176,7 +176,7 @@ class WaitingControllerTest {
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("중복으로 예약 대기를 할 수 없습니다."));
+                .body("detail", is("중복으로 예약 대기를 할 수 없습니다."));
     }
 
     @DisplayName("존재하지 않는 예약에 대해 예약 대기를 할 수 없다.")
@@ -194,6 +194,6 @@ class WaitingControllerTest {
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(400)
-                .body("errorMessage", is("존재하지 않는 예약에 대해 대기할 수 없습니다."));
+                .body("detail", is("존재하지 않는 예약에 대해 대기할 수 없습니다."));
     }
 }

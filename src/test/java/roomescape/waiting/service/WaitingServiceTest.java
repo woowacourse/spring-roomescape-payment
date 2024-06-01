@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
@@ -107,7 +108,7 @@ class WaitingServiceTest {
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> waitingService.createWaiting(request, waitingMember.getId()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("존재하지 않는 예약에 대해 대기할 수 없습니다.");
     }
 
@@ -132,7 +133,7 @@ class WaitingServiceTest {
                 .willReturn(true);
 
         assertThatThrownBy(() -> waitingService.createWaiting(request, waitingMember.getId()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("중복으로 예약 대기를 할 수 없습니다.");
     }
 }
