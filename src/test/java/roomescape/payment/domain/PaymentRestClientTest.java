@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.advice.exception.RoomEscapeException;
-import roomescape.config.BeanConfiguration;
+import roomescape.config.RestClientConfiguration;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
@@ -37,7 +37,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 
 @RestClientTest
-@ContextConfiguration(classes = {BeanConfiguration.class})
+@ContextConfiguration(classes = {RestClientConfiguration.class})
 class PaymentRestClientTest {
 
     private static final PaymentCreateRequest PAYMENT_CREATE_REQUEST = new PaymentCreateRequest(

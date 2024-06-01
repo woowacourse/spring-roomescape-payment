@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.PaymentRestClient;
 
 @Configuration
-public class BeanConfiguration {
+public class RestClientConfiguration {
 
     private static final String TOSS_PAYMENT_URL = "https://api.tosspayments.com";
 
