@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
@@ -28,17 +28,18 @@ public class ReservationService {
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentHistoryService paymentHistoryService;
+    private final TossPaymentHistoryService tossPaymentHistoryService;
 
     public ReservationService(ReservationRepository reservationRepository, MemberRepository memberRepository,
                               TimeRepository timeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository, PaymentHistoryService paymentHistoryService) {
+                              WaitingRepository waitingRepository,
+                              TossPaymentHistoryService tossPaymentHistoryService) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentHistoryService = paymentHistoryService;
+        this.tossPaymentHistoryService = tossPaymentHistoryService;
     }
 
     public List<ReservationResponse> findReservations() {
@@ -82,7 +83,7 @@ public class ReservationService {
         validate(reservation);
 
         ReservationResponse reservationResponse = createReservation(reservation);
-        paymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
+        tossPaymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
 
         return reservationResponse;
     }
@@ -133,7 +134,7 @@ public class ReservationService {
     }
 
     private void promoteWaiting(Waiting waiting) {
-        paymentHistoryService.cancelPayment(waiting.getReservation().getId());
+        tossPaymentHistoryService.cancelPayment(waiting.getReservation().getId());
 
         Reservation promotedReservation = waiting.promoteToReservation();
         reservationRepository.save(promotedReservation);
@@ -149,7 +150,7 @@ public class ReservationService {
             return;
         }
 
-        paymentHistoryService.cancelPayment(id);
+        tossPaymentHistoryService.cancelPayment(id);
         reservationRepository.deleteById(id);
     }
 }

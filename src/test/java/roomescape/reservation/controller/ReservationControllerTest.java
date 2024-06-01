@@ -28,7 +28,7 @@ import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.paymenthistory.PaymentType;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -46,7 +46,7 @@ class ReservationControllerTest {
     private ReservationRepository reservationRepository;
 
     @MockBean
-    private PaymentHistoryService paymentHistoryService;
+    private TossPaymentHistoryService tossPaymentHistoryService;
 
     @BeforeEach
     void setUp() {
@@ -56,7 +56,7 @@ class ReservationControllerTest {
     @DisplayName("예약을 조회, 추가, 삭제할 수 있다.")
     @Test
     void findCreateDeleteReservations() {
-        doNothing().when(paymentHistoryService).approvePayment(any());
+        doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
         Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_BRI);
         LocalDate date = LocalDate.now().plusDays(1);

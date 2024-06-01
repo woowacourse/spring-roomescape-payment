@@ -25,7 +25,7 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.member.domain.Member;
 import roomescape.paymenthistory.PaymentType;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.waiting.dto.WaitingCreateRequest;
 
@@ -38,7 +38,7 @@ class MyReservationControllerTest {
     private int port;
 
     @MockBean
-    private PaymentHistoryService paymentHistoryService;
+    private TossPaymentHistoryService tossPaymentHistoryService;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,7 @@ class MyReservationControllerTest {
         Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
 
-        doNothing().when(paymentHistoryService).approvePayment(any());
+        doNothing().when(tossPaymentHistoryService).approvePayment(any());
         // 예약 추가
         Member reservationMember = MEMBER_BRI;
         Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);

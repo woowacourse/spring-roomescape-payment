@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
@@ -43,7 +43,7 @@ class ReservationServiceTest {
     @Mock
     private ThemeRepository themeRepository;
     @Mock
-    private PaymentHistoryService paymentHistoryService;
+    private TossPaymentHistoryService tossPaymentHistoryService;
     @InjectMocks
     private ReservationService reservationService;
 

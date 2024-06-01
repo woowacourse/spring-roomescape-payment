@@ -3,20 +3,20 @@ package roomescape.paymenthistory.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.paymenthistory.domain.PaymentHistory;
-import roomescape.paymenthistory.domain.PaymentRestClient;
+import roomescape.paymenthistory.domain.TossPaymentRestClient;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
 import roomescape.paymenthistory.repository.PaymentHistoryRepository;
 
 @Service
-public class PaymentHistoryService {
+public class TossPaymentHistoryService {
 
     private final PaymentHistoryRepository paymentHistoryRepository;
-    private final PaymentRestClient restClient;
+    private final TossPaymentRestClient restClient;
 
-    public PaymentHistoryService(PaymentHistoryRepository paymentHistoryRepository,
-                                 PaymentRestClient paymentRestClient) {
+    public TossPaymentHistoryService(PaymentHistoryRepository paymentHistoryRepository,
+                                     TossPaymentRestClient restClient) {
         this.paymentHistoryRepository = paymentHistoryRepository;
-        this.restClient = paymentRestClient;
+        this.restClient = restClient;
     }
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {

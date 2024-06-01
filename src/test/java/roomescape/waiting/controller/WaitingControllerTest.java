@@ -29,7 +29,7 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.member.domain.Member;
 import roomescape.paymenthistory.PaymentType;
-import roomescape.paymenthistory.service.PaymentHistoryService;
+import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.waiting.dto.WaitingCreateRequest;
@@ -48,12 +48,12 @@ class WaitingControllerTest {
     }
 
     @MockBean
-    private PaymentHistoryService paymentHistoryService;
+    private TossPaymentHistoryService tossPaymentHistoryService;
 
     @DisplayName("예약 대기를 조회, 추가, 삭제 할 수 있다.")
     @Test
     void findCreateDeleteWaitingsTest() {
-        doNothing().when(paymentHistoryService).approvePayment(any());
+        doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
         Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
@@ -139,7 +139,7 @@ class WaitingControllerTest {
     @DisplayName("자신이 예약 대기한 방탈출에 대해 예약 대기를 할 수 없다.")
     @Test
     void createWaiting_whenDuplicateWaiting() {
-        doNothing().when(paymentHistoryService).approvePayment(any());
+        doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
         Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
