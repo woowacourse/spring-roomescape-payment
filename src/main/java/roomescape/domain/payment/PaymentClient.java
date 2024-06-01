@@ -11,21 +11,29 @@ import roomescape.dto.PaymentApproveRequest;
 
 @Component
 public class PaymentClient {
-    private final RestClient restClient = RestClient.builder()
-            .baseUrl("https://api.tosspayments.com")
-            .build();
+    private final String apiUri;
+    private final String approveSecretKey;
+    private final RestClient restClient;
     private final PaymentApiResponseErrorHandler errorHandler;
-    @Value("${payment.approve.key}")
-    private String approveSecretKey;
 
-    public PaymentClient(PaymentApiResponseErrorHandler errorHandler) {
+
+    public PaymentClient(
+            @Value("${payment.approve.base-url}") String baseUrl,
+            @Value("${payment.approve.api-uri}") String apiUri,
+            @Value("${payment.approve.key}") String approveSecretKey,
+            PaymentApiResponseErrorHandler errorHandler) {
+        this.restClient = RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+        this.apiUri = apiUri;
+        this.approveSecretKey = approveSecretKey;
         this.errorHandler = errorHandler;
     }
 
     public Payment approve(PaymentApproveRequest paymentApproveRequest, Member member) {
         String encryptedKey = Base64.getEncoder().encodeToString(approveSecretKey.getBytes());
         ApproveApiResponse response = Optional.ofNullable(restClient.post()
-                        .uri("/v1/payments/confirm")
+                        .uri(apiUri)
                         .header(HttpHeaders.AUTHORIZATION, "Basic " + encryptedKey)
                         .body(paymentApproveRequest)
                         .retrieve()

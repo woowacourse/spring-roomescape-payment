@@ -24,7 +24,9 @@ class PaymentServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원이 결제를 요청하면 예외가 발생하는지 확인")
     void approveFailWhenNotFoundMember() {
-        PaymentClient paymentClient = new PaymentClient(new PaymentApiResponseErrorHandler(new ObjectMapper()));
+        PaymentClient paymentClient = new PaymentClient(
+                "baseUrl", "apiUri", "approveSecretKey",
+                new PaymentApiResponseErrorHandler(new ObjectMapper()));
         PaymentRepository paymentRepository = new CollectionPaymentRepository();
         MemberRepository memberRepository = new CollectionMemberRepository();
         PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository);
