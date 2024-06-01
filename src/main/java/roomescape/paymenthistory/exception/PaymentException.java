@@ -13,8 +13,8 @@ public class PaymentException extends RuntimeException {
     }
 
     public static class PaymentServerError extends PaymentException {
-        public PaymentServerError(String message) {
-            super(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        public PaymentServerError() {
+            super("내부 서버 에러가 발생했습니다. 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

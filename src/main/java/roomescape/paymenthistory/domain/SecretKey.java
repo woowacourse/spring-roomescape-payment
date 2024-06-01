@@ -1,5 +1,7 @@
 package roomescape.paymenthistory.domain;
 
+import roomescape.paymenthistory.exception.PaymentException.PaymentServerError;
+
 public class SecretKey {
 
     private final String secretKey;
@@ -15,8 +17,7 @@ public class SecretKey {
 
     private void validation() {
         if (secretKey == null) {
-            throw new IllegalArgumentException("토스 연결에 실패했습니다. 관리자에게 문의해주세요.",
-                    new Throwable("TossProperties 에 SecretKey가 null 입니다."));
+            throw new PaymentServerError();
         }
     }
 }
