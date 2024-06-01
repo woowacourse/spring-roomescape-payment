@@ -12,6 +12,7 @@ import static roomescape.fixture.TimeFixture.TIME_1;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -66,7 +67,7 @@ class ReservationControllerTest {
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         ReservationCreateRequest params = new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId",
-                1000, PaymentType.NORMAL);
+                BigDecimal.valueOf(1000), PaymentType.NORMAL);
 
         // 예약 추가
         ReservationResponse response = RestAssured.given().log().all()

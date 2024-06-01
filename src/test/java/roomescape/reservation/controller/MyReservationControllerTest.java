@@ -11,6 +11,7 @@ import static roomescape.fixture.TimeFixture.TIME_1;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Cookies;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +60,7 @@ class MyReservationControllerTest {
         Member reservationMember = MEMBER_BRI;
         Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);
         ReservationCreateRequest reservationParams =
-                new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 10000, PaymentType.NORMAL);
+                new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", BigDecimal.valueOf(1000), PaymentType.NORMAL);
         RestAssuredTemplate.create(reservationParams, reservationMemberCookies);
 
         // 로그인 유저 대기 추가
@@ -70,7 +71,7 @@ class MyReservationControllerTest {
 
         // 로그인 유저 예약 추가
         reservationParams = new ReservationCreateRequest(date.plusDays(1), timeId, themeId, "paymentKey", "orderId",
-                10000, PaymentType.NORMAL);
+                BigDecimal.valueOf(1000), PaymentType.NORMAL);
         RestAssuredTemplate.create(reservationParams, loginMemberCookies);
 
         // 나의 예약 목록 조회

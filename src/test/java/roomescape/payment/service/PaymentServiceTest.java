@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class PaymentServiceTest {
     @Test
     void approvePayment() {
         PaymentCreateRequest paymentCreateRequest = new PaymentCreateRequest("paymentKey",
-                "orderId", 1000, RESERVATION);
+                "orderId", BigDecimal.valueOf(1000), RESERVATION);
 
         doNothing().when(paymentRestClient).approvePayment(paymentCreateRequest);
 

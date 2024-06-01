@@ -2,6 +2,7 @@ package roomescape.payment.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,8 @@ class PaymentRestClientTest {
     @Test
     void approvePaymentTest_whenInvalidSecretKeyd() {
         PaymentCreateRequest paymentCreateRequest = new PaymentCreateRequest(
-                "tgen_20240528211", "MC40MTMwMTk0ODU0ODU4", 1000, new Reservation(1L, MemberFixture.MEMBER_BRI,
+                "tgen_20240528211", "MC40MTMwMTk0ODU0ODU4", BigDecimal.valueOf(1000), new Reservation(1L,
+                MemberFixture.MEMBER_BRI,
                 LocalDate.now().plusDays(1), TimeFixture.TIME_1, ThemeFixture.THEME_1, ReservationStatus.RESERVED));
 
         assertThatThrownBy(
