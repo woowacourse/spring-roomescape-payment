@@ -24,10 +24,8 @@ public class PaymentClient {
         this.restClient = restClient;
     }
 
-    public void approvePayment(
-            PaymentRequest paymentRequest,
-            PaymentAuthorizationResponse paymentAuthorizationResponse
-    ) {
+    public void approvePayment(PaymentRequest paymentRequest,
+                               PaymentAuthorizationResponse paymentAuthorizationResponse) {
         restClient.post()
                 .uri(confirmUrl)
                 .header(HttpHeaders.AUTHORIZATION, paymentAuthorizationResponse.getPaymentAuthorization())
@@ -38,15 +36,13 @@ public class PaymentClient {
                 .toBodilessEntity();
     }
 
-    public void refundPayment(
-            PaymentResponse paymentResponse,
-            PaymentAuthorizationResponse paymentAuthorizationResponse
-    ) {
+    public void refundPayment(PaymentResponse paymentResponse,
+                              PaymentAuthorizationResponse paymentAuthorizationResponse) {
         String refundUrl = refundUrlTemplate.replace("{paymentKey}", paymentResponse.getPaymentKey());
 
         restClient.post()
                 .uri(refundUrl)
-                .header("Authorization", paymentAuthorizationResponse.getPaymentAuthorization())
+                .header(HttpHeaders.AUTHORIZATION, paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
