@@ -2,6 +2,7 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.BDDMockito.given;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -108,7 +109,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
         ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
-        BDDMockito.given(paymentService.pay(paymentRequest))
+        given(paymentService.pay(paymentRequest))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new TossExceptionResponse("EXCEPTION", "exception")));
 
