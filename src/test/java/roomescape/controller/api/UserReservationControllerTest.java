@@ -1,9 +1,12 @@
 package roomescape.controller.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -23,7 +26,9 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.service.AdminReservationService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.TossPaymentService;
@@ -44,6 +49,9 @@ class UserReservationControllerTest {
 
     @Autowired
     private ReservationTimeService reservationTimeService;
+
+    @Autowired
+    private AdminReservationService adminReservationService;
 
     @Autowired
     private UserReservationService userReservationService;
@@ -102,6 +110,29 @@ class UserReservationControllerTest {
             .body("date", is("2060-01-01"))
             .body("time", is("10:00"))
             .body("themeName", is("t1"));
+    }
+
+    @DisplayName("실패: 결제 실패 시 예약이 추가되면 안 됨")
+    @Test
+    void save_PaymentApprovalFailed() {
+        doThrow(RoomescapeException.class)
+            .when(tossPaymentService)
+            .pay(any(String.class), any(Long.class), any(String.class));
+
+        CreateUserReservationRequest request = new CreateUserReservationRequest(
+            DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
+
+        assertAll(
+            () -> RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", userToken)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400),
+            () -> assertThat(adminReservationService.findAllReserved()).hasSize(0),
+            () -> assertThat(adminReservationService.findAllStandby()).hasSize(0)
+        );
     }
 
     @DisplayName("성공: 예약대기 추가 -> 201")
