@@ -17,6 +17,9 @@ import roomescape.payment.dto.PaymentCreateRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.dto.RestClientPaymentCancelRequest;
 
+/**
+ * @see <a href="https://docs.tosspayments.com/reference/error-codes#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8">토스 결제 승인 예외정의서</a>
+ */
 public class PaymentRestClient {
 
     private static final String BASIC = "Basic ";
