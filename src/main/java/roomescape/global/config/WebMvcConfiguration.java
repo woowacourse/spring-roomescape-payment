@@ -1,26 +1,15 @@
 package roomescape.global.config;
 
-import java.time.Duration;
 import java.util.List;
-import org.springframework.boot.web.client.ClientHttpRequestFactories;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.auth.AdminHandlerInterceptor;
 import roomescape.auth.AuthenticatedMemberArgumentResolver;
-import roomescape.payment.TossPaymentClient;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
-    private static final int CONNECTION_TIMEOUT_DURATION = 5;
-    private static final int READ_TIMEOUT_DURATION = 45;
 
     private final AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
     private final AdminHandlerInterceptor adminHandlerInterceptor;
@@ -40,25 +29,5 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminHandlerInterceptor)
                 .addPathPatterns("/admin/**");
-    }
-
-    @Bean
-    public TossPaymentClient tossPaymentClient() {
-        ClientHttpRequestFactory factory = getClientHttpRequestFactory();
-
-        return new TossPaymentClient(
-                RestClient.builder()
-                        .requestFactory(factory)
-                        .baseUrl("https://api.tosspayments.com")
-                        .build()
-        );
-    }
-
-    private ClientHttpRequestFactory getClientHttpRequestFactory() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT_DURATION))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT_DURATION));
-
-        return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
