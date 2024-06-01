@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS member
 (
     id         BIGINT       NOT NULL AUTO_INCREMENT,
     name       VARCHAR(255) NOT NULL,
-    email      VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     role       VARCHAR(255) NOT NULL,
     created_at timestamp(6) NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS member_reservation
 CREATE TABLE IF NOT EXISTS payment
 (
     id                    BIGINT        NOT NULL AUTO_INCREMENT,
-    payment_key           VARCHAR(1023) NOT NULL,
+    payment_key           VARCHAR(1023) NOT NULL UNIQUE,
     payment_type          VARCHAR(255)  NOT NULL,
     price                 DECIMAL       NOT NULL,
     member_reservation_id BIGINT        NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS payment
 CREATE TABLE IF NOT EXISTS payment_history
 (
     id             BIGINT        NOT NULL AUTO_INCREMENT,
-    payment_key    VARCHAR(1023) NOT NULL,
+    payment_key    VARCHAR(1023) NOT NULL UNIQUE,
     payment_type   VARCHAR(255)  NOT NULL,
     payment_status VARCHAR(255)  NOT NULL,
     price          DECIMAL       NOT NULL,

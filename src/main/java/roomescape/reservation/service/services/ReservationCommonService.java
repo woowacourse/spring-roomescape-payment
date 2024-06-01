@@ -125,7 +125,8 @@ public class ReservationCommonService {
         validateDuplicatedReservation(reservation, member);
 
         if (isReservationConfirmed(reservation)) {
-            return memberReservationRepository.save(new MemberReservation(member, reservation, ReservationStatus.PENDING));
+            return memberReservationRepository.save(
+                    new MemberReservation(member, reservation, ReservationStatus.PENDING));
         }
 
         return memberReservationRepository.save(new MemberReservation(member, reservation, ReservationStatus.APPROVED));

@@ -9,7 +9,6 @@ import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.WaitingResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.service.dto.MyReservationInfo;

@@ -1,5 +1,6 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,15 +23,19 @@ public class PaymentHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String paymentKey;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentType paymentType;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
     @Embedded
+    @Column(nullable = false)
     private Price price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
