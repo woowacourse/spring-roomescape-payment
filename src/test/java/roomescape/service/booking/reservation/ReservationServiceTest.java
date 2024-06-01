@@ -12,7 +12,7 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.UserReservationRequest;
-import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.infrastructure.tosspayments.TossPaymentsClient;
 import roomescape.service.ServiceBaseTest;
 
 class ReservationServiceTest extends ServiceBaseTest {
@@ -21,7 +21,7 @@ class ReservationServiceTest extends ServiceBaseTest {
     ReservationService reservationService;
 
     @MockBean
-    TossPaymentClient tossPaymentClient;
+    TossPaymentsClient tossPaymentsClient;
 
     @Test
     void 정상_결제시_예약_등록() {
@@ -38,7 +38,7 @@ class ReservationServiceTest extends ServiceBaseTest {
 
         PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
-        Mockito.when(tossPaymentClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
 
         // when
         ReservationResponse reservationResponse = reservationService.registerReservationWithPayment(

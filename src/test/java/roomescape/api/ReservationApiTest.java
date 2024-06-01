@@ -22,7 +22,7 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.infrastructure.auth.JwtProvider;
-import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.infrastructure.tosspayments.TossPaymentsClient;
 
 class ReservationApiTest extends ApiBaseTest {
 
@@ -33,7 +33,7 @@ class ReservationApiTest extends ApiBaseTest {
     JwtProvider jwtProvider;
 
     @MockBean
-    TossPaymentClient tossPaymentClient;
+    TossPaymentsClient tossPaymentsClient;
 
     @Test
     void 사용자_예약_추가() {
@@ -45,7 +45,7 @@ class ReservationApiTest extends ApiBaseTest {
 
         PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
-        Mockito.when(tossPaymentClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
 
         RestAssured
                 .given().log().all()

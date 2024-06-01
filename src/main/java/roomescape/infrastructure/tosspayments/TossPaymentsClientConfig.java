@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.tosspayments;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
-public class PaymentClientConfig {
+public class TossPaymentsClientConfig {
 
     @Bean
     public WebClient getTossWebClient() {

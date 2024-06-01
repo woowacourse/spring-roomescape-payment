@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.tosspayments;
 
 import io.netty.handler.timeout.TimeoutException;
 import java.util.Base64;
@@ -16,7 +16,7 @@ import roomescape.exception.TossClientException;
 import roomescape.exception.TossServerException;
 
 @Component
-public class TossPaymentClient {
+public class TossPaymentsClient {
 
     private static final String BASIC = "Basic";
     private static final String API_DELIMITER = ":";
@@ -25,9 +25,9 @@ public class TossPaymentClient {
     private final String confirmUrl;
     private final WebClient webClient;
 
-    public TossPaymentClient(@Value("${api.toss.secret-key}") String secretKey,
-                             @Value("${api.toss.url.confirm}") String confirmUrl,
-                             WebClient webClient
+    public TossPaymentsClient(@Value("${api.toss.secret-key}") String secretKey,
+                              @Value("${api.toss.url.confirm}") String confirmUrl,
+                              WebClient webClient
     ) {
         this.secretKey = secretKey;
         this.confirmUrl = confirmUrl;
