@@ -9,14 +9,14 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.client.PaymentProperties;
 
 @Configuration
-public class ClientConfiguration {
+public class PaymentClientConfiguration {
 
     private static final String BASIC_PREFIX = "Basic ";
     private static final String NO_PASSWORD_SUFFIX = ":";
 
     private final PaymentProperties paymentProperties;
 
-    public ClientConfiguration(final PaymentProperties paymentProperties) {
+    public PaymentClientConfiguration(final PaymentProperties paymentProperties) {
         this.paymentProperties = paymentProperties;
     }
 
