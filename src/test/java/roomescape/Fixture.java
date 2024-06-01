@@ -6,6 +6,7 @@ import roomescape.auth.domain.Role;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.payment.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -42,6 +43,16 @@ public class Fixture {
 
     public static final LocalDate TODAY = LocalDate.now();
     public static final LocalDate TOMORROW = TODAY.plusDays(1);
+
+    public static final PaymentConfirmResponse PAYMENT_CONFIRM_RESPONSE = new PaymentConfirmResponse(
+            "paymentKey",
+            "orderId",
+            1000,
+            "orderName",
+            "DONE",
+            "2024-02-13T12:17:57+09:00",
+            "2024-02-13T12:18:14+09:00"
+    );
 
     private Fixture() {
     }

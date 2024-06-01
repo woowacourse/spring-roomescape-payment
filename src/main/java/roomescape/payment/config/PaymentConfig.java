@@ -1,9 +1,9 @@
 package roomescape.payment.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -16,9 +16,8 @@ public class PaymentConfig {
     }
 
     @Bean
-    public RestClient paymentRestClient() {
-        return RestClient.builder()
-                .baseUrl(paymentProperties.getBaseUrl())
+    public RestClientCustomizer paymentRestClientCustomizer() {
+        return builder -> builder.baseUrl(paymentProperties.getBaseUrl())
                 .defaultHeader("Authorization", paymentProperties.getEncodedSecretKey())
                 .build();
     }
