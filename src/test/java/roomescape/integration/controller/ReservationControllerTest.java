@@ -73,7 +73,7 @@ public class ReservationControllerTest {
                 Map.of(
                         "id", DEFAULT_MEMBER.getId(),
                         "name", DEFAULT_MEMBER.getName(),
-                        "role", DEFAULT_MEMBER.getRole().getTokenValue()
+                        "role", DEFAULT_MEMBER.getRole().name()
                 )
         );
 
@@ -179,7 +179,7 @@ public class ReservationControllerTest {
                     Map.of(
                             "id", testMember.getId(),
                             "name", testMember.getName(),
-                            "role", testMember.getRole().getTokenValue()
+                            "role", testMember.getRole().name()
                     )
             );
             Map<String, Object> reservationParam = Map.of(
@@ -262,7 +262,7 @@ public class ReservationControllerTest {
                     Map.of(
                             "id", testMember.getId(),
                             "name", testMember.getName(),
-                            "role", testMember.getRole().getTokenValue()
+                            "role", testMember.getRole().name()
                     )
             );
             RestAssured.given().log().all()
@@ -293,7 +293,7 @@ public class ReservationControllerTest {
                     Map.of(
                             "id", testMember.getId(),
                             "name", testMember.getName(),
-                            "role", testMember.getRole().getTokenValue()
+                            "role", testMember.getRole().name()
                     )
             );
             RestAssured.given().log().all()
@@ -324,7 +324,7 @@ public class ReservationControllerTest {
                     Map.of(
                             "id", testMember.getId(),
                             "name", testMember.getName(),
-                            "role", testMember.getRole().getTokenValue()
+                            "role", testMember.getRole().name()
                     )
             );
             RestAssured.given().log().all()

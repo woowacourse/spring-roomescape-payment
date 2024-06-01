@@ -1,29 +1,18 @@
 package roomescape.domain;
 
-import java.util.Arrays;
-
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 
+import java.util.Arrays;
+
 public enum Role {
-    ADMIN("role1"),
-    USER("role2");
+    ADMIN,
+    USER;
 
-    private final String tokenValue;
-
-    Role(String tokenValue) {
-        this.tokenValue = tokenValue;
-    }
-
-    public static Role findByValue(String value) {
+    public static Role from(String name) {
         return Arrays.stream(values())
-                .filter(role -> role.tokenValue.equals(value))
+                .filter(role -> role.name().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_ROLE));
-    }
-
-
-    public String getTokenValue() {
-        return tokenValue;
     }
 }
