@@ -9,6 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(render)
         .catch(error => console.error('Error fetching reservations:', error));
+
+    document.getElementById("close-modal").addEventListener("click", function () {
+        let modal = document.getElementsByClassName("payment-modal-back")[0];
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
 });
 
 function render(data) {
