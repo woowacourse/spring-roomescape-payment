@@ -22,11 +22,11 @@ public class TossPaymentErrorHandler {
         }
 
         PaymentErrorResponse paymentErrorResponse = OBJECT_MAPPER.readValue(res.getBody(), PaymentErrorResponse.class);
-        HandlingTargetErrorCodes handledType = HandlingTargetErrorCodes.from(paymentErrorResponse.code());
-        throw new PaymentException(handledType.handledMessage, handledType.handledStatusCode);
+        HandlingTargetErrorCode targetErrorCode = HandlingTargetErrorCode.from(paymentErrorResponse.code());
+        throw new PaymentException(targetErrorCode.handledMessage, targetErrorCode.handledStatusCode);
     }
 
-    private enum HandlingTargetErrorCodes {
+    private enum HandlingTargetErrorCode {
         REJECT_ACCOUNT_PAYMENT(HttpStatus.BAD_REQUEST, "잔액 부족"),
         UNAUTHORIZED_KEY(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"),
         DEFAULT(HttpStatus.BAD_REQUEST, "결제 실패");
@@ -34,12 +34,12 @@ public class TossPaymentErrorHandler {
         private final HttpStatus handledStatusCode;
         private final String handledMessage;
 
-        HandlingTargetErrorCodes(HttpStatus handledStatusCode, String handledMessage) {
+        HandlingTargetErrorCode(HttpStatus handledStatusCode, String handledMessage) {
             this.handledStatusCode = handledStatusCode;
             this.handledMessage = handledMessage;
         }
 
-        private static HandlingTargetErrorCodes from(String targetCode) {
+        private static HandlingTargetErrorCode from(String targetCode) {
             return Arrays.stream(values())
                     .filter(ht -> ht.name().equals(targetCode))
                     .findAny()
