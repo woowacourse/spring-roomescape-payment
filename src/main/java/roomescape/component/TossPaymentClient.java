@@ -1,15 +1,12 @@
 package roomescape.component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.dto.payment.TossPaymentError;
 import roomescape.dto.payment.PaymentDto;
-import roomescape.exception.TossPaymentException;
+import roomescape.exception.TossPaymentsErrorHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -22,11 +19,12 @@ public class TossPaymentClient {
     private String widgetSecretKey;
 
     private final RestClient restClient;
-    private final ObjectMapper objectMapper;
+    private final TossPaymentsErrorHandler errorHandler;
 
-    public TossPaymentClient(final RestClient restClient, final ObjectMapper objectMapper) {
+    public TossPaymentClient(final RestClient restClient,
+                             final TossPaymentsErrorHandler errorHandler) {
         this.restClient = restClient;
-        this.objectMapper = objectMapper;
+        this.errorHandler = errorHandler;
     }
 
     public void confirm(final PaymentDto paymentDto) {
@@ -35,14 +33,7 @@ public class TossPaymentClient {
                 .headers(httpHeaders -> httpHeaders.addAll(headers()))
                 .body(paymentDto)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
-                })
+                .onStatus(errorHandler)
                 .toBodilessEntity();
     }
 
@@ -52,10 +43,7 @@ public class TossPaymentClient {
                 .headers(httpHeaders -> httpHeaders.addAll(headers()))
                 .body(Map.of("cancelReason", cancelReason))
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
-                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
-                })
+                .onStatus(errorHandler)
                 .toBodilessEntity();
     }
 

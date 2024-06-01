@@ -12,7 +12,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.RoomescapeExceptionCode;
-import roomescape.exception.TossPaymentException;
+import roomescape.exception.TossPaymentsException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
@@ -33,7 +33,7 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Retryable(include = { TossPaymentException.class }, maxAttempts = 3)
+    @Retryable(include = { TossPaymentsException.class }, maxAttempts = 3)
     public void confirmPayment(final PaymentDto paymentDto, final Long reservationId) {
         paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)

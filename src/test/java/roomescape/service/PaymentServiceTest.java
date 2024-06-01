@@ -14,7 +14,7 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.payment.PaymentDto;
-import roomescape.exception.TossPaymentException;
+import roomescape.exception.TossPaymentsException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.*;
 import static roomescape.TestFixture.*;
 import static roomescape.TestFixture.THEME_HORROR;
 import static roomescape.exception.RoomescapeExceptionCode.DATABASE_SAVE_ERROR;
-import static roomescape.exception.RoomescapeExceptionCode.TOSS_PAYMENT_ERROR;
+import static roomescape.exception.RoomescapeExceptionCode.TOSS_PAYMENTS_ERROR;
 
 @EnableRetry
 @SpringBootTest
@@ -56,8 +56,8 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
         final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
         given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
-        willThrow(new TossPaymentException(TOSS_PAYMENT_ERROR.getHttpStatusCode(), TOSS_PAYMENT_ERROR.getMessage()))
-                .willThrow(new TossPaymentException(TOSS_PAYMENT_ERROR.getHttpStatusCode(), TOSS_PAYMENT_ERROR.getMessage()))
+        willThrow(new TossPaymentsException(TOSS_PAYMENTS_ERROR.getHttpStatusCode(), TOSS_PAYMENTS_ERROR.getMessage()))
+                .willThrow(new TossPaymentsException(TOSS_PAYMENTS_ERROR.getHttpStatusCode(), TOSS_PAYMENTS_ERROR.getMessage()))
                 .willDoNothing()
                 .given(paymentClient).confirm(paymentDto);
 
@@ -81,12 +81,12 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
         final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
         given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
-        willThrow(new TossPaymentException(TOSS_PAYMENT_ERROR.getHttpStatusCode(), TOSS_PAYMENT_ERROR.getMessage()))
+        willThrow(new TossPaymentsException(TOSS_PAYMENTS_ERROR.getHttpStatusCode(), TOSS_PAYMENTS_ERROR.getMessage()))
                 .given(paymentClient).confirm(paymentDto);
 
         // when
         assertThatThrownBy(() -> paymentService.confirmPayment(paymentDto, reservationId))
-                .isInstanceOf(TossPaymentException.class);
+                .isInstanceOf(TossPaymentsException.class);
 
         // then
         verify(paymentClient, times(3)).confirm(paymentDto);
