@@ -1,6 +1,8 @@
 package roomescape.global.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +17,12 @@ class PriceTest {
     @ValueSource(doubles = {-1000.0, -1.1})
     void invalidPrice(Double invalidPrice) {
         //given & when & then
-        assertThatThrownBy(() -> new Price(BigDecimal.valueOf(invalidPrice)))
-                .isInstanceOf(IllegalArgumentException.class);
+        BigDecimal bigDecimal = BigDecimal.valueOf(0);
+
+        assertAll(
+                () -> assertThat(new Price(bigDecimal).getPrice()).isEqualTo(bigDecimal),
+                () -> assertThatThrownBy(() -> new Price(BigDecimal.valueOf(invalidPrice)))
+                        .isInstanceOf(IllegalArgumentException.class)
+        );
     }
 }
