@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
 import roomescape.payment.dto.PaymentCreateRequest;
@@ -34,37 +35,43 @@ public class PaymentRestClient {
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {
         String authorizations = BASIC + secretKey;
-
-        restClient.post()
-                .uri("/v1/payments/confirm")
-                .header("Authorization", authorizations)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentCreateRequest.createRestClientPaymentApproveRequest())
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, ((request, response) ->
-                        handleErrorMessage(response)
-                ))
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri("/v1/payments/confirm")
+                    .header("Authorization", authorizations)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(paymentCreateRequest.createRestClientPaymentApproveRequest())
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, ((request, response) ->
+                            handleErrorMessage(response)
+                    ))
+                    .toBodilessEntity();
+        } catch (RestClientException e) {
+            throwInternalServerError();
+        }
     }
 
     public void cancelPayment(String paymentKey) {
         String authorizations = BASIC + secretKey;
-        restClient.post()
-                .uri("/v1/payments/" + paymentKey + "/cancel")
-                .header("Authorization", authorizations)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(new RestClientPaymentCancelRequest(CancelReason.CHANGE_MIND))
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, (request, response) -> handleErrorMessage(response))
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri("/v1/payments/" + paymentKey + "/cancel")
+                    .header("Authorization", authorizations)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new RestClientPaymentCancelRequest(CancelReason.CHANGE_MIND))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, (request, response) -> handleErrorMessage(response))
+                    .toBodilessEntity();
+        } catch (RestClientException e) {
+            throwInternalServerError();
+        }
     }
 
     private void handleErrorMessage(ClientHttpResponse httpResponse) {
         try {
             convertException(httpResponse);
         } catch (IOException | NullPointerException e) {
-            throw new RoomEscapeException(
-                    "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
+            throwInternalServerError();
         }
     }
 
@@ -75,10 +82,14 @@ public class PaymentRestClient {
 
         if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
             code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
-            throw new RoomEscapeException(
-                    "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
+            throwInternalServerError();
         }
         throw new RoomEscapeException(message, ExceptionTitle.ILLEGAL_USER_REQUEST);
+    }
+
+    private void throwInternalServerError() {
+        throw new RoomEscapeException(
+                "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
     }
 
     public String getSecretKey() {
