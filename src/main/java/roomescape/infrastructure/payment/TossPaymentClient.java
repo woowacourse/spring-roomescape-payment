@@ -52,6 +52,8 @@ public class TossPaymentClient implements PaymentClient {
             LOGGER.error("토스 결제 에러 message: {}, body: {}",
                     response.getStatusCode(),
                     response.getStatusText());
+
+            System.out.println("response = " + response.getBody());
             throw new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
                     String.format("결제 승인 요청 처리 중 예외가 발생했습니다."));
         };
@@ -62,6 +64,8 @@ public class TossPaymentClient implements PaymentClient {
             LOGGER.error("TossPaymentClient 서버 에러 message: {}, body: {}",
                     response.getStatusCode(),
                     response.getStatusText());
+
+            System.out.println("response = " + response.getBody());
             throw new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
                     String.format("결제 승인 처리 API 서버에서 에러가 발생했습니다."));
         };

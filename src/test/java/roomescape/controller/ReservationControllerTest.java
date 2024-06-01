@@ -10,6 +10,7 @@ import static roomescape.Fixture.VALID_USER_EMAIL;
 import static roomescape.Fixture.VALID_USER_NAME;
 import static roomescape.Fixture.VALID_USER_PASSWORD;
 
+import java.math.BigDecimal;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +46,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve() {
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(201)
                 .body("name", is(VALID_USER_NAME.getName()));
@@ -70,7 +71,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_IllegalDateRequest() {
         MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -79,7 +80,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_NoSuchTheme() {
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 200L, "paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(404);
     }
@@ -88,7 +89,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_NoSuchTime() {
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 100L, 1L, "paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(404);
     }
@@ -97,7 +98,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_PastTime() {
         MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 1L, 1L, "paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(409);
     }

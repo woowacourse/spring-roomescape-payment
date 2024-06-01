@@ -11,6 +11,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ class TossPaymentClientTest {
     @Test
     void approve() throws IOException {
         PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
@@ -64,7 +65,7 @@ class TossPaymentClientTest {
     @Test
     void invalidPaymentApproveRequest() throws IOException {
         PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("invalidKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
@@ -86,7 +87,7 @@ class TossPaymentClientTest {
     @Test
     void tossInternalServerErrorTest() throws IOException {
         PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
-                1000L);
+                BigDecimal.valueOf(1000));
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
