@@ -10,7 +10,7 @@ import roomescape.payment.model.Payment;
 @TestComponent
 @Primary
 public class FakePaymentClient implements PaymentClient {
-    private final static String FAIL_KEYWORD = "failPayment";
+    private static final String FAIL_KEYWORD = "failPayment";
 
     @Override
     public Payment confirm(final ConfirmPaymentRequest confirmPaymentRequest) {

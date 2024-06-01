@@ -5,6 +5,8 @@ import java.util.Base64;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.client.toss.TossPaymentErrorHandler;
 
@@ -31,6 +33,14 @@ public class PaymentRestClientConfiguration {
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
                 .defaultStatusHandler(new TossPaymentErrorHandler())
+                .requestFactory(getClientHttpRequestFactory())
                 .build();
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        simpleClientHttpRequestFactory.setConnectTimeout(3);
+        simpleClientHttpRequestFactory.setReadTimeout(30);
+        return simpleClientHttpRequestFactory;
     }
 }
