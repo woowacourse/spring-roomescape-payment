@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
 import roomescape.common.exception.PaymentExceptionCode;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.resonse.PaymentConfirmResponse;
 import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
 @Service
@@ -26,14 +27,17 @@ public class PaymentService {
         this.objectMapper = objectMapper;
     }
 
-    public void confirmPayment(PaymentConfirmRequest paymentRequest) {
-        restClient.post()
+    public PaymentConfirmResponse confirmPayment(PaymentConfirmRequest confirmRequest) {
+        PaymentConfirmResponse confirmResponse = restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(confirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
-                .toBodilessEntity();
+                .body(PaymentConfirmResponse.class);
+        log.info("토스 결제 요청 응답 : {}", confirmResponse);
+        
+        return confirmResponse;
     }
 
     private ErrorHandler createPaymentErrorHandler() {
