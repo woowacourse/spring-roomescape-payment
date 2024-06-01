@@ -2,7 +2,7 @@ package roomescape.domain.payment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.exception.PaymentCredentialMissMatchException;
+import roomescape.domain.payment.exception.PaymentCredentialMissMatchException;
 import roomescape.domain.member.model.Member;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
 import roomescape.domain.payment.dto.SavePaymentCredentialRequest;

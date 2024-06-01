@@ -2,6 +2,7 @@ package roomescape.domain.reservation.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 @Embeddable
 public class ThemeThumbnail {
@@ -21,12 +22,12 @@ public class ThemeThumbnail {
 
     private void validateValue(final String value) {
         if (value == null) {
-            throw new IllegalArgumentException("썸네일은 1글자 이상 700글자 이하여야 합니다.");
+            throw new InvalidReserveInputException("썸네일은 1글자 이상 700글자 이하여야 합니다.");
         }
 
         final String stripedValue = value.strip();
         if (stripedValue.isEmpty() || stripedValue.length() > MAXIMUM_ENABLE_NAME_LENGTH) {
-            throw new IllegalArgumentException("썸네일은 1글자 이상 700글자 이하여야 합니다.");
+            throw new InvalidReserveInputException("썸네일은 1글자 이상 700글자 이하여야 합니다.");
         }
     }
 

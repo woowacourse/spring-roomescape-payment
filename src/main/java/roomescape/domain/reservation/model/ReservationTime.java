@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import java.time.LocalTime;
 
@@ -33,7 +34,7 @@ public class ReservationTime {
 
     private void validateTime(final LocalTime startAt) {
         if (startAt == null) {
-            throw new IllegalArgumentException("시간 정보는 공백을 입력할 수 없습니다.");
+            throw new InvalidReserveInputException("시간 정보는 공백을 입력할 수 없습니다.");
         }
     }
 

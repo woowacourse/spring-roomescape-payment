@@ -10,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.domain.member.dto.MemberDto;
 import roomescape.domain.member.dto.SaveMemberRequest;
+import roomescape.domain.member.exception.InvalidSignUpInputException;
 import roomescape.domain.member.model.MemberRole;
-import roomescape.domain.member.service.MemberService;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class MemberServiceTest {
-    
+
     @Autowired
     private MemberService memberService;
 
@@ -35,7 +35,7 @@ class MemberServiceTest {
         // Then
         assertThat(members.size()).isEqualTo(5);
     }
-    
+
     @DisplayName("회원 정보를 저장한다.")
     @Test
     void saveMemberTest() {
@@ -70,7 +70,7 @@ class MemberServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> memberService.saveMember(saveMemberRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("회원 비밀번호로 공백을 입력할 수 없습니다.");
     }
 
@@ -86,7 +86,7 @@ class MemberServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> memberService.saveMember(saveMemberRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("회원 비밀번호 길이는 10이상 30이하여만 합니다.");
     }
 
@@ -102,7 +102,7 @@ class MemberServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> memberService.saveMember(saveMemberRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("이미 존재하는 이메일입니다.");
     }
 }

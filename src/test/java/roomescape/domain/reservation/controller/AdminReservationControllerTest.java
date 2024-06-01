@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.domain.auth.token.TokenProvider;
+import roomescape.auth.token.TokenProvider;
 import roomescape.config.TestConfig;
 import roomescape.domain.member.model.MemberRole;
 import roomescape.domain.reservation.dto.ReservationResponse;

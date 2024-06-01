@@ -2,6 +2,7 @@ package roomescape.domain.reservation.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import java.time.LocalDate;
 
@@ -21,7 +22,7 @@ public class ReservationDate {
 
     private void validateDate(final LocalDate value) {
         if (value == null) {
-            throw new IllegalArgumentException("예약 날짜는 공백을 입력할 수 없습니다.");
+            throw new InvalidReserveInputException("예약 날짜는 공백을 입력할 수 없습니다.");
         }
     }
 

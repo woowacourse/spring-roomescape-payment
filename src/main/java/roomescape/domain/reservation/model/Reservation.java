@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import roomescape.domain.member.model.Member;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import java.time.LocalDate;
 
@@ -96,7 +97,7 @@ public class Reservation {
             final Member member
     ) {
         if (status == null || reservationTime == null || theme == null || member == null) {
-            throw new IllegalArgumentException("예약 상태, 시간, 테마, 회원 정보는 Null을 입력할 수 없습니다.");
+            throw new InvalidReserveInputException("예약 상태, 시간, 테마, 회원 정보는 Null을 입력할 수 없습니다.");
         }
     }
 

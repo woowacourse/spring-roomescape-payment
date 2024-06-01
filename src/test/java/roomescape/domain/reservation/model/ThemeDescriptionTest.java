@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.domain.reservation.model.ThemeDescription;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,7 +35,7 @@ class ThemeDescriptionTest {
     void themeDescriptionLengthTest(final String invalidDescription) {
         // When & Then
         assertThatThrownBy(() -> new ThemeDescription(invalidDescription))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("테마 설명은 1글자 이상 80글자 이하여야 합니다.");
     }
 }

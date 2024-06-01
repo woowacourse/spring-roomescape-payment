@@ -2,7 +2,7 @@ package roomescape.domain.reservation.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.domain.reservation.model.ReservationTime;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -12,7 +12,7 @@ class ReservationTimeTest {
     void throwExceptionWhenReservationTimeBlank() {
         // When & Then
         assertThatThrownBy(() -> new ReservationTime(1L, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("시간 정보는 공백을 입력할 수 없습니다.");
     }
 }

@@ -3,6 +3,7 @@ package roomescape.domain.member.model;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import roomescape.domain.member.exception.InvalidSignUpInputException;
 import roomescape.domain.member.model.MemberPassword;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,7 +16,7 @@ class MemberPasswordTest {
     void validateMemberPasswordTest(final String invalidName) {
         // When & Then
         assertThatThrownBy(() -> new MemberPassword(invalidName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("회원 비밀번호로 공백을 입력할 수 없습니다.");
     }
 }

@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.domain.auth.dto.LoginRequest;
-import roomescape.domain.auth.token.TokenProvider;
+import roomescape.auth.dto.LoginRequest;
+import roomescape.auth.token.TokenProvider;
 import roomescape.domain.member.model.MemberRole;
 
 import static org.hamcrest.Matchers.is;
@@ -80,7 +80,7 @@ class AuthControllerTest {
                 .body(loginRequest)
                 .when().post("/login")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(401)
                 .body("message", is("일치하지 않는 비밀번호입니다."));
     }
 

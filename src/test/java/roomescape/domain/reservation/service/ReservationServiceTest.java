@@ -9,11 +9,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import roomescape.config.TestConfig;
 import roomescape.domain.reservation.dto.ReservationDto;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationWaiting;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationWaitingRepository;
-import roomescape.domain.reservation.service.ReservationService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -139,7 +139,7 @@ class ReservationServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
     }
 
@@ -159,7 +159,7 @@ class ReservationServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("이미 해당 날짜/시간의 테마 예약이 있습니다.");
     }
 }

@@ -2,6 +2,7 @@ package roomescape.domain.member.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import roomescape.domain.member.exception.InvalidSignUpInputException;
 
 import java.util.regex.Pattern;
 
@@ -24,13 +25,13 @@ public class MemberEmail {
 
     private void checkNullOrEmpty(final String value) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("이메일 값은 공백일 수 없습니다.");
+            throw new InvalidSignUpInputException("이메일 값은 공백일 수 없습니다.");
         }
     }
 
     private void validateEmailRegex(final String email) {
         if (!REGEX_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
+            throw new InvalidSignUpInputException("유효하지 않은 이메일 형식입니다.");
         }
     }
 

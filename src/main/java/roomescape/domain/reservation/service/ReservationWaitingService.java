@@ -6,6 +6,7 @@ import roomescape.domain.member.repository.MemberRepository;
 import roomescape.domain.reservation.dto.ReservationWaitingDto;
 import roomescape.domain.reservation.dto.ReservationWaitingWithOrderDto;
 import roomescape.domain.reservation.dto.SaveReservationWaitingRequest;
+import roomescape.domain.reservation.exception.InvalidReservationWaitInputException;
 import roomescape.domain.reservation.model.ReservationDate;
 import roomescape.domain.reservation.model.ReservationTime;
 import roomescape.domain.reservation.model.ReservationWaiting;
@@ -89,7 +90,7 @@ public class ReservationWaitingService {
             final ReservationTime reservationTime
     ) {
         if (!reservationRepository.existsByDateAndTime_IdAndTheme_Id(date, reservationTime.getId(), theme.getId())) {
-            throw new IllegalStateException("존재하지 않는 예약에 대한 대기 신청을 할 수 없습니다.");
+            throw new InvalidReservationWaitInputException("존재하지 않는 예약에 대한 대기 신청을 할 수 없습니다.");
         }
     }
 
@@ -100,7 +101,7 @@ public class ReservationWaitingService {
             final Theme theme
     ) {
         if (reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, reservationDate, reservationTime, theme)) {
-            throw new IllegalStateException("이미 해당 예약 대기가 존재합니다.");
+            throw new InvalidReservationWaitInputException("이미 해당 예약 대기가 존재합니다.");
         }
     }
 

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.domain.member.model.MemberEmail;
+import roomescape.domain.member.exception.InvalidSignUpInputException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,7 +16,7 @@ class MemberEmailTest {
     void memberEmailLengthTest(final String invalidName) {
         // When & Then
         assertThatThrownBy(() -> new MemberEmail(invalidName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("이메일 값은 공백일 수 없습니다.");
     }
 
@@ -26,7 +26,7 @@ class MemberEmailTest {
     void validateInvalidRegexTest(final String invalidName) {
         // When & Then
         assertThatThrownBy(() -> new MemberEmail(invalidName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("유효하지 않은 이메일 형식입니다.");
     }
 }

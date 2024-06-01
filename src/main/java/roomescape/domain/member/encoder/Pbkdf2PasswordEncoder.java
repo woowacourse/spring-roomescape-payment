@@ -1,5 +1,7 @@
 package roomescape.domain.member.encoder;
 
+import roomescape.domain.member.exception.PasswordEncodingException;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.spec.KeySpec;
@@ -34,7 +36,7 @@ public class Pbkdf2PasswordEncoder implements PasswordEncoder {
 
             return Base64.getEncoder().encodeToString(hash);
         } catch (final Exception e) {
-            throw new IllegalStateException("비밀번호 암호화에 실패하였습니다.");
+            throw new PasswordEncodingException("비밀번호 암호화에 실패하였습니다.", e.getCause());
         }
     }
 
@@ -48,7 +50,7 @@ public class Pbkdf2PasswordEncoder implements PasswordEncoder {
 
             return newHash.equals(encodedPassword);
         } catch (final Exception e) {
-            throw new IllegalStateException("로그인 비밀번호 검증에 실패하였습니다.");
+            throw new PasswordEncodingException("로그인 비밀번호 검증에 실패하였습니다.", e.getCause());
         }
     }
 }

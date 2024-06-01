@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.domain.reservation.dto.ReservationWaitingDto;
 import roomescape.domain.reservation.dto.ReservationWaitingWithOrderDto;
 import roomescape.domain.reservation.dto.SaveReservationWaitingRequest;
-import roomescape.domain.reservation.service.ReservationWaitingService;
+import roomescape.domain.reservation.exception.InvalidReservationWaitInputException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -70,7 +70,7 @@ class ReservationWaitingServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(InvalidReservationWaitInputException.class)
                 .hasMessage("존재하지 않는 예약에 대한 대기 신청을 할 수 없습니다.");
     }
 
@@ -82,7 +82,7 @@ class ReservationWaitingServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> reservationWaitingService.saveReservationWaiting(saveReservationWaitingRequest))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(InvalidReservationWaitInputException.class)
                 .hasMessage("이미 해당 예약 대기가 존재합니다.");
     }
 

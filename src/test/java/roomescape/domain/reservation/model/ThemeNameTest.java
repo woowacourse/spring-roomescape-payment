@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.domain.reservation.model.ThemeName;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -17,7 +17,7 @@ class ThemeNameTest {
     void themeNameLengthTest(final String invalidName) {
         // When & Then
         assertThatThrownBy(() -> new ThemeName(invalidName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("테마 이름은 1글자 이상 20글자 이하여야 합니다.");
     }
 }

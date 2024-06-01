@@ -9,6 +9,7 @@ import roomescape.domain.reservation.dto.ReservationDto;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.dto.SearchReservationsParams;
 import roomescape.domain.reservation.dto.SearchReservationsRequest;
+import roomescape.domain.reservation.exception.InvalidReserveInputException;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationDate;
 import roomescape.domain.reservation.model.ReservationTime;
@@ -94,7 +95,7 @@ public class ReservationService {
     private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
         final LocalDateTime reservationLocalDateTime = LocalDateTime.of(date.getValue(), time.getStartAt());
         if (reservationLocalDateTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
+            throw new InvalidReserveInputException("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
         }
     }
 
@@ -104,7 +105,7 @@ public class ReservationService {
                 reservation.getTime().getId(),
                 reservation.getTheme().getId())
         ) {
-            throw new IllegalArgumentException("이미 해당 날짜/시간의 테마 예약이 있습니다.");
+            throw new InvalidReserveInputException("이미 해당 날짜/시간의 테마 예약이 있습니다.");
         }
     }
 

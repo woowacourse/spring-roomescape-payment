@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import roomescape.domain.member.exception.InvalidSignUpInputException;
 import roomescape.domain.member.model.MemberName;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,7 +17,7 @@ class MemberNameTest {
     void validateNullOrEmptyTest(final String invalidName) {
         // When & Then
         assertThatThrownBy(() -> new MemberName(invalidName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("회원 이름으로 공백을 입력할 수 없습니다.");
     }
 
@@ -28,7 +29,7 @@ class MemberNameTest {
 
         // When & Then
         assertThatThrownBy(() -> new MemberName(invalidNameInput))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidSignUpInputException.class)
                 .hasMessage("회원 이름은 8글자 이하여만 합니다.");
     }
 }

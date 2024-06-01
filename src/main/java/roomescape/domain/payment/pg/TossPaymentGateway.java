@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.dto.PaymentConfirmRequest;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
-import roomescape.exception.PaymentConfirmClientFailException;
-import roomescape.exception.PaymentConfirmServerFailException;
+import roomescape.domain.payment.exception.PaymentConfirmClientFailException;
+import roomescape.domain.payment.exception.PaymentConfirmServerFailException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import static roomescape.domain.config.PaymentConfig.PG_API_BASE_URL;
-import static roomescape.domain.config.PaymentConfig.PG_CONFIRM_API_URL;
+import static roomescape.domain.payment.config.PaymentConfig.PG_API_BASE_URL;
+import static roomescape.domain.payment.config.PaymentConfig.PG_CONFIRM_API_URL;
 
 @Component
 public class TossPaymentGateway implements PaymentGateway {

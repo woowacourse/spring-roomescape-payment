@@ -5,9 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.domain.auth.dto.LoginRequest;
-import roomescape.domain.auth.service.AuthService;
-import roomescape.domain.auth.token.TokenProvider;
+import roomescape.auth.dto.LoginRequest;
+import roomescape.auth.exception.LogInException;
+import roomescape.auth.service.AuthService;
+import roomescape.auth.token.TokenProvider;
 import roomescape.domain.member.model.Member;
 import roomescape.domain.member.model.MemberRole;
 
@@ -59,7 +60,7 @@ class AuthServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(LogInException.class)
                 .hasMessage("일치하지 않는 비밀번호입니다.");
     }
 

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import roomescape.domain.auth.token.TokenProvider;
+import roomescape.auth.token.TokenProvider;
 import roomescape.domain.member.model.MemberRole;
 
 import java.util.Date;

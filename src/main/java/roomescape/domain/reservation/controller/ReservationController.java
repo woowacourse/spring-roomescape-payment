@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.domain.auth.principal.AuthenticatedMember;
+import roomescape.auth.principal.AuthenticatedMember;
 import roomescape.domain.reservation.dto.MyReservationResponse;
 import roomescape.domain.reservation.dto.ReservationDto;
 import roomescape.domain.reservation.dto.ReservationResponse;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.service.ReservationService;
-import roomescape.resolver.Authenticated;
+import roomescape.auth.resolver.Authenticated;
 
 import java.net.URI;
 import java.util.List;
