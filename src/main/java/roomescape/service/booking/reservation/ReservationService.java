@@ -7,7 +7,7 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.UserReservationPaymentRequest;
+import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.service.booking.reservation.module.PaymentService;
 import roomescape.service.booking.reservation.module.ReservationCancelService;
@@ -33,15 +33,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
-        ReservationResponse reservationResponse = reservationRegisterService.registerReservation(
-                ReservationRequest.of(userReservationPaymentRequest, memberId));
-        paymentService.pay(PaymentRequest.from(userReservationPaymentRequest));
+    public ReservationResponse registerReservationWithPayment(UserReservationRequest userReservationRequest,
+                                                              Long memberId
+    ) {
+        ReservationRequest reservationRequest = userReservationRequest.toReservationRequest(memberId);
+        PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
+
+        ReservationResponse reservationResponse = reservationRegisterService.registerReservation(reservationRequest);
+        paymentService.pay(paymentRequest);
         return reservationResponse;
     }
 
-    public ReservationResponse registerReservation(ReservationRequest request) {
-        return reservationRegisterService.registerReservation(request);
+    public ReservationResponse registerReservationWithoutPayment(ReservationRequest reservationRequest) {
+        return reservationRegisterService.registerReservation(reservationRequest);
     }
 
     public ReservationResponse findReservation(Long reservationId) {

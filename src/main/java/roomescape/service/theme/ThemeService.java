@@ -24,8 +24,8 @@ public class ThemeService {
         this.themeDeleteService = themeDeleteService;
     }
 
-    public Long addTheme(ThemeRequest themeRequest) {
-        return themeRegisterService.resisterTheme(themeRequest);
+    public Long registerTheme(ThemeRequest themeRequest) {
+        return themeRegisterService.registerTheme(themeRequest);
     }
 
     public ThemeResponse findTheme(Long themeId) {

@@ -17,7 +17,7 @@ public class ThemeRegisterService {
         this.themeRepository = themeRepository;
     }
 
-    public Long resisterTheme(ThemeRequest themeRequest) {
+    public Long registerTheme(ThemeRequest themeRequest) {
         ThemeName name = new ThemeName(themeRequest.name());
         validateNameDuplicate(name);
         Theme theme = themeRequest.toEntity();

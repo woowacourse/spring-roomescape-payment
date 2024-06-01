@@ -23,24 +23,6 @@ public record ReservationRequest(
         Objects.requireNonNull(memberId);
     }
 
-    public static ReservationRequest from(UserReservationRequest userRequest, Long memberId) {
-        return new ReservationRequest(
-                userRequest.date(),
-                userRequest.timeId(),
-                userRequest.themeId(),
-                memberId
-        );
-    }
-
-    public static ReservationRequest of(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
-        return new ReservationRequest(
-                userReservationPaymentRequest.date(),
-                userReservationPaymentRequest.timeId(),
-                userReservationPaymentRequest.themeId(),
-                memberId
-        );
-    }
-
     public Reservation toEntity(ReservationTime reservationTime, Theme theme, Member member, Status status) {
         return new Reservation(
                 date,

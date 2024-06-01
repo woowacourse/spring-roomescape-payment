@@ -26,7 +26,7 @@ public class ReservationTimeService {
         this.timeDeleteService = timeDeleteService;
     }
 
-    public Long resisterReservationTime(ReservationTimeRequest reservationTimeRequest) {
+    public Long registerReservationTime(ReservationTimeRequest reservationTimeRequest) {
         return timeRegisterService.registerTime(reservationTimeRequest);
     }
 

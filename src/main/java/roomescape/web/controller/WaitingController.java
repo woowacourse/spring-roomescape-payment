@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.dto.login.LoginMember;
-import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.UserReservationRequest;
+import roomescape.dto.reservation.UserWaitingRequest;
 import roomescape.dto.waiting.WaitingResponse;
 import roomescape.service.booking.reservation.ReservationService;
 import roomescape.service.booking.waiting.WaitingService;
@@ -29,11 +28,10 @@ public class WaitingController {
     }
 
     @PostMapping("/reservations/waiting")
-    public ResponseEntity<ReservationResponse> addReservationWaiting(
-            @RequestBody UserReservationRequest userReservationRequest,
-            LoginMember loginMember) {
-        ReservationRequest reservationRequest = ReservationRequest.from(userReservationRequest, loginMember.id());
-        Long savedId = waitingService.resisterWaiting(reservationRequest);
+    public ResponseEntity<ReservationResponse> addReservationWaiting(@RequestBody UserWaitingRequest userWaitingRequest,
+                                                                     LoginMember loginMember
+    ) {
+        Long savedId = waitingService.registerWaiting(userWaitingRequest, loginMember.id());
         ReservationResponse reservationResponse = reservationService.findReservation(savedId);
         return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);
     }

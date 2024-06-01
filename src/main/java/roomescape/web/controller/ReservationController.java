@@ -13,7 +13,7 @@ import roomescape.dto.login.LoginMember;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.UserReservationPaymentRequest;
+import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.service.booking.reservation.ReservationService;
 
@@ -27,19 +27,19 @@ class ReservationController {
     }
 
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> addReservationByAdmin(
-            @RequestBody ReservationRequest reservationRequest) {
-        ReservationResponse reservationResponse = reservationService.registerReservation(reservationRequest);
+    public ResponseEntity<ReservationResponse> addReservationByAdmin(@RequestBody ReservationRequest reservationRequest
+    ) {
+        ReservationResponse reservationResponse = reservationService.registerReservationWithoutPayment(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> addReservationByUser(
-            @RequestBody UserReservationPaymentRequest userReservationPaymentRequest,
-            LoginMember loginMember) {
-        ReservationResponse reservationResponse = reservationService.registerReservationPayments(
-                userReservationPaymentRequest, loginMember.id());
+    public ResponseEntity<ReservationResponse> addReservationByUser(@RequestBody UserReservationRequest userReservationRequest,
+                                                                    LoginMember loginMember
+    ) {
+        ReservationResponse reservationResponse = reservationService.registerReservationWithPayment(
+                userReservationRequest, loginMember.id());
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
     }
