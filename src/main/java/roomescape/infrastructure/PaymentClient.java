@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.core.controller.PaymentErrorHandler;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;
@@ -32,7 +31,7 @@ public class PaymentClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new PaymentErrorHandler())
+                .onStatus(new PaymentApproveErrorHandler())
                 .toBodilessEntity();
     }
 
@@ -46,7 +45,7 @@ public class PaymentClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(Map.of("cancelReason", "고객 변심"))
                 .retrieve()
-                .onStatus(new PaymentErrorHandler())
+                .onStatus(new PaymentRefundErrorHandler())
                 .toBodilessEntity();
     }
 }

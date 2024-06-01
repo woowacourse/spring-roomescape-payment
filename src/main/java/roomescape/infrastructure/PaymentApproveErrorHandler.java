@@ -1,11 +1,11 @@
-package roomescape.core.controller;
+package roomescape.infrastructure;
 
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.core.exception.PaymentException;
 
-public class PaymentErrorHandler implements ResponseErrorHandler {
+public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(final ClientHttpResponse response) throws IOException {
