@@ -4,7 +4,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.exception.PaymentServerException;
 import roomescape.service.PaymentClient;
 import roomescape.service.dto.request.PaymentRequest;
 
@@ -35,13 +37,17 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void confirm(PaymentRequest paymentRequest) {
-        restClient.post()
-                .uri(properties.getPaymentUri())
-                .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + encodedSecretKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
-                .retrieve()
-                .onStatus(errorHandler)
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri(properties.getPaymentUri())
+                    .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + encodedSecretKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(paymentRequest)
+                    .retrieve()
+                    .onStatus(errorHandler)
+                    .toBodilessEntity();
+        } catch (ResourceAccessException e) {
+            throw new PaymentServerException(e.getMessage(), e);
+        }
     }
 }
