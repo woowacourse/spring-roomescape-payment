@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.maker;
 
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
