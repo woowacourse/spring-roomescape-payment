@@ -10,6 +10,7 @@ import roomescape.controller.steps.ReservationSteps;
 import roomescape.domain.MemberRole;
 import roomescape.web.controller.request.MemberReservationRequest;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
@@ -59,7 +60,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: paymentKey가 비어 있을 경우 -> 400")
     @Test
     void blankPaymentKeyRequest() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "", "orderId", 1000L);
+        LocalDate date = LocalDate.now().minusDays(3);
+        MemberReservationRequest request = new MemberReservationRequest(date.toString(), 1L, 1L, "", "orderId", 1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -67,7 +69,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: orderId가 비어 있을 경우 -> 400")
     @Test
     void blankOrderIdRequest() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "", 1000L);
+        LocalDate date = LocalDate.now().minusDays(3);
+        MemberReservationRequest request = new MemberReservationRequest(date.toString(), 1L, 1L, "paymentKey", "", 1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -75,7 +78,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: amount가 올바르지 않은 경우 -> 400")
     @Test
     void illegalAmountRequest() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "orderId", null);
+        LocalDate date = LocalDate.now().minusDays(3);
+        MemberReservationRequest request = new MemberReservationRequest(date.toString(), 1L, 1L, "paymentKey", "orderId", null);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -83,7 +87,8 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("실패: 예약 날짜가 잘못될 경우 -> 400")
     @Test
     void reserve_IllegalDateRequest() {
-        MemberReservationRequest request = new MemberReservationRequest("2040-00-02", 1L, 1L, "paymentKey", "orderId", 1000L);
+        LocalDate date = LocalDate.now().minusDays(3);
+        MemberReservationRequest request = new MemberReservationRequest(date.toString(), 1L, 1L, "paymentKey", "orderId", 1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
