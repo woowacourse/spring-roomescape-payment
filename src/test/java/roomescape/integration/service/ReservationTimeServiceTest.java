@@ -1,17 +1,5 @@
 package roomescape.integration.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
-import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,10 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
-import roomescape.fixture.MemberFixture;
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.ReservationTimes;
 import roomescape.dto.AvailableTimeResponse;
 import roomescape.dto.ReservationTimeRequest;
 import roomescape.dto.ReservationTimeResponse;
@@ -32,11 +17,21 @@ import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
 import roomescape.exception.RoomescapeException;
+import roomescape.fixture.MemberFixture;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ReservationTimeService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
+import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
+import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -143,8 +138,7 @@ class ReservationTimeServiceTest {
             reservationTimeService.delete(1L);
 
             //then
-            assertThat(new ReservationTimes(reservationTimeRepository.findAll()).getReservationTimes())
-                    .isEmpty();
+            assertThat(reservationTimeRepository.findAll()).isEmpty();
         }
 
         @DisplayName("예약 시간을 사용하는 예약이 있으면 예약을 삭제할 수 없다.")

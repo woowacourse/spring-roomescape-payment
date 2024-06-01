@@ -1,19 +1,5 @@
 package roomescape.integration.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
-import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
-import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
-import static roomescape.fixture.ReservationFixture.ReservationOfDateAndTheme;
-import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,9 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.Themes;
 import roomescape.dto.ThemeRequest;
 import roomescape.dto.ThemeResponse;
 import roomescape.entity.Reservation;
@@ -38,6 +22,17 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ThemeService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
+import static roomescape.fixture.ReservationFixture.ReservationOfDateAndTheme;
+import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -141,8 +136,7 @@ class ThemeServiceTest {
         void notDuplicatedThemeNameSaveTest() {
             themeService.save(new ThemeRequest("otherName", "description", "thumbnail"));
 
-            assertThat(new Themes(themeRepository.findAll()).getThemes())
-                    .hasSize(2);
+            assertThat(themeRepository.findAll()).hasSize(2);
         }
 
         @DisplayName("테마에 예약이 없다면 테마를 삭제할 수 있다.")

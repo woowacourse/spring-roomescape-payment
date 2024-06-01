@@ -1,25 +1,21 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
-import roomescape.domain.ReservationTimes;
-import roomescape.domain.Reservations;
 import roomescape.dto.AvailableTimeResponse;
 import roomescape.dto.ReservationTimeRequest;
 import roomescape.dto.ReservationTimeResponse;
+import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static roomescape.exception.ExceptionType.*;
 
 @Service
 public class ReservationTimeService {
@@ -45,7 +41,8 @@ public class ReservationTimeService {
     }
 
     public List<ReservationTimeResponse> findAll() {
-        return new ReservationTimes(reservationTimeRepository.findAll()).getReservationTimes().stream()
+        List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
+        return reservationTimes.stream()
                 .map(ReservationTimeResponse::from)
                 .toList();
     }
@@ -53,21 +50,28 @@ public class ReservationTimeService {
     public List<AvailableTimeResponse> findByThemeAndDate(LocalDate date, long themeId) {
         Theme requestedTheme = themeRepository.findById(themeId)
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME, themeId));
-        Reservations findReservations = new Reservations(reservationRepository.findByThemeAndDate(requestedTheme, date));
+        List<Reservation> reservations = reservationRepository.findByThemeAndDate(requestedTheme, date);
+        List<Long> reservedTimeIds = toTimeIds(reservations);
 
-        return new ReservationTimes(reservationTimeRepository.findAll()).getReservationTimes().stream()
-                .map(reservationTime -> AvailableTimeResponse.of(reservationTime, findReservations))
+        List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
+        return reservationTimes.stream()
+                .map(reservationTime -> {
+                    boolean isReserved = reservedTimeIds.contains(reservationTime.getId());
+                    return AvailableTimeResponse.of(reservationTime, isReserved);
+                })
+                .toList();
+    }
+
+    private List<Long> toTimeIds(List<Reservation> reservations) {
+        return reservations.stream()
+                .map(reservation -> reservation.getReservationTime().getId())
                 .toList();
     }
 
     public void delete(long timeId) {
-        if (isUsedTime(timeId)) {
+        if (reservationRepository.existsByTimeId(timeId)) {
             throw new RoomescapeException(DELETE_USED_TIME, timeId);
         }
         reservationTimeRepository.deleteById(timeId);
-    }
-
-    private boolean isUsedTime(long timeId) {
-        return reservationRepository.existsByTimeId(timeId);
     }
 }

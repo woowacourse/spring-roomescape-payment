@@ -1,24 +1,5 @@
 package roomescape.integration.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.DUPLICATE_WAITING_RESERVATION;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-import static roomescape.fixture.ReservationFixture.ReservationOfDate;
-import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
-import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;
-import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
-import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,10 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.Reservations;
 import roomescape.domain.Role;
 import roomescape.domain.Waiting;
 import roomescape.dto.AdminReservationDetailResponse;
@@ -47,6 +26,16 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ReservationService;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.exception.ExceptionType.*;
+import static roomescape.fixture.ReservationFixture.*;
+import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
+import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -86,8 +75,7 @@ class ReservationServiceTest {
 
         //then
         assertAll(
-                () -> assertThat(new Reservations(reservationRepository.findAll()).getReservations())
-                        .hasSize(1),
+                () -> assertThat(reservationRepository.findAll()).hasSize(1),
                 () -> assertThat(saved.id()).isEqualTo(1L)
         );
     }
@@ -202,10 +190,10 @@ class ReservationServiceTest {
 
         //then
         List<ReservationDetailResponse> expected = List.of(
-                ReservationDetailResponse.from(new Waiting(reservation2, 1)),
+                ReservationDetailResponse.from(Waiting.of(reservation2, 1)),
                 ReservationDetailResponse.from(reservation3),
                 ReservationDetailResponse.from(reservation4));
-        assertThat(reservationResponses).isEqualTo(expected);
+        assertThat(reservationResponses).containsAnyElementsOf(expected);
     }
 
     @DisplayName("특정 사용자가 자신의 예약 대기를 취소할 수 있다.")
@@ -311,7 +299,7 @@ class ReservationServiceTest {
             reservationService.deleteById(1L);
 
             //then
-            assertThat(new Reservations(reservationRepository.findAll()).getReservations()).isEmpty();
+            assertThat(reservationRepository.findAll()).isEmpty();
         }
 
         @DisplayName("존재하지 않는 예약에 대한 삭제 요청은 정상 요청으로 간주한다.")

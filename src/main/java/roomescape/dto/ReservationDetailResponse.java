@@ -1,14 +1,13 @@
 package roomescape.dto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.Reservations;
 import roomescape.domain.Waiting;
 import roomescape.entity.Reservation;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Stream;
 
 public record ReservationDetailResponse(
         long reservationId,
@@ -27,26 +26,21 @@ public record ReservationDetailResponse(
     }
 
     public static ReservationDetailResponse from(Waiting waiting) {
-        Reservation reservation = waiting.reservation();
+        Reservation reservation = waiting.getReservation();
         return new ReservationDetailResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
-                String.format(getStatusName(reservation.getStatus()), waiting.rank()));
+                String.format(getStatusName(reservation.getStatus()), waiting.getRank()));
     }
 
-    public static List<ReservationDetailResponse> of(Reservations reservations, List<Waiting> waitings) {
-        List<ReservationDetailResponse> responses = new ArrayList<>();
-        for (Reservation reservation : reservations.getReservations()) {
-            ReservationDetailResponse response = waitings.stream()
-                    .filter(waiting -> waiting.reservation().equals(reservation))
-                    .findFirst()
-                    .map(ReservationDetailResponse::from)
-                    .orElse(from(reservation));
-            responses.add(response);
-        }
-        return responses;
+    public static List<ReservationDetailResponse> of(List<Reservation> bookedReservations, List<Waiting> waitings) {
+        return Stream.concat(
+                        bookedReservations.stream().map(ReservationDetailResponse::from),
+                        waitings.stream().map(ReservationDetailResponse::from)
+                )
+                .toList();
     }
 
     private static String getStatusName(ReservationStatus status) {

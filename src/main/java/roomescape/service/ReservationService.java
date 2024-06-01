@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.Reservations;
 import roomescape.domain.Waiting;
 import roomescape.dto.AdminReservationDetailResponse;
 import roomescape.dto.AdminReservationRequest;
@@ -51,57 +50,34 @@ public class ReservationService {
         this.memberRepository = memberRepository;
     }
 
-    public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
+    public ReservationResponse save(LoginMember loginMember, ReservationRequest request) {
+        validateDuplicatedReservation(request);
 
-        Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED);
-
-        Reservations reservations = new Reservations(reservationRepository.findAll());
-        if (reservations.hasSameReservation(reservation)) {
-            throw new RoomescapeException(
-                    DUPLICATE_RESERVATION,
-                    reservationRequest.date(),
-                    reservationRequest.themeId(),
-                    reservationRequest.timeId());
-        }
-
+        Reservation reservation = getReservation(loginMember.getId(), request, ReservationStatus.BOOKED);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
-    public ReservationResponse saveWaiting(LoginMember loginMember, ReservationRequest reservationRequest) {
+    public ReservationResponse saveByAdmin(AdminReservationRequest adminReservationRequest) {
+        ReservationRequest request = ReservationRequest.from(adminReservationRequest);
+        validateDuplicatedReservation(request);
 
-        Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.WAITING);
-        Reservations reservations = new Reservations(reservationRepository.findAllByMemberId(loginMember.getId()));
-        if (reservations.hasSameReservation(reservation)) {
-            throw new RoomescapeException(
-                    DUPLICATE_WAITING_RESERVATION,
-                    loginMember.getId(),
-                    reservationRequest.date(),
-                    reservationRequest.themeId(),
-                    reservationRequest.timeId());
-        }
-        return ReservationResponse.from(reservationRepository.save(reservation));
-    }
-
-    public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
-
-        Reservation beforeSaveReservation = getReservation(
-                reservationRequest.memberId(),
-                new ReservationRequest(
-                        reservationRequest.date(),
-                        reservationRequest.timeId(),
-                        reservationRequest.themeId()),
-                ReservationStatus.BOOKED);
-
-        Reservations reservations = new Reservations(reservationRepository.findAll());
-        if (reservations.hasSameReservation(beforeSaveReservation)) {
-            throw new RoomescapeException(
-                    DUPLICATE_RESERVATION,
-                    reservationRequest.date(),
-                    reservationRequest.themeId(),
-                    reservationRequest.timeId());
-        }
-
+        Reservation beforeSaveReservation = getReservation(adminReservationRequest.memberId(), request, ReservationStatus.BOOKED);
         return ReservationResponse.from(reservationRepository.save(beforeSaveReservation));
+    }
+
+    private void validateDuplicatedReservation(ReservationRequest request) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId())) {
+            throw new RoomescapeException(DUPLICATE_RESERVATION, request.date(), request.themeId(), request.timeId());
+        }
+    }
+
+    public ReservationResponse saveWaiting(LoginMember loginMember, ReservationRequest request) {
+        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(loginMember.getId(), request.date(), request.timeId(), request.themeId())) {
+            throw new RoomescapeException(DUPLICATE_WAITING_RESERVATION, loginMember.getId(), request.date(), request.themeId(), request.timeId());
+        }
+
+        Reservation reservation = getReservation(loginMember.getId(), request, ReservationStatus.WAITING);
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
 
@@ -126,33 +102,19 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllReservations() {
-        Reservations reservations = new Reservations(reservationRepository.findAllByStatus(ReservationStatus.BOOKED));
-        return reservations.getReservations().stream()
-                .map(ReservationResponse::from)
-                .toList();
+        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.BOOKED);
+        return toReservationResponses(reservations);
     }
 
     public List<ReservationResponse> searchReservation(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo) {
-        Reservations reservations = new Reservations(reservationRepository.findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, dateFrom, dateTo));
-        return reservations.booked().stream()
-                .map(ReservationResponse::from)
-                .toList();
+        List<Reservation> reservations = reservationRepository.findByThemeIdAndMemberIdAndStatusAndDateBetween(themeId, memberId, ReservationStatus.BOOKED, dateFrom, dateTo);
+        return toReservationResponses(reservations);
     }
 
-    @Transactional
-    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
-        Reservations reservations = new Reservations(reservationRepository.findAllByMemberId(memberId));
-        List<Waiting> waitings = reservations.waiting().stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
-                .filter(waiting -> !waiting.isOver())
+    private List<ReservationResponse> toReservationResponses(List<Reservation> reservations) {
+        return reservations.stream()
+                .map(ReservationResponse::from)
                 .toList();
-        return ReservationDetailResponse.of(reservations, waitings);
     }
 
     @Transactional
@@ -166,18 +128,34 @@ public class ReservationService {
     }
 
     @Transactional
+    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
+        List<Reservation> waitingReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.WAITING);
+        List<Waiting> waitings = getWaitings(waitingReservations);
+
+        List<Reservation> bookedReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.BOOKED);
+        return ReservationDetailResponse.of(bookedReservations, waitings);
+    }
+
+    @Transactional
     public List<AdminReservationDetailResponse> findAllWaitingReservations() {
         List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
-        return reservations.stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
-                .filter(waiting -> !waiting.isOver())
+        return getWaitings(reservations).stream()
                 .map(AdminReservationDetailResponse::from)
                 .toList();
+    }
+
+    private List<Waiting> getWaitings(List<Reservation> reservations) {
+        return reservations.stream()
+                .map(reservation -> Waiting.of(reservation, findWaitingRanking(reservation)))
+                .filter(Waiting::remainsWaitingRank)
+                .toList();
+    }
+
+    private long findWaitingRanking(Reservation reservation) {
+        return reservationRepository.findAndCountWaitingNumber(
+                reservation.getDate(),
+                reservation.getReservationTime(),
+                reservation.getTheme(),
+                reservation.getCreatedAt());
     }
 }

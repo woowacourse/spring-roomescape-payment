@@ -15,10 +15,10 @@ public record AdminReservationDetailResponse(
         LocalTime time
 ) {
     public static AdminReservationDetailResponse from(Waiting waiting) {
-        Reservation reservation = waiting.reservation();
+        Reservation reservation = waiting.getReservation();
         return new AdminReservationDetailResponse(
                 reservation.getId(),
-                waiting.rank(),
+                waiting.getRank(),
                 reservation.getLoginMember().getName(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),

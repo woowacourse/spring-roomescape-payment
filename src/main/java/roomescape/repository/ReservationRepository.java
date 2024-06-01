@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByThemeAndDate(Theme theme, LocalDate date);
 
-    List<Reservation> findByThemeIdAndMemberIdAndDateBetween(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo);
+    List<Reservation> findByThemeIdAndMemberIdAndStatusAndDateBetween(Long themeId, Long memberId, ReservationStatus status, LocalDate dateFrom, LocalDate dateTo);
 
     @Query("""
             SELECT r.theme, COUNT(r) AS themeCount 
@@ -31,8 +31,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByTimeId(long timeId);
 
     boolean existsByThemeId(long themeId);
-
-    List<Reservation> findAllByMemberId(long memberId);
 
     void deleteByMemberIdAndId(long memberId, long reservationId);
 
@@ -49,4 +47,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("createdAt") LocalDateTime localDateTime);
 
     List<Reservation> findAllByStatus(ReservationStatus status);
+
+    List<Reservation> findAllByMemberIdAndStatus(long memberId, ReservationStatus status);
+
+    boolean existsByDateAndTimeIdAndThemeId(LocalDate date, long timeId, long themeId);
+
+    boolean existsByMemberIdAndDateAndTimeIdAndThemeId(long memberId, LocalDate date, long timeId, long themeId);
 }

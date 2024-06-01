@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import roomescape.domain.Members;
 import roomescape.dto.MemberResponse;
+import roomescape.entity.Member;
 import roomescape.repository.MemberRepository;
 
 @Service
@@ -17,9 +17,9 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-
     public List<MemberResponse> findAll() {
-        return new Members(memberRepository.findAll()).getMembers().stream()
+        List<Member> members = memberRepository.findAll();
+        return members.stream()
                 .map(MemberResponse::from)
                 .toList();
     }
