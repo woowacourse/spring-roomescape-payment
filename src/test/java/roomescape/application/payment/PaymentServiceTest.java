@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import roomescape.application.ServiceTest;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
@@ -24,12 +23,9 @@ import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.BookStatus;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationTimeRepository;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.ThemeRepository;
-import roomescape.fixture.MemberFixture;
-import roomescape.fixture.ReservationFixture;
 
 @ServiceTest
 @ExtendWith(MockitoExtension.class)
@@ -37,9 +33,6 @@ class PaymentServiceTest {
 
     @Autowired
     private ReservationPaymentRepository reservationPaymentRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
 
     @Autowired
     private ThemeRepository themeRepository;
