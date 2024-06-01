@@ -20,4 +20,6 @@ jwt:
   secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
 
 payment:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    payment-url: https://api.tosspayments.com
