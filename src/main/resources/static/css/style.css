@@ -9,6 +9,10 @@
     display: none; /* 드롭다운 화살표 제거 */
 }
 
+.dropdown-menu{
+    left: -50%;
+}
+
 .nav-item {
     margin-right: 10px; /* 네비게이션 간격 조정 */
 }
