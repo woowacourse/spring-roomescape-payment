@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -18,11 +19,10 @@ import roomescape.payment.dto.RestClientPaymentCancelRequest;
 
 public class PaymentRestClient {
 
-    public static final String BASIC = "Basic ";
-    public static final String INVALID_ORDER_ID_CODE = "INVALID_ORDER_ID";
-    public static final String INVALID_API_KEY_CODE = "INVALID_API_KEY";
-    public static final String UNAUTHORIZED_KEY_CODE = "UNAUTHORIZED_KEY";
-    public static final String INCORRECT_BASIC_AUTH_FORMAT_CODE = "INCORRECT_BASIC_AUTH_FORMAT";
+    private static final String BASIC = "Basic ";
+    private static final Set<String> INTERNAL_SERVER_ERROR_CODES = Set.of(
+            "INVALID_ORDER_ID", "INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT"
+    );
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestClient restClient;
@@ -80,8 +80,7 @@ public class PaymentRestClient {
         String code = Objects.requireNonNull(response.code());
         String message = Objects.requireNonNull(response.message());
 
-        if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
-            code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
+        if (INTERNAL_SERVER_ERROR_CODES.contains(code)) {
             throwInternalServerError();
         }
         throw new RoomEscapeException(message, ExceptionTitle.ILLEGAL_USER_REQUEST);
