@@ -17,7 +17,7 @@ import roomescape.dto.reservationtime.ReservationTimeRequest;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.booking.time.module.TimeRegisterService;
 
-@Sql("/all-test-data.sql")
+@Sql("/test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TimeRegisterServiceTest {
@@ -30,13 +30,13 @@ class TimeRegisterServiceTest {
 
     @Test
     void 시간_등록() {
-        //given
+        // given
         ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.parse("00:00"));
 
-        //when
+        // when
         Long timeId = timeRegisterService.registerTime(reservationTimeRequest);
 
-        //then
+        // then
         ReservationTime time = timeRepository.findById(timeId).orElseThrow();
         assertAll(
                 () -> assertThat(time.getId()).isEqualTo(timeId),
@@ -46,10 +46,10 @@ class TimeRegisterServiceTest {
 
     @Test
     void 동일한_시간을_추가할_경우_예외_발생() {
-        //given
+        // given
         ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.parse("10:00"));
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> timeRegisterService.registerTime(reservationTimeRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }

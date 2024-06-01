@@ -16,7 +16,7 @@ import roomescape.dto.theme.ThemeRequest;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.theme.module.ThemeRegisterService;
 
-@Sql("/all-test-data.sql")
+@Sql("/test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ThemeRegisterServiceTest {
@@ -33,7 +33,7 @@ class ThemeRegisterServiceTest {
         ThemeRequest themeRequest = new ThemeRequest("테마명", "테마설명테마설명테마설명", "썸네일명");
 
         //when
-        Long themeId = themeRegisterService.resisterTheme(themeRequest);
+        Long themeId = themeRegisterService.registerTheme(themeRequest);
 
         //then
         Theme theme = themeRepository.findById(themeId).orElseThrow();
@@ -50,7 +50,7 @@ class ThemeRegisterServiceTest {
         ThemeRequest themeRequest = new ThemeRequest("테마1", "테마설명테마설명테마설명", "썸네일명");
 
         //when, then
-        assertThatThrownBy(() -> themeRegisterService.resisterTheme(themeRequest))
+        assertThatThrownBy(() -> themeRegisterService.registerTheme(themeRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

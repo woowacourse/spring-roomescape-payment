@@ -4,20 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.waiting.Waiting;
 import roomescape.repository.WaitingRepository;
+import roomescape.service.ServiceBaseTest;
 
-@Sql("/waiting-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class WaitingCancelServiceTest {
+class WaitingCancelServiceTest extends ServiceBaseTest {
 
     @Autowired
     WaitingCancelService waitingCancelService;
@@ -27,13 +20,13 @@ class WaitingCancelServiceTest {
 
     @Test
     void 예약_대기_취소후_자동으로_다음_대기번호_변경() {
-        //given
+        // given
         int waitingOrderBefore = waitingRepository.findById(2L).orElseThrow().getWaitingOrderValue();
 
-        //when
+        // when
         waitingCancelService.cancelWaiting(1L);
 
-        //then
+        // then
         List<Waiting> allWaiting = waitingRepository.findAll();
         Waiting waiting = waitingRepository.findById(2L).orElseThrow();
 

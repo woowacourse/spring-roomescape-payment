@@ -6,12 +6,10 @@ import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class AuthorizationExtractorTest {
+class AuthorizationExtractorTest extends BaseTest {
 
     @Test
     void 요청_쿠키에서_토큰을_추출() {
@@ -28,5 +26,4 @@ class AuthorizationExtractorTest {
         //then
         assertThat(token).isEqualTo("expectedToken");
     }
-
 }

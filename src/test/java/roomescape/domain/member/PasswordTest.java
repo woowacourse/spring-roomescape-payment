@@ -2,19 +2,17 @@ package roomescape.domain.member;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class PasswordTest {
+class PasswordTest extends BaseTest {
 
     @Test
     void 비밀번호가_4자_미만일_경우_예외_발생() {
-        //given
+        // given
         String password = "123";
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> new Password(password))
                 .isInstanceOf(IllegalArgumentException.class);
     }

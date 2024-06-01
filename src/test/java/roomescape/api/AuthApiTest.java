@@ -2,32 +2,22 @@ package roomescape.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.LoginTestSetting.getCookieByLogin;
+import static roomescape.TestFixture.USER_EMAIL;
+import static roomescape.TestFixture.USER_NAME;
+import static roomescape.TestFixture.USER_PASSWORD;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Cookie;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.login.LoginCheckResponse;
 import roomescape.dto.login.LoginRequest;
 import roomescape.infrastructure.auth.JwtProvider;
 
-@Sql("/member-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class AuthApiTest {
-
-    private static final String NAME = "테드";
-    private static final String EMAIL = "test@email.com";
-    private static final String PASSWORD = "123456";
+class AuthApiTest extends ApiBaseTest {
 
     @Autowired
     JwtProvider jwtProvider;
@@ -40,7 +30,7 @@ class AuthApiTest {
         String token = RestAssured
                 .given().log().all()
                 .port(port)
-                .body(new LoginRequest(EMAIL, PASSWORD))
+                .body(new LoginRequest(USER_EMAIL, USER_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/login")
                 .then().log().all()
@@ -56,7 +46,7 @@ class AuthApiTest {
 
     @Test
     void 로그인_사용자_조회() {
-        Cookie cookieByLogin = getCookieByLogin(port, EMAIL, PASSWORD);
+        Cookie cookieByLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
 
         LoginCheckResponse response = RestAssured
                 .given().log().all()
@@ -67,6 +57,6 @@ class AuthApiTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value()).extract().as(LoginCheckResponse.class);
 
-        assertThat(response.name()).isEqualTo(NAME);
+        assertThat(response.name()).isEqualTo(USER_NAME);
     }
 }

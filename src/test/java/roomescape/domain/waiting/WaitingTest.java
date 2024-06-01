@@ -2,32 +2,32 @@ package roomescape.domain.waiting;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
+import roomescape.BaseTest;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
-import roomescape.repository.ReservationRepository;
+import roomescape.domain.reservation.Status;
+import roomescape.domain.theme.Theme;
+import roomescape.domain.time.ReservationTime;
 
-@Sql("/all-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class WaitingTest {
-
-    @Autowired
-    ReservationRepository reservationRepository;
+class WaitingTest extends BaseTest {
 
     @Test
     void 확정된_예약으로_대기번호_생성할_경우_예외() {
-        //given
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        // given
+        Reservation reservation = new Reservation(
+                LocalDate.now(),
+                new ReservationTime(LocalTime.now()),
+                new Theme("테마명", "테마설명테마설명테마설명", "썸네일"),
+                new Member("이름", "이메일", "비밀번호", Role.USER),
+                Status.RESERVED
+        );
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> new Waiting(reservation, 1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
 }

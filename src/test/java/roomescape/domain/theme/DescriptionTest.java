@@ -2,19 +2,17 @@ package roomescape.domain.theme;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class DescriptionTest {
+class DescriptionTest extends BaseTest {
 
     @Test
     void 설명이_10자_미만일_경우_예외_발생() {
-        //given
+        // given
         String name = "123456789";
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> new Description(name))
                 .isInstanceOf(IllegalArgumentException.class);
     }

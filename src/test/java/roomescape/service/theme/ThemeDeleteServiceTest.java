@@ -4,21 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
 import roomescape.repository.ThemeRepository;
+import roomescape.service.ServiceBaseTest;
 import roomescape.service.theme.module.ThemeDeleteService;
 
-@Sql("/all-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ThemeDeleteServiceTest {
+class ThemeDeleteServiceTest extends ServiceBaseTest {
 
     @Autowired
     ThemeDeleteService themeDeleteService;
@@ -26,21 +20,26 @@ class ThemeDeleteServiceTest {
     @Autowired
     ThemeRepository themeRepository;
 
+    @Sql("/reset-data.sql")
     @Test
     void 테마_삭제() {
-        //when
-        themeDeleteService.deleteTheme(2L);
+        // given
+        themeRepository.save(new Theme("테마1", "설명 설명 설명 설명", "썸네일"));
+        themeRepository.save(new Theme("테마2", "설명 설명 설명 설명", "썸네일"));
 
-        //when
+        // when
+        themeDeleteService.deleteTheme(1L);
+
+        // when
         List<Theme> allThemes = themeRepository.findAll();
         assertThat(allThemes).extracting(Theme::getId)
                 .isNotEmpty()
-                .doesNotContain(2L);
+                .doesNotContain(1L);
     }
 
     @Test
     void 예약_되어있는_테마를_삭제할_경우_예외_발생() {
-        //then
+        // then
         assertThatThrownBy(() -> themeDeleteService.deleteTheme(1L))
                 .isInstanceOf(IllegalArgumentException.class);
     }

@@ -3,60 +3,52 @@ package roomescape.api;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
-import static roomescape.LoginTestSetting.getCookieByLogin;
+import static roomescape.TestFixture.ADMIN_EMAIL;
+import static roomescape.TestFixture.ADMIN_PASSWORD;
+import static roomescape.TestFixture.USER_EMAIL;
+import static roomescape.TestFixture.USER_PASSWORD;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
 import java.time.LocalDate;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
-import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.infrastructure.auth.JwtProvider;
-import roomescape.service.booking.reservation.module.PaymentService;
+import roomescape.infrastructure.payment.TossPaymentClient;
 
-@Sql("/member-theme-time-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ReservationApiTest {
+class ReservationApiTest extends ApiBaseTest {
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     JwtProvider jwtProvider;
 
     @MockBean
-    PaymentService paymentService;
-
-    @LocalServerPort
-    int port;
+    TossPaymentClient tossPaymentClient;
 
     @Test
     void 사용자_예약_추가() {
-        Cookie cookieByUserLogin = getCookieByLogin(port, "ted@email.com", "123456");
+        Cookie cookieByUserLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
         String userAccessToken = cookieByUserLogin.getValue();
         String userId = jwtProvider.getSubject(userAccessToken);
 
         UserReservationRequest userReservationRequest = createUserReservationRequest();
 
-        UserReservationPaymentRequest userReservationPaymentRequest = new UserReservationPaymentRequest(
-                LocalDate.now().plusDays(7), 1L, 1L, 1L, "paymentKey", "orderId", 1000, "paymentType");
-
-        PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
+        PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
-        Mockito.when(paymentService.pay(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(tossPaymentClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
 
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .contentType(ContentType.JSON)
                 .cookie(cookieByUserLogin)
@@ -64,8 +56,8 @@ class ReservationApiTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)
-                .header("Location", "/reservations/1")
-                .body("id", equalTo(1))
+                .header("Location", "/reservations/33")
+                .body("id", equalTo(33))
                 .body("date", equalTo(userReservationRequest.date().toString()))
                 .body("time.id", equalTo(userReservationRequest.timeId().intValue()))
                 .body("theme.id", equalTo(userReservationRequest.themeId().intValue()))
@@ -74,10 +66,11 @@ class ReservationApiTest {
 
     @Test
     void 관리자_예약_추가() {
-        Cookie cookieByAdminLogin = getCookieByLogin(port, "admin@email.com", "123456");
-        ReservationRequest reservationRequest = createReservationRequest(2L, 1L);
+        Cookie cookieByAdminLogin = getCookieByLogin(port, ADMIN_EMAIL, ADMIN_PASSWORD);
+        ReservationRequest reservationRequest = createReservationRequest();
 
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .contentType(ContentType.JSON)
                 .cookie(cookieByAdminLogin)
@@ -85,8 +78,8 @@ class ReservationApiTest {
                 .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201)
-                .header("Location", "/reservations/1")
-                .body("id", equalTo(1))
+                .header("Location", "/reservations/33")
+                .body("id", equalTo(33))
                 .body("date", equalTo(reservationRequest.date().toString()))
                 .body("time.id", equalTo(reservationRequest.timeId().intValue()))
                 .body("theme.id", equalTo(reservationRequest.themeId().intValue()))
@@ -95,70 +88,61 @@ class ReservationApiTest {
 
     @Test
     void 예약_단일_조회() {
-        ReservationRequest reservationRequest = createReservationRequest(2L, 1L);
-        addReservation(reservationRequest);
-
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .when().get("/reservations/1")
                 .then().log().all()
                 .statusCode(200)
                 .body("id", equalTo(1))
-                .body("date", equalTo(reservationRequest.date().toString()))
-                .body("time.id", equalTo((reservationRequest.timeId().intValue())))
-                .body("theme.id", equalTo(reservationRequest.themeId().intValue()))
-                .body("member.id", equalTo(reservationRequest.memberId().intValue()));
+                .body("date", equalTo(LocalDate.now().minusDays(9).toString()))
+                .body("time.id", equalTo(3))
+                .body("theme.id", equalTo(12))
+                .body("member.id", equalTo(3));
     }
 
     @Test
     void 예약_전체_조회() {
-        ReservationRequest reservationRequest = createReservationRequest(2L, 1L);
-        addReservation(reservationRequest);
-
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("size()", is(32));
     }
 
     @Test
     void 사용자_예약_전체_조회() {
-        ReservationRequest otherUserReservationRequest = createReservationRequest(2L, 1L);
-        ReservationRequest userReservationRequest = createReservationRequest(3L, 2L);
-        addReservation(otherUserReservationRequest);
-        addReservation(userReservationRequest);
+        Cookie cookieByUserLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
 
-        Cookie cookieByUserLogin = getCookieByLogin(port, "atom@email.com", "123456");
-
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .cookie(cookieByUserLogin)
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("size()", is(29));
     }
 
-    @Sql("/reservation-filter-api-test-data.sql")
     @Test
     void 예약_조회시_조회필터_적용하여_조회() {
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
-                .when().get("/reservations?member=1")
+                .when().get("/reservations?member=2&theme=1")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(2))
-                .body("member.id", everyItem(is(1)));
+                .body("size()", is(8))
+                .body("member.id", everyItem(is(2)))
+                .body("theme.id", everyItem(is(1)));
     }
 
     @Test
     void 예약_삭제() {
-        ReservationRequest reservationRequest = createReservationRequest(2L, 1L);
-        addReservation(reservationRequest);
-
-        RestAssured.given().log().all()
+        RestAssured
+                .given().log().all()
                 .port(port)
                 .when().delete("/reservations/1")
                 .then().log().all()
@@ -166,20 +150,23 @@ class ReservationApiTest {
     }
 
     private UserReservationRequest createUserReservationRequest() {
-        return new UserReservationRequest(LocalDate.now().plusDays(1), 1L, 1L);
+        return new UserReservationRequest(
+                LocalDate.now().plusDays(10),
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                1000,
+                "paymentType"
+        );
     }
 
-    private ReservationRequest createReservationRequest(Long memberId, Long timeId) {
-        return new ReservationRequest(LocalDate.now().plusDays(1), timeId, 1L, memberId);
-    }
-
-    private void addReservation(ReservationRequest reservationRequest) {
-        Cookie cookieByAdminLogin = getCookieByLogin(port, "admin@email.com", "123456");
-        RestAssured.given().log().all()
-                .port(port)
-                .cookie(cookieByAdminLogin)
-                .contentType(ContentType.JSON)
-                .body(reservationRequest)
-                .when().post("/admin/reservations");
+    private ReservationRequest createReservationRequest() {
+        return new ReservationRequest(
+                LocalDate.now().plusDays(10),
+                1L,
+                1L,
+                2L
+        );
     }
 }

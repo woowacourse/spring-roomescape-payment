@@ -3,12 +3,10 @@ package roomescape.infrastructure.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class PasswordEncoderTest {
+class PasswordEncoderTest extends BaseTest {
 
     PasswordEncoder passwordEncoder = new PasswordEncoder();
 

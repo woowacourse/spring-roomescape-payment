@@ -54,7 +54,7 @@ public class AuthService {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "[ERROR] 등록된 아이디가 아닙니다.",
-                        new Throwable("id(email) : " + email)
+                        new Throwable("id(email) : " + email.getEmail())
                 ));
     }
 

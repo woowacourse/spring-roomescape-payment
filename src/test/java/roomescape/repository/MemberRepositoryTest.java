@@ -1,32 +1,29 @@
 package roomescape.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.TestFixture.USER_EMAIL;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
 
-@DataJpaTest
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class MemberRepositoryTest {
+@Sql("/test-data.sql")
+class MemberRepositoryTest extends RepositoryBaseTest{
 
     @Autowired
     MemberRepository memberRepository;
 
     @Test
     void 등록된_이메일로_멤버_조회() {
-        //given
-        Member sevedMember = memberRepository.save(new Member("ted", "ted@email.com", "123456", Role.USER));
+        // given
+        Email email = new Email(USER_EMAIL);
 
-        //when
-        Member findMember = memberRepository.findByEmail(new Email(sevedMember.getEmail())).orElseThrow();
+        // when
+        Member member = memberRepository.findByEmail(email).orElseThrow();
 
-        //then
-        assertThat(findMember.getEmail()).isEqualTo(sevedMember.getEmail());
+        // then
+        assertThat(member.getEmail()).isEqualTo(email.getEmail());
     }
 }

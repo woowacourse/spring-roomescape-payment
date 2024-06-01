@@ -2,29 +2,27 @@ package roomescape.domain.theme;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ThemeNameTest {
+class ThemeNameTest extends BaseTest {
 
     @Test
     void 테마명이_비어있을_경우_예외_발생() {
-        //given
+        // given
         String themeName = "";
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> new ThemeName(themeName))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 테마명이_20자_초과인_경우_예외_발생() {
-        //given
+        // given
         String themeName = "123456789012345678901";
 
-        //when, then
+        // when, then
         assertThatThrownBy(() -> new ThemeName(themeName))
                 .isInstanceOf(IllegalArgumentException.class);
     }

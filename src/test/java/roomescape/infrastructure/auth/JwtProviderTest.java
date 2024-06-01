@@ -2,36 +2,29 @@ package roomescape.infrastructure.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.TestFixture.USER_EMAIL;
+import static roomescape.TestFixture.USER_ID;
+import static roomescape.TestFixture.USER_NAME;
+import static roomescape.TestFixture.USER_ROLE;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
-import roomescape.domain.member.Member;
+import roomescape.BaseTest;
 import roomescape.domain.member.Role;
 import roomescape.dto.member.MemberPayload;
-import roomescape.repository.MemberRepository;
 import roomescape.util.DateUtil;
 
-@Sql("/member-test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class JwtProviderTest {
-
+@SpringBootTest(classes = JwtProvider.class)
+class JwtProviderTest extends BaseTest {
 
     @Autowired
     JwtProvider jwtProvider;
-
-    @Autowired
-    MemberRepository memberRepository;
 
     @Value("${security.jwt.token.secret-key}")
     String secretKey;
@@ -39,8 +32,7 @@ class JwtProviderTest {
     @Test
     void 사용자의_정보가_포함된_토큰을_생성() {
         //given
-        Member member = memberRepository.findById(1L).orElseThrow();
-        MemberPayload memberPayLoad = createMemberPayLoad(member);
+        MemberPayload memberPayLoad = createMemberPayLoad();
 
         //when
         String token = jwtProvider.createToken(memberPayLoad);
@@ -53,18 +45,17 @@ class JwtProviderTest {
         Role role = Role.valueOf(claims.get("role", String.class));
 
         assertAll(
-                () -> assertThat(member.getId()).isEqualTo(id),
-                () -> assertThat(member.getName()).isEqualTo(name),
-                () -> assertThat(member.getEmail()).isEqualTo(email),
-                () -> assertThat(member.getRole()).isEqualTo(role)
+                () -> assertThat(Long.parseLong(memberPayLoad.id())).isEqualTo(id),
+                () -> assertThat(memberPayLoad.name()).isEqualTo(name),
+                () -> assertThat(memberPayLoad.email()).isEqualTo(email),
+                () -> assertThat(memberPayLoad.role()).isEqualTo(role)
         );
     }
 
     @Test
     void 유효한_토큰일_경우_true() {
         //given
-        Member member = memberRepository.findById(1L).orElseThrow();
-        MemberPayload memberPayLoad = createMemberPayLoad(member);
+        MemberPayload memberPayLoad = createMemberPayLoad();
         String validToken = jwtProvider.createToken(memberPayLoad);
 
         //when
@@ -77,8 +68,7 @@ class JwtProviderTest {
     @Test
     void 유효한_토큰이_아닐_경우_false() {
         //given
-        Member member = memberRepository.findById(1L).orElseThrow();
-        MemberPayload memberPayLoad = createMemberPayLoad(member);
+        MemberPayload memberPayLoad = createMemberPayLoad();
         String expiredToken = createExpiredToken(memberPayLoad);
 
         //when
@@ -88,12 +78,12 @@ class JwtProviderTest {
         assertThat(result).isFalse();
     }
 
-    private MemberPayload createMemberPayLoad(Member member) {
+    private MemberPayload createMemberPayLoad() {
         return new MemberPayload(
-                member.getId().toString(),
-                member.getName(),
-                member.getEmail(),
-                member.getRole()
+                USER_ID.toString(),
+                USER_NAME,
+                USER_EMAIL,
+                Role.valueOf(USER_ROLE)
         );
     }
 
