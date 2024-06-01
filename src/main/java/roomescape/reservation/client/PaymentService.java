@@ -55,7 +55,7 @@ public class PaymentService {
                     .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
                     .body(PaymentErrorResponse.class);
         } catch (ResourceAccessException exception) {
-            throw new RuntimeException();
+            throw new RuntimeException("외부 시스템과의 연동에 실패했거나 응답을 가져올 수 없습니다.");
         }
     }
 
