@@ -13,8 +13,8 @@ public class ClientHttpRequestConfig {
     private final int connectTimeoutSeconds;
     private final int readTimeoutSeconds;
 
-    public ClientHttpRequestConfig(@Value("${payment.connection-timeout}") int connectTimeoutSeconds,
-                                   @Value("${payment.read-timeout}") int readTimeoutSeconds) {
+    public ClientHttpRequestConfig(@Value("${payment.connection-timeout-seconds}") int connectTimeoutSeconds,
+                                   @Value("${payment.read-timeout-seconds}") int readTimeoutSeconds) {
         this.connectTimeoutSeconds = connectTimeoutSeconds;
         this.readTimeoutSeconds = readTimeoutSeconds;
     }

@@ -20,7 +20,7 @@ security:
       expire-length: 5
 payment:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  connection-timeout: 10
-  read-timeout: 30
+  connection-timeout-seconds: 10
+  read-timeout-seconds: 30
   base-url: https://api.tosspayments.com/v1/payments
   confirm-url: /confirm
