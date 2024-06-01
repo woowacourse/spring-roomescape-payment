@@ -117,9 +117,10 @@ class AdminReservationServiceTest {
     @Test
     void save_TodayPastTimeReservation() {
         LocalDate today = LocalDate.now();
-        String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
+        LocalTime oneMinuteAgo = LocalTime.now().minusMinutes(1);
+        oneMinuteAgo = oneMinuteAgo.withNano(0);
 
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo));
+        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
 
         assertThatThrownBy(() -> adminReservationService.reserve(userId, today, savedTime.getId(), themeId))
             .isInstanceOf(RoomescapeException.class)

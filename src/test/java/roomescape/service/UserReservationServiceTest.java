@@ -62,8 +62,6 @@ class UserReservationServiceTest {
         memberRepository.save(new Member("트레", "tretre@test.com", "123a!", Role.USER));
         themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
         reservationTimeRepository.save(new ReservationTime("08:00"));
-        String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
-        reservationTimeRepository.save(new ReservationTime(oneMinuteAgo));
     }
 
     @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
@@ -118,6 +116,7 @@ class UserReservationServiceTest {
     void save_TodayPastTimeReservation() {
         LocalDate today = LocalDate.now();
         LocalTime oneMinuteAgo = LocalTime.now().minusMinutes(1);
+        oneMinuteAgo = oneMinuteAgo.withNano(0);
 
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
 
