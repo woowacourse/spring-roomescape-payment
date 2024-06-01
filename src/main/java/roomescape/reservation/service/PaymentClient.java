@@ -25,14 +25,14 @@ public class PaymentClient {
     @Value("${third-party-api.payment.secret-key}")
     private String secretKey;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public PaymentClient() {
         this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
     }
 
     public void requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
-        ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         restClient.post()
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
