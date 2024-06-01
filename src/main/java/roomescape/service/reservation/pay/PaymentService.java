@@ -1,9 +1,9 @@
 package roomescape.service.reservation.pay;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import roomescape.config.PaymentConfig;
 import roomescape.controller.HeaderGenerator;
 import roomescape.exception.customexception.api.ApiException;
 import roomescape.service.dto.request.PaymentApproveRequest;
@@ -17,19 +17,16 @@ import java.util.Base64;
 @Service
 public class PaymentService {
     // TODO HeadGenerator 받지 않기
-    @Value("${payment.approve-end-point")
-    private static String PAYMENT_APPROVE_ENDPOINT;
-
-    @Value("${payment.cancel-end-point")
-    private static String PAYMENT_CANCEL_ENDPOINT;
-
-    @Value("${payment.secret-key}")
-    private static String SECRET_KEY;
-
+    private final PaymentConfig paymentConfig;
     private final IdemPotencyKeyGenerator generator;
     private final RestTemplate restTemplate;
 
-    public PaymentService(IdemPotencyKeyGenerator generator, RestTemplate restTemplate) {
+    public PaymentService(
+            PaymentConfig paymentConfig,
+            IdemPotencyKeyGenerator generator,
+            RestTemplate restTemplate
+    ) {
+        this.paymentConfig = paymentConfig;
         this.generator = generator;
         this.restTemplate = restTemplate;
     }
@@ -37,7 +34,7 @@ public class PaymentService {
 
     public PaymentApproveResponse pay(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
         ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
-                PAYMENT_APPROVE_ENDPOINT,
+                paymentConfig.getApproveUrl(),
                 new HttpEntity<>(paymentApproveRequest, header()),
                 PaymentApproveResponse.class
         );
@@ -52,7 +49,7 @@ public class PaymentService {
         headers.add("Idempotency-Key", generator.generate());
 
         ResponseEntity<PaymentCancelResponse> response = restTemplate.postForEntity(
-                String.format(PAYMENT_CANCEL_ENDPOINT, paymentCancelRequest.paymentKey()),
+                String.format(paymentConfig.getCancelUrl(), paymentCancelRequest.paymentKey()),
                 new HttpEntity<>(headers),
                 PaymentCancelResponse.class
         );
@@ -75,7 +72,7 @@ public class PaymentService {
 
     private String encodeSecretKey() {
         return Base64.getEncoder()
-                .encodeToString((SECRET_KEY + ":")
+                .encodeToString((paymentConfig.getSecretKey() + ":")
                         .getBytes(StandardCharsets.UTF_8));
     }
 }
