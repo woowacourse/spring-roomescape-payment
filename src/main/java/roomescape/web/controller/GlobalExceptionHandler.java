@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.dto.payment.TossError;
+import roomescape.exception.ExternalApiTimeoutException;
 import roomescape.exception.TossClientException;
 import roomescape.exception.TossServerException;
 
@@ -70,6 +71,17 @@ class GlobalExceptionHandler {
         logger.log(Level.SEVERE, logMessage);
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, tossError.message());
+    }
+
+    @ExceptionHandler(value = ExternalApiTimeoutException.class)
+    private ProblemDetail handleExternalApiTimeoutException(ExternalApiTimeoutException e) {
+        String logMessage = """
+                [%s]
+                message : %s
+                """.formatted(e.getClass().getName(), e.getMessage());
+        logger.log(Level.SEVERE, logMessage);
+        String errorMessage = "결제 요청이 지연되고 있습니다. 잠시후 다시 시도해주세요.";
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
     }
 
     @ExceptionHandler(value = Exception.class)
