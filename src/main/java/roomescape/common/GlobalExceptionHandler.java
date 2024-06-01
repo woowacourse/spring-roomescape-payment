@@ -3,6 +3,7 @@ package roomescape.common;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import io.jsonwebtoken.JwtException;
+import java.net.SocketTimeoutException;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -109,6 +110,15 @@ public class GlobalExceptionHandler {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
         return ResponseEntity.status(409)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> catchSocketTimeoutException(SocketTimeoutException ex) {
+        logger.warning(EXCEPTION_PREFIX + ex.getClass() + " " + ex.getMessage());
+        String exceptionMessage = "요청 처리 중 처리 중단(Timeout)이 발생했습니다. 잠시 후 다시 시도해 주세요.";
+
+        return ResponseEntity.status(500)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exceptionMessage));
     }
 
     @ExceptionHandler
