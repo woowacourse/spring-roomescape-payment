@@ -31,6 +31,7 @@ import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ import static roomescape.member.domain.Role.USER;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
     protected static final PaymentConfirmRequest paymentConfirmRequest =
-            new PaymentConfirmRequest("key", "orderId", 1000L, "none");
+            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
 
     @LocalServerPort
     private int port;

@@ -34,6 +34,7 @@ import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -68,7 +69,7 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 class ReservationControllerTest extends ControllerTest {
     private static final Cookie COOKIE = new Cookie("token", "token");
     private static final PaymentConfirmRequest paymentConfirmRequest =
-            new PaymentConfirmRequest("key", "orderId", 1000L, "none");
+            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
 
     @MockBean
     private BookingQueryService bookingQueryService;
