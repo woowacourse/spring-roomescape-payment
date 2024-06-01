@@ -8,9 +8,9 @@ import roomescape.RoomescapeApplication;
 @RestControllerAdvice
 public abstract class AbstractExceptionHandler {
 
-    protected static final Logger logger = LoggerFactory.getLogger(RoomescapeApplication.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(RoomescapeApplication.class);
 
     protected void logError(Exception exception) {
-        logger.error("Error occur {}", exception);
+        LOGGER.error("Error occur {}", exception);
     }
 }
