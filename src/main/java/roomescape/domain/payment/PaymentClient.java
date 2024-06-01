@@ -31,8 +31,8 @@ public class PaymentClient {
                 .baseUrl(baseUrl)
                 .requestFactory(ClientHttpRequestFactories.get(
                         ClientHttpRequestFactorySettings.DEFAULTS
-                                .withConnectTimeout(Duration.ofMillis(3))
-                                .withReadTimeout(Duration.ofMillis(3)))
+                                .withConnectTimeout(Duration.ofSeconds(3))
+                                .withReadTimeout(Duration.ofSeconds(3)))
                 ).build();
         this.apiUri = apiUri;
         this.approveSecretKey = approveSecretKey;
