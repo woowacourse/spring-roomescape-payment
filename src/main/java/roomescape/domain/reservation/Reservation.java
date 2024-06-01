@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -22,7 +23,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.reservation.CancelReservationException;
 
@@ -37,15 +39,21 @@ public class Reservation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private ReservationDetail detail;
+    @JoinColumn(name = "theme_id")
+    private Theme theme;
+
+    private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_time_id")
+    private ReservationTime time;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
@@ -55,9 +63,11 @@ public class Reservation {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Reservation(Member member, ReservationDetail detail, Status status) {
+    public Reservation(Member member, Theme theme, LocalDate date, ReservationTime time, Status status) {
         this.member = member;
-        this.detail = detail;
+        this.theme = theme;
+        this.date = date;
+        this.time = time;
         this.status = status;
     }
 
@@ -90,7 +100,7 @@ public class Reservation {
     }
 
     public void validateOwner(Long memberId) {
-        if (member.hasSameId(memberId)) {
+        if (!member.hasSameId(memberId)) {
             throw new AuthenticationFailureException();
         }
     }

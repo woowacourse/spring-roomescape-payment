@@ -1,6 +1,7 @@
 package roomescape.infra.event;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Component;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-
+import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.Theme;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +49,11 @@ public class ReservationEventHandler {
     }
 
     private void pendingNextReservation(Reservation canceledReservation) {
-        reservationRepository.findNextWaiting(canceledReservation.getDetail())
+        Theme theme = canceledReservation.getTheme();
+        LocalDate date = canceledReservation.getDate();
+        ReservationTime time = canceledReservation.getTime();
+
+        reservationRepository.findNextWaiting(theme, date, time)
                 .ifPresent(reservation -> {
                     reservation.toPending();
                     reservationRepository.save(reservation);

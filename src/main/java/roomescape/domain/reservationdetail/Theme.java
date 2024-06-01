@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class Theme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +28,9 @@ public class Theme {
     @Column
     private String thumbnail;
 
-    public Theme(Long id) {
-        this(id, null, null, null);
-    }
-
     public Theme(String name, String description, String thumbnail) {
-        this(null, name, description, thumbnail);
+        this.name = name;
+        this.description = description;
+        this.thumbnail = thumbnail;
     }
 }

@@ -10,7 +10,8 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
-import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.reservation.NotFoundReservationException;
 
 @Repository
@@ -50,8 +51,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public Optional<Reservation> findNextWaiting(ReservationDetail detail) {
-        return reservationJpaRepository.findNextWaitingReservation(detail);
+    public Optional<Reservation> findNextWaiting(Theme theme, LocalDate date, ReservationTime time) {
+        return reservationJpaRepository.findNextWaitingReservation(theme, date, time);
     }
 
     @Override
@@ -60,12 +61,17 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public boolean existsReservation(ReservationDetail detail, Member member, List<Status> status) {
-        return reservationJpaRepository.existsByDetailAndMemberAndStatusIn(detail, member, status);
+    public boolean existsReservation(Theme theme,
+                                     LocalDate date,
+                                     ReservationTime time,
+                                     Member member,
+                                     List<Status> status) {
+        return reservationJpaRepository.existsByThemeAndDateAndTimeAndMemberAndStatusIn(theme, date, time, member,
+                status);
     }
 
     @Override
-    public boolean existsReservation(ReservationDetail detail, List<Status> status) {
-        return reservationJpaRepository.existsByDetailAndStatusIn(detail, status);
+    public boolean existsReservation(Theme theme, LocalDate date, ReservationTime time, List<Status> status) {
+        return reservationJpaRepository.existsByThemeAndDateAndTimeAndStatusIn(theme, date, time, status);
     }
 }

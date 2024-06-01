@@ -22,8 +22,6 @@ import roomescape.domain.reservation.ReservationFactory;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
-import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.domain.reservationdetail.ReservationDetailFactory;
 import roomescape.exception.member.AuthenticationFailureException;
 
 @Service
@@ -36,14 +34,12 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     private final ReservationFactory reservationFactory;
-    private final ReservationDetailFactory reservationDetailFactory;
 
     @Transactional
-    public synchronized ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
+    public ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
         Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationFailureException::new);
-        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
-                request.date(), request.timeId(), request.themeId());
-        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
+        Reservation reservation = reservationFactory.create(
+                request.themeId(), request.date(), request.timeId(), member);
         reservationRepository.save(reservation);
 
         if (reservation.isReserved()) {
@@ -56,12 +52,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public synchronized ReservationResponse saveReservationByAdmin(ReservationRequest request) {
+    public ReservationResponse saveReservationByAdmin(ReservationRequest request) {
         Member member = memberRepository.findMember(request.memberId())
                 .orElseThrow(AuthenticationFailureException::new);
-        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
-                request.date(), request.timeId(), request.themeId());
-        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
+        Reservation reservation = reservationFactory.create(
+                request.themeId(), request.date(), request.timeId(), member);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
     }

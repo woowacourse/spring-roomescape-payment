@@ -17,32 +17,17 @@ public interface ReservationTimeJpaRepository extends Repository<ReservationTime
 
     List<ReservationTime> findAll();
 
-    @Query("""
-            select d.time from ReservationDetail d
-            where d.date = :date
-            and d.theme.id = :themeId
-            and exists (
-                select 1 from Reservation r
-                where r.detail.id = d.id
-                and r.status = 'RESERVED'
-            )
-            """)
+    @Query(value = """
+            select
+            t.id as reservation_time_id,
+            t.start_at as time_value
+            from reservation as r
+            inner join reservation_time as t on r.reservation_time_id = t.id
+            inner join theme as th on r.theme_id = th.id
+            where r.date = :date
+            and r.theme_id = :themeId
+            """, nativeQuery = true)
     List<ReservationTime> findAllReservedTimeByDateAndThemeId(
-            @Param("date") LocalDate date,
-            @Param("themeId") Long themeId
-    );
-
-    @Query("""
-            select d.time from ReservationDetail d
-            where d.date = :date
-            and d.theme.id = :themeId
-            and exists (
-                select 1 from Reservation r
-                where r.detail.id = d.id
-                and r.status = 'RESERVED' or r.status = 'PAYMENT_PENDING'
-            )
-            """)
-    List<ReservationTime> findAllUnAvailableTimes(
             @Param("date") LocalDate date,
             @Param("themeId") Long themeId
     );

@@ -10,7 +10,8 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
-import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.Theme;
 
 public interface ReservationJpaRepository extends Repository<Reservation, Long> {
 
@@ -24,12 +25,10 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
 
     @Query(""" 
             select r from Reservation r
-            join fetch r.member m
-            join fetch r.detail d
-            where r.detail.date >= :start
-            and r.detail.date <= :end
-            and m.id = :memberId
-            and d.theme.id = :themeId
+            where r.date >= :start
+            and r.date <= :end
+            and r.member.id = :memberId
+            and r.theme.id = :themeId
             """)
     List<Reservation> findByPeriodAndThemeAndMember(
             @Param("start") LocalDate start, @Param("end") LocalDate end,
@@ -38,27 +37,35 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
 
     @Query("""
             select r from Reservation r
-            where r.detail = :detail
+            where r.theme = :theme
+            and r.date = :date
+            and r.time = :time
             and r.status = 'WAITING'
             order by r.createdAt
             limit 1
             """)
-    Optional<Reservation> findNextWaitingReservation(@Param("detail") ReservationDetail detail);
+    Optional<Reservation> findNextWaitingReservation(Theme theme, LocalDate date, ReservationTime time);
 
     @Query(""" 
-            select new roomescape.domain.reservation.ReservationWithRank(mine,
-                (select count(r) + 1 from Reservation r
-                where r.createdAt < mine.createdAt
-                and r.detail = mine.detail
-                and r.status = 'WAITING'))
-            from Reservation mine
-            where mine.member.id = :memberId
-            and (mine.detail.date > current_date or (mine.detail.date = current_date
-                and mine.detail.time.startAt > current_time))
+            select new roomescape.domain.reservation.ReservationWithRank
+            (r.id, r.theme.name, r.date, r.time.startAt, r.status, (SELECT count(r2) AS waiting_rank
+            FROM Reservation r2
+            WHERE r.createdAt >= r2.createdAt AND r.time = r2.time AND r.date = r2.date AND r.theme = r2.theme)
+            )
+            from Reservation r
+            where r.member.id = :memberId
+            and (r.date > current_date or (r.date = current_date and r.time.startAt > current_time))
             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
 
-    boolean existsByDetailAndMemberAndStatusIn(ReservationDetail detail, Member member, List<Status> status);
+    boolean existsByThemeAndDateAndTimeAndMemberAndStatusIn(Theme theme,
+                                                            LocalDate date,
+                                                            ReservationTime time,
+                                                            Member member,
+                                                            List<Status> status);
 
-    boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
+    boolean existsByThemeAndDateAndTimeAndStatusIn(Theme theme,
+                                                   LocalDate date,
+                                                   ReservationTime time,
+                                                   List<Status> status);
 }

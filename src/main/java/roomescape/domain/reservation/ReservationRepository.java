@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import roomescape.domain.member.Member;
-import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.Theme;
 
 public interface ReservationRepository {
     Reservation save(Reservation reservation);
@@ -21,9 +22,9 @@ public interface ReservationRepository {
 
     List<ReservationWithRank> findWithRank(Long memberId);
 
-    Optional<Reservation> findNextWaiting(ReservationDetail detail);
+    Optional<Reservation> findNextWaiting(Theme theme, LocalDate date, ReservationTime time);
 
-    boolean existsReservation(ReservationDetail detail, List<Status> status);
+    boolean existsReservation(Theme theme, LocalDate date, ReservationTime time, List<Status> status);
 
-    boolean existsReservation(ReservationDetail detail, Member member, List<Status> status);
+    boolean existsReservation(Theme theme, LocalDate date, ReservationTime time, Member member, List<Status> status);
 }

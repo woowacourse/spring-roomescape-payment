@@ -34,7 +34,7 @@ public class CancelService {
     }
 
     private void updateFirstWaitingToPending(Reservation reservation) {
-        reservationRepository.findNextWaiting(reservation.getDetail())
+        reservationRepository.findNextWaiting(reservation.getTheme(), reservation.getDate(), reservation.getTime())
                 .ifPresent(nextReservation -> {
                     nextReservation.toPending();
                     eventPublisher.publishPaymentPendingEvent(nextReservation);
