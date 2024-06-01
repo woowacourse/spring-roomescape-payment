@@ -10,8 +10,8 @@ public class TossErrorHandler {
     }
 
     public static HttpStatusCode covertStatusCode(final HttpStatusCode statusCode, final String errorCode) {
-        boolean isServerError = Arrays.stream(TossErrorCode.values())
-                .anyMatch(tossErrorCode -> tossErrorCode.name().equals(errorCode));
+        boolean isServerError = Arrays.stream(TossSeverErrorCode.values())
+                .anyMatch(tossSeverErrorCode -> tossSeverErrorCode.name().equals(errorCode));
         if (isServerError) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }

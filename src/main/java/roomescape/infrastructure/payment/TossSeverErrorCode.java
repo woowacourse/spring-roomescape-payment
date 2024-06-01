@@ -1,6 +1,6 @@
 package roomescape.infrastructure.payment;
 
-public enum TossErrorCode {
+public enum TossSeverErrorCode {
     INVALID_API_KEY,
     INVALID_AUTHORIZE_AUTH,
     UNAPPROVED_ORDER_ID,
