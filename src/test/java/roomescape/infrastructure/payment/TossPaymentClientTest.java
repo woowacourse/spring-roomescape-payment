@@ -69,7 +69,9 @@ class TossPaymentClientTest {
                 .andRespond(withBadRequest().body(responseJson));
 
         assertThatCode(() -> tossPaymentClient.approve(paymentApproveDto))
-                .isInstanceOf(RoomescapeException.class);
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.PAYMENT_FAILED);
 
         server.verify();
     }
@@ -88,7 +90,9 @@ class TossPaymentClientTest {
                 .andRespond(withServerError().body(responseJson));
 
         assertThatCode(() -> tossPaymentClient.approve(paymentApproveDto))
-                .isInstanceOf(RoomescapeException.class);
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.INTERNAL_SERVER_ERROR);
 
         server.verify();
     }

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.PaymentClient;
@@ -39,20 +40,28 @@ public class TossPaymentClient implements PaymentClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentApproveDto)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    LOGGER.error("토스 결제 에러 message: {}, body: {}",
-                            response.getStatusCode(),
-                            response.getStatusText());
-                    throw new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
-                            String.format("결제 승인 요청 처리 중 예외가 발생했습니다."));
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    LOGGER.error("TossPaymentClient 서버 에러 message: {}, body: {}",
-                            response.getStatusCode(),
-                            response.getStatusText());
-                    throw new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
-                            String.format("결제 승인 처리 API 서버에서 에러가 발생했습니다."));
-                })
+                .onStatus(HttpStatusCode::is4xxClientError, handleClientError())
+                .onStatus(HttpStatusCode::is5xxServerError, handleServerError())
                 .body(PaymentApproveSuccessDto.class);
+    }
+
+    private ErrorHandler handleClientError() {
+        return (request, response) -> {
+            LOGGER.error("토스 결제 에러 message: {}, body: {}",
+                    response.getStatusCode(),
+                    response.getStatusText());
+            throw new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
+                    String.format("결제 승인 요청 처리 중 예외가 발생했습니다."));
+        };
+    }
+
+    private ErrorHandler handleServerError() {
+        return (request, response) -> {
+            LOGGER.error("TossPaymentClient 서버 에러 message: {}, body: {}",
+                    response.getStatusCode(),
+                    response.getStatusText());
+            throw new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
+                    String.format("결제 승인 처리 API 서버에서 에러가 발생했습니다."));
+        };
     }
 }
