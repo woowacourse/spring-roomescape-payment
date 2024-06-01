@@ -1,12 +1,15 @@
 package roomescape.common;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.client.PaymentClient;
 import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.client.TossPaymentClient;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 public class PaymentClientConfiguration {
@@ -21,16 +24,18 @@ public class PaymentClientConfiguration {
     }
 
     @Bean
-    public RestClient restClient() {
+    public PaymentClient tossPaymentClient() {
         byte[] encodedBytes = Base64.getEncoder()
                 .encode((paymentProperties.getSecretKey() + NO_PASSWORD_SUFFIX)
                         .getBytes(StandardCharsets.UTF_8));
 
         String authorizations = BASIC_PREFIX + new String(encodedBytes);
 
-        return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
-                .build();
+        return new TossPaymentClient(
+                RestClient.builder()
+                        .baseUrl("https://api.tosspayments.com/v1/payments")
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
+                        .build()
+        );
     }
 }
