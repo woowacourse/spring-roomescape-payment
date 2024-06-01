@@ -8,12 +8,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.infrastructure.payment.response.PaymentErrorResponse;
+import roomescape.infrastructure.payment.response.PaymentServerErrorCode;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.request.PaymentApproveDto;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Optional;
 
 @Component
 public class PaymentManager {
@@ -46,7 +49,12 @@ public class PaymentManager {
     }
 
     private void handlePaymentError(HttpRequest request, ClientHttpResponse response) throws IOException {
-        RuntimeException exception = objectMapper.readValue(response.getBody(), RuntimeException.class);
-        throw new PaymentException(response.getStatusCode(), exception.getMessage());
+        PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+        Optional<PaymentServerErrorCode> serverErrorCode = PaymentServerErrorCode.from(paymentErrorResponse.code());
+
+        if (serverErrorCode.isPresent()) {
+            throw new PaymentException(paymentErrorResponse, serverErrorCode.get().getMessage());
+        }
+        throw new PaymentException(response.getStatusCode(), paymentErrorResponse);
     }
 }

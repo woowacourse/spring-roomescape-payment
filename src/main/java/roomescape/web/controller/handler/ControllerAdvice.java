@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.exception.ReservationExistsException;
+import roomescape.service.exception.RoomEscapeException;
 import roomescape.web.exception.AuthorizationException;
 
 @RestControllerAdvice
@@ -59,8 +60,11 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<PaymentException> handleHttpClientErrorException(PaymentException e) {
+    public ResponseEntity<RoomEscapeException> handleHttpClientErrorException(PaymentException e) {
+        logger.error(e.getPaymentErrorResponse().toString());
+        logger.error(e.getMessage(), e);
+        RoomEscapeException roomEscapeException = new RoomEscapeException(e.getMessage());
         return ResponseEntity.status(e.getStatusCode())
-                .body(e);
+                .body(roomEscapeException);
     }
 }
