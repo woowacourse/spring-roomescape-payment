@@ -19,23 +19,25 @@ import roomescape.service.response.PaymentApproveSuccessAppResponse;
 public class TossPaymentClient implements PaymentClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TossPaymentClient.class);
-    private static final String CONFIRM_URL = "/confirm";
 
     private final PaymentAuthorizationGenerator paymentAuthorizationGenerator;
     private final RestClient restClient;
+    private final String confirmUrl;
 
     public TossPaymentClient(PaymentAuthorizationGenerator paymentAuthorizationGenerator,
                              RestClient.Builder restClient,
-                             @Value("${payment.base-url}") String baseUrl) {
+                             @Value("${payment.base-url}") String baseUrl,
+                             @Value("${payment.confirm-url}") String confirmUrl) {
         this.paymentAuthorizationGenerator = paymentAuthorizationGenerator;
         this.restClient = restClient.baseUrl(baseUrl).build();
+        this.confirmUrl = confirmUrl;
     }
 
     public PaymentApproveSuccessAppResponse approve(PaymentApproveAppRequest paymentApproveAppRequest) {
         String authorizations = paymentAuthorizationGenerator.createAuthorizations();
 
         return restClient.post()
-                .uri(CONFIRM_URL)
+                .uri(confirmUrl)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentApproveAppRequest)
