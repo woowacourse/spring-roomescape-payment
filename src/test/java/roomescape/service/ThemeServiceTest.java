@@ -19,6 +19,7 @@ import roomescape.service.dto.request.PopularThemeRequest;
 import roomescape.service.dto.request.ThemeSaveRequest;
 import roomescape.service.dto.response.ThemeResponse;
 import roomescape.service.dto.response.ThemeResponses;
+import roomescape.service.reservation.ThemeService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

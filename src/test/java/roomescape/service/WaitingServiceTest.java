@@ -7,6 +7,7 @@ import roomescape.IntegrationTestSupport;
 import roomescape.domain.repository.WaitingRepository;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.WaitingRequest;
+import roomescape.service.reservation.WaitingService;
 
 import java.time.LocalDate;
 

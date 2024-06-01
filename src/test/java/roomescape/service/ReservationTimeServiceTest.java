@@ -10,6 +10,7 @@ import roomescape.service.dto.request.ReservationTimeBookedRequest;
 import roomescape.service.dto.request.ReservationTimeSaveRequest;
 import roomescape.service.dto.response.ReservationTimeBookedResponses;
 import roomescape.service.dto.response.ReservationTimeResponse;
+import roomescape.service.reservation.ReservationTimeService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

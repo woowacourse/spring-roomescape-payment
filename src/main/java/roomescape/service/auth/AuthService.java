@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.auth;
 
 import org.springframework.stereotype.Service;
 import roomescape.auth.JwtTokenProvider;

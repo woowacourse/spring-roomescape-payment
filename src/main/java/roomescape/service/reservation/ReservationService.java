@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.reservation;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import roomescape.service.dto.response.PaymentApproveResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.ReservationResponses;
 import roomescape.service.dto.response.UserReservationResponse;
+import roomescape.service.reservation.pay.PaymentService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import roomescape.auth.Login;
 import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
-import roomescape.service.ReservationService;
+import roomescape.service.reservation.ReservationService;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.response.ReservationResponse;
 

@@ -16,6 +16,7 @@ import roomescape.controller.HeaderGenerator;
 import roomescape.service.dto.request.PaymentApproveRequest;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.exception.customexception.api.ApiException;
+import roomescape.service.reservation.pay.PaymentService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)

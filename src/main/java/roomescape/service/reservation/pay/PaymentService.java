@@ -1,6 +1,5 @@
-package roomescape.service;
+package roomescape.service.reservation.pay;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -27,33 +26,19 @@ public class PaymentService {
     @Value("${payment.secret-key}")
     private static String SECRET_KEY;
 
-    private static HttpHeaders HEADER;
-
-
+    private final IdemPotencyKeyGenerator generator;
     private final RestTemplate restTemplate;
 
-    public PaymentService(RestTemplate restTemplate) {
+    public PaymentService(IdemPotencyKeyGenerator generator, RestTemplate restTemplate) {
+        this.generator = generator;
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    private static void init() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth(encodeSecretKey());
-        HEADER = headers;
-    }
-
-    private static String encodeSecretKey() {
-        return Base64.getEncoder()
-                .encodeToString((SECRET_KEY + ":")
-                        .getBytes(StandardCharsets.UTF_8));
-    }
 
     public PaymentApproveResponse pay(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
         ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 PAYMENT_APPROVE_ENDPOINT,
-                new HttpEntity<>(paymentApproveRequest, HEADER),
+                new HttpEntity<>(paymentApproveRequest, header()),
                 PaymentApproveResponse.class
         );
 
@@ -62,11 +47,13 @@ public class PaymentService {
     }
 
     public PaymentCancelResponse cancel(PaymentCancelRequest paymentCancelRequest) {
-        HEADER.add("cancelReason", paymentCancelRequest.cancelReason());
+        HttpHeaders headers = header();
+        headers.add("cancelReason", paymentCancelRequest.cancelReason());
+        headers.add("Idempotency-Key", generator.generate());
 
         ResponseEntity<PaymentCancelResponse> response = restTemplate.postForEntity(
                 String.format(PAYMENT_CANCEL_ENDPOINT, paymentCancelRequest.paymentKey()),
-                new HttpEntity<>(HEADER),
+                new HttpEntity<>(headers),
                 PaymentCancelResponse.class
         );
         validateStatusCode(response.getStatusCode());
@@ -77,5 +64,18 @@ public class PaymentService {
         if (!code.is2xxSuccessful()) {
             throw new ApiException("결제 요청 과정에서 문제가 발생했습니다.");
         }
+    }
+
+    private HttpHeaders header() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(encodeSecretKey());
+        return headers;
+    }
+
+    private String encodeSecretKey() {
+        return Base64.getEncoder()
+                .encodeToString((SECRET_KEY + ":")
+                        .getBytes(StandardCharsets.UTF_8));
     }
 }

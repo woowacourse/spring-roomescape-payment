@@ -9,7 +9,7 @@ import roomescape.auth.AuthenticationExtractor;
 import roomescape.auth.AuthenticationPrincipalArgumentResolver;
 import roomescape.auth.CheckAdminInterceptor;
 import roomescape.auth.CheckLoginInterceptor;
-import roomescape.service.AuthService;
+import roomescape.service.auth.AuthService;
 
 import java.util.List;
 

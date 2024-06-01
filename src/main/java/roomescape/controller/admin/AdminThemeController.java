@@ -3,7 +3,7 @@ package roomescape.controller.admin;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.service.ThemeService;
+import roomescape.service.reservation.ThemeService;
 import roomescape.service.dto.request.ThemeSaveRequest;
 import roomescape.service.dto.response.ThemeResponse;
 import roomescape.service.dto.response.ThemeResponses;

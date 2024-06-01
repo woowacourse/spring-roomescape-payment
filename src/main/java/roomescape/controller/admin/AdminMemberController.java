@@ -2,7 +2,7 @@ package roomescape.controller.admin;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.service.MemberService;
+import roomescape.service.reservation.MemberService;
 import roomescape.service.dto.response.MemberResponses;
 
 @RestController
