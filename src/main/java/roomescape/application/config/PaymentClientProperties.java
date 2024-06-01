@@ -1,30 +1,25 @@
 package roomescape.application.config;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.ConstructorBinding;
-import roomescape.util.Base64Utils;
 
 @ConfigurationProperties(prefix = "payment")
 public class PaymentClientProperties {
-    private static final String BASIC_AUTH_FORMAT = "Basic %s";
+    private final Map<String, PaymentClientProperty> properties;
 
-    private final String url;
-    private final String secret;
-
-    @ConstructorBinding
-    public PaymentClientProperties(String url, String secret) {
-        this.url = url;
-        this.secret = String.format(
-                BASIC_AUTH_FORMAT,
-                Base64Utils.encode(secret + ":")
-        );
+    public PaymentClientProperties(List<PaymentClientProperty> providers) {
+        this.properties = providers.stream()
+                .collect(Collectors.toMap(PaymentClientProperty::name, property -> property));
     }
 
-    public String getUrl() {
-        return url;
+    public Set<String> getNames() {
+        return properties.keySet();
     }
 
-    public String getBasicKey() {
-        return secret;
+    public PaymentClientProperty get(String name) {
+        return properties.get(name);
     }
 }

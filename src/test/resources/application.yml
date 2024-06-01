@@ -11,5 +11,9 @@ jwt:
   expire-in-millis: 1800000
 
 payment:
-  secret: testtesttesttesttesttesttesttesttesttesttest
-  url: https://test.wib.aru
+  providers:
+    - name: toss
+      secret: testtesttesttesttesttesttesttesttesttesttest
+      url: https://test.toss.aru
+      connection-timeout-in-seconds: 3
+      read-timeout-in-seconds: 31
