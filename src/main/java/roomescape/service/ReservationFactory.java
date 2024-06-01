@@ -1,12 +1,16 @@
-package roomescape.domain.reservation;
+package roomescape.service;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.DomainService;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.ReservationTimeRepository;
+import roomescape.domain.reservation.Status;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.RoomescapeException;
@@ -17,20 +21,17 @@ public class ReservationFactory {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final Clock clock;
 
     public ReservationFactory(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            Clock clock
+            MemberRepository memberRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.clock = clock;
     }
 
     public Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
@@ -66,7 +67,7 @@ public class ReservationFactory {
     }
 
     private void validateRequestDateAfterCurrentTime(LocalDateTime dateTime) {
-        LocalDateTime currentTime = LocalDateTime.now(clock);
+        LocalDateTime currentTime = LocalDateTime.now();
         if (dateTime.isBefore(currentTime)) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "현재 시간보다 과거로 예약할 수 없습니다.");
         }

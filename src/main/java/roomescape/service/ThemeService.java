@@ -1,10 +1,11 @@
 package roomescape.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.theme.PopularThemeFinder;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.dto.request.theme.ThemeRequest;
@@ -14,12 +15,16 @@ import roomescape.exception.RoomescapeException;
 
 @Service
 public class ThemeService {
-    private final ThemeRepository themeRepository;
-    private final PopularThemeFinder popularThemeFinder;
+    private static final int START_DAY_TO_SUBTRACT = 8;
+    private static final int END_DATE_TO_SUBTRACT = 1;
+    private static final int COUNT_OF_LIMIT = 10;
 
-    public ThemeService(ThemeRepository themeRepository, PopularThemeFinder popularThemeFinder) {
+    private final ThemeRepository themeRepository;
+    private final ReservationRepository reservationRepository;
+
+    public ThemeService(ThemeRepository themeRepository, ReservationRepository reservationRepository) {
         this.themeRepository = themeRepository;
-        this.popularThemeFinder = popularThemeFinder;
+        this.reservationRepository = reservationRepository;
     }
 
     public ThemeResponse save(ThemeRequest themeRequest) {
@@ -43,7 +48,11 @@ public class ThemeService {
     }
 
     public List<ThemeResponse> findPopularThemes() {
-        return popularThemeFinder.findThemes().stream()
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(START_DAY_TO_SUBTRACT);
+        LocalDate endDate = today.minusDays(END_DATE_TO_SUBTRACT);
+        return reservationRepository.findPopularThemesDateBetween(startDate, endDate).stream()
+                .limit(COUNT_OF_LIMIT)
                 .map(ThemeResponse::from)
                 .toList();
     }

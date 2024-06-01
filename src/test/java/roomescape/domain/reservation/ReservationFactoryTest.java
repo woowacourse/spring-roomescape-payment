@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.exception.RoomescapeException;
+import roomescape.service.ReservationFactory;
 
 class ReservationFactoryTest extends BasicAcceptanceTest {
     @Autowired
