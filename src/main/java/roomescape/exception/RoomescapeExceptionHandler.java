@@ -1,18 +1,16 @@
 package roomescape.exception;
 
-import static roomescape.exception.ExceptionType.INVALID_DATE_TIME_FORMAT;
-import static roomescape.exception.ExceptionType.NO_QUERY_PARAMETER;
-import static roomescape.exception.ExceptionType.UN_EXPECTED_ERROR;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import static roomescape.exception.ExceptionType.*;
+
+@RestControllerAdvice
 public class RoomescapeExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(RoomescapeExceptionHandler.class);
