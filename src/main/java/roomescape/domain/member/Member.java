@@ -36,11 +36,15 @@ public class Member {
     @Column(nullable = false, length = 6)
     private Role role;
 
-    public Member(String name, String email, String password) {
+    public Member(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = Role.NORMAL;
+        this.role = role;
+    }
+
+    public Member(String name, String email, String password) {
+        this(name, email, password, Role.NORMAL);
     }
 
     public String getRoleAsString() {
