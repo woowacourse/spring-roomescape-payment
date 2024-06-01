@@ -1,11 +1,10 @@
 package roomescape.payment.domain;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -13,6 +12,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
 import roomescape.payment.dto.PaymentCreateRequest;
+import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.dto.RestClientPaymentCancelRequest;
 
 public class PaymentRestClient {
@@ -23,6 +23,7 @@ public class PaymentRestClient {
     public static final String UNAUTHORIZED_KEY_CODE = "UNAUTHORIZED_KEY";
     public static final String INCORRECT_BASIC_AUTH_FORMAT_CODE = "INCORRECT_BASIC_AUTH_FORMAT";
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestClient restClient;
     private final String secretKey;
 
@@ -54,19 +55,23 @@ public class PaymentRestClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new RestClientPaymentCancelRequest(CancelReason.CHANGE_MIND))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, ((request, response) ->
-                        handleErrorMessage(response)
-                ))
+                .onStatus(HttpStatusCode::isError, (request, response) -> handleErrorMessage(response))
                 .toBodilessEntity();
     }
 
-    private void handleErrorMessage(ClientHttpResponse httpResponse) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
+    private void handleErrorMessage(ClientHttpResponse httpResponse) {
+        try {
+            convertException(httpResponse);
+        } catch (IOException | NullPointerException e) {
+            throw new RoomEscapeException(
+                    "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-        JsonNode rootNode = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readTree(httpResponse.getBody());
-        String code = rootNode.path("code").asText();
-        String message = rootNode.path("message").asText();
+    private void convertException(ClientHttpResponse httpResponse) throws IOException {
+        PaymentErrorResponse response = objectMapper.readValue(httpResponse.getBody(), PaymentErrorResponse.class);
+        String code = Objects.requireNonNull(response.code());
+        String message = Objects.requireNonNull(response.message());
 
         if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
             code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {

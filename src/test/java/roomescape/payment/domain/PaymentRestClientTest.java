@@ -150,4 +150,52 @@ class PaymentRestClientTest {
                         """, HttpStatus.FORBIDDEN)
         );
     }
+
+    @DisplayName("토스 문서와 다른 JSON 에러가 응답되는 경우 500 예외로 전환한다.")
+    @ParameterizedTest
+    @MethodSource("provideIllegalTossErrorResponse")
+    void approvePaymentTest_whenIllegalErrorResponse(String response, HttpStatus responseStatus)
+            throws JsonProcessingException {
+        // given
+        String request = objectMapper.writeValueAsString(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest());
+
+        mockServer.expect(ExpectedCount.manyTimes(), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("Authorization", "Basic " + paymentRestClient.getSecretKey()))
+                .andExpect(content().json(request))
+                .andRespond(withStatus(responseStatus)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(response));
+
+        // when & then
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.")
+                .extracting(exception -> ((RoomEscapeException) exception).getStatus())
+                .isEqualTo(500);
+    }
+
+    private static Stream<Arguments> provideIllegalTossErrorResponse() {
+        return Stream.of(
+                Arguments.of("""
+                        {}
+                        """, HttpStatus.BAD_REQUEST),
+                Arguments.of("""
+                        {
+                          "code": "INVALID_API_KEY",
+                        }
+                        """, HttpStatus.BAD_REQUEST),
+                Arguments.of("""
+                        {
+                          "message": "게이트웨이 또는 프록시가 시간 초과되었습니다."
+                        }
+                        """, HttpStatus.GATEWAY_TIMEOUT),
+                Arguments.of("""
+                        {
+                          "status": "BAD_REQUEST",
+                          "detail": "잘못된 요청입니다."
+                        }
+                        """, HttpStatus.BAD_REQUEST)
+        );
+    }
 }
