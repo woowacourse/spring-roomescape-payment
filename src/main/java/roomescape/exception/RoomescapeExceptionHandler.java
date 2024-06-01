@@ -1,6 +1,6 @@
 package roomescape.exception;
 
-import global.AbstractExceptionHandler;
+import global.exception.AbstractExceptionHandler;
 import java.time.format.DateTimeParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
