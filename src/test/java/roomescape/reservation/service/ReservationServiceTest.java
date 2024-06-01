@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.payment.client.PaymentRestClientConfiguration;
+import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
@@ -22,6 +22,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.client.PaymentRestClientConfiguration;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
@@ -93,6 +94,24 @@ class ReservationServiceTest {
 
         // then
         assertThat(createReservationResponse.id()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("회원 예약 생성 실패: 결제 오류 시 예약은 저장되지 않는다.")
+    void createReservation_ifPaymentClientError_throwException() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
+        Theme theme = themeRepository.save(ThemeFixture.getOne());
+        Member member = memberRepository.save(MemberFixture.getOne());
+
+        CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(
+                LocalDate.of(2024, 10, 10), reservationTime.getId(), theme.getId(), "failPayment", "orderId", 100_000L);
+        AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
+
+        // when & then
+        assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createMyReservationRequest))
+                .isInstanceOf(ClientException.class);
+        assertThat(reservationRepository.count()).isZero();
     }
 
     @Test

@@ -28,7 +28,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
-import roomescape.payment.client.PaymentClient;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
@@ -51,21 +50,18 @@ class ReservationIntegrationTest {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClient paymentClient;
 
     @Autowired
     ReservationIntegrationTest(final MemberRepository memberRepository,
                                final ReservationTimeRepository reservationTimeRepository,
                                final ThemeRepository themeRepository,
                                final ReservationRepository reservationRepository,
-                               final WaitingRepository waitingRepository,
-                               final PaymentClient paymentClient) {
+                               final WaitingRepository waitingRepository) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClient = paymentClient;
     }
 
     @LocalServerPort
@@ -106,6 +102,28 @@ class ReservationIntegrationTest {
                 .then().log().all()
 
                 .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("방탈출 예약 생성 실패: 결제 실패")
+    void createReservationTime_WhenPaymentClientException() {
+        // given
+        reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
+        themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
+
+        CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2099-11-30"), 1L, 1L,
+                "failPayment", "orderId", 100L);
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
+                .body(createMyReservationRequest)
+                .when().post("/reservations")
+                .then().log().all()
+
+                .statusCode(500)
+                .body("detail", equalTo("결제 오류입니다. 같은 문제가 반복된다면 문의해주세요."));
     }
 
     @Test
