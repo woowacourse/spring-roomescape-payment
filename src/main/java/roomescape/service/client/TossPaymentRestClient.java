@@ -15,8 +15,8 @@ import roomescape.service.config.TossPaymentConfigProperties;
 public class TossPaymentRestClient {
 
     private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final Duration CONNECT_TIMEOUT_DURATION = Duration.ofMillis(3);
-    private static final Duration READ_TIMEOUT_DURATION = Duration.ofSeconds(3);
+    private static final Duration CONNECT_TIMEOUT_DURATION = Duration.ofSeconds(3);
+    private static final Duration READ_TIMEOUT_DURATION = Duration.ofSeconds(30);
 
     private final TossPaymentConfigProperties properties;
     private final String authorizationKey;
