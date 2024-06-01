@@ -1,11 +1,12 @@
 package roomescape.dto.payment;
 
+import java.math.BigDecimal;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
 
 public record PaymentRequest(
         String paymentKey,
         String orderId,
-        int amount,
+        BigDecimal amount,
         String paymentType
 ) {
     public static PaymentRequest from(UserReservationPaymentRequest userReservationPaymentRequest) {

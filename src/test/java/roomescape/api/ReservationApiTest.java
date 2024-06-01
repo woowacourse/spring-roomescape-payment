@@ -8,6 +8,7 @@ import static roomescape.LoginTestSetting.getCookieByLogin;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -50,7 +51,7 @@ class ReservationApiTest {
         UserReservationRequest userReservationRequest = createUserReservationRequest();
 
         UserReservationPaymentRequest userReservationPaymentRequest = new UserReservationPaymentRequest(
-                LocalDate.now().plusDays(7), 1L, 1L, 1L, "paymentKey", "orderId", 1000, "paymentType");
+                LocalDate.now().plusDays(7), 1L, 1L, 1L, "paymentKey", "orderId",  BigDecimal.valueOf(1000), "paymentType");
 
         PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
