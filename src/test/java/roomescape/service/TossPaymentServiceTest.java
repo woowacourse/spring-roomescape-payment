@@ -57,7 +57,7 @@ class TossPaymentServiceTest {
             .doesNotThrowAnyException();
     }
 
-    @DisplayName("실패: 결제 과정에서 400 예외 발생")
+    @DisplayName("실패: 결제 과정에서 400 에러 발생")
     @Test
     void pay_4xxError() {
         server.expect(requestTo(TOSS_PAYMENTS_URL))
@@ -67,7 +67,7 @@ class TossPaymentServiceTest {
             .hasMessage("결제가 승인되지 않았습니다.");
     }
 
-    @DisplayName("실패: 결제 과정에서 500 예외 발생")
+    @DisplayName("실패: 결제 과정에서 500 에러 발생")
     @Test
     void pay_5xxError() {
         server.expect(requestTo(TOSS_PAYMENTS_URL))
