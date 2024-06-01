@@ -11,6 +11,7 @@ import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationWaitingResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.reservation.BookStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -48,13 +49,11 @@ public class ReservationService {
         this.clock = clock;
     }
 
-    @Transactional
     public ReservationResponse bookReservation(ReservationPaymentRequest request) {
         Reservation reservation = getReservationFromRequest(request.toReservationRequest());
-        Reservation savedReservation = reservationRepository.save(reservation);
         Theme theme = reservation.getTheme();
-        paymentService.purchase(savedReservation, request.toPaymentRequest(theme.getPrice()));
-        return ReservationResponse.from(reservation);
+        ReservationPayment payment = paymentService.purchase(reservation, request.toPaymentRequest(theme.getPrice()));
+        return ReservationResponse.from(payment.getReservation());
     }
 
     @Transactional

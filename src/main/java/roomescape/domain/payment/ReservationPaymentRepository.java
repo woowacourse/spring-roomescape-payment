@@ -4,5 +4,5 @@ public interface ReservationPaymentRepository {
 
     ReservationPayment save(ReservationPayment reservationPayment);
 
-    ReservationPayment getById(String id);
+    ReservationPayment getByOrderId(String orderId);
 }

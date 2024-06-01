@@ -1,7 +1,10 @@
 package roomescape.domain.payment;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -14,9 +17,13 @@ import roomescape.domain.reservation.Reservation;
 public class ReservationPayment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "order_id", nullable = false, unique = true)
     private String orderId;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
@@ -50,6 +57,10 @@ public class ReservationPayment {
     @Override
     public int hashCode() {
         return Objects.hash(orderId);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getOrderId() {
