@@ -10,7 +10,7 @@ import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
-import roomescape.service.PaymentService;
+import roomescape.service.ReservationFacadeService;
 import roomescape.service.ReservationService;
 
 import java.util.List;
@@ -20,11 +20,12 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final ReservationFacadeService reservationFacadeService;
 
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
+    public ReservationController(final ReservationService reservationService,
+                                 final ReservationFacadeService reservationFacadeService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
+        this.reservationFacadeService = reservationFacadeService;
     }
 
     @PostMapping
@@ -32,9 +33,8 @@ public class ReservationController {
             @AuthenticationPrincipal final LoginMember loginMember,
             @RequestBody final ReservationSaveRequest request) {
         final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
-        final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
         final PaymentDto paymentDto = PaymentDto.of(request);
-        paymentService.confirmPayment(paymentDto, reservationResponse.id());
+        final ReservationResponse reservationResponse = reservationFacadeService.createReservation(reservationDto, paymentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
     }
 

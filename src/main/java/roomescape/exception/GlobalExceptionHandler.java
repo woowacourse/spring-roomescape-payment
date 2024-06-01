@@ -12,6 +12,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @ExceptionHandler(TossPaymentException.class)
+    public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentException e) {
+        logger.error(e.getMessage(), e);
+        return ResponseEntity.status(e.getHttpStatusCode())
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
     @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleRoomescapeException(RoomescapeException e) {
         logger.error(e.getMessage(), e);
