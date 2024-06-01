@@ -11,8 +11,8 @@ public class LoginMember {
         this.role = role;
     }
 
-    public boolean isAdmin() {
-        return this.role == Role.ADMIN;
+    public boolean isNotAdmin() {
+        return this.role != Role.ADMIN;
     }
 
     public long getId() {

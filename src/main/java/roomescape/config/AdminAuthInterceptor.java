@@ -25,7 +25,7 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
             throws Exception {
         String accessToken = CookieExtractor.getTokenCookie(request).getValue();
         LoginMember loginMember = loginService.checkLogin(accessToken);
-        if (!loginMember.isAdmin()) {
+        if (loginMember.isNotAdmin()) {
             throw new RoomescapeException(ExceptionType.PERMISSION_DENIED, loginMember.getRole());
         }
         return true;
