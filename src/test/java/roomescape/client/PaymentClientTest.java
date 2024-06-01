@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,9 +21,9 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 @RestClientTest(PaymentConfig.class)
-class PaymentServiceTest {
+class PaymentClientTest {
     @Autowired
-    private PaymentService paymentService;
+    private PaymentClient paymentClient;
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -44,7 +44,7 @@ class PaymentServiceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(expectedResponse));
 
-        PaymentResponse result = paymentService.pay(request);
+        PaymentResponse result = paymentClient.requestPayment(request);
         assertAll(
                 () -> assertThat(result.paymentKey()).isEqualTo("randomPaymentKey"),
                 () -> assertThat(result.totalAmount()).isEqualTo(10000)
@@ -67,7 +67,7 @@ class PaymentServiceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(expectedResponse));
 
-        assertThatThrownBy(() -> paymentService.pay(request))
+        assertThatThrownBy(() -> paymentClient.requestPayment(request))
                 .isInstanceOf(PaymentException.class);
     }
 }

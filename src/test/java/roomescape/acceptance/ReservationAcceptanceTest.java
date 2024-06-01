@@ -108,7 +108,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
         ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
-        BDDMockito.given(paymentService.pay(paymentRequest))
+        BDDMockito.given(paymentClient.requestPayment(paymentRequest))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new TossExceptionResponse("EXCEPTION", "exception")));
 

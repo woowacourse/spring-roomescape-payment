@@ -17,7 +17,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.dto.response.reservation.TossExceptionResponse;
 import roomescape.exception.PaymentException;
-import roomescape.service.PaymentService;
+import roomescape.client.PaymentClient;
 
 @Configuration
 public class PaymentConfig {
@@ -25,7 +25,7 @@ public class PaymentConfig {
     private String widgetSecretKey;
 
     @Bean
-    public PaymentService paymentService(RestClient.Builder restClientBuilder) {
+    public PaymentClient paymentClient(RestClient.Builder restClientBuilder) {
         byte[] encodedBytes = Base64.getEncoder().encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorization = "Basic " + new String(encodedBytes);
 
@@ -37,7 +37,7 @@ public class PaymentConfig {
                 }))
                 .build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build();
-        return factory.createClient(PaymentService.class);
+        return factory.createClient(PaymentClient.class);
     }
 
     private TossExceptionResponse getTossExceptionResponse(ClientHttpResponse response) throws IOException {

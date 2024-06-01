@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.service.PaymentService;
+import roomescape.client.PaymentClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql("/reset.sql")
@@ -15,7 +15,7 @@ public abstract class BasicAcceptanceTest {
     private int port;
 
     @MockBean
-    protected PaymentService paymentService;
+    protected PaymentClient paymentClient;
 
     @BeforeEach
     protected void setUp() {
