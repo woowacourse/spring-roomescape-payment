@@ -1,9 +1,12 @@
 package roomescape.domain.payment.pg;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.dto.PaymentConfirmRequest;
@@ -12,6 +15,7 @@ import roomescape.domain.payment.exception.PaymentConfirmClientFailException;
 import roomescape.domain.payment.exception.PaymentConfirmServerFailException;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 
 import static roomescape.domain.payment.config.PaymentConfig.PG_API_BASE_URL;
@@ -20,12 +24,26 @@ import static roomescape.domain.payment.config.PaymentConfig.PG_CONFIRM_API_URL;
 @Component
 public class TossPaymentGateway implements PaymentGateway {
 
-    private final RestClient restClient = RestClient.builder()
-            .baseUrl(PG_API_BASE_URL)
-            .build();
+    private static final long API_TIME_OUT_VALUE = 2L;
+
+    private final RestClient restClient;
 
     @Value("${custom.pg.widget-secret-key}")
     private String widgetSecretKey;
+
+    public TossPaymentGateway() {
+        this.restClient = configRestClient();
+    }
+
+    private RestClient configRestClient() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withReadTimeout(Duration.ofMinutes(API_TIME_OUT_VALUE));
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+        return RestClient.builder()
+                .baseUrl(PG_API_BASE_URL)
+                .requestFactory(requestFactory)
+                .build();
+    }
 
     public PaymentConfirmResponse confirm(
             final String orderId,
