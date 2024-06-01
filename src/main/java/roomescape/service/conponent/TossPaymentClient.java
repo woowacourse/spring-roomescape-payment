@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import roomescape.service.dto.PaymentRequestDto;
+
 @Component
 public class TossPaymentClient implements PaymentClient {
 
@@ -30,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void requestPayment(Object body) {
+    public void requestPayment(PaymentRequestDto body) {
         restClient.post()
                 .uri(TOSS_PAYMENTS_URL)
                 .body(body)
