@@ -10,6 +10,7 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservation.ReservationRequest;
+import roomescape.dto.reservation.ReservationResponse;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -36,10 +37,10 @@ public class ReservationRegisterService {
         this.memberRepository = memberRepository;
     }
 
-    public Long registerReservation(ReservationRequest request) {
+    public ReservationResponse registerReservation(ReservationRequest request) {
         Reservation reservation = convertReservation(request);
         validateReservationAvailability(reservation);
-        return reservationRepository.save(reservation).getId();
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     private Reservation convertReservation(ReservationRequest request) {

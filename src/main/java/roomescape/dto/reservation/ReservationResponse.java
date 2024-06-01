@@ -19,9 +19,9 @@ public record ReservationResponse(
 ) {
 
     public static ReservationResponse from(Reservation reservation) {
-        ReservationTimeResponse reservationTimeResponse = getReservationTimeResponse(reservation.getTime());
-        ThemeResponse themeResponse = getThemeResponse(reservation.getTheme());
-        MemberResponse memberResponse = getMemberResponse(reservation.getMember());
+        ReservationTimeResponse reservationTimeResponse = createReservationTimeResponse(reservation.getTime());
+        ThemeResponse themeResponse = createThemeResponse(reservation.getTheme());
+        MemberResponse memberResponse = createMemberResponse(reservation.getMember());
 
         return new ReservationResponse(
                 reservation.getId(),
@@ -32,14 +32,14 @@ public record ReservationResponse(
         );
     }
 
-    private static ReservationTimeResponse getReservationTimeResponse(ReservationTime reservationTime) {
+    private static ReservationTimeResponse createReservationTimeResponse(ReservationTime reservationTime) {
         return new ReservationTimeResponse(
                 reservationTime.getId(),
                 reservationTime.getStartAt()
         );
     }
 
-    private static ThemeResponse getThemeResponse(Theme theme) {
+    private static ThemeResponse createThemeResponse(Theme theme) {
         return new ThemeResponse(
                 theme.getId(),
                 theme.getThemeName(),
@@ -48,7 +48,7 @@ public record ReservationResponse(
         );
     }
 
-    private static MemberResponse getMemberResponse(Member member) {
+    private static MemberResponse createMemberResponse(Member member) {
         return new MemberResponse(
                 member.getId(),
                 member.getName(),
