@@ -6,6 +6,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.PaymentException;
+import roomescape.service.httpclient.TossPaymentClient;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -14,25 +15,15 @@ public class PaymentService {
 
     private final static long RESERVATION_PRICE = 1999999;
 
-    private final RestClient restClient;
+    private final TossPaymentClient tossPaymentClient;
 
-    public PaymentService(RestClient restClient) {
-        this.restClient = restClient;
+    public PaymentService(final TossPaymentClient tossPaymentClient) {
+        this.tossPaymentClient = tossPaymentClient;
     }
 
     public void confirmReservationPayments(ReservationRequest request) {
         validatePayments(request.amount());
-        restClient.post()
-                .uri("/confirm")
-                .contentType(APPLICATION_JSON)
-                .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new PaymentException("결제 정보가 일치하지 않습니다.");
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentException("결제 시스템이 원활하게 동작하지 않습니다.");
-                }).toBodilessEntity();
+        tossPaymentClient.confirm(new PaymentRequest(request.paymentKey(),request.orderId(),request.amount()));
     }
 
     private void validatePayments(long amount) {
