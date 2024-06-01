@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.TossPaymentsClient;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -39,30 +38,26 @@ public class ReservationController {
     private final WaitingQueryService waitingQueryService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
-    private final TossPaymentsClient tossPaymentsClient;
 
     public ReservationController(BookingQueryService bookingQueryService,
                                  @Qualifier("waitingManageService") ReservationManageService waitingScheduler,
                                  @Qualifier("bookingManageService") ReservationManageService bookingScheduler,
                                  WaitingQueryService waitingQueryService,
                                  ReservationTimeService reservationTimeService,
-                                 ThemeService themeService,
-                                 TossPaymentsClient tossPaymentsClient) {
+                                 ThemeService themeService) {
         this.bookingQueryService = bookingQueryService;
         this.waitingScheduler = waitingScheduler;
         this.bookingScheduler = bookingScheduler;
         this.waitingQueryService = waitingQueryService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
-        this.tossPaymentsClient = tossPaymentsClient;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
-        tossPaymentsClient.confirm(request.paymentConfirmRequest());
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
-        Reservation createdReservation = bookingScheduler.create(newReservation);
+        Reservation createdReservation = bookingScheduler.create(newReservation, request.paymentConfirmRequest());
         Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));
