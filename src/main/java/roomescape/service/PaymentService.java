@@ -1,5 +1,7 @@
 package roomescape.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import roomescape.component.TossPaymentClient;
@@ -12,8 +14,12 @@ import roomescape.exception.TossPaymentException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
+import static roomescape.exception.RoomescapeExceptionCode.DATABASE_SAVE_ERROR;
+
 @Service
 public class PaymentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final TossPaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
@@ -33,6 +39,12 @@ public class PaymentService {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
         final Payment payment = paymentDto.toPayment(reservation);
-        paymentRepository.save(payment);
+
+        try {
+            paymentRepository.save(payment);
+        } catch (RuntimeException e) {
+            logger.error("Failed to save payment reservationId = {}: {}", reservationId, e.getMessage());
+            paymentClient.cancel(paymentDto, DATABASE_SAVE_ERROR.getMessage());
+        }
     }
 }

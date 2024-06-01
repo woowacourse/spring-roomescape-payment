@@ -21,7 +21,8 @@ public enum RoomescapeExceptionCode {
     EMPTY_TIME(HttpStatus.BAD_REQUEST, "예약 시간이 비어 있습니다."),
     INVALID_NAME_FORMAT(HttpStatus.BAD_REQUEST, "예약자 이름은 숫자로만 구성될 수 없습니다."),
     INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 시간입니다."),
-    TOSS_PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "Toss payments 에러입니다.")
+    TOSS_PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "Toss payments 에러입니다."),
+    DATABASE_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 진행 중 예기치 못한 에러가 발생했습니다.")
     ;
 
     private final HttpStatusCode httpStatusCode;

@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 import static roomescape.TestFixture.*;
 import static roomescape.TestFixture.THEME_HORROR;
+import static roomescape.exception.RoomescapeExceptionCode.DATABASE_SAVE_ERROR;
 import static roomescape.exception.RoomescapeExceptionCode.TOSS_PAYMENT_ERROR;
 
 @EnableRetry
@@ -90,5 +91,32 @@ class PaymentServiceTest {
         // then
         verify(paymentClient, times(3)).confirm(paymentDto);
         then(paymentRepository).should(never()).save(any(Payment.class));
+    }
+    
+    @Test
+    @DisplayName("결제 승인은 성공했으나 결제 정보 저장이 실패한 경우 결제를 취소한다.")
+    void cancelPaymentWhenSaveFailure() {
+        // given
+        final Long reservationId = 1L;
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final String errorMessage = DATABASE_SAVE_ERROR.getMessage();
+        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+        willDoNothing().given(paymentClient).confirm(paymentDto);
+        willThrow(new RuntimeException(errorMessage))
+                .given(paymentRepository).save(any(Payment.class));
+        willDoNothing().given(paymentClient).cancel(paymentDto, errorMessage);
+
+        // when
+        paymentService.confirmPayment(paymentDto, reservationId);
+
+        // then
+        then(paymentClient).should(times(1)).confirm(paymentDto);
+        then(paymentRepository).should(times(1)).save(any(Payment.class));
+        then(paymentClient).should(times(1)).cancel(paymentDto, errorMessage);
     }
 }

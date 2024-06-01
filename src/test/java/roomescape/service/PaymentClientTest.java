@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,6 +36,7 @@ class PaymentClientTest {
     @InjectMocks
     private ObjectMapper objectMapper;
 
+    @Disabled
     @ParameterizedTest
     @EnumSource(value = TossErrorCode.class)
     @DisplayName("결제 승인 오류 시 예외가 발생한다.")

@@ -13,6 +13,7 @@ import roomescape.exception.TossPaymentException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Map;
 
 @Component
 public class TossPaymentClient {
@@ -30,6 +31,7 @@ public class TossPaymentClient {
 
     public void confirm(final PaymentDto paymentDto) {
         restClient.post()
+                .uri("/confirm")
                 .headers(httpHeaders -> httpHeaders.addAll(headers()))
                 .body(paymentDto)
                 .retrieve()
@@ -38,6 +40,19 @@ public class TossPaymentClient {
                     throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                    final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
+                    throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
+                })
+                .toBodilessEntity();
+    }
+
+    public void cancel(final PaymentDto paymentDto, final String cancelReason) {
+        restClient.post()
+                .uri("/" + paymentDto.paymentKey() + "/cancel")
+                .headers(httpHeaders -> httpHeaders.addAll(headers()))
+                .body(Map.of("cancelReason", cancelReason))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     final TossPaymentError tossPaymentError = objectMapper.readValue(response.getBody(), TossPaymentError.class);
                     throw new TossPaymentException(response.getStatusCode(), tossPaymentError.message());
                 })
