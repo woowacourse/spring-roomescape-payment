@@ -22,7 +22,7 @@ class DurationTest {
                         .isFalse(),
                 () -> assertThat(duration.contains(LocalDate.of(2024, 5, 1)))
                         .isTrue(),
-                () -> assertThat(duration.contains(LocalDate.of(2024, 5, 30)))
+                () -> assertThat(duration.contains(LocalDate.of(2024, 5, 31)))
                         .isTrue(),
                 () -> assertThat(duration.contains(LocalDate.of(2024, 6, 1)))
                         .isFalse()
