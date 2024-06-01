@@ -20,7 +20,6 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.common.exception.PaymentException;
 import roomescape.reservation.client.errorcode.PaymentConfirmCustomException;
 import roomescape.reservation.client.errorcode.PaymentConfirmErrorCode;
-import roomescape.reservation.controller.dto.response.PaymentErrorResponse;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.service.dto.response.PaymentConfirmResponse;
 
@@ -53,7 +52,7 @@ public class PaymentService {
                     .body(paymentRequest)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
-                    .body(PaymentErrorResponse.class);
+                    .toBodilessEntity();
         } catch (ResourceAccessException exception) {
             throw new RuntimeException("외부 시스템과의 연동에 실패했거나 응답을 가져올 수 없습니다.");
         }
