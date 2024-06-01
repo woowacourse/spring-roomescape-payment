@@ -6,28 +6,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.config.RestClientConfigFactory;
+import roomescape.config.properties.PaymentProperties;
+import roomescape.config.properties.TossPaymentProperties;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
 import roomescape.paymenthistory.dto.RestClientPaymentCancelRequest;
+import roomescape.paymenthistory.error.TossPaymentServerErrorCode;
 import roomescape.paymenthistory.exception.PaymentException;
 
-public class PaymentRestClient {
+@Component
+@EnableConfigurationProperties(TossPaymentProperties.class)
+public class TossPaymentRestClient {
 
     public static final String BASIC = "Basic ";
-    public static final String INVALID_ORDER_ID_CODE = "INVALID_ORDER_ID";
-    public static final String INVALID_API_KEY_CODE = "INVALID_API_KEY";
-    public static final String UNAUTHORIZED_KEY_CODE = "UNAUTHORIZED_KEY";
-    public static final String INCORRECT_BASIC_AUTH_FORMAT_CODE = "INCORRECT_BASIC_AUTH_FORMAT";
 
     private final RestClient restClient;
     private final String secretKey;
 
-    public PaymentRestClient(RestClient restClient, String secretKey) {
-        this.restClient = restClient;
-        this.secretKey = new String(Base64.getEncoder().encode((secretKey + ":").getBytes(StandardCharsets.UTF_8)));
+    public TossPaymentRestClient(PaymentProperties properties) {
+        this.restClient = RestClientConfigFactory.restClient(properties.getPaymentUrl());
+        this.secretKey = new String(
+                Base64.getEncoder().encode((properties.getSecretKey() + ":").getBytes(StandardCharsets.UTF_8)));
     }
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {
@@ -66,9 +71,8 @@ public class PaymentRestClient {
                 .readTree(httpResponse.getBody());
         String code = rootNode.path("code").asText();
 
-        if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
-                code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
-            throw new PaymentException.PaymentServerError("내부 서버 에러가 발생했습니다. 관리자에게 문의해주세요.");
+        if (TossPaymentServerErrorCode.existInAdminErrorCode(code)) {
+            throw new PaymentException.PaymentServerError();
         }
         throw new PaymentException(rootNode.path("message").asText(), httpResponse.getStatusCode());
     }
