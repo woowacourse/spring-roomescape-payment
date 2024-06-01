@@ -55,7 +55,7 @@ class ReservationServiceTest {
     private ThemeService themeService;
 
     @Mock
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -119,7 +119,7 @@ class ReservationServiceTest {
     @Test
     void should_throw_exception_when_reservation_not_confirmed_payments_4xx_error() {
         doThrow(IllegalRequestException.class)
-                .when(paymentClient)
+                .when(tossPaymentClient)
                 .requestConfirmPayment(any(PaymentConfirmRequest.class));
 
         assertThatThrownBy(
@@ -131,7 +131,7 @@ class ReservationServiceTest {
     @Test
     void should_throw_exception_when_reservation_not_confirmed_payments_5xx_error() {
         doThrow(InternalServerException.class)
-                .when(paymentClient)
+                .when(tossPaymentClient)
                 .requestConfirmPayment(any(PaymentConfirmRequest.class));
 
         assertThatThrownBy(
@@ -142,7 +142,7 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
     @Test
     void should_save_member_reservation_when_payment_is_confirmed() {
-        doNothing().when(paymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        doNothing().when(tossPaymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
