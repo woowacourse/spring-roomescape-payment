@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 class MemberRoleTest {
     @DisplayName("생성 테스트")
@@ -23,6 +25,8 @@ class MemberRoleTest {
     @ValueSource(strings = {"MEMBER"})
     void create_Fail(String role) {
         assertThatThrownBy(() -> MemberRole.from(role))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.BAD_REQUEST);
     }
 }
