@@ -66,12 +66,17 @@ public class PaymentRestClient {
         JsonNode rootNode = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .readTree(httpResponse.getBody());
         String code = rootNode.path("code").asText();
+        String message = rootNode.path("message").asText();
 
         if (code.equals(INVALID_ORDER_ID_CODE) || code.equals(INVALID_API_KEY_CODE) ||
             code.equals(UNAUTHORIZED_KEY_CODE) || code.equals(INCORRECT_BASIC_AUTH_FORMAT_CODE)) {
             throw new RoomEscapeException(
-                    "내부 서버 에러가 발생했습니다. 관리자에게 문의해주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
+                    "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
         }
-        throw new RoomEscapeException(rootNode.path("message").asText(), ExceptionTitle.ILLEGAL_USER_REQUEST);
+        throw new RoomEscapeException(message, ExceptionTitle.ILLEGAL_USER_REQUEST);
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 }
