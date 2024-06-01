@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,7 +73,7 @@ class ThemeAcceptanceTest extends BasicAcceptanceTest {
     }
 
     private Long postTheme(String token, int expectedHttpCode) {
-        ThemeRequest themeRequest = new ThemeRequest("테마", "설명서", "썸네일", 1000);
+        ThemeRequest themeRequest = new ThemeRequest("테마", "설명서", "썸네일", new BigDecimal("1000"));
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

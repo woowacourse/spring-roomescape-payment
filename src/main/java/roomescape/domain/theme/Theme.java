@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.RoomescapeException;
@@ -24,16 +26,16 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
     @Column(nullable = false)
-    private int price;
+    private BigDecimal price;
 
     protected Theme() {
     }
 
-    public Theme(ThemeName name, String description, String thumbnail, int price) {
+    public Theme(ThemeName name, String description, String thumbnail, BigDecimal price) {
         this(null, name, description, thumbnail, price);
     }
 
-    public Theme(Long id, ThemeName name, String description, String thumbnail, int price) {
+    public Theme(Long id, ThemeName name, String description, String thumbnail, BigDecimal price) {
         int descriptionLength = description.length();
         if (descriptionLength > MAX_DESCRIPTION_LENGTH) {
             throw new RoomescapeException(
@@ -65,8 +67,8 @@ public class Theme {
         return thumbnail;
     }
 
-    public int getPrice() {
-        return price;
+    public BigDecimal getPrice() {
+        return price.setScale(0, RoundingMode.FLOOR);
     }
 
     @Override

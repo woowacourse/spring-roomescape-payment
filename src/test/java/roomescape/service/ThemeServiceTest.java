@@ -3,6 +3,7 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,6 @@ class ThemeServiceTest extends BasicAcceptanceTest {
     void findThemePriceById() {
         ThemePriceResponse themePriceResponse = themeService.findThemePriceById(1L);
 
-        assertThat(themePriceResponse.price()).isEqualTo(1000);
+        assertThat(themePriceResponse.price()).isEqualTo(new BigDecimal("1000"));
     }
 }

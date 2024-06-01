@@ -1,5 +1,6 @@
 package roomescape;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -18,37 +19,37 @@ import roomescape.dto.response.theme.ThemeResponse;
 public class TestFixtures {
     public static final LocalDate TODAY = LocalDate.now();
     public static final ThemeResponse THEME_RESPONSE_1 = new ThemeResponse(
-            1L, "name1", "description1", "thumbnail1", 1000
+            1L, "name1", "description1", "thumbnail1", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_2 = new ThemeResponse(
-            2L, "name2", "description2", "thumbnail2", 1000
+            2L, "name2", "description2", "thumbnail2", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_3 = new ThemeResponse(
-            3L, "name3", "description3", "thumbnail3", 1000
+            3L, "name3", "description3", "thumbnail3", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_4 = new ThemeResponse(
-            4L, "name4", "description4", "thumbnail4", 1000
+            4L, "name4", "description4", "thumbnail4", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_5 = new ThemeResponse(
-            5L, "name5", "description5", "thumbnail5", 1000
+            5L, "name5", "description5", "thumbnail5", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_6 = new ThemeResponse(
-            6L, "name6", "description6", "thumbnail6", 1000
+            6L, "name6", "description6", "thumbnail6", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_7 = new ThemeResponse(
-            7L, "name7", "description7", "thumbnail7", 1000
+            7L, "name7", "description7", "thumbnail7", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_8 = new ThemeResponse(
-            8L, "name8", "description8", "thumbnail8", 1000
+            8L, "name8", "description8", "thumbnail8", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_9 = new ThemeResponse(
-            9L, "name9", "description9", "thumbnail9", 1000
+            9L, "name9", "description9", "thumbnail9", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_10 = new ThemeResponse(
-            10L, "name10", "description10", "thumbnail10", 1000
+            10L, "name10", "description10", "thumbnail10", new BigDecimal("1000")
     );
     public static final ThemeResponse THEME_RESPONSE_11 = new ThemeResponse(
-            11L, "name11", "description11", "thumbnail11", 1000
+            11L, "name11", "description11", "thumbnail11", new BigDecimal("1000")
     );
     public static final List<ThemeResponse> THEME_RESPONSES_1 = List.of(
             THEME_RESPONSE_1, THEME_RESPONSE_2, THEME_RESPONSE_3, THEME_RESPONSE_4, THEME_RESPONSE_5, THEME_RESPONSE_6,
