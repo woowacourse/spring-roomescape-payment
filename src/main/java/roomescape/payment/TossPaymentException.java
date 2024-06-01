@@ -7,11 +7,6 @@ public class TossPaymentException extends RoomescapeException { //TODO 예외 �
 
     private final PaymentErrorResponse errorResponse;
 
-    public TossPaymentException(final String message) {
-        super(message);
-        errorResponse = null;
-    }
-
     public TossPaymentException(final PaymentErrorResponse errorResponse) {
         super(errorResponse.message());
         this.errorResponse = errorResponse;
