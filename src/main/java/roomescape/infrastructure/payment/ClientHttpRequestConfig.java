@@ -20,7 +20,13 @@ public class ClientHttpRequestConfig {
     private static final int READ_TIMEOUT = 30;
 
     @Bean
-    protected ClientHttpRequestFactory clientHttpRequestFactory() {
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> RestClient
+                .builder()
+                .requestFactory(createRequestFactory());
+    }
+
+    private ClientHttpRequestFactory createRequestFactory() {
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
                 .setConnectTimeout(Timeout.ofSeconds(CONNECTION_TIMEOUT))
                 .build();
@@ -38,13 +44,6 @@ public class ClientHttpRequestConfig {
                 .build();
 
         return new HttpComponentsClientHttpRequestFactory(httpClient);
-    }
-
-    @Bean
-    public RestClientCustomizer restClientCustomizer() {
-        return restClientBuilder -> RestClient
-                .builder()
-                .requestFactory(clientHttpRequestFactory());
     }
 }
 
