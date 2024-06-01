@@ -10,7 +10,7 @@ public record WaitingResponse(
         Long waitingId,
         String member,
         String theme,
-        @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+        LocalDate date,
         @JsonFormat(pattern = "HH-mm") LocalTime startAt
 ) {
 

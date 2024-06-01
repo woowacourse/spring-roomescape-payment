@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
 public record UserReservationPaymentRequest(
-        @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+        LocalDate date,
         Long timeId,
         Long themeId,
         Long memberId,
