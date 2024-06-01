@@ -28,10 +28,10 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.ReservationDto;
-import roomescape.service.response.ReservationTimeDto;
-import roomescape.service.response.ThemeDto;
+import roomescape.service.request.ReservationSaveAppRequest;
+import roomescape.service.response.ReservationAppResponse;
+import roomescape.service.response.ReservationTimeAppResponse;
+import roomescape.service.response.ThemeAppResponse;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -72,15 +72,16 @@ class ReservationServiceTest {
                         VALID_THEME)
                 );
 
-        ReservationSaveDto request = new ReservationSaveDto(VALID_RESERVATION_DATE.getDate().toString(), timeId,
+        ReservationSaveAppRequest request = new ReservationSaveAppRequest(VALID_RESERVATION_DATE.getDate().toString(),
+                timeId,
                 themeId, memberId);
-        ReservationDto actual = reservationService.save(request);
-        ReservationDto expected = new ReservationDto(
+        ReservationAppResponse actual = reservationService.save(request);
+        ReservationAppResponse expected = new ReservationAppResponse(
                 reservationId,
                 reservation.getMember().getName(),
                 reservation.getDate(),
-                ReservationTimeDto.from(reservation.getTime()),
-                ThemeDto.from(reservation.getTheme()));
+                ReservationTimeAppResponse.from(reservation.getTime()),
+                ThemeAppResponse.from(reservation.getTheme()));
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -88,7 +89,7 @@ class ReservationServiceTest {
     @DisplayName("실패: 존재하지 않는 시간,테마,사용자 ID 입력 시 예외가 발생한다.")
     @Test
     void save_TimeIdDoesntExist() {
-        assertThatThrownBy(() -> reservationService.save(new ReservationSaveDto("2030-12-31", 1L, 1L, 1L)))
+        assertThatThrownBy(() -> reservationService.save(new ReservationSaveAppRequest("2030-12-31", 1L, 1L, 1L)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -108,7 +109,7 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(
-                () -> reservationService.save(new ReservationSaveDto(rawDate, timeId, themeId, memberId)))
+                () -> reservationService.save(new ReservationSaveAppRequest(rawDate, timeId, themeId, memberId)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -126,7 +127,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(
                 () -> reservationService.save(
-                        new ReservationSaveDto(yesterday.toString(), timeId, themeId, memberId))
+                        new ReservationSaveAppRequest(yesterday.toString(), timeId, themeId, memberId))
         ).isInstanceOf(RoomescapeException.class);
     }
 
@@ -147,7 +148,7 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(VALID_MEMBER));
 
         assertThatThrownBy(() ->
-                reservationService.save(new ReservationSaveDto(today.toString(), timeId, themeId, memberId)))
+                reservationService.save(new ReservationSaveAppRequest(today.toString(), timeId, themeId, memberId)))
                 .isInstanceOf(RoomescapeException.class);
     }
 }

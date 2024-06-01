@@ -12,8 +12,8 @@ import roomescape.domain.MemberPassword;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.MemberSignUpDto;
-import roomescape.service.response.MemberDto;
+import roomescape.service.request.MemberSignUpAppRequest;
+import roomescape.service.response.MemberAppResponse;
 import roomescape.web.auth.CookieHandler;
 
 @Service
@@ -29,7 +29,7 @@ public class MemberAuthService {
     }
 
     @Transactional
-    public MemberDto signUp(MemberSignUpDto request) {
+    public MemberAppResponse signUp(MemberSignUpAppRequest request) {
         if (memberRepository.existsByEmail(new MemberEmail(request.email()))) {
             throw new RoomescapeException(RoomescapeErrorCode.DUPLICATED_MEMBER, "해당 이메일의 회원이 이미 존재합니다.");
         }
@@ -41,18 +41,18 @@ public class MemberAuthService {
         );
 
         Member savedMember = memberRepository.save(newMember);
-        return new MemberDto(savedMember.getId(), savedMember.getName(), savedMember.getRole().name());
+        return new MemberAppResponse(savedMember.getId(), savedMember.getName(), savedMember.getRole().name());
     }
 
-    public MemberDto findMemberByEmail(String email) {
+    public MemberAppResponse findMemberByEmail(String email) {
         return memberRepository.findByEmail(new MemberEmail(email))
-                .map(MemberDto::from)
+                .map(MemberAppResponse::from)
                 .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾지 못했습니다. 다시 로그인 해주세요."));
     }
 
-    public List<MemberDto> findAll() {
+    public List<MemberAppResponse> findAll() {
         return memberRepository.findAll().stream()
-                .map(member -> new MemberDto(member.getId(), member.getName(), member.getRole().name()))
+                .map(member -> new MemberAppResponse(member.getId(), member.getName(), member.getRole().name()))
                 .toList();
     }
 

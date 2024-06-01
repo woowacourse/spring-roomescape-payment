@@ -7,26 +7,26 @@ import roomescape.domain.ReservationWaiting;
 import roomescape.domain.ReservationWaitingWithRank;
 import roomescape.domain.Theme;
 
-public record ReservationWaitingWithRankDto(
+public record ReservationWaitingWithRankAppResponse(
         Long id,
         String name,
         ReservationDate date,
-        ReservationTimeDto reservationTimeDto,
-        ThemeDto themeDto,
+        ReservationTimeAppResponse reservationTimeAppResponse,
+        ThemeAppResponse themeAppResponse,
         Long rank,
         String deniedAt) {
 
-    public static ReservationWaitingWithRankDto from(ReservationWaitingWithRank waitingWithRank) {
+    public static ReservationWaitingWithRankAppResponse from(ReservationWaitingWithRank waitingWithRank) {
         ReservationWaiting waiting = waitingWithRank.getWaiting();
         Member member = waiting.getMember();
         ReservationTime time = waiting.getTime();
         Theme theme = waiting.getTheme();
-        return new ReservationWaitingWithRankDto(
+        return new ReservationWaitingWithRankAppResponse(
                 waiting.getId(),
                 member.getName(),
                 waiting.getDate(),
-                ReservationTimeDto.from(time),
-                ThemeDto.from(theme),
+                ReservationTimeAppResponse.from(time),
+                ThemeAppResponse.from(theme),
                 waitingWithRank.getRank(),
                 waiting.getDeniedAt()
         );

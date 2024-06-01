@@ -8,7 +8,7 @@ import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
-import roomescape.service.response.MemberDto;
+import roomescape.service.response.MemberAppResponse;
 
 @Component
 public class CheckLoginInterceptor implements HandlerInterceptor {
@@ -30,7 +30,7 @@ public class CheckLoginInterceptor implements HandlerInterceptor {
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
-        MemberDto appResponse = memberAuthService.findMemberByEmail(email);
+        MemberAppResponse appResponse = memberAuthService.findMemberByEmail(email);
         if (token == null || !appResponse.role().equals(ADMIN)) {
             throw new RoomescapeException(RoomescapeErrorCode.FORBIDDEN, "접근 권한이 없습니다.");
         }

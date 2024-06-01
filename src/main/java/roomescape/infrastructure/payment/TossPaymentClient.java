@@ -12,8 +12,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.PaymentClient;
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.response.PaymentApproveSuccessDto;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.response.PaymentApproveSuccessAppResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -31,18 +31,18 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient.baseUrl(baseUrl).build();
     }
 
-    public PaymentApproveSuccessDto approve(PaymentApproveDto paymentApproveDto) {
+    public PaymentApproveSuccessAppResponse approve(PaymentApproveAppRequest paymentApproveAppRequest) {
         String authorizations = paymentAuthorizationGenerator.createAuthorizations();
 
         return restClient.post()
                 .uri(CONFIRM_URL)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentApproveDto)
+                .body(paymentApproveAppRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, handleClientError())
                 .onStatus(HttpStatusCode::is5xxServerError, handleServerError())
-                .body(PaymentApproveSuccessDto.class);
+                .body(PaymentApproveSuccessAppResponse.class);
     }
 
     private ErrorHandler handleClientError() {

@@ -19,8 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.response.PaymentApproveSuccessDto;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.response.PaymentApproveSuccessAppResponse;
 
 @RestClientTest({TossPaymentClient.class, PaymentAuthorizationGenerator.class})
 class TossPaymentClientTest {
@@ -37,19 +37,24 @@ class TossPaymentClientTest {
     @DisplayName("결제 승인을 요청하고 올바르게 응답을 반환한다.")
     @Test
     void approve() throws IOException {
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "orderId", 1000L);
-        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveDto);
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
+                1000L);
+        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(content().json(paymentApproveJson))
                 .andRespond(withSuccess(paymentApproveJson, MediaType.APPLICATION_JSON));
 
-        PaymentApproveSuccessDto paymentApproveSuccessDto = tossPaymentClient.approve(paymentApproveDto);
+        PaymentApproveSuccessAppResponse paymentApproveSuccessAppResponse = tossPaymentClient.approve(
+                paymentApproveAppRequest);
 
         assertAll(
-                () -> assertThat(paymentApproveSuccessDto.paymentKey()).isEqualTo(paymentApproveDto.paymentKey()),
-                () -> assertThat(paymentApproveSuccessDto.orderId()).isEqualTo(paymentApproveDto.orderId()),
-                () -> assertThat(paymentApproveSuccessDto.totalAmount()).isEqualTo(paymentApproveDto.totalAmount())
+                () -> assertThat(paymentApproveSuccessAppResponse.paymentKey()).isEqualTo(
+                        paymentApproveAppRequest.paymentKey()),
+                () -> assertThat(paymentApproveSuccessAppResponse.orderId()).isEqualTo(
+                        paymentApproveAppRequest.orderId()),
+                () -> assertThat(paymentApproveSuccessAppResponse.totalAmount()).isEqualTo(
+                        paymentApproveAppRequest.totalAmount())
         );
 
         server.verify();
@@ -58,8 +63,9 @@ class TossPaymentClientTest {
     @DisplayName("결제 승인 실패 시 예외가 발생한다.")
     @Test
     void invalidPaymentApproveRequest() throws IOException {
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto("invalidKey", "orderId", 1000L);
-        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveDto);
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("invalidKey", "orderId",
+                1000L);
+        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
                         String.format("결제 승인 요청 처리 중 예외가 발생했습니다.")));
@@ -68,7 +74,7 @@ class TossPaymentClientTest {
                 .andExpect(content().json(paymentApproveJson))
                 .andRespond(withBadRequest().body(responseJson));
 
-        assertThatCode(() -> tossPaymentClient.approve(paymentApproveDto))
+        assertThatCode(() -> tossPaymentClient.approve(paymentApproveAppRequest))
                 .isInstanceOf(RoomescapeException.class)
                 .extracting("errorCode")
                 .isEqualTo(RoomescapeErrorCode.PAYMENT_FAILED);
@@ -79,8 +85,9 @@ class TossPaymentClientTest {
     @DisplayName("토스 서버에서 발생한 문제로 예외가 발생한다.")
     @Test
     void tossInternalServerErrorTest() throws IOException {
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "orderId", 1000L);
-        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveDto);
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
+                1000L);
+        String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
                         String.format("결제 승인 처리 API 서버에서 에러가 발생했습니다.")));
@@ -89,7 +96,7 @@ class TossPaymentClientTest {
                 .andExpect(content().json(paymentApproveJson))
                 .andRespond(withServerError().body(responseJson));
 
-        assertThatCode(() -> tossPaymentClient.approve(paymentApproveDto))
+        assertThatCode(() -> tossPaymentClient.approve(paymentApproveAppRequest))
                 .isInstanceOf(RoomescapeException.class)
                 .extracting("errorCode")
                 .isEqualTo(RoomescapeErrorCode.INTERNAL_SERVER_ERROR);

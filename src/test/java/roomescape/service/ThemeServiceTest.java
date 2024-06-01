@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ThemeSaveDto;
+import roomescape.service.request.ThemeSaveAppRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ThemeServiceTest {
@@ -34,7 +34,7 @@ class ThemeServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void save_IllegalName(String name) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(name, validDescription, validThumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveAppRequest(name, validDescription, validThumbnail)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -42,7 +42,7 @@ class ThemeServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void save_IllegalDescription(String description) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, description, validThumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveAppRequest(validName, description, validThumbnail)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -51,7 +51,7 @@ class ThemeServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"ftp://hello.jpg"})
     void save_IllegalThumbnail(String thumbnail) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, thumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveAppRequest(validName, validDescription, thumbnail)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -61,7 +61,8 @@ class ThemeServiceTest {
         when(themeRepository.existsByName(validName))
                 .thenReturn(true);
 
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, validThumbnail)))
+        assertThatThrownBy(
+                () -> themeService.save(new ThemeSaveAppRequest(validName, validDescription, validThumbnail)))
                 .isInstanceOf(RoomescapeException.class);
     }
 

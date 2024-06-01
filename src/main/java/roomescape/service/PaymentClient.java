@@ -1,9 +1,9 @@
 package roomescape.service;
 
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.response.PaymentApproveSuccessDto;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.response.PaymentApproveSuccessAppResponse;
 
 public interface PaymentClient {
 
-    PaymentApproveSuccessDto approve(PaymentApproveDto request);
+    PaymentApproveSuccessAppResponse approve(PaymentApproveAppRequest request);
 }

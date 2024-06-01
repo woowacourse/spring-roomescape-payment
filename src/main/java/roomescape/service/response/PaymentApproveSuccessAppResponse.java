@@ -1,6 +1,6 @@
 package roomescape.service.response;
 
-public record PaymentApproveSuccessDto(
+public record PaymentApproveSuccessAppResponse(
         String paymentKey,
         String orderId,
         Long totalAmount,

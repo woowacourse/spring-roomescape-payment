@@ -6,24 +6,24 @@ import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 
-public record ReservationDto(
+public record ReservationAppResponse(
         Long id,
         String name,
         ReservationDate date,
-        ReservationTimeDto reservationTimeDto,
-        ThemeDto themeDto
+        ReservationTimeAppResponse reservationTimeAppResponse,
+        ThemeAppResponse themeAppResponse
 ) {
 
-    public static ReservationDto from(Reservation reservation) {
+    public static ReservationAppResponse from(Reservation reservation) {
         Member member = reservation.getMember();
         ReservationTime time = reservation.getTime();
         Theme theme = reservation.getTheme();
-        return new ReservationDto(
+        return new ReservationAppResponse(
                 reservation.getId(),
                 member.getName(),
                 reservation.getDate(),
-                ReservationTimeDto.from(time),
-                ThemeDto.from(theme)
+                ReservationTimeAppResponse.from(time),
+                ThemeAppResponse.from(theme)
         );
     }
 }

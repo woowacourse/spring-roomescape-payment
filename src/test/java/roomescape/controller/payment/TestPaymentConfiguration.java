@@ -7,8 +7,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.service.PaymentClient;
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.response.PaymentApproveSuccessDto;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.response.PaymentApproveSuccessAppResponse;
 
 @TestConfiguration
 public class TestPaymentConfiguration {
@@ -18,8 +18,8 @@ public class TestPaymentConfiguration {
 
     @PostConstruct
     private void initMock() {
-        given(paymentClient.approve(any(PaymentApproveDto.class))).willReturn(
-                new PaymentApproveSuccessDto(
+        given(paymentClient.approve(any(PaymentApproveAppRequest.class))).willReturn(
+                new PaymentApproveSuccessAppResponse(
                         "paymentKey",
                         "orderId",
                         1000L,

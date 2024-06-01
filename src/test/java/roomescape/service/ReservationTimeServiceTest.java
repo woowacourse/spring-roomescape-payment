@@ -20,8 +20,8 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ReservationTimeSaveDto;
-import roomescape.service.response.ReservationTimeDto;
+import roomescape.service.request.ReservationTimeSaveAppRequest;
+import roomescape.service.response.ReservationTimeAppResponse;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceTest {
@@ -44,8 +44,8 @@ class ReservationTimeServiceTest {
         when(reservationTimeRepository.save(any(ReservationTime.class)))
                 .thenReturn(reservationTime);
 
-        ReservationTimeDto actual = reservationTimeService.save(new ReservationTimeSaveDto(startAt));
-        ReservationTimeDto expected = ReservationTimeDto.from(reservationTime);
+        ReservationTimeAppResponse actual = reservationTimeService.save(new ReservationTimeSaveAppRequest(startAt));
+        ReservationTimeAppResponse expected = ReservationTimeAppResponse.from(reservationTime);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -55,7 +55,7 @@ class ReservationTimeServiceTest {
     @ValueSource(strings = {"24:00", "-1:00", "10:60"})
     @NullAndEmptySource
     void save_IllegalTimeFormat(String time) {
-        assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveDto(time)))
+        assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveAppRequest(time)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -67,7 +67,7 @@ class ReservationTimeServiceTest {
         when(reservationTimeRepository.existsByStartAt(LocalTime.parse(rawTime)))
                 .thenReturn(true);
 
-        assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveDto(rawTime)))
+        assertThatThrownBy(() -> reservationTimeService.save(new ReservationTimeSaveAppRequest(rawTime)))
                 .isInstanceOf(RoomescapeException.class);
     }
 

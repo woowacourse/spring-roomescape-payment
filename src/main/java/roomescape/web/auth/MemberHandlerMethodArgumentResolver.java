@@ -11,7 +11,7 @@ import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
-import roomescape.service.response.MemberDto;
+import roomescape.service.response.MemberAppResponse;
 import roomescape.web.controller.request.LoginMember;
 
 @Component
@@ -44,7 +44,7 @@ public class MemberHandlerMethodArgumentResolver implements HandlerMethodArgumen
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
-        MemberDto appResponse = memberAuthService.findMemberByEmail(email);
+        MemberAppResponse appResponse = memberAuthService.findMemberByEmail(email);
 
         return new LoginMember(appResponse.id(), appResponse.name(), appResponse.role());
     }

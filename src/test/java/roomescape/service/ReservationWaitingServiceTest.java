@@ -31,9 +31,9 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ReservationWaitingSaveDto;
-import roomescape.service.response.ReservationWaitingDto;
-import roomescape.service.response.ReservationWaitingWithRankDto;
+import roomescape.service.request.ReservationWaitingSaveAppRequest;
+import roomescape.service.response.ReservationWaitingAppResponse;
+import roomescape.service.response.ReservationWaitingWithRankAppResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -89,12 +89,13 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(otherMember, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+        ReservationWaitingSaveAppRequest request = new ReservationWaitingSaveAppRequest(date, time.getId(),
+                theme.getId(),
                 member.getId());
-        ReservationWaitingDto response = reservationWaitingService.save(request);
+        ReservationWaitingAppResponse response = reservationWaitingService.save(request);
         ReservationWaiting expectedWaiting = reservationWaitingRepository.findById(response.id()).get();
 
-        assertThat(response).isEqualTo(ReservationWaitingDto.from(expectedWaiting));
+        assertThat(response).isEqualTo(ReservationWaitingAppResponse.from(expectedWaiting));
     }
 
     @Test
@@ -106,7 +107,8 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(member, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+        ReservationWaitingSaveAppRequest request = new ReservationWaitingSaveAppRequest(date, time.getId(),
+                theme.getId(),
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
@@ -122,7 +124,8 @@ class ReservationWaitingServiceTest {
         Theme theme = themeRepository.save(VALID_THEME);
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+        ReservationWaitingSaveAppRequest request = new ReservationWaitingSaveAppRequest(date, time.getId(),
+                theme.getId(),
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
@@ -142,7 +145,8 @@ class ReservationWaitingServiceTest {
         reservationWaitingRepository.save(
                 new ReservationWaiting(LocalDateTime.now(), member, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+        ReservationWaitingSaveAppRequest request = new ReservationWaitingSaveAppRequest(date, time.getId(),
+                theme.getId(),
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
@@ -160,7 +164,8 @@ class ReservationWaitingServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         reservationRepository.save(new Reservation(otherMember, new ReservationDate(date), time, theme));
 
-        ReservationWaitingSaveDto request = new ReservationWaitingSaveDto(date, time.getId(), theme.getId(),
+        ReservationWaitingSaveAppRequest request = new ReservationWaitingSaveAppRequest(date, time.getId(),
+                theme.getId(),
                 member.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.save(request))
@@ -187,12 +192,13 @@ class ReservationWaitingServiceTest {
         ReservationWaiting savedWaiting = reservationWaitingRepository.save(
                 new ReservationWaiting(createdDateTime, savedMembers.get(2), new ReservationDate(date), time, theme));
 
-        List<ReservationWaitingWithRankDto> waitingWithRankAppResponses = reservationWaitingService.findWaitingWithRankByMemberId(
+        List<ReservationWaitingWithRankAppResponse> waitingWithRankAppResponses = reservationWaitingService.findWaitingWithRankByMemberId(
                 savedMembers.get(2).getId());
 
         assertThat(waitingWithRankAppResponses)
                 .hasSize(1)
-                .containsExactly(ReservationWaitingWithRankDto.from(new ReservationWaitingWithRank(savedWaiting, 2L)));
+                .containsExactly(
+                        ReservationWaitingWithRankAppResponse.from(new ReservationWaitingWithRank(savedWaiting, 2L)));
     }
 
     @Test

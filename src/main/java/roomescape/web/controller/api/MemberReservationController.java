@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.ReservationDto;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.request.ReservationSaveAppRequest;
+import roomescape.service.response.ReservationAppResponse;
 import roomescape.web.auth.Auth;
 import roomescape.web.controller.request.LoginMember;
 import roomescape.web.controller.request.MemberReservationRequest;
@@ -35,14 +35,14 @@ public class MemberReservationController {
     public ResponseEntity<MemberReservationResponse> reserve(
             @Valid @RequestBody MemberReservationRequest reservationRequest,
             @Valid @Auth LoginMember loginMember) {
-        PaymentApproveDto paymentApproveDto = PaymentApproveDto.from(reservationRequest);
+        PaymentApproveAppRequest paymentApproveAppRequest = PaymentApproveAppRequest.from(reservationRequest);
 
-        ReservationDto appResponse = reservationService.save(
-                new ReservationSaveDto(reservationRequest.date(),
+        ReservationAppResponse appResponse = reservationService.save(
+                new ReservationSaveAppRequest(reservationRequest.date(),
                         reservationRequest.timeId(),
                         reservationRequest.themeId(),
                         loginMember.id()),
-                paymentApproveDto);
+                paymentApproveAppRequest);
 
         Long id = appResponse.id();
         MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);
@@ -60,7 +60,7 @@ public class MemberReservationController {
 
     @GetMapping
     public ResponseEntity<List<MemberReservationResponse>> getReservations() {
-        List<ReservationDto> appResponses = reservationService.findAll();
+        List<ReservationAppResponse> appResponses = reservationService.findAll();
         List<MemberReservationResponse> memberReservationResponse = appResponses.stream()
                 .map(MemberReservationResponse::from)
                 .toList();

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationWaitingService;
-import roomescape.service.response.ReservationWaitingDto;
+import roomescape.service.response.ReservationWaitingAppResponse;
 import roomescape.web.controller.response.ReservationWaitingResponse;
 
 @RestController
@@ -32,7 +32,7 @@ public class AdminReservationWaitingController {
 
     @PatchMapping("/{id}/deny")
     public ResponseEntity<ReservationWaitingResponse> updateWaitingStatus(@PathVariable Long id) {
-        ReservationWaitingDto waitingAppResponse = reservationWaitingService.denyWaiting(id);
+        ReservationWaitingAppResponse waitingAppResponse = reservationWaitingService.denyWaiting(id);
         ReservationWaitingResponse waitingWebResponse = ReservationWaitingResponse.from(waitingAppResponse);
 
         return ResponseEntity.ok(waitingWebResponse);

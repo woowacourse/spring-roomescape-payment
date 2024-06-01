@@ -14,8 +14,8 @@ import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.service.MemberAuthService;
-import roomescape.service.request.MemberSignUpDto;
-import roomescape.service.response.MemberDto;
+import roomescape.service.request.MemberSignUpAppRequest;
+import roomescape.service.response.MemberAppResponse;
 import roomescape.web.controller.request.MemberSignUpRequest;
 import roomescape.web.controller.request.TokenRequest;
 import roomescape.web.controller.response.MemberResponse;
@@ -48,7 +48,7 @@ public class MemberAuthController {
         }
         String token = memberAuthService.extractTokenFromCookies(request.getCookies());
         String email = jwtProvider.getPayload(token);
-        MemberDto appResponse = memberAuthService.findMemberByEmail(email);
+        MemberAppResponse appResponse = memberAuthService.findMemberByEmail(email);
         MemberResponse response = new MemberResponse(appResponse.id(), appResponse.name(), appResponse.role());
 
         return ResponseEntity.ok().body(response);
@@ -56,8 +56,8 @@ public class MemberAuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<MemberResponse> signUp(@Valid @RequestBody MemberSignUpRequest request) {
-        MemberDto appResponse = memberAuthService.signUp(
-                new MemberSignUpDto(request.name(), request.email(), request.password()));
+        MemberAppResponse appResponse = memberAuthService.signUp(
+                new MemberSignUpAppRequest(request.name(), request.email(), request.password()));
 
         MemberResponse response = new MemberResponse(appResponse.id(), appResponse.name(), appResponse.role());
         return ResponseEntity.created(URI.create("/member" + appResponse.id())).body(response);
@@ -73,7 +73,7 @@ public class MemberAuthController {
 
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> getMembers() {
-        List<MemberDto> appResponses = memberAuthService.findAll();
+        List<MemberAppResponse> appResponses = memberAuthService.findAll();
 
         List<MemberResponse> responses = appResponses.stream()
                 .map(MemberResponse::from)

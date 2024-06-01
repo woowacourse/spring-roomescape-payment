@@ -6,26 +6,26 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.ReservationWaiting;
 import roomescape.domain.Theme;
 
-public record ReservationWaitingDto(
+public record ReservationWaitingAppResponse(
         Long id,
         String name,
         ReservationDate date,
-        ReservationTimeDto reservationTimeDto,
-        ThemeDto themeDto,
+        ReservationTimeAppResponse reservationTimeAppResponse,
+        ThemeAppResponse themeAppResponse,
         String status
 ) {
 
-    public static ReservationWaitingDto from(ReservationWaiting waiting) {
+    public static ReservationWaitingAppResponse from(ReservationWaiting waiting) {
         Member member = waiting.getMember();
         ReservationDate date = waiting.getDate();
         ReservationTime time = waiting.getTime();
         Theme theme = waiting.getTheme();
-        return new ReservationWaitingDto(
+        return new ReservationWaitingAppResponse(
                 waiting.getId(),
                 member.getName(),
                 date,
-                ReservationTimeDto.from(time),
-                ThemeDto.from(theme),
+                ReservationTimeAppResponse.from(time),
+                ThemeAppResponse.from(theme),
                 waiting.getDeniedAt());
     }
 }

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationAndWaitingService;
 import roomescape.service.ReservationService;
-import roomescape.service.request.AdminSearchedReservationDto;
-import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.ReservationDto;
+import roomescape.service.request.AdminSearchedReservationAppRequest;
+import roomescape.service.request.ReservationSaveAppRequest;
+import roomescape.service.response.ReservationAppResponse;
 import roomescape.web.controller.request.AdminReservationRequest;
 import roomescape.web.controller.request.SearchCondition;
 import roomescape.web.controller.response.AdminReservationResponse;
@@ -37,9 +37,9 @@ public class AdminReservationController {
     @PostMapping
     public ResponseEntity<AdminReservationResponse> reserve(
             @Valid @RequestBody AdminReservationRequest request) {
-        ReservationSaveDto appRequest = ReservationSaveDto.from(request);
+        ReservationSaveAppRequest appRequest = ReservationSaveAppRequest.from(request);
 
-        ReservationDto appResponse = reservationService.save(appRequest);
+        ReservationAppResponse appResponse = reservationService.save(appRequest);
         AdminReservationResponse adminReservationResponse = AdminReservationResponse.from(appRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + appResponse.id()))
@@ -48,9 +48,9 @@ public class AdminReservationController {
 
     @GetMapping("/search")
     public ResponseEntity<List<MemberReservationResponse>> getSearchedReservations(SearchCondition searchCondition) {
-        AdminSearchedReservationDto appRequest = AdminSearchedReservationDto.from(searchCondition);
+        AdminSearchedReservationAppRequest appRequest = AdminSearchedReservationAppRequest.from(searchCondition);
 
-        List<ReservationDto> appResponses = reservationService.findAllSearched(appRequest);
+        List<ReservationAppResponse> appResponses = reservationService.findAllSearched(appRequest);
 
         List<MemberReservationResponse> webResponse = appResponses.stream()
                 .map(MemberReservationResponse::from)

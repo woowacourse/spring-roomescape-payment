@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationTimeService;
-import roomescape.service.request.ReservationTimeSaveDto;
-import roomescape.service.response.BookableReservationTimeDto;
-import roomescape.service.response.ReservationTimeDto;
+import roomescape.service.request.ReservationTimeSaveAppRequest;
+import roomescape.service.response.BookableReservationTimeAppResponse;
+import roomescape.service.response.ReservationTimeAppResponse;
 import roomescape.web.controller.request.ReservationTimeRequest;
 import roomescape.web.controller.response.BookableReservationTimeResponse;
 import roomescape.web.controller.response.ReservationTimeResponse;
@@ -32,7 +32,8 @@ public class ReservationTimeController {
 
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody ReservationTimeRequest request) {
-        ReservationTimeDto appResponse = reservationTimeService.save(new ReservationTimeSaveDto(request.startAt()));
+        ReservationTimeAppResponse appResponse = reservationTimeService.save(
+                new ReservationTimeSaveAppRequest(request.startAt()));
         Long id = appResponse.id();
 
         return ResponseEntity.created(URI.create("/times/" + id))
@@ -48,7 +49,7 @@ public class ReservationTimeController {
 
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
-        List<ReservationTimeDto> appResponses = reservationTimeService.findAll();
+        List<ReservationTimeAppResponse> appResponses = reservationTimeService.findAll();
 
         List<ReservationTimeResponse> reservationTimeResponses = appResponses.stream()
                 .map(ReservationTimeResponse::from)
@@ -62,7 +63,7 @@ public class ReservationTimeController {
             @RequestParam String date,
             @RequestParam Long id) {
 
-        List<BookableReservationTimeDto> appResponses = reservationTimeService
+        List<BookableReservationTimeAppResponse> appResponses = reservationTimeService
                 .findAllWithBookAvailability(date, id);
 
         List<BookableReservationTimeResponse> webResponses = appResponses.stream()

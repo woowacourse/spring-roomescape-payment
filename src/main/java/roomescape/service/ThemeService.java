@@ -9,8 +9,8 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ThemeSaveDto;
-import roomescape.service.response.ThemeDto;
+import roomescape.service.request.ThemeSaveAppRequest;
+import roomescape.service.response.ThemeAppResponse;
 
 @Service
 public class ThemeService {
@@ -26,15 +26,15 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
-    public ThemeDto save(ThemeSaveDto request) {
+    public ThemeAppResponse save(ThemeSaveAppRequest request) {
         Theme theme = new Theme(request.name(), request.description(), request.thumbnail());
         validateDuplication(request);
         Theme savedTheme = themeRepository.save(theme);
 
-        return ThemeDto.from(savedTheme);
+        return ThemeAppResponse.from(savedTheme);
     }
 
-    private void validateDuplication(ThemeSaveDto request) {
+    private void validateDuplication(ThemeSaveAppRequest request) {
         if (themeRepository.existsByName(request.name())) {
             throw new RoomescapeException(RoomescapeErrorCode.DUPLICATED_THEME, "이미 존재하는 테마 입니다.");
         }
@@ -47,20 +47,20 @@ public class ThemeService {
         themeRepository.deleteById(id);
     }
 
-    public List<ThemeDto> findAll() {
+    public List<ThemeAppResponse> findAll() {
         return themeRepository.findAll().stream()
-                .map(ThemeDto::from)
+                .map(ThemeAppResponse::from)
                 .toList();
     }
 
-    public List<ThemeDto> findPopular() {
+    public List<ThemeAppResponse> findPopular() {
         LocalDate from = LocalDate.now().minusDays(BASED_ON_PERIOD_POPULAR_THEME);
         LocalDate to = LocalDate.now().minusDays(1);
         List<Theme> mostReservedThemes = themeRepository.findMostReservedThemesInPeriod(from, to,
                 PageRequest.of(0, MAX_POPULAR_THEME_COUNT));
 
         return mostReservedThemes.stream()
-                .map(ThemeDto::from)
+                .map(ThemeAppResponse::from)
                 .toList();
     }
 }

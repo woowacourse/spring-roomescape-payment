@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.domain.Reservation;
-import roomescape.service.request.AdminSearchedReservationDto;
+import roomescape.service.request.AdminSearchedReservationAppRequest;
 
 public class ReservationSpecification {
 
-    public Specification<Reservation> generate(AdminSearchedReservationDto request) {
+    public Specification<Reservation> generate(AdminSearchedReservationAppRequest request) {
         List<Specification<Reservation>> specifications = new ArrayList<>();
         if (request.themeId() != null) {
             specifications.add((root, query, criteriaBuilder) ->

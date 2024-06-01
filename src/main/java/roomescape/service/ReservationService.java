@@ -15,11 +15,11 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.AdminSearchedReservationDto;
-import roomescape.service.request.PaymentApproveDto;
-import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.PaymentApproveSuccessDto;
-import roomescape.service.response.ReservationDto;
+import roomescape.service.request.AdminSearchedReservationAppRequest;
+import roomescape.service.request.PaymentApproveAppRequest;
+import roomescape.service.request.ReservationSaveAppRequest;
+import roomescape.service.response.PaymentApproveSuccessAppResponse;
+import roomescape.service.response.ReservationAppResponse;
 import roomescape.service.specification.ReservationSpecification;
 
 @Service
@@ -45,26 +45,28 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationDto save(ReservationSaveDto reservationSaveDto) {
-        Member member = findMember(reservationSaveDto.memberId());
-        ReservationDate date = new ReservationDate(reservationSaveDto.date());
-        ReservationTime time = findTime(reservationSaveDto.timeId());
-        Theme theme = findTheme(reservationSaveDto.themeId());
+    public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest) {
+        Member member = findMember(reservationSaveAppRequest.memberId());
+        ReservationDate date = new ReservationDate(reservationSaveAppRequest.date());
+        ReservationTime time = findTime(reservationSaveAppRequest.timeId());
+        Theme theme = findTheme(reservationSaveAppRequest.themeId());
         Reservation reservation = new Reservation(member, date, time, theme);
         validatePastReservation(reservation);
-        validateDuplication(date, reservationSaveDto.timeId(), reservationSaveDto.themeId());
+        validateDuplication(date, reservationSaveAppRequest.timeId(), reservationSaveAppRequest.themeId());
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        return ReservationDto.from(savedReservation);
+        return ReservationAppResponse.from(savedReservation);
     }
 
     @Transactional
-    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
-        ReservationDto reservationDto = save(reservationSaveDto);
-        PaymentApproveSuccessDto paymentApproveSuccessDto = paymentManager.approve(paymentApproveDto);
+    public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest,
+                                       PaymentApproveAppRequest paymentApproveAppRequest) {
+        ReservationAppResponse reservationAppResponse = save(reservationSaveAppRequest);
+        PaymentApproveSuccessAppResponse paymentApproveSuccessAppResponse = paymentManager.approve(
+                paymentApproveAppRequest);
 
-        return reservationDto;
+        return reservationAppResponse;
     }
 
     private ReservationTime findTime(Long timeId) {
@@ -102,24 +104,24 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public List<ReservationDto> findAll() {
+    public List<ReservationAppResponse> findAll() {
         return reservationRepository.findAll().stream()
-                .map(ReservationDto::from)
+                .map(ReservationAppResponse::from)
                 .toList();
     }
 
-    public List<ReservationDto> findAllSearched(AdminSearchedReservationDto request) {
+    public List<ReservationAppResponse> findAllSearched(AdminSearchedReservationAppRequest request) {
         Specification<Reservation> reservationSpecification = new ReservationSpecification().generate(request);
 
         return reservationRepository.findAll(reservationSpecification).stream()
-                .map(ReservationDto::from)
+                .map(ReservationAppResponse::from)
                 .toList();
     }
 
-    public List<ReservationDto> findByMemberId(Long id) {
+    public List<ReservationAppResponse> findByMemberId(Long id) {
 
         return reservationRepository.findAllByMemberId(id).stream()
-                .map(ReservationDto::from)
+                .map(ReservationAppResponse::from)
                 .toList();
     }
 }

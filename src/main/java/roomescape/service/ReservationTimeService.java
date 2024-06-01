@@ -12,9 +12,9 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
-import roomescape.service.request.ReservationTimeSaveDto;
-import roomescape.service.response.BookableReservationTimeDto;
-import roomescape.service.response.ReservationTimeDto;
+import roomescape.service.request.ReservationTimeSaveAppRequest;
+import roomescape.service.response.BookableReservationTimeAppResponse;
+import roomescape.service.response.ReservationTimeAppResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,12 +30,12 @@ public class ReservationTimeService {
     }
 
     @Transactional
-    public ReservationTimeDto save(ReservationTimeSaveDto request) {
+    public ReservationTimeAppResponse save(ReservationTimeSaveAppRequest request) {
         ReservationTime newReservationTime = new ReservationTime(request.startAt());
         validateDuplication(newReservationTime.getStartAt());
         ReservationTime savedTime = reservationTimeRepository.save(newReservationTime);
 
-        return ReservationTimeDto.from(savedTime);
+        return ReservationTimeAppResponse.from(savedTime);
     }
 
     private void validateDuplication(LocalTime parsedTime) {
@@ -52,13 +52,13 @@ public class ReservationTimeService {
         reservationTimeRepository.deleteById(id);
     }
 
-    public List<ReservationTimeDto> findAll() {
+    public List<ReservationTimeAppResponse> findAll() {
         return reservationTimeRepository.findAll().stream()
-                .map(ReservationTimeDto::from)
+                .map(ReservationTimeAppResponse::from)
                 .toList();
     }
 
-    public List<BookableReservationTimeDto> findAllWithBookAvailability(String date, Long themeId) {
+    public List<BookableReservationTimeAppResponse> findAllWithBookAvailability(String date, Long themeId) {
         List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(
                 new ReservationDate(date), themeId
         );
@@ -67,7 +67,7 @@ public class ReservationTimeService {
                 .toList();
 
         return reservationTimeRepository.findAll().stream()
-                .map(time -> BookableReservationTimeDto.of(time, isBooked(reservedTimes, time)))
+                .map(time -> BookableReservationTimeAppResponse.of(time, isBooked(reservedTimes, time)))
                 .toList();
     }
 
