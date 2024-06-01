@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
-import roomescape.global.exception.PaymentErrorResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentErrorResponse;
 
 @Component
 public class PaymentClient {
@@ -50,7 +50,7 @@ public class PaymentClient {
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                     PaymentErrorResponse errorResponse = OBJECT_MAPPER.readValue(res.getBody(),
                             PaymentErrorResponse.class);
-                    throw new IllegalRequestException(errorResponse.getMessage());
+                    throw new IllegalRequestException(errorResponse.message());
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                     throw new InternalServerException("결제 승인 도중 알 수 없는 예외가 발생했습니다");
