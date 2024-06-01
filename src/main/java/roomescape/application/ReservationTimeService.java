@@ -30,7 +30,7 @@ public class ReservationTimeService {
 
     public List<AvailableReservationTimeResponse> findAllAvailableReservationTime(LocalDate date, Long themeId) {
         List<ReservationTime> totalTimes = reservationTimeRepository.findAll();
-        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllUnAvailableTimes(date, themeId);
+        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTime(date, themeId);
 
         return totalTimes.stream()
                 .map(time -> AvailableReservationTimeResponse.of(time, reservedTimes))

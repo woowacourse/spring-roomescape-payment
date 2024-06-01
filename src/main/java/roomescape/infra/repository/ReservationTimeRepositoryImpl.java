@@ -42,11 +42,6 @@ public class ReservationTimeRepositoryImpl implements ReservationTimeRepository 
     }
 
     @Override
-    public List<ReservationTime> findAllUnAvailableTimes(LocalDate date, Long themeId) {
-        return reservationTimeJpaRepository.findAllUnAvailableTimes(date, themeId);
-    }
-
-    @Override
     public boolean existsByStartAt(LocalTime startAt) {
         return reservationTimeJpaRepository.existsByStartAt(startAt);
     }
