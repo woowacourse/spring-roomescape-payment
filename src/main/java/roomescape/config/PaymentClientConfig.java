@@ -5,17 +5,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
+import roomescape.payment.PaymentClient;
 import roomescape.payment.TossPaymentClient;
 
 @Configuration
-public class ClientConfig {
+public class PaymentClientConfig {
 
     @Bean
-    public TossPaymentClient paymentRestClient(final ResponseErrorHandler errorHandler,
-                                               @Value("${payments.toss.secret-key}") final String secretKey,
-                                               @Value("${payments.toss.password}") final String password,
-                                               @Value("${payments.toss.host-name}") final String hostName,
-                                               @Value("${payments.toss.payment-api}") final String paymentApi
+    public PaymentClient paymentRestClient(final ResponseErrorHandler errorHandler,
+                                           @Value("${payments.toss.secret-key}") final String secretKey,
+                                           @Value("${payments.toss.password}") final String password,
+                                           @Value("${payments.toss.host-name}") final String hostName,
+                                           @Value("${payments.toss.payment-api}") final String paymentApi
     ) {
         return new TossPaymentClient(factory(), errorHandler, secretKey, password, hostName, paymentApi);
     }
