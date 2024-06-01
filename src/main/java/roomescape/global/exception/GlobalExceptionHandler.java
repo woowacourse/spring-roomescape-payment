@@ -46,7 +46,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(PaymentException e) {
-        System.out.println("GlobalExceptionHandler.handle");
         return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getMessage()));
     }
 
