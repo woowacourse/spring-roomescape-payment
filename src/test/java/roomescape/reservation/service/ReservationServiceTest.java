@@ -27,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.global.exception.IllegalRequestException;
+import roomescape.global.exception.InternalServerException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.domain.Reservation;
@@ -114,9 +115,9 @@ class ReservationServiceTest {
                 .isInstanceOf(IllegalRequestException.class);
     }
 
-    @DisplayName("결제가 승인되지 않으면 멤버의 예약 저장에 실패한다")
+    @DisplayName("결제가 4xx 에러로 인해 승인되지 않으면 멤버의 예약 저장에 실패한다")
     @Test
-    void should_throw_exception_when_reservation_not_confirmed_payments() {
+    void should_throw_exception_when_reservation_not_confirmed_payments_4xx_error() {
         doThrow(IllegalRequestException.class)
                 .when(paymentClient)
                 .requestConfirmPayment(any(PaymentConfirmRequest.class));
@@ -124,6 +125,18 @@ class ReservationServiceTest {
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
                 .isInstanceOf(IllegalRequestException.class);
+    }
+
+    @DisplayName("결제가 5xx 에러로 인해 승인되지 않으면 멤버의 예약 저장에 실패한다")
+    @Test
+    void should_throw_exception_when_reservation_not_confirmed_payments_5xx_error() {
+        doThrow(InternalServerException.class)
+                .when(paymentClient)
+                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+
+        assertThatThrownBy(
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
+                .isInstanceOf(InternalServerException.class);
     }
 
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
