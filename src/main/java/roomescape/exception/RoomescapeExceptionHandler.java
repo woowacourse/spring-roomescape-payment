@@ -34,9 +34,17 @@ public class RoomescapeExceptionHandler {
     @ExceptionHandler(ApiCallException.class)
     public ResponseEntity<ErrorResponse> handle(ApiCallException e) {
         logger.error(e.getMessage(), e);
+        String errorMessage = getApiErrorMessage(e);
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(e.getMessage()));
+                .body(new ErrorResponse(errorMessage));
+    }
+
+    private String getApiErrorMessage(ApiCallException e) {
+        if (!TossPaymentApiUserExceptionCode.hasErrorCode(e.getCode())) {
+            return "서버에 오류가 발생했습니다.";
+        }
+        return e.getMessage();
     }
 
     @ExceptionHandler(Exception.class)

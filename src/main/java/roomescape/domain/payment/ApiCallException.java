@@ -20,4 +20,11 @@ public class ApiCallException extends RuntimeException {
         }
         return super.getMessage();
     }
+
+    public String getCode() {
+        if (apiError != null) {
+            return apiError.code();
+        }
+        return "ERROR_CODE";
+    }
 }
