@@ -6,6 +6,6 @@ import roomescape.service.dto.request.PaymentRequest;
 public class FakePaymentClient implements PaymentClient {
 
     @Override
-    public void confirm(PaymentRequest paymentRequest) {
+    public void pay(PaymentRequest paymentRequest) {
     }
 }

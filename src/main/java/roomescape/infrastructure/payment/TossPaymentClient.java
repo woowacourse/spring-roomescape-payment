@@ -36,7 +36,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void confirm(PaymentRequest paymentRequest) {
+    public void pay(PaymentRequest paymentRequest) {
         try {
             restClient.post()
                     .uri(properties.getPaymentUri())

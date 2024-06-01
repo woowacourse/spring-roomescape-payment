@@ -83,7 +83,7 @@ public class ReservationService {
                                               PaymentRequest paymentRequest) {
         Reservation reservation = createValidatedReservation(createReservationRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentClient.confirm(paymentRequest);
+        paymentClient.pay(paymentRequest);
         return ReservationResponse.from(savedReservation);
     }
 
