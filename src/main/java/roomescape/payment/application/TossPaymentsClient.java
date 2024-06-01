@@ -63,7 +63,7 @@ public class TossPaymentsClient {
                 .toBodilessEntity();
     }
 
-    private String extractErrorMessage(ClientHttpResponse res) throws IOException {
-        return objectMapper.readValue(res.getBody(), TossPaymentsErrorResponse.class).message();
+    private String extractErrorMessage(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), TossPaymentsErrorResponse.class).message();
     }
 }
