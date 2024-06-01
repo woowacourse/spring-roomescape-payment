@@ -18,6 +18,9 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.payment.TossErrorResponse;
 import roomescape.exception.PaymentException;
 
+/**
+ * @see <a href="https://docs.tosspayments.com/reference/error-codes">토스 결제 오류 코드 정의서</a>
+ */
 @Component
 public class TossPaymentClient {
 
