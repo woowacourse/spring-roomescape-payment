@@ -1,6 +1,7 @@
 package roomescape.service.config;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -21,6 +22,7 @@ public class TossPaymentClientConfiguration {
     public RestTemplate build(RestTemplateBuilder builder, TossPaymentConfigProperties properties) {
         return builder
             .defaultHeader(HttpHeaders.AUTHORIZATION, encode(properties.getTestSecretKey()))
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .setConnectTimeout(CONNECT_TIMEOUT_DURATION)
             .setReadTimeout(READ_TIMEOUT_DURATION)
             .build();
