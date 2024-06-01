@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -111,13 +110,12 @@ class UserReservationServiceTest {
             .hasMessage("과거 예약을 추가할 수 없습니다.");
     }
 
-    @DisplayName("실패: 같은 날짜, 과거 시간 예약 생성하면 예외 발생 -- 1분 전")
+    @DisplayName("실패: 같은 날짜, 과거 시간 예약 생성하면 예외 발생")
     @Test
     void save_TodayPastTimeReservation() {
         LocalDate today = LocalDate.now();
-        String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
 
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo));
+        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime("00:00"));
 
         assertThatThrownBy(
             () -> userReservationService.reserve(userId, today, savedTime.getId(), themeId)
