@@ -24,11 +24,6 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @GetMapping("/login")
-    public String loginView() {
-        return "/login";
-    }
-
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         String loginToken = loginService.getLoginToken(loginRequest);
