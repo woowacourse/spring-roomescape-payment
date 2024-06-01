@@ -1,15 +1,19 @@
 package roomescape.infrastructure.payment;
 
+import io.netty.handler.timeout.TimeoutException;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClient;
-import roomescape.dto.payment.PaymentErrorResponse;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.reactive.function.client.WebClient;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
-import roomescape.exception.PaymentException;
+import roomescape.dto.payment.TossError;
+import roomescape.exception.ExternalApiTimeoutException;
+import roomescape.exception.TossClientException;
+import roomescape.exception.TossServerException;
 
 @Component
 public class TossPaymentClient {
@@ -19,29 +23,37 @@ public class TossPaymentClient {
 
     private final String secretKey;
     private final String confirmUrl;
-    private final RestClient restClient;
+    private final WebClient webClient;
 
     public TossPaymentClient(@Value("${api.toss.secret-key}") String secretKey,
                              @Value("${api.toss.url.confirm}") String confirmUrl,
-                             RestClient restClient
+                             WebClient webClient
     ) {
         this.secretKey = secretKey;
         this.confirmUrl = confirmUrl;
-        this.restClient = restClient;
+        this.webClient = webClient;
     }
 
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse requestPayment(PaymentRequest paymentRequest) {
         try {
-            return restClient.post()
+            return webClient.post()
                     .uri(confirmUrl)
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", createAuthorizationHeader())
-                    .body(paymentRequest)
+                    .bodyValue(paymentRequest)
                     .retrieve()
-                    .body(PaymentResponse.class);
+                    .bodyToMono(PaymentResponse.class)
+                    .block();
         } catch (HttpClientErrorException e) {
-            PaymentErrorResponse errorResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
-            throw new PaymentException(errorResponse.message(), e.getStatusCode());
+            TossError tossError = e.getResponseBodyAs(TossError.class);
+            throw new TossClientException(tossError);
+
+        } catch (HttpServerErrorException e) {
+            TossError tossError = e.getResponseBodyAs(TossError.class);
+            throw new TossServerException(tossError);
+
+        } catch (TimeoutException e) {
+            throw new ExternalApiTimeoutException(e.getMessage());
         }
     }
 

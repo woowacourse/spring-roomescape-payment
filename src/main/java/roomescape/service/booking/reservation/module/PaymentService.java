@@ -15,6 +15,6 @@ public class PaymentService {
     }
 
     public PaymentResponse pay(PaymentRequest paymentRequest) {
-       return tossPaymentClient.confirm(paymentRequest);
+       return tossPaymentClient.requestPayment(paymentRequest);
     }
 }

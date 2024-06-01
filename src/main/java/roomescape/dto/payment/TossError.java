@@ -1,6 +1,6 @@
 package roomescape.dto.payment;
 
-public record PaymentErrorResponse(
+public record TossError(
         String code,
         String message
 ) {
