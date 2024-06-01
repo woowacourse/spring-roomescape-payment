@@ -15,8 +15,6 @@ public class PaymentTimeoutHandlerInterceptor implements ClientHttpRequestInterc
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) {
-        String requestBody = new String(body);
-        logger.info("Payment request: {}", requestBody);
         try {
             return execution.execute(request, body);
         } catch (SocketTimeoutException e) {
