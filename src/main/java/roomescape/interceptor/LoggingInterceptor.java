@@ -19,6 +19,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) throws IOException {
         logger.info("[REQUEST BODY] msg : {}", new String(body, StandardCharsets.UTF_8));
         final ClientHttpResponse response = execution.execute(request, body);
+        response.getStatusCode(); // restTemplate에서 4xx, 5xx에러 발생시 .getBody()에서 IOException을 방지하기 위함
         logger.info("[RESPONSE BODY] msg : {}", new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8));
         return response;
     }
