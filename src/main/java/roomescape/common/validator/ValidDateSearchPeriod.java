@@ -7,12 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = DateRangeValidator.class)
+@Constraint(validatedBy = DateSearchPeriodValidator.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidDateSearchPeriod {
 
-    String message() default "최대 " + DateRangeValidator.LIMIT_DAY + "일 까지만 조회가능합니다.";
+    String message() default "최대 " + DateSearchPeriodValidator.LIMIT_DAY + "일 까지만 조회가능합니다.";
 
     Class<?>[] groups() default {};
 

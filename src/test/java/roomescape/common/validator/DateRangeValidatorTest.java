@@ -20,8 +20,8 @@ class DateRangeValidatorTest {
                 1L, 1L, dateFrom, dateTo
         );
 
-        DateRangeValidator dateRangeValidator = new DateRangeValidator();
-        boolean valid = dateRangeValidator.isValid(
+        DateSearchPeriodValidator validator = new DateSearchPeriodValidator();
+        boolean valid = validator.isValid(
                 reservationSearchCondRequest,
                 mock(ConstraintValidatorContext.class)
         );

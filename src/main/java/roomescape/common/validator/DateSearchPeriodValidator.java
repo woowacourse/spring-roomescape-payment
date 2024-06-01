@@ -5,7 +5,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.time.temporal.ChronoUnit;
 import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 
-public class DateRangeValidator implements ConstraintValidator<ValidDateSearchPeriod, ReservationSearchCondRequest> {
+public class DateSearchPeriodValidator implements
+        ConstraintValidator<ValidDateSearchPeriod, ReservationSearchCondRequest> {
 
     public static final int LIMIT_DAY = 30;
 
