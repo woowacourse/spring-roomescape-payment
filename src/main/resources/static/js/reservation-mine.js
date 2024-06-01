@@ -12,17 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function render(data) {
-    // ------  결제위젯 초기화 ------
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = PAYMENT_AMOUNT;
-    const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-    const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: paymentAmount},
-        {variantKey: "DEFAULT"}
-    );
 
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
@@ -69,13 +58,37 @@ function render(data) {
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick =
                 function onReservationButtonClickWithPaymentWidget(event) {
-                    onReservationButtonClick(event, paymentWidget, item.id);
+                    popupModal(price, item.id);
                 }
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(5).textContent = '';
         }
     });
+}
+
+function popupModal(price, id) {
+    let modal = document.getElementsByClassName("payment-modal-back")[0]; // 첫 번째 요소 선택
+    if (modal) { // modal이 존재하는지 확인
+        modal.style.display = 'block'; // display를 block으로 설정하여 모달 띄우기
+    }
+
+    // ------  결제위젯 초기화 ------
+    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
+    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
+    const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+    paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
+    paymentWidget.renderPaymentMethods(
+        "#payment-method",
+        {value: price},
+        {variantKey: "DEFAULT"}
+    );
+
+    document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
+
+    function onReservationButtonClickWithPaymentWidget(event) {
+        onReservationButtonClick(event, paymentWidget, id);
+    }
 }
 
 function onReservationButtonClick(event, paymentWidget, id) {
