@@ -1,5 +1,6 @@
 package roomescape.common;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +19,12 @@ public class PaymentClientConfiguration {
     private static final String NO_PASSWORD_SUFFIX = ":";
 
     private final PaymentProperties paymentProperties;
+    private final String tossBaseUrl;
 
-    public PaymentClientConfiguration(final PaymentProperties paymentProperties) {
+    public PaymentClientConfiguration(final PaymentProperties paymentProperties,
+                                      @Value("${payment.baseUrl.toss}") final String tossBaseUrl) {
         this.paymentProperties = paymentProperties;
+        this.tossBaseUrl = tossBaseUrl;
     }
 
     @Bean
@@ -33,9 +37,9 @@ public class PaymentClientConfiguration {
 
         return new TossPaymentClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com/v1/payments")
+                        .baseUrl(tossBaseUrl)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
-                        .build()
+                .build()
         );
     }
 }
