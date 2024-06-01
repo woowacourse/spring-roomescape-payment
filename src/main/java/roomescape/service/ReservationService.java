@@ -9,6 +9,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationFactory;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
+import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.WaitingRequest;
@@ -22,14 +23,20 @@ import roomescape.exception.RoomescapeException;
 public class ReservationService {
     private final ReservationFactory reservationFactory;
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(ReservationFactory reservationFactory, ReservationRepository reservationRepository) {
+    public ReservationService(ReservationFactory reservationFactory, ReservationRepository reservationRepository,
+                              PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationFactory = reservationFactory;
+        this.paymentService = paymentService;
     }
 
     @Transactional
     public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+        PaymentRequest paymentRequest = new PaymentRequest(reservationRequest.orderId(), reservationRequest.amount(),
+                reservationRequest.paymentKey());
+        paymentService.confirmPayment(paymentRequest);
         Reservation reservation = reservationFactory.createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
