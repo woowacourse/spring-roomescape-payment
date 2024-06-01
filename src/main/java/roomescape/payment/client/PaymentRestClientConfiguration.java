@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.client.toss.TossPaymentErrorHandler;
 
 @Configuration
 public class PaymentRestClientConfiguration {
@@ -29,6 +30,7 @@ public class PaymentRestClientConfiguration {
         return RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
+                .defaultStatusHandler(new TossPaymentErrorHandler())
                 .build();
     }
 }
