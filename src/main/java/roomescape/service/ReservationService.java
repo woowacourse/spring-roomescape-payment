@@ -63,8 +63,7 @@ public class ReservationService {
     public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest,
                                        PaymentApproveAppRequest paymentApproveAppRequest) {
         ReservationAppResponse reservationAppResponse = save(reservationSaveAppRequest);
-        PaymentApproveSuccessAppResponse paymentApproveSuccessAppResponse = paymentManager.approve(
-                paymentApproveAppRequest);
+        PaymentApproveSuccessAppResponse approveSuccessResponse = paymentManager.approve(paymentApproveAppRequest);
 
         return reservationAppResponse;
     }
@@ -72,13 +71,15 @@ public class ReservationService {
     private ReservationTime findTime(Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(
-                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TIME, "예약에 대한 예약시간이 존재하지 않습니다."));
+                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TIME,
+                                "예약에 대한 예약시간이 존재하지 않습니다."));
     }
 
     private Theme findTheme(Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(
-                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_THEME, "예약에 대한 테마가 존재하지 않습니다."));
+                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_THEME,
+                                "예약에 대한 테마가 존재하지 않습니다."));
     }
 
     private Member findMember(Long memberId) {
