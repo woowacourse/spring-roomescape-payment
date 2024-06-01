@@ -42,7 +42,7 @@ public class RoomescapeExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ErrorResponse> handle(PaymentException e) {
         logger.error(e.getMessage(), e);
-        return ResponseEntity.status(e.getHttpStatusCode())
+        return ResponseEntity.internalServerError()
                 .body(new ErrorResponse(e.getErrorMessage()));
     }
 
