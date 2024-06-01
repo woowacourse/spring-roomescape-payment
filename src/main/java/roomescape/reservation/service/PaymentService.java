@@ -35,8 +35,8 @@ public class PaymentService {
     private String tossSecretKey;
 
     public PaymentService(RestTemplateBuilder builder) {
-        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(3000, ChronoUnit.MILLIS))
-                .setReadTimeout(Duration.of(1000, ChronoUnit.MILLIS))
+        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(5, ChronoUnit.SECONDS))
+                .setReadTimeout(Duration.of(30, ChronoUnit.SECONDS))
                 .uriTemplateHandler(new DefaultUriBuilderFactory("https://api.tosspayments.com/v1/payments"))
                 .build();
         tossRestClient = RestClient.create(tossPaymentRestTemplate);
