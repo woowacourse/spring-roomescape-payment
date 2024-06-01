@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -9,8 +10,12 @@ import roomescape.payment.TossPaymentClient;
 public class ClientConfig {
 
     @Bean
-    public TossPaymentClient paymentRestClient() {
-        return new TossPaymentClient(factory());
+    public TossPaymentClient paymentRestClient(@Value("${payments.toss.secret-key}") final String secretKey,
+                                               @Value("${payments.toss.password}") final String password,
+                                               @Value("${payments.toss.host-name}") final String hostName,
+                                               @Value("${payments.toss.payment-api}") final String paymentApi
+    ) {
+        return new TossPaymentClient(factory(), secretKey, password, hostName, paymentApi);
     }
 
     @Bean

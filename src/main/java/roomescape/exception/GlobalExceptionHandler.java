@@ -8,10 +8,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import roomescape.controller.exception.AuthenticationException;
 import roomescape.controller.exception.AuthorizationException;
+import roomescape.payment.TossPaymentException;
+import roomescape.payment.dto.PaymentErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,6 +31,13 @@ public class GlobalExceptionHandler {
         logger.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
+    }
+
+    @ExceptionHandler(TossPaymentException.class)
+    public ResponseEntity<PaymentErrorResponse> handleHttpClientErrorException(final TossPaymentException e) {
+        logger.error(e.getMessage(), e);
+        return ResponseEntity.badRequest()
+                .body(e.getErrorResponse());
     }
 
     @ExceptionHandler(RoomescapeException.class)
@@ -60,14 +68,6 @@ public class GlobalExceptionHandler {
         logger.error(e.getMessage(), e);
         return ResponseEntity.notFound()
                 .build();
-    }
-
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<PaymentErrorResponse> handleHttpClientErrorException(final HttpClientErrorException e) {
-        final PaymentErrorResponse response = e.getResponseBodyAs(PaymentErrorResponse.class);
-        logger.error(e.getMessage(), e);
-        return ResponseEntity.badRequest()
-                .body(response);
     }
 
     @ExceptionHandler(Exception.class)
