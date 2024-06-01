@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
+import roomescape.global.exception.InternalServerException;
 import roomescape.global.exception.PaymentException;
 import roomescape.payment.dto.PaymentErrorResponse;
 
@@ -16,6 +17,10 @@ public class TossPaymentErrorHandler {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static void handle(HttpRequest req, ClientHttpResponse res) throws IOException {
+        if (res.getStatusCode().is5xxServerError()) {
+            throw new InternalServerException("결제 서버 오류");
+        }
+
         PaymentErrorResponse paymentErrorResponse = OBJECT_MAPPER.readValue(res.getBody(), PaymentErrorResponse.class);
         HandlingTargetErrorCodes handledType = HandlingTargetErrorCodes.from(paymentErrorResponse.code());
         throw new PaymentException(handledType.handledMessage, handledType.handledStatusCode);
