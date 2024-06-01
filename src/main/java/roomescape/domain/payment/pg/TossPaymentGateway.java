@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.dto.PaymentConfirmRequest;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
-import roomescape.exception.PaymentConfirmFailException;
+import roomescape.exception.PaymentConfirmClientFailException;
+import roomescape.exception.PaymentConfirmServerFailException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -40,7 +41,10 @@ public class TossPaymentGateway implements PaymentGateway {
                 .body(new PaymentConfirmRequest(orderId, amount, paymentKey))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new PaymentConfirmFailException(response.getStatusText());
+                    throw new PaymentConfirmClientFailException(response.getStatusText());
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                    throw new PaymentConfirmServerFailException(response.getStatusText());
                 })
                 .body(PaymentConfirmResponse.class);
     }
