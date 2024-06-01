@@ -1,12 +1,11 @@
 package roomescape.client.payment.dto;
 
-import java.io.Serializable;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
 public record PaymentConfirmToTossDto(
         String orderId,
         Integer amount,
-        String paymentKey) implements Serializable {
+        String paymentKey) {
 
     public static PaymentConfirmToTossDto from(ReservationRequest reservationRequest) {
         return new PaymentConfirmToTossDto(
