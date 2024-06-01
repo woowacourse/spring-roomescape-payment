@@ -34,7 +34,8 @@ public class MemberReservationController {
     @PostMapping
     public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest reservationRequest,
                                                              @Valid @Auth LoginMember loginMember) {
-        PaymentApproveDto request = new PaymentApproveDto(reservationRequest);
+        PaymentApproveDto request = new PaymentApproveDto(reservationRequest.paymentKey(),
+                reservationRequest.orderId(), reservationRequest.amount());
 
         ReservationDto appResponse = reservationService.save(
                 new ReservationSaveDto(reservationRequest.date(), reservationRequest.timeId(),
