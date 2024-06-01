@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.BDDMockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -52,7 +52,7 @@ class ReservationControllerTest {
     @LocalServerPort
     private int port;
 
-    @SpyBean
+    @MockBean
     private PaymentClient paymentClient;
 
     @BeforeEach

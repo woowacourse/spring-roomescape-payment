@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -46,7 +46,7 @@ class ThemeControllerTest {
     @LocalServerPort
     private int port;
 
-    @SpyBean
+    @MockBean
     private PaymentClient paymentClient;
 
     @BeforeEach
@@ -57,6 +57,9 @@ class ThemeControllerTest {
 
         BDDMockito.doNothing()
                 .when(paymentClient).approvePayment(any(), any());
+
+        BDDMockito.doNothing()
+                .when(paymentClient).refundPayment(any(), any());
     }
 
     @Test
