@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.waiting.Waiting;
-import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
@@ -35,12 +35,12 @@ public class ReservationSearchService {
                 .toList();
     }
 
-    public List<ReservationResponse> findReservationsByFilter(ReservationFilter filter) {
+    public List<ReservationResponse> findReservationsByFilter(ReservationfilterRequest filter) {
         List<Reservation> reservations = reservationRepository.findByMemberOrThemeOrDateRange(
-                filter.getMemberId(),
-                filter.getThemeId(),
-                filter.getStartDate(),
-                filter.getEndDate()
+                filter.memberId(),
+                filter.themeId(),
+                filter.startDate(),
+                filter.endDate()
         );
 
         return reservations.stream()

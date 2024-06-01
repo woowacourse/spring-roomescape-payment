@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.service.booking.reservation.module.ReservationSearchService;
 
 @Sql("/all-test-data.sql")
@@ -54,8 +54,7 @@ class ReservationSearchServiceTest {
     void 특정_사용자로_필터링_후_예약_조회() {
         //given
         Long filteringUserId = 1L;
-        ReservationFilter reservationFilter = new ReservationFilter();
-        reservationFilter.setMemberId(filteringUserId);
+        ReservationfilterRequest reservationFilter = new ReservationfilterRequest(null, filteringUserId, null, null);
 
         //when
         List<ReservationResponse> reservationResponses = reservationSearchService.findReservationsByFilter(
@@ -74,10 +73,8 @@ class ReservationSearchServiceTest {
         LocalDate startDate = LocalDate.of(2024, 5, 2);
         LocalDate endDate = LocalDate.of(2024, 5, 3);
 
-        ReservationFilter reservationFilter = new ReservationFilter();
-        reservationFilter.setThemeId(filteringThemeId);
-        reservationFilter.setStartDate(startDate);
-        reservationFilter.setEndDate(endDate);
+        ReservationfilterRequest reservationFilter = new ReservationfilterRequest(filteringThemeId, null, startDate,
+                endDate);
 
         //when
         List<ReservationResponse> reservationResponses = reservationSearchService.findReservationsByFilter(
@@ -87,8 +84,8 @@ class ReservationSearchServiceTest {
         assertThat(reservationResponses).isNotEmpty()
                 .allMatch(r ->
                         r.theme().id().equals(filteringThemeId) &&
-                                (r.date().isEqual(startDate) || r.date().isAfter(startDate)) &&
-                                (r.date().isEqual(endDate) || r.date().isBefore(endDate))
+                        (r.date().isEqual(startDate) || r.date().isAfter(startDate)) &&
+                        (r.date().isEqual(endDate) || r.date().isBefore(endDate))
                 );
     }
 

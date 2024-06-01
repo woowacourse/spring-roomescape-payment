@@ -4,9 +4,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.payment.PaymentRequest;
-import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.service.booking.reservation.module.PaymentService;
@@ -57,7 +57,7 @@ public class ReservationService {
         return reservationSearchService.findReservationByMemberId(memberId);
     }
 
-    public List<ReservationResponse> findReservationsByFilter(ReservationFilter filter) {
+    public List<ReservationResponse> findReservationsByFilter(ReservationfilterRequest filter) {
         return reservationSearchService.findReservationsByFilter(filter);
     }
 

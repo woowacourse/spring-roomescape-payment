@@ -5,14 +5,15 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.login.LoginMember;
-import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.service.booking.reservation.ReservationService;
@@ -40,18 +41,20 @@ class ReservationController {
             LoginMember loginMember) {
         ReservationResponse reservationResponse = reservationService.registerReservationPayments(
                 userReservationPaymentRequest, loginMember.id());
-        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id())).body(reservationResponse);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
+                .body(reservationResponse);
     }
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationResponse>> getAllReservations(ReservationFilter reservationFilter) {
-        if (reservationFilter.existFilter()) {
-            List<ReservationResponse> reservationResponses = reservationService.findReservationsByFilter(
-                    reservationFilter);
-            return ResponseEntity.ok(reservationResponses);
-        }
-        List<ReservationResponse> reservationResponses = reservationService.findAllReservations();
-        return ResponseEntity.ok(reservationResponses);
+    public ResponseEntity<List<ReservationResponse>> getReservations() {
+        return ResponseEntity.ok(reservationService.findAllReservations());
+    }
+
+    @GetMapping(value = "/reservations/search")
+    public ResponseEntity<List<ReservationResponse>> getReservations(
+            @ModelAttribute ReservationfilterRequest reservationfilterRequest
+    ) {
+        return ResponseEntity.ok(reservationService.findReservationsByFilter(reservationfilterRequest));
     }
 
     @GetMapping("/reservations-mine")

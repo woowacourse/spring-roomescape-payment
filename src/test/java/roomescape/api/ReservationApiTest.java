@@ -147,7 +147,7 @@ class ReservationApiTest {
     void 예약_조회시_조회필터_적용하여_조회() {
         RestAssured.given().log().all()
                 .port(port)
-                .when().get("/reservations?member=1")
+                .when().get("/reservations/search?memberId=1")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(2))
