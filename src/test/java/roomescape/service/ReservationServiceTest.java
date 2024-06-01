@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +40,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     void saveByClient() {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         LoginMember loginMember = new LoginMember(1L, "찰리");
-        ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, 0);
+        ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, BigDecimal.valueOf(1000));
         reservationService.saveReservationByClient(loginMember, reservationRequest);
 
         List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);

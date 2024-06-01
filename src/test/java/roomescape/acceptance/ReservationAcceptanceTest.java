@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -105,7 +106,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @Test
     void reservationPostWhenPaymentFail() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
+        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, BigDecimal.valueOf(1000));
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
         BDDMockito.given(paymentClient.requestPayment(paymentRequest))
