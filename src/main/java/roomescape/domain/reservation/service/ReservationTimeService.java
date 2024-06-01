@@ -1,18 +1,17 @@
 package roomescape.domain.reservation.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.domain.reservation.dto.ReservationTimeDto;
+import roomescape.domain.reservation.dto.SaveReservationTimeRequest;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationDate;
 import roomescape.domain.reservation.model.ReservationTime;
 import roomescape.domain.reservation.model.ReservationTimeAvailabilities;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
-import roomescape.domain.reservation.dto.ReservationTimeDto;
-import roomescape.domain.reservation.dto.SaveReservationTimeRequest;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservationTimeService {
@@ -33,11 +32,6 @@ public class ReservationTimeService {
                 .stream()
                 .map(ReservationTimeDto::from)
                 .toList();
-    }
-
-    public ReservationTime getReservationTime(final Long reservationTimeId) {
-        return reservationTimeRepository.findById(reservationTimeId)
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
     }
 
     public ReservationTimeDto saveReservationTime(final SaveReservationTimeRequest request) {

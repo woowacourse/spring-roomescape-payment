@@ -3,8 +3,12 @@ package roomescape.domain.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.model.Member;
-import roomescape.domain.member.service.MemberService;
+import roomescape.domain.member.repository.MemberRepository;
 import roomescape.domain.payment.service.PaymentService;
+import roomescape.domain.reservation.dto.ReservationDto;
+import roomescape.domain.reservation.dto.SaveReservationRequest;
+import roomescape.domain.reservation.dto.SearchReservationsParams;
+import roomescape.domain.reservation.dto.SearchReservationsRequest;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationDate;
 import roomescape.domain.reservation.model.ReservationTime;
@@ -12,11 +16,9 @@ import roomescape.domain.reservation.model.ReservationWaiting;
 import roomescape.domain.reservation.model.Theme;
 import roomescape.domain.reservation.repository.CustomReservationRepository;
 import roomescape.domain.reservation.repository.ReservationRepository;
+import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ReservationWaitingRepository;
-import roomescape.domain.reservation.dto.ReservationDto;
-import roomescape.domain.reservation.dto.SaveReservationRequest;
-import roomescape.domain.reservation.dto.SearchReservationsParams;
-import roomescape.domain.reservation.dto.SearchReservationsRequest;
+import roomescape.domain.reservation.repository.ThemeRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,27 +28,28 @@ import java.util.NoSuchElementException;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final CustomReservationRepository customReservationRepository;
-    private final MemberService memberService;
-    private final ThemeService themeService;
-    private final ReservationTimeService reservationTimeService;
+    private final MemberRepository memberRepository;
+    private final ThemeRepository themeRepository;
     private final PaymentService paymentService;
 
     public ReservationService(
             final CustomReservationRepository customReservationRepository,
             final ReservationRepository reservationRepository,
+            final ReservationTimeRepository reservationTimeRepository,
             final ReservationWaitingRepository reservationWaitingRepository,
-            final MemberService memberService,
-            final ThemeService themeService,
-            final ReservationTimeService reservationTimeService, final PaymentService paymentService
+            final MemberRepository memberRepository,
+            final ThemeRepository themeRepository,
+            final PaymentService paymentService
     ) {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;
+        this.reservationTimeRepository = reservationTimeRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
-        this.memberService = memberService;
-        this.themeService = themeService;
-        this.reservationTimeService = reservationTimeService;
+        this.memberRepository = memberRepository;
+        this.themeRepository = themeRepository;
         this.paymentService = paymentService;
     }
 
@@ -72,9 +75,12 @@ public class ReservationService {
     }
 
     public ReservationDto saveReservation(final SaveReservationRequest request) {
-        final ReservationTime reservationTime = reservationTimeService.getReservationTime(request.timeId());
-        final Theme theme = themeService.getTheme(request.themeId());
-        final Member member = memberService.getMember(request.memberId());
+        final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
+        final Theme theme = themeRepository.findById(request.themeId())
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
+        final Member member = memberRepository.findById(request.memberId())
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
         final Reservation reservation = request.toReservation(reservationTime, theme, member);
 
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
@@ -108,9 +114,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
         reservationRepository.deleteById(reservation.getId());
         reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
-                reservation.getDate(),
-                reservation.getTime(),
-                reservation.getTheme())
+                        reservation.getDate(),
+                        reservation.getTime(),
+                        reservation.getTheme())
                 .ifPresent(this::saveReservationWithWaiting);
     }
 

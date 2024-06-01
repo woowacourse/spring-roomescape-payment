@@ -1,17 +1,16 @@
 package roomescape.domain.reservation.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.domain.reservation.dto.SaveThemeRequest;
+import roomescape.domain.reservation.dto.ThemeDto;
 import roomescape.domain.reservation.model.ReservationDate;
+import roomescape.domain.reservation.model.Theme;
 import roomescape.domain.reservation.repository.CustomThemeRepository;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
-import roomescape.domain.reservation.dto.SaveThemeRequest;
-import roomescape.domain.reservation.dto.ThemeDto;
-import roomescape.domain.reservation.model.Theme;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ThemeService {
@@ -35,11 +34,6 @@ public class ThemeService {
                 .stream()
                 .map(ThemeDto::from)
                 .toList();
-    }
-
-    public Theme getTheme(final Long themeId) {
-        return themeRepository.findById(themeId)
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
     }
 
     public ThemeDto saveTheme(final SaveThemeRequest saveThemeRequest) {
