@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 @RestClientTest(PaymentConfig.class)
+@Import(TossPaymentClientFactory.class)
 class PaymentClientTest {
     @Autowired
     private PaymentClient paymentClient;
