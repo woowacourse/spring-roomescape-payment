@@ -15,13 +15,17 @@ public class TossPaymentClient implements PaymentClient {
     private String secretKey;
     @Value("${payments.toss.password}")
     private String password;
+    @Value("${payments.toss.host-name}")
+    private String hostName;
+    @Value("${payments.toss.payment-api}")
+    private String paymentApi;
 
     private final RestClient restClient;
 
     public TossPaymentClient(final HttpComponentsClientHttpRequestFactory factory) {
         this.restClient = RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl("https://api.tosspayments.com")
+                .baseUrl(hostName)
                 .build();
     }
 
@@ -30,7 +34,7 @@ public class TossPaymentClient implements PaymentClient {
         final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
 
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(paymentApi)
                 .header(HttpHeaders.AUTHORIZATION, secret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest);
