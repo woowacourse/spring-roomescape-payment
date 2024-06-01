@@ -23,7 +23,7 @@ public class ReservationPayment {
     @Column(name = "order_id", nullable = false, unique = true)
     private String orderId;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
