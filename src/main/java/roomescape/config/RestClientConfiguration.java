@@ -3,6 +3,7 @@ package roomescape.config;
 import org.apache.logging.log4j.util.Base64Util;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -14,7 +15,7 @@ public class RestClientConfiguration {
     @Bean
     RestClient paymentRestClient() {
         return RestClient.builder()
-                .defaultHeader("Authorization", buildAuthHeader())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, buildAuthHeader())
                 .baseUrl(PAYMENT_URL).build();
     }
 
