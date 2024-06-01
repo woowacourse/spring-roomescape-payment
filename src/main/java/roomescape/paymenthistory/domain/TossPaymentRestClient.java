@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -40,7 +41,7 @@ public class TossPaymentRestClient {
 
         restClient.post()
                 .uri("/v1/payments/confirm")
-                .header("Authorization", authorizations)
+                .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentCreateRequest.createRestClientPaymentApproveRequest())
                 .retrieve()
@@ -54,7 +55,7 @@ public class TossPaymentRestClient {
         String authorizations = BASIC + secretKey;
         restClient.post()
                 .uri("/v1/payments/" + paymentKey + "/cancel")
-                .header("Authorization", authorizations)
+                .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new RestClientPaymentCancelRequest(CancelReason.CHANGE_MIND))
                 .retrieve()
