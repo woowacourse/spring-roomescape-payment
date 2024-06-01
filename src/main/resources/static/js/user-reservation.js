@@ -1,5 +1,5 @@
 const THEME_API_ENDPOINT = '/themes';
-
+paymentWidget = null;
 document.addEventListener('DOMContentLoaded', () => {
     requestRead(THEME_API_ENDPOINT)
         .then(renderTheme)
@@ -12,19 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
             checkDate();
         }
     });
-
-    // ------  결제위젯 초기화 ------
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
-    const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-    const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: paymentAmount},
-        {variantKey: "DEFAULT"}
-    );
-
 
     document.getElementById('theme-slots').addEventListener('click', event => {
         if (event.target.classList.contains('theme-slot')) {
@@ -41,13 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
             checkDateAndThemeAndTime();
         }
     });
-    document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
+
+    document.getElementById("close-modal").addEventListener("click", function () {
+        let modal = document.getElementsByClassName("payment-modal-back")[0];
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    document.getElementById('reservation-button').addEventListener('click', popupModal);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
 
+});
+
+function popupModal() {
+    let modal = document.getElementsByClassName("payment-modal-back")[0]; // 첫 번째 요소 선택
+    if (modal) { // modal이 존재하는지 확인
+        modal.style.display = 'block'; // display를 block으로 설정하여 모달 띄우기
+    }
+
+    const price = document.getElementById('price-amount').getAttribute('priceAmount');
+
+    // ------  결제위젯 초기화 ------
+    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
+    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
+    const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+    paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
+    paymentWidget.renderPaymentMethods(
+        "#payment-method",
+        {value: price},
+        {variantKey: "DEFAULT"}
+    );
+
+    document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
-});
+}
 
 function renderTheme(themes) {
     const themeSlots = document.getElementById('theme-slots');
@@ -149,6 +166,8 @@ function renderPrice(price) {
     summarySection.innerHTML = '';
     const a = document.createElement('a');
     a.className = 'price' + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
+    a.id = 'price-amount';
+    a.setAttribute('priceAmount', price);
     a.textContent = price;
     summarySection.appendChild(a);
 }
@@ -158,6 +177,7 @@ function checkDateAndThemeAndTime() {
     const selectedThemeElement = document.querySelector('.theme-slot.active');
     const selectedTimeElement = document.querySelector('.time-slot.active');
     const reserveButton = document.getElementById("reserve-button");
+    const reservationButton = document.getElementById("reservation-button");
     const waitButton = document.getElementById("wait-button");
 
     let price;
@@ -165,7 +185,12 @@ function checkDateAndThemeAndTime() {
         if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
             // 선택된 시간이 이미 예약된 경우
             reserveButton.classList.add("disabled");
+            reservationButton.classList.add("disabled");
             waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
+
+            // 여기서 하면 됨
+            // 예약 하기 버튼 클릭 -> 결제 모달이 띄워짐 -> 결제 모달은 가격을 가짐
+
             const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
             const selectedTimeId = selectedTimeElement.getAttribute('data-time-id');
             fetchPrice(selectedDate, selectedThemeId, selectedTimeId);
@@ -173,6 +198,7 @@ function checkDateAndThemeAndTime() {
         } else {
             // 선택된 시간이 예약 가능한 경우
             reserveButton.classList.remove("disabled");
+            reservationButton.classList.remove("disabled");
             waitButton.classList.add("disabled"); // 예약 대기 버튼 비활성화
             const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
             const selectedTimeId = selectedTimeElement.getAttribute('data-time-id');
@@ -190,7 +216,8 @@ function onReservationButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-    const price = document.getElementById('price');
+    const price = document.getElementById('price-amount').getAttribute('priceAmount');
+    console.log(price)
     if (selectedDate && selectedThemeId && selectedTimeId) {
 
         const reservationData = {
