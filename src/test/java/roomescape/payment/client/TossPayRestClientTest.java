@@ -10,29 +10,28 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.config.PaymentConfig;
+import org.springframework.web.client.RestClient;
+import roomescape.exception.ParsingFailException;
 import roomescape.exception.PaymentFailException;
+import roomescape.exception.TossPayErrorHandler;
 import roomescape.payment.dto.PaymentRequest;
 
-@RestClientTest(TossPayRestClient.class)
-@ContextConfiguration(classes = PaymentConfig.class)
 class TossPayRestClientTest {
 
-    @Autowired
-    private MockRestServiceServer server;
+    private final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com")
+            .defaultStatusHandler(new TossPayErrorHandler());
 
-    @Autowired
-    private TossPayRestClient tossPayRestClient;
+    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+
+    private TossPayRestClient tossPayRestClient = new TossPayRestClient(testBuilder.build());
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         server.reset();
     }
 
@@ -68,5 +67,26 @@ class TossPayRestClientTest {
         assertThatCode(() -> tossPayRestClient.pay(request))
                 .isInstanceOf(PaymentFailException.class)
                 .hasMessage("존재하지 않는 결제 입니다.");
+    }
+
+    @DisplayName("올바르지 않은 형태의 예외데이터가 응답되면 Parsing 예외가 발생한다.")
+    @Test
+    void throwParsingException() {
+        String expectedBody = """
+                {
+                  "error": "NOT_FOUND_PAYMENT",
+                  "message": "존재하지 않는 결제 입니다."
+                }
+                """;
+
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
+
+        PaymentRequest request = new PaymentRequest("orderId", 1000, "paymentKey");
+
+        assertThatCode(() -> tossPayRestClient.pay(request))
+                .isInstanceOf(ParsingFailException.class);
     }
 }

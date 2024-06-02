@@ -23,4 +23,9 @@ security:
     expiration-time: 36000000
 
 payment:
-  toss-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  properties:
+    - vendor: toss
+      baseUrl: https://api.tosspayments.com
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connection-timeout-seconds: 5
+      read-timeout-seconds: 31

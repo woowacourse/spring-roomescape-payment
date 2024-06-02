@@ -3,16 +3,18 @@ package roomescape.config;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
-import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
 import roomescape.exception.TossPayErrorHandler;
 import roomescape.payment.client.TossPayRestClient;
 
@@ -20,9 +22,7 @@ import roomescape.payment.client.TossPayRestClient;
 @EnableConfigurationProperties(PaymentProperties.class)
 public class PaymentConfig {
 
-    private static final String TOSS_KEY_PREFIX = "Basic ";
-    private static final long CONNECTION_TIMEOUT = 5L;
-    private static final long READ_TIMEOUT = 30L;
+    private static final String BASIC = "Basic ";
 
     private final PaymentProperties paymentProperties;
 
@@ -31,30 +31,44 @@ public class PaymentConfig {
     }
 
     @Bean
-    public TossPayRestClient tossPayRestClient(RestClient.Builder builder) {
-        return new TossPayRestClient(builder.build());
+    public PaymentClientBuilders builders() {
+        return new PaymentClientBuilders(createBuilders());
     }
 
-    @Bean
-    public RestClientCustomizer tossPayRestClientCustomizer() {
-        return builder -> builder
-                .requestFactory(createHttpRequestFactory())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, createTossAuthorizations())
-                .baseUrl("https://api.tosspayments.com")
-                .defaultStatusHandler(new TossPayErrorHandler());
+    private Map<String, Builder> createBuilders() {
+        Map<String, Builder> builders = new HashMap<>();
+        paymentProperties.getProperties().keySet()
+                .forEach(vendor -> builders.put(vendor, createBuilder(vendor)));
+        return builders;
     }
 
-    private ClientHttpRequestFactory createHttpRequestFactory() {
+    private Builder createBuilder(String vendor) {
+        PaymentProperty property = paymentProperties.get(vendor);
+
+        return RestClient.builder()
+                .requestFactory(createHttpRequestFactory(property))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, createBasicAuthorization(property))
+                .baseUrl(property.baseUrl());
+    }
+
+    private ClientHttpRequestFactory createHttpRequestFactory(PaymentProperty property) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT));
+                .withConnectTimeout(Duration.ofSeconds(property.connectionTimeoutSeconds()))
+                .withReadTimeout(Duration.ofSeconds(property.readTimeoutSeconds()));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 
-    private String createTossAuthorizations() {
+    private String createBasicAuthorization(PaymentProperty property) {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((paymentProperties.getTossSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
-        return TOSS_KEY_PREFIX + new String(encodedBytes);
+        byte[] encodedBytes = encoder.encode((property.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
+        return BASIC + new String(encodedBytes);
+    }
+
+    @Bean
+    public TossPayRestClient tossPayRestClient() {
+        Builder tossBuilder = builders().get("toss")
+                .defaultStatusHandler(new TossPayErrorHandler());
+        return new TossPayRestClient(tossBuilder.build());
     }
 }
