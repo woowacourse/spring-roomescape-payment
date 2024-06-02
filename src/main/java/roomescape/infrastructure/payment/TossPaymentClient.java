@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.PaymentClient;
@@ -36,22 +38,17 @@ public class TossPaymentClient implements PaymentClient {
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentApproveAppRequest)
-                .exchange((request, response) -> {
-                    InputStream body = response.getBody();
-                    if (response.getStatusCode().is4xxClientError()) {
-                        Throwable throwable = objectMapper.readValue(body, Throwable.class);
-                        throw new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
-                                throwable.getMessage(),
-                                throwable);
-                    }
-                    if (response.getStatusCode().is5xxServerError()) {
-                        Throwable throwable = objectMapper.readValue(body, Throwable.class);
-                        throw new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
-                                throwable.getMessage(),
-                                throwable);
-                    }
-                    return objectMapper.readValue(body,
-                            PaymentApproveSuccessAppResponse.class);
-                });
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, handleError(RoomescapeErrorCode.PAYMENT_FAILED))
+                .onStatus(HttpStatusCode::is5xxServerError, handleError(RoomescapeErrorCode.INTERNAL_SERVER_ERROR))
+                .body(PaymentApproveSuccessAppResponse.class);
+    }
+
+    private ErrorHandler handleError(RoomescapeErrorCode errorCode) {
+        return (request, response) -> {
+            InputStream body = response.getBody();
+            Throwable throwable = objectMapper.readValue(body, Throwable.class);
+            throw new RoomescapeException(errorCode, throwable.getMessage(), throwable);
+        };
     }
 }
