@@ -58,11 +58,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     )
     Integer countByCreateAtRank(final LocalDate date, final ReservationTime time, final Theme theme,
                                 final LocalDateTime createAt);
-
-    @Query("""
-            SELECT CASE WHEN r.payment IS NULL THEN false ELSE true END 
-            FROM Reservation r 
-            WHERE r.id = :reservationId
-            """)
-    Boolean isNotAdminReservation(@Param("reservationId") final Long reservationId);
 }

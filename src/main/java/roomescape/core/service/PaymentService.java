@@ -1,6 +1,8 @@
 package roomescape.core.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.core.domain.Payment;
+import roomescape.core.domain.Reservation;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;
@@ -22,18 +24,25 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public PaymentResponse approvePayment(final PaymentRequest paymentRequest) {
+    public PaymentResponse approvePayment(final Reservation reservation, final PaymentRequest paymentRequest) {
         paymentClient.approvePayment(paymentRequest, createPaymentAuthorization());
 
-        return new PaymentResponse(paymentRepository.save(paymentRequest.toPayment()));
+        final Payment payment = new Payment(reservation, paymentRequest.getPaymentKey(), paymentRequest.getAmount(),
+                paymentRequest.getOrderId());
+
+        return new PaymentResponse(paymentRepository.save(payment));
     }
 
     public PaymentAuthorizationResponse createPaymentAuthorization() {
         return new PaymentAuthorizationResponse(paymentAuthorizationProvider.getAuthorization());
     }
 
-    public void refundPayment(PaymentResponse paymentResponse) {
-        paymentClient.refundPayment(paymentResponse, createPaymentAuthorization());
-        paymentRepository.delete(paymentResponse.toPayment());
+    public void refundPayment(Reservation reservation) {
+        paymentRepository.findByReservation(reservation).ifPresent(
+                payment -> {
+                    paymentClient.refundPayment(new PaymentResponse(payment), createPaymentAuthorization());
+                    paymentRepository.delete(payment);
+                }
+        );
     }
 }

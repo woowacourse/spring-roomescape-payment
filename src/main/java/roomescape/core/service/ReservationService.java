@@ -12,7 +12,6 @@ import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
-import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.AdminReservationRequest;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
@@ -46,22 +45,21 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(final MemberReservationRequest memberReservationRequest,
                                       final LoginMember loginMember) {
-        final PaymentResponse paymentResponse =
-                paymentService.approvePayment(new PaymentRequest(memberReservationRequest));
-
-        final Reservation reservation = new Reservation(
+        final Reservation reservationToSave = new Reservation(
                 getMember(loginMember.getId()),
                 memberReservationRequest.getDate(),
                 getReservationTime(memberReservationRequest.getTimeId()),
                 getTheme(memberReservationRequest.getThemeId()),
                 Status.findStatus(memberReservationRequest.getStatus()),
-                LocalDateTime.now(),
-                paymentResponse.toPayment()
+                LocalDateTime.now()
         );
-        validateDuplicateReservation(reservation);
-        reservation.validateDateAndTime();
+        validateDuplicateReservation(reservationToSave);
+        reservationToSave.validateDateAndTime();
 
-        return new ReservationResponse(reservationRepository.save(reservation));
+        Reservation reservation = reservationRepository.save(reservationToSave);
+        paymentService.approvePayment(reservation, new PaymentRequest(memberReservationRequest));
+
+        return new ReservationResponse(reservation);
     }
 
     @Transactional
@@ -151,11 +149,8 @@ public class ReservationService {
     public void delete(final Long reservationId) {
         Reservation reservation = reservationRepository.findReservationById(reservationId);
         updateReservationStatus(reservation);
+        paymentService.refundPayment(reservation);
         reservationRepository.deleteById(reservationId);
-
-        if (reservation.isPaid()) {
-            paymentService.refundPayment(new PaymentResponse(reservation.getPayment()));
-        }
     }
 
     private void updateReservationStatus(final Reservation reservation) {

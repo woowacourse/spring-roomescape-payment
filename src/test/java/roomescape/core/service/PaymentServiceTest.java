@@ -15,11 +15,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import roomescape.core.domain.Reservation;
 import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
-import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.exception.PaymentException;
 import roomescape.core.repository.PaymentRepository;
+import roomescape.core.repository.ReservationRepository;
 import roomescape.infrastructure.PaymentClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -31,6 +32,8 @@ class PaymentServiceTest {
     private PaymentService paymentService;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
     @MockBean
     private PaymentClient paymentClient;
 
@@ -44,13 +47,14 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("결제를 승인에 성공하면 결제 정보가 DB에 저장된다.")
+    @DisplayName("결제 승인에 성공하면 결제 정보가 DB에 저장된다.")
     void savePaymentInfoIfApproved() {
+        Reservation reservation = reservationRepository.findById(5L).get();
         PaymentRequest paymentRequest = new PaymentRequest("test_payment_key", "test_order_id", 1000L);
 
-        paymentService.approvePayment(paymentRequest);
+        paymentService.approvePayment(reservation, paymentRequest);
 
-        assertThat(paymentRepository.findById(6L).isPresent()).isTrue();
+        assertThat(paymentRepository.findById(5L).isPresent()).isTrue();
     }
 
     @Test
@@ -58,12 +62,13 @@ class PaymentServiceTest {
     void throwExceptionAndDoNotSavePaymentInfoUnlessApproved() {
         BDDMockito.doThrow(new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 승인 과정에서 문제가 발생했습니다."))
                 .when(paymentClient).approvePayment(any(), any());
+        Reservation reservation = reservationRepository.findById(5L).get();
         PaymentRequest paymentRequest = new PaymentRequest("test_payment_key", "test_order_id", 1000L);
 
         assertAll(
-                () -> assertThatThrownBy(() -> paymentService.approvePayment(paymentRequest))
+                () -> assertThatThrownBy(() -> paymentService.approvePayment(reservation, paymentRequest))
                         .isInstanceOf(PaymentException.class),
-                () -> assertThat(paymentRepository.findById(6L).isEmpty()).isTrue()
+                () -> assertThat(paymentRepository.findById(5L).isEmpty()).isTrue()
         );
     }
 
@@ -78,11 +83,11 @@ class PaymentServiceTest {
     @Test
     @DisplayName("환불에 성공하면 결제 정보가 DB에서 삭제된다.")
     void deletePaymentIfSucceedRefund() {
-        PaymentResponse paymentResponse = new PaymentResponse(5L, "payment_key5", 1000L, "order_id5");
+        Reservation reservation = reservationRepository.findById(1L).get();
 
-        paymentService.refundPayment(paymentResponse);
+        paymentService.refundPayment(reservation);
 
-        assertThat(paymentRepository.findById(5L).isEmpty()).isTrue();
+        assertThat(paymentRepository.findById(1L).isEmpty()).isTrue();
     }
 
     @Test
@@ -90,12 +95,12 @@ class PaymentServiceTest {
     void throwExceptionAndDoNotDeletePaymentUnlessSucceedRefund() {
         BDDMockito.doThrow(new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "환불 과정에서 문제가 발생했습니다."))
                 .when(paymentClient).refundPayment(any(), any());
-        PaymentResponse paymentResponse = new PaymentResponse(5L, "payment_key5", 1000L, "order_id5");
+        Reservation reservation = reservationRepository.findById(1L).get();
 
         assertAll(
-                () -> assertThatThrownBy(() -> paymentService.refundPayment(paymentResponse))
+                () -> assertThatThrownBy(() -> paymentService.refundPayment(reservation))
                         .isInstanceOf(PaymentException.class),
-                () -> assertThat(paymentRepository.findById(5L).isPresent()).isTrue()
+                () -> assertThat(paymentRepository.findById(1L).isPresent()).isTrue()
         );
     }
 }

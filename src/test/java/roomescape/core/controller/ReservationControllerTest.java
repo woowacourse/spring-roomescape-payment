@@ -165,7 +165,7 @@ class ReservationControllerTest {
     void findAllReservations() {
         ValidatableResponse response = e2eTest.get("/reservations", accessToken);
         response.statusCode(200)
-                .body("size()", is(2));
+                .body("size()", is(3));
     }
 
     @Test
