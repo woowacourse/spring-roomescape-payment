@@ -217,8 +217,9 @@ async function fetchReservationPayment(paymentData, reservationData) {
             });
         } else {
             response.json().then(successBody => {
+                alert("예약이 완료되었습니다.");
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
+                window.location.href = "/";
             });
         }
     }).catch(error => {
