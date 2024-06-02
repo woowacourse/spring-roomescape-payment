@@ -8,7 +8,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
+        return response.getStatusCode().isError();
     }
 
     @Override
