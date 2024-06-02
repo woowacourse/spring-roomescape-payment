@@ -141,7 +141,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .post(String.format("/api/v1/admin/reservations/%d/waiting/approve", waitingResponse.memberReservationId()))
+                .put(String.format("/api/v1/admin/reservations/%d/waiting/approve", waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("approve/change/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -170,7 +170,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .post(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
+                .put(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("deny/change/success"))
                 .statusCode(HttpStatus.OK.value());

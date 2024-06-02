@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,15 +53,14 @@ public class AdminController {
         return ResponseEntity.ok().body(memberService.findAll());
     }
 
-    // TODO: PUT으로 변경
-    @PostMapping("/reservations/{id}/waiting/approve")
+    @PutMapping("/reservations/{id}/waiting/approve")
     public ResponseEntity<Void> approve(@LoginUser AuthInfo authInfo,
                                         @PathVariable("id") @Min(1) long memberReservationId) {
         reservationApplicationService.approveWaiting(authInfo, memberReservationId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/reservations/{id}/waiting/deny")
+    @PutMapping("/reservations/{id}/waiting/deny")
     public ResponseEntity<Void> deny(@LoginUser AuthInfo authInfo,
                                      @PathVariable("id") @Min(1) long memberReservationId) {
         reservationApplicationService.denyWaiting(authInfo, memberReservationId);
