@@ -19,23 +19,20 @@ public class TossPaymentClient implements PaymentClient {
     private final ObjectMapper objectMapper;
     private final PaymentAuthorizationGenerator paymentAuthorizationGenerator;
     private final RestClient restClient;
-    private final String confirmUrl;
 
     public TossPaymentClient(ObjectMapper objectMapper, PaymentAuthorizationGenerator paymentAuthorizationGenerator,
                              RestClient.Builder restClient,
-                             @Value("${payment.base-url}") String baseUrl,
-                             @Value("${payment.confirm-url}") String confirmUrl) {
+                             @Value("${payment.base-url}") String baseUrl) {
         this.objectMapper = objectMapper;
         this.paymentAuthorizationGenerator = paymentAuthorizationGenerator;
         this.restClient = restClient.baseUrl(baseUrl).build();
-        this.confirmUrl = confirmUrl;
     }
 
     public PaymentApproveSuccessAppResponse approve(PaymentApproveAppRequest paymentApproveAppRequest) {
         String authorizations = paymentAuthorizationGenerator.createAuthorizations();
 
         return restClient.post()
-                .uri(confirmUrl)
+                .uri("/v1/payments/confirm")
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentApproveAppRequest)
@@ -53,8 +50,6 @@ public class TossPaymentClient implements PaymentClient {
                                 throwable.getMessage(),
                                 throwable);
                     }
-//                    System.out.println("paymentApproveSuccessAppResponse = " + objectMapper.readValue(body,
-//                            PaymentApproveSuccessAppResponse.class));
                     return objectMapper.readValue(body,
                             PaymentApproveSuccessAppResponse.class);
                 });
