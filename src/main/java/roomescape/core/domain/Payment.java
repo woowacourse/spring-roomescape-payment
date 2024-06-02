@@ -13,7 +13,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Reservation reservation;
     @Column(unique = true, nullable = false)
     private String paymentKey;
