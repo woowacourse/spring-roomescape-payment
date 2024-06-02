@@ -1,9 +1,12 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.BadRequestException;
@@ -19,19 +22,27 @@ public class TossPaymentRestClient {
 
     private final RestClient restClient;
 
-    public TossPaymentRestClient(ObjectMapper objectMapper, PaymentProperties properties
-    ) {
+    public TossPaymentRestClient(ObjectMapper objectMapper, PaymentProperties properties) {
         String authorizationToken = Base64.getEncoder()
                 .encodeToString((properties.secret() + ":").getBytes());
+        ClientHttpRequestFactory requestFactoryWithTimeout = ClientHttpRequestFactories.get(
+                ClientHttpRequestFactorySettings.DEFAULTS
+                        .withConnectTimeout(properties.connectTimeout())
+                        .withReadTimeout(properties.readTimeout()));
 
         this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(properties.baseUrl())
+                .requestFactory(requestFactoryWithTimeout)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + authorizationToken)
-                .defaultStatusHandler(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
-                    throw new BadRequestException(paymentFailure.message());
-                }))
+                .defaultStatusHandler(HttpStatusCode::is4xxClientError, get4xxErrorHandler(objectMapper))
                 .build();
+    }
+
+    private static RestClient.ResponseSpec.ErrorHandler get4xxErrorHandler(ObjectMapper objectMapper) {
+        return (request, response) -> {
+            PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            throw new BadRequestException(paymentFailure.message());
+        };
     }
 
     public <T> Optional<PaymentResponse> post(String uri, T body) {

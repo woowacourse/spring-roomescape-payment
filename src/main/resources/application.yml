@@ -20,4 +20,7 @@ jwt:
   expired-period: 3600000 # 1000 * 60 * 60 = 1시간
 
 toss:
+  base-url: https://api.tosspayments.com/v1/payments
   secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  connect-timeout: 5s
+  read-timeout: 30s
