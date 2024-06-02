@@ -2,9 +2,10 @@ spring:
   profiles:
     active:
       - dev
+      - default
     group:
       dev:
-        - db-dev
+        - db
         - logging
         - security
         - payment

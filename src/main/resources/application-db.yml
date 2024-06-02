@@ -1,11 +1,6 @@
 spring:
   main:
     allow-bean-definition-overriding: true
----
-spring:
-  config:
-    activate:
-      on-profile: "db-dev"
 
   h2:
     console:
