@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
-import roomescape.core.domain.PaidReservation;
 import roomescape.core.domain.Payment;
+import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
@@ -18,11 +18,10 @@ import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
-import roomescape.core.dto.reservation.PaidReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.dto.reservation.WebPaidReservationResponse;
 import roomescape.core.repository.MemberRepository;
-import roomescape.core.repository.PaidReservationRepository;
 import roomescape.core.repository.PaymentRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
@@ -49,7 +48,6 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentRepository paymentRepository;
-    private final PaidReservationRepository paidReservationRepository;
 
     public ReservationService(final PaymentApprover paymentApprover,
                               final ReservationRepository reservationRepository,
@@ -57,8 +55,7 @@ public class ReservationService {
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository,
-                              final PaymentRepository paymentRepository,
-                              final PaidReservationRepository paidReservationRepository) {
+                              final PaymentRepository paymentRepository) {
         this.paymentApprover = paymentApprover;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -66,40 +63,45 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentRepository = paymentRepository;
-        this.paidReservationRepository = paidReservationRepository;
     }
 
     @Transactional
     public ReservationResponse create(final ReservationRequest request) {
-        final Reservation reservation = saveReservation(request);
-        return new ReservationResponse(reservation);
+        final Reservation reservation
+                = createReservation(request, PaymentStatus.ACCOUNT_TRANSFERRED);
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        return new ReservationResponse(savedReservation);
     }
 
     @Transactional
-    public PaidReservationResponse createAndPay(final ReservationRequest reservationRequest,
-                                                final PaymentConfirmRequest paymentRequest) {
-        final Reservation reservation = saveReservation(reservationRequest);
+    public WebPaidReservationResponse createAndPay(final ReservationRequest reservationRequest,
+                                                   final PaymentConfirmRequest paymentRequest) {
+        final Reservation reservation
+                = createReservation(reservationRequest, PaymentStatus.WEB_PAID);
         final PaymentConfirmResponse paymentResponse
                 = paymentApprover.confirmPayment(paymentRequest);
-        final Payment payment = paymentRepository.save(paymentResponse.toPayment());
-        final PaidReservation paidReservation = new PaidReservation(reservation, payment);
-        final PaidReservation savedPaidReservation = paidReservationRepository.save(
-                paidReservation);
-        return new PaidReservationResponse(savedPaidReservation);
+        final Payment savedPayment = paymentRepository.save(paymentResponse.toPayment());
+        final Reservation savedReservation = saveWithPayment(reservation, savedPayment);
+        return new WebPaidReservationResponse(savedReservation);
     }
 
-    private Reservation saveReservation(final ReservationRequest request) {
+    private Reservation createReservation(final ReservationRequest request,
+                                          final PaymentStatus paymentStatus) {
         final Member member = getMemberById(request.getMemberId());
         final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
 
         final Reservation reservation
-                = new Reservation(member, date, reservationTime, theme);
-
-        validateDuplicatedReservation(reservation, reservationTime);
+                = new Reservation(member, date, reservationTime, theme, paymentStatus);
         reservation.validateDateAndTime();
-        return reservationRepository.save(reservation);
+        validateDuplicatedReservation(reservation, reservationTime);
+        return reservation;
+    }
+
+    private Reservation saveWithPayment(final Reservation reservation, final Payment payment) {
+        final Reservation reservationWithPayment = reservation.withPayment(payment);
+        return reservationRepository.save(reservationWithPayment);
     }
 
     private Member getMemberById(final Long id) {
@@ -205,7 +207,8 @@ public class ReservationService {
             final Member member = waiting.getMember();
             final String dateString = date.format(DateTimeFormatter.ISO_DATE);
 
-            final Reservation nextReservation = new Reservation(member, dateString, time, theme);
+            final Reservation nextReservation
+                    = new Reservation(member, dateString, time, theme, PaymentStatus.PENDING);
 
             waitingRepository.delete(waiting);
             reservationRepository.save(nextReservation);

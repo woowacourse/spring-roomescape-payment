@@ -3,6 +3,7 @@ package roomescape.core.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import roomescape.core.dto.auth.TokenRequest;
 import roomescape.core.dto.member.MemberRequest;
-import roomescape.core.dto.member.MemberResponse;
 import roomescape.utils.AdminGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -86,15 +86,15 @@ class MemberControllerTest {
                 .when().post("/login")
                 .then().log().cookies().extract().cookie("token");
 
-        MemberResponse user = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .cookies("token", accessToken)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/login/check")
                 .then().log().all()
-                .statusCode(200).extract().as(MemberResponse.class);
+                .statusCode(200).extract().response();
 
-        assertThat(user.getName()).isEqualTo("리건");
+        assertThat(response.getBody().jsonPath().getString("name")).isEqualTo("리건");
     }
 
     @Test

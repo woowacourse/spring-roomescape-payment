@@ -46,7 +46,7 @@ public class MemberService {
         if (member == null) {
             throw new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE);
         }
-        return new MemberResponse(member.getId(), member.getName());
+        return new MemberResponse(member);
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +73,7 @@ public class MemberService {
                 request.getPassword(), Role.USER);
         try {
             final Member savedMember = memberRepository.save(member);
-            return new MemberResponse(savedMember.getId(), savedMember.getName());
+            return new MemberResponse(savedMember);
         } catch (DataIntegrityViolationException exception) {
             throw new IllegalArgumentException(ALREADY_USED_EMAIL_EXCEPTION_MESSAGE);
         }

@@ -2,16 +2,20 @@ package roomescape.core.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 @Entity
 public class Reservation {
@@ -39,29 +43,49 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = true)
+    private Payment payment;
+
     public Reservation() {
     }
 
     public Reservation(final Member member, final String date, final ReservationTime time,
                        final Theme theme) {
-        this(null, member, date, time, theme);
+        this(member, parseDate(date), time, theme, PaymentStatus.ACCOUNT_TRANSFERRED, null);
     }
 
-    public Reservation(final Long id, final Member member, final String date,
-                       final ReservationTime time, final Theme theme) {
-        this.id = id;
+    public Reservation(final Member member, final String date, final ReservationTime time,
+                       final Theme theme, final PaymentStatus paymentStatus) {
+        this(member, parseDate(date), time, theme, paymentStatus, null);
+    }
+
+    private Reservation(final Member member, final LocalDate date, final ReservationTime time,
+                        final Theme theme, final PaymentStatus paymentStatus,
+                        final Payment payment) {
+        this.id = null;
         this.member = member;
-        this.date = parseDate(date);
+        this.date = date;
         this.time = time;
         this.theme = theme;
+        this.paymentStatus = paymentStatus;
+        this.payment = payment;
     }
 
-    private LocalDate parseDate(final String date) {
+    private static LocalDate parseDate(final String date) {
         try {
             return LocalDate.parse(date);
         } catch (final DateTimeParseException e) {
             throw new IllegalArgumentException(DATE_FORMAT_EXCEPTION_MESSAGE);
         }
+    }
+
+    public Reservation withPayment(final Payment payment) {
+        return new Reservation(member, date, time, theme, paymentStatus, payment);
     }
 
     public void validateDateAndTime() {
@@ -105,5 +129,13 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public Optional<Payment> getPayment() {
+        return Optional.ofNullable(payment);
     }
 }

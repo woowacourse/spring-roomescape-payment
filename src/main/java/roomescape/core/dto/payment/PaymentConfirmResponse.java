@@ -7,13 +7,13 @@ public class PaymentConfirmResponse {
     private String orderId;
     private Long totalAmount;
 
+    public PaymentConfirmResponse() {
+    }
+
     public PaymentConfirmResponse(Payment payment) {
         this.paymentKey = payment.getPaymentKey();
         this.orderId = payment.getOrderId();
         this.totalAmount = payment.getAmount();
-    }
-
-    public PaymentConfirmResponse() {
     }
 
     public Payment toPayment() {

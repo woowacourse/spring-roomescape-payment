@@ -14,11 +14,11 @@ import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
-import roomescape.core.dto.reservation.PaidReservationResponse;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.dto.reservation.WebPaidReservationResponse;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
@@ -82,10 +82,10 @@ class ReservationServiceTest {
         final PaymentConfirmRequest paymentRequest
                 = new PaymentConfirmRequest(request);
 
-        final PaidReservationResponse response
+        final WebPaidReservationResponse response
                 = reservationService.createAndPay(reservationRequest, paymentRequest);
         final ReservationResponse reservationResponse = response.getReservationResponse();
-        final PaymentConfirmResponse paymentResponse = response.getPaymentConfirmResponse();
+        final PaymentResponse paymentResponse = response.getPaymentResponse();
 
         assertAll(
                 () -> assertThat(reservationResponse.getTheme().getId()).isEqualTo(1L),

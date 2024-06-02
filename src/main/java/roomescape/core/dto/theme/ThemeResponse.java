@@ -9,11 +9,7 @@ public class ThemeResponse {
     private final String thumbnail;
 
     public ThemeResponse(final Theme theme) {
-        this(theme.getId(), theme);
-    }
-
-    public ThemeResponse(final Long id, final Theme theme) {
-        this.id = id;
+        this.id = theme.getId();
         this.name = theme.getName();
         this.description = theme.getDescription();
         this.thumbnail = theme.getThumbnail();

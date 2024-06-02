@@ -37,6 +37,7 @@ class PaymentApproverTest {
         PaymentConfirmRequest request = new PaymentConfirmRequest(reservationPaymentRequest);
 
         assertThatThrownBy(() -> paymentApprover.confirmPayment(request))
-                .isInstanceOf(PaymentException.class);
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제 서버와의 연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.");
     }
 }
