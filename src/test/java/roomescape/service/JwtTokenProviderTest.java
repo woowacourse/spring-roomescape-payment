@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.model.Member;
+import roomescape.service.fixture.MemberBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.model.Role.MEMBER;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class JwtTokenProviderTest {
@@ -20,8 +20,7 @@ class JwtTokenProviderTest {
     @DisplayName("주어진 사용자로 토큰을 생성한다.")
     @Test
     void should_create_token_when_given_member() {
-        Member member = new Member(1L, "썬", MEMBER, "sun@email.com", "1234");
-
+        Member member = MemberBuilder.builder().build();
         String token = jwtTokenProvider.createToken(member);
 
         assertThat(token).isNotBlank();
@@ -30,7 +29,7 @@ class JwtTokenProviderTest {
     @DisplayName("주어진 토큰으로 payload를 반환한다.")
     @Test
     void should_get_payload_when_given_token() {
-        Member member = new Member(1L, "썬", MEMBER, "sun@email.com", "1234");
+        Member member = MemberBuilder.builder().build();
         String token = jwtTokenProvider.createToken(member);
 
         Claims claims = jwtTokenProvider.getPayload(token);

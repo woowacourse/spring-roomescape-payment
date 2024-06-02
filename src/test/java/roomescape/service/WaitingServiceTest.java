@@ -8,11 +8,16 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.WaitingRequest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.model.*;
+import roomescape.model.Member;
+import roomescape.model.ReservationTime;
+import roomescape.model.Theme;
+import roomescape.model.Waiting;
+import roomescape.model.WaitingWithRank;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.service.fixture.WaitingRequestBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,7 +48,7 @@ class WaitingServiceTest {
     @Test
     void should_add_waiting_when_give_member_request() {
         Member member = memberRepository.findById(1L).get();
-        WaitingRequest request = new WaitingRequest(now().plusDays(2), 1L, 1L);
+        WaitingRequest request = WaitingRequestBuilder.builder().build();
 
         waitingService.addWaiting(request, member);
 
@@ -78,8 +83,7 @@ class WaitingServiceTest {
     @DisplayName("현재 이전으로 예약 대기를 추가하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_previous_date() {
-        WaitingRequest request =
-                new WaitingRequest(LocalDate.now().minusDays(1), 1L, 1L);
+        WaitingRequest request = WaitingRequestBuilder.builder().date(now().minusDays(1)).build();
         Member member = memberRepository.findById(1L).get();
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
@@ -87,23 +91,12 @@ class WaitingServiceTest {
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약 대기를 추가할 수 없습니다.");
     }
 
-    @DisplayName("현재 이후로 예약 대기를 추가하면 예외가 발생하지 않는다.")
-    @Test
-    void should_not_throw_exception_when_current_date() {
-        Member member = memberRepository.findById(1L).get();
-        WaitingRequest request = new WaitingRequest(LocalDate.now().plusDays(4), 1L, 1L);
-
-        assertThatCode(() -> waitingService.addWaiting(request, member))
-                .doesNotThrowAnyException();
-    }
-
     @DisplayName("사용자가 예약한 예약 대기를 반환한다.")
     @Test
     void should_return_member_waiting() {
         Member member = memberRepository.findById(2L).get();
 
-        List<WaitingWithRank> waiting = waitingService
-                .findMemberWaiting(member.getId());
+        List<WaitingWithRank> waiting = waitingService.findMemberWaiting(member.getId());
 
         assertThat(waiting).hasSize(2);
     }
@@ -112,8 +105,7 @@ class WaitingServiceTest {
     @Test
     void should_throw_exception_when_existing_reservation() {
         Member member = memberRepository.findById(1L).get();
-
-        WaitingRequest request = new WaitingRequest(now().plusDays(1), 1L, 1L);
+        WaitingRequest request = WaitingRequestBuilder.builder().date(now().plusDays(1)).build();
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
@@ -124,8 +116,7 @@ class WaitingServiceTest {
     @Test
     void should_throw_exception_when_existing_waiting() {
         Member member = memberRepository.findById(2L).get();
-
-        WaitingRequest request = new WaitingRequest(now().plusDays(1), 1L, 1L);
+        WaitingRequest request = WaitingRequestBuilder.builder().date(now().plusDays(1)).build();
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)

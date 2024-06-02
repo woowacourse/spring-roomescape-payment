@@ -14,13 +14,15 @@ import roomescape.model.Member;
 import roomescape.model.Reservation;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
+import roomescape.service.fixture.AdminReservationRequestBuilder;
+import roomescape.service.fixture.MemberBuilder;
+import roomescape.service.fixture.ReservationRequestBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.*;
-import static roomescape.model.Role.MEMBER;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
@@ -59,8 +61,7 @@ class ReservationServiceTest {
     @Test
     void should_add_reservation_times_when_give_member_request() {
         Member member = memberRepository.findById(1L).get();
-
-        ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234);
+        ReservationRequest request = ReservationRequestBuilder.builder().build();
 
         reservationService.addReservation(request, member);
 
@@ -71,8 +72,8 @@ class ReservationServiceTest {
     @DisplayName("관리자가 예약 시간을 추가한다")
     @Test
     void should_add_reservation_times_when_give_admin_request() {
-        AdminReservationRequest request =
-                new AdminReservationRequest(now().plusDays(2), 1L, 1L, 1L);
+        AdminReservationRequest request = AdminReservationRequestBuilder.builder().build();
+
         reservationService.addReservation(request);
 
         List<Reservation> allReservations = reservationRepository.findAll();
@@ -82,8 +83,8 @@ class ReservationServiceTest {
     @DisplayName("관리자가 예약 시간을 추가할 때 사용자가 없으면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_not_exist_member() {
-        AdminReservationRequest request =
-                new AdminReservationRequest(now().plusDays(2), 1L, 1L, 99L);
+        AdminReservationRequest request = AdminReservationRequestBuilder.builder()
+                .memberId(99L).build();
 
         assertThatThrownBy(() -> reservationService.addReservation(request))
                 .isInstanceOf(NotFoundException.class)
@@ -117,34 +118,24 @@ class ReservationServiceTest {
     @DisplayName("현재 이전으로 예약하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_previous_date() {
-        ReservationRequest request =
-                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234);
-        Member member = new Member("썬", MEMBER, "sun@email.com", "1111");
+        ReservationRequest request = ReservationRequestBuilder.builder()
+                .date(now().minusDays(1))
+                .build();
+        Member member = MemberBuilder.builder().build();
 
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약할 수 없습니다.");
     }
 
-    @DisplayName("현재 이후로 예약하면 예외가 발생하지 않는다.")
-    @Test
-    void should_not_throw_exception_when_later_date() {
-        Member member = memberRepository.findById(1L).get();
-
-        ReservationRequest request =
-                new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234);
-
-        assertThatCode(() -> reservationService.addReservation(request, member))
-                .doesNotThrowAnyException();
-    }
 
     @DisplayName("날짜, 시간, 테마가 일치하는 예약을 추가하려 할 때 예외가 발생한다.")
     @Test
     void should_throw_exception_when_add_exist_reservation() {
         LocalDate date = now().plusDays(1);
         Member member = memberRepository.findById(1L).get();
+        ReservationRequest request = ReservationRequestBuilder.builder().date(date).build();
 
-        ReservationRequest request = new ReservationRequest(date, 1L, 1L, "orderId", "paymentKey", 1234);
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
