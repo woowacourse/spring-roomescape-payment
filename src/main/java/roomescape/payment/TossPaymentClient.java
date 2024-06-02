@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
@@ -23,7 +23,7 @@ public class TossPaymentClient implements PaymentClient {
     private final String password;
     private final String paymentApi;
 
-    public TossPaymentClient(final HttpComponentsClientHttpRequestFactory factory,
+    public TossPaymentClient(final ClientHttpRequestFactory factory,
                              final ResponseErrorHandler errorHandler,
                              @Value("${payments.toss.secret-key}") final String secretKey,
                              @Value("${payments.toss.password}") final String password,

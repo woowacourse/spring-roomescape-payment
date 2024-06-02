@@ -3,7 +3,7 @@ package roomescape.payment;
 import roomescape.exception.RoomescapeException;
 import roomescape.payment.dto.PaymentErrorResponse;
 
-public class TossPaymentException extends RoomescapeException { //TODO 예외 처리 전체적으로 리팩터링 필요
+public class TossPaymentException extends RoomescapeException {
 
     private final PaymentErrorResponse errorResponse;
 
