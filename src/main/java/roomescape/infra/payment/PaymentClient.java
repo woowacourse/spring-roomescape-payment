@@ -42,8 +42,7 @@ public class PaymentClient {
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     PaymentErrorResponse errorResponse = objectMapper
                             .readValue(res.getBody(), PaymentErrorResponse.class);
-
-                    throw new PaymentException(errorResponse.message());
+                    throw PaymentException.tossPaymentExceptionOf(errorResponse.message());
                 });
     }
 
