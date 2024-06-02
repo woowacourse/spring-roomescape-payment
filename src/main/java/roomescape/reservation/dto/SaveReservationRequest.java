@@ -18,10 +18,6 @@ public record SaveReservationRequest(@NotNull(message = "예약 날짜는 공백
                                      Long amount
 ) {
 
-    public SaveReservationRequest setMemberId(final Long memberId) {
-        return new SaveReservationRequest(date, memberId, timeId, themeId, paymentKey, orderId, amount);
-    }
-
     public Reservation toReservation(
             final ReservationTime reservationTime,
             final Theme theme,
