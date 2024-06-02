@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      data-locations:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+
+security:
+  jwt:
+    secret-key: eyJhbGciOiJIeyJzdWIilowafgfaoTazAGa
+    expiration-time: 36000000
+
+payment:
+  properties:
+    - vendor: toss
+      baseUrl: https://api.tosspayments.com
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connection-timeout-seconds: 5
+      read-timeout-seconds: 31
