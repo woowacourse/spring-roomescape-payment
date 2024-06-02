@@ -47,11 +47,11 @@ public class ReservationCreateService {
 
     @Transactional
     public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
-        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
+        Reservation reservation = makeReservation(memberId, request.date(), request.timeId(), request.themeId());
+        ReservationResponse reservationResponse = saveReservation(reservation);
 
-        Reservation reservation = makeReservation(
-                memberId, request.date(), request.timeId(), request.themeId());
-        return saveReservation(reservation);
+        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
+        return reservationResponse;
     }
 
     private Reservation makeReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
