@@ -21,13 +21,13 @@ public class RestClientConfig {
     }
 
     @Bean
-    public PaymentRestClient paymentRestClient(ClientHttpRequestFactory factory) {
+    public PaymentRestClient paymentRestClient(ClientHttpRequestFactory factory, ObjectMapper objectMapper) {
         return new PaymentRestClient(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com/v1/payments")
                         .requestFactory(factory)
                         .build(),
-                new ObjectMapper()
+                objectMapper
         );
     }
 }
