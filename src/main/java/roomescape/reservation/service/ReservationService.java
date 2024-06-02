@@ -12,11 +12,14 @@ import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.TossPaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
@@ -30,15 +33,18 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final TossPaymentClient tossPaymentClient;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository) {
+                              ThemeRepository themeRepository,
+                              TossPaymentClient tossPaymentClient) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.tossPaymentClient = tossPaymentClient;
     }
 
     public List<ReservationResponse> findAllReservation() {
@@ -90,9 +96,19 @@ public class ReservationService {
                 .forEach(responses::add);
     }
 
-    public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
+    public ReservationResponse saveAdminReservation(Long memberId, MemberReservationAddRequest request) {
         validateDuplicatedReservation(request);
         return saveMemberReservation(memberId, request, Status.RESERVED);
+    }
+
+    public ReservationResponse saveMemberReservation(Long memberId, MemberReservationWithPaymentAddRequest request) {
+        MemberReservationAddRequest memberReservationAddRequest = request.extractMemberReservationAddRequest();
+        PaymentConfirmRequest paymentConfirmRequest = request.extractPaymentConfirmRequest();
+
+        validateDuplicatedReservation(memberReservationAddRequest);
+
+        tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        return saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
     }
 
     public ReservationResponse saveMemberWaitingReservation(Long memberId, MemberReservationAddRequest request) {

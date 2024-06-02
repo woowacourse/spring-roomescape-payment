@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.member.fixture.MemberFixture.MEMBER_ID_1;
 import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
+import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_PAYMENT_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_2;
@@ -25,6 +26,7 @@ import roomescape.global.exception.DuplicateSaveException;
 import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
@@ -49,6 +51,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private TossPaymentClient tossPaymentClient;
 
 
     @DisplayName("전체 예약을 조회하고 응답 형태로 반환할 수 있다")
@@ -78,7 +83,7 @@ class ReservationServiceTest {
         when(themeRepository.findById(1L)).thenReturn(Optional.of(THEME_1));
 
         ReservationResponse savedReservation = reservationService.saveMemberReservation(1L,
-                RESERVATION_REQUEST_1);
+                RESERVATION_PAYMENT_REQUEST_1);
 
         assertThat(savedReservation).isEqualTo(new ReservationResponse(SAVED_RESERVATION_1));
     }
@@ -90,7 +95,7 @@ class ReservationServiceTest {
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
                 .isInstanceOf(NoSuchRecordException.class);
     }
 
@@ -102,7 +107,7 @@ class ReservationServiceTest {
         when(themeRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
                 .isInstanceOf(NoSuchRecordException.class);
     }
 
@@ -124,7 +129,7 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDateValueAndTimeIdAndThemeId(TOMORROW, 1L, 1L)).thenReturn(true);
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
                 .isInstanceOf(DuplicateSaveException.class);
     }
 

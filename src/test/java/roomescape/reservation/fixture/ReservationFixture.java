@@ -13,18 +13,35 @@ import roomescape.member.fixture.MemberFixture;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MemberReservationAddRequest;
+import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 
 public class ReservationFixture {
+
+    public static final MemberReservationWithPaymentAddRequest RESERVATION_PAYMENT_REQUEST_1
+            = new MemberReservationWithPaymentAddRequest(
+            TOMORROW,
+            1L,
+            1L,
+            "testPaymentKey",
+            "testOrderId",
+            1000L
+    );
 
     public static final MemberReservationAddRequest RESERVATION_REQUEST_1 = new MemberReservationAddRequest(
             TOMORROW,
             1L,
-            1L);
+            1L
+    );
 
-    public static final MemberReservationAddRequest PAST_DATE_RESERVATION_REQUEST = new MemberReservationAddRequest(
+    public static final MemberReservationWithPaymentAddRequest PAST_DATE_RESERVATION_REQUEST
+            = new MemberReservationWithPaymentAddRequest(
             YESTERDAY,
             1L,
-            1L);
+            1L,
+            "testPaymentKey",
+            "testOrderId",
+            1000L
+    );
 
     public static final Reservation SAVED_RESERVATION_1 = new Reservation(
             1L,
