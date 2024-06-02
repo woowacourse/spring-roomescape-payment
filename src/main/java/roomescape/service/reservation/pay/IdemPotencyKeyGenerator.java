@@ -1,5 +1,12 @@
 package roomescape.service.reservation.pay;
 
-public interface IdemPotencyKeyGenerator {
-    String generate();
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+@Component
+public class IdemPotencyKeyGenerator {
+    public String generate() {
+        return UUID.randomUUID().toString();
+    }
 }

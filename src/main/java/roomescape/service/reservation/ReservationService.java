@@ -3,7 +3,6 @@ package roomescape.service.reservation;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.HeaderGeneratorImpl;
 import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.*;
@@ -51,7 +50,7 @@ public class ReservationService {
     public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest) {
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        PaymentApproveResponse payResponse = paymentService.pay(new HeaderGeneratorImpl(), paymentApproveRequest);
+        PaymentApproveResponse payResponse = paymentService.pay(paymentApproveRequest);
 
         try {
             return saveReservation(reservationSaveRequest);

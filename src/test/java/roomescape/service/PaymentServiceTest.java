@@ -1,64 +1,166 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import roomescape.controller.HeaderGenerator;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
+import roomescape.exception.customexception.api.ApiBadRequestException;
 import roomescape.service.dto.request.PaymentApproveRequest;
-import roomescape.exception.customexception.business.RoomEscapeBusinessException;
-import roomescape.exception.customexception.api.ApiException;
+import roomescape.service.dto.request.PaymentCancelRequest;
+import roomescape.service.dto.response.PaymentApproveResponse;
+import roomescape.service.dto.response.PaymentCancelResponse;
+import roomescape.service.reservation.pay.PaymentProperties;
 import roomescape.service.reservation.pay.PaymentService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@ExtendWith(MockitoExtension.class)
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableConfigurationProperties({PaymentProperties.class})
 class PaymentServiceTest {
 
     @Autowired
+    private PaymentProperties paymentProperties;
+    ;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
     private PaymentService paymentService;
 
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setUp() {
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+    }
+
+    @AfterEach
+    void clear() {
+        mockServer.reset();
+    }
+
+
     @Test
-    @DisplayName("400에러 반환시 custom exception으로 예외가 전환된다.")
-    void is4XXException_PaymentException(){
-        PaymentApproveRequest request = new PaymentApproveRequest(
-                null, null, null
+    @DisplayName("성공 : 결제를 요청한다")
+    void sucessPayment() {
+        PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
+        PaymentApproveResponse expectedResponse = new PaymentApproveResponse(request.paymentKey(), request.orderId());
+
+        mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(makeJsonFrom(expectedResponse), MediaType.APPLICATION_JSON));
+
+        PaymentApproveResponse actualResponse = paymentService.pay(request);
+
+        assertAll(
+                () -> mockServer.verify(),
+                () -> assertThat(actualResponse.paymentKey()).isEqualTo(expectedResponse.paymentKey()),
+                () -> assertThat(actualResponse.orderId()).isEqualTo(expectedResponse.orderId())
         );
-
-        HeaderGenerator headerGenerator = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("TossPayments-Test-Code", "INVALID_CARD_LOST_OR_STOLEN");
-            return headers;
-        };
-
-        assertThatThrownBy(() -> paymentService.pay(headerGenerator, request))
-                .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
     @Test
-    @DisplayName("500에러 반환시 custom exeption으로 예외가 전환된다.")
-    void is5XXException_PaymentException(){
-        PaymentApproveRequest request = new PaymentApproveRequest(
-                null, null, null
+    @DisplayName("성공 : 결제 취소를 요청한다")
+    void sucessCancelPayment() {
+        PaymentCancelRequest request = new PaymentCancelRequest("testKey", "결제 취소");
+        PaymentCancelResponse expectedResponse = new PaymentCancelResponse(request.paymentKey(), "testId", "testOrder");
+
+        mockServer.expect(requestTo(String.format(paymentProperties.getCancelUrl(), request.paymentKey())))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(makeJsonFrom(expectedResponse), MediaType.APPLICATION_JSON));
+
+        PaymentCancelResponse actualResponse = paymentService.cancel(request);
+
+        assertAll(
+                () -> mockServer.verify(),
+                () -> assertThat(actualResponse.paymentKey()).isEqualTo(expectedResponse.paymentKey()),
+                () -> assertThat(actualResponse.orderId()).isEqualTo(expectedResponse.orderId()),
+                () -> assertThat(actualResponse.orderName()).isEqualTo(expectedResponse.orderName())
         );
+    }
 
-        HeaderGenerator headerGenerator = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("TossPayments-Test-Code", "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING");
-            return headers;
-        };
+    @Test
+    @DisplayName("실패 : 400에러 발생 시 custom exception으로 예외가 전환된다.")
+    void is4XXException_PaymentException() {
+        PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
+        TestErrorResponse response = new TestErrorResponse("INVALID_REQUEST", "test_error");
 
-        assertThatThrownBy(() -> paymentService.pay(headerGenerator, request))
-                .isInstanceOf(ApiException.class);
+        mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withBadRequest().body(makeJsonFrom(response)));
+
+        assertThatThrownBy(() -> paymentService.pay(request))
+                .isInstanceOf(ApiBadRequestException.class)
+                .hasMessage(response.message);
+    }
+
+    @Test
+    @DisplayName("실패 : 500에러 반환시 custom exeption으로 예외가 전환된다.")
+    void is5XXException_PaymentException() {
+        PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
+
+        mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withServerError());
+
+        assertThatThrownBy(() -> paymentService.pay(request))
+                .isInstanceOf(ApiBadRequestException.class);
+    }
+
+    private String makeJsonFrom(PaymentApproveResponse response) {
+        try {
+            return new JSONObject()
+                    .put("paymentKey", response.paymentKey())
+                    .put("orderId", response.orderId())
+                    .toString();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String makeJsonFrom(PaymentCancelResponse response) {
+        try {
+            return new JSONObject()
+                    .put("paymentKey", response.paymentKey())
+                    .put("orderId", response.orderId())
+                    .put("orderName", response.orderName())
+                    .toString();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String makeJsonFrom(TestErrorResponse response) {
+        try {
+            return new JSONObject()
+                    .put("code", response.code)
+                    .put("message", response.message)
+                    .toString();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static class TestErrorResponse {
+        private final String code;
+        private final String message;
+
+        public TestErrorResponse(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
     }
 }
