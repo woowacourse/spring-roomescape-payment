@@ -22,12 +22,19 @@ public class PaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentClient.class);
     private final String secretKey;
+    private final String paymentUrl;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentClient(@Value("${security.payment.secret-key}") String secretKey, RestClient restClient, ObjectMapper objectMapper) {
+    public PaymentClient(@Value("${security.payment.secret-key}") String secretKey,
+                         @Value("${security.payment.url}") String paymentUrl,
+                         RestClient.Builder restClientBuilder,
+                         ObjectMapper objectMapper) {
         this.secretKey = secretKey;
-        this.restClient = restClient;
+        this.paymentUrl = paymentUrl;
+        this.restClient = restClientBuilder
+                .baseUrl(paymentUrl)
+                .build();
         this.objectMapper = objectMapper;
     }
 
