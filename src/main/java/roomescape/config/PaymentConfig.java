@@ -51,7 +51,6 @@ public class PaymentConfig {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(properties.getConnectionTimeoutSeconds()))
                 .withReadTimeout(Duration.ofSeconds(properties.getReadTimeoutSeconds()));
-
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
