@@ -53,13 +53,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException e) {
         log.error("[Data Access Error] " + e.getMessage(),e);
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponse("[Data Access Error] " + e.getMessage()));
+                .body(new ErrorResponse("[Data Access Error] 관리자에게 문의하세요"));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("[Server Error] " + e.getMessage(),e);
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponse("[Server Error] " + e.getMessage()));
+                .body(new ErrorResponse("[Server Error] 관리자에게 문의하세요"));
     }
 }
