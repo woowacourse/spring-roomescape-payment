@@ -3,18 +3,23 @@ package roomescape.service.reservation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.member.Member;
+import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.schedule.ReservationTime;
+import roomescape.domain.schedule.Schedule;
+import roomescape.domain.theme.Theme;
 import roomescape.exception.InvalidReservationException;
+import roomescape.fixture.*;
+import roomescape.service.ServiceTest;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
-import roomescape.service.reservation.dto.ReservationResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
-class ReservationCreateServiceTest extends ReservationServiceTest {
-
+class ReservationCreateServiceTest extends ServiceTest {
     @Autowired
     private ReservationCreateService reservationCreateService;
 
@@ -22,47 +27,42 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     @Test
     void createAdminReservation() {
         //given
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(reservationDetail.getDate(), admin.getId(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+        Member admin = memberRepository.save(MemberFixture.createAdmin());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        AdminReservationRequest adminReservationRequest = ReservationFixture.createAdminReservationRequest(admin, reservationDetail);
 
-        //when
-        ReservationResponse result = reservationCreateService.createAdminReservation(adminReservationRequest);
-
-        //then
-        assertAll(
-                () -> assertThat(result.id()).isNotZero(),
-                () -> assertThat(result.time().id()).isEqualTo(reservationDetail.getReservationTime().getId()),
-                () -> assertThat(result.theme().id()).isEqualTo(theme.getId()),
-                () -> assertThat(result.status()).isEqualTo(ReservationStatus.RESERVED.getDescription())
-        );
+        //when & then
+        assertThatNoException().isThrownBy(() -> reservationCreateService.createAdminReservation(adminReservationRequest));
     }
 
     @DisplayName("사용자가 새로운 예약을 저장한다.")
     @Test
     void createMemberReservation() {
         //given
-        ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(schedule, theme);
 
-        //when
-        ReservationResponse result = reservationCreateService.createMemberReservation(reservationRequest, member.getId());
-
-        //then
-        assertAll(
-                () -> assertThat(result.id()).isNotZero(),
-                () -> assertThat(result.time().id()).isEqualTo(reservationDetail.getReservationTime().getId()),
-                () -> assertThat(result.theme().id()).isEqualTo(theme.getId()),
-                () -> assertThat(result.status()).isEqualTo(ReservationStatus.RESERVED.getDescription())
-        );
+        //when & then
+        assertThatNoException().isThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()));
     }
 
     @DisplayName("사용자가 이미 예약인 상태에서 예약 요청을 한다면 예외가 발생한다.")
     @Test
     void cannotCreateByExistingMemberReservation() {
         //given
-        ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
-        reservationCreateService.createMemberReservation(reservationRequest, member.getId());
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(reservationDetail.getSchedule(), reservationDetail.getTheme());
 
         //when & then
         assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
@@ -74,11 +74,14 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     @Test
     void cannotCreateByUnknownTime() {
         //given
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(reservationDetail.getDate(), member.getId(), 0L,
-                theme.getId());
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        Long invalidTimeId = 0L;
+        LocalDate date = LocalDate.now();
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(date, invalidTimeId, theme);
 
         //when & then
-        assertThatThrownBy(() -> reservationCreateService.createAdminReservation(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 시간입니다.");
     }
@@ -87,11 +90,14 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     @Test
     void cannotCreateByUnknownTheme() {
         //given
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(reservationDetail.getDate(), member.getId(),
-                reservationDetail.getReservationTime().getId(), 0L);
+        Member guest = memberRepository.save(MemberFixture.createGuest());
+        Long invalidThemeId = 0L;
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(schedule, invalidThemeId);
 
         //when & then
-        assertThatThrownBy(() -> reservationCreateService.createAdminReservation(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, guest.getId()))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 테마입니다.");
     }

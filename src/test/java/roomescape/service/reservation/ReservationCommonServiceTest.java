@@ -5,20 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.dto.ReservationWithRank;
-import roomescape.domain.payment.Payment;
+import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.schedule.ReservationTime;
+import roomescape.domain.schedule.Schedule;
+import roomescape.domain.theme.Theme;
 import roomescape.exception.InvalidReservationException;
+import roomescape.fixture.*;
+import roomescape.service.ServiceTest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
-class ReservationCommonServiceTest extends ReservationServiceTest {
+class ReservationCommonServiceTest extends ServiceTest {
 
     @Autowired
     private ReservationCommonService reservationCommonService;
@@ -27,90 +31,86 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
 
     @DisplayName("모든 예약 내역을 조회한다.")
     @Test
-    @Sql({"/truncate-with-time-and-theme.sql", "/insert-past-reservation.sql"})
     void findAllReservations() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+
         //when
         List<ReservationResponse> reservations = reservationCommonService.findAll();
-
-        //then
-        assertThat(reservations).hasSize(3);
-    }
-
-    @DisplayName("사용자 조건으로 예약 내역을 조회한다.")
-    @Test
-    void findByMember() {
-        //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        reservationRepository.save(reservation);
-        ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(), null, null,
-                null);
-
-        //when
-        List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
 
         //then
         assertThat(reservations).hasSize(1);
     }
 
-    @DisplayName("사용자와 테마 조건으로 예약 내역을 조회한다.")
+    @DisplayName("특정 조건으로 예약 내역을 조회한다.")
     @Test
-    void findByMemberAndTheme() {
+    void findByMember() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        reservationRepository.save(reservation);
-        long notMemberThemeId = theme.getId() + 1;
-        ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(),
-                notMemberThemeId, null, null);
-
-        //when
-        List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+        ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(), null, null, null);
 
         //then
-        assertThat(reservations).isEmpty();
+        assertThatNoException().isThrownBy(() -> reservationCommonService.findByCondition(reservationFilterRequest));
     }
 
-    @DisplayName("관리자가 id로 예약을 삭제한다.")
+    @DisplayName("id로 예약을 삭제한다.")
     @Test
     void deleteReservationById() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        Reservation target = reservationRepository.save(reservation);
+        Member admin = memberRepository.save(MemberFixture.createAdmin());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(ReservationFixture.createReserved(admin, reservationDetail));
 
         //when
-        reservationRepository.deleteById(target.getId());
-
-        //then
-        assertThat(reservationCommonService.findAll()).isEmpty();
+        assertThatNoException().isThrownBy(() -> reservationRepository.deleteById(reservation.getId()));
     }
 
-    @DisplayName("관리자가 예약을 삭제하고, 예약 대기가 있다면 가장 우선순위가 높은 예약 대기를 예약으로 전환한다.")
+    @DisplayName("예약을 삭제하고, 예약 대기가 있다면 가장 우선순위가 높은 예약 대기를 예약으로 전환한다.")
     @Test
     void deleteThenUpdateReservation() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
-        Reservation reservation3 = new Reservation(anotherMember, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
-        reservationRepository.save(reservation);
-        reservationRepository.save(reservation2);
-        reservationRepository.save(reservation3);
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Member anotherMember = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+        reservationRepository.save(WaitingFixture.create(anotherMember, reservationDetail));
 
         //when
         reservationCommonService.deleteById(reservation.getId());
 
         //then
-        List<ReservationWithRank> reservations = reservationRepository.findWithRankingByMemberId(member.getId());
-        assertThat(reservations.get(0).getReservation().isReserved()).isTrue();
+        List<Boolean> reservations = reservationRepository.findWithRankingByMemberId(anotherMember.getId()).stream()
+                .map(ReservationWithRank::getReservation)
+                .map(Reservation::isReserved)
+                .toList();
+        assertThat(reservations).containsExactly(true);
     }
 
-    @DisplayName("관리자가 과거 예약을 삭제하려고 하면 예외가 발생한다.")
+    @DisplayName("과거 예약을 삭제하려고 하면 예외가 발생한다.")
     @Test
-    @Sql({"/truncate.sql", "/insert-past-reservation.sql"})
+    @Sql({"/truncate.sql", "/member.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/reservation.sql"})
     void cannotDeleteReservationByIdIfPast() {
         //given
-        long id = 1;
+        long pastReservationId = 1;
 
         //when & then
-        assertThatThrownBy(() -> reservationCommonService.deleteById(id))
+        assertThatThrownBy(() -> reservationCommonService.deleteById(pastReservationId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
     }

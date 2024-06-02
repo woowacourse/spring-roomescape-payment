@@ -4,13 +4,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
+import roomescape.fixture.PaymentFixture;
+import roomescape.service.ServiceTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class PaymentServiceTest {
-
+class PaymentServiceTest extends ServiceTest {
     @Autowired
     private PaymentService paymentService;
 
@@ -18,7 +17,7 @@ class PaymentServiceTest {
     @Test
     void approvePayment() {
         // given
-        PaymentRequest request = new PaymentRequest("testKey", "testOrderId", 1000L);
+        PaymentRequest request = PaymentFixture.createPaymentRequest();
 
         // when
         Payment payment = paymentService.approvePayment(request);

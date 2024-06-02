@@ -3,62 +3,34 @@ package roomescape.service.schedule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
-import roomescape.domain.member.Role;
-import roomescape.domain.payment.Payment;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.domain.reservationdetail.ReservationDetailRepository;
-import roomescape.domain.schedule.ReservationDate;
 import roomescape.domain.schedule.ReservationTime;
-import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
-import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
+import roomescape.fixture.*;
+import roomescape.service.ServiceTest;
 import roomescape.service.schedule.dto.AvailableReservationTimeResponse;
 import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
 import roomescape.service.schedule.dto.ReservationTimeReadRequest;
 import roomescape.service.schedule.dto.ReservationTimeResponse;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Sql("/truncate-with-guests.sql")
-class ReservationTimeServiceTest {
-
+class ReservationTimeServiceTest extends ServiceTest {
     @Autowired
     private ReservationTimeService reservationTimeService;
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
-    private ThemeRepository themeRepository;
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private ReservationDetailRepository reservationDetailRepository;
 
     @DisplayName("새로운 예약 시간을 저장한다.")
     @Test
     void create() {
         //given
-        LocalTime startAt = LocalTime.of(10, 0);
-        ;
-        ReservationTimeCreateRequest reservationTimeCreateRequest = new ReservationTimeCreateRequest(startAt);
+        ReservationTimeCreateRequest reservationTimeCreateRequest = TimeFixture.createTimeCreateRequest();
 
         //when
         ReservationTimeResponse result = reservationTimeService.create(reservationTimeCreateRequest);
@@ -66,7 +38,7 @@ class ReservationTimeServiceTest {
         //then
         assertAll(
                 () -> assertThat(result.id()).isNotZero(),
-                () -> assertThat(result.startAt()).isEqualTo(startAt)
+                () -> assertThat(result.startAt()).isEqualTo(reservationTimeCreateRequest.startAt())
         );
     }
 
@@ -74,7 +46,7 @@ class ReservationTimeServiceTest {
     @Test
     void findAll() {
         //given
-        reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
+        reservationTimeRepository.save(TimeFixture.createTime());
 
         //when
         List<ReservationTimeResponse> reservationTimes = reservationTimeService.findAll();
@@ -87,11 +59,8 @@ class ReservationTimeServiceTest {
     @Test
     void duplicatedTime() {
         //given
-        LocalTime time = LocalTime.of(10, 0);
-        ;
-        reservationTimeRepository.save(new ReservationTime(time));
-
-        ReservationTimeCreateRequest reservationTimeCreateRequest = new ReservationTimeCreateRequest(time);
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        ReservationTimeCreateRequest reservationTimeCreateRequest = TimeFixture.createTimeCreateRequest(time.getStartAt());
 
         //when&then
         assertThatThrownBy(() -> reservationTimeService.create(reservationTimeCreateRequest))
@@ -103,17 +72,14 @@ class ReservationTimeServiceTest {
     @Test
     void cannotDeleteTime() {
         //given
-        ReservationDate reservationDate = ReservationDate.of(LocalDate.MAX);
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
-        Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-                "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
-        Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
-        ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        reservationRepository.save(reservation);
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(reservationTimeRepository.save(TimeFixture.createTime()));
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
 
         //when&then
-        long timeId = reservationTime.getId();
+        long timeId = schedule.getReservationTime().getId();
         assertThatThrownBy(() -> reservationTimeService.deleteById(timeId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("해당 시간에 예약(대기)이 존재해서 삭제할 수 없습니다.");
@@ -123,21 +89,17 @@ class ReservationTimeServiceTest {
     @Test
     void findAvailableTimes() {
         //given
-        ReservationDate reservationDate = ReservationDate.of(LocalDate.MAX);
-        LocalTime time = LocalTime.of(10, 0);
-        ReservationTime bookedReservationTime = reservationTimeRepository.save(new ReservationTime(time));
-        ReservationTime notBookedReservationTime = reservationTimeRepository.save(
-                new ReservationTime(time.plusHours(5)));
-        Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-                "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
-        Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
-        ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, bookedReservationTime), theme));
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        reservationRepository.save(reservation);
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        ReservationTime bookedReservationTime = reservationTimeRepository.save(TimeFixture.createTime(10, 0));
+        ReservationTime notBookedReservationTime = reservationTimeRepository.save(TimeFixture.createTime(12, 0));
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(bookedReservationTime);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
 
         //when
-        List<AvailableReservationTimeResponse> result = reservationTimeService.findAvailableTimes(
-                new ReservationTimeReadRequest(reservationDate.getValue(), theme.getId()));
+        ReservationTimeReadRequest request = new ReservationTimeReadRequest(schedule.getDate(), theme.getId());
+        List<AvailableReservationTimeResponse> result = reservationTimeService.findAvailableTimes(request);
 
         //then
         boolean isBookedOfBookedTime = result.stream()
