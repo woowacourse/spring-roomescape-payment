@@ -110,17 +110,21 @@
 
 ### Request
 
-> POST /reservations HTTP/1.1  
-> content-type: application/json  
-> cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
+> POST /reservations HTTP/1.1
+content-type: application/json
 > 
+> cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
+>
 > host: localhost:8080
 
 ```JSON
 {
-  "date": "2023-08-05",
-  "timeId": 1,
-  "themeId": 1
+  "date":"2024-03-01",
+  "themeId":1,
+  "timeId":1,
+  "paymentKey":"tgen_20240513184816ZSAZ9",
+  "orderId":"MC4wNDYzMzA0OTc2MDgy",
+  "amount":1000
 }
 ```
 
@@ -132,19 +136,32 @@
 > Location: /reservations/{id}
 
 ```JSON
+
 {
-  "id": 1,
-  "name": "브라운",
-  "date": "2023-08-05",
-  "time": {
-    "id": 1,
-    "startAt": "10:00"
+  "reservationResponse": {
+    "id": 13,
+    "date": "2024-06-20",
+    "time": {
+      "id": 1,
+      "startAt": "10:00"
+    },
+    "theme": {
+      "id": 1,
+      "name": "이름",
+      "description": "설명",
+      "thumbnail": "썸네일"
+    },
+    "member": {
+      "id": 1,
+      "name": "admin"
+    }
   },
-  "theme": {
-    "id": 1,
-    "name": "이름",
-    "description": "설명",
-    "thumbnail": "썸네일"
+  "paymentResponse" : {
+    "orderName": "테스트 방탈출 예약 결제 1건",
+    "requestedAt": "2024-06-03T00:57:15+09:00",
+    "approvedAt": "2024-06-03T00:57:30+09:00",
+    "currency": "KRW",
+    "totalAmount": 1000
   }
 }
 ```
