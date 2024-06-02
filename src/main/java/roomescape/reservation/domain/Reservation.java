@@ -26,7 +26,7 @@ public class Reservation {
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_time_id", nullable = false)
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,7 +87,7 @@ public class Reservation {
     }
 
     public boolean isReserved() {
-        return reservationStatus == ReservationStatus.RESERVED;
+        return reservationStatus == ReservationStatus.CONFIRMED;
     }
 
     public Long getMemberId() {
