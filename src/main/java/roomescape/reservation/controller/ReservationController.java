@@ -90,7 +90,7 @@ public class ReservationController {
             final HttpServletResponse response
     ) {
         tossPaymentClient.confirmPayment(
-                new PaymentRequest(reservationRequest.paymentKey() + "123ivjdls", reservationRequest.orderId(),
+                new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(),
                         reservationRequest.amount(), reservationRequest.paymentType()));
         final ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
 
