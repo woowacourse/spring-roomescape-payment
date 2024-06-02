@@ -2,12 +2,8 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.domain.payment.Payment;
@@ -21,19 +17,17 @@ public class PaymentRestClient {
     private static final String CONFIRM_ENDPOINT = "/confirm";
     private static final String CANCEL_ENDPOINT = "/cancel";
 
-    @Value("${tosspay.secret_key}")
-    private String secretKey;
-
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final HttpHeaders headers;
 
-    public PaymentRestClient(RestClient restClient, ObjectMapper objectMapper) {
+    public PaymentRestClient(RestClient restClient, ObjectMapper objectMapper, HttpHeaders headers) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
+        this.headers = headers;
     }
 
     public PaymentResult confirm(ReservationRequest request) {
-        HttpHeaders headers = generateHttpHeaders();
         try {
             return restClient.post()
                     .uri(CONFIRM_ENDPOINT)
@@ -56,7 +50,6 @@ public class PaymentRestClient {
     }
 
     public void cancel(Payment payment) {
-        HttpHeaders headers = generateHttpHeaders();
         try {
             restClient.post()
                     .uri("/" + payment.getPaymentKey() + CANCEL_ENDPOINT)
@@ -67,15 +60,6 @@ public class PaymentRestClient {
             String responseBody = exception.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody));
         }
-    }
-
-    private HttpHeaders generateHttpHeaders() {
-        String header = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Basic " + header);
-        return headers;
     }
 
     private Map<String, Object> generatedCancelRequestBody() {
@@ -91,4 +75,5 @@ public class PaymentRestClient {
             throw new PaymentException("에러 메세지를 불러올 수 없습니다.");
         }
     }
+
 }
