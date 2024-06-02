@@ -20,8 +20,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.system.exception.model.NotFoundException;
-import roomescape.system.exception.model.ValidateException;
+import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.service.ThemeService;
@@ -55,7 +54,7 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
                         "amount", "paymentType"), member.getId()))
-                .isInstanceOf(ValidateException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -71,7 +70,7 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
                         "orderId", "amount", "paymentType"), member.getId()))
-                .isInstanceOf(ValidateException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -88,6 +87,6 @@ class ReservationServiceTest {
                 new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
                         "orderId", "amount", "paymentType"),
                 NotExistMemberId))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

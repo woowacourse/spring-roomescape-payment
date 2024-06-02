@@ -16,7 +16,7 @@ import roomescape.system.auth.dto.LoginRequest;
 import roomescape.system.auth.jwt.JwtHandler;
 import roomescape.system.auth.jwt.dto.TokenDto;
 import roomescape.system.auth.service.AuthService;
-import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.RoomEscapeException;
 
 @SpringBootTest
 @Import({AuthService.class, JwtHandler.class, MemberService.class})
@@ -56,7 +56,7 @@ class AuthServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.login(new LoginRequest(notExistEmail, notExistPassword)))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -67,6 +67,6 @@ class AuthServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.checkLogin(notExistMemberId))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

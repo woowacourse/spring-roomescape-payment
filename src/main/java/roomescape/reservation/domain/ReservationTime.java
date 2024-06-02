@@ -5,8 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalTime;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.ValidateException;
+import org.springframework.http.HttpStatus;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Entity
 public class ReservationTime {
@@ -32,8 +33,8 @@ public class ReservationTime {
 
     private void validateNull() {
         if (startAt == null) {
-            throw new ValidateException(ErrorType.REQUEST_DATA_BLANK,
-                    String.format("예약 시간(Time) 생성에 유효하지 않은 값(null)이 입력되었습니다. [values: %s]", this));
+            throw new RoomEscapeException(ErrorType.REQUEST_DATA_BLANK, String.format("[values: %s]", this),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 

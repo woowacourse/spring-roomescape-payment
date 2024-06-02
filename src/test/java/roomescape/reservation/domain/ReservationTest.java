@@ -1,29 +1,29 @@
 package roomescape.reservation.domain;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import roomescape.system.exception.model.ValidateException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.stream.Stream;
 
 public class ReservationTest {
 
     @ParameterizedTest
     @MethodSource("validateConstructorParameterBlankSource")
     @DisplayName("객체 생성 시, null 또는 공백이 존재하면 예외를 발생한다.")
-    void validateConstructorParameterBlank(LocalDate date, ReservationTime reservationTime, Theme theme, Member member) {
+    void validateConstructorParameterBlank(LocalDate date, ReservationTime reservationTime, Theme theme,
+                                           Member member) {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new Reservation(date, reservationTime, theme, member))
-                .isInstanceOf(ValidateException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     static Stream<Arguments> validateConstructorParameterBlankSource() {

@@ -3,7 +3,7 @@ package roomescape.reservation.domain;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.system.exception.model.ValidateException;
+import roomescape.system.exception.RoomEscapeException;
 
 class ReservationTimeTest {
 
@@ -13,6 +13,6 @@ class ReservationTimeTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new ReservationTime(null))
-                .isInstanceOf(ValidateException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

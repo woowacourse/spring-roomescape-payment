@@ -1,4 +1,4 @@
-package roomescape.system.exception.error;
+package roomescape.system.exception;
 
 public enum ErrorType {
 
@@ -15,6 +15,7 @@ public enum ErrorType {
     ILLEGAL_TOKEN("JWT 토큰의 Claim 이 비어있습니다."),
     INVALID_TOKEN("JWT 토큰이 존재하지 않거나 유효하지 않습니다."),
     INVALID_REFRESH_TOKEN("유효하지 않은 RefreshToken 입니다."),
+    NOT_EXIST_COOKIE("쿠키가 존재하지 않습니다."),
 
     // 403 Forbidden
     PERMISSION_DOES_NOT_EXIST("접근 권한이 존재하지 않습니다."),
@@ -29,7 +30,7 @@ public enum ErrorType {
     METHOD_NOT_ALLOWED("지원하지 않는 HTTP Method 입니다."),
 
     // 409 Conflict
-    TIME_IS_USED_CONFLICT("삭제할 수 없는 시간대입니다."),
+    TIME_IS_USED_CONFLICT("삭제할 수 없는 시간대입니다. 예약이 존재하는지 확인해주세요."),
     TIME_DUPLICATED("이미 해당 시간이 존재합니다."),
     RESERVATION_DUPLICATED("해당 시간에 이미 예약이 존재합니다."),
     RESERVATION_PERIOD_IN_PAST("이미 지난 시간대는 예약할 수 없습니다."),
@@ -38,7 +39,7 @@ public enum ErrorType {
     INTERNAL_SERVER_ERROR("서버 내부에서 에러가 발생하였습니다."),
 
     // Payment Error
-    PAYMENT_ERROR("결제 에러가 발생하였습니다.");
+    PAYMENT_ERROR("결제에 실패했습니다. 결제 정보를 확인해주세요.");
 
     private final String description;
 

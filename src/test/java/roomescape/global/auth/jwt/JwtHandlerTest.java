@@ -11,12 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.system.auth.jwt.JwtHandler;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.UnauthorizedException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 import java.util.Date;
 
-import static roomescape.system.exception.error.ErrorType.EXPIRED_TOKEN;
+import static roomescape.system.exception.ErrorType.EXPIRED_TOKEN;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -47,7 +47,7 @@ class JwtHandlerTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> jwtHandler.getMemberIdFromToken(accessToken))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage(EXPIRED_TOKEN.getDescription());
     }
 
@@ -70,7 +70,7 @@ class JwtHandlerTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> jwtHandler.getMemberIdFromToken(unsupportedAccessToken))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage(ErrorType.MALFORMED_TOKEN.getDescription());
     }
 
@@ -92,7 +92,7 @@ class JwtHandlerTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> jwtHandler.getMemberIdFromToken(accessToken))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage(ErrorType.INVALID_SIGNATURE_TOKEN.getDescription());
     }
 
@@ -104,7 +104,7 @@ class JwtHandlerTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> jwtHandler.getMemberIdFromToken(accessToken))
-                .isInstanceOf(UnauthorizedException.class)
+                .isInstanceOf(RoomEscapeException.class)
                 .hasMessage(ErrorType.ILLEGAL_TOKEN.getDescription());
     }
 }

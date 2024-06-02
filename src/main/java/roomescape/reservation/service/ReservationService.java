@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
@@ -24,10 +25,8 @@ import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.dto.response.WaitingWithRankResponse;
 import roomescape.reservation.dto.response.WaitingWithRanksResponse;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.ForbiddenException;
-import roomescape.system.exception.model.NotFoundException;
-import roomescape.system.exception.model.ValidateException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeService;
 
@@ -89,8 +88,8 @@ public class ReservationService {
 
     public Reservation findReservationById(final Long id) {
         return reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorType.RESERVATION_NOT_FOUND,
-                        String.format("예약(Reservation) 정보가 존재하지 않습니다. [reservationId: %d]", id)));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
+                        String.format("[reservationId: %d]", id), HttpStatus.BAD_REQUEST));
     }
 
     @Transactional
@@ -99,10 +98,7 @@ public class ReservationService {
         final Reservation requestReservation = findReservationById(targetReservationId);
 
         if (!requestMember.isAdmin() && !requestReservation.getMemberId().equals(myMemberId)) {
-            throw new ForbiddenException(
-                    ErrorType.PERMISSION_DOES_NOT_EXIST,
-                    "예약(Reservation) 정보에 대한 삭제 권한이 존재하지 않습니다."
-            );
+            throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST, HttpStatus.FORBIDDEN);
         }
 
         reservationRepository.delete(requestReservation);
@@ -152,10 +148,10 @@ public class ReservationService {
             final LocalDateTime now
     ) {
         if (isReservationInPast(requestDate, requestReservationTime, now)) {
-            throw new ValidateException(
-                    ErrorType.RESERVATION_PERIOD_IN_PAST,
-                    String.format("지난 날짜나 시간은 예약이 불가능합니다. [now: %s %s | request: %s %s]",
-                            now.toLocalDate(), now.toLocalTime(), requestDate, requestReservationTime.getStartAt())
+            throw new RoomEscapeException(ErrorType.RESERVATION_PERIOD_IN_PAST,
+                    String.format("[now: %s %s | request: %s %s]",
+                            now.toLocalDate(), now.toLocalTime(), requestDate, requestReservationTime.getStartAt()),
+                    HttpStatus.BAD_REQUEST
             );
         }
     }

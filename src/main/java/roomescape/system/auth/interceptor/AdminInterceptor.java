@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,9 +12,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 import roomescape.system.auth.annotation.Admin;
 import roomescape.system.auth.jwt.JwtHandler;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.ForbiddenException;
-import roomescape.system.exception.model.UnauthorizedException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
@@ -45,8 +45,8 @@ public class AdminInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        throw new ForbiddenException(ErrorType.PERMISSION_DOES_NOT_EXIST,
-                String.format("회원 권한이 존재하지 않아 접근할 수 없습니다. [memberId: %d, Role: %s]", member.getId(), member.getRole()));
+        throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST,
+                String.format("[memberId: %d, Role: %s]", member.getId(), member.getRole()), HttpStatus.FORBIDDEN);
     }
 
     private Cookie getToken(final HttpServletRequest request) {
@@ -56,13 +56,13 @@ public class AdminInterceptor implements HandlerInterceptor {
         return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(ACCESS_TOKEN_COOKIE_NAME))
                 .findAny()
-                .orElseThrow(() -> new UnauthorizedException(ErrorType.INVALID_TOKEN, "JWT 토큰이 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.INVALID_TOKEN, HttpStatus.UNAUTHORIZED));
     }
 
     private void validateCookieHeader(final HttpServletRequest request) {
         final String cookieHeader = request.getHeader("Cookie");
         if (cookieHeader == null) {
-            throw new UnauthorizedException(ErrorType.INVALID_TOKEN, "쿠키가 존재하지 않습니다");
+            throw new RoomEscapeException(ErrorType.NOT_EXIST_COOKIE, HttpStatus.UNAUTHORIZED);
         }
     }
 

@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.payment.PaymentRequest;
+import roomescape.payment.TossPaymentClient;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.dto.response.WaitingWithRanksResponse;
-import roomescape.payment.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.system.auth.annotation.Admin;
 import roomescape.system.auth.annotation.MemberId;
@@ -29,12 +30,13 @@ import roomescape.system.dto.response.ApiResponse;
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final TossPaymentClient tossPaymentClient;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
+        this.tossPaymentClient = tossPaymentClient;
     }
+
 
     @Admin
     @GetMapping("/reservations")
@@ -87,7 +89,9 @@ public class ReservationController {
             @MemberId final Long memberId,
             final HttpServletResponse response
     ) {
-        paymentService.confirm(reservationRequest);
+        tossPaymentClient.confirmPayment(
+                new PaymentRequest(reservationRequest.paymentKey() + "123ivjdls", reservationRequest.orderId(),
+                        reservationRequest.amount(), reservationRequest.paymentType()));
         final ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
 
         response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());

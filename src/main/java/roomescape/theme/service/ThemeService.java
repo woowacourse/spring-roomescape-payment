@@ -2,9 +2,10 @@ package roomescape.theme.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.dto.ThemeRequest;
@@ -21,8 +22,8 @@ public class ThemeService {
 
     public Theme findThemeById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorType.THEME_NOT_FOUND,
-                        String.format("테마(Theme) 정보가 존재하지 않습니다. [themeId: %d]", id)));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.THEME_NOT_FOUND,
+                        String.format("[themeId: %d]", id), HttpStatus.BAD_REQUEST));
     }
 
     public ThemesResponse findAllThemes() {

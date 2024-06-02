@@ -8,10 +8,11 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import roomescape.system.auth.jwt.dto.TokenDto;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.UnauthorizedException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Component
 public class JwtHandler {
@@ -63,17 +64,15 @@ public class JwtHandler {
         try {
             Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token);
         } catch (final ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorType.EXPIRED_TOKEN, ErrorType.EXPIRED_TOKEN.getDescription(), e);
+            throw new RoomEscapeException(ErrorType.EXPIRED_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (final UnsupportedJwtException e) {
-            throw new UnauthorizedException(ErrorType.UNSUPPORTED_TOKEN, ErrorType.UNSUPPORTED_TOKEN.getDescription(),
-                    e);
+            throw new RoomEscapeException(ErrorType.UNSUPPORTED_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (final MalformedJwtException e) {
-            throw new UnauthorizedException(ErrorType.MALFORMED_TOKEN, ErrorType.MALFORMED_TOKEN.getDescription(), e);
+            throw new RoomEscapeException(ErrorType.MALFORMED_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (final SignatureException e) {
-            throw new UnauthorizedException(ErrorType.INVALID_SIGNATURE_TOKEN,
-                    ErrorType.INVALID_SIGNATURE_TOKEN.getDescription(), e);
+            throw new RoomEscapeException(ErrorType.INVALID_SIGNATURE_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (final IllegalArgumentException e) {
-            throw new UnauthorizedException(ErrorType.ILLEGAL_TOKEN, ErrorType.ILLEGAL_TOKEN.getDescription(), e);
+            throw new RoomEscapeException(ErrorType.ILLEGAL_TOKEN, HttpStatus.UNAUTHORIZED);
         }
     }
 }

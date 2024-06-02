@@ -6,8 +6,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.ValidateException;
+import org.springframework.http.HttpStatus;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Entity
 public class Member {
@@ -58,8 +59,8 @@ public class Member {
 
     private void validateRole() {
         if (role == null) {
-            throw new ValidateException(ErrorType.REQUEST_DATA_BLANK,
-                    String.format("회원(Member) 역할(Role)에 유효하지 않은 값(null OR 공백)이 입력되었습니다. [values: %s]", this));
+            throw new RoomEscapeException(ErrorType.REQUEST_DATA_BLANK, String.format("[values: %s]", this),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -11,9 +11,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.springframework.http.HttpStatus;
 import roomescape.member.domain.Member;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.ValidateException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -80,8 +81,8 @@ public class Reservation {
 
     private void validateBlank() {
         if (date == null || reservationTime == null || theme == null || member == null) {
-            throw new ValidateException(ErrorType.REQUEST_DATA_BLANK,
-                    String.format("예약(Reservation) 생성에 유효하지 않은 값(null OR 공백)이 입력되었습니다. [values: %s]", this));
+            throw new RoomEscapeException(ErrorType.REQUEST_DATA_BLANK, String.format("[values: %s]", this),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 

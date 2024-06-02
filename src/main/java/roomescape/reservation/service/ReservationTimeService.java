@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -9,10 +10,8 @@ import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimesResponse;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.AssociatedDataExistsException;
-import roomescape.system.exception.model.DataDuplicateException;
-import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Service
 public class ReservationTimeService {
@@ -29,8 +28,8 @@ public class ReservationTimeService {
 
     public ReservationTime findTimeById(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorType.RESERVATION_TIME_NOT_FOUND,
-                        String.format("예약 시간(ReservationTime) 정보가 존재하지 않습니다. [reservationTimeId: %d]", id)));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_TIME_NOT_FOUND,
+                        String.format("[reservationTimeId: %d]", id), HttpStatus.BAD_REQUEST));
     }
 
     public ReservationTimesResponse findAllTimes() {
@@ -54,9 +53,8 @@ public class ReservationTimeService {
                 reservationTimeRequest.startAt());
 
         if (!duplicateReservationTimes.isEmpty()) {
-            throw new DataDuplicateException(ErrorType.TIME_DUPLICATED,
-                    String.format("이미 존재하는 예약 시간(ReservationTime) 입니다. [startAt: %s]",
-                            reservationTimeRequest.startAt()));
+            throw new RoomEscapeException(ErrorType.TIME_DUPLICATED,
+                    String.format("[startAt: %s]", reservationTimeRequest.startAt()), HttpStatus.CONFLICT);
         }
     }
 
@@ -65,8 +63,8 @@ public class ReservationTimeService {
         List<Reservation> usingTimeReservations = reservationRepository.findByReservationTime(reservationTime);
 
         if (!usingTimeReservations.isEmpty()) {
-            throw new AssociatedDataExistsException(ErrorType.TIME_IS_USED_CONFLICT,
-                    String.format("해당 예약 시간(ReservationTime) 에 예약이 존재하여 시간을 삭제할 수 없습니다. [timeId: %d]", id));
+            throw new RoomEscapeException(ErrorType.TIME_IS_USED_CONFLICT, String.format("[timeId: %d]", id),
+                    HttpStatus.CONFLICT);
         }
 
         reservationTimeRepository.deleteById(id);

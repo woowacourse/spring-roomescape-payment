@@ -1,13 +1,14 @@
 package roomescape.member.service;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.dto.MembersResponse;
-import roomescape.system.exception.error.ErrorType;
-import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.ErrorType;
+import roomescape.system.exception.RoomEscapeException;
 
 @Service
 public class MemberService {
@@ -27,13 +28,13 @@ public class MemberService {
 
     public Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_NOT_FOUND,
-                        String.format("회원(Member) 정보가 존재하지 않습니다. [memberId: %d]", memberId)));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.MEMBER_NOT_FOUND,
+                        String.format("[memberId: %d]", memberId), HttpStatus.BAD_REQUEST));
     }
 
     public Member findMemberByEmailAndPassword(final String email, final String password) {
         return memberRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_NOT_FOUND,
-                        String.format("회원(Member) 정보가 존재하지 않습니다. [email: %s, password: %s]", email, password)));
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.MEMBER_NOT_FOUND,
+                        String.format("[email: %s, password: %s]", email, password), HttpStatus.BAD_REQUEST));
     }
 }
