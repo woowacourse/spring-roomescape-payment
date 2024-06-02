@@ -77,7 +77,7 @@ class WaitingServiceTest extends BaseServiceTest {
     class AddReservationWaiting {
 
         @Test
-        @DisplayName("성공한다.")
+        @DisplayName("예약 대기 추가를 성공한다.")
         void success() {
             // given
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
@@ -199,7 +199,7 @@ class WaitingServiceTest extends BaseServiceTest {
     class ApproveReservationWaiting {
 
         @Test
-        @DisplayName("성공한다.")
+        @DisplayName("예약 대기가 삭제되고 예약이 추가된다.")
         void success() {
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
             LocalDate waitingDate = LocalDate.of(2024, 4, 9);
@@ -236,7 +236,7 @@ class WaitingServiceTest extends BaseServiceTest {
     class DeleteReservationWaiting {
 
         @Test
-        @DisplayName("성공한다.")
+        @DisplayName("예약 대기를 삭제한다.")
         void success() {
             LocalDate date = LocalDate.of(2024, 4, 9);
             ReservationDetail detail = new ReservationDetail(date, time1, theme);

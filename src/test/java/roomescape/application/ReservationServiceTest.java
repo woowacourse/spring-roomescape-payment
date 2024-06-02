@@ -83,7 +83,7 @@ class ReservationServiceTest extends BaseServiceTest {
     class AddReservation {
 
         @Test
-        @DisplayName("성공한다.")
+        @DisplayName("예약이 추가된다.")
         void success() {
             BDDMockito.doNothing()
                     .when(paymentClient).confirmPayment(any());
@@ -192,7 +192,7 @@ class ReservationServiceTest extends BaseServiceTest {
     class DeleteReservation {
 
         @Test
-        @DisplayName("성공한다.")
+        @DisplayName("예약이 삭제된다.")
         void success() {
             LocalDate date = LocalDate.of(2024, 4, 9);
             ReservationDetail detail = new ReservationDetail(date, time1, theme);
