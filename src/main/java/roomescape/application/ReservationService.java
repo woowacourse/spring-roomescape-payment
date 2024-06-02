@@ -75,7 +75,7 @@ public class ReservationService {
         return ReservationResponse.from(reservation);
     }
 
-    public List<ReservationResponse> findAllReservationsWithoutCancel() {
+    public List<ReservationResponse> findAllReservationsWithReserved() {
         List<Reservation> reservations = reservationRepository.findAll(Status.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)

@@ -13,8 +13,7 @@ public record UserReservationRequest(
         @Positive(message = "테마 아이디는 1이상의 정수만 허용합니다.") Long themeId,
         Integer amount,
         String orderId,
-        String paymentKey,
-        String paymentType
+        String paymentKey
 ) {
 
     public PaymentRequest toPaymentRequest() {

@@ -6,7 +6,6 @@ public record PaymentResponse(
         int totalAmount,
         String paymentKey,
         String orderId,
-        String status,
         String requestedAt,
         String approvedAt
 ) {
