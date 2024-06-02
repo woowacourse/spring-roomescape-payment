@@ -12,4 +12,9 @@ public abstract class CustomException extends RuntimeException {
         super(message);
         this.status = status;
     }
+
+    protected CustomException(String message, HttpStatus status, Throwable cause) {
+        super(message, cause);
+        this.status = status;
+    }
 }

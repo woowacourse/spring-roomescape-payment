@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.exception.payment.PaymentServerException;
 
 @Component
 @EnableConfigurationProperties(TossPaymentProperties.class)
@@ -45,14 +47,18 @@ public class TossPaymentClient implements PaymentClient {
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
         String encodedSecretKey = Base64.getEncoder().encodeToString(properties.secretKey().getBytes());
 
-        return Optional.ofNullable(restClient.post()
-                        .uri("/v1/payments/confirm")
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_PREFIX + encodedSecretKey)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(paymentRequest)
-                        .retrieve()
-                        .onStatus(errorHandler)
-                        .body(PaymentResponse.class))
-                .orElse(PaymentResponse.empty());
+        try {
+            return Optional.ofNullable(restClient.post()
+                            .uri("/v1/payments/confirm")
+                            .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_PREFIX + encodedSecretKey)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(paymentRequest)
+                            .retrieve()
+                            .onStatus(errorHandler)
+                            .body(PaymentResponse.class))
+                    .orElse(PaymentResponse.empty());
+        } catch (RestClientException e) {
+            throw new PaymentServerException(e.getMessage(), e.getCause());
+        }
     }
 }
