@@ -25,6 +25,7 @@ import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
 @SpringBootTest
+@Sql("/data/payment.sql")
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
 
@@ -41,11 +42,10 @@ class PaymentServiceTest {
     private PaymentClient paymentClient;
 
     @Test
-    @Sql(scripts = {"/data/clean-up.sql", "/data/unpaid-reservation.sql"})
     @DisplayName("결제가 정상 처리되면, 결제 정보를 저장한다.")
     void savePayment() {
         // given
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findById(2L).orElseThrow();
 
         PaymentRequest request = new PaymentRequest(reservation.getId(), "paymentKey", "WTESTzzzzz", 1000L);
         given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
@@ -57,11 +57,10 @@ class PaymentServiceTest {
     }
 
     @Test
-    @Sql(scripts = {"/data/clean-up.sql", "/data/unpaid-reservation.sql"})
     @DisplayName("결제가 실패하면, 예약의 결제 정보를 갱신하지 않는다.")
     void failPaymentThenReservationPaymentInfoNotUpdated() {
         // given
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findById(2L).orElseThrow();
 
         given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
                 .willThrow(new RuntimeException());
@@ -77,7 +76,6 @@ class PaymentServiceTest {
     }
 
     @Test
-    @Sql(scripts = {"/data/clean-up.sql", "/data/paid-reservation.sql"})
     @DisplayName("이미 결제된 예약은 결제를 시도할 수 없다.")
     void failPaymentWhenReservationStatusIsPaid() {
         // given
@@ -93,11 +91,10 @@ class PaymentServiceTest {
     }
 
     @Test
-    @Sql(scripts = {"/data/clean-up.sql", "/data/pending-reservation.sql"})
     @DisplayName("대기중인 예약은 결제를 시도할 수 없다.")
     void failPaymentWhenReservationStatusIsPending() {
         // given
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findById(3L).orElseThrow();
         PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), "paymentKey", "WTEST000001", 1000L);
 
         // when & then
