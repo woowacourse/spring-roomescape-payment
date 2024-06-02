@@ -10,8 +10,6 @@ public record PaymentRequest(
         String orderId,
 
         @Range(min = 0, max = Integer.MAX_VALUE)
-        @NotNull
-        @Positive
         int amount,
 
         @NotNull
