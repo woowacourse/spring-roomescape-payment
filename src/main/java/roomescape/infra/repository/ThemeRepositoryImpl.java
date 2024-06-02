@@ -1,11 +1,11 @@
 package roomescape.infra.repository;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
+import roomescape.exception.theme.NotFoundThemeException;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,8 +18,8 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     }
 
     @Override
-    public Optional<Theme> findTheme(Long id) {
-        return themeJpaRepository.findById(id);
+    public Theme getById(Long id) {
+        return themeJpaRepository.findById(id).orElseThrow(NotFoundThemeException::new);
     }
 
     @Override

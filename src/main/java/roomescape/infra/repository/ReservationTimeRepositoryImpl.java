@@ -3,7 +3,6 @@ package roomescape.infra.repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationdetail.ReservationTime;
@@ -24,11 +23,6 @@ public class ReservationTimeRepositoryImpl implements ReservationTimeRepository 
     public ReservationTime getReservationTime(Long id) {
         return reservationTimeJpaRepository.findById(id)
                 .orElseThrow(NotFoundReservationTimeException::new);
-    }
-
-    @Override
-    public Optional<ReservationTime> findReservationTime(Long id) {
-        return reservationTimeJpaRepository.findById(id);
     }
 
     @Override
