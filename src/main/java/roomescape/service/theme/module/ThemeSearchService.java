@@ -1,5 +1,6 @@
 package roomescape.service.theme.module;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,7 +8,6 @@ import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeResponse;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ThemeRepository;
-import roomescape.util.DateUtil;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +35,7 @@ public class ThemeSearchService {
 
     public List<ThemeResponse> findPopularThemes() {
         List<Long> popularThemeIds = reservationRepository.findTopThemeIdsByReservationCountsForDate(
-                DateUtil.A_WEEK_AGO, DateUtil.YESTERDAY);
+                LocalDate.now().minusDays(7), LocalDate.now().minusDays(1));
 
         return themeRepository.findAllById(popularThemeIds)
                 .stream()
