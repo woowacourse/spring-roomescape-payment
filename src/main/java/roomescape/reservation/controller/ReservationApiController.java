@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
@@ -27,9 +29,11 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService) {
+    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -69,6 +73,7 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
+        paymentService.pay(PaymentRequest.from(reservationSaveRequest));
         ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))

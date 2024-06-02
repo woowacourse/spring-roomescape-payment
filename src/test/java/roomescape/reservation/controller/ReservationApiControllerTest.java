@@ -2,6 +2,7 @@ package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.TODAY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
+import roomescape.exception.PaymentFailException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -99,6 +101,29 @@ class ReservationApiControllerTest extends IntegrationTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .header("Location", "/reservations/1");
+    }
+
+    @DisplayName("회원이 결제에 실패하면 400 응답을 받는다.")
+    @Test
+    void failPaymentReservation() throws JsonProcessingException {
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+
+        ReservationSaveRequest reservationSaveRequest
+                = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
+
+        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+
+        RestAssured.given().log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(reservationSaveRequest))
+                .accept(ContentType.JSON)
+                .when()
+                .post("/reservations")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("회원이 예약 대기를 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
