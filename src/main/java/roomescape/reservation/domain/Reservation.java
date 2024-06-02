@@ -77,7 +77,7 @@ public class Reservation {
         return status;
     }
 
-    public Long getAMOUNT() {
+    public Long getAmount() {
         return AMOUNT;
     }
 
