@@ -51,6 +51,7 @@ public class PaymentRestClient {
     }
 
     public void cancel(Payment payment) {
+        validatePayment(payment);
         HttpHeaders headers = generateHttpHeaders();
         Map<String, String> cancelReason = Map.of("cancelReason", "고객이 취소를 원함");
 
@@ -63,6 +64,12 @@ public class PaymentRestClient {
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             String responseBody = e.getResponseBodyAsString();
             throw new PaymentException(parseErrorBody(responseBody), e);
+        }
+    }
+
+    private void validatePayment(Payment payment) {
+        if (payment == null) {
+            throw new PaymentException("결제정보가 비어 있습니다.");
         }
     }
 
