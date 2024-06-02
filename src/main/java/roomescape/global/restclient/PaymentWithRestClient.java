@@ -1,5 +1,8 @@
 package roomescape.global.restclient;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -7,6 +10,9 @@ import roomescape.reservation.controller.dto.PaymentRequest;
 import roomescape.reservation.controller.dto.PaymentResponse;
 
 public class PaymentWithRestClient {
+
+    @Value("${security.toss-pay.secret_key}")
+    private String secretKey;
 
     private final RestClient restClient;
 
@@ -18,9 +24,18 @@ public class PaymentWithRestClient {
         return restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6")
+                .header("Authorization", "Basic " + createBasicHeader())
                 .body(paymentRequest)
                 .retrieve()
                 .body(PaymentResponse.class);
     }
+
+    private String createBasicHeader() {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String tmp = new String(encodedBytes);
+        System.out.println(tmp);
+        return tmp;
+    }
+
 }
