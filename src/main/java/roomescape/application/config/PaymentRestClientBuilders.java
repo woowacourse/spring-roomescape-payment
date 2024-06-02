@@ -1,6 +1,5 @@
 package roomescape.application.config;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,8 +36,8 @@ public class PaymentRestClientBuilders {
 
     private ClientHttpRequestFactory createRequestFactory(PaymentClientProperty property) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(property.connectionTimeoutInSeconds()))
-                .withReadTimeout(Duration.ofSeconds(property.readTimeoutInSeconds()));
+                .withConnectTimeout(property.connectionTimeoutInSeconds())
+                .withReadTimeout(property.readTimeoutInSeconds());
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }

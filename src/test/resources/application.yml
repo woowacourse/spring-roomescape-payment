@@ -15,5 +15,5 @@ payment:
     - name: toss
       secret: testtesttesttesttesttesttesttesttesttesttest
       url: https://test.toss.aru
-      connection-timeout-in-seconds: 3
-      read-timeout-in-seconds: 31
+      connection-timeout-in-seconds: 3s
+      read-timeout-in-seconds: 31s

@@ -13,5 +13,5 @@ payment:
     - name: toss
       secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
       url: https://api.tosspayments.com
-      connection-timeout-in-seconds: 3
-      read-timeout-in-seconds: 31
+      connection-timeout-in-seconds: 3s
+      read-timeout-in-seconds: 31s

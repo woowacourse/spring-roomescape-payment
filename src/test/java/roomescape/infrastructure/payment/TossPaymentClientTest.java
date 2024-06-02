@@ -36,7 +36,7 @@ import roomescape.util.Base64Utils;
 class TossPaymentClientTest {
     private final PaymentClientProperty property = new PaymentClientProperty(
             "test", "https://test-toss-url.com", "test-secret",
-            3L, 30L);
+            Duration.ofSeconds(3L), Duration.ofSeconds(31L));
     private final PaymentClientConfig config = new PaymentClientConfig(
             new PaymentClientProperties(List.of(property))
     );
