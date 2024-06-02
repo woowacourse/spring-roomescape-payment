@@ -20,7 +20,7 @@ import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationApplicationService;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
     private final ReservationApplicationService reservationApplicationService;
@@ -52,6 +52,7 @@ public class AdminController {
         return ResponseEntity.ok().body(memberService.findAll());
     }
 
+    // TODO: PUT으로 변경
     @PostMapping("/reservations/{id}/waiting/approve")
     public ResponseEntity<Void> approve(@LoginUser AuthInfo authInfo,
                                         @PathVariable("id") @Min(1) long memberReservationId) {

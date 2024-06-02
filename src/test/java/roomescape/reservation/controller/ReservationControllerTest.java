@@ -65,7 +65,7 @@ class ReservationControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
                 .body(params)
-                .when().post("/reservations")
+                .when().post("/api/v1/reservations")
                 .then().log().all()
                 .apply(document("reservations/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -94,7 +94,7 @@ class ReservationControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().delete("/reservations/" + reservationResponse.memberReservationId())
+                .when().delete("/api/v1/reservations/" + reservationResponse.memberReservationId())
                 .then().log().all()
                 .apply(document("reservations/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -123,7 +123,7 @@ class ReservationControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().delete("/reservations/" + reservationResponse.memberReservationId())
+                .when().delete("/api/v1/reservations/" + reservationResponse.memberReservationId())
                 .then().log().all()
                 .apply(document("reservations/delete/fail/invalid-auth"))
                 .statusCode(HttpStatus.FORBIDDEN.value());
@@ -152,7 +152,7 @@ class ReservationControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().get("/reservations")
+                .when().get("/api/v1/reservations")
                 .then().log().all()
                 .apply(document("reservations/find/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -180,7 +180,7 @@ class ReservationControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
                 .body(params)
-                .when().post("/reservations")
+                .when().post("/api/v1/reservations")
                 .then().log().all()
                 .apply(document("reservations/create/fail/invalid-date-time"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -215,7 +215,7 @@ class ReservationControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
                 .body(params)
-                .when().post("/reservations/waiting")
+                .when().post("/api/v1/reservations/waiting")
                 .then().log().all()
                 .apply(document("waiting/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -244,7 +244,7 @@ class ReservationControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().delete(String.format("/reservations/%d/waiting", reservationResponse.memberReservationId()))
+                .when().delete(String.format("/api/v1/reservations/%d/waiting", reservationResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("waiting/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());

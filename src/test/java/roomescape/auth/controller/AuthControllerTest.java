@@ -51,7 +51,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/login")
+                .when().post("/api/v1/login")
                 .then().log().all()
                 .apply(document("login/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -64,7 +64,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().get("/login/check")
+                .when().get("/api/v1/login/check")
                 .then().log().all()
                 .apply(document("login/check/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -77,7 +77,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().post("/logout")
+                .when().post("/api/v1/logout")
                 .then().log().all()
                 .apply(document("logout/success"))
                 .statusCode(HttpStatus.OK.value())
@@ -104,7 +104,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/signup")
+                .when().post("/api/v1/signup")
                 .then().log().all()
                 .apply(document("member/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -128,7 +128,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/signup")
+                .when().post("/api/v1/signup")
                 .then().log().all()
                 .apply(document("member/create/fail/duplicated-email"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -148,7 +148,7 @@ class AuthControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/signup")
+                .when().post("/api/v1/signup")
                 .then().log().all()
                 .apply(document("member/create/fail/invalid-email-format"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());

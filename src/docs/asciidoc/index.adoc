@@ -8,6 +8,7 @@
 :sectnums:
 :docinfo: shared-head
 
+= v1.0.0
 == 사용자
 === 로그인
 ==== 성공

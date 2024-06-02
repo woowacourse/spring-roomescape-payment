@@ -49,7 +49,7 @@ class AdminControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().get("/reservations")
+                .when().get("/api/v1/reservations")
                 .then().log().all()
                 .apply(document("admin-reservations/find/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -84,7 +84,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .body(params)
-                .when().post("/admin/reservations")
+                .when().post("/api/v1/admin/reservations")
                 .then().log().all()
                 .apply(document("admin-reservations/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -112,7 +112,7 @@ class AdminControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().delete(String.format("/admin/reservations/%d", reservationResponse.memberReservationId()))
+                .when().delete(String.format("/api/v1/admin/reservations/%d", reservationResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("admin-reservations/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -141,7 +141,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .post(String.format("/admin/reservations/%d/waiting/approve", waitingResponse.memberReservationId()))
+                .post(String.format("/api/v1/admin/reservations/%d/waiting/approve", waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("approve/change/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -170,7 +170,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .post(String.format("/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
+                .post(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("deny/change/success"))
                 .statusCode(HttpStatus.OK.value());

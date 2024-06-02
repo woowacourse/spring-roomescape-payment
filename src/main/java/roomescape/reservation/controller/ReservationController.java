@@ -29,7 +29,7 @@ import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.reservation.service.dto.WaitingCreate;
 
 @RestController
-@RequestMapping("/reservations")
+@RequestMapping("/api/v1/reservations")
 public class ReservationController {
 
     private final ReservationApplicationService reservationApplicationService;

@@ -49,7 +49,7 @@ class ThemeControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .body(params)
-                .when().post("/themes")
+                .when().post("/api/v1/themes")
                 .then().log().all()
                 .apply(document("themes/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -70,7 +70,7 @@ class ThemeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().get("/themes")
+                .when().get("/api/v1/themes")
                 .then().log().all()
                 .apply(document("themes/find/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -91,7 +91,7 @@ class ThemeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().delete("/themes/" + themeResponse.id())
+                .when().delete("/api/v1/themes/" + themeResponse.id())
                 .then().log().all()
                 .apply(document("reservations/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -112,7 +112,7 @@ class ThemeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().delete("/themes/" + themeResponse.id())
+                .when().delete("/api/v1/themes/" + themeResponse.id())
                 .then().log().all()
                 .apply(document("themes/delete/fail/reservation-exist"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -133,7 +133,7 @@ class ThemeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().get("/themes/popular")
+                .when().get("/api/v1/themes/popular")
                 .then().log().all()
                 .apply(document("popular-themes/find/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -159,7 +159,7 @@ class ThemeControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .body(params)
-                .when().post("/themes")
+                .when().post("/api/v1/themes")
                 .then().log().all()
                 .apply(document("themes/create/fail/invalid-name"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -183,7 +183,7 @@ class ThemeControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
                 .when()
-                .get(String.format("/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate, limit))
+                .get(String.format("/api/v1/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate, limit))
                 .then().log().all()
                 .apply(document("popular-themes/find/fail/invalid-limit"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());

@@ -2,7 +2,7 @@ const PAYMENT_AMOUNT = 21000;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    fetch('/reservations/my') // 내 예약 목록 조회 API 호출
+    fetch('/api/v1/reservations/my') // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -94,11 +94,11 @@ function popupModal(price, id) {
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
 
     function onReservationButtonClickWithPaymentWidget(event) {
-        onReservationButtonClick(event, paymentWidget, id);
+        onReservationButtonClick(event, paymentWidget, id, price);
     }
 }
 
-function onReservationButtonClick(event, paymentWidget, id) {
+function onReservationButtonClick(event, paymentWidget, id, price) {
 
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
@@ -109,7 +109,7 @@ function onReservationButtonClick(event, paymentWidget, id) {
     paymentWidget.requestPayment({
         orderId: orderIdPrefix + generateRandomString(),
         orderName: "테스트 방탈출 예약 결제 1건",
-        amount: 1000,
+        amount: price,
     }).then(function (data) {
         console.debug(data);
         fetchReservationPayment(data, id);
@@ -130,7 +130,7 @@ async function fetchReservationPayment(paymentData, id) {
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations/payment";
+    const reservationURL = "/api/v1/reservations/payment";
     fetch(reservationURL, {
         method: "POST",
         headers: {
@@ -155,7 +155,7 @@ async function fetchReservationPayment(paymentData, id) {
 }
 
 function requestDeleteWaiting(id) {
-    const endpoint = `/reservations/${id}/waiting`;
+    const endpoint = `/api/v1/reservations/${id}/waiting`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {
@@ -165,7 +165,7 @@ function requestDeleteWaiting(id) {
 }
 
 function requestDelete(id) {
-    const endpoint = `/reservations/${id}`;
+    const endpoint = `/api/v1/reservations/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {

@@ -45,7 +45,7 @@ class ReservationTimeControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .body(params)
-                .when().post("/times")
+                .when().post("/api/v1/times")
                 .then().log().all()
                 .apply(document("times/create/success"))
                 .statusCode(HttpStatus.CREATED.value());
@@ -66,7 +66,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().get("/times")
+                .when().get("/api/v1/times")
                 .then().log().all()
                 .apply(document("times/find/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -87,7 +87,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().delete("/times/" + reservationTimeResponse.id())
+                .when().delete("/api/v1/times/" + reservationTimeResponse.id())
                 .then().log().all()
                 .apply(document("times/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -108,7 +108,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().delete("/times/" + reservationTimeResponse.id())
+                .when().delete("/api/v1/times/" + reservationTimeResponse.id())
                 .then().log().all()
                 .apply(document("times/delete/fail/reservation-exist"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -129,7 +129,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().get("/times")
+                .when().get("/api/v1/times")
                 .then().log().all()
                 .apply(document("available-times/find/success"))
                 .statusCode(HttpStatus.OK.value());

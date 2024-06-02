@@ -1,4 +1,4 @@
-const THEME_API_ENDPOINT = '/themes';
+const THEME_API_ENDPOINT = '/api/v1/themes';
 paymentWidget = null;
 document.addEventListener('DOMContentLoaded', () => {
     requestRead(THEME_API_ENDPOINT)
@@ -114,7 +114,7 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-    fetch(`/times/available?date=${date}&themeId=${themeId}`, { // 예약 가능 시간 조회 API endpoint
+    fetch(`/api/v1/times/available?date=${date}&themeId=${themeId}`, { // 예약 가능 시간 조회 API endpoint
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ function renderAvailableTimes(times) {
 }
 
 function fetchPrice(date, themeId, timeId) {
-    fetch(`/reservations/price?date=${date}&themeId=${themeId}&timeId=${timeId}`, { // 예약 가격 조회 API endpoint
+    fetch(`/api/v1/reservations/price?date=${date}&themeId=${themeId}&timeId=${timeId}`, { // 예약 가격 조회 API endpoint
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -217,7 +217,6 @@ function onReservationButtonClick(event, paymentWidget) {
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
     const price = document.getElementById('price-amount').getAttribute('priceAmount');
-    console.log(price)
     if (selectedDate && selectedThemeId && selectedTimeId) {
 
         const reservationData = {
@@ -261,7 +260,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
+    const reservationURL = "/api/v1/reservations";
     fetch(reservationURL, {
         method: "POST",
         headers: {
@@ -297,7 +296,7 @@ function onWaitButtonClick() {
             timeId: selectedTimeId
         };
 
-        fetch('/reservations/waiting', {
+        fetch('/api/v1/reservations/waiting', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

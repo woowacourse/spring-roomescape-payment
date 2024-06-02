@@ -1,5 +1,5 @@
 let isEditing = false;
-const API_ENDPOINT = '/themes';
+const API_ENDPOINT = '/api/v1/themes';
 const cellFields = ['id', 'name', 'description', 'thumbnail', 'price'];
 const createCellFields = ['', createInput(), createInput(), createInput(), createInput()];
 function createBody(inputs) {

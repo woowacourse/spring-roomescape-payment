@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.controller.dto.LoginRequest;
 import roomescape.auth.controller.dto.MemberResponse;
@@ -19,6 +20,7 @@ import roomescape.auth.service.AuthService;
 import roomescape.auth.service.dto.SignUpCommand;
 
 @RestController
+@RequestMapping("/api/v1")
 public class AuthController {
 
     private final AuthService authService;
