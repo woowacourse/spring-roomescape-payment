@@ -16,21 +16,24 @@ public class PaymentClient {
 
     private final String encodedSecretKey;
     private final RestClient restClient;
+    private final String confirmPaymentUrl;
     private final ObjectMapper objectMapper;
 
     public PaymentClient(
             @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
+            @Value("${payment.request-url.v1.confirm-payment}") String confirmPaymentUrl,
             ObjectMapper objectMapper
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
         this.restClient = RestClient.builder().baseUrl(paymentBaseUrl).build();
+        this.confirmPaymentUrl = confirmPaymentUrl;
         this.objectMapper = objectMapper;
     }
 
     public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
         return restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(confirmPaymentUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", encodedSecretKey)
                 .body(paymentRequest)
