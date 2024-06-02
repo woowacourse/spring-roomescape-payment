@@ -19,7 +19,7 @@ public class PaymentService {
     }
 
     public PaymentInfo payment(MemberReservationRequest memberReservationRequest) {
-        int amount = memberReservationRequest.amount();
+        Long amount = memberReservationRequest.amount();
         String orderId = memberReservationRequest.orderId();
         String paymentKey = memberReservationRequest.paymentKey();
 

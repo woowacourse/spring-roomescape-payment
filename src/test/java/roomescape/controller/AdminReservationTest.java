@@ -154,14 +154,107 @@ class AdminReservationTest {
                 .body(containsString("[ERROR] 올바르지 않은 예약 시간입니다."));
     }
 
+    @DisplayName("Null 값의 paymentKey로 예약하려 할 경우 400 오류를 반환한다.")
+    @Test
+    void given_when_saveWithoutPaymentKey_then_statusCodeIsBadRequest() {
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", "2024-09-01",
+                "timeId", 1,
+                "themeId", 1,
+                "orderId", "orderId",
+                "amount", 1L
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookies(TOKEN, accessToken)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400)
+                .body(containsString("[ERROR] 올바르지 않은 paymentKey입니다."));
+    }
+
+    @DisplayName("Null 값의 orderId로 예약하려 할 경우 400 오류를 반환한다.")
+    @Test
+    void given_when_saveWithoutOrderId_then_statusCodeIsBadRequest() {
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", "2024-09-01",
+                "timeId", 1,
+                "themeId", 1,
+                "paymentKey", "paymentKey",
+                "amount", 1L
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookies(TOKEN, accessToken)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400)
+                .body(containsString("[ERROR] 올바르지 않은 orderId입니다."));
+    }
+
+    @DisplayName("Null 값의 amount로 예약하려 할 경우 400 오류를 반환한다.")
+    @Test
+    void given_when_saveWithoutAmount_then_statusCodeIsBadRequest() {
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", "2024-09-01",
+                "timeId", 1,
+                "themeId", 1,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId"
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookies(TOKEN, accessToken)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400)
+                .body(containsString("[ERROR] 올바르지 않은 amount입니다."));
+    }
+
+    @DisplayName("Null 값의 amount로 예약하려 할 경우 400 오류를 반환한다.")
+    @Test
+    void given_when_saveWithInvalidAmount_then_statusCodeIsBadRequest() {
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", "2024-09-01",
+                "timeId", 1,
+                "themeId", 1,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", -1L
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookies(TOKEN, accessToken)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400)
+                .body(containsString("[ERROR] 올바르지 않은 amount입니다."));
+    }
+
     @DisplayName("지나간 날짜와 시간으로 예약할 경우 400 오류를 반환한다.")
     @Test
     void given_when_saveWithPastReservation_then_statusCodeIsBadRequest() {
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "브라운");
-        reservation.put("date", LocalDate.now().toString());
-        reservation.put("timeId", 1); // 10:00
-        reservation.put("themeId", 1);
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", LocalDate.now().toString(),
+                "timeId", 1,
+                "themeId", 1,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1L
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -176,11 +269,15 @@ class AdminReservationTest {
     @DisplayName("이미 예약이 된 시간을 등록하려 하면 400 오류를 반환한다.")
     @Test
     void given_when_saveDuplicatedReservation_then_statusCodeIsBadRequest() {
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "포케");
-        reservation.put("date", "2099-04-30");
-        reservation.put("timeId", 1); // 10:00
-        reservation.put("themeId", 1);
+        Map<String, Object> reservation = Map.of(
+                "name", "포케",
+                "date", "2099-04-30",
+                "timeId", 1,
+                "themeId", 1,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1L
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -213,14 +310,18 @@ class AdminReservationTest {
                 .body(containsString("[ERROR] 올바르지 않은 테마 입니다."));
     }
 
-    @DisplayName("등록되지 않은 시간으로 예약하는 경우 400 오류를 반환한다.")
+    @DisplayName("등록되지 않은 테마로 예약하는 경우 400 오류를 반환한다.")
     @Test
     void given_when_saveNotExistThemeId_then_statusCodeIsBadRequest() {
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "브라운");
-        reservation.put("date", "2099-01-01");
-        reservation.put("timeId", 1);
-        reservation.put("themeId", 99);
+        Map<String, Object> reservation = Map.of(
+                "name", "브라운",
+                "date", "2099-01-01",
+                "timeId", 1,
+                "themeId", 99,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1L
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

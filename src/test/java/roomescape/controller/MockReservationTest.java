@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class MockReservationTest {
     @DisplayName("reservation 페이지에 새로운 예약 정보를 추가할 수 있다.")
     @Test
     void given_when_saveAndDeleteReservations_then_statusCodeIsOkay() throws Exception {
-        PaymentInfo paymentInfo = new PaymentInfo(1000, "orderId", "paymentKey");
+        PaymentInfo paymentInfo = new PaymentInfo(1000L, "orderId", "paymentKey");
         MemberResponse memberResponse = new MemberResponse(1L, "atto");
         TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
         ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
