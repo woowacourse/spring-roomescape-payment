@@ -1,7 +1,6 @@
 package roomescape.domain.reservation;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
@@ -33,9 +32,9 @@ public class ReservationFactory {
     }
 
     private Reservation getReservation(ReservationDetail detail, Member member) {
-        if (reservationRepository.existsReservation(detail, List.of(Status.RESERVED, Status.PAYMENT_PENDING))) {
+        if (reservationRepository.existsReservation(detail, Status.getStatusWithoutCancel())) {
             return new Reservation(member, detail, Status.WAITING);
         }
-        return new Reservation(member, detail, Status.RESERVED);
+        return new Reservation(member, detail, Status.PAYMENT_PENDING);
     }
 }

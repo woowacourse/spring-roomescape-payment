@@ -45,11 +45,11 @@ public class ReservationService {
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
         reservationRepository.save(reservation);
 
-        if (reservation.isReserved()) {
+        if (reservation.isPaymentPending()) {
             PaymentRequest paymentRequest = request.toPaymentRequest();
             PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
             Payment payment = paymentRepository.save(paymentResponse.toPayment());
-            reservation.setPayment(payment);
+            reservation.completePayment(payment);
         }
         return ReservationResponse.from(reservation);
     }
@@ -73,8 +73,7 @@ public class ReservationService {
         PaymentRequest paymentRequest = request.toPaymentRequest();
         PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
         Payment payment = paymentRepository.save(paymentResponse.toPayment());
-        reservation.setPayment(payment);
-        reservation.toReserved();
+        reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
     }
 
