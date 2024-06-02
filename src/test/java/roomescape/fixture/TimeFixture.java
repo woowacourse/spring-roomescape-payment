@@ -17,4 +17,8 @@ public enum TimeFixture {
     public ReservationTime create() {
         return new ReservationTime(startAt);
     }
+
+    public String getStartAt() {
+        return startAt;
+    }
 }

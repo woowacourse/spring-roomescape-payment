@@ -12,12 +12,10 @@ import roomescape.application.dto.response.time.ReservationTimeResponse;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.exception.time.DuplicatedTimeException;
-import roomescape.exception.time.NotFoundTimeException;
 import roomescape.exception.time.ReservationReferencedTimeException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
 
@@ -47,18 +45,11 @@ public class ReservationTimeService {
         return ReservationTimeResponse.from(savedReservationTime);
     }
 
-    @Transactional
     public void deleteReservationTime(Long id) {
-        ReservationTime reservationTime = findReservationTimeById(id);
         try {
-            reservationTimeRepository.delete(reservationTime);
+            reservationTimeRepository.delete(id);
         } catch (DataIntegrityViolationException e) {
             throw new ReservationReferencedTimeException();
         }
-    }
-
-    private ReservationTime findReservationTimeById(Long id) {
-        return reservationTimeRepository.findReservationTime(id)
-                .orElseThrow(NotFoundTimeException::new);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import roomescape.domain.reservationdetail.ReservationTime;
 
-public interface ReservationTimeJpaRepository extends Repository<ReservationTime, LocalTime> {
+public interface ReservationTimeJpaRepository extends Repository<ReservationTime, Long> {
 
     ReservationTime save(ReservationTime time);
 
@@ -34,5 +34,5 @@ public interface ReservationTimeJpaRepository extends Repository<ReservationTime
 
     boolean existsByStartAt(LocalTime startAt);
 
-    void delete(ReservationTime time);
+    void deleteById(Long id);
 }

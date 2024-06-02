@@ -47,7 +47,7 @@ public class ReservationTimeRepositoryImpl implements ReservationTimeRepository 
     }
 
     @Override
-    public void delete(ReservationTime time) {
-        reservationTimeJpaRepository.delete(time);
+    public void delete(Long id) {
+        reservationTimeJpaRepository.deleteById(id);
     }
 }
