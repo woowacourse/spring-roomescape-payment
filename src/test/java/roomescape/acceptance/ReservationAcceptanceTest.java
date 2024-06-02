@@ -1,11 +1,18 @@
 package roomescape.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
 import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.exception.ExternalApiException;
 
+import java.time.LocalDate;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
@@ -100,5 +107,27 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         saveReservation();
 
         assertGetResponseWithLoginMember("/reservations", 200);
+    }
+
+    @Test
+    @DisplayName("결제가 실패하면 예약이 생성되지 않는다.")
+    void throwExceptionWhenFailPayment() {
+        // given
+        LocalDate now = LocalDate.now();
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(now, 1L, 1L, null, null, null);
+        given(paymentClient.pay(any())).willThrow(new ExternalApiException("결제 승인 서버에 문제가 있습니다."));
+
+        // when
+        String responseId = RestAssured.given().log().all()
+                .cookie("token", getAccessToken(MEMBER_CAT_EMAIL))
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .extract()
+                .jsonPath().getObject("id", String.class);
+
+        // then
+        Assertions.assertThat(responseId).isNull();
     }
 }

@@ -29,11 +29,10 @@ import static roomescape.TestFixture.THEME_COMIC_THUMBNAIL;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class AcceptanceTest {
 
+    @MockBean
+    protected PaymentClient paymentClient;
     @LocalServerPort
     private int port;
-
-    @MockBean
-    private PaymentClient paymentClient;
 
     @BeforeEach
     void setUp() {
