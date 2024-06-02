@@ -55,7 +55,7 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @MockBean
-    private PaymentRestClient paymentRestClient;
+    private PaymentClient paymentClient;
 
     @AfterEach
     void cleanUp() {

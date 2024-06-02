@@ -12,7 +12,7 @@ import roomescape.dto.service.TossPaymentResponse;
 import roomescape.exception.PaymentErrorHandler;
 import roomescape.exception.RoomescapeException;
 
-public class PaymentRestClient {
+public class TossPaymentClient implements PaymentClient {
 
     private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
@@ -23,7 +23,7 @@ public class PaymentRestClient {
     private final RestClient restClient;
     private final PaymentErrorHandler paymentErrorHandler;
 
-    public PaymentRestClient(RestClient restClient, PaymentErrorHandler paymentErrorHandler) {
+    public TossPaymentClient(RestClient restClient, PaymentErrorHandler paymentErrorHandler) {
         this.restClient = restClient;
         this.paymentErrorHandler = paymentErrorHandler;
     }
@@ -36,7 +36,7 @@ public class PaymentRestClient {
                 .retrieve()
                 .onStatus(paymentErrorHandler)
                 .body(TossPaymentResponse.class);
-        
+
         validatePaymentResponseNotNull(response);
 
         return response.toPayment();
