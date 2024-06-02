@@ -1,5 +1,7 @@
 package roomescape.infra;
 
+import static roomescape.exception.ExceptionType.EMPTY_RESPONSE_FROM_TOSS_API;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.http.MediaType;
@@ -8,6 +10,7 @@ import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.service.TossPaymentResponse;
 import roomescape.exception.PaymentErrorHandler;
+import roomescape.exception.RoomescapeException;
 
 public class PaymentRestClient {
 
@@ -33,8 +36,16 @@ public class PaymentRestClient {
                 .retrieve()
                 .onStatus(paymentErrorHandler)
                 .body(TossPaymentResponse.class);
+        
+        validatePaymentResponseNotNull(response);
 
         return response.toPayment();
+    }
+
+    private void validatePaymentResponseNotNull(TossPaymentResponse response) {
+        if (response == null) {
+            throw new RoomescapeException(EMPTY_RESPONSE_FROM_TOSS_API);
+        }
     }
 
 }

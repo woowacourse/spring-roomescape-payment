@@ -39,7 +39,9 @@ public enum ExceptionType {
     INVALID_TOKEN(UNAUTHORIZED, "잘못된 토큰입니다. 다시 로그인하세요"),
     NO_AUTHORITY(FORBIDDEN, "권한이 없습니다."),
     ENCRYPT_FAIL(INTERNAL_SERVER_ERROR, "비밀번호 암호화에 실패하였습니다."),
-    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다.");
+    EMPTY_RESPONSE_FROM_TOSS_API(INTERNAL_SERVER_ERROR, "토스 API로부터 응답이 없습니다."),
+    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;
