@@ -1,8 +1,8 @@
 let isEditing = false;
-const RESERVATION_API_ENDPOINT = '/reservations';
-const TIME_API_ENDPOINT = '/times';
+const RESERVATION_API_ENDPOINT = '/admin/reservations';
+const TIME_API_ENDPOINT = '/admin/times';
 const THEME_API_ENDPOINT = '/themes';
-const MEMBER_API_ENDPOINT = '/members';
+const MEMBER_API_ENDPOINT = '/admin/members';
 const timesOptions = [];
 const themesOptions = [];
 const membersOptions = [];
@@ -41,7 +41,7 @@ function render(data) {
 function fetchTimes() {
   requestRead(TIME_API_ENDPOINT)
       .then(data => {
-        timesOptions.push(...data);
+        timesOptions.push(...data.list);
       })
       .catch(error => console.error('Error fetching time:', error));
 }
@@ -49,7 +49,7 @@ function fetchTimes() {
 function fetchThemes() {
   requestRead(THEME_API_ENDPOINT)
       .then(data => {
-        themesOptions.push(...data);
+        themesOptions.push(...data.list);
         populateSelect('theme', themesOptions, 'name');
       })
       .catch(error => console.error('Error fetching theme:', error));
@@ -58,7 +58,7 @@ function fetchThemes() {
 function fetchMembers() {
   requestRead(MEMBER_API_ENDPOINT)
       .then(data => {
-        membersOptions.push(...data);
+        membersOptions.push(...data.list);
         populateSelect('member', membersOptions, 'name');
       })
       .catch(error => console.error('Error fetching member:', error));
@@ -66,7 +66,7 @@ function fetchMembers() {
 
 function populateSelect(selectId, options, textProperty) {
   const select = document.getElementById(selectId);
-  options.list.forEach(optionData => {
+  options.forEach(optionData => {
     const option = document.createElement('option');
     option.value = optionData.id;
     option.textContent = optionData[textProperty];
@@ -199,7 +199,7 @@ function applyFilter(event) {
   if (dateFrom) params.append('dateFrom', dateFrom);
   if (dateTo) params.append('dateTo', dateTo);
 
-  let url = `/reservations`;
+  let url = RESERVATION_API_ENDPOINT;
   if (params.toString()) {
     url += `?${params.toString()}`;
   }
@@ -223,7 +223,7 @@ function requestCreate(reservation) {
     body: JSON.stringify(reservation)
   };
 
-  return fetch('/admin/reservations', requestOptions)
+  return fetch(RESERVATION_API_ENDPOINT, requestOptions)
       .then(response => {
         if (response.status === 201) return response.json();
         throw new Error('Create failed');

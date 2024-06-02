@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import roomescape.controller.BaseControllerTest;
@@ -23,11 +24,14 @@ class MemberControllerTest extends BaseControllerTest {
     @DisplayName("회원 가입, 회원 조회를 한다.")
     Stream<DynamicTest> memberControllerTests() {
         return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
                 dynamicTest("회원 가입을 한다.", this::signup),
                 dynamicTest("모든 회원을 조회한다.", this::getAllMembers)
         );
     }
 
+    @Test
+    @DisplayName("회원 가입을 한다.")
     void signup() {
         SignupRequest request = new SignupRequest("new@gmail.com", "password", "new");
 
@@ -50,7 +54,8 @@ class MemberControllerTest extends BaseControllerTest {
 
     void getAllMembers() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/members")
+                .cookie("token", token)
+                .when().get("/admin/members")
                 .then().log().all()
                 .extract();
 

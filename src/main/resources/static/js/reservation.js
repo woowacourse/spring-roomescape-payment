@@ -1,6 +1,6 @@
 let isEditing = false;
-const RESERVATION_API_ENDPOINT = '/reservations';
-const TIME_API_ENDPOINT = '/times';
+const RESERVATION_API_ENDPOINT = '/admin/reservations';
+const TIME_API_ENDPOINT = '/admin/times';
 const timesOptions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,7 +33,7 @@ function render(data) {
 function fetchTimes() {
   requestRead(TIME_API_ENDPOINT)
       .then(data => {
-        timesOptions.push(...data);
+        timesOptions.push(...data.list);
       })
       .catch(error => console.error('Error fetching time:', error));
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.dto.request.AdminReservationRequest;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
@@ -44,12 +45,31 @@ class ReservationControllerTest extends BaseControllerTest {
     }
 
     @TestFactory
-    @DisplayName("예약을 생성, 조회, 삭제한다.")
-    Stream<DynamicTest> reservationControllerTests() {
+    @DisplayName("어드민이 예약을 생성, 조회, 삭제한다.")
+    Stream<DynamicTest> adminReservationControllerTests() {
         return Stream.of(
-                DynamicTest.dynamicTest("예약을 생성한다.", this::addReservation),
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
+                DynamicTest.dynamicTest("예약을 생성한다.", this::addAdminReservation),
                 DynamicTest.dynamicTest("예약을 모두 조회한다.", this::getReservationsByConditions),
                 DynamicTest.dynamicTest("예약을 삭제한다.", this::deleteReservationById)
+        );
+    }
+
+    @TestFactory
+    @DisplayName("존재하지 않는 예약을 삭제하면 실패한다.")
+    Stream<DynamicTest> failWhenNotFoundReservation() {
+        return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
+                DynamicTest.dynamicTest("존재하지 않는 예약을 삭제한다.", this::deleteReservationFailWhenNotFoundReservation)
+        );
+    }
+
+    @TestFactory
+    @DisplayName("유저가 예약을 생성한다.")
+    Stream<DynamicTest> reservationControllerTests() {
+        return Stream.of(
+                DynamicTest.dynamicTest("유저가 로그인한다.", this::userLogin),
+                DynamicTest.dynamicTest("예약을 생성한다.", this::addReservation)
         );
     }
 
@@ -57,42 +77,19 @@ class ReservationControllerTest extends BaseControllerTest {
     @DisplayName("중복된 예약을 생성하면 실패한다.")
     Stream<DynamicTest> failWhenDuplicatedReservation() {
         return Stream.of(
+                DynamicTest.dynamicTest("유저가 로그인한다.", this::userLogin),
                 DynamicTest.dynamicTest("예약을 생성한다.", this::addReservation),
                 DynamicTest.dynamicTest("이미 존재하는 예약을 생성한다.", this::addReservationFailWhenDuplicatedReservation)
         );
     }
 
-    @Test
+    @TestFactory
     @DisplayName("지나간 날짜/시간에 대한 예약은 실패한다.")
-    void failWhenDateTimePassed() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, "paymentKey", "orderId", 1000);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .cookie("token", token)
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/reservations")
-                .then().log().all()
-                .extract();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            softly.assertThat(response.body().asString()).contains("예약은 최소 1일 전에 해야합니다.");
-        });
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 예약을 삭제하면 실패한다.")
-    void failWhenNotFoundReservation() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .extract();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            softly.assertThat(response.body().asString()).contains("존재하지 않는 예약입니다.");
-        });
+    Stream<DynamicTest> failWhenDateTimePassed() {
+        return Stream.of(
+                DynamicTest.dynamicTest("유저가 로그인한다.", this::userLogin),
+                DynamicTest.dynamicTest("지나간 날짜/시간에 대한 예약을 생성한다.", this::addReservationFailWhenDateTimePassed)
+        );
     }
 
     @Test
@@ -127,6 +124,75 @@ class ReservationControllerTest extends BaseControllerTest {
         });
     }
 
+    private void addAdminReservation() {
+        LocalDate date = LocalDate.of(2024, 4, 9);
+        AdminReservationRequest request = new AdminReservationRequest(date, theme.getId(), time.getId(), ADMIN_ID);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/admin/reservations")
+                .then().log().all()
+                .extract();
+
+        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+            softly.assertThat(response.header("Location")).isEqualTo("/reservations/1");
+
+            softly.assertThat(reservationResponse.date()).isEqualTo(date);
+            softly.assertThat(reservationResponse.theme()).isEqualTo(theme.getRawName());
+            softly.assertThat(reservationResponse.startAt()).isEqualTo(time.getStartAt());
+        });
+    }
+
+    private void getReservationsByConditions() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/admin/reservations")
+                .then().log().all()
+                .extract();
+
+        List<ReservationResponse> reservationResponses = response.jsonPath()
+                .getList("list", ReservationResponse.class);
+
+        ReservationResponse reservationResponse = reservationResponses.get(0);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            softly.assertThat(reservationResponses).hasSize(1);
+
+            softly.assertThat(reservationResponse.date()).isEqualTo(LocalDate.of(2024, 4, 9));
+        });
+    }
+
+    private void deleteReservationById() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().delete("/admin/reservations/1")
+                .then().log().all()
+                .extract();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        });
+    }
+
+    void deleteReservationFailWhenNotFoundReservation() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().delete("/admin/reservations/1")
+                .then().log().all()
+                .extract();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            softly.assertThat(response.body().asString()).contains("존재하지 않는 예약입니다.");
+        });
+    }
+
     private void addReservation() {
         LocalDate date = LocalDate.of(2024, 4, 9);
         ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000);
@@ -151,36 +217,6 @@ class ReservationControllerTest extends BaseControllerTest {
         });
     }
 
-    private void getReservationsByConditions() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .extract();
-
-        List<ReservationResponse> reservationResponses = response.jsonPath()
-                .getList("list", ReservationResponse.class);
-
-        ReservationResponse reservationResponse = reservationResponses.get(0);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThat(reservationResponses).hasSize(1);
-
-            softly.assertThat(reservationResponse.date()).isEqualTo(LocalDate.of(2024, 4, 9));
-        });
-    }
-
-    private void deleteReservationById() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .extract();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        });
-    }
-
     private void addReservationFailWhenDuplicatedReservation() {
         ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L, "paymentKey", "orderId", 1000);
 
@@ -195,6 +231,23 @@ class ReservationControllerTest extends BaseControllerTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
             softly.assertThat(response.body().asString()).contains("해당 날짜/시간에 이미 예약이 존재합니다.");
+        });
+    }
+
+    void addReservationFailWhenDateTimePassed() {
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, "paymentKey", "orderId", 1000);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .cookie("token", token)
+                .when().post("/reservations")
+                .then().log().all()
+                .extract();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            softly.assertThat(response.body().asString()).contains("예약은 최소 1일 전에 해야합니다.");
         });
     }
 }

@@ -48,6 +48,7 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     @DisplayName("예약 시간을 생성, 조회, 삭제한다.")
     Stream<DynamicTest> addReservationTimeAndGetAndDelete() {
         return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
                 DynamicTest.dynamicTest("예약 시간을 생성한다.", this::addReservationTime),
                 DynamicTest.dynamicTest("예약 시간을 모두 조회한다.", this::getAllReservationTimes),
                 DynamicTest.dynamicTest("예약 시간을 삭제한다.", this::deleteReservationTimeById)
@@ -58,42 +59,28 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     @DisplayName("중복된 예약 시간을 생성하면 실패한다.")
     Stream<DynamicTest> failWhenDuplicatedTime() {
         return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
                 DynamicTest.dynamicTest("예약 시간을 생성한다.", this::addReservationTime),
                 DynamicTest.dynamicTest("이미 존재하는 예약 시간을 생성한다.", this::addReservationTimeFailWhenDuplicatedTime)
         );
     }
 
-    @Test
+    @TestFactory
     @DisplayName("존재하지 않는 예약 시간을 삭제하면 실패한다.")
-    void deleteReservationTimeByIdFailWhenNotFoundId() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/times/1")
-                .then().log().all()
-                .extract();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            softly.assertThat(response.body().asString()).contains("해당 id의 시간이 존재하지 않습니다.");
-        });
+    Stream<DynamicTest> failWhenNotFoundId() {
+        return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
+                DynamicTest.dynamicTest("존재하지 않는 예약 시간을 삭제한다.", this::deleteReservationTimeByIdFailWhenNotFoundId)
+        );
     }
 
-    @Test
+    @TestFactory
     @DisplayName("이미 사용 중인 예약 시간을 삭제하면 실패한다.")
-    void deleteReservationTimeByIdFailWhenUsedTime() {
-        Member member = memberRepository.save(new Member("member@gmail.com", "password", "member", Role.USER));
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
-        Theme theme = themeRepository.save(new Theme("테마 이름", "테마 설명", "https://example.com"));
-        reservationRepository.save(new Reservation(LocalDate.of(2024, 4, 9), member, reservationTime, theme));
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/times/1")
-                .then().log().all()
-                .extract();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-            softly.assertThat(response.body().asString()).contains("해당 시간을 사용하는 예약이 존재합니다.");
-        });
+    Stream<DynamicTest> failWhenUsedTime() {
+        return Stream.of(
+                DynamicTest.dynamicTest("어드민이 로그인한다.", this::adminLogin),
+                DynamicTest.dynamicTest("이미 사용 중인 예약 시간을 삭제한다.", this::deleteReservationTimeByIdFailWhenUsedTime)
+        );
     }
 
     @Test
@@ -137,7 +124,8 @@ class ReservationTimeControllerTest extends BaseControllerTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .when().post("/times")
+                .cookie("token", token)
+                .when().post("/admin/times")
                 .then().log().all()
                 .extract();
 
@@ -156,7 +144,8 @@ class ReservationTimeControllerTest extends BaseControllerTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .when().post("/times")
+                .cookie("token", token)
+                .when().post("/admin/times")
                 .then().log().all()
                 .extract();
 
@@ -168,7 +157,8 @@ class ReservationTimeControllerTest extends BaseControllerTest {
 
     private void getAllReservationTimes() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/times")
+                .cookie("token", token)
+                .when().get("/admin/times")
                 .then().log().all()
                 .extract();
 
@@ -185,12 +175,44 @@ class ReservationTimeControllerTest extends BaseControllerTest {
 
     private void deleteReservationTimeById() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/times/1")
+                .cookie("token", token)
+                .when().delete("/admin/times/1")
                 .then().log().all()
                 .extract();
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        });
+    }
+
+    void deleteReservationTimeByIdFailWhenNotFoundId() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().delete("/admin/times/1")
+                .then().log().all()
+                .extract();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            softly.assertThat(response.body().asString()).contains("해당 id의 시간이 존재하지 않습니다.");
+        });
+    }
+
+    void deleteReservationTimeByIdFailWhenUsedTime() {
+        Member member = memberRepository.save(new Member("member@gmail.com", "password", "member", Role.USER));
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
+        Theme theme = themeRepository.save(new Theme("테마 이름", "테마 설명", "https://example.com"));
+        reservationRepository.save(new Reservation(LocalDate.of(2024, 4, 9), member, reservationTime, theme));
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().delete("/admin/times/1")
+                .then().log().all()
+                .extract();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            softly.assertThat(response.body().asString()).contains("해당 시간을 사용하는 예약이 존재합니다.");
         });
     }
 }

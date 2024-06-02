@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.dto.request.AdminReservationRequest;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
@@ -24,7 +24,6 @@ import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
 @RestController
-@RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -33,7 +32,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping
+    @GetMapping("/admin/reservations")
     public ApiResponses<ReservationResponse> getReservationsByConditions(@RequestParam(required = false) Long memberId,
                                                                          @RequestParam(required = false) Long themeId,
                                                                          @RequestParam(required = false) LocalDate dateFrom,
@@ -43,14 +42,22 @@ public class ReservationController {
         return new ApiResponses<>(reservationResponses);
     }
 
-    @GetMapping("/mine")
+    @GetMapping("/reservations/mine")
     public ApiResponses<PersonalReservationResponse> getMyReservations(@Auth Authentication authentication) {
         List<PersonalReservationResponse> reservationResponses = reservationService
                 .getReservationsByMemberId(authentication.getId());
         return new ApiResponses<>(reservationResponses);
     }
 
-    @PostMapping
+    @PostMapping("/admin/reservations")
+    public ResponseEntity<ReservationResponse> addAdminReservation(
+            @RequestBody @Valid AdminReservationRequest request) {
+        ReservationResponse response = reservationService.addReservationByAdmin(request.toCreateReservationRequest());
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
+                .body(response);
+    }
+
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid ReservationRequest request,
                                                               @Auth Authentication authentication) {
         long memberId = authentication.getId();
@@ -61,7 +68,7 @@ public class ReservationController {
                 .body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservationById(@PathVariable Long id) {
         reservationService.deleteReservationById(id);
