@@ -11,7 +11,16 @@ import roomescape.dto.response.reservation.TossExceptionResponse;
 public class PaymentExceptionHandler extends DefaultResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        throw new PaymentException((HttpStatus) response.getStatusCode(), getTossExceptionResponse(response));
+        TossExceptionResponse tossExceptionResponse = getTossExceptionResponse(response);
+        if (tossExceptionResponse.code().equals("INVALID_API_KEY") || tossExceptionResponse.code().equals("INVALID_AUTHORIZE_AUTH")
+        || tossExceptionResponse.code().equals("UNAUTHORIZED_KEY") || tossExceptionResponse.code().equals("INCORRECT_BASIC_AUTH_FORMAT")) {
+            TossExceptionResponse changeTossExceptionResponse = new TossExceptionResponse(
+                    tossExceptionResponse.code(),
+                    "결제 시스템에 문제가 발생했습니다."
+            );
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, changeTossExceptionResponse);
+        }
+        throw new PaymentException((HttpStatus) response.getStatusCode(), tossExceptionResponse);
     }
 
     private TossExceptionResponse getTossExceptionResponse(ClientHttpResponse response) throws IOException {
