@@ -18,13 +18,13 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 
-@RestClientTest(value = PaymentService.class)
+@RestClientTest(value = TossPaymentService.class)
 @Import(PaymentRestClientConfiguration.class)
-class PaymentServiceTest {
+class TossPaymentServiceTest {
     @Autowired
     private MockRestServiceServer mockRestServiceServer;
     @Autowired
-    private PaymentService paymentService;
+    private TossPaymentService tossPaymentService;
 
     @DisplayName("결제 확인 되었을 경우 정상 처리한다.")
     @Test
@@ -35,7 +35,7 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withSuccess());
 
-        assertThatCode(() -> paymentService.confirmPayment(request)).doesNotThrowAnyException();
+        assertThatCode(() -> tossPaymentService.confirmPayment(request)).doesNotThrowAnyException();
     }
 
     @DisplayName("결제 확인 오류가 발생한 경우 예외를 던진다.")
@@ -53,7 +53,7 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> tossPaymentService.confirmPayment(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("존재하지 않는 결제 입니다.");
     }
@@ -73,7 +73,7 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withUnauthorizedRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> tossPaymentService.confirmPayment(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessageContaining("토스 결제 인증 에러입니다.");
     }
