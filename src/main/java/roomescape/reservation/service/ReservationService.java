@@ -101,6 +101,7 @@ public class ReservationService {
         return saveMemberReservation(memberId, request, Status.RESERVED);
     }
 
+    @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationWithPaymentAddRequest request) {
         MemberReservationAddRequest memberReservationAddRequest = request.extractMemberReservationAddRequest();
         PaymentConfirmRequest paymentConfirmRequest = request.extractPaymentConfirmRequest();
