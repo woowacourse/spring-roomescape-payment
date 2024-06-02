@@ -38,7 +38,7 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public synchronized ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
+    public ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
         Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationFailureException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
@@ -55,7 +55,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public synchronized ReservationResponse saveReservationByAdmin(ReservationRequest request) {
+    public ReservationResponse saveReservationByAdmin(ReservationRequest request) {
         Member member = memberRepository.findMember(request.memberId())
                 .orElseThrow(AuthenticationFailureException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
