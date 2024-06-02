@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class PaymentService {
     }
 
     public PaymentInfo payment(MemberReservationRequest memberReservationRequest) {
-        int amount = memberReservationRequest.amount();
+        BigDecimal amount = memberReservationRequest.amount();
         String orderId = memberReservationRequest.orderId();
         String paymentKey = memberReservationRequest.paymentKey();
 

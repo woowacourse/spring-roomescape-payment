@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,7 @@ public class MockReservationTest {
     @DisplayName("reservation 페이지에 새로운 예약 정보를 추가할 수 있다.")
     @Test
     void given_when_saveAndDeleteReservations_then_statusCodeIsOkay() throws Exception {
-        PaymentInfo paymentInfo = new PaymentInfo(1000, "orderId", "paymentKey");
+        PaymentInfo paymentInfo = new PaymentInfo(BigDecimal.valueOf(1000000000), "orderId", "paymentKey");
         MemberResponse memberResponse = new MemberResponse(1L, "atto");
         TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
         ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
@@ -59,7 +60,7 @@ public class MockReservationTest {
                     "themeId": 1,
                     "paymentKey": "paymentKey",
                     "orderId": "orderId",
-                    "amount": 1000
+                    "amount": 1000000000
                   }
                 """;
 
@@ -67,5 +68,36 @@ public class MockReservationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isCreated());
+    }
+
+    @DisplayName("금액이 10억이 넘으면 결제할 수 없다.")
+    @Test
+    void given_moreThanBillionWon_when_saveReservations_then_statusCodeIs() throws Exception {
+        PaymentInfo paymentInfo = new PaymentInfo(BigDecimal.valueOf(1000000001), "orderId", "paymentKey");
+        MemberResponse memberResponse = new MemberResponse(1L, "atto");
+        TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
+        ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
+        ReservationResponse reservationResponse = new ReservationResponse(1L, memberResponse,
+                LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
+
+        given(reservationService.checkAvailableReservation(any(), any())).willReturn(null);
+        given(paymentService.payment(any())).willReturn(paymentInfo);
+        given(reservationService.confirmReservationByClient(any())).willReturn(reservationResponse);
+
+        String jsonRequest = """
+                 {
+                    "date": "2999-12-31",
+                    "timeId": 1,
+                    "themeId": 1,
+                    "paymentKey": "paymentKey",
+                    "orderId": "orderId",
+                    "amount": 1000000001
+                  }
+                """;
+
+        mockMvc.perform(post("/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -1,5 +1,7 @@
 package roomescape.dto.request;
 
+import jakarta.validation.constraints.Max;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -8,7 +10,13 @@ import roomescape.domain.Theme;
 import roomescape.domain.TimeSlot;
 
 public record MemberReservationRequest(
-        LocalDate date, Long timeId, Long themeId, String paymentKey, String orderId, int amount) {
+        LocalDate date, 
+        Long timeId, 
+        Long themeId, 
+        String paymentKey, 
+        String orderId,
+        @Max(1000000000)
+        BigDecimal amount) {
 
     public MemberReservationRequest {
         isValid(date, timeId, themeId);
