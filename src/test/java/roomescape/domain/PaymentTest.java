@@ -1,7 +1,6 @@
 package roomescape.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static roomescape.exception.ExceptionType.EMPTY_AMOUNT;
 import static roomescape.exception.ExceptionType.EMPTY_ORDER_ID;
@@ -23,27 +22,34 @@ class PaymentTest {
     @Test
     @DisplayName("결제 키가 비어있는 경우 생성할 수 없는지 확인")
     void createFailWhenEmptyPaymentKey() {
-        assertAll(
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, null, VALID_ORDER_ID, VALID_AMOUNT))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_PAYMENT_KEY.getMessage()),
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, "", VALID_ORDER_ID, VALID_AMOUNT))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_PAYMENT_KEY.getMessage())
-        );
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, null, VALID_ORDER_ID, VALID_AMOUNT))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(EMPTY_PAYMENT_KEY.getMessage());
+    }
+
+    @Test
+    @DisplayName("결제 키가 빈 문자열인 경우 생성할 수 없는지 확인")
+    void createFailWhenBlankPaymentKey() {
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, "", VALID_ORDER_ID, VALID_AMOUNT))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(EMPTY_PAYMENT_KEY.getMessage());
     }
 
     @Test
     @DisplayName("주문 아이디가 비어있는 경우 생성할 수 없는지 확인")
     void createFailWhenEmptyOrderId() {
-        assertAll(
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, null, VALID_AMOUNT))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_ORDER_ID.getMessage()),
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, "", VALID_AMOUNT))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_ORDER_ID.getMessage())
-        );
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, null, VALID_AMOUNT))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(EMPTY_ORDER_ID.getMessage());
+
+    }
+
+    @Test
+    @DisplayName("주문 아이디가 빈 문자열인 경우 생성할 수 없는지 확인")
+    void createFailWhenBlankOrderId() {
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, "", VALID_AMOUNT))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(EMPTY_ORDER_ID.getMessage());
     }
 
     @Test
@@ -57,21 +63,17 @@ class PaymentTest {
     @Test
     @DisplayName("금액이 비어있는 경우 생성할 수 없는지 확인")
     void createFailWhenEmptyAmount() {
-        assertAll(
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, null))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_AMOUNT.getMessage())
-        );
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, null))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(EMPTY_AMOUNT.getMessage());
     }
 
     @Test
     @DisplayName("금액이 비어있는 경우 생성할 수 없는지 확인")
     void createFailWhenInvalidAmount() {
-        assertAll(
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, -1000L))
-                        .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(INVALID_AMOUNT.getMessage())
-        );
+        assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, -1000L))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(INVALID_AMOUNT.getMessage());
     }
 
     @Test
