@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.common.exception.PaymentException;
 import roomescape.payment.config.PaymentConfig;
@@ -27,7 +26,6 @@ import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
 @RestClientTest(PaymentService.class)
 @Import(PaymentConfig.class)
-@ActiveProfiles("test")
 class PaymentServiceTest {
 
     @Autowired
