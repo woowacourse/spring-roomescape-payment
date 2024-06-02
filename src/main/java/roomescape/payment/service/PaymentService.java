@@ -52,8 +52,8 @@ public class PaymentService {
      *     {@code
      *          토스 결제 실패 응답 :
      *          {
-     *              "code": "NOT_FOUND_PAYMENT_SESSION",
-     *              "message": "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."
+     *              "code": "ALREADY_PROCESSED_PAYMENT",
+     *              "message": "이미 처리된 결제 입니다."
      *          }
      *     }
      * </pre>

@@ -67,8 +67,8 @@ class PaymentServiceTest {
     void confirmPaymentWithInvalidRequest() throws JsonProcessingException {
         PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
         PaymentErrorResponse expectedResponse = new PaymentErrorResponse(
-                "NOT_FOUND_PAYMENT_SESSION",
-                "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."
+                "ALREADY_PROCESSED_PAYMENT",
+                "이미 처리된 결제 입니다."
         );
 
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
