@@ -9,4 +9,9 @@ public record TossPaymentProperties(
         int readTimeout,
         int connectTimeout
 ) {
+
+    @Override
+    public String secretKey() {
+        return secretKey + ":";
+    }
 }
