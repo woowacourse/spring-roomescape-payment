@@ -3,7 +3,7 @@ package roomescape.application.dto.response.payment;
 import roomescape.domain.payment.Payment;
 
 public record PaymentResponse(
-        Long totalAmount,
+        int totalAmount,
         String paymentKey,
         String orderId,
         String status,

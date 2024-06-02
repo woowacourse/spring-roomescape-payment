@@ -9,15 +9,13 @@ import jakarta.persistence.Id;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "members")
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

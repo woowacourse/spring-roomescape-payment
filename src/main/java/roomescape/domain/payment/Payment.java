@@ -18,7 +18,7 @@ public class Payment {
     private Long id;
 
     @Column(name = "amount", nullable = false)
-    private Long amount;
+    private int amount;
 
     @Column(name = "payment_key", nullable = false)
     private String paymentKey;
@@ -32,7 +32,7 @@ public class Payment {
     @Column(name = "approved_at", nullable = false)
     private String approvedAt;
 
-    public Payment(Long amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
+    public Payment(int amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
         this.amount = amount;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
