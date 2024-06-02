@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import roomescape.exception.PaymentException;
+import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.global.GlobalExceptionCode;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(RoomEscapeException.class)
@@ -24,8 +25,8 @@ public class GlobalExceptionHandler {
                 .body(exception.getMessage());
     }
 
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<String> handleCustomPaymentException(PaymentException exception) {
+    @ExceptionHandler(PaymentConfirmException.class)
+    public ResponseEntity<String> handleCustomPaymentException(PaymentConfirmException exception) {
         logger.error(exception.getMessage(), exception);
         return ResponseEntity
                 .status(exception.getHttpStatus())
