@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ClientConfig {
 
-    private static final int CONNECT_TIMEOUT_MILLISECONDS = 60000;
-    private static final int CONNECTION_REQUEST_TIMEOUT_MILLISECONDS = 30000;
+    private static final int CONNECT_TIMEOUT_MILLISECONDS = 60_000;
+    private static final int CONNECTION_REQUEST_TIMEOUT_MILLISECONDS = 30_000;
 
     @Bean
     public RestClient restClient() {
