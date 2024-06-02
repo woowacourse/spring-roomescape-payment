@@ -44,10 +44,18 @@ class TossPaymentClientTest {
                 BigDecimal.valueOf(1000)
         );
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
+        String approveSuccessAppResponse = objectMapper.writeValueAsString(new PaymentApproveSuccessAppResponse(
+                "paymentKey",
+                "orderId",
+                BigDecimal.valueOf(1000),
+                "DONE",
+                "2022-06-01T00:00:00+09:00",
+                "2022-06-01T00:00:00+09:00"
+        ));
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(content().json(paymentApproveJson))
-                .andRespond(withSuccess(paymentApproveJson, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(approveSuccessAppResponse, MediaType.APPLICATION_JSON));
 
         PaymentApproveSuccessAppResponse paymentApproveSuccessAppResponse = tossPaymentClient.approve(
                 paymentApproveAppRequest);

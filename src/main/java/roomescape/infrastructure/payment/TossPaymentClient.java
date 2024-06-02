@@ -53,7 +53,10 @@ public class TossPaymentClient implements PaymentClient {
                                 throwable.getMessage(),
                                 throwable);
                     }
-                    return objectMapper.readValue(response.getBody(), PaymentApproveSuccessAppResponse.class);
+//                    System.out.println("paymentApproveSuccessAppResponse = " + objectMapper.readValue(body,
+//                            PaymentApproveSuccessAppResponse.class));
+                    return objectMapper.readValue(body,
+                            PaymentApproveSuccessAppResponse.class);
                 });
     }
 }
