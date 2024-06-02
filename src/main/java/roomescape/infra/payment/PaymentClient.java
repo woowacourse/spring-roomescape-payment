@@ -32,8 +32,8 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
-        return restClient.post()
+    public void confirmPayment(PaymentRequest paymentRequest) {
+        restClient.post()
                 .uri(confirmPaymentUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
@@ -44,8 +44,7 @@ public class PaymentClient {
                             .readValue(res.getBody(), PaymentErrorResponse.class);
 
                     throw new PaymentException(errorResponse.message());
-                })
-                .body(PaymentResponse.class);
+                });
     }
 
     private static String encodeSecretKey(String secretKey) {
