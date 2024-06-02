@@ -117,7 +117,7 @@ public class ReservationService {
                     waitingReservation.getReservationTime(),
                     waitingReservation.getTheme(),
                     waitingReservation.getMember(),
-                    ReservationStatus.RESERVED
+                    ReservationStatus.CONFIRMED
             ));
         }
 
@@ -134,9 +134,9 @@ public class ReservationService {
         validateDateAndTime(requestDate, requestTime, now);
 
         final Optional<Reservation> optional = reservationRepository.findFirstByReservationTimeAndDateAndThemeAndReservationStatusOrderById(
-                requestTime, requestDate, requestTheme, ReservationStatus.RESERVED
+                requestTime, requestDate, requestTheme, ReservationStatus.CONFIRMED
         );
-        final ReservationStatus state = optional.isEmpty() ? ReservationStatus.RESERVED : ReservationStatus.WAITING;
+        final ReservationStatus state = optional.isEmpty() ? ReservationStatus.CONFIRMED : ReservationStatus.WAITING;
         final Reservation saved = reservationRepository.save(
                 new Reservation(requestDate, requestTime, requestTheme, member, state));
         return ReservationResponse.from(saved);

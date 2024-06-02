@@ -30,6 +30,6 @@ public class ReservationSpecification {
 
     public static Specification<Reservation> withWaiting(final boolean waiting) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationStatus"),
-                waiting ? ReservationStatus.WAITING : ReservationStatus.RESERVED);
+                waiting ? ReservationStatus.WAITING : ReservationStatus.CONFIRMED);
     }
 }
