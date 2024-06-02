@@ -2,6 +2,7 @@ package roomescape.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentStatus;
@@ -29,9 +30,19 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
+    @Transactional(readOnly = true)
     public List<PaymentResponse> findPaidByMemberId(Long memberId) {
         return paymentRepository.findByMemberIdAndStatus(memberId, PaymentStatus.DONE).stream()
                 .map(PaymentResponse::from)
                 .toList();
+    }
+
+    public void requestRefund(Long reservationId, Long memberId) {
+        paymentRepository.findByReservationIdAndMemberIdAndStatus(reservationId, memberId, PaymentStatus.DONE)
+                .ifPresent(payment -> {
+                    paymentClient.requestRefund(payment.getPaymentKey());
+                    payment.refund();
+                    paymentRepository.save(payment);
+                });
     }
 }

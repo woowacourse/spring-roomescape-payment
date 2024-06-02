@@ -51,6 +51,10 @@ public class Payment {
     protected Payment() {
     }
 
+    public void refund() {
+        this.status = PaymentStatus.CANCELED;
+    }
+
     public Long getReservationId() {
         return reservationId;
     }

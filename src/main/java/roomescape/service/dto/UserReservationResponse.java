@@ -7,10 +7,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import roomescape.domain.reservation.BookedMember;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.WaitingMember;
-import roomescape.domain.reservation.dto.WaitingRank;
 
 public record UserReservationResponse(
         long id,
@@ -24,22 +20,21 @@ public record UserReservationResponse(
         Integer amount
 ) {
 
-        public static Stream<UserReservationResponse> reservationsToResponseStream(List<BookedMember> bookedMembers, List<PaymentResponse> paymentResponses) {
-                return bookedMembers.stream()
+        public static Stream<UserReservationResponse> reservationsToResponseStream(List<BookedReservationResponse> bookedReservationResponses, List<PaymentResponse> paymentResponses) {
+                return bookedReservationResponses.stream()
                         .map(bookedMember -> createByReservation(bookedMember, paymentResponses));
         }
 
-        private static UserReservationResponse createByReservation(BookedMember bookedMember, List<PaymentResponse> paymentResponses) {
-                Reservation reservation = bookedMember.getReservation();
+        private static UserReservationResponse createByReservation(BookedReservationResponse bookedReservationResponse, List<PaymentResponse> paymentResponses) {
                 Optional<PaymentResponse> payment = paymentResponses.stream()
-                        .filter(paymentResponse -> paymentResponse.reservationId().equals(reservation.getId()))
+                        .filter(paymentResponse -> paymentResponse.reservationId().equals(bookedReservationResponse.reservationId()))
                         .findFirst();
 
                 return new UserReservationResponse(
-                        reservation.getId(),
-                        reservation.getTheme().getName(),
-                        reservation.getDate(),
-                        reservation.getTime().getStartAt(),
+                        bookedReservationResponse.id(),
+                        bookedReservationResponse.theme(),
+                        bookedReservationResponse.date(),
+                        bookedReservationResponse.startAt(),
                         payment.isPresent() ?  ReservationStatus.BOOKED.getValue() : ReservationStatus.WAIT_PAYMENT.getValue(),
                         0L,
                         payment.isPresent() ? payment.get().paymentKey() : "",
@@ -47,19 +42,17 @@ public record UserReservationResponse(
                 );
         }
 
-        public static Stream<UserReservationResponse> waitingsToResponseStream(List<WaitingRank> waitingRanks) {
+        public static Stream<UserReservationResponse> waitingsToResponseStream(List<WaitingRankResponse> waitingRanks) {
                 return waitingRanks.stream()
                         .map(UserReservationResponse::createByWaiting);
         }
 
-        private static UserReservationResponse createByWaiting(WaitingRank waitingRank) {
-                WaitingMember waitingMember = waitingRank.waitingMember();
-                Reservation reservation = waitingMember.getReservation();
+        private static UserReservationResponse createByWaiting(WaitingRankResponse waitingRank) {
                 return new UserReservationResponse(
-                        waitingMember.getId(),
-                        reservation.getTheme().getName(),
-                        reservation.getDate(),
-                        reservation.getTime().getStartAt(),
+                        waitingRank.id(),
+                        waitingRank.theme(),
+                        waitingRank.date(),
+                        waitingRank.startAt(),
                         ReservationStatus.WAIT.getValue(),
                         waitingRank.rank(),
                         "",

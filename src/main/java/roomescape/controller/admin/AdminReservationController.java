@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.ReservationBookedResponse;
 import roomescape.service.dto.ReservationConditionRequest;
@@ -25,9 +26,12 @@ import roomescape.service.dto.WaitingResponse;
 public class AdminReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPaymentService reservationPaymentService;
 
-    public AdminReservationController(ReservationService reservationService) {
+    public AdminReservationController(ReservationService reservationService,
+                                      ReservationPaymentService reservationPaymentService) {
         this.reservationService = reservationService;
+        this.reservationPaymentService = reservationPaymentService;
     }
 
     @PostMapping("/booked")
@@ -54,7 +58,7 @@ public class AdminReservationController {
 
     @DeleteMapping("/booked/{id}")
     public ResponseEntity<Void> deleteBooked(@PathVariable("id") Long id) {
-        reservationService.cancelBooked(id);
+        reservationPaymentService.cancelBookedAndRefund(id);
         return ResponseEntity.noContent().build();
     }
 

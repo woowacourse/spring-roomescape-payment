@@ -3,7 +3,6 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -14,7 +13,6 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.WaitingMember;
 import roomescape.domain.reservation.dto.BookedReservationReadOnly;
-import roomescape.domain.reservation.dto.WaitingRank;
 import roomescape.domain.reservation.repository.BookedMemberRepository;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
@@ -22,15 +20,14 @@ import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingMemberRepository;
 import roomescape.exception.AuthorizationException;
 import roomescape.exception.RoomEscapeBusinessException;
+import roomescape.service.dto.BookedMemberResponse;
+import roomescape.service.dto.BookedReservationResponse;
 import roomescape.service.dto.LoginMember;
-import roomescape.service.dto.PaymentResponse;
 import roomescape.service.dto.ReservationBookedResponse;
 import roomescape.service.dto.ReservationConditionRequest;
-import roomescape.service.dto.ReservationPaymentRequest;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
-import roomescape.service.dto.ReservationStatus;
-import roomescape.service.dto.UserReservationResponse;
+import roomescape.service.dto.WaitingRankResponse;
 import roomescape.service.dto.WaitingResponse;
 
 @Service
@@ -42,7 +39,6 @@ public class ReservationService {
     private final BookedMemberRepository bookedMemberRepository;
     private final WaitingMemberRepository waitingMemberRepository;
     private final MemberRepository memberRepository;
-    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
@@ -50,7 +46,7 @@ public class ReservationService {
             ThemeRepository themeRepository,
             BookedMemberRepository bookedMemberRepository,
             WaitingMemberRepository waitingMemberRepository,
-            MemberRepository memberRepository, PaymentService paymentService
+            MemberRepository memberRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -58,7 +54,6 @@ public class ReservationService {
         this.bookedMemberRepository = bookedMemberRepository;
         this.waitingMemberRepository = waitingMemberRepository;
         this.memberRepository = memberRepository;
-        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -78,14 +73,28 @@ public class ReservationService {
         return ReservationResponse.createByBooked(bookedMember);
     }
 
-    public ReservationResponse saveReservationWithPayment(ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationResponse reservationResponse = saveReservation(reservationPaymentRequest.toReservationRequest());
+    @Transactional
+    public BookedMemberResponse cancelBooked(Long bookedMemberId) {
+        BookedMember bookedMember = bookedMemberRepository.findById(bookedMemberId)
+                .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 예약입니다."));
 
-        if (reservationResponse.status() == ReservationStatus.BOOKED) {
-            paymentService.requestApproval(reservationPaymentRequest.toPaymentApproveRequest(reservationResponse.reservationId()));
+        Reservation reservation = bookedMember.getReservation();
+
+        reservation.cancelBooked();
+
+        return BookedMemberResponse.from(bookedMember);
+    }
+
+    @Transactional
+    public void cancelWaiting(Long waitingMemberId, LoginMember loginMember) {
+        WaitingMember foundWaitingMember = waitingMemberRepository.findById(waitingMemberId)
+                .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 예약 대기입니다."));
+
+        if (loginMember.isUser() && foundWaitingMember.isNotMemberId(loginMember.id())) {
+            throw new AuthorizationException();
         }
 
-        return reservationResponse;
+        waitingMemberRepository.delete(foundWaitingMember);
     }
 
     @Transactional(readOnly = true)
@@ -112,45 +121,19 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserReservationResponse> findMyAllReservationAndWaiting(Long memberId, LocalDate date) {
+    public List<BookedReservationResponse> findBookedAfterDate(Long memberId, LocalDate date) {
         Member member = findMemberById(memberId);
-
-        List<BookedMember> bookedMembers = bookedMemberRepository.findByMemberAndReservation_DateGreaterThanEqual(member, date);
-        List<PaymentResponse> paymentResponses = paymentService.findPaidByMemberId(member.getId());
-
-        List<WaitingRank> waitingRanks = waitingMemberRepository.findRankByMemberAndDateGreaterThanEqual(member, date);
-
-        return Stream.concat(
-                        UserReservationResponse.reservationsToResponseStream(bookedMembers, paymentResponses),
-                        UserReservationResponse.waitingsToResponseStream(waitingRanks)
-                )
-                .sorted(Comparator.comparing(UserReservationResponse::dateTime))
+        return bookedMemberRepository.findByMemberAndReservation_DateGreaterThanEqual(member, date).stream()
+                .map(BookedReservationResponse::from)
                 .toList();
     }
 
-    @Transactional
-    public void cancelBooked(Long bookedMemberId) {
-        Reservation reservation = reservationRepository.findByBookedMember_Id(bookedMemberId)
-                .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 예약입니다."));
-
-        reservation.cancelBooked();
-    }
-
-    @Transactional
-    public void cancelWaiting(Long waitingMemberId, LoginMember loginMember) {
-        WaitingMember foundWaitingMember = waitingMemberRepository.findById(waitingMemberId)
-                .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 예약 대기입니다."));
-
-        if (loginMember.isUser() && foundWaitingMember.isNotMemberId(loginMember.id())) {
-            throw new AuthorizationException();
-        }
-
-        waitingMemberRepository.delete(foundWaitingMember);
-    }
-
-    private Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RoomEscapeBusinessException("회원이 존재하지 않습니다."));
+    @Transactional(readOnly = true)
+    public List<WaitingRankResponse> findWaitingRanksAfterDate(Long memberId, LocalDate date) {
+        Member member = findMemberById(memberId);
+        return waitingMemberRepository.findRankByMemberAndDateGreaterThanEqual(member, date).stream()
+                .map(WaitingRankResponse::from)
+                .toList();
     }
 
     private Reservation findReservation(LocalDate date, Long timeId, Long themeId) {
@@ -159,6 +142,11 @@ public class ReservationService {
 
         return reservationRepository.findByDateAndTimeAndTheme(date, time, theme)
                 .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RoomEscapeBusinessException("회원이 존재하지 않습니다."));
     }
 
     private Theme findThemeById(Long id) {

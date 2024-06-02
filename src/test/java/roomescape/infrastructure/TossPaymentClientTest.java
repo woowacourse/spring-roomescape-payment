@@ -63,7 +63,7 @@ class TossPaymentClientTest {
         // when // then
         assertThatThrownBy(() -> paymentClient.requestApproval(paymentRequest))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("결제에 실패했습니다.");
+                .hasMessage("결제 서버 오류로 작업을 진행할 수 없습니다.");
     }
 
     @DisplayName("결제 승인 요청시 TimeOut되면 PaymentException이 발생한다.")

@@ -16,8 +16,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByDateAndTimeAndTheme(LocalDate date, ReservationTime time, Theme theme);
 
-    Optional<Reservation> findByBookedMember_Id(Long id);
-
     @Query("""
             select new roomescape.domain.reservation.dto.BookedReservationReadOnly(
                 r.bookedMember.id,
@@ -43,8 +41,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     List<Theme> findPopularThemes(LocalDate startDate, LocalDate endDate, Limit limit);
 
-    @Query("select r.time from Reservation r where r.date = :date and r.theme = :theme")
-    List<ReservationTime> findTimesByDateAndTheme(LocalDate date, Theme theme);
+    @Query("select r.time from Reservation r where r.date = :date and r.theme = :theme and r.bookedMember is not null")
+    List<ReservationTime> findBookedTimesByDateAndTheme(LocalDate date, Theme theme);
 
     boolean existsByTime(ReservationTime time);
 

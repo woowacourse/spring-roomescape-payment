@@ -65,7 +65,7 @@ public class ReservationTimeService {
         Theme foundTheme = themeRepository.findById(reservationTimeBookedRequest.themeId())
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 테마입니다."));
 
-        List<ReservationTime> bookedTimes = reservationRepository.findTimesByDateAndTheme(
+        List<ReservationTime> bookedTimes = reservationRepository.findBookedTimesByDateAndTheme(
                 reservationTimeBookedRequest.date(),
                 foundTheme
         );

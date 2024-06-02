@@ -53,13 +53,13 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
 
     @DisplayName("날짜와 테마로 예약된 시간을 찾는다.")
     @Test
-    void findTimesByDateAndTheme() {
+    void findBookedTimesByDateAndTheme() {
         // given
         Theme theme = themeRepository.findById(2L).get();
         LocalDate date = LocalDate.parse("2024-05-30");
 
         // when
-        List<ReservationTime> times = reservationRepository.findTimesByDateAndTheme(date, theme);
+        List<ReservationTime> times = reservationRepository.findBookedTimesByDateAndTheme(date, theme);
 
         // then
         assertThat(times).hasSize(4).extracting("id", "startAt")

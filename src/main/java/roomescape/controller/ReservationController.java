@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.infrastructure.Login;
+import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.LoginMember;
 import roomescape.service.dto.ReservationRequest;
@@ -27,9 +28,12 @@ import roomescape.controller.dto.UserWaitingSaveRequest;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPaymentService reservationPaymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService,
+                                 ReservationPaymentService reservationPaymentService) {
         this.reservationService = reservationService;
+        this.reservationPaymentService = reservationPaymentService;
     }
 
     @PostMapping("/reservations/booked")
@@ -38,7 +42,7 @@ public class ReservationController {
             @RequestBody @Valid UserReservationSaveRequest userReservationSaveRequest
     ) {
         ReservationPaymentRequest reservationPaymentRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        ReservationResponse reservationResponse = reservationService.saveReservationWithPayment(reservationPaymentRequest);
+        ReservationResponse reservationResponse = reservationPaymentService.saveReservationWithPayment(reservationPaymentRequest);
         if (reservationResponse.status() == ReservationStatus.BOOKED) {
             return ResponseEntity.created(URI.create("/reservations/booked/" + reservationResponse.id()))
                     .body(reservationResponse);
@@ -68,7 +72,7 @@ public class ReservationController {
             @Login LoginMember member,
             @RequestParam LocalDate date
     ){
-        List<UserReservationResponse> reservationResponses = reservationService.findMyAllReservationAndWaiting(member.id(), date);
+        List<UserReservationResponse> reservationResponses = reservationPaymentService.findMyAllReservationWithPayment(member.id(), date);
         return ResponseEntity.ok(reservationResponses);
     }
 

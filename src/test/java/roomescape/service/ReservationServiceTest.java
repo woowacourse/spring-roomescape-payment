@@ -19,16 +19,15 @@ import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.repository.BookedMemberRepository;
-import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingMemberRepository;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.LoginMember;
-import roomescape.service.dto.ReservationPaymentRequest;
+import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
 import roomescape.service.dto.ReservationStatus;
-import roomescape.service.dto.UserReservationResponse;
+import roomescape.service.dto.WaitingRankResponse;
 import roomescape.service.dto.WaitingResponse;
 
 @Transactional
@@ -47,9 +46,6 @@ class ReservationServiceTest extends IntegrationTestSupport {
     private MemberRepository memberRepository;
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
     private BookedMemberRepository bookedMemberRepository;
 
     @Autowired
@@ -62,10 +58,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationResponse reservationResponse = reservationService.saveReservationWithPayment(
-                reservationPaymentRequest);
+        ReservationRequest reservationRequest = new ReservationRequest(member.getId(),
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+        ReservationResponse reservationResponse = reservationService.saveReservation(reservationRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -88,17 +83,15 @@ class ReservationServiceTest extends IntegrationTestSupport {
         Member member1 = memberRepository.save(Member.createUser("고구마1", "email1@email.com", "1234"));
         Member member2 = memberRepository.save(Member.createUser("고구마2", "email2@email.com", "1234"));
 
-        ReservationPaymentRequest reservationPaymentRequest1 = new ReservationPaymentRequest(member1.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationPaymentRequest reservationPaymentRequest2 = new ReservationPaymentRequest(member2.getId(),
-                LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+        ReservationRequest reservationRequest1 = new ReservationRequest(member1.getId(),
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
+        ReservationRequest reservationRequest2 = new ReservationRequest(member2.getId(),
+                LocalDate.parse("2025-11-11"), time.getId(), theme.getId());
 
-        ReservationResponse reservationResponse1 = reservationService.saveReservationWithPayment(
-                reservationPaymentRequest1);
+        ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationRequest1);
 
         // when
-        ReservationResponse reservationResponse2 = reservationService.saveReservationWithPayment(
-                reservationPaymentRequest2);
+        ReservationResponse reservationResponse2 = reservationService.saveReservation(reservationRequest2);
 
         // then
         assertAll(
@@ -119,10 +112,10 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void timeForSaveReservationNotFound() {
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
+        ReservationRequest reservationRequest = new ReservationRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), 100L, 1L);
         assertThatThrownBy(() -> {
-            reservationService.saveReservationWithPayment(reservationPaymentRequest);
+            reservationService.saveReservation(reservationRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -154,28 +147,27 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("한 사람이 중복된 예약을 할 수 없다.")
     @Test
     void saveDuplicatedReservation() {
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(1L,
+        ReservationRequest reservationRequest = new ReservationRequest(1L,
                 LocalDate.parse("2024-05-04"),
                 1L, 1L);
 
-        assertThatThrownBy(() -> reservationService.saveReservationWithPayment(reservationPaymentRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(reservationRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
-    @DisplayName("내 예약을 조회하면 예약 대기 순번도 함께 표시한다.")
+    @DisplayName("내 예약 대기를 조회하면 예약 대기 순번도 함께 표시한다.")
     @Test
     void findAllMyReservations() {
         // given // when
-        List<UserReservationResponse> allUserReservation = reservationService.findMyAllReservationAndWaiting(1L,
+        List<WaitingRankResponse> waitingRanks = reservationService.findWaitingRanksAfterDate(1L,
                 LocalDate.parse("2024-05-30"));
 
         // then
-        assertThat(allUserReservation).hasSize(3)
-                .extracting("id", "status", "rank")
+        assertThat(waitingRanks).hasSize(2)
+                .extracting("id", "rank")
                 .containsExactly(
-                        tuple(14L, "결제 대기", 0L),
-                        tuple(2L, "예약대기", 2L),
-                        tuple(3L, "예약대기", 1L)
+                        tuple(2L, 2L),
+                        tuple(3L, 1L)
                 );
     }
 
