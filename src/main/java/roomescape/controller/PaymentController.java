@@ -19,10 +19,10 @@ public class PaymentController {
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
-    
+
     @PostMapping
-    public ResponseEntity<PaymentResponse> savePaymentAndUpdateReservationStatus(@RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse response = paymentService.savePaymentAndUpdateReservationStatus(paymentRequest);
+    public ResponseEntity<PaymentResponse> payReservation(@RequestBody PaymentRequest paymentRequest) {
+        PaymentResponse response = paymentService.payReservation(paymentRequest);
 
         return ResponseEntity.created(URI.create("/payments/" + response.id()))
                 .body(response);

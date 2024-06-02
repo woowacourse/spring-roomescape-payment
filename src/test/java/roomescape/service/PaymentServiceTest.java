@@ -25,7 +25,7 @@ import roomescape.dto.PaymentRequest;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
-import roomescape.infra.PaymentRestClient;
+import roomescape.infra.PaymentClient;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -85,11 +85,11 @@ class PaymentServiceTest {
                 .build());
 
         PaymentRequest request = new PaymentRequest(reservation.getId(), "paymentKey", "WTESTzzzzz", 1000L);
-        given(paymentRestClient.requestPaymentApproval(any(PaymentRequest.class)))
+        given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
                 .willReturn(new Payment(null, "paymentKey", "WTESTzzzzz", 1000L));
 
         // when & then
-        assertThatCode(() -> paymentService.savePaymentAndUpdateReservationStatus(request))
+        assertThatCode(() -> paymentService.payReservation(request))
                 .doesNotThrowAnyException();
     }
 
@@ -111,7 +111,7 @@ class PaymentServiceTest {
                 .status(status)
                 .build());
 
-        given(paymentRestClient.requestPaymentApproval(any(PaymentRequest.class)))
+        given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
                 .willThrow(new RuntimeException());
 
         // when

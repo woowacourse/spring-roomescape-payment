@@ -8,33 +8,33 @@ import roomescape.dto.PaymentRequest;
 import roomescape.dto.PaymentResponse;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
-import roomescape.infra.PaymentRestClient;
+import roomescape.infra.PaymentClient;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
 @Service
 public class PaymentService {
 
-    private final PaymentRestClient paymentRestClient;
+    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
 
     public PaymentService(
-            PaymentRestClient paymentRestClient,
+            PaymentClient paymentClient,
             ReservationRepository reservationRepository,
             PaymentRepository paymentRepository
     ) {
-        this.paymentRestClient = paymentRestClient;
+        this.paymentClient = paymentClient;
         this.reservationRepository = reservationRepository;
         this.paymentRepository = paymentRepository;
     }
 
     @Transactional
-    public PaymentResponse savePaymentAndUpdateReservationStatus(PaymentRequest request) {
+    public PaymentResponse payReservation(PaymentRequest request) {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        Payment payment = paymentRestClient.requestPaymentApproval(request);
+        Payment payment = paymentClient.requestPaymentApproval(request);
         Payment saved = paymentRepository.save(payment);
         reservation.updatePayment(payment);
 
