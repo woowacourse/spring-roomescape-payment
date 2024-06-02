@@ -1,0 +1,40 @@
+### 예약 조회 API
+
+GET http://localhost:8080/reservations
+
+### 사용자 별 예약 조회 API
+
+GET http://localhost:8080/reservations/mine
+
+### 사용자 예약 추가 API
+
+POST http://localhost:8080/reservations
+Content-Type: application/json
+
+{
+  "date": "2024-05-31",
+  "timeId": 1,
+  "themeId": 1,
+  "paymentKey": "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+  "orderId": "testId",
+  "amount": 1000
+}
+
+### 사용자 예약 대기 추가 API
+
+POST http://localhost:8080/reservations/waiting
+Content-Type: application/json
+
+{
+  "date": "2024-05-26",
+  "timeId": 1,
+  "themeId": 1
+}
+
+### 예약 취소 API
+
+PATCH http://localhost:8080/reservations/29
+
+### 예약 삭제 API
+
+DELETE http://localhost:8080/reservations/1

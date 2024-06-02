@@ -1,0 +1,19 @@
+### 관리자 테마 아이디, 회원 아이디, 기간 조건 별 조회 API
+
+GET http://localhost:8080/admin/reservations/search?themeId=1&memberId=1&dateFrom=2024-05-19&dateTo=2024-05-21
+
+### 관리자 예약 추가 API
+
+POST http://localhost:8080/admin/reservations
+Content-Type: application/json
+
+{
+  "date": "2024-05-12",
+  "themeId": 1,
+  "timeId": 1,
+  "memberId": 1
+}
+
+### 관리자 예약 대기 조회
+
+GET http://localhost:8080/admin/reservations/waiting
