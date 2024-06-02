@@ -66,7 +66,6 @@ class PaymentServiceTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(expectedResponse));
-
         assertThatThrownBy(() -> paymentService.pay(request))
                 .isInstanceOf(PaymentException.class);
     }
