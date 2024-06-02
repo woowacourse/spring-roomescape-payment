@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import roomescape.domain.reservation.Reservation;
+import roomescape.exception.RoomEscapeException;
 
 @Entity
 public class Waiting {
@@ -44,9 +45,9 @@ public class Waiting {
 
     private void validateAvailableWaiting(Reservation reservation) {
         if (reservation.isReserved()) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 확정된 예약은 대기가 불가능합니다.",
-                    new Throwable("reservation_id : " + reservation.getId())
+            throw new RoomEscapeException(
+                    "확정된 예약은 대기가 불가능합니다.",
+                    "reservation_id : " + reservation.getId()
             );
         }
     }

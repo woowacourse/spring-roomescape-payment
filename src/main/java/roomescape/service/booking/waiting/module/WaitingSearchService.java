@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.waiting.WaitingResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.WaitingRepository;
 
 @Service
@@ -32,9 +33,9 @@ public class WaitingSearchService {
 
     private Waiting findWaitingById(final Long waitingId) {
         return waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 예약 대기 정보 입니다.",
-                        new Throwable("waiting_id : " + waitingId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "잘못된 예약 대기 정보 입니다.",
+                        "waiting_id : " + waitingId
                 ));
     }
 }

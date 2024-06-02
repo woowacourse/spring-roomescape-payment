@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.waiting.Waiting;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
@@ -55,17 +56,17 @@ public class WaitingCancelService {
 
     private Waiting findWaitingByReservationId(Long reservationId) {
         return waitingRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
-                        new Throwable("reservation_id : " + reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
+                        "reservation_id : " + reservationId
                 ));
     }
 
     private Waiting findWaitingById(Long waitingId) {
         return waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 대기 정보가 존재하지 않습니다.",
-                        new Throwable("waiting_id : " + waitingId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 대기 정보가 존재하지 않습니다.",
+                        "waiting_id : " + waitingId
                 ));
     }
 }

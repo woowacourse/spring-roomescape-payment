@@ -16,6 +16,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationRequest;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
@@ -66,7 +67,7 @@ class WaitingRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> waitingRegisterService.registerWaiting(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Sql("/waiting-test-data.sql")
@@ -78,6 +79,6 @@ class WaitingRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> waitingRegisterService.registerWaiting(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

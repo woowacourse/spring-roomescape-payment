@@ -1,6 +1,7 @@
 package roomescape.domain.member;
 
 import jakarta.persistence.Embeddable;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class Password {
@@ -23,9 +24,9 @@ public class Password {
 
     private void validatePassword(String password) {
         if (password.length() < MIN_PASSWORD_LENGTH) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 비밀번호는 4자 이상만 가능합니다.",
-                    new Throwable("password_length : " + password.length()));
+            throw new RoomEscapeException(
+                    "비밀번호는 4자 이상만 가능합니다.",
+                    "password_length : " + password.length());
         }
     }
 }

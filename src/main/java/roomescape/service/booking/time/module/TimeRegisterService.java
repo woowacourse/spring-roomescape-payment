@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservationtime.ReservationTimeRequest;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 
 @Service
@@ -25,9 +26,9 @@ public class TimeRegisterService {
 
     private void validateTimeDuplicate(LocalTime time) {
         if (reservationTimeRepository.existsByStartAt(time)) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 이미 등록된 시간은 등록할 수 없습니다.",
-                    new Throwable("등록 시간 : " + time)
+            throw new RoomEscapeException(
+                    "이미 등록된 시간은 등록할 수 없습니다.",
+                    "등록 시간 : " + time
             );
         }
     }

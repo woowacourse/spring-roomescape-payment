@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ThemeRepository;
 
@@ -45,9 +46,9 @@ public class ThemeSearchService {
 
     private Theme findThemeById(Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 테마 정보 입니다.",
-                        new Throwable("theme_id : " + themeId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "잘못된 테마 정보 입니다.",
+                        "theme_id : " + themeId
                 ));
     }
 }

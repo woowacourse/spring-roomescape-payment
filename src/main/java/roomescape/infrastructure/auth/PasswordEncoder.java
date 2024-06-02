@@ -1,6 +1,6 @@
 package roomescape.infrastructure.auth;
 
-import java.util.IllegalFormatFlagsException;
+import roomescape.exception.RoomEscapeException;
 
 public class PasswordEncoder {
 
@@ -17,7 +17,7 @@ public class PasswordEncoder {
 
     private void validateEmpty(String password) {
         if (password == null || password.isEmpty()) {
-            throw new IllegalFormatFlagsException("[ERROR] 비밀번호가 없습니다.");
+            throw new RoomEscapeException("비밀번호가 없습니다.");
         }
     }
 }

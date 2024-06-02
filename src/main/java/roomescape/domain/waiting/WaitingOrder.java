@@ -1,6 +1,7 @@
 package roomescape.domain.waiting;
 
 import jakarta.persistence.Embeddable;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class WaitingOrder {
@@ -33,9 +34,9 @@ public class WaitingOrder {
 
     private void validateWaitingOrder(int order) {
         if (order < MIN_ORDER) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 잘못된 대기 순서입니다. 관리자에게 문의해주세요.",
-                    new Throwable("order : " + order));
+            throw new RoomEscapeException(
+                    "잘못된 대기 순서입니다. 관리자에게 문의해주세요.",
+                    "order : " + order);
         }
     }
 

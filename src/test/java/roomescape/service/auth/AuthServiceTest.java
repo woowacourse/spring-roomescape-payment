@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.login.LoginMember;
 import roomescape.dto.login.LoginRequest;
 import roomescape.dto.token.TokenDto;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.MemberRepository;
 
 @Sql("/member-test-data.sql")
@@ -46,7 +47,7 @@ class AuthServiceTest {
 
         //when, then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -56,7 +57,7 @@ class AuthServiceTest {
 
         //when, then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test

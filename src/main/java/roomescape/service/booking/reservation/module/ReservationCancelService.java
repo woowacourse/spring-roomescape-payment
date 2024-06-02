@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
@@ -53,17 +54,17 @@ public class ReservationCancelService {
 
     private Reservation findReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 예약 정보 입니다.",
-                        new Throwable("reservation_id : " + reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "잘못된 예약 정보 입니다.",
+                        "reservation_id : " + reservationId
                 ));
     }
 
     private Waiting findWaitingByReservationId(Long reservationId) {
         return waitingRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
-                        new Throwable("reservation_id : " + reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
+                        "reservation_id : " + reservationId
                 ));
     }
 }

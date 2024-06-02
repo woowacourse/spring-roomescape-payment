@@ -15,6 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.reservation.ReservationRequest;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -67,7 +68,7 @@ class ReservationRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> reservationRegisterService.registerReservation(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -80,7 +81,7 @@ class ReservationRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> reservationRegisterService.registerReservation(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -91,7 +92,7 @@ class ReservationRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> reservationRegisterService.registerReservation(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -102,6 +103,6 @@ class ReservationRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> reservationRegisterService.registerReservation(reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

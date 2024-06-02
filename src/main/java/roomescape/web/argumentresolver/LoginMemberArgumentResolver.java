@@ -9,6 +9,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.dto.login.LoginMember;
 import roomescape.dto.token.TokenDto;
+import roomescape.exception.RoomEscapeException;
 import roomescape.infrastructure.auth.AuthorizationExtractor;
 import roomescape.service.auth.AuthService;
 
@@ -45,7 +46,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
         String token = authorizationExtractor.extractToken(request);
         TokenDto tokenDto = new TokenDto(token);
         if (!authService.isValidateToken(tokenDto)) {
-            throw new IllegalArgumentException("[ERROR] 유효한 토큰이 아닙니다.");
+            throw new RoomEscapeException("유효한 토큰이 아닙니다.");
         }
 
         return authService.extractLoginMemberByToken(tokenDto);

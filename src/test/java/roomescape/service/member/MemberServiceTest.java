@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.member.MemberResponse;
+import roomescape.exception.RoomEscapeException;
 
 @Sql("/member-test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -38,6 +39,6 @@ class MemberServiceTest {
 
         //when, then
         assertThatThrownBy(() -> memberService.getMemberById(notExistId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

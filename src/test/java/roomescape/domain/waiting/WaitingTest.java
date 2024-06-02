@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.Reservation;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 
 @Sql("/all-test-data.sql")
@@ -27,7 +28,7 @@ class WaitingTest {
 
         //when, then
         assertThatThrownBy(() -> new Waiting(reservation, 1))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
 }

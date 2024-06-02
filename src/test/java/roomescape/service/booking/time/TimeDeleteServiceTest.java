@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.booking.time.module.TimeDeleteService;
 
@@ -42,6 +43,6 @@ class TimeDeleteServiceTest {
     void 예약이_존재하는_시간대를_삭제할_경우_예외_발생() {
         //then
         assertThatThrownBy(() -> timeDeleteService.deleteTime(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

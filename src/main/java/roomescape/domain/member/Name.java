@@ -2,6 +2,7 @@ package roomescape.domain.member;
 
 import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class Name {
@@ -31,18 +32,18 @@ public class Name {
 
     private void validateNameFormat(String name) {
         if (!Pattern.matches(NAME_PATTERN, name)) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 이름은 영어 또는 한글만 가능합니다.",
-                    new Throwable("member_name : " + name)
+            throw new RoomEscapeException(
+                    "이름은 영어 또는 한글만 가능합니다.",
+                    "member_name : " + name
             );
         }
     }
 
     private void validateNameLength(String name) {
         if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 이름은 2~10자만 가능합니다.",
-                    new Throwable("member_name : " + name)
+            throw new RoomEscapeException(
+                    "이름은 2~10자만 가능합니다.",
+                    "member_name : " + name
             );
         }
     }

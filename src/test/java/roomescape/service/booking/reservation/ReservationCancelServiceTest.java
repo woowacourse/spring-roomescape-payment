@@ -15,6 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.service.booking.reservation.module.ReservationCancelService;
@@ -69,6 +70,6 @@ class ReservationCancelServiceTest {
 
         //when, then
         assertThatThrownBy(() -> reservationCancelService.deleteReservation(notExistIdToFind))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

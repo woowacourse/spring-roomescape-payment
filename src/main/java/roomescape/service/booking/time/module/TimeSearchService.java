@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservationtime.ReservationTimeResponse;
 import roomescape.dto.reservationtime.TimeWithAvailableResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
@@ -51,7 +52,7 @@ public class TimeSearchService {
 
     private ReservationTime findTimeById(Long timeId) {
         return reservationTimeRepository.findById(timeId).orElseThrow(
-                () -> new IllegalArgumentException("[ERROR] 잘못된 잘못된 예약시간 정보 입니다.",
-                        new Throwable("time_id : " + timeId)));
+                () -> new RoomEscapeException("잘못된 예약시간 정보 입니다.",
+                        "time_id : " + timeId));
     }
 }

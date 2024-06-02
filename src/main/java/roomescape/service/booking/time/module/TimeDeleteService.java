@@ -3,6 +3,7 @@ package roomescape.service.booking.time.module;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.time.ReservationTime;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
@@ -27,17 +28,17 @@ public class TimeDeleteService {
 
     private ReservationTime findTimeById(Long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 잘못된 예약시간 정보 입니다.",
-                        new Throwable("time_id : " + timeId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "잘못된 잘못된 예약시간 정보 입니다.",
+                        "time_id : " + timeId
                 ));
     }
 
     private void validateDeletable(ReservationTime reservationTime) {
         if (reservationRepository.existsByTimeId(reservationTime.getId())) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 해당 시간에 예약이 존재해서 삭제할 수 없습니다.",
-                    new Throwable("예약 시간 : " + reservationTime.getStartAt())
+            throw new RoomEscapeException(
+                    "해당 시간에 예약이 존재해서 삭제할 수 없습니다.",
+                    "예약 시간 : " + reservationTime.getStartAt()
             );
         }
     }

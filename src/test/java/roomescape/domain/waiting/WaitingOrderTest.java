@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import roomescape.exception.RoomEscapeException;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class WaitingOrderTest {
@@ -15,7 +16,7 @@ class WaitingOrderTest {
     void 대기번호가_1보다_작을경우_예외_발생() {
         //when, then
         assertThatThrownBy(() -> new WaitingOrder(0))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
