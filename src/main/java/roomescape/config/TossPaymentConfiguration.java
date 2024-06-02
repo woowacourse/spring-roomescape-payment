@@ -5,10 +5,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.TossPaymentErrorHandler;
 import roomescape.interceptor.LoggingInterceptor;
+import roomescape.service.httpclient.TossPaymentClient;
+import roomescape.service.httpclient.TossPaymentRestTemplate;
 
 @Configuration
 public class TossPaymentConfiguration {
@@ -25,21 +26,13 @@ public class TossPaymentConfiguration {
     }
 
     @Bean
-    RestClient paymentRestClient() {
-        return RestClient.builder()
-                .defaultHeader(HttpHeaders.AUTHORIZATION, buildAuthHeader())
-                .defaultStatusHandler(tossPaymentErrorHandler)
-                .requestInterceptor(loggingInterceptor)
-                .baseUrl(API_BASE_URL).build();
-    }
-
-    @Bean
-    RestTemplate paymentRestTemplate() {
-        return new RestTemplateBuilder()
+    TossPaymentClient tossPaymentClient() {
+        RestTemplate restTemplate = new RestTemplateBuilder()
                 .defaultHeader(HttpHeaders.AUTHORIZATION, buildAuthHeader())
                 .errorHandler(tossPaymentErrorHandler)
                 .interceptors(loggingInterceptor)
                 .rootUri(API_BASE_URL).build();
+        return new TossPaymentRestTemplate(restTemplate);
     }
 
     private String buildAuthHeader() {

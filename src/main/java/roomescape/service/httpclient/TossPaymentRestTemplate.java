@@ -1,12 +1,9 @@
 package roomescape.service.httpclient;
 
-
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import roomescape.controller.request.PaymentRequest;
 
-@Component
-public class TossPaymentRestTemplate extends TossPaymentClient{
+public class TossPaymentRestTemplate extends TossPaymentClient {
 
     private final RestTemplate restTemplate;
 
