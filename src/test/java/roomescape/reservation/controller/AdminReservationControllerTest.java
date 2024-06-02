@@ -21,7 +21,6 @@ import roomescape.reservation.domain.entity.ReservationStatus;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -169,7 +168,7 @@ class AdminReservationControllerTest {
 
         Map<String, String> body = Map.of("cancelReason", "reason");
         Mockito.when(restClient.post("/testPaymentKey/cancel", body))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         RestAssured.given().log().all()

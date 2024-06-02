@@ -10,12 +10,12 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.BadRequestException;
+import roomescape.exception.PaymentFailureException;
 import roomescape.payment.PaymentProperties;
 import roomescape.payment.dto.PaymentFailure;
 import roomescape.payment.dto.PaymentResponse;
 
 import java.util.Base64;
-import java.util.Optional;
 
 @Component
 public class TossPaymentRestClient {
@@ -35,6 +35,7 @@ public class TossPaymentRestClient {
                 .requestFactory(requestFactoryWithTimeout)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + authorizationToken)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, get4xxErrorHandler(objectMapper))
+                .defaultStatusHandler(HttpStatusCode::isError, getDefaultErrorHandler(objectMapper))
                 .build();
     }
 
@@ -45,14 +46,19 @@ public class TossPaymentRestClient {
         };
     }
 
-    public <T> Optional<PaymentResponse> post(String uri, T body) {
-        return Optional.ofNullable(
-                restClient.post()
-                        .uri(uri)
-                        .body(body)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .retrieve()
-                        .body(PaymentResponse.class)
-        );
+    private static RestClient.ResponseSpec.ErrorHandler getDefaultErrorHandler(ObjectMapper objectMapper) {
+        return (request, response) -> {
+            PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            throw new PaymentFailureException(paymentFailure.message());
+        };
+    }
+
+    public <T> PaymentResponse post(String uri, T body) {
+        return restClient.post()
+                .uri(uri)
+                .body(body)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(PaymentResponse.class);
     }
 }

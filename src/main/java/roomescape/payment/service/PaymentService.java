@@ -1,7 +1,6 @@
 package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.exception.PaymentFailureException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
@@ -22,8 +21,7 @@ public class PaymentService {
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
-        PaymentResponse response = restClient.post("/confirm", request)
-                .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
+        PaymentResponse response = restClient.post("/confirm", request);
 
         Payment payment = new Payment(
                 response.paymentKey(),

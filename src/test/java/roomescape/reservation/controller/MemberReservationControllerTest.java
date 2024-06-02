@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -89,7 +88,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String name = RestAssured.given().log().all()
@@ -165,7 +164,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
 
         // when
@@ -198,7 +197,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -257,7 +256,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String detailMessage = RestAssured.given().log().all()
@@ -289,7 +288,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String detailMessage = RestAssured.given().log().all()
@@ -349,7 +348,7 @@ class MemberReservationControllerTest {
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
         Mockito.when(restClient.post("/confirm", paymentRequest))
-                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         Long id = RestAssured.given()
                 .contentType(ContentType.JSON)

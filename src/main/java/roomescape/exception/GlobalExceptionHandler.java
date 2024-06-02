@@ -86,6 +86,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
     }
 
+    @ExceptionHandler(PaymentFailureException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentFailureException(
+            PaymentFailureException exception
+    ) {
+        exception.printStackTrace();
+        logger.warn(exception.getMessage());
+        ErrorResponse data = new ErrorResponse("결제를 승인하던 중 오류가 발생했습니다.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(data);
+    }
+
     @ExceptionHandler(value = {IllegalArgumentException.class, Exception.class})
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception e) {
         e.printStackTrace();
