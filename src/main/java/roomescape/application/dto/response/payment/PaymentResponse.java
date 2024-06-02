@@ -10,6 +10,11 @@ public record PaymentResponse(
         String requestedAt,
         String approvedAt
 ) {
+
+    public static PaymentResponse empty() {
+        return new PaymentResponse(0L, "", "", "", "", "");
+    }
+
     public Payment toPayment() {
         return new Payment(totalAmount, paymentKey, orderId, requestedAt, approvedAt);
     }
