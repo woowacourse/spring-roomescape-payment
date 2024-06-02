@@ -24,7 +24,7 @@ import roomescape.domain.reservation.detail.ThemeRepository;
 
 @Component
 @Transactional
-@Profile("default")
+@Profile("dev")
 public class DataInitializer implements ApplicationRunner {
 
     private final ThemeRepository themeRepository;
