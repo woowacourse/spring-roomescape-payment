@@ -1,6 +1,6 @@
 package roomescape.exception;
 
-import roomescape.exception.model.InternalExceptionCode;
+import roomescape.exception.global.GlobalExceptionCode;
 import roomescape.exception.model.PaymentConfirmExceptionCode;
 
 public class PaymentConfirmException extends RoomEscapeException{
@@ -9,7 +9,7 @@ public class PaymentConfirmException extends RoomEscapeException{
         super(paymentConfirmExceptionCode);
     }
 
-    public PaymentConfirmException(InternalExceptionCode internalExceptionCode) {
-        super(internalExceptionCode);
+    public PaymentConfirmException(GlobalExceptionCode globalExceptionCode) {
+        super(globalExceptionCode);
     }
 }

@@ -7,7 +7,8 @@ public enum GlobalExceptionCode implements ExceptionCode {
 
     METHOD_ARGUMENT_TYPE_INVALID(HttpStatus.BAD_REQUEST, "타입이 일치하지 않습니다."),
 
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버에서 에러가 발생했습니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버에서 에러가 발생했습니다."),
+    INVALID_JSON_DATA(HttpStatus.INTERNAL_SERVER_ERROR, "Json 변환에 실패하였습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

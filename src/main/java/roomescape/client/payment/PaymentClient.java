@@ -14,7 +14,7 @@ import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.RoomEscapeException;
-import roomescape.exception.model.InternalExceptionCode;
+import roomescape.exception.global.GlobalExceptionCode;
 import roomescape.exception.model.PaymentConfirmExceptionCode;
 import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.util.LoggerUtil;
@@ -79,7 +79,7 @@ public class PaymentClient {
         try {
             return objectMapper.readValue(response.getBody(), PaymentConfirmExceptionCode.class);
         } catch (JsonProcessingException e) {
-            throw new PaymentConfirmException(InternalExceptionCode.INVALID_JSON_DATA);
+            throw new PaymentConfirmException(GlobalExceptionCode.INVALID_JSON_DATA);
         }
     }
 }
