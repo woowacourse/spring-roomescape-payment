@@ -97,10 +97,10 @@ class ThemeServiceTest extends BaseServiceTest {
         reservationRepository.save(ReservationFixture.create("2024-04-09", member, time, theme3));
         reservationRepository.save(ReservationFixture.create("2024-04-10", member, time, theme3));
 
-        LocalDate stateDate = LocalDate.of(2024, 4, 6);
-        LocalDate endDate = LocalDate.of(2024, 4, 10);
+        LocalDate date = LocalDate.of(2024, 4, 10);
+        int days = 4;
         int limit = 3;
-        List<ThemeResponse> popularThemes = themeService.getPopularThemes(stateDate, endDate, limit);
+        List<ThemeResponse> popularThemes = themeService.getPopularThemes(date, days, limit);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(popularThemes).hasSize(3);

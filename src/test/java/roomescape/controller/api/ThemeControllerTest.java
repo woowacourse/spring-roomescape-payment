@@ -101,8 +101,8 @@ class ThemeControllerTest extends BaseControllerTest {
     @Sql("/popular-themes.sql")
     void getPopularThemes() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .param("startDate", "2024-04-06")
-                .param("endDate", "2024-04-10")
+                .param("date", "2024-04-10")
+                .param("days", 4)
                 .param("limit", "3")
                 .when().get("/themes/popular")
                 .then().log().all()

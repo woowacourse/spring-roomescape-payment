@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,12 +16,18 @@ import roomescape.service.dto.response.ThemeResponse;
 @Transactional(readOnly = true)
 public class ThemeService {
 
+    private static final int POPULAR_THEME_END_DATE_OFFSET = 1;
+    private static final int POPULAR_THEME_DAYS_AGO = 6;
+    private static final int POPULAR_THEME_LIMIT = 10;
+
     private final ReservationRepository reservationRepository;
     private final ThemeRepository themeRepository;
+    private final Clock clock;
 
-    public ThemeService(ReservationRepository reservationRepository, ThemeRepository themeRepository) {
+    public ThemeService(ReservationRepository reservationRepository, ThemeRepository themeRepository, Clock clock) {
         this.reservationRepository = reservationRepository;
         this.themeRepository = themeRepository;
+        this.clock = clock;
     }
 
     public List<ThemeResponse> getAllThemes() {
@@ -63,11 +70,35 @@ public class ThemeService {
         }
     }
 
-    public List<ThemeResponse> getPopularThemes(LocalDate startDate, LocalDate endDate, int limit) {
-        List<Theme> themes = themeRepository.findPopularThemes(startDate, endDate, limit);
+    public List<ThemeResponse> getPopularThemes(LocalDate date, Integer days, Integer limit) {
+        LocalDate endDate = getOrDefaultEndDate(date);
+        LocalDate startDate = getOrDefaultStartDate(days, endDate);
+        limit = getOrDefaultLimit(limit);
 
+        List<Theme> themes = themeRepository.findPopularThemes(startDate, endDate, limit);
         return themes.stream()
                 .map(ThemeResponse::from)
                 .toList();
+    }
+
+    private LocalDate getOrDefaultEndDate(LocalDate date) {
+        if (date == null) {
+            return LocalDate.now(clock).minusDays(POPULAR_THEME_END_DATE_OFFSET);
+        }
+        return date;
+    }
+
+    private LocalDate getOrDefaultStartDate(Integer days, LocalDate endDate) {
+        if (days == null) {
+            return endDate.minusDays(POPULAR_THEME_DAYS_AGO);
+        }
+        return endDate.minusDays(days);
+    }
+
+    private Integer getOrDefaultLimit(Integer limit) {
+        if (limit == null) {
+            return POPULAR_THEME_LIMIT;
+        }
+        return limit;
     }
 }
