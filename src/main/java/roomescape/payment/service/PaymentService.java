@@ -1,6 +1,5 @@
 package roomescape.payment.service;
 
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import roomescape.exception.PaymentFailureException;
 import roomescape.payment.domain.Payment;
@@ -8,6 +7,8 @@ import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
+
+import java.util.Map;
 
 @Service
 public class PaymentService {
@@ -35,14 +36,10 @@ public class PaymentService {
     public void cancelPayment(MemberReservation memberReservation) {
         paymentRepository.findByMemberReservation(memberReservation)
                 .ifPresent(payment -> {
-                    postCancelPaymentRequest(payment);
+                    String uri = "/" + payment.getPaymentKey() + "/cancel";
+                    Map<String, String> body = Map.of("cancelReason", "고객 변심");
+                    restClient.post(uri, body);
                     paymentRepository.delete(payment);
                 });
-    }
-
-    private void postCancelPaymentRequest(Payment payment) {
-        String uri = "/" + payment.getPaymentKey() + "/cancel";
-        Map<String, String> body = Map.of("cancelReason", "고객 변심");
-        restClient.post(uri, body);
     }
 }
