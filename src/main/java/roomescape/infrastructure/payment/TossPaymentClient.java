@@ -1,10 +1,7 @@
 package roomescape.infrastructure.payment;
 
 import java.util.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -17,14 +14,13 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.payment.TossErrorResponse;
 import roomescape.exception.PaymentException;
+import roomescape.exception.PaymentInternalException;
 
 /**
  * @see <a href="https://docs.tosspayments.com/reference/error-codes">토스 결제 오류 코드 정의서</a>
  */
 @Component
 public class TossPaymentClient {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Value("${secret-key}")
     private String secretKey;
@@ -35,7 +31,7 @@ public class TossPaymentClient {
     }
 
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
-        String authorizationKey = secretKey + ":";
+        String authorizationKey = secretKey + "바보:";
 
         try {
             return restClient.post()
@@ -49,21 +45,17 @@ public class TossPaymentClient {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             TossErrorResponse errorResponse = getErrorResponse(e);
-            log.error("[{}] statusCode: {}, message: {}, paymentKey: {}",
+            HttpStatusCode clientStatusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(), errorResponse.code());
+            throw new PaymentException(
                     e.getClass().getName(),
                     e.getStatusCode(),
+                    clientStatusCode,
                     errorResponse.message(),
                     paymentRequest.paymentKey()
             );
-            HttpStatusCode statusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(), errorResponse.code());
-            throw new PaymentException(errorResponse.message(), statusCode);
 
         } catch (Exception e) {
-            log.error("[{}] {}",
-                    e.getClass().getName(),
-                    "시스템에서 오류가 발생했습니다."
-            );
-            throw new PaymentException("시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PaymentInternalException(e.getClass().getName(), "시스템에서 오류가 발생했습니다.");
         }
     }
 
@@ -71,11 +63,7 @@ public class TossPaymentClient {
         try {
             return exception.getResponseBodyAs(TossErrorResponse.class);
         } catch (RestClientResponseException e) {
-            log.error("[{}] {}",
-                    e.getClass().getName(),
-                    "결제 오류 객체를 생성하는 과정에서 오류가 발생했습니다."
-            );
-            throw new PaymentException("시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PaymentInternalException(e.getClass().getName(), "결제 오류 객체를 생성하는 과정에서 오류가 발생했습니다.");
         }
     }
 }

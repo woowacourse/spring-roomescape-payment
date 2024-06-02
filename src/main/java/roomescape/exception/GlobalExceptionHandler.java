@@ -32,7 +32,19 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(value = PaymentException.class)
     private ProblemDetail handlePaymentException(PaymentException e) {
-        return ProblemDetail.forStatusAndDetail(e.getStatusCode(), e.getMessage());
+        log.error("[{}] statusCode: {}, message: {}, paymentKey: {}",
+                e.getExceptionClass(),
+                e.getServerStatusCode(),
+                e.getMessage(),
+                e.getPaymentKey()
+        );
+        return ProblemDetail.forStatusAndDetail(e.getClientStatusCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(value = PaymentInternalException.class)
+    private ProblemDetail handlePaymentInternalException(PaymentInternalException e) {
+        log.error("[{}] {}", e.getExceptionClass(), e.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.");
     }
 
     @ExceptionHandler(value = Exception.class)
