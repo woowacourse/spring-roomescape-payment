@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,13 +19,21 @@ public class ExceptionApiController {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> IllegalArgExHandler(IllegalArgumentException exception) {
+    public ResponseEntity<ProblemDetail> illegalArgumentExceptionHandler(IllegalArgumentException exception) {
         log.error("[IllegalArgumentException] ", exception);
-        return ResponseEntity.badRequest().body(exception.getMessage());
+
+        return createErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException exception) {
+        log.error("[HttpMessageNotReadableException] ", exception);
+
+        return createErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> methodArgumentExHandler(MethodArgumentNotValidException exception) {
+    public ResponseEntity<Map<String, String>> methodArgumentExceptionHandler(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new LinkedHashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(error -> {
             String fieldName = error.getField();
@@ -37,10 +46,17 @@ public class ExceptionApiController {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ProblemDetail> paymentExHandler(PaymentException exception) {
+    public ResponseEntity<ProblemDetail> paymentExceptionHandler(PaymentException exception) {
         log.error("[PaymentException]", exception);
 
         return createErrorResponse(exception.getStatus(), exception.getMessage());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ProblemDetail> paymentExceptionHandler(RuntimeException exception) {
+        log.error("[RuntimeException]", exception);
+
+        return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러입니다.");
     }
 
     private ResponseEntity<ProblemDetail> createErrorResponse(HttpStatus httpStatus, String errorMessage) {

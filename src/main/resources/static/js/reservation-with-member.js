@@ -223,7 +223,7 @@ function requestCreate(reservation) {
       .then(response => {
         if (response.status !== 201) {
           return response.json().then(errorResponse => {
-            throw new Error(JSON.stringify(errorResponse));
+            throw new Error(JSON.stringify(errorResponse.detail));
           })
         }
         return response.json();
