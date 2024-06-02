@@ -1,13 +1,18 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.reservation.domain.entity.MemberReservation;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import roomescape.reservation.domain.entity.MemberReservation;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -45,15 +50,6 @@ public class Payment {
 
     public Payment(String paymentKey, String orderId, BigDecimal amount, MemberReservation memberReservation) {
         this(null, paymentKey, orderId, amount, null, memberReservation);
-    }
-
-    public static Payment of(PaymentResponse paymentResponse, MemberReservation memberReservation) {
-        return new Payment(
-                paymentResponse.paymentKey(),
-                paymentResponse.orderId(),
-                paymentResponse.totalAmount(),
-                memberReservation
-        );
     }
 
     public Long getId() {
