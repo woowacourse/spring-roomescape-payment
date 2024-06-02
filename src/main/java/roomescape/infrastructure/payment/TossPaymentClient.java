@@ -26,12 +26,12 @@ public class TossPaymentClient {
     private String secretKey;
     private final RestClient restClient;
 
-    public TossPaymentClient(RestClient restClient) {
-        this.restClient = restClient;
+    public TossPaymentClient(RestClient.Builder restClient) {
+        this.restClient = restClient.build();
     }
 
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
-        String authorizationKey = secretKey + "바보:";
+        String authorizationKey = secretKey + ":";
 
         try {
             return restClient.post()
