@@ -3,6 +3,7 @@ package roomescape.service.reservation.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import roomescape.service.payment.dto.PaymentRequest;
 
 public record ReservationRequest(
         LocalDate date,
@@ -19,5 +20,9 @@ public record ReservationRequest(
                 request.date(), request.timeId(), request.themeId(),
                 "PAID_BY_ADMIN", "ORDER_BY_ADMIN", 0, "BY_ADMIN"
         );
+    }
+
+    public PaymentRequest toPaymentRequest() {
+        return new PaymentRequest(paymentKey, orderId, amount, paymentType);
     }
 }

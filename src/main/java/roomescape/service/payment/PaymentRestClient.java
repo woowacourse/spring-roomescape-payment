@@ -14,8 +14,8 @@ import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.PaymentException;
 import roomescape.service.payment.dto.PaymentErrorResult;
+import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.payment.dto.PaymentResult;
-import roomescape.service.reservation.dto.ReservationRequest;
 
 public class PaymentRestClient {
     @Value("${tosspay.secret_key}")
@@ -29,7 +29,7 @@ public class PaymentRestClient {
         this.objectMapper = objectMapper;
     }
 
-    public PaymentResult confirm(ReservationRequest request) {
+    public PaymentResult confirm(PaymentRequest request) {
         HttpHeaders headers = generateHttpHeaders();
         Map<String, Object> amount = Map.of(
                 "amount", request.amount(),

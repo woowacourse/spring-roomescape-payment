@@ -20,7 +20,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
-import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -33,20 +33,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
-    private final PaymentRestClient paymentRestClient;
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            ReservationWaitingRepository reservationWaitingRepository, PaymentRestClient paymentRestClient) {
+            ReservationWaitingRepository reservationWaitingRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
-        this.paymentRestClient = paymentRestClient;
+        this.paymentService = paymentService;
     }
 
     public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
@@ -59,7 +59,7 @@ public class ReservationService {
 
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        paymentRestClient.confirm(reservationRequest);
+        paymentService.confirm(reservationRequest.toPaymentRequest());
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return new ReservationResponse(savedReservation);
