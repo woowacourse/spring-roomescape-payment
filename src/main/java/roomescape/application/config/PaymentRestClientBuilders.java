@@ -17,20 +17,17 @@ import roomescape.util.Base64Utils;
 
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentRestClientBuilders {
-    private final PaymentClientProperties properties;
     private final Map<String, RestClient.Builder> builders;
 
     public PaymentRestClientBuilders(PaymentClientProperties properties) {
-        this.properties = properties;
         this.builders = properties.getNames()
                 .stream()
-                .collect(Collectors.toMap(name -> name, this::createBuilder));
+                .collect(Collectors.toMap(name -> name, name -> createBuilder(properties.get(name))));
     }
 
-    private Builder createBuilder(String name) {
-        PaymentClientProperty property = properties.get(name);
+    private Builder createBuilder(PaymentClientProperty property) {
         return RestClient.builder()
-                .requestFactory(new BufferingClientHttpRequestFactory(createRequestFactory(name)))
+                .requestFactory(new BufferingClientHttpRequestFactory(createRequestFactory(property)))
                 .defaultHeader(HttpHeaders.AUTHORIZATION, Base64Utils.encode(property.secret() + ":"))
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .requestInterceptor(new PaymentRequestResponseLoggingInterceptor())
@@ -38,8 +35,7 @@ public class PaymentRestClientBuilders {
                 .baseUrl(property.url());
     }
 
-    private ClientHttpRequestFactory createRequestFactory(String name) {
-        PaymentClientProperty property = properties.get(name);
+    private ClientHttpRequestFactory createRequestFactory(PaymentClientProperty property) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(property.connectionTimeoutInSeconds()))
                 .withReadTimeout(Duration.ofSeconds(property.readTimeoutInSeconds()));
