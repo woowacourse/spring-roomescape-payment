@@ -2,10 +2,13 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -17,6 +20,7 @@ import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 
 @Component
@@ -30,11 +34,17 @@ public class PaymentClient {
 
     public PaymentClient(@Value("${payment.secret-key}") String secretKey,
                          @Value("${payment.url}") String baseUrl,
+                         RestClient.Builder restClientBuilder,
                          ObjectMapper objectMapper) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.restClient = RestClient.builder().build();
+
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(30))
+                .withReadTimeout(Duration.ofMinutes(30));
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+        this.restClient = restClientBuilder.requestFactory(requestFactory).build();
     }
 
     public PaymentConfirmOutput confirmPayment(PaymentConfirmInput confirmRequest) {
