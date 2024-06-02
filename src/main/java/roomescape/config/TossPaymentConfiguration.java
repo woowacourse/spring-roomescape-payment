@@ -10,8 +10,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.TossPaymentErrorHandler;
 import roomescape.interceptor.LoggingInterceptor;
-import roomescape.service.httpclient.TossPaymentClient;
-import roomescape.service.httpclient.TossPaymentRestTemplate;
 
 import java.time.Duration;
 
@@ -38,14 +36,14 @@ public class TossPaymentConfiguration {
     }
 
     @Bean
-    TossPaymentClient tossPaymentClient() {
-        RestTemplate restTemplate = new RestTemplateBuilder()
+    RestTemplate restTemplate() {
+        return new RestTemplateBuilder()
                 .defaultHeader(HttpHeaders.AUTHORIZATION, authKey)
+                .rootUri(baseUrl)
                 .errorHandler(tossPaymentErrorHandler)
                 .interceptors(loggingInterceptor)
-                .rootUri(baseUrl).build();
-        restTemplate.setRequestFactory(getClientHttpRequestFactory());
-        return new TossPaymentRestTemplate(restTemplate);
+                .requestFactory(this::getClientHttpRequestFactory)
+                .build();
     }
 
     ClientHttpRequestFactory getClientHttpRequestFactory() {
