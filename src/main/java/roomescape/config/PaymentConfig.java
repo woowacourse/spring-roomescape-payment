@@ -3,7 +3,6 @@ package roomescape.config;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.boot.web.client.RestClientCustomizer;
@@ -21,8 +20,11 @@ import roomescape.service.PaymentService;
 
 @Configuration
 public class PaymentConfig {
-    @Value("${payment.toss.secret-key}")
-    private String widgetSecretKey;
+    private final PaymentProperties paymentProperties;
+
+    public PaymentConfig(PaymentProperties paymentProperties) {
+        this.paymentProperties = paymentProperties;
+    }
 
     @Bean
     public PaymentService paymentService(RestClient.Builder restClientBuilder) {
@@ -38,18 +40,20 @@ public class PaymentConfig {
                 .requestFactory(clientHttpRequestFactory())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, authorization())
                 .defaultStatusHandler(responseErrorHandler())
-                .baseUrl("https://api.tosspayments.com");
+                .baseUrl(paymentProperties.getBaseUrl());
     }
 
     private String authorization() {
-        byte[] encodedBytes = Base64.getEncoder().encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = Base64.getEncoder().encode(
+                (paymentProperties.getSecretKey() + ":").getBytes(StandardCharsets.UTF_8)
+        );
         return "Basic " + new String(encodedBytes);
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(3))
-                .withReadTimeout(Duration.ofSeconds(30));
+                .withConnectTimeout(Duration.ofSeconds(paymentProperties.getConnectionTime()))
+                .withReadTimeout(Duration.ofSeconds(paymentProperties.getReadTime()));
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 
