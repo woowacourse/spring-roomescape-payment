@@ -35,13 +35,14 @@ public enum ExceptionType {
     NOT_FOUND_MEMBER(BAD_REQUEST, "없는 회원입니다."),
     INVALID_ORDER_ID(BAD_REQUEST, "주문번호가 올바르지 않습니다."),
     NOT_FOUND_RESERVATION_STATUS(BAD_REQUEST, "없는 예약 상태입니다."),
+    PENDING_RESERVATION(BAD_REQUEST, "대기중인 예약은 결제가 불가능 합니다."),
+    ALREADY_PAID_RESERVATION(BAD_REQUEST, "이미 결제가 되었습니다."),
     LOGIN_FAIL(UNAUTHORIZED, "이메일이나 비밀번호가 잘못되었습니다."),
     INVALID_TOKEN(UNAUTHORIZED, "잘못된 토큰입니다. 다시 로그인하세요"),
     NO_AUTHORITY(FORBIDDEN, "권한이 없습니다."),
     ENCRYPT_FAIL(INTERNAL_SERVER_ERROR, "비밀번호 암호화에 실패하였습니다."),
     EMPTY_RESPONSE_FROM_TOSS_API(INTERNAL_SERVER_ERROR, "토스 API로부터 응답이 없습니다."),
-    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다."),
-    ;
+    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, "서버 내부에 문제가 발생했습니다.");
 
     private final HttpStatus status;
     private final String message;

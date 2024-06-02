@@ -137,4 +137,12 @@ public class Reservation {
     public Payment getPayment() {
         return payment;
     }
+
+    public boolean isPending() {
+        return status == ReservationStatus.PENDING;
+    }
+
+    public boolean isPaid() {
+        return status == ReservationStatus.RESERVED_COMPLETE;
+    }
 }
