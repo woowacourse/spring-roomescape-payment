@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class PaymentService {
 
         return tossRestClient.post()
                 .uri("/confirm")
-                .header("Authorization", authorization)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })
                 .retrieve()
