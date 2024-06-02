@@ -212,7 +212,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         if (response.status !== 201) {
             return response.text().then(errorBody => {
                 console.error("예약 결제 실패 : " + errorBody);
-                window.alert("예약 결제에 실패했습니다." + errorBody);
+                window.alert("예약 결제에 실패했습니다. 오류 내용 : " + errorBody);
             });
         } else {
             response.json().then(successBody => {

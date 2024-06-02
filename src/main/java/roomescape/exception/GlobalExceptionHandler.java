@@ -45,6 +45,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleRunTimeException(Exception exception) {
+        exception.printStackTrace();
         return ResponseEntity.internalServerError().body("예상치 못한 오류가 발생했습니다.");
     }
 }
