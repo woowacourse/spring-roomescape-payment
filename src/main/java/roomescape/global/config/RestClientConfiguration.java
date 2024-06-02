@@ -1,6 +1,7 @@
 package roomescape.global.config;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,9 @@ public class RestClientConfiguration {
     private static final int CONNECTION_TIMEOUT_DURATION = 5;
     private static final int READ_TIMEOUT_DURATION = 45;
 
+    @Value("${payment.api.base}")
+    private String apiBaseUrl;
+
     @Bean
     public TossPaymentClient tossPaymentClient() {
         ClientHttpRequestFactory factory = getClientHttpRequestFactory();
@@ -23,7 +27,7 @@ public class RestClientConfiguration {
         return new TossPaymentClient(
                 RestClient.builder()
                         .requestFactory(factory)
-                        .baseUrl("https://api.tosspayments.com")
+                        .baseUrl(apiBaseUrl)
                         .build()
         );
     }
