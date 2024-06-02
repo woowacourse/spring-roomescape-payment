@@ -11,12 +11,11 @@ import java.util.Objects;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import roomescape.domain.member.Member;
-import roomescape.domain.reservation.slot.ReservationSlot;
 
 @Entity
 @SQLRestriction("is_deleted = false")
-@SQLDelete(sql = "UPDATE waiting SET is_deleted = true where id = ?")
-public class Waiting {
+@SQLDelete(sql = "UPDATE waiting_member SET is_deleted = true where id = ?")
+public class WaitingMember {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,17 +30,17 @@ public class Waiting {
 
     private boolean isDeleted = false;
 
-    public Waiting(Member member, Reservation reservation) {
+    public WaitingMember(Member member, Reservation reservation) {
         this(null, member, reservation);
     }
 
-    public Waiting(Long id, Member member, Reservation reservation) {
+    public WaitingMember(Long id, Member member, Reservation reservation) {
         this.id = id;
         this.member = member;
         this.reservation = reservation;
     }
 
-    protected Waiting() {
+    protected WaitingMember() {
     }
 
     public boolean isMember(Member member) {
@@ -64,19 +63,15 @@ public class Waiting {
         return reservation;
     }
 
-    public ReservationSlot getSlot() {
-        return reservation.getSlot();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Waiting waiting)) {
+        if (!(o instanceof WaitingMember waitingMember)) {
             return false;
         }
-        return Objects.equals(id, waiting.id);
+        return Objects.equals(id, waitingMember.id);
     }
 
     @Override

@@ -22,7 +22,7 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
         RestAssured.given().log().all()
                 .cookies("token", ADMIN_TOKEN)
                 .queryParams(params)
-                .when().get("/admin/reservations")
+                .when().get("/admin/reservations/booked")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(2));

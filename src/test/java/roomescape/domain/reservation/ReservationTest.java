@@ -10,9 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.domain.reservation.slot.ReservationSlot;
-import roomescape.domain.reservation.slot.ReservationTime;
-import roomescape.domain.reservation.slot.Theme;
 import roomescape.exception.RoomEscapeBusinessException;
 
 class ReservationTest {
@@ -25,9 +22,9 @@ class ReservationTest {
         LocalDate date = LocalDate.parse("2024-06-01");
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
-        ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
 
         // when // then
         assertThatThrownBy(() -> reservation.addWaiting(member))
@@ -45,9 +42,9 @@ class ReservationTest {
         LocalDate date = LocalDate.parse("2024-06-01");
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
-        ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
         reservation.addWaiting(member1);
 
         // when // then
@@ -67,24 +64,23 @@ class ReservationTest {
         LocalDate date = LocalDate.parse("2024-06-01");
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
-        ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
-
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
 
         // when
-        Waiting waiting1 = reservation.addWaiting(member1);
-        Waiting waiting2 = reservation.addWaiting(member2);
+        WaitingMember waitingMember1 = reservation.addWaiting(member1);
+        WaitingMember waitingMember2 = reservation.addWaiting(member2);
 
         // then
         assertAll(
-                () -> assertThat(waiting1.getMember()).isEqualTo(member1),
-                () -> assertThat(waiting1.getReservation()).isEqualTo(reservation),
-                () -> assertThat(waiting2.getMember()).isEqualTo(member2),
-                () -> assertThat(waiting2.getReservation()).isEqualTo(reservation)
+                () -> assertThat(waitingMember1.getMember()).isEqualTo(member1),
+                () -> assertThat(waitingMember1.getReservation()).isEqualTo(reservation),
+                () -> assertThat(waitingMember2.getMember()).isEqualTo(member2),
+                () -> assertThat(waitingMember2.getReservation()).isEqualTo(reservation)
         );
     }
 
-    @DisplayName("예약 대기자가 없으면 예약 대기를 승인할 수 없다.")
+    @DisplayName("예약을 취소한다.")
     @Test
     void approveEmptyWaiting() {
         // given
@@ -92,19 +88,19 @@ class ReservationTest {
         LocalDate date = LocalDate.parse("2024-06-01");
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
-        ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        // when
+        reservation.cancelBooked();
 
-        // when // then
-        assertThatThrownBy(reservation::approveWaiting)
-                .isInstanceOf(RoomEscapeBusinessException.class)
-                .hasMessage("예약 대기자가 없습니다.");
+        // then
+        assertThat(reservation.isBooked()).isFalse();
     }
 
-    @DisplayName("예약 대기를 승인하면 첫 번째 예약 대기자가 예약된다.")
+    @DisplayName("예약을 취소하면 첫 번째 예약 대기자가 예약된다.")
     @Test
-    void approveWaiting() {
+    void cancelBooked() {
         // given
         Member member = new Member(1L, "비밥", "uu@naver.com", "1234", Role.USER);
         Member member1 = new Member(2L, "비밥1", "uu1@naver.com", "1234", Role.USER);
@@ -113,19 +109,19 @@ class ReservationTest {
         LocalDate date = LocalDate.parse("2024-06-01");
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
-        ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
         reservation.addWaiting(member1);
         reservation.addWaiting(member2);
 
         // when
-        reservation.approveWaiting();
+        reservation.cancelBooked();
 
         // then
         assertAll(
-                () -> assertThat(reservation.getMember()).isEqualTo(member1),
-                () -> assertThat(reservation).extracting("waitings").asList()
+                () -> assertThat(reservation).extracting("bookedMember.member").isEqualTo(member1),
+                () -> assertThat(reservation).extracting("waitingMembers").asList()
                         .hasSize(1).extracting("member")
                         .containsExactly(member2)
         );

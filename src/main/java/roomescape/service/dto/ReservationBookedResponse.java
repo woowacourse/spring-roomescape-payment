@@ -4,30 +4,32 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import roomescape.domain.reservation.dto.ReservationReadOnly;
+import java.time.LocalTime;
+import roomescape.domain.reservation.dto.BookedReservationReadOnly;
 
 public record ReservationBookedResponse(
         Long id,
-        MemberResponse member,
+        String name,
         @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
         LocalDate date,
-        ReservationTimeResponse time,
-        ThemeResponse theme,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+        LocalTime time,
+        String theme,
         String status
 ) {
 
-    public static ReservationBookedResponse from(ReservationReadOnly reservation) {
+    public static ReservationBookedResponse from(BookedReservationReadOnly reservation) {
         return new ReservationBookedResponse(
                 reservation.id(),
-                MemberResponse.from(reservation.member()),
+                reservation.name(),
                 reservation.date(),
-                new ReservationTimeResponse(reservation.time()),
-                new ThemeResponse(reservation.theme()),
+                reservation.time(),
+                reservation.theme(),
                 "예약 확정"
         );
     }
 
     public LocalDateTime dateTime() {
-        return LocalDateTime.of(date, time.startAt());
+        return LocalDateTime.of(date, time);
     }
 }

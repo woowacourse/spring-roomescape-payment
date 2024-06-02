@@ -35,12 +35,12 @@ public record ReservationPaymentRequest(
         this(memberId, date, timeId, themeId, null, null, null);
     }
 
-    public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(amount, orderId, paymentKey);
-    }
-
     public ReservationRequest toReservationRequest() {
         return new ReservationRequest(memberId, date, timeId, themeId);
+    }
+
+    public PaymentApproveRequest toPaymentApproveRequest(Long reservationid) {
+        return new PaymentApproveRequest(reservationid, memberId, paymentKey, orderId, amount);
     }
 }
 

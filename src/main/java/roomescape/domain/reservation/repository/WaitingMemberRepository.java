@@ -1,33 +1,37 @@
-package roomescape.domain.reservation;
+package roomescape.domain.reservation.repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.WaitingMember;
+import roomescape.domain.reservation.dto.WaitingRank;
 import roomescape.domain.reservation.dto.WaitingReadOnly;
 
-public interface WaitingRepository extends JpaRepository<Waiting, Long> {
+public interface WaitingMemberRepository extends JpaRepository<WaitingMember, Long> {
 
     @Query("""
             select new roomescape.domain.reservation.dto.WaitingReadOnly(
             w.id,
-            w.member,
-            w.reservation.slot
+            w.member.name,
+            w.reservation.date,
+            w.reservation.time.startAt,
+            w.reservation.theme.name
             )
-            from Waiting w""")
+            from WaitingMember w""")
     List<WaitingReadOnly> findAllReadOnly();
 
     @Query("""
-        select new roomescape.domain.reservation.WaitingRank(w, count(1))
-        from Waiting w
-        inner join Waiting w2
+        select new roomescape.domain.reservation.dto.WaitingRank(w, count(1))
+        from WaitingMember w
+        inner join WaitingMember w2
         on w.member = :member
-        and w.reservation.slot.date >= :date
+        and w.reservation.date >= :date
         and w.reservation = w2.reservation
         join fetch w.reservation
-        join fetch w.reservation.slot.time
-        join fetch w.reservation.slot.theme
+        join fetch w.reservation.time
+        join fetch w.reservation.theme
         where w2.id <= w.id
         group by w.reservation
     """)

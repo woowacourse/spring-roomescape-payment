@@ -11,14 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.reservation.WaitingRank;
-import roomescape.domain.reservation.WaitingRepository;
+import roomescape.domain.reservation.dto.WaitingRank;
+import roomescape.domain.reservation.repository.WaitingMemberRepository;
 
 @Transactional
-class WaitingRepositoryTest extends IntegrationTestSupport {
+class WaitingMemberRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
-    private WaitingRepository waitingRepository;
+    private WaitingMemberRepository waitingMemberRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -29,7 +29,7 @@ class WaitingRepositoryTest extends IntegrationTestSupport {
         // given
         Member member = memberRepository.findById(1L).get();
         // when
-        List<WaitingRank> waitingReservations = waitingRepository.findRankByMemberAndDateGreaterThanEqual(member,
+        List<WaitingRank> waitingReservations = waitingMemberRepository.findRankByMemberAndDateGreaterThanEqual(member,
                 LocalDate.parse("2024-05-30"));
 
         // then

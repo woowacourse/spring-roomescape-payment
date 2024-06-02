@@ -6,7 +6,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
-import roomescape.service.dto.WaitingSaveRequest;
+import roomescape.service.dto.ReservationRequest;
 
 public record UserWaitingSaveRequest(
         @NotNull
@@ -22,7 +22,7 @@ public record UserWaitingSaveRequest(
         @Positive
         Long themeId
 ) {
-    public WaitingSaveRequest toWaitingSaveRequest(Long memberId) {
-        return new WaitingSaveRequest(memberId, date, timeId, themeId);
+    public ReservationRequest toReservationRequest(Long memberId) {
+        return new ReservationRequest(memberId, date, timeId, themeId);
     }
 }

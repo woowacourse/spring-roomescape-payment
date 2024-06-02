@@ -3,7 +3,7 @@ package roomescape.domain.reservation.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record WaitingReadOnly(
+public record BookedReservationReadOnly(
         Long id,
         String name,
         LocalDate date,

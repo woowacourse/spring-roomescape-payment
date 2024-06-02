@@ -30,31 +30,31 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping
+    @PostMapping("/booked")
     public ResponseEntity<ReservationResponse> saveReservation(
             @RequestBody @Valid ReservationRequest reservationRequest
     ) {
         ReservationResponse reservationResponse = reservationService.saveReservation(reservationRequest);
         if (reservationResponse.status() == ReservationStatus.BOOKED) {
-            return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
+            return ResponseEntity.created(URI.create("/reservations/booked/" + reservationResponse.id()))
                     .body(reservationResponse);
         }
         return ResponseEntity.created(URI.create("/reservations/waiting/" + reservationResponse.id()))
                 .body(reservationResponse);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReservationBookedResponse>> getReservations(
+    @GetMapping("/booked")
+    public ResponseEntity<List<ReservationBookedResponse>> findBookedReservations(
             @ModelAttribute @Valid ReservationConditionRequest reservationConditionRequest) {
-        List<ReservationBookedResponse> reservationResponses = reservationService.findReservationsByCondition(reservationConditionRequest);
+        List<ReservationBookedResponse> reservationResponses = reservationService.findBookedReservationsByCondition(reservationConditionRequest);
 
         return ResponseEntity.ok()
                 .body(reservationResponses);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
-        reservationService.cancelReservation(id);
+    @DeleteMapping("/booked/{id}")
+    public ResponseEntity<Void> deleteBooked(@PathVariable("id") Long id) {
+        reservationService.cancelBooked(id);
         return ResponseEntity.noContent().build();
     }
 

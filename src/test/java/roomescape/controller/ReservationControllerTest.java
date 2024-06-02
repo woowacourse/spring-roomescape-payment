@@ -35,7 +35,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     adminReservationSize = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().get("/admin/reservations")
+                            .when().get("/admin/reservations/booked")
                             .then().log().all()
                             .statusCode(200).extract()
                             .response().jsonPath().getList("$").size();
@@ -54,9 +54,9 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/admin/reservations")
+                            .when().post("/admin/reservations/booked")
                             .then().log().all()
-                            .statusCode(201).extract().header("location").split("/")[2];
+                            .statusCode(201).extract().header("location").split("/")[3];
                 }),
                 dynamicTest("존재하지 않는 시간으로 예약을 추가할 수 없다.", () -> {
                     Map<String, Object> params = Map.of(
@@ -72,7 +72,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/admin/reservations")
+                            .when().post("/admin/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -90,7 +90,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/admin/reservations")
+                            .when().post("/admin/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -108,7 +108,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/admin/reservations")
+                            .when().post("/admin/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -116,7 +116,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().get("/admin/reservations")
+                            .when().get("/admin/reservations/booked")
                             .then().log().all()
                             .statusCode(200).body("size()", is(adminReservationSize + 1));
                 }),
@@ -124,7 +124,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/reservations/" + adminReservationId)
+                            .when().delete("/admin/reservations/booked/" + adminReservationId)
                             .then().log().all()
                             .statusCode(204);
                 }),
@@ -132,7 +132,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/reservations/" + adminReservationId)
+                            .when().delete("/admin/reservations/booked/" + adminReservationId)
                             .then().log().all()
                             .statusCode(400);
                 })
@@ -165,9 +165,9 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
-                            .statusCode(201).extract().header("location").split("/")[2];
+                            .statusCode(201).extract().header("location").split("/")[3];
                 }),
                 dynamicTest("내 예약 목록을 조회하면 사이즈가 1증가한다.", () -> {
                     UserReservationResponse userReservationResponse = RestAssured.given().log().all()
@@ -199,7 +199,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -217,7 +217,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -225,7 +225,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/reservations/" + userReservationId)
+                            .when().delete("/admin/reservations/booked/" + userReservationId)
                             .then().log().all()
                             .statusCode(204);
                 })
@@ -258,9 +258,9 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
-                            .statusCode(201).extract().header("location").split("/")[2];
+                            .statusCode(201).extract().header("location").split("/")[3];
                 }),
                 dynamicTest("예약이 없으면 예약 상태로 간다.", () -> {
                     UserReservationResponse userReservationResponse = RestAssured.given().log().all()
@@ -289,7 +289,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", USER_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
                             .statusCode(400);
                 }),
@@ -303,7 +303,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
                             .body(params)
-                            .when().post("/reservations")
+                            .when().post("/reservations/booked")
                             .then().log().all()
                             .statusCode(201).extract().header("location").split("/")[3];
                 }),
@@ -337,7 +337,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/reservations/" + userReservationId)
+                            .when().delete("/admin/reservations/booked/" + userReservationId)
                             .then().log().all()
                             .statusCode(204);
                 })
