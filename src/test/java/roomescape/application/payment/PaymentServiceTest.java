@@ -58,7 +58,7 @@ class PaymentServiceTest {
                 theme,
                 LocalDate.now(),
                 reservationTimeRepository.save(TEN_AM.create()),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(1),
                 BookStatus.BOOKED
         );
         PaymentRequest request = new PaymentRequest("orderId", theme.getPrice(), "paymentKey");
