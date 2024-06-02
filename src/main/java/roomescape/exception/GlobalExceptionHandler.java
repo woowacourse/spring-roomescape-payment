@@ -5,18 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.dto.response.reservation.TossExceptionResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends AbstractExceptionHandler {
-    @ExceptionHandler
+    @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<String> roomescapeExceptionHandler(RoomescapeException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
                 .body(exception.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<String> dateTimeParseExceptionHandler(DateTimeParseException exception) {
         logError(exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -24,12 +23,10 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<TossExceptionResponse> exceptionHandler(PaymentException exception) {
+    public ResponseEntity<PaymentExceptionResponse> exceptionHandler(PaymentException exception) {
         logError(exception);
-        System.out.println(
-                "exception.getTossExceptionResponse().toString() = " + exception.getTossExceptionResponse().toString());
         return ResponseEntity.status(exception.getHttpStatus())
-                .body(exception.getTossExceptionResponse());
+                .body(exception.getPaymentExceptionResponse());
     }
 
     @ExceptionHandler(RuntimeException.class)

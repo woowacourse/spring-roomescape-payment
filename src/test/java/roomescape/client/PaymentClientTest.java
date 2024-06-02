@@ -3,16 +3,17 @@ package roomescape.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.ExpectedCount.manyTimes;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +24,6 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 @RestClientTest(PaymentConfig.class)
-@Import(TossPaymentClientFactory.class)
 class PaymentClientTest {
     @Autowired
     private PaymentClient paymentClient;
@@ -41,11 +41,9 @@ class PaymentClientTest {
                     "totalAmount" : 10000
                 }
                 """;
-        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        mockServer.expect(manyTimes(), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(expectedResponse));
+                .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
         PaymentResponse result = paymentClient.requestPayment(request);
         assertAll(
