@@ -89,8 +89,8 @@ public class ReservationController {
     }
 
     @GetMapping("/waiting")
-    public ResponseEntity<List<ReservationResponse>> getWaiting() {
-        return ResponseEntity.ok().body(reservationApplicationService.getWaiting());
+    public ResponseEntity<List<ReservationResponse>> findAllWaiting() {
+        return ResponseEntity.ok().body(reservationApplicationService.findAllWaiting());
     }
 
     @PostMapping("/waiting")
@@ -119,6 +119,6 @@ public class ReservationController {
             @RequestParam("date") @Future LocalDate date,
             @RequestParam("themeId") @Min(1) long themeId,
             @RequestParam("timeId") @Min(1) long timeId) {
-        return ResponseEntity.ok().body(reservationApplicationService.getPrice(date, themeId, timeId));
+        return ResponseEntity.ok().body(reservationApplicationService.findPrice(date, themeId, timeId));
     }
 }

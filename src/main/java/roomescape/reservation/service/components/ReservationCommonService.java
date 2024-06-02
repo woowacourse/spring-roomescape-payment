@@ -1,4 +1,4 @@
-package roomescape.reservation.service.services;
+package roomescape.reservation.service.components;
 
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;

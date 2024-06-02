@@ -14,12 +14,12 @@ import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
+import roomescape.reservation.service.components.MemberReservationService;
+import roomescape.reservation.service.components.ReservationCommonService;
+import roomescape.reservation.service.components.WaitingReservationService;
 import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.reservation.service.dto.MyReservationInfo;
 import roomescape.reservation.service.dto.WaitingCreate;
-import roomescape.reservation.service.services.MemberReservationService;
-import roomescape.reservation.service.services.ReservationCommonService;
-import roomescape.reservation.service.services.WaitingReservationService;
 
 @Service
 @Transactional(readOnly = true)
@@ -101,8 +101,8 @@ public class ReservationApplicationService {
         memberReservationService.delete(reservationId);
     }
 
-    public List<ReservationResponse> getWaiting() {
-        return waitingReservationService.getWaiting();
+    public List<ReservationResponse> findAllWaiting() {
+        return waitingReservationService.findAllWaiting();
     }
 
     @Transactional
@@ -133,7 +133,7 @@ public class ReservationApplicationService {
         waitingReservationService.denyWaiting(member, memberReservation);
     }
 
-    public BigDecimal getPrice(LocalDate date, long themeId, long timeId) {
+    public BigDecimal findPrice(LocalDate date, long themeId, long timeId) {
         return reservationCommonService.getReservation(date, timeId, themeId).getPrice();
     }
 }
