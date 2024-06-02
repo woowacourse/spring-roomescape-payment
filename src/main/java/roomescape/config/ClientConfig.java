@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,6 @@ public class ClientConfig {
     @Bean
     public PaymentClient paymentClient(@Value("${payment.widget-secret-key}") String widgetSecretKey) {
         RestClient restClient = RestClient.builder().build();
-        return new PaymentClient(widgetSecretKey, restClient);
+        return new PaymentClient(widgetSecretKey, restClient, new ObjectMapper());
     }
 }

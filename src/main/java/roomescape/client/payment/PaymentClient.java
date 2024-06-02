@@ -1,5 +1,7 @@
 package roomescape.client.payment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
 import org.slf4j.Logger;
@@ -10,9 +12,11 @@ import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleC
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
-import roomescape.exception.PaymentException;
+import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.RoomEscapeException;
-import roomescape.exception.model.ServerExceptionCode;
+import roomescape.exception.model.InternalExceptionCode;
+import roomescape.exception.model.PaymentConfirmExceptionCode;
+import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.util.LoggerUtil;
 
 public class PaymentClient {
@@ -21,10 +25,12 @@ public class PaymentClient {
 
     private final String widgetSecretKey;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public PaymentClient(String widgetSecretKey, RestClient restClient) {
+    public PaymentClient(String widgetSecretKey, RestClient restClient, ObjectMapper objectMapper) {
         this.widgetSecretKey = widgetSecretKey;
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public void sendPaymentConfirmToToss(PaymentConfirmToTossDto paymentConfirmToTossDto) {
@@ -53,8 +59,8 @@ public class PaymentClient {
             throws IOException, RoomEscapeException {
         if (response.getStatusCode().is4xxClientError()) {
             try {
-                PaymentConfirmFromTossDto paymentConfirmFromTossDto = response.bodyTo(PaymentConfirmFromTossDto.class);
-                throw new PaymentException(response.getStatusCode(), paymentConfirmFromTossDto.message());
+                PaymentConfirmExceptionCode paymentConfirmExceptionCode =  convertApiExceptionToCustomException(response);
+                throw new PaymentConfirmException(paymentConfirmExceptionCode);
             } catch (HttpMessageNotReadableException e) {
                 log.error("토스 결제 불러오기 에러 message: {}, body: {}, cause: {}", e.getMessage(), e.getCause(), e.getCause());
             } catch (IOException e) {
@@ -62,10 +68,19 @@ public class PaymentClient {
             }
         }
         if (response.getStatusCode().is5xxServerError()) {
-            throw new RoomEscapeException(ServerExceptionCode.RESERVATION_FAIL);
+            throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_FAIL);
         }
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RoomEscapeException(ServerExceptionCode.RESERVATION_URI_MOVE);
+            throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_URI_MOVE);
+        }
+    }
+
+    private PaymentConfirmExceptionCode convertApiExceptionToCustomException(ConvertibleClientHttpResponse response) throws IOException{
+        try {
+            return objectMapper.readValue(response.getBody(), PaymentConfirmExceptionCode.class);
+        } catch (JsonProcessingException e) {
+            throw new PaymentConfirmException(InternalExceptionCode.INVALID_JSON_DATA);
         }
     }
 }
+
