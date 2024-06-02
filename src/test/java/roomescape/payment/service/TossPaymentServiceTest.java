@@ -8,23 +8,41 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withUnauthorizedRequest;
 
 import java.math.BigDecimal;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient.Builder;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 
-@RestClientTest(value = TossPaymentService.class)
-@Import(PaymentRestClientConfiguration.class)
 class TossPaymentServiceTest {
-    @Autowired
     private MockRestServiceServer mockRestServiceServer;
-    @Autowired
     private TossPaymentService tossPaymentService;
+
+    @BeforeEach
+    void setUp() {
+        PaymentProperty toss = new PaymentProperty();
+        toss.setName("toss");
+        toss.setUrl("https://api.tosspayments.com/v1/payments");
+        toss.setSecretKey("testSecretKey");
+        toss.setConnectionTimeout(1);
+        toss.setReadTimeout(1);
+
+        PaymentProperties properties = new PaymentProperties(List.of(toss));
+        RestClientBuilders builders = new RestClientBuilders(properties);
+        Builder builder = builders.getBuilder("toss");
+        mockRestServiceServer = MockRestServiceServer.bindTo(builder).build();
+        tossPaymentService = new TossPaymentService(builder.build());
+    }
+
+    @AfterEach
+    void reset() {
+        mockRestServiceServer.reset();
+    }
 
     @DisplayName("결제 확인 되었을 경우 정상 처리한다.")
     @Test
