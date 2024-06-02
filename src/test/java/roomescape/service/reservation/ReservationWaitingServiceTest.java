@@ -14,6 +14,8 @@ import roomescape.Fixture;
 import roomescape.auth.TokenProvider;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -43,11 +45,14 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
     private TokenProvider tokenProvider;
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
     private String token;
+    private Payment payment;
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -57,6 +62,7 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
         theme = themeRepository.save(Fixture.theme);
         member = memberRepository.save(Fixture.member);
         token = tokenProvider.create(member);
+        payment = paymentRepository.save(Fixture.payment);
     }
 
     @DisplayName("새로운 예약 대기를 저장한다.")
@@ -112,7 +118,7 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
     void deleteById() {
         // given
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.tomorrow), reservationTime);
-        ReservationWaiting waiting = new ReservationWaiting(member, theme, schedule);
+        ReservationWaiting waiting = new ReservationWaiting(member, theme, schedule, payment);
         ReservationWaiting target = reservationWaitingRepository.save(waiting);
 
         // when

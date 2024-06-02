@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.service.theme.dto.ThemeRequest;
@@ -31,5 +32,5 @@ public class Fixture {
     public static final String TEST_ORDER_ID = "TEST_ORDER_ID";
     public static final long TEST_ORDER_AMOUNT = 2_000_000L;
     public static final String TEST_PAYMENT_TYPE = "TEST_PAYMENT_TYPE";
-
+    public static final Payment payment = new Payment(TEST_ORDER_ID, TEST_PAYMENT_KEY, TEST_ORDER_AMOUNT);
 }

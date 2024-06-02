@@ -11,6 +11,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.payment.Payment;
@@ -38,6 +40,7 @@ public class ReservationWaiting {
     private Schedule schedule;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Payment payment;
 
     @CreatedDate
