@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     protected ResponseEntity<ErrorResponse> handlePaymentConfirmFailException(final PaymentConfirmFailException e) {
         log.error(e.getMessage(), e);
-        return ResponseEntity.status(BAD_REQUEST)
+        return ResponseEntity.status(e.getStatus())
                 .body(new ErrorResponse(e.getMessage()));
     }
 
