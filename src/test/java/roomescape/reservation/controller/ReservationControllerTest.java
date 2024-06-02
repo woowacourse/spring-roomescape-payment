@@ -5,13 +5,10 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static roomescape.fixture.DateFixture.getNextDay;
 
-import jakarta.servlet.http.Cookie;
+import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
@@ -37,7 +35,7 @@ class ReservationControllerTest extends ControllerTest {
 
     @DisplayName("사용자 예약 생성 시 201을 반환한다.")
     @Test
-    void create() throws Exception {
+    void create() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -63,17 +61,19 @@ class ReservationControllerTest extends ControllerTest {
                 .createMemberReservation(any(MemberReservationCreate.class));
 
         //then
-        mockMvc.perform(
-                post("/reservations")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isCreated());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .apply(document("reservations/create/success"))
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     @DisplayName("예약 삭제 시 204를 반환한다.")
     @Test
-    void deleteTest() throws Exception {
+    void deleteTest() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -91,16 +91,18 @@ class ReservationControllerTest extends ControllerTest {
                 .deleteMemberReservation(isA(AuthInfo.class), isA(Long.class));
 
         //then
-        mockMvc.perform(
-                delete("/reservations/" + reservationResponse.memberReservationId())
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().delete("/reservations/" + reservationResponse.memberReservationId())
+                .then().log().all()
+                .apply(document("reservations/delete/success"))
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("타인의 예약 삭제 시, 403을 반환한다.")
     @Test
-    void delete_InvalidUser() throws Exception {
+    void delete_InvalidUser() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -118,16 +120,18 @@ class ReservationControllerTest extends ControllerTest {
                 .deleteMemberReservation(isA(AuthInfo.class), isA(Long.class));
 
         //then
-        mockMvc.perform(
-                delete("/reservations/" + reservationResponse.memberReservationId())
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isForbidden());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().delete("/reservations/" + reservationResponse.memberReservationId())
+                .then().log().all()
+                .apply(document("reservations/delete/fail/invalid-auth"))
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @DisplayName("예약 조회 시 200을 반환한다.")
     @Test
-    void find() throws Exception {
+    void find() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -145,16 +149,18 @@ class ReservationControllerTest extends ControllerTest {
                 .findMemberReservations(any());
 
         //then
-        mockMvc.perform(
-                get("/reservations")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().get("/reservations")
+                .then().log().all()
+                .apply(document("reservations/find/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("지나간 날짜와 시간에 대한 예약 생성 시, 400을 반환한다.")
     @Test
-    void createReservationAfterNow() throws Exception {
+    void createReservationAfterNow() {
         //given
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
@@ -170,17 +176,19 @@ class ReservationControllerTest extends ControllerTest {
                 .createMemberReservation(any(MemberReservationCreate.class));
 
         //then
-        mockMvc.perform(
-                post("/reservations")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isBadRequest());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .apply(document("reservations/create/fail/invalid-date-time"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("예약 대기 시, 201을 반환한다.")
     @Test
-    void createWaiting() throws Exception {
+    void createWaiting() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -203,17 +211,19 @@ class ReservationControllerTest extends ControllerTest {
                 .addWaiting(any());
 
         //then
-        mockMvc.perform(
-                post("/reservations/waiting")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isCreated());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .body(params)
+                .when().post("/reservations/waiting")
+                .then().log().all()
+                .apply(document("waiting/create/success"))
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     @DisplayName("예약 대기 삭제 시, 204을 반환한다.")
     @Test
-    void deleteWaiting() throws Exception {
+    void deleteWaiting() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -231,10 +241,12 @@ class ReservationControllerTest extends ControllerTest {
                 .addWaiting(any());
 
         //then
-        mockMvc.perform(
-                delete(String.format("/reservations/%d/waiting", reservationResponse.memberReservationId()))
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().delete(String.format("/reservations/%d/waiting", reservationResponse.memberReservationId()))
+                .then().log().all()
+                .apply(document("waiting/delete/success"))
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
