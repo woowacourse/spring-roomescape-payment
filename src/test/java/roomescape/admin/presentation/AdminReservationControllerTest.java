@@ -1,17 +1,15 @@
 package roomescape.admin.presentation;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.admin.AdminHandlerInterceptor;
 import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.fixture.ReservationFixture;
 import roomescape.reservation.service.ReservationService;
 
 @WebMvcTest(AdminReservationController.class)
@@ -45,11 +45,15 @@ class AdminReservationControllerTest {
     void should_handle_read_all_reservations_request_when_requested() throws Exception {
         when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
                 any(Object.class))).thenReturn(true);
-        when(reservationService.findAllReservation()).thenReturn(Collections.emptyList());
+
+        List<ReservationResponse> reservationResponses = List.of(
+                new ReservationResponse(ReservationFixture.SAVED_RESERVATION_1));
+
+        when(reservationService.findAllReservation()).thenReturn(reservationResponses);
 
         mockMvc.perform(get("/admin/reservations"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(content().json(objectMapper.writeValueAsString(reservationResponses)));
     }
 }

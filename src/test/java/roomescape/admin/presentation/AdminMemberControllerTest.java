@@ -1,17 +1,15 @@
 package roomescape.admin.presentation;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.admin.AdminHandlerInterceptor;
 import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.member.dto.MemberResponse;
+import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 
 @WebMvcTest(AdminMemberController.class)
@@ -47,12 +47,12 @@ class AdminMemberControllerTest {
         when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
                 any(Object.class))).thenReturn(true);
 
-        when(memberService.findAll()).thenReturn(
-                Collections.emptyList());
+        List<MemberResponse> memberResponses = List.of(new MemberResponse(MemberFixture.MEMBER_ID_1));
+        when(memberService.findAll()).thenReturn(memberResponses);
 
         mockMvc.perform(get("/admin/members"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(content().json(objectMapper.writeValueAsString(memberResponses)));
     }
 }
