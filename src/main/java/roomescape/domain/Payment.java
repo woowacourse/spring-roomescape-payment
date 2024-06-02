@@ -1,5 +1,6 @@
 package roomescape.domain;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +21,8 @@ public class Payment {
 
     private String orderId;
 
-    private Long amount;
+    @Embedded
+    private PaymentAmount amount;
 
     protected Payment() {
     }
@@ -28,12 +30,11 @@ public class Payment {
     public Payment(Long id, String paymentKey, String orderId, Long amount) {
         validatePaymentKey(paymentKey);
         validateOrderId(orderId);
-        validateAmount(amount);
 
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
-        this.amount = amount;
+        this.amount = new PaymentAmount(amount);
     }
 
     private void validatePaymentKey(String paymentKey) {
@@ -51,15 +52,6 @@ public class Payment {
         }
     }
 
-    private void validateAmount(Long amount) {
-        if (amount == null) {
-            throw new RoomescapeException(ExceptionType.EMPTY_AMOUNT);
-        }
-        if (amount < 0) {
-            throw new RoomescapeException(ExceptionType.INVALID_AMOUNT);
-        }
-    }
-
     public Long getId() {
         return id;
     }
@@ -73,6 +65,6 @@ public class Payment {
     }
 
     public Long getAmount() {
-        return amount;
+        return amount.amount();
     }
 }
