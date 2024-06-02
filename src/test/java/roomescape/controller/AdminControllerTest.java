@@ -2,6 +2,7 @@ package roomescape.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.util.Arrays;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.ReservationRequest;
@@ -43,5 +45,18 @@ class AdminControllerTest {
                 () -> Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201)),
                 () -> Assertions.assertThat(response.getBody()).isEqualTo(expected)
         );
+    }
+
+    @Autowired
+    ApplicationContext applicationContext;
+
+    @Test
+    void name() {
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        Arrays.sort(beanNames);
+        for (String beanName : beanNames) {
+            System.out.println(beanName);
+        }
+
     }
 }

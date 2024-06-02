@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -11,17 +12,17 @@ import roomescape.infra.TossPaymentClient;
 public class ClientConfig {
 
     @Bean
-    public PaymentErrorHandler paymentErrorHandler() {
-        return new PaymentErrorHandler();
+    public PaymentErrorHandler paymentErrorHandler(ObjectMapper objectMapper) {
+        return new PaymentErrorHandler(objectMapper);
     }
 
     @Bean
-    public PaymentClient tossPaymentRestClient() {
+    public PaymentClient PaymentRestClient(PaymentErrorHandler paymentErrorHandler) {
         return new TossPaymentClient(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
-                        .build(),
-                paymentErrorHandler()
+                        .defaultStatusHandler(paymentErrorHandler)
+                        .build()
         );
     }
 }
