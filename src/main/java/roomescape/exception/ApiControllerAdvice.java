@@ -34,6 +34,12 @@ public class ApiControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(ParsingFailException.class)
+    public ResponseEntity<String> handleParsingFailException(ParsingFailException exception) {
+        LOGGER.error(exception.getMessage(), exception);
+        return ResponseEntity.internalServerError().body("서버 에러입니다.");
+    }
+
     @ExceptionHandler(PaymentFailException.class)
     public ResponseEntity<PaymentErrorResponse> handlePaymentFailException(PaymentFailException exception) {
         LOGGER.error("토스 결제 에러 code: {}, message: {}", exception.getCode(), exception.getMessage(), exception);

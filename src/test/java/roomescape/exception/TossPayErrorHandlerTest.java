@@ -36,12 +36,23 @@ class TossPayErrorHandlerTest {
 
     @DisplayName("토스 서버로부터 예외가 발생하면 사용자 정의 예외로 변환한다.")
     @Test
-    void handleTossServerError() throws IOException {
+    void handleTossServerError() {
         ClientHttpResponse response = new MockClientHttpResponse(
                 "{\"code\":\"NOT_FOUND_PAYMENT\",\"message\":\"존재하지 않는 결제 입니다.\"}".getBytes(),
                 HttpStatus.NOT_FOUND
         );
 
         assertThatThrownBy(() -> tossPayErrorHandler.handleError(response)).isInstanceOf(PaymentFailException.class);
+    }
+
+    @DisplayName("토스 서버로부터 파싱할 수 없는 응답이 오면 사용자 정의 예외로 변환한다.")
+    @Test
+    void handleTossServerParsingError() {
+        ClientHttpResponse response = new MockClientHttpResponse(
+                "{\"test\":\"TEST_CODE\",\"message\":\"존재하지 않는 결제 입니다.\"}".getBytes(),
+                HttpStatus.NOT_FOUND
+        );
+
+        assertThatThrownBy(() -> tossPayErrorHandler.handleError(response)).isInstanceOf(ParsingFailException.class);
     }
 }
