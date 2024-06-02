@@ -15,14 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.dto.PaymentInfo;
 import roomescape.dto.response.MemberResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ThemeResponse;
 import roomescape.dto.response.TimeSlotResponse;
 import roomescape.infrastructure.CheckAuthenticationInterceptor;
 import roomescape.infrastructure.LoginMemberArgumentResolver;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(ReservationController.class)
@@ -30,8 +28,6 @@ public class MockReservationTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private PaymentService paymentService;
     @MockBean
     private ReservationService reservationService;
     @MockBean
@@ -42,16 +38,13 @@ public class MockReservationTest {
     @DisplayName("reservation 페이지에 새로운 예약 정보를 추가할 수 있다.")
     @Test
     void given_when_saveAndDeleteReservations_then_statusCodeIsOkay() throws Exception {
-        PaymentInfo paymentInfo = new PaymentInfo(1000L, "orderId", "paymentKey");
         MemberResponse memberResponse = new MemberResponse(1L, "atto");
         TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
         ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
         ReservationResponse reservationResponse = new ReservationResponse(1L, memberResponse,
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 
-        given(reservationService.checkAvailableReservation(any(), any())).willReturn(null);
-        given(paymentService.payment(any())).willReturn(paymentInfo);
-        given(reservationService.confirmReservationByClient(any())).willReturn(reservationResponse);
+        given(reservationService.createByClient(any(), any())).willReturn(reservationResponse);
 
         String jsonRequest = """
                  {

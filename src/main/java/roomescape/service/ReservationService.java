@@ -24,16 +24,18 @@ public class ReservationService {
     private final WaitingRepository waitingRepository;
 
     private final MemberService memberService;
+    private final PaymentService paymentService;
     private final ThemeService themeService;
     private final TimeService timeService;
     private final WaitingService waitingService;
 
     public ReservationService(ReservationRepository reservationRepository, WaitingRepository waitingRepository,
-                              MemberService memberService, ThemeService themeService, TimeService timeService,
+                              MemberService memberService, PaymentService paymentService, ThemeService themeService, TimeService timeService,
                               WaitingService waitingService) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.memberService = memberService;
+        this.paymentService = paymentService;
         this.themeService = themeService;
         this.timeService = timeService;
         this.waitingService = waitingService;
@@ -90,19 +92,10 @@ public class ReservationService {
         return ReservationResponse.from(createdReservation);
     }
 
-    public Reservation checkAvailableReservation(Long memberId, MemberReservationRequest reservationRequest) {
-        Member member = memberService.findMemberById(memberId);
-        TimeSlot timeSlot = timeService.findTimeSlotById(reservationRequest.timeId());
-        Theme theme = themeService.findThemeById(reservationRequest.themeId());
-
-        validate(reservationRequest.date(), timeSlot, theme, member);
-
-        return reservationRequest.toEntity(member, timeSlot, theme);
-    }
-
-    public ReservationResponse confirmReservationByClient(Reservation reservation) {
-        Reservation createdReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(createdReservation);
+    public ReservationResponse createByClient(MemberReservationRequest reservationRequest, LoginMember member) {
+        Reservation reservation = checkAvailableReservation(member.id(), reservationRequest);
+        paymentService.payment(reservationRequest);
+        return confirmReservationByClient(reservation);
     }
 
     public void delete(Long id) {
@@ -112,6 +105,21 @@ public class ReservationService {
         reservationRepository.deleteById(id);
 
         updateWaitingToReservation(currentReservation);
+    }
+
+    private Reservation checkAvailableReservation(Long memberId, MemberReservationRequest reservationRequest) {
+        Member member = memberService.findMemberById(memberId);
+        TimeSlot timeSlot = timeService.findTimeSlotById(reservationRequest.timeId());
+        Theme theme = themeService.findThemeById(reservationRequest.themeId());
+
+        validate(reservationRequest.date(), timeSlot, theme, member);
+
+        return reservationRequest.toEntity(member, timeSlot, theme);
+    }
+
+    private ReservationResponse confirmReservationByClient(Reservation reservation) {
+        Reservation createdReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(createdReservation);
     }
 
     private void updateWaitingToReservation(final Reservation reservation) {
