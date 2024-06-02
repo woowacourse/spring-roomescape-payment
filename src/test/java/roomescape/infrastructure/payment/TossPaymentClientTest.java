@@ -38,8 +38,11 @@ class TossPaymentClientTest {
     @DisplayName("결제 승인을 요청하고 올바르게 응답을 반환한다.")
     @Test
     void approve() throws IOException {
-        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
-                BigDecimal.valueOf(1000));
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest(
+                "paymentKey",
+                "orderId",
+                BigDecimal.valueOf(1000)
+        );
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
@@ -55,7 +58,7 @@ class TossPaymentClientTest {
                 () -> assertThat(paymentApproveSuccessAppResponse.orderId()).isEqualTo(
                         paymentApproveAppRequest.orderId()),
                 () -> assertThat(paymentApproveSuccessAppResponse.totalAmount()).isEqualTo(
-                        paymentApproveAppRequest.totalAmount())
+                        paymentApproveAppRequest.amount())
         );
 
         server.verify();
@@ -64,8 +67,11 @@ class TossPaymentClientTest {
     @DisplayName("결제 승인 실패 시 예외가 발생한다.")
     @Test
     void invalidPaymentApproveRequest() throws IOException {
-        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("invalidKey", "orderId",
-                BigDecimal.valueOf(1000));
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest(
+                "invalidKey",
+                "orderId",
+                BigDecimal.valueOf(1000)
+        );
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.PAYMENT_FAILED,
@@ -86,8 +92,11 @@ class TossPaymentClientTest {
     @DisplayName("토스 서버에서 발생한 문제로 예외가 발생한다.")
     @Test
     void tossInternalServerErrorTest() throws IOException {
-        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest("paymentKey", "orderId",
-                BigDecimal.valueOf(1000));
+        PaymentApproveAppRequest paymentApproveAppRequest = new PaymentApproveAppRequest(
+                "paymentKey",
+                "orderId",
+                BigDecimal.valueOf(1000)
+        );
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveAppRequest);
         String responseJson = objectMapper.writeValueAsString(
                 new RoomescapeException(RoomescapeErrorCode.INTERNAL_SERVER_ERROR,
