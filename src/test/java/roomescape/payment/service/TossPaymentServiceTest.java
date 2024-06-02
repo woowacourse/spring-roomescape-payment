@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient.Builder;
+import roomescape.payment.domain.PaymentProperties;
+import roomescape.payment.domain.PaymentProperty;
+import roomescape.payment.domain.RestClientBuilders;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 

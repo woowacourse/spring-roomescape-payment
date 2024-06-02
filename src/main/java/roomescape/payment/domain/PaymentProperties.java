@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.domain;
 
 import java.util.List;
 import java.util.Map;

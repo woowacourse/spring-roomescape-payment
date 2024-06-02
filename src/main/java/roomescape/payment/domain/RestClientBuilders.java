@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.domain;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

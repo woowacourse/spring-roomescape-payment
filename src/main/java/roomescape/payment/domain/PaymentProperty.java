@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.domain;
 
 public class PaymentProperty {
     private String name;
