@@ -7,5 +7,4 @@ public interface PaymentClient {
 
     PaymentResponse confirm(PaymentRequest paymentRequest);
 
-    void cancel(Payment payment, CancelReason request);
 }
