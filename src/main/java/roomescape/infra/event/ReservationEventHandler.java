@@ -44,7 +44,7 @@ public class ReservationEventHandler {
     }
 
     private void cancelReservation(Reservation reservation) {
-        reservation.cancelByAdmin();
+        reservation.cancel();
         reservationRepository.save(reservation);
     }
 

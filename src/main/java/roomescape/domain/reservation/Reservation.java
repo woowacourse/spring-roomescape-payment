@@ -92,10 +92,7 @@ public class Reservation {
         this.status = Status.CANCELED;
     }
 
-    public void cancelByAdmin() {
-        if (this.isCanceled()) {
-            throw new CancelReservationException();
-        }
+    public void cancel() {
         this.status = Status.CANCELED;
     }
 

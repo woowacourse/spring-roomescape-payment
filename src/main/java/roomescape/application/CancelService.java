@@ -28,7 +28,7 @@ public class CancelService {
     @Transactional
     public void cancelReservationByAdmin(Long reservationId) {
         Reservation reservation = reservationRepository.getReservation(reservationId);
-        reservation.cancelByAdmin();
+        reservation.cancel();
         reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);
     }
