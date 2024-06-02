@@ -9,6 +9,11 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(PaymentProperties.class)
 public class PaymentConfig {
     @Bean
+    public TossPaymentClient tossPaymentClient(PaymentProperties paymentProperties) {
+        return new TossPaymentClient(restClient(), paymentProperties);
+    }
+
+    @Bean
     public RestClient restClient() {
         return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
     }
