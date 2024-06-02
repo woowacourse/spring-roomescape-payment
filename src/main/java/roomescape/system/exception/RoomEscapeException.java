@@ -1,19 +1,19 @@
 package roomescape.system.exception;
 
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 public class RoomEscapeException extends RuntimeException {
     private final ErrorType errorType;
     private final String message;
     private final String invalidValue;
-    private final HttpStatus httpStatus;
+    private final HttpStatusCode httpStatus;
 
-    public RoomEscapeException(ErrorType errorType, HttpStatus httpStatus) {
+    public RoomEscapeException(ErrorType errorType, HttpStatusCode httpStatus) {
         this(errorType, null, httpStatus);
     }
 
-    public RoomEscapeException(ErrorType errorType, String invalidValue, HttpStatus httpStatus) {
+    public RoomEscapeException(ErrorType errorType, String invalidValue, HttpStatusCode httpStatus) {
         this.errorType = errorType;
         this.message = errorType.getDescription();
         this.invalidValue = invalidValue;
@@ -24,7 +24,7 @@ public class RoomEscapeException extends RuntimeException {
         return errorType;
     }
 
-    public HttpStatus getHttpStatus() {
+    public HttpStatusCode getHttpStatus() {
         return httpStatus;
     }
 
