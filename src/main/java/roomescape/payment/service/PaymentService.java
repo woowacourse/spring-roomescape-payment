@@ -5,7 +5,6 @@ import roomescape.exception.PaymentFailureException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.infrastructure.TossPaymentRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 

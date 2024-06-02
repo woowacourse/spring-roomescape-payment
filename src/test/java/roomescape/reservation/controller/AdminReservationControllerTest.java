@@ -15,7 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.Fixtures;
 import roomescape.auth.service.TokenCookieService;
-import roomescape.payment.infrastructure.TossPaymentRestClient;
+import roomescape.payment.service.TossPaymentRestClient;
 import roomescape.reservation.domain.entity.ReservationStatus;
 
 import java.time.LocalDate;

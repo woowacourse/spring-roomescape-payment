@@ -18,7 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.Fixtures;
 import roomescape.auth.service.TokenCookieService;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.infrastructure.TossPaymentRestClient;
+import roomescape.payment.service.TossPaymentRestClient;
 import roomescape.reservation.domain.entity.ReservationStatus;
 
 import java.math.BigDecimal;
