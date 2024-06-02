@@ -14,9 +14,9 @@ public interface ThemeJpaRepository extends Repository<Theme, Long> {
 
     @Query(value = """
             select theme.id, theme.name, theme.description, theme.thumbnail
-            from reservation_detail
-            left join theme on theme.id=reservation_detail.theme_id
-            where reservation_detail.date >= ? and reservation_detail.date <= ?
+            from reservation
+            left join theme on theme.id=reservation.theme_id
+            where reservation.date >= ? and reservation.date <= ?
             group by theme.id
             order by count(*) desc
             limit ?;
