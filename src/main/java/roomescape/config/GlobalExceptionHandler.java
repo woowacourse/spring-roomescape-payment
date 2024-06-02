@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import java.net.SocketTimeoutException;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -9,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.exception.ExceptionTemplate;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
@@ -52,5 +54,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = PaymentException.class)
     public ResponseEntity<ExceptionTemplate> handlePaymentException(PaymentException exception) {
         return ResponseEntity.badRequest().body(new ExceptionTemplate(exception.getMessage()));
+    }
+
+    @ExceptionHandler(value = ResourceAccessException.class)
+    public ResponseEntity<ExceptionTemplate> handleResourceAccessException(ResourceAccessException exception) {
+        if (exception.getCause() instanceof SocketTimeoutException) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ExceptionTemplate("외부 서비스 요청 시간이 초과되었습니다."));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionTemplate("외부 서비스 입/출력 오류입니다."));
     }
 }
