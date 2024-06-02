@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.service.TokenProvider;
 import roomescape.fixture.ReservationFixture;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.application.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.Reservation;

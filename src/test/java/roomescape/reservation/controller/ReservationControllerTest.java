@@ -11,7 +11,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.application.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.service.ReservationService;

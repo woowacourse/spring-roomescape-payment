@@ -13,7 +13,7 @@ import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.application.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
