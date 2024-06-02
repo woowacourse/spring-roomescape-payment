@@ -102,6 +102,14 @@ public class Reservation {
         status = ReservationStatus.RESERVED_UNPAID;
     }
 
+    public boolean isPending() {
+        return status == ReservationStatus.PENDING;
+    }
+
+    public boolean isPaid() {
+        return status == ReservationStatus.RESERVED_COMPLETE;
+    }
+
     public LocalTime getTime() {
         return time.getStartAt();
     }
@@ -136,13 +144,5 @@ public class Reservation {
 
     public Payment getPayment() {
         return payment;
-    }
-
-    public boolean isPending() {
-        return status == ReservationStatus.PENDING;
-    }
-
-    public boolean isPaid() {
-        return status == ReservationStatus.RESERVED_COMPLETE;
     }
 }
