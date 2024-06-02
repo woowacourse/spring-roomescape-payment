@@ -1,36 +1,30 @@
 package roomescape.payment.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
-@ConfigurationProperties(prefix = "toss.payment")
+@ConfigurationProperties(prefix = "payment")
 public class PaymentProperties {
-    private int connectionTimeout;
-    private int readTimeout;
-    private String secretKey;
+    private final Map<String, PaymentProperty> properties;
 
-    public int getConnectionTimeout() {
-        return connectionTimeout;
+    public PaymentProperties(List<PaymentProperty> payments) {
+        this.properties = payments.stream()
+                .collect(Collectors.toMap(
+                                PaymentProperty::getName,
+                                Function.identity()
+                        )
+                );
     }
 
-    public int getReadTimeout() {
-        return readTimeout;
+    public PaymentProperty getProperty(String name) {
+        return properties.get(name);
     }
 
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setConnectionTimeout(int connectionTimeout) {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    public void setReadTimeout(int readTimeout) {
-        this.readTimeout = readTimeout;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public Set<String> getNames() {
+        return properties.keySet();
     }
 }

@@ -16,8 +16,10 @@ spring:
 jwt:
   secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
 
-toss:
-  payment:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-    connect-timeout: 3
-    read-timeout: 40
+payment:
+  payments:
+    - name: toss
+      url: https://api.tosspayments.com/v1/payments
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connection-timeout: 3
+      read-timeout: 40
