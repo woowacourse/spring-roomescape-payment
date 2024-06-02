@@ -1,38 +1,4 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  datasource:
-    url: jdbc:h2:mem:database
-  jpa:
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
-  cloud:
-    openfeign:
-      okhttp:
-        enabled: true
-      client:
-        config:
-          paymentClient:
-            read-timeout: 5000
-            connect-timeout: 5000
+  profiles:
+    default: local
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: beans
-
-toss:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-
-security:
-  jwt:
-    secret-key: hogihogihogihogihogihogihogihogihogihogiHOGIhogihogihogihogi
-    expiration-time: 36000000000000

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import roomescape.reservation.dto.request.PaymentRequest;
 
-@FeignClient(name = "paymentClient", url = "https://api.tosspayments.com", configuration = PaymentClientConfig.class)
+@FeignClient(name = "paymentClient", url = "${toss.url}", configuration = PaymentClientConfig.class)
 public interface PaymentClient {
 
     @PostMapping("/v1/payments/confirm")
