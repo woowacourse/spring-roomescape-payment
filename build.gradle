@@ -28,6 +28,8 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-gson:${JJWT_VERSION}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${JJWT_VERSION}"
 
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.2.1'
+
     implementation 'org.mindrot:jbcrypt:0.4'
 
     runtimeOnly 'com.h2database:h2'

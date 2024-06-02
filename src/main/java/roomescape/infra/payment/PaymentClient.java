@@ -19,18 +19,18 @@ import roomescape.exception.PaymentException;
 public class PaymentClient {
 
     private final String encodedSecretKey;
-    private final RestClient restClient;
     private final String confirmPaymentUrl;
+    private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
     public PaymentClient(
-            @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
             @Value("${payment.request-url.v1.confirm-payment}") String confirmPaymentUrl,
+            RestClient restClient,
             ObjectMapper objectMapper
     ) {
         this.encodedSecretKey = encodeSecretKey(secretKey);
-        this.restClient = RestClient.builder().baseUrl(paymentBaseUrl).build();
+        this.restClient = restClient;
         this.confirmPaymentUrl = confirmPaymentUrl;
         this.objectMapper = objectMapper;
     }
