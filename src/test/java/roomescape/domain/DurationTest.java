@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import roomescape.reservation.domain.Duration;
+
 class DurationTest {
 
     @DisplayName("기간이 포함하는 날짜를 확인할 수 있다.")

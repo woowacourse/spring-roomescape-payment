@@ -19,13 +19,13 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 import io.jsonwebtoken.Claims;
 import roomescape.fixture.MemberFixture;
-import roomescape.domain.LoginMember;
-import roomescape.dto.LoginRequest;
-import roomescape.entity.Member;
+import roomescape.member.domain.LoginMember;
+import roomescape.auth.dto.LoginRequest;
+import roomescape.member.entity.Member;
 import roomescape.exception.RoomescapeException;
-import roomescape.repository.MemberRepository;
-import roomescape.service.JwtGenerator;
-import roomescape.service.LoginService;
+import roomescape.member.repository.MemberRepository;
+import roomescape.auth.config.JwtGenerator;
+import roomescape.auth.service.LoginService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class LoginServiceTest {

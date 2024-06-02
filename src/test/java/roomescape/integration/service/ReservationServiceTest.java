@@ -29,24 +29,24 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.domain.LoginMember;
-import roomescape.domain.ReservationStatus;
-import roomescape.domain.Reservations;
-import roomescape.domain.Role;
-import roomescape.domain.Waiting;
-import roomescape.dto.AdminReservationDetailResponse;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
-import roomescape.entity.Member;
-import roomescape.entity.Reservation;
+import roomescape.member.domain.LoginMember;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.Reservations;
+import roomescape.auth.domain.Role;
+import roomescape.reservation.domain.Waiting;
+import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.member.entity.Member;
+import roomescape.reservation.entity.Reservation;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
-import roomescape.service.ReservationService;
+import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.time.repository.ReservationTimeRepository;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.service.ReservationService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)

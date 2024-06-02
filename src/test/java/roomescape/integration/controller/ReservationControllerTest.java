@@ -29,18 +29,18 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.config.PaymentClient;
-import roomescape.domain.Role;
-import roomescape.dto.ReservationResponse;
-import roomescape.entity.Member;
-import roomescape.entity.Reservation;
-import roomescape.entity.Theme;
+import roomescape.payment.config.PaymentClient;
+import roomescape.auth.domain.Role;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.member.entity.Member;
+import roomescape.reservation.entity.Reservation;
+import roomescape.theme.entity.Theme;
 import roomescape.fixture.ThemeFixture;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
-import roomescape.service.JwtGenerator;
+import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.time.repository.ReservationTimeRepository;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.auth.config.JwtGenerator;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)

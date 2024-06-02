@@ -12,7 +12,7 @@ import static roomescape.exception.ExceptionType.EMPTY_THUMBNAIL;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import roomescape.entity.Theme;
+import roomescape.theme.entity.Theme;
 import roomescape.exception.RoomescapeException;
 
 class ThemeTest {

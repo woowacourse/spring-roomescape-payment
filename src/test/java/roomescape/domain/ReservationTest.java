@@ -17,9 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import roomescape.fixture.MemberFixture;
-import roomescape.entity.Reservation;
-import roomescape.entity.ReservationTime;
-import roomescape.entity.Theme;
+import roomescape.reservation.domain.Duration;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.entity.Reservation;
+import roomescape.time.entity.ReservationTime;
+import roomescape.theme.entity.Theme;
 import roomescape.exception.RoomescapeException;
 
 class ReservationTest {

@@ -60,7 +60,7 @@ public enum ExceptionType {
 
     INVALID_DATE_TIME_FORMAT(BAD_REQUEST, "해석할 수 없는 날짜, 시간 포맷입니다.",
             "Invalid date or time format."),
-    INVALID_PARSE_FORMAT(BAD_REQUEST,"적합하지 않은 포맷으로 파싱에 실패하였습니다.",
+    INVALID_PARSE_FORMAT(BAD_REQUEST, "적합하지 않은 포맷으로 파싱에 실패하였습니다.",
             "Invalid json parsing format."),
     NO_QUERY_PARAMETER(BAD_REQUEST, "필수 검색 조건이 누락되었습니다. 요청을 다시 확인해 주세요",
             "Missing required query parameter."),

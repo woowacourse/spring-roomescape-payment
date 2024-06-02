@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import roomescape.dto.PaymentRequest;
+import roomescape.payment.config.PaymentClient;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
 
 @SpringBootTest

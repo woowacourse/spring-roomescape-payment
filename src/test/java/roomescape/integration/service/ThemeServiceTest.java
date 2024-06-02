@@ -24,20 +24,20 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.domain.ReservationStatus;
-import roomescape.domain.Themes;
-import roomescape.dto.ThemeRequest;
-import roomescape.dto.ThemeResponse;
-import roomescape.entity.Reservation;
-import roomescape.entity.ReservationTime;
-import roomescape.entity.Theme;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.theme.domain.Themes;
+import roomescape.theme.dto.ThemeRequest;
+import roomescape.theme.dto.ThemeResponse;
+import roomescape.reservation.entity.Reservation;
+import roomescape.time.entity.ReservationTime;
+import roomescape.theme.entity.Theme;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.ThemeFixture;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
-import roomescape.service.ThemeService;
+import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.time.repository.ReservationTimeRepository;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.theme.service.ThemeService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)

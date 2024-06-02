@@ -3,9 +3,9 @@ package roomescape.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-public class PaymentException  extends RuntimeException{
-    private HttpStatus httpStatus;
-    private String message;
+public class PaymentException extends RuntimeException {
+    private final HttpStatus httpStatus;
+    private final String message;
 
     public PaymentException(HttpStatusCode httpStatusCode, String message) {
         super(message);

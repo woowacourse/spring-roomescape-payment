@@ -2,10 +2,10 @@ package roomescape.fixture;
 
 import java.time.LocalDate;
 
-import roomescape.domain.ReservationStatus;
-import roomescape.entity.Member;
-import roomescape.entity.Reservation;
-import roomescape.entity.Theme;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.member.entity.Member;
+import roomescape.reservation.entity.Reservation;
+import roomescape.theme.entity.Theme;
 
 public class ReservationFixture {
     public static final Reservation ReservationOfDate(LocalDate date) {

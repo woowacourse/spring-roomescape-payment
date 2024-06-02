@@ -1,6 +1,6 @@
 package roomescape.fixture;
 
-import roomescape.entity.Theme;
+import roomescape.theme.entity.Theme;
 
 public class ThemeFixture {
     public static final Theme DEFAULT_THEME = new Theme(1L, "name", "description", "thumbnail");
