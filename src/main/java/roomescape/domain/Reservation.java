@@ -86,8 +86,23 @@ public class Reservation {
     }
 
     public void updatePayment(Payment payment) {
+        validatePendingReservation(status);
+        validateAleadyPaidReservation(status);
+
         this.status = ReservationStatus.RESERVED_COMPLETE;
         this.payment = payment;
+    }
+
+    private void validatePendingReservation(ReservationStatus status) {
+        if (status == ReservationStatus.PENDING) {
+            throw new RoomescapeException(ExceptionType.PENDING_RESERVATION);
+        }
+    }
+
+    private void validateAleadyPaidReservation(ReservationStatus status) {
+        if (status == ReservationStatus.RESERVED_COMPLETE) {
+            throw new RoomescapeException(ExceptionType.ALREADY_PAID_RESERVATION);
+        }
     }
 
     public static ReservationBuilder builder() {
@@ -100,14 +115,6 @@ public class Reservation {
 
     public void approve() {
         status = ReservationStatus.RESERVED_UNPAID;
-    }
-
-    public boolean isPending() {
-        return status == ReservationStatus.PENDING;
-    }
-
-    public boolean isPaid() {
-        return status == ReservationStatus.RESERVED_COMPLETE;
     }
 
     public LocalTime getTime() {

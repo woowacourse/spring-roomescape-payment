@@ -34,25 +34,10 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        validatePendingReservation(reservation);
-        validateAleadyPaidReservation(reservation);
-
         Payment payment = paymentClient.requestPaymentApproval(request);
-        Payment saved = paymentRepository.save(payment);
         reservation.updatePayment(payment);
+        Payment saved = paymentRepository.save(payment);
 
         return new PaymentResponse(saved.getId(), saved.getPaymentKey(), saved.getOrderId(), saved.getAmount());
-    }
-
-    private void validatePendingReservation(Reservation reservation) {
-        if (reservation.isPending()) {
-            throw new RoomescapeException(ExceptionType.PENDING_RESERVATION);
-        }
-    }
-
-    private void validateAleadyPaidReservation(Reservation reservation) {
-        if (reservation.isPaid()) {
-            throw new RoomescapeException(ExceptionType.ALREADY_PAID_RESERVATION);
-        }
     }
 }
