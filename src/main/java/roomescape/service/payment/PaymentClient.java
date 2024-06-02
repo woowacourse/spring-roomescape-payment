@@ -1,6 +1,7 @@
 package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -31,14 +32,16 @@ public class PaymentClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
+    private final Logger logger;
 
     public PaymentClient(@Value("${payment.secret-key}") String secretKey,
                          @Value("${payment.url}") String baseUrl,
                          RestClient.Builder restClientBuilder,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper, Logger logger) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
+        this.logger = logger;
 
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(30))
@@ -59,7 +62,6 @@ public class PaymentClient {
                 .body(confirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    //TODO: 에러 로깅 처리
                     throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
