@@ -39,7 +39,8 @@ public enum ErrorType {
     INTERNAL_SERVER_ERROR("서버 내부에서 에러가 발생하였습니다."),
 
     // Payment Error
-    PAYMENT_ERROR("결제에 실패했습니다. 결제 정보를 확인해주세요.");
+    PAYMENT_ERROR("결제에 실패했습니다. 결제 정보를 확인해주세요."),
+    PAYMENT_SERVER_ERROR("결제 서버에서 에러가 발생하였습니다. 잠시 후 다시 시도해주세요.");
 
     private final String description;
 
