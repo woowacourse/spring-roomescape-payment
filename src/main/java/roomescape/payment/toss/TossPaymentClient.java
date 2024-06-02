@@ -23,8 +23,8 @@ public class TossPaymentClient implements PaymentClient {
 
     public TossPaymentClient(String secretKey) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofMinutes(1))
-                .withReadTimeout(Duration.ofMinutes(3));
+                .withConnectTimeout(Duration.ofSeconds(1))
+                .withReadTimeout(Duration.ofSeconds(3));
 
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
 
