@@ -5,15 +5,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.WaitingRequest;
 
 import java.time.LocalDate;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/initialize_table.sql")
-@Sql("/controller_test_data.sql")
 class WaitingControllerTest extends AbstractControllerTest {
 
     @DisplayName("예약 대기를 추가할 수 있다.")

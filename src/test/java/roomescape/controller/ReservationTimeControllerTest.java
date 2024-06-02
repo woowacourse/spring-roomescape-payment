@@ -5,14 +5,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.ReservationTimeRequest;
 import roomescape.model.ReservationTime;
 
 import java.time.LocalTime;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 class ReservationTimeControllerTest {
     @DisplayName("모든 예약 시간을 조회한다")
     @Test

@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.AdminReservationRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.service.PaymentService;
@@ -24,7 +23,6 @@ import static org.mockito.Mockito.doNothing;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 class ReservationControllerTest extends AbstractControllerTest {
 
     @LocalServerPort

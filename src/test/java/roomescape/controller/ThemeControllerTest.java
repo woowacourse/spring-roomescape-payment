@@ -5,15 +5,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.ThemeRequest;
 import roomescape.model.Theme;
 
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/initialize_table.sql")
-@Sql("/controller_test_data.sql")
 class ThemeControllerTest {
 
     @DisplayName("전체 테마를 조회한다.")

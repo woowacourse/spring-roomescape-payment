@@ -2,8 +2,10 @@ package roomescape.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.MemberLoginRequest;
 
+@Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 public abstract class AbstractControllerTest {
     protected String getAuthenticationCookie(String email, String password) {
         MemberLoginRequest request = new MemberLoginRequest(password, email);

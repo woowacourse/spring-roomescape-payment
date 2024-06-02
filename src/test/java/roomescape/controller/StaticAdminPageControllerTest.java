@@ -5,11 +5,8 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/initialize_table.sql")
-@Sql("/controller_test_data.sql")
 class StaticAdminPageControllerTest extends AbstractControllerTest {
 
     @DisplayName("관리자 권한이 아니면 403을 반환한다.")

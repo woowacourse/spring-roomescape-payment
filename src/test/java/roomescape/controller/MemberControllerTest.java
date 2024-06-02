@@ -5,15 +5,12 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.model.Member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql(scripts = "/initialize_table.sql")
-@Sql("/controller_test_data.sql")
 class MemberControllerTest extends AbstractControllerTest {
 
     @DisplayName("로그인 요청시 쿠키를 응답한다.")
