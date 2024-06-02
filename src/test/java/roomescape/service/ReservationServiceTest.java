@@ -8,7 +8,7 @@ import static roomescape.fixture.ReservationTimeFixture.DEFAULT_TIME;
 import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 import java.time.LocalDate;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ class ReservationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @AfterEach
+    @BeforeEach
     void cleanUp() {
         reservationRepository.deleteAll();
         reservationTimeRepository.deleteAll();

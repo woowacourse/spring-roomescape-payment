@@ -2,12 +2,11 @@ package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import java.time.LocalDate;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,22 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import roomescape.domain.Member;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
 import roomescape.dto.PaymentRequest;
-import roomescape.fixture.MemberFixture;
-import roomescape.fixture.ReservationTimeFixture;
-import roomescape.fixture.ThemeFixture;
+import roomescape.exception.RoomescapeException;
 import roomescape.infra.PaymentClient;
-import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -40,49 +32,20 @@ class PaymentServiceTest {
     private PaymentService paymentService;
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private ThemeRepository themeRepository;
-
-    @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @MockBean
     private PaymentClient paymentClient;
 
-    @AfterEach
-    void cleanUp() {
-        reservationRepository.deleteAll();
-        reservationTimeRepository.deleteAll();
-        themeRepository.deleteAll();
-        memberRepository.deleteAll();
-        paymentRepository.deleteAll();
-    }
-
     @Test
+    @Sql(scripts = {"/data/clean-up.sql", "/data/unpaid-reservation.sql"})
     @DisplayName("결제가 정상 처리되면, 결제 정보를 저장한다.")
     void savePayment() {
         // given
-        Member member = memberRepository.save(MemberFixture.DEFAULT_MEMBER);
-        Theme theme = themeRepository.save(ThemeFixture.DEFAULT_THEME);
-        ReservationTime time = reservationTimeRepository.save(ReservationTimeFixture.DEFAULT_TIME);
-        LocalDate date = LocalDate.now().plusDays(1);
-        ReservationStatus status = ReservationStatus.RESERVED_UNPAID;
-
-        Reservation reservation = reservationRepository.save(Reservation.builder()
-                .member(member)
-                .date(date)
-                .time(time)
-                .theme(theme)
-                .status(status)
-                .build());
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
 
         PaymentRequest request = new PaymentRequest(reservation.getId(), "paymentKey", "WTESTzzzzz", 1000L);
         given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
@@ -94,22 +57,11 @@ class PaymentServiceTest {
     }
 
     @Test
+    @Sql(scripts = {"/data/clean-up.sql", "/data/unpaid-reservation.sql"})
     @DisplayName("결제가 실패하면, 예약의 결제 정보를 갱신하지 않는다.")
     void failPaymentThenReservationPaymentInfoNotUpdated() {
         // given
-        Member member = memberRepository.save(MemberFixture.DEFAULT_MEMBER);
-        Theme theme = themeRepository.save(ThemeFixture.DEFAULT_THEME);
-        ReservationTime time = reservationTimeRepository.save(ReservationTimeFixture.DEFAULT_TIME);
-        LocalDate date = LocalDate.now().plusDays(1);
-        ReservationStatus status = ReservationStatus.RESERVED_UNPAID;
-
-        Reservation reservation = reservationRepository.save(Reservation.builder()
-                .member(member)
-                .date(date)
-                .time(time)
-                .theme(theme)
-                .status(status)
-                .build());
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
 
         given(paymentClient.requestPaymentApproval(any(PaymentRequest.class)))
                 .willThrow(new RuntimeException());
@@ -122,5 +74,35 @@ class PaymentServiceTest {
                 () -> assertThat(foundReservation.getStatus()).isEqualTo(ReservationStatus.RESERVED_UNPAID),
                 () -> assertThat(foundReservation.getPayment()).isNull()
         );
+    }
+
+    @Test
+    @Sql(scripts = {"/data/clean-up.sql", "/data/paid-reservation.sql"})
+    @DisplayName("이미 결제된 예약은 결제를 시도할 수 없다.")
+    void failPaymentWhenReservationStatusIsPaid() {
+        // given
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Payment payment = paymentRepository.findById(1L).orElseThrow();
+        PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), payment.getPaymentKey(), payment.getOrderId(),
+                payment.getAmount());
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.payReservation(paymentRequest))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("이미 결제가 되었습니다.");
+    }
+
+    @Test
+    @Sql(scripts = {"/data/clean-up.sql", "/data/pending-reservation.sql"})
+    @DisplayName("대기중인 예약은 결제를 시도할 수 없다.")
+    void failPaymentWhenReservationStatusIsPending() {
+        // given
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), "paymentKey", "WTEST000001", 1000L);
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.payReservation(paymentRequest))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage("대기중인 예약은 결제가 불가능 합니다.");
     }
 }
