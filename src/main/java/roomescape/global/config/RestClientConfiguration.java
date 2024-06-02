@@ -18,7 +18,7 @@ import roomescape.payment.TossPaymentClient;
 public class RestClientConfiguration {
 
     private static final int CONNECTION_TIMEOUT_DURATION = 5;
-    private static final int READ_TIMEOUT_DURATION = 45;
+    private static final int READ_TIMEOUT_DURATION = 3;
     private static final String HEADER_NAME = "Authorization";
     private static final String AUTHENTICATION_TYPE = "Basic";
     private static final String KEY_DELIMITER = ":";
