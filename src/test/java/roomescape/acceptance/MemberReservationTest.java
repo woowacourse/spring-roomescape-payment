@@ -44,7 +44,7 @@ class MemberReservationTest {
 
     private void mockPaymentClient() {
         PaymentResponse responseBody = new PaymentResponse(
-                10000L,
+                10000,
                 "qwer",
                 "1234abcd",
                 "DONE",

@@ -5,12 +5,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
-import roomescape.exception.theme.ReservationReferencedThemeException;
 import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.application.policy.RankingPolicy;
+import roomescape.domain.reservationdetail.Theme;
+import roomescape.domain.reservationdetail.ThemeRepository;
+import roomescape.exception.theme.ReservationReferencedThemeException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +18,13 @@ public class ThemeService {
     private final ThemeRepository themeRepository;
 
     public ThemeResponse saveTheme(ThemeRequest request) {
-        Theme theme = request.toTheme();
-        Theme savedTheme = themeRepository.save(theme);
+        Theme savedTheme = themeRepository.save(request.toTheme());
         return ThemeResponse.from(savedTheme);
     }
 
     public List<ThemeResponse> findAllTheme() {
-        List<Theme> themes = themeRepository.findAll();
-        return themes.stream()
+        return themeRepository.findAll()
+                .stream()
                 .map(ThemeResponse::from)
                 .toList();
     }
@@ -35,8 +34,7 @@ public class ThemeService {
         LocalDate endDate = rankingPolicy.getEndDateAsString();
         int limit = rankingPolicy.exposureSize();
 
-        List<Theme> themes = themeRepository.findPopularThemes(
-                startDate.toString(), endDate.toString(), limit);
+        List<Theme> themes = themeRepository.findPopularThemes(startDate.toString(), endDate.toString(), limit);
 
         return themes.stream()
                 .map(ThemeResponse::from)
