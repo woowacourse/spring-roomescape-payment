@@ -1,10 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +20,12 @@ import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationSaveInput;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationServiceTest extends ServiceTest {
     @Autowired
@@ -51,7 +52,7 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 필터링_없이_전체_예약_목록을_조회할_수_있다() {
-            ReservationListResponse response = reservationService.findAllReservation(
+            ReservationListResponse response = reservationService.searchReservation(
                     null, null, null, null);
 
             assertThat(response.getReservations().size())
@@ -60,7 +61,7 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_목록을_예약자별로_필터링해_조회할_수_있다() {
-            ReservationListResponse response = reservationService.findAllReservation(
+            ReservationListResponse response = reservationService.searchReservation(
                     user.getId(), null, null, null);
 
             assertThat(response.getReservations().size())
@@ -69,7 +70,7 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_목록을_테마별로_필터링해_조회할_수_있다() {
-            ReservationListResponse response = reservationService.findAllReservation(
+            ReservationListResponse response = reservationService.searchReservation(
                     null, firstTheme.getId(), null, null);
 
             assertThat(response.getReservations().size())
@@ -80,7 +81,7 @@ class ReservationServiceTest extends ServiceTest {
         void 예약_목록을_기간별로_필터링해_조회할_수_있다() {
             LocalDate dateFrom = LocalDate.of(2000, 4, 1);
             LocalDate dateTo = LocalDate.of(2000, 4, 7);
-            ReservationListResponse response = reservationService.findAllReservation(
+            ReservationListResponse response = reservationService.searchReservation(
                     null, null, dateFrom, dateTo);
 
             assertThat(response.getReservations().size())

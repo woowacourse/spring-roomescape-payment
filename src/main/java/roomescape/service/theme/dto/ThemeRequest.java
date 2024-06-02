@@ -1,27 +1,21 @@
 package roomescape.service.theme.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeName;
-import roomescape.exception.common.InvalidRequestBodyException;
 
 public class ThemeRequest {
+    @NotBlank(message = "name 값이 null 또는 공백일 수 없습니다.")
     private final String name;
+    @NotBlank(message = "description 값이 null 또는 공백일 수 없습니다.")
     private final String description;
+    @NotBlank(message = "thumbnail 값이 null 또는 공백일 수 없습니다.")
     private final String thumbnail;
 
     public ThemeRequest(String name, String description, String thumbnail) {
-        validate(name, description, thumbnail);
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-    }
-
-    private void validate(String name, String description, String thumbnail) {
-        if (name == null || name.isBlank() ||
-                description == null || description.isBlank() ||
-                thumbnail == null || thumbnail.isBlank()) {
-            throw new InvalidRequestBodyException();
-        }
     }
 
     public Theme toTheme() {

@@ -1,32 +1,21 @@
 package roomescape.service.reservationwaiting.dto;
 
-import java.time.DateTimeException;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
-import roomescape.exception.common.InvalidRequestBodyException;
 
 public class ReservationWaitingRequest {
+    @NotNull(message = "date 값이 null일 수 없습니다.")
     private final LocalDate date;
+    @NotNull(message = "timeId 값이 null일 수 없습니다.")
     private final Long timeId;
+    @NotNull(message = "themeId 값이 null일 수 없습니다.")
     private final Long themeId;
 
     public ReservationWaitingRequest(String date, String timeId, String themeId) {
-        validate(date, timeId, themeId);
         this.date = LocalDate.parse(date);
         this.timeId = Long.parseLong(timeId);
         this.themeId = Long.parseLong(themeId);
-    }
-
-    public void validate(String date, String timeId, String themeId) {
-        if (date == null || date.isBlank() ||
-                timeId == null || timeId.isBlank() ||
-                themeId == null || themeId.isBlank()) {
-            throw new InvalidRequestBodyException();
-        }
-        try {
-            LocalDate.parse(date);
-        } catch (DateTimeException e) {
-            throw new InvalidRequestBodyException();
-        }
     }
 
     public LocalDate getDate() {

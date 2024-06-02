@@ -1,23 +1,18 @@
 package roomescape.service.login.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import roomescape.domain.member.MemberEmail;
 import roomescape.domain.member.MemberPassword;
-import roomescape.exception.common.InvalidRequestBodyException;
 
 public class LoginRequest {
+    @NotBlank(message = "email 값이 null 또는 공백일 수 없습니다.")
     private final String email;
+    @NotBlank(message = "password 값이 null 또는 공백일 수 없습니다.")
     private final String password;
 
     public LoginRequest(String email, String password) {
-        validate(email, password);
         this.email = email;
         this.password = password;
-    }
-
-    private void validate(String email, String password) {
-        if (email == null || email.isBlank() || password == null || password.isBlank()) {
-            throw new InvalidRequestBodyException();
-        }
     }
 
     public MemberEmail toMemberEmail() {

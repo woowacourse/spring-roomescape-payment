@@ -1,6 +1,7 @@
 package roomescape.controller.theme;
 
-import java.net.URI;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,8 @@ import roomescape.service.theme.ThemeService;
 import roomescape.service.theme.dto.ThemeListResponse;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
+
+import java.net.URI;
 
 @RestController
 public class ThemeController {
@@ -37,14 +40,15 @@ public class ThemeController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @PostMapping("/themes")
-    public ResponseEntity<ThemeResponse> saveTheme(@RequestBody ThemeRequest request) {
+    public ResponseEntity<ThemeResponse> saveTheme(@RequestBody @Valid ThemeRequest request) {
         ThemeResponse response = themeService.saveTheme(request);
         return ResponseEntity.created(URI.create("/themes/" + response.getId())).body(response);
     }
 
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/themes/{themeId}")
-    public ResponseEntity<Void> deleteTheme(@PathVariable Long themeId) {
+    public ResponseEntity<Void> deleteTheme(
+            @PathVariable @NotNull(message = "themeId 값이 null일 수 없습니다.") Long themeId) {
         themeService.deleteTheme(themeId);
         return ResponseEntity.noContent().build();
     }

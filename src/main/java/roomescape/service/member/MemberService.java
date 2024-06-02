@@ -25,4 +25,8 @@ public class MemberService {
                 .map(MemberResponse::new)
                 .toList());
     }
+
+    public Member findById(final Long memberId) {
+        return memberRepository.getMemberById(memberId);
+    }
 }

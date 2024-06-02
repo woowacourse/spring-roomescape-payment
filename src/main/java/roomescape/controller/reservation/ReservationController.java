@@ -1,8 +1,9 @@
 package roomescape.controller.reservation;
 
-import java.net.URI;
-import java.time.LocalDate;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,11 @@ import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationSaveInput;
 
+import java.net.URI;
+import java.time.LocalDate;
+
 @RestController
+@Validated
 public class ReservationController {
     private final ReservationService reservationService;
     private final MemberService memberService;
@@ -36,12 +41,12 @@ public class ReservationController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @GetMapping("/reservations")
-    public ResponseEntity<ReservationListResponse> findAllReservation(
+    public ResponseEntity<ReservationListResponse> searchReservation(
             @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) Long themeId,
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo) {
-        ReservationListResponse response = reservationService.findAllReservation(memberId, themeId, dateFrom, dateTo);
+        ReservationListResponse response = reservationService.searchReservation(memberId, themeId, dateFrom, dateTo);
         return ResponseEntity.ok().body(response);
     }
 
@@ -54,7 +59,7 @@ public class ReservationController {
 
     @RoleAllowed
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest request,
+    public ResponseEntity<ReservationResponse> saveReservation(@RequestBody @Valid ReservationRequest request,
                                                                @LoginMember Member member) {
         ReservationSaveInput reservationSaveInput = request.toReservationSaveInput();
         PaymentConfirmInput paymentConfirmInput = request.toPaymentConfirmInput();
@@ -66,7 +71,7 @@ public class ReservationController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> saveAdminReservation(@RequestBody AdminReservationRequest request) {
+    public ResponseEntity<ReservationResponse> saveAdminReservation(@RequestBody @Valid AdminReservationRequest request) {
         ReservationSaveInput reservationSaveInput = request.toReservationSaveInput();
         Member member = memberService.findById(request.getMemberId());
 
@@ -76,8 +81,9 @@ public class ReservationController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/reservations/{reservationId}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long reservationId,
-                                                  @RequestParam Long memberId) {
+    public ResponseEntity<Void> deleteReservation(
+            @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
+            @RequestParam @NotNull(message = "memberId 값이 null일 수 없습니다.") Long memberId) {
         reservationService.deleteReservation(reservationId, memberId);
         return ResponseEntity.noContent().build();
     }

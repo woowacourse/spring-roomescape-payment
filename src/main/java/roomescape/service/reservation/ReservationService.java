@@ -61,7 +61,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationListResponse findAllReservation(
+    public ReservationListResponse searchReservation(
             Long memberId, Long themeId, LocalDate dateFrom, LocalDate dateTo) {
         List<Reservation> reservations = reservationRepository.findAll(
                 where(hasMemberId(memberId))

@@ -1,6 +1,6 @@
 package roomescape.controller.reservationwaiting;
 
-import java.net.URI;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +16,8 @@ import roomescape.service.reservationwaiting.ReservationWaitingService;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingListResponse;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingRequest;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingResponse;
+
+import java.net.URI;
 
 @RestController
 public class ReservationWaitingController {
@@ -42,14 +44,17 @@ public class ReservationWaitingController {
 
     @RoleAllowed
     @DeleteMapping("/reservations/{reservationId}/waitings")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long reservationId, @LoginMember Member member) {
+    public ResponseEntity<Void> deleteReservation(
+            @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
+            @LoginMember Member member) {
         reservationWaitingService.deleteReservationWaiting(reservationId, member);
         return ResponseEntity.noContent().build();
     }
 
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/admin/reservations/waitings/{waitingId}")
-    public ResponseEntity<Void> deleteAdminReservation(@PathVariable Long waitingId) {
+    public ResponseEntity<Void> deleteAdminReservation(
+            @PathVariable @NotNull(message = "waitingId 값이 null일 수 없습니다.") Long waitingId) {
         reservationWaitingService.deleteAdminReservationWaiting(waitingId);
         return ResponseEntity.noContent().build();
     }

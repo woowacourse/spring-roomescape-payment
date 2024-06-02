@@ -3,23 +3,18 @@ package roomescape.service.reservationtime.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import java.time.LocalTime;
+import jakarta.validation.constraints.NotNull;
 import roomescape.domain.reservationtime.ReservationTime;
-import roomescape.exception.common.InvalidRequestBodyException;
+
+import java.time.LocalTime;
 
 public class ReservationTimeRequest {
+    @NotNull(message = "startAt 값이 null일 수 없습니다.")
     private final LocalTime startAt;
 
     @JsonCreator
     public ReservationTimeRequest(LocalTime startAt) {
-        validate(startAt);
         this.startAt = startAt;
-    }
-
-    private void validate(LocalTime startAt) {
-        if (startAt == null) {
-            throw new InvalidRequestBodyException();
-        }
     }
 
     public ReservationTime toReservationTime() {
