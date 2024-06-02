@@ -8,69 +8,41 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
-import roomescape.dto.payment.PaymentRequest;
-import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
+import roomescape.dto.request.reservation.WaitingRequest;
+import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
 @Service
 public class ReservationService {
-    private final ReservationFactory reservationFactory;
+    private final ReservationCreateService reservationCreateService;
     private final ReservationRepository reservationRepository;
-    private final PaymentService paymentService;
 
     public ReservationService(
-            ReservationFactory reservationFactory,
-            ReservationRepository reservationRepository,
-            PaymentService paymentService
+            ReservationCreateService reservationCreateService,
+            ReservationRepository reservationRepository
     ) {
+        this.reservationCreateService = reservationCreateService;
         this.reservationRepository = reservationRepository;
-        this.reservationFactory = reservationFactory;
-        this.paymentService = paymentService;
     }
 
     @Transactional
     public ReservationResponse saveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        Reservation reservation = reservationFactory.createReservation(
-                loginMember.id(),
-                reservationRequest.date(),
-                reservationRequest.timeId(),
-                reservationRequest.themeId()
-        );
-        PaymentRequest paymentRequest = new PaymentRequest(
-                reservationRequest.orderId(),
-                reservationRequest.amount(),
-                reservationRequest.paymentKey()
-        );
-        paymentService.pay(paymentRequest);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationCreateService.saveReservationWithPaymentByClient(loginMember, reservationRequest);
     }
 
     @Transactional
     public ReservationResponse saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
-        Reservation reservation = reservationFactory.createWaiting(
-                loginMember.id(),
-                waitingRequest.date(),
-                waitingRequest.timeId(),
-                waitingRequest.themeId()
-        );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationCreateService.saveWaitingByClient(loginMember, waitingRequest);
     }
 
     @Transactional
     public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
-        Reservation reservation = reservationFactory.createReservation(
-                adminReservationRequest.memberId(),
-                adminReservationRequest.date(),
-                adminReservationRequest.timeId(),
-                adminReservationRequest.themeId()
-        );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationCreateService.saveReservationByAdmin(adminReservationRequest);
     }
 
     @Transactional

@@ -18,11 +18,11 @@ import roomescape.BasicAcceptanceTest;
 import roomescape.TestFixtures;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
-import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
+import roomescape.dto.request.reservation.AdminReservationRequest;
+import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
-import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
