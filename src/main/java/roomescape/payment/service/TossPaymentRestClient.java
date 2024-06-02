@@ -1,13 +1,13 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.BadRequestException;
+import roomescape.payment.PaymentProperties;
 import roomescape.payment.dto.PaymentFailure;
 import roomescape.payment.dto.PaymentResponse;
 
@@ -19,11 +19,10 @@ public class TossPaymentRestClient {
 
     private final RestClient restClient;
 
-    public TossPaymentRestClient(ObjectMapper objectMapper,
-                                 @Value("${toss.secret}") String tossSecretKey
+    public TossPaymentRestClient(ObjectMapper objectMapper, PaymentProperties properties
     ) {
         String authorizationToken = Base64.getEncoder()
-                .encodeToString((tossSecretKey + ":").getBytes());
+                .encodeToString((properties.secret() + ":").getBytes());
 
         this.restClient = RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/v1/payments")
