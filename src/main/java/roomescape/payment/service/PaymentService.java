@@ -27,6 +27,11 @@ public class PaymentService {
         this.objectMapper = objectMapper;
     }
 
+    /***
+     * 토스 결제 요청 api 호출하여 응답받는다.
+     * @param confirmRequest 결제 요청 정보를 담고 있는 DTO
+     * @return paymentConfirmResponse - 결제 요청 성공 응답을 담고 있는 DTO
+     */
     public PaymentConfirmResponse confirmPayment(PaymentConfirmRequest confirmRequest) {
         PaymentConfirmResponse confirmResponse = restClient.post()
                 .uri("/v1/payments/confirm")
@@ -38,6 +43,22 @@ public class PaymentService {
         return confirmResponse;
     }
 
+    /***
+     * 토스 결제 api 응답을 검증하고 응답 DTO로 변환한다.
+     * @param response 토스 결제 api 응답<br>
+     * @return paymentConfirmResponse - 결제 요청 성공 응답을 담고 있는 DTO
+     * @throws PaymentException 토스 결제 요청 실패 시, 에러 메시지와 코드를 변환하여 다시 던짐<br>
+     * <pre>
+     *     {@code
+     *          토스 결제 실패 응답 :
+     *          {
+     *              "code": "NOT_FOUND_PAYMENT_SESSION",
+     *              "message": "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."
+     *          }
+     *     }
+     * </pre>
+     * @throws IOException getStatusCode(), readValue() 메서드 호출 시 발생하는 에러
+     */
     private PaymentConfirmResponse createPaymentConfirmResponse(ConvertibleClientHttpResponse response)
             throws IOException {
         if (response.getStatusCode().isError()) {
