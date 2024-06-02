@@ -4,7 +4,7 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.PaymentInfo;
+import roomescape.dto.PaymentInfo;
 import roomescape.dto.request.MemberReservationRequest;
 
 @Service
