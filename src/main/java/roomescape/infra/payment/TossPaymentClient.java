@@ -30,6 +30,7 @@ public class TossPaymentClient implements PaymentClient {
         this.errorHandler = errorHandler;
         this.properties = properties;
         this.restClient = RestClient.builder()
+                .requestInterceptor(new PaymentApiLoggingInterceptor())
                 .requestFactory(getClientHttpRequestFactory())
                 .baseUrl(properties.url())
                 .build();
