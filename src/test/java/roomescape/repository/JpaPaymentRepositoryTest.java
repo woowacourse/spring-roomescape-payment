@@ -6,11 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
 
 @SpringBootTest
-@Transactional
 class JpaPaymentRepositoryTest {
 
     @Autowired
@@ -21,6 +19,7 @@ class JpaPaymentRepositoryTest {
     void save() {
         Payment saved = paymentRepository.save(new Payment(null, "paymentKey1", "WTEST12345", 1000L));
 
-        assertThat(saved.getId()).isNotNull();
+        Payment findPayment = paymentRepository.findById(saved.getId()).orElseThrow();
+        assertThat(findPayment).isNotNull();
     }
 }
