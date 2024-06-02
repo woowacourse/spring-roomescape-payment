@@ -27,6 +27,12 @@ class GlobalExceptionHandler {
             log.error("[{}] {}", e.getClass().getName(), cause.getMessage()
             );
         }
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    }
+
+    @ExceptionHandler(value = RoomEscapeException.class)
+    private ProblemDetail handleRoomEscapeException(RoomEscapeException e) {
+        log.error("[{}] {}", e.getClass().getName(), e.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
