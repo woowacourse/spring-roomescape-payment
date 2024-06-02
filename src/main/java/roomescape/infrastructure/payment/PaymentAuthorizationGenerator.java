@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentAuthorizationGenerator {
 
+    private static final String PAYMENT_AUTHORIZATION_PREFIX = "Basic ";
     private final String secretKey;
 
     public PaymentAuthorizationGenerator(@Value("${payment.secret-key}") String secretKey) {
@@ -17,6 +18,6 @@ public class PaymentAuthorizationGenerator {
     public String createAuthorizations() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
+        return PAYMENT_AUTHORIZATION_PREFIX + new String(encodedBytes);
     }
 }
