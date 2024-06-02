@@ -13,6 +13,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -52,12 +53,16 @@ public class PaymentService {
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })
                 .retrieve()
-                .onStatus(r -> r.is4xxClientError() || r.is5xxServerError(), (request, response) -> {
+                .onStatus(this::isFailToPayment, (request, response) -> {
                     String errorMessage = parseErrorMessage(response);
                     throw new PaymentException("결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value()));
                 })
                 .toEntity(PaymentResponse.class)
                 .getBody();
+    }
+
+    private boolean isFailToPayment(HttpStatusCode status) {
+        return status.is4xxClientError() || status.is5xxServerError();
     }
 
     private String parseErrorMessage(ClientHttpResponse response) throws IOException {
