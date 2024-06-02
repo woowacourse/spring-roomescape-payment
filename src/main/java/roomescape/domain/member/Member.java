@@ -8,14 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +32,16 @@ public class Member {
     @Column(nullable = false, length = 6)
     private Role role;
 
-    public Member(String name, String email, String password, Role role) {
+    public Member(Long id, String name, String email, String password, Role role) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public Member(String name, String email, String password, Role role) {
+        this(null, name, email, password, role);
     }
 
     public Member(String name, String email, String password) {

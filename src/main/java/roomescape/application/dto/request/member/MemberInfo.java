@@ -1,4 +1,4 @@
 package roomescape.application.dto.request.member;
 
-public record MemberInfo(Long id) {
+public record MemberInfo(Long id, String name) {
 }

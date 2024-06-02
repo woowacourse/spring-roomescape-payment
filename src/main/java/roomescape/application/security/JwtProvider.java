@@ -1,12 +1,15 @@
 package roomescape.application.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.exception.member.AuthenticationFailureException;
 
 @Component
 public class JwtProvider {
@@ -23,30 +26,24 @@ public class JwtProvider {
                 .compact();
     }
 
-    public Long extractId(String token) {
-        return Long.valueOf(extractPayload(token).getSubject());
-    }
-
-    public Role extractRole(String token) {
-        return Role.of(extractPayload(token).get(ROLE_CLAIM_KEY, String.class));
-    }
-
-    public String extractName(String token) {
-        return extractPayload(token).get(NAME_CLAIM_KEY, String.class);
-    }
-
-    private Claims extractPayload(String token) {
+    public Claims verifyToken(String token) {
         try {
-            token = token.replace("token=", "");
-
-            return Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (Exception e) {
-            throw new AuthenticationFailureException();
+            return parseClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw new JwtException("기한이 만료된 JWT 토큰입니다.", e);
+        } catch (UnsupportedJwtException | MalformedJwtException e) {
+            throw new JwtException("JWT 토큰 구성이 올바르지 않습니다.", e);
+        } catch (SignatureException e) {
+            throw new JwtException("JWT 토큰 검증에 실패하였습니다.", e);
         }
     }
 
+    private Claims parseClaims(String token) {
+        token = token.replace("token=", "");
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 }

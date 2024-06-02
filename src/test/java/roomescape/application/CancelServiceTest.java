@@ -66,7 +66,7 @@ class CancelServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
-        MemberInfo memberInfo = new MemberInfo(jazz.getId());
+        MemberInfo memberInfo = new MemberInfo(jazz.getId(), jazz.getName());
 
         reservationRepository.save(reservation(jazz, bed, date.toString(), onePm, RESERVED));
 
@@ -82,7 +82,7 @@ class CancelServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
-        MemberInfo memberInfo = new MemberInfo(jazz.getId());
+        MemberInfo memberInfo = new MemberInfo(jazz.getId(), jazz.getName());
 
         Reservation reserved = reservationRepository.save(reservation(jazz, bed, date.toString(), onePm, RESERVED));
         Reservation waiting = reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
