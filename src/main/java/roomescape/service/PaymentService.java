@@ -8,7 +8,6 @@ import roomescape.dto.payment.PaymentResponse;
 
 @HttpExchange
 public interface PaymentService {
-
     @PostExchange("/confirm")
     PaymentResponse pay(@RequestBody PaymentRequest paymentRequest);
 }
