@@ -26,7 +26,7 @@ public class PaymentService {
     public PaymentApproveResponse pay(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
         HttpHeaders headers = headerGenerator.generate();
         headers.setBasicAuth(encodeSecretKey());
-        HttpEntity httpEntity = new HttpEntity(paymentApproveRequest, headers);
+        HttpEntity<PaymentApproveRequest> httpEntity = new HttpEntity<>(paymentApproveRequest, headers);
 
         return restTemplate.postForEntity(
                 PAYMENT_APPROVE_ENDPOINT,

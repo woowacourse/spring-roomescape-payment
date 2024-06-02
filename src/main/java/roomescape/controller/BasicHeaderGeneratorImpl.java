@@ -3,7 +3,7 @@ package roomescape.controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-public class HeaderGeneratorImpl implements HeaderGenerator {
+public class BasicHeaderGeneratorImpl implements HeaderGenerator {
 
     @Override
     public HttpHeaders generate() {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.HeaderGeneratorImpl;
+import roomescape.controller.BasicHeaderGeneratorImpl;
 import roomescape.controller.dto.PaymentApproveRequest;
 import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
@@ -58,7 +58,7 @@ public class ReservationService {
 
     public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-        paymentService.pay(new HeaderGeneratorImpl(), paymentApproveRequest);
+        paymentService.pay(new BasicHeaderGeneratorImpl(), paymentApproveRequest);
 
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
         return saveReservation(reservationSaveRequest);
