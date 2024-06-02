@@ -18,7 +18,7 @@ public class RestClientConfig {
     }
 
     private static HttpComponentsClientHttpRequestFactory getClientHttpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory  = new HttpComponentsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(3000);
         factory.setConnectionRequestTimeout(5000);
         return factory;

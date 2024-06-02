@@ -36,8 +36,8 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void confirmPayment(PaymentRequest paymentRequest) {
-        restClient.post()
+    public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
+        return restClient.post()
                 .uri(confirmPaymentUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
@@ -47,7 +47,8 @@ public class TossPaymentClient implements PaymentClient {
                     PaymentErrorResponse errorResponse = objectMapper
                             .readValue(res.getBody(), PaymentErrorResponse.class);
                     throw PaymentException.tossPaymentExceptionOf(errorResponse.message());
-                });
+                })
+                .body(PaymentResponse.class);
     }
 
     private static String encodeSecretKey(String secretKey) {

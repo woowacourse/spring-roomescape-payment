@@ -41,6 +41,7 @@ import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.exception.BadRequestException;
 import roomescape.infra.payment.PaymentClient;
+import roomescape.infra.payment.PaymentResponse;
 
 class ReservationServiceTest extends BaseServiceTest {
 
@@ -85,7 +86,7 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("예약이 추가된다.")
         void success() {
-            BDDMockito.doNothing()
+            BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
