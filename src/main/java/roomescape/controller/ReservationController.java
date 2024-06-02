@@ -37,7 +37,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
-        ReservationResponse response = reservationService.saveReservationByClient(loginMember, reservationRequest);
+        ReservationResponse response = reservationService.saveReservationWithPaymentByClient(loginMember, reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 

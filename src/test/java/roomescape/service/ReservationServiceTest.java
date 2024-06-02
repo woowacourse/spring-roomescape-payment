@@ -40,7 +40,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         LoginMember loginMember = new LoginMember(1L, "찰리");
         ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, 0);
-        reservationService.saveReservationByClient(loginMember, reservationRequest);
+        reservationService.saveReservationWithPaymentByClient(loginMember, reservationRequest);
 
         List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
 

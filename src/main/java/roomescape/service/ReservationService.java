@@ -35,19 +35,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        PaymentRequest paymentRequest = new PaymentRequest(
-                reservationRequest.orderId(),
-                reservationRequest.amount(),
-                reservationRequest.paymentKey()
-        );
-        paymentService.pay(paymentRequest);
+    public ReservationResponse saveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
         Reservation reservation = reservationFactory.createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
                 reservationRequest.themeId()
         );
+        PaymentRequest paymentRequest = new PaymentRequest(
+                reservationRequest.orderId(),
+                reservationRequest.amount(),
+                reservationRequest.paymentKey()
+        );
+        paymentService.pay(paymentRequest);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
