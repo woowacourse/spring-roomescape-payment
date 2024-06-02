@@ -11,7 +11,7 @@ public class TestConfig {
 
     @Primary
     @Bean
-    public PaymentGateway paymentGateway() {
+    public PaymentGateway fakePaymentGateway() {
         return new FakePaymentGateway();
     }
 }

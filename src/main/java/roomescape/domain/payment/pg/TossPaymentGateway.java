@@ -1,48 +1,20 @@
 package roomescape.domain.payment.pg;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.ClientHttpRequestFactories;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.dto.PaymentConfirmRequest;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
 import roomescape.domain.payment.exception.PaymentConfirmClientFailException;
 import roomescape.domain.payment.exception.PaymentConfirmServerFailException;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Base64;
+import static roomescape.domain.payment.config.PaymentApiUrl.PG_CONFIRM_API_URL;
 
-import static roomescape.domain.payment.config.PaymentConfig.PG_API_BASE_URL;
-import static roomescape.domain.payment.config.PaymentConfig.PG_CONFIRM_API_URL;
-
-@Component
 public class TossPaymentGateway implements PaymentGateway {
-
-    private static final long API_TIME_OUT_VALUE = 2L;
 
     private final RestClient restClient;
 
-    @Value("${custom.pg.widget-secret-key}")
-    private String widgetSecretKey;
-
-    public TossPaymentGateway() {
-        this.restClient = configRestClient();
-    }
-
-    private RestClient configRestClient() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withReadTimeout(Duration.ofMinutes(API_TIME_OUT_VALUE));
-        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
-        return RestClient.builder()
-                .baseUrl(PG_API_BASE_URL)
-                .requestFactory(requestFactory)
-                .build();
+    public TossPaymentGateway(final RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public PaymentConfirmResponse confirm(
@@ -52,10 +24,6 @@ public class TossPaymentGateway implements PaymentGateway {
     ) {
         return restClient.post()
                 .uri(PG_CONFIRM_API_URL)
-                .headers(httpHeaders -> {
-                    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-                    httpHeaders.set(HttpHeaders.AUTHORIZATION, generateAuthorizations());
-                })
                 .body(new PaymentConfirmRequest(orderId, amount, paymentKey))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -65,11 +33,5 @@ public class TossPaymentGateway implements PaymentGateway {
                     throw new PaymentConfirmServerFailException(response.getStatusText());
                 })
                 .body(PaymentConfirmResponse.class);
-    }
-
-    private String generateAuthorizations() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
     }
 }
