@@ -9,14 +9,13 @@ import org.junit.jupiter.api.Test;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.exception.PaymentException;
-import roomescape.exception.PaymentServerException;
 import roomescape.utils.TestClient;
 import roomescape.utils.TestFixture;
 
 class PaymentApproverTest {
     private static final String TOMORROW = TestFixture.getTomorrowDate();
 
-    private PaymentApprover paymentApprover
+    private final PaymentApprover paymentApprover
             = new PaymentApprover(new TestClient(), new PaymentSecretKeyEncoder());
 
     @Test
@@ -38,6 +37,6 @@ class PaymentApproverTest {
         PaymentConfirmRequest request = new PaymentConfirmRequest(reservationPaymentRequest);
 
         assertThatThrownBy(() -> paymentApprover.confirmPayment(request))
-                .isInstanceOf(PaymentServerException.class);
+                .isInstanceOf(PaymentException.class);
     }
 }

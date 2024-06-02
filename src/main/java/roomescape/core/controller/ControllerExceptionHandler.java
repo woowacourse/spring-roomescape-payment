@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import roomescape.core.dto.exception.ExceptionResponse;
 import roomescape.exception.PaymentException;
-import roomescape.exception.PaymentServerException;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
@@ -54,7 +53,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handlePaymentException(final PaymentException exception) {
         return ResponseEntity.badRequest()
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(),
                         exception.getMessage()));
     }
 
@@ -64,14 +63,6 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.REQUEST_TIMEOUT,
                         REQUEST_TIMEOUT_EXCEPTION_MESSAGE));
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handlePaymentServerException(
-            final PaymentServerException exception) {
-        return ResponseEntity.internalServerError()
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                        exception.getMessage()));
     }
 
     @ExceptionHandler
