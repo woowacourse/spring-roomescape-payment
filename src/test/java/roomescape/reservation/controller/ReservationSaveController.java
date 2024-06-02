@@ -18,13 +18,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
 @AutoConfigureMockMvc
-class ReservationSaveController extends IntegrationTest {
+class ReservationSaveController extends ControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;

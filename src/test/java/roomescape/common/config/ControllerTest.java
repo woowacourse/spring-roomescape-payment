@@ -16,7 +16,7 @@ import roomescape.member.domain.MemberName;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class IntegrationTest {
+public class ControllerTest {
 
     @LocalServerPort
     private int port;

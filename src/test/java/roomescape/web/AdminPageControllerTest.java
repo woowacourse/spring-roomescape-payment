@@ -6,10 +6,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 
-class AdminPageControllerTest extends IntegrationTest {
+class AdminPageControllerTest extends ControllerTest {
 
     @DisplayName("어드민 사용자 접근 성공 테스트")
     @Nested

@@ -8,10 +8,10 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 
-class ReservationControllerTest extends IntegrationTest {
+class ReservationControllerTest extends ControllerTest {
 
     @DisplayName("예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test

@@ -6,11 +6,11 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.auth.dto.LoginRequest;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.member.dto.MemberSignUpRequest;
 
-class AuthControllerTest extends IntegrationTest {
+class AuthControllerTest extends ControllerTest {
 
     @DisplayName("회원 가입 후 로그인에 성공하면 200 응답을 받고 쿠키가 존재하는지 확인하고 로그인 체크 한다.")
     @Test

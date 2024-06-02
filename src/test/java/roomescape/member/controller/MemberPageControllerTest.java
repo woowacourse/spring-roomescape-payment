@@ -5,9 +5,9 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 
-class MemberPageControllerTest extends IntegrationTest {
+class MemberPageControllerTest extends ControllerTest {
 
     @DisplayName("/signup을 요청하면 html을 반환한다.")
     @Test

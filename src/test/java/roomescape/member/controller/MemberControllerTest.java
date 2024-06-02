@@ -6,11 +6,11 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.member.dto.MemberSignUpRequest;
 
-class MemberControllerTest extends IntegrationTest {
+class MemberControllerTest extends ControllerTest {
 
     @DisplayName("회원가입에 성공하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
     @Test

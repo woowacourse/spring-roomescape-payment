@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.auth.domain.Role;
-import roomescape.common.config.IntegrationTest;
+import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 import roomescape.reservation.controller.dto.request.WaitingReservationSaveRequest;
 
-class WaitingReservationControllerTest extends IntegrationTest {
+class WaitingReservationControllerTest extends ControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
