@@ -8,15 +8,19 @@ import org.springframework.web.client.RestClient;
 import roomescape.api.TossPaymentClient;
 import roomescape.service.PaymentClient;
 
+import java.time.Duration;
+
 @Configuration
 public class PaymentConfig {
 
     @Bean
     public PaymentClient getTossPaymentClient(@Value("${security.api.toss.secret-key}") String widgetSecretKey,
-                                              @Value("${security.api.toss.url}") String url) {
+                                              @Value("${api.toss.url}") String url,
+                                              @Value("${api.connectTimeoutSecond}") int connectTimeoutSecond,
+                                              @Value("${api.readTimeoutSecond}") int readTimeoutSecond) {
         SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        simpleClientHttpRequestFactory.setConnectTimeout(3);
-        simpleClientHttpRequestFactory.setReadTimeout(30);
+        simpleClientHttpRequestFactory.setConnectTimeout(Duration.ofSeconds(connectTimeoutSecond));
+        simpleClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(readTimeoutSecond));
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(url)
