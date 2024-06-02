@@ -1,9 +1,6 @@
 package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,18 +15,24 @@ import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 @Component
 public class PaymentClient {
-    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     private static final String BASIC_DELIMITER = ":";
     private static final String AUTH_HEADER_PREFIX = "Basic ";
     private final String secretKey;
+    private final String baseUrl;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
 
     public PaymentClient(@Value("${payment.secret-key}") String secretKey,
+                         @Value("${payment.url}") String baseUrl,
                          ObjectMapper objectMapper) {
         this.secretKey = secretKey;
+        this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
         this.restClient = RestClient.builder().build();
     }
@@ -40,12 +43,13 @@ public class PaymentClient {
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
 
         return restClient.method(HttpMethod.POST)
-                .uri(BASE_URL + "/confirm")
+                .uri(baseUrl + "/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .body(confirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    //TODO: 에러 로깅 처리
                     throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
