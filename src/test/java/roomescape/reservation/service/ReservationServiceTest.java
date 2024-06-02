@@ -48,7 +48,9 @@ class ReservationServiceTest {
                 1000L);
 
         // When
-        final Reservation reservation = reservationService.saveReservation(saveReservationRequest, saveReservationRequest.memberId());
+        final Reservation reservation = reservationService.saveReservation(
+                saveReservationRequest, saveReservationRequest.memberId()
+        );
 
         // Then
         final List<Reservation> reservations = reservationService.getReservations();
@@ -74,7 +76,9 @@ class ReservationServiceTest {
                 1000L);
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, saveReservationRequest.memberId()))
+        assertThatThrownBy(() -> reservationService.saveReservation(
+                saveReservationRequest, saveReservationRequest.memberId())
+        )
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("해당 id의 예약 시간이 존재하지 않습니다.");
     }
@@ -94,16 +98,20 @@ class ReservationServiceTest {
     @Test
     void throwExceptionWhenPastDateOrTime() {
         // Given
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(LocalDate.now().minusDays(3),
+        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+                LocalDate.now().minusDays(3),
                 3L,
                 1L,
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L);
+                1000L
+        );
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, saveReservationRequest.memberId()))
+        assertThatThrownBy(() -> reservationService.saveReservation(
+                saveReservationRequest, saveReservationRequest.memberId())
+        )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
     }
@@ -123,7 +131,9 @@ class ReservationServiceTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, saveReservationRequest.memberId()))
+        assertThatThrownBy(() -> reservationService.saveReservation(
+                saveReservationRequest, saveReservationRequest.memberId())
+        )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 해당 날짜/시간의 테마 예약이 있습니다.");
     }

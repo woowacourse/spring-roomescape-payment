@@ -61,7 +61,9 @@ class PaymentServiceTest {
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
 
         // When
-        PaymentResponse paymentResponse = paymentService.requestTossPayment(new PaymentRequest(paymentKey, orderId, 1000L));
+        PaymentResponse paymentResponse = paymentService.requestTossPayment(
+                new PaymentRequest(paymentKey, orderId, 1000L)
+        );
 
         // Then
         server.verify();

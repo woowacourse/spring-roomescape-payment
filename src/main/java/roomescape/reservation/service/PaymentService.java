@@ -55,7 +55,9 @@ public class PaymentService {
                 .retrieve()
                 .onStatus(this::isFailToPayment, (request, response) -> {
                     String errorMessage = parseErrorMessage(response);
-                    throw new PaymentException("결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value()));
+                    throw new PaymentException(
+                            "결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value())
+                    );
                 })
                 .toEntity(PaymentResponse.class)
                 .getBody();
