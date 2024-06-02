@@ -30,7 +30,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -269,18 +268,11 @@ class ReservationRepositoryTest {
         reservationRepository.save(new Reservation(member, tomorrow, theme, reservationTime, Status.SUCCESS));
         reservationRepository.save(new Reservation(member, oneWeekLater, theme, reservationTime, Status.SUCCESS));
 
-        ReservationSearchCondRequest request = new ReservationSearchCondRequest(
+        List<Reservation> reservations = reservationRepository.findAllByThemeIdAndMemberIdAndDateBetweenAndStatus(
                 theme.getId(),
                 member.getId(),
                 LocalDate.now(),
-                tomorrow
-        );
-
-        List<Reservation> reservations = reservationRepository.findAllByThemeIdAndMemberIdAndDateBetweenAndStatus(
-                request.themeId(),
-                request.memberId(),
-                request.dateFrom(),
-                request.dateTo(),
+                tomorrow,
                 Status.SUCCESS
         );
 
