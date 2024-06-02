@@ -63,7 +63,7 @@ public class ReservationCreateServiceTest {
                 date,
                 1L,
                 1L,
-                ReservationStatus.WAITING);
+                ReservationStatus.CANCELLATION_WAITING);
 
         // when
         MemberReservation reservation = reservationCreateService.createReservation(request);

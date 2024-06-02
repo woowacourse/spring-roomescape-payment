@@ -27,7 +27,7 @@ public class MemberReservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
     @Enumerated(value = EnumType.STRING)
-    @ColumnDefault(value = "'CONFIRMATION'")
+    @ColumnDefault("'CONFIRMED'")
     private ReservationStatus status;
     @CreatedDate
     private LocalDateTime createdAt;
@@ -43,7 +43,7 @@ public class MemberReservation {
     }
 
     public MemberReservation(Long id, Member member, Reservation reservation) {
-        this(id, member, reservation, ReservationStatus.CONFIRMATION);
+        this(id, member, reservation, ReservationStatus.CONFIRMED);
     }
 
     public MemberReservation(Member member, Reservation reservation, ReservationStatus status) {
@@ -73,13 +73,13 @@ public class MemberReservation {
     }
 
     public void validatePendingStatus() {
-        if (!status.isPending()) {
+        if (!status.isPaymentRequired()) {
             throw new BadRequestException("해당 예약은 결제 대기 상태가 아닙니다.");
         }
     }
 
-    public boolean isConfirmationStatus() {
-        return status.isConfirmation();
+    public boolean isConfirmed() {
+        return status.isConfirmed();
     }
 
     public void validateRankConfirm(Long waitingRank) {

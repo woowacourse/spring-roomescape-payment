@@ -4,9 +4,9 @@ import java.util.List;
 
 public enum ReservationStatus {
 
-    CONFIRMATION("예약"),
-    WAITING("예약대기"),
-    PENDING("결제대기");
+    CONFIRMED("예약"),
+    CANCELLATION_WAITING("예약대기"),
+    PAYMENT_REQUIRED("결제대기");
 
     private final String statusName;
 
@@ -19,18 +19,18 @@ public enum ReservationStatus {
     }
 
     public boolean isNotWaiting() {
-        return !this.equals(WAITING);
+        return !this.equals(CANCELLATION_WAITING);
     }
 
-    public boolean isConfirmation() {
-        return this.equals(CONFIRMATION);
+    public boolean isConfirmed() {
+        return this.equals(CONFIRMED);
     }
 
-    public boolean isPending() {
-        return this.equals(PENDING);
+    public boolean isPaymentRequired() {
+        return this.equals(PAYMENT_REQUIRED);
     }
 
     public static List<ReservationStatus> getConfirmationStatuses() {
-        return List.of(CONFIRMATION, PENDING);
+        return List.of(CONFIRMED, PAYMENT_REQUIRED);
     }
 }

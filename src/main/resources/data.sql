@@ -56,10 +56,10 @@ INSERT INTO member_reservation (member_id, reservation_id, created_at)
 VALUES (1, 8, CURRENT_TIMESTAMP);
 
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
-VALUES (1, 3, 'WAITING', CURRENT_TIMESTAMP);
+VALUES (1, 3, 'CANCELLATION_WAITING', CURRENT_TIMESTAMP);
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
-VALUES (3, 3, 'WAITING', CURRENT_TIMESTAMP);
+VALUES (3, 3, 'CANCELLATION_WAITING', CURRENT_TIMESTAMP);
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
-VALUES (1, 9, 'PENDING', CURRENT_TIMESTAMP);
+VALUES (1, 9, 'PAYMENT_REQUIRED', CURRENT_TIMESTAMP);
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
-VALUES (1, 10, 'PENDING', CURRENT_TIMESTAMP);
+VALUES (1, 10, 'PAYMENT_REQUIRED', CURRENT_TIMESTAMP);

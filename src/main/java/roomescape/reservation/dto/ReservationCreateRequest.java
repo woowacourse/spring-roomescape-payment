@@ -18,7 +18,7 @@ public record ReservationCreateRequest(
 ) {
 
     public ReservationCreateRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        this(memberId, date, timeId, themeId, ReservationStatus.CONFIRMATION);
+        this(memberId, date, timeId, themeId, ReservationStatus.CONFIRMED);
     }
 
     public static ReservationCreateRequest of(MemberReservationCreateRequest request, LoginMember loginMember) {

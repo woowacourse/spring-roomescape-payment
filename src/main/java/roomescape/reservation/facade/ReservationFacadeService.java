@@ -45,7 +45,7 @@ public class ReservationFacadeService {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.of(request, member);
 
         MemberReservation savedMemberReservation = reservationCreateService.createReservation(reservationCreateRequest);
-        if (savedMemberReservation.isConfirmationStatus()) {
+        if (savedMemberReservation.isConfirmed()) {
             paymentService.confirmPayment(PaymentRequest.from(request), savedMemberReservation);
         }
 
@@ -98,7 +98,7 @@ public class ReservationFacadeService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(Long id) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        if (memberReservation.isConfirmationStatus()) {
+        if (memberReservation.isConfirmed()) {
             paymentService.cancelPayment(memberReservation);
         }
         reservationService.deleteReservation(memberReservation);
@@ -107,7 +107,7 @@ public class ReservationFacadeService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteReservation(Long id, LoginMember loginMember) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        if (memberReservation.isConfirmationStatus()) {
+        if (memberReservation.isConfirmed()) {
             paymentService.cancelPayment(memberReservation);
         }
         reservationService.deleteReservation(memberReservation, loginMember);

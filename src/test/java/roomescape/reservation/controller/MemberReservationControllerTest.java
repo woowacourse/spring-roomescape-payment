@@ -82,7 +82,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MAX.toString());
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);
@@ -116,7 +116,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MAX.toString());
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
 
         // when & then
         RestAssured.given().log().all()
@@ -158,7 +158,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MIN);
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);
@@ -191,7 +191,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MAX);
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);
@@ -230,7 +230,7 @@ class MemberReservationControllerTest {
         reservation.put("date", "2099-12-31");
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.WAITING);
+        reservation.put("status", ReservationStatus.CANCELLATION_WAITING);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -250,7 +250,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MIN);
         reservation.put("timeId", Integer.MAX_VALUE);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);
@@ -282,7 +282,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MIN);
         reservation.put("timeId", 1);
         reservation.put("themeId", Integer.MAX_VALUE);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);
@@ -342,7 +342,7 @@ class MemberReservationControllerTest {
         reservation.put("date", LocalDate.MAX);
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.WAITING);
+        reservation.put("status", ReservationStatus.CANCELLATION_WAITING);
         reservation.put("paymentKey", "test");
         reservation.put("orderId", "test");
         reservation.put("amount", 21000);

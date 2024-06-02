@@ -104,7 +104,7 @@ class AdminReservationControllerTest {
         reservation.put("date", LocalDate.MAX.toString());
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -139,7 +139,7 @@ class AdminReservationControllerTest {
         reservation.put("date", LocalDate.MAX.toString());
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
-        reservation.put("status", ReservationStatus.CONFIRMATION);
+        reservation.put("status", ReservationStatus.CONFIRMED);
 
         // when
         String detailMessage = RestAssured.given().log().all()

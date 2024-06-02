@@ -20,7 +20,7 @@ public class WaitingReservationService {
     }
 
     public List<MemberReservation> readWaitingReservations() {
-        return memberReservationRepository.findByStatus(ReservationStatus.WAITING);
+        return memberReservationRepository.findByStatus(ReservationStatus.CANCELLATION_WAITING);
     }
 
     public void confirmWaitingReservation(Long id) {
@@ -31,7 +31,7 @@ public class WaitingReservationService {
         validateConfirmReservationExists(reservation);
         validateRankCanConfirm(reservation, memberReservation);
 
-        memberReservation.setStatus(ReservationStatus.CONFIRMATION);
+        memberReservation.setStatus(ReservationStatus.CONFIRMED);
     }
 
     private MemberReservation findMemberReservationById(Long id) {

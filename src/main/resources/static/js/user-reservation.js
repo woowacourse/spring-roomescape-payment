@@ -244,7 +244,7 @@ function onWaitButtonClick() {
             date: selectedDate,
             themeId: selectedThemeId,
             timeId: selectedTimeId,
-            status: 'WAITING'
+            status: 'CANCELLATION_WAITING'
         };
 
         fetch('/reservations', {

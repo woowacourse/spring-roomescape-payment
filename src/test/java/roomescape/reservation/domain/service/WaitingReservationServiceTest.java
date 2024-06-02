@@ -54,7 +54,7 @@ class WaitingReservationServiceTest {
         Optional<MemberReservation> actual = memberReservationRepository.findById(id);
 
         // then
-        assertThat(actual.get().getStatus()).isEqualTo(ReservationStatus.CONFIRMATION);
+        assertThat(actual.get().getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
     }
 
     @DisplayName("예약 대기 서비스는 대기 상태가 아닌 예약을 승인하려고하면 예외가 발생한다.")

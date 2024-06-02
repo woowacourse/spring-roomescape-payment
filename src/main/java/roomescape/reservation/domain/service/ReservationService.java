@@ -63,12 +63,12 @@ public class ReservationService {
     }
 
     private void confirmFirstWaitingReservation(Reservation reservation) {
-        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING).ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
+        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.CANCELLATION_WAITING).ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PAYMENT_REQUIRED));
     }
 
     public void confirmPendingReservation(Long id) {
         MemberReservation memberReservation = findMemberReservationById(id);
         memberReservation.validatePendingStatus();
-        memberReservation.setStatus(ReservationStatus.CONFIRMATION);
+        memberReservation.setStatus(ReservationStatus.CONFIRMED);
     }
 }

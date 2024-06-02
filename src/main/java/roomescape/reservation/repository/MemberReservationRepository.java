@@ -20,7 +20,7 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
 
     Optional<MemberReservation> findFirstByReservationAndStatus(Reservation reservation, ReservationStatus status);
 
-    @Query("select mr from MemberReservation as mr where mr.reservation = :reservation and mr.status IN ('CONFIRMATION', 'PENDING')")
+    @Query("select mr from MemberReservation as mr where mr.reservation = :reservation and mr.status IN ('CONFIRMED', 'PAYMENT_REQUIRED')")
     Optional<MemberReservation> findByReservationAndStatusIsConfirmationAndPending(Reservation reservation);
 
     @Query("select mr from MemberReservation as mr where mr.status in :statuses")
@@ -37,9 +37,9 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
 
     @Query("select mr as memberReservation, " +
             "(select count(*) from MemberReservation as cmr " +
-            "where cmr.reservation.id = mr.reservation.id and cmr.status = 'WAITING' and cmr.createdAt < mr.createdAt) as rank " +
+            "where cmr.reservation.id = mr.reservation.id and cmr.status = 'CANCELLATION_WAITING' and cmr.createdAt < mr.createdAt) as rank " +
             "from MemberReservation mr " +
-            "where mr.status = 'WAITING' and mr.member.id = :memberId"
+            "where mr.status = 'CANCELLATION_WAITING' and mr.member.id = :memberId"
     )
     List<WaitingReservationRanking> findWaitingReservationRankingByMemberId(@Param("memberId") Long memberId);
 

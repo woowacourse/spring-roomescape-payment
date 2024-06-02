@@ -98,6 +98,6 @@ class ReservationServiceTest {
         reservationService.deleteReservation(deletedMemberReservation);
 
         // then
-        assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.PENDING);
+        assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.PAYMENT_REQUIRED);
     }
 }
