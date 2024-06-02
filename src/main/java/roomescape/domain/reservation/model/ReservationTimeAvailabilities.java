@@ -16,6 +16,6 @@ public record ReservationTimeAvailabilities(Map<ReservationTime, Boolean> values
 
     private static boolean isTimeAvailable(final List<Reservation> reservations, final ReservationTime reservationTime) {
         return reservations.stream()
-                .anyMatch(reservation -> reservation.getTime().equals(reservationTime));
+                .anyMatch(reservation -> reservation.getTime().getStartAt().equals(reservationTime.getStartAt()));
     }
 }

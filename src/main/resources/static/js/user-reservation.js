@@ -144,6 +144,7 @@ function checkDateAndThemeAndTime() {
       waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
     } else {
       // 선택된 시간이 예약 가능한 경우
+      // reserveButton.classList.remove("disabled");
       reserveButton.classList.remove("disabled");
       waitButton.classList.add("disabled");
     }
@@ -212,12 +213,6 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-  /*
-  TODO: [1단계]
-      - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-      - 내 서버 URL에 맞게 reservationURL 변경
-      - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-  */
   const reservationPaymentRequest = {
     date: reservationData.date,
     timeId: reservationData.timeId,
