@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.toss;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

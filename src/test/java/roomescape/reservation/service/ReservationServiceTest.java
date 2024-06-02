@@ -29,8 +29,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.toss.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWithWaiting;
@@ -55,7 +55,7 @@ class ReservationServiceTest {
     private ThemeService themeService;
 
     @Mock
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -120,7 +120,7 @@ class ReservationServiceTest {
     void should_throw_exception_when_reservation_not_confirmed_payments() {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         doThrow(IllegalRequestException.class)
-                .when(paymentClient)
+                .when(tossPaymentClient)
                 .requestConfirmPayment(any(PaymentConfirmRequest.class));
 
         assertThatThrownBy(
@@ -131,7 +131,7 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
     @Test
     void should_save_member_reservation_when_payment_is_confirmed() {
-        doNothing().when(paymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        doNothing().when(tossPaymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);

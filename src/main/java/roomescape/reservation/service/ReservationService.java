@@ -26,16 +26,16 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final ReservationRepository reservationRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentClient tossPaymentClient;
 
     public ReservationService(MemberService memberService, ReservationTimeService reservationTimeService,
                               ThemeService themeService, ReservationRepository reservationRepository,
-                              PaymentClient paymentClient) {
+                              PaymentClient tossPaymentClient) {
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.reservationRepository = reservationRepository;
-        this.paymentClient = paymentClient;
+        this.tossPaymentClient = tossPaymentClient;
     }
 
     @Transactional(readOnly = true)
@@ -77,7 +77,7 @@ public class ReservationService {
                 request.themeId()
         );
         ReservationResponse reservationResponse = saveReservation(reservationRequest);
-        paymentClient.requestConfirmPayment(request.extractPaymentInformation());
+        tossPaymentClient.requestConfirmPayment(request.extractPaymentInformation());
 
         return reservationResponse;
     }
