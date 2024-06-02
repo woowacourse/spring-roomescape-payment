@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import roomescape.service.dto.request.ReservationSaveRequest;
 
 import java.time.LocalDate;
-
+// TODO valid 일관성 지키기
 public record UserReservationSaveRequest(
         @NotNull(message = "날짜를 입력해주세요")
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")

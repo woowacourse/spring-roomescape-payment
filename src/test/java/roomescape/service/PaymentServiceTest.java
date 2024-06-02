@@ -11,9 +11,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.customexception.api.ApiBadRequestException;
+import roomescape.exception.customexception.api.ApiException;
 import roomescape.service.dto.request.PaymentApproveRequest;
 import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.response.PaymentApproveResponse;
@@ -28,15 +30,17 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableConfigurationProperties({PaymentProperties.class})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(methodMode =  DirtiesContext.MethodMode.BEFORE_METHOD)
 class PaymentServiceTest {
 
     @Autowired
     private PaymentProperties paymentProperties;
-    ;
+
     @Autowired
     private RestTemplate restTemplate;
+
     @Autowired
     private PaymentService paymentService;
 
@@ -102,22 +106,31 @@ class PaymentServiceTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest().body(makeJsonFrom(response)));
 
-        assertThatThrownBy(() -> paymentService.pay(request))
-                .isInstanceOf(ApiBadRequestException.class)
-                .hasMessage(response.message);
+        assertAll(
+                () -> assertThatThrownBy(() -> paymentService.pay(request))
+                        .isInstanceOf(ApiBadRequestException.class)
+                        .hasMessage(response.message),
+                () -> mockServer.verify()
+        );
     }
+
 
     @Test
     @DisplayName("실패 : 500에러 반환시 custom exeption으로 예외가 전환된다.")
     void is5XXException_PaymentException() {
         PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
+        TestErrorResponse response = new TestErrorResponse("INTERNAL_SERVER_ERROR", "test_error");
 
         mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withServerError());
+                .andRespond(withServerError().body(makeJsonFrom(response)));
 
-        assertThatThrownBy(() -> paymentService.pay(request))
-                .isInstanceOf(ApiBadRequestException.class);
+        assertAll(
+                () -> assertThatThrownBy(() -> paymentService.pay(request))
+                        .isInstanceOf(ApiException.class),
+                () -> mockServer.verify()
+        );
+
     }
 
     private String makeJsonFrom(PaymentApproveResponse response) {

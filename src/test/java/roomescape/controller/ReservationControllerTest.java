@@ -255,7 +255,6 @@ class ReservationControllerTest extends IntegrationTestSupport {
     }
 
     @DisplayName("결제에 성공할 시, 예약에 성공한다")
-    // TODO 테스트 케이스 추가
     @Test
     void paymentSuccess() {
         Map<String, Object> params = Map.of(

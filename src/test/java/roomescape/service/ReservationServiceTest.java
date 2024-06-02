@@ -2,10 +2,15 @@ package roomescape.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
+import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
+import roomescape.domain.member.Role;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
@@ -14,7 +19,11 @@ import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
+import roomescape.service.dto.request.LoginMember;
+import roomescape.service.dto.request.PaymentApproveRequest;
+import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.request.ReservationSaveRequest;
+import roomescape.service.dto.response.PaymentApproveResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.UserReservationResponse;
 import roomescape.service.reservation.ReservationService;
@@ -26,9 +35,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static roomescape.domain.reservation.ReservationStatus.RESERVED;
 
 @Transactional
+@ExtendWith(MockitoExtension.class)
 class ReservationServiceTest extends IntegrationTestSupport {
 
     @Autowired
@@ -134,6 +146,88 @@ class ReservationServiceTest extends IntegrationTestSupport {
                 () -> assertThat(slot.getTime().getStartAt()).isEqualTo(reservationResponse.time().startAt()),
                 () -> assertThat(slot.getTheme().getName()).isEqualTo(reservationResponse.theme().name()),
                 () -> assertThat(allUserReservation.get(0).status()).isEqualTo(RESERVED)
+        );
+    }
+
+    @DisplayName("예약 성공 : 결제 + 예약 저장 성공 시 예약에 성공한다")
+    @Test
+    void successReservation() {
+        //given
+        LoginMember member = new LoginMember(2L, "user1", Role.USER);
+        UserReservationSaveRequest request = new UserReservationSaveRequest(
+                LocalDate.now(),
+                3L,
+                3L,
+                "testPaymentKey",
+                "testOrderId",
+                "1000",
+                "NORMAL"
+        );
+        PaymentApproveResponse response = new PaymentApproveResponse(request.paymentKey(), request.orderId());
+        Mockito.when(paymentService.pay(any(PaymentApproveRequest.class))).thenReturn(response);
+
+        //when
+        ReservationResponse reservationResponse = reservationService.saveUserReservation(member, request);
+
+        //then
+        assertAll(
+                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
+                ()-> assertThat(reservationResponse.date()).isEqualTo(request.date()),
+                ()-> assertThat(reservationResponse.theme().id()).isEqualTo(request.themeId()),
+                ()-> assertThat(reservationResponse.time().id()).isEqualTo(request.timeId()),
+                ()-> assertThat(reservationResponse.member().id()).isEqualTo(member.id())
+        );
+    }
+
+    @DisplayName("예약 실패 : 결제 실패 시, 예약에 실패한다")
+    @Test
+    void failReservation_When_FailPay() {
+        //given
+        LoginMember member = new LoginMember(2L, "user1", Role.USER);
+        UserReservationSaveRequest request = new UserReservationSaveRequest(
+                LocalDate.now(),
+                3L,
+                3L,
+                "testPaymentKey",
+                "testOrderId",
+                "1000",
+                "NORMAL"
+        );
+
+        Mockito.when(paymentService.pay(any(PaymentApproveRequest.class)))
+                .thenThrow(RoomEscapeBusinessException.class);
+
+        //when - then
+        assertAll(
+                ()-> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
+                        .isInstanceOf(RoomEscapeBusinessException.class),
+                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class))
+        );
+    }
+
+    @DisplayName("예약 실패 : 결제 성공 - 예약 저장 실패 시, 결제를 취소한다")
+    @Test
+    void cancelReservation_When_FailReservation() {
+        //given
+        LoginMember member = new LoginMember(2L, "user1", Role.USER);
+        UserReservationSaveRequest request = new UserReservationSaveRequest(
+                LocalDate.now(),
+                10000L,
+                3L,
+                "testPaymentKey",
+                "testOrderId",
+                "1000",
+                "NORMAL"
+        );
+        PaymentApproveResponse response = new PaymentApproveResponse(request.paymentKey(), request.orderId());
+        Mockito.when(paymentService.pay(any(PaymentApproveRequest.class))).thenReturn(response);
+
+        //when - then
+        assertAll(
+                ()-> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
+                        .isInstanceOf(RoomEscapeBusinessException.class),
+                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
+                ()-> Mockito.verify(paymentService, times(1)).cancel(any(PaymentCancelRequest.class))
         );
     }
 }
