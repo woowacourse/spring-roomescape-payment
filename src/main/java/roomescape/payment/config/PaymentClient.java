@@ -46,7 +46,7 @@ public class PaymentClient {
                 .header("Authorization", "Basic " + basic)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new PaymentClientResponseErrorHandler())
+                .onStatus(new PaymentClientResponseErrorHandler(objectMapper))
                 .toBodilessEntity();
         logging(uri, "POST", paymentRequest);
     }

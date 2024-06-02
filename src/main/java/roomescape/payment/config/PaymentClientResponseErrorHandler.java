@@ -17,8 +17,11 @@ import roomescape.exception.PaymentException;
 @Component
 public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
+    public PaymentClientResponseErrorHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
