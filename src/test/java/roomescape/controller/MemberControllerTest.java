@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.controller.request.MemberLoginRequest;
 import roomescape.model.Member;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,21 +14,14 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = "/initialize_table.sql")
 @Sql("/controller_test_data.sql")
-class MemberControllerTest {
+class MemberControllerTest extends AbstractControllerTest {
 
     @DisplayName("로그인 요청시 쿠키를 응답한다.")
     @Test
     void should_response_cookie_when_login() {
-        MemberLoginRequest request = new MemberLoginRequest("1234", "sun@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
+        String email = "sun@email.com";
+        String password = "1234";
+        String cookie = getAuthenticationCookie(email, password);
         assertSoftly(assertSoftly -> {
             assertSoftly.assertThat(cookie).isNotBlank();
             assertSoftly.assertThat(cookie).containsPattern("^token=");
@@ -39,15 +31,9 @@ class MemberControllerTest {
     @DisplayName("요청시 쿠키를 제공하면 이름을 반환한다.")
     @Test
     void should_response_member_name_when_given_cookie() {
-        MemberLoginRequest request = new MemberLoginRequest("1234", "sun@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
+        String email = "sun@email.com";
+        String password = "1234";
+        String cookie = getAuthenticationCookie(email, password);
 
         String name = RestAssured
                 .given().log().all()

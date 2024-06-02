@@ -13,7 +13,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.AdminReservationRequest;
-import roomescape.controller.request.MemberLoginRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.service.PaymentService;
 
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.doNothing;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql({"/initialize_table.sql", "/controller_test_data.sql"})
-class ReservationControllerTest {
+class ReservationControllerTest extends AbstractControllerTest {
 
     @LocalServerPort
     private int port;
@@ -54,18 +53,8 @@ class ReservationControllerTest {
     @DisplayName("예약을 검색한다.")
     @Test
     void should_search_reservations() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("2222", "pobi@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
         RestAssured.given().log().all()
-                .cookie(cookie)
+                .cookie(getAdminCookie())
                 .when().get("/admin/reservations?themeId=1&memberId=1&dateFrom=2024-05-05&dateTo=2024-05-10")
                 .then().log().all()
                 .statusCode(200).extract();
@@ -76,16 +65,6 @@ class ReservationControllerTest {
     void should_insert_reservation_whenT_member_request() {
         doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
 
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2030, 8, 5), 6L, 10L,
                 "asdfsdf", "dfadf", 1999999);
@@ -93,7 +72,7 @@ class ReservationControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .cookie(cookie)
+                .cookie(getMemberCookie())
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)
@@ -103,23 +82,13 @@ class ReservationControllerTest {
     @DisplayName("관리자가 예약을 추가할 수 있다.")
     @Test
     void should_insert_reservation_when_admin_request() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("2222", "pobi@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
         AdminReservationRequest request = new AdminReservationRequest(
                 LocalDate.of(2030, 8, 5), 10L, 6L, 1L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .cookie(cookie)
+                .cookie(getAdminCookie())
                 .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201)
@@ -131,16 +100,6 @@ class ReservationControllerTest {
     void should_add_reservation_when_admin_request() {
         doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
 
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2030, 8, 5), 6L, 10L,
                 "asdfsdf", "dfadf", 1999999);
@@ -148,7 +107,7 @@ class ReservationControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .cookie(cookie)
+                .cookie(getMemberCookie())
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)
@@ -182,18 +141,8 @@ class ReservationControllerTest {
     @DisplayName("로그인 정보에 따른 예약 내역을 조회한다.")
     @Test
     void should_find_member_reservation() {
-        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "sun@email.com");
-
-        String cookie = RestAssured
-                .given().log().all()
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().header("Set-Cookie");
-
         RestAssured.given().log().all()
-                .cookie(cookie)
+                .cookie(getMemberCookie())
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .statusCode(200);
