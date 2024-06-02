@@ -1,4 +1,4 @@
-package roomescape.exception;
+package roomescape.exception.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,8 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ConflictException;
 import roomescape.exception.custom.ForbiddenException;
+import roomescape.exception.custom.PaymentException;
+import roomescape.exception.dto.ExceptionResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -53,19 +55,19 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse("중복된 데이터 요청입니다."));
     }
 
-    @ExceptionHandler(HttpStatusCodeException.class)
-    public ResponseEntity<ExceptionResponse> handleHttpStatusCodeException(HttpStatusCodeException e) {
-        log.error(e.getMessage());
-        RestClientErrorDto restClientErrorDto = e.getResponseBodyAs(RestClientErrorDto.class);
-        return ResponseEntity.status(e.getStatusCode())
-                .body(new ExceptionResponse(restClientErrorDto.message()));
-    }
-
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ExceptionResponse> handleRestClientExceptionException(RestClientException e) {
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ExceptionResponse("서버에 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요."));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ExceptionResponse> handlePaymentExceptionException(PaymentException e) {
+        log.error(e.getMessage());
+        TossPaymentErrorType errorType = TossPaymentErrorType.findByErrorCode(e.getMessage());
+        return ResponseEntity.status(errorType.getHttpStatus())
+                .body(new ExceptionResponse(errorType.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

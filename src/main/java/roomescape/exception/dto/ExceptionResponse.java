@@ -1,4 +1,4 @@
-package roomescape.exception;
+package roomescape.exception.dto;
 
 public record ExceptionResponse(String message) {
 }
