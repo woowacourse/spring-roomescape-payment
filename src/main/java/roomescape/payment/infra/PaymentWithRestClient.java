@@ -24,7 +24,7 @@ public class PaymentWithRestClient implements PaymentClient {
 
     public PaymentWithRestClient() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withReadTimeout(Duration.ofSeconds(10L))
+                .withReadTimeout(Duration.ofSeconds(30L))
                 .withConnectTimeout(Duration.ofSeconds(10L));
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
         this.restClient = RestClient.builder().baseUrl("https://api.tosspayments.com/v1/payments")
