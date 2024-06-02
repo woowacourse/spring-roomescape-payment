@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -21,17 +22,17 @@ public record AdminReservationWebRequest(
         @Positive
         Long timeId,
 
-        @NotNull(message = "payment key를 입력해주세요.")
+        @NotEmpty(message = "payment key를 입력해주세요.")
         String paymentKey,
 
-        @NotNull(message = "주문 id을 입력해주세요.")
+        @NotEmpty(message = "주문 id을 입력해주세요.")
         String orderId,
 
         @NotNull(message = "가격을 입력해주세요.")
         @Positive
         Long amount,
 
-        @NotNull(message = "payment type을 입력해주세요.")
+        @NotEmpty(message = "payment type을 입력해주세요.")
         String paymentType,
 
         @NotNull(message = "회원 id는 필수 값입니다.")
