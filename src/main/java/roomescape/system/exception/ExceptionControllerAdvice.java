@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.system.dto.response.ErrorResponse;
 
 @RestControllerAdvice
@@ -21,6 +22,13 @@ public class ExceptionControllerAdvice {
         logger.error("{}{}", e.getMessage(), e.getInvalidValue().orElse(""), e);
         response.setStatus(e.getHttpStatus().value());
         return ErrorResponse.of(e.getErrorType(), e.getMessage());
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleResourceAccessException(final ResourceAccessException e) {
+        logger.error(e.getMessage(), e);
+        return ErrorResponse.of(ErrorType.PAYMENT_SERVER_ERROR, ErrorType.PAYMENT_SERVER_ERROR.getDescription());
     }
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
