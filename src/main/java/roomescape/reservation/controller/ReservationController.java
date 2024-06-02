@@ -46,8 +46,6 @@ public class ReservationController {
         final Reservation savedReservation = reservationService.saveReservation(
                 request, authenticatedMember.id());
 
-        paymentService.requestTossPayment(request.toPaymentRequest());
-
         return ResponseEntity.created(URI.create("/reservations/" + savedReservation.getId()))
                 .body(ReservationResponse.from(savedReservation));
     }

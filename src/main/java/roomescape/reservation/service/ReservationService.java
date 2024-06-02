@@ -27,19 +27,22 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository
+            final WaitingRepository waitingRepository,
+            final PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     public List<Reservation> getReservations() {
@@ -55,7 +58,7 @@ public class ReservationService {
         );
     }
 
-    public Reservation saveReservation(final SaveReservationRequest request, Long memberId) {
+    public Reservation saveReservation(final SaveReservationRequest request, final Long memberId) {
         final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
         final Theme theme = themeRepository.findById(request.themeId())
@@ -67,6 +70,7 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
 
+        paymentService.requestTossPayment(request.toPaymentRequest());
         return reservationRepository.save(reservation);
     }
 
