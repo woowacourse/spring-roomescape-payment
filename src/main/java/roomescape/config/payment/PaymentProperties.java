@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.payment;
 
 import java.util.List;
 import java.util.Map;

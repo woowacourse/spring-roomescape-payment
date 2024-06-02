@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.payment;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

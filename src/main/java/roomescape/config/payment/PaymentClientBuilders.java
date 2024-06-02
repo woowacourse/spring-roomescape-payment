@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.payment;
 
 import java.util.Map;
 import org.springframework.web.client.RestClient;
