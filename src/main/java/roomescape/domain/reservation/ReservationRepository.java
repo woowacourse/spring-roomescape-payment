@@ -1,16 +1,24 @@
 package roomescape.domain.reservation;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.reservation.NotFoundReservationException;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
+
+    default Reservation getReservationById(long id) {
+        return findById(id)
+                .orElseThrow(NotFoundReservationException::new);
+    }
+
     boolean existsByInfo(ReservationInfo info);
 
     boolean existsByInfoTime(ReservationTime time);

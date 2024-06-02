@@ -1,18 +1,18 @@
 package roomescape.service.theme;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.exception.theme.ReservationReferencedThemeException;
 import roomescape.service.theme.dto.ThemeListResponse;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional
@@ -52,15 +52,10 @@ public class ThemeService {
     }
 
     public void deleteTheme(long id) {
-        Theme theme = findThemeById(id);
+        Theme theme = themeRepository.getThemeById(id);
         if (reservationRepository.existsByInfoTheme(theme)) {
             throw new ReservationReferencedThemeException();
         }
         themeRepository.delete(theme);
-    }
-
-    private Theme findThemeById(long id) {
-        return themeRepository.findById(id)
-                .orElseThrow(NotFoundThemeException::new);
     }
 }

@@ -1,20 +1,20 @@
 package roomescape.service.reservationtime;
 
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.exception.time.DuplicatedTimeException;
-import roomescape.exception.time.NotFoundTimeException;
 import roomescape.exception.time.ReservationReferencedTimeException;
 import roomescape.service.reservationtime.dto.ReservationTimeAvailableListResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeAvailableResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeListResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeRequest;
 import roomescape.service.reservationtime.dto.ReservationTimeResponse;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional
@@ -61,15 +61,10 @@ public class ReservationTimeService {
     }
 
     public void deleteReservationTime(long id) {
-        ReservationTime reservationTime = findReservationTimeById(id);
+        ReservationTime reservationTime = reservationTimeRepository.getReservationTimeById(id);
         if (reservationRepository.existsByInfoTime(reservationTime)) {
             throw new ReservationReferencedTimeException();
         }
         reservationTimeRepository.delete(reservationTime);
-    }
-
-    private ReservationTime findReservationTimeById(long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(NotFoundTimeException::new);
     }
 }

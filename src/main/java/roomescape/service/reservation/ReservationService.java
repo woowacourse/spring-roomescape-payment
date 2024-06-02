@@ -1,17 +1,5 @@
 package roomescape.service.reservation;
 
-import static org.springframework.data.jpa.domain.Specification.where;
-import static roomescape.domain.reservation.ReservationRepository.Specs.hasEndDate;
-import static roomescape.domain.reservation.ReservationRepository.Specs.hasMemberId;
-import static roomescape.domain.reservation.ReservationRepository.Specs.hasStartDate;
-import static roomescape.domain.reservation.ReservationRepository.Specs.hasThemeId;
-
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -27,9 +15,6 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.InvalidReservationMemberException;
-import roomescape.exception.reservation.NotFoundReservationException;
-import roomescape.exception.theme.NotFoundThemeException;
-import roomescape.exception.time.NotFoundTimeException;
 import roomescape.service.payment.PaymentClient;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
@@ -37,6 +22,19 @@ import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationMineResponse;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationSaveInput;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.springframework.data.jpa.domain.Specification.where;
+import static roomescape.domain.reservation.ReservationRepository.Specs.hasEndDate;
+import static roomescape.domain.reservation.ReservationRepository.Specs.hasMemberId;
+import static roomescape.domain.reservation.ReservationRepository.Specs.hasStartDate;
+import static roomescape.domain.reservation.ReservationRepository.Specs.hasThemeId;
 
 @Service
 @Transactional
@@ -104,23 +102,13 @@ public class ReservationService {
     }
 
     private Reservation saveReservation(ReservationSaveInput input, Member member) {
-        ReservationTime time = findReservationTimeById(input.timeId());
-        Theme theme = findThemeById(input.themeId());
+        ReservationTime time = reservationTimeRepository.getReservationTimeById(input.timeId());
+        Theme theme = themeRepository.getThemeById(input.themeId());
         Reservation reservation = input.toReservation(time, theme, member);
         validateDuplicateReservation(reservation);
         validateDateTimeReservation(reservation);
 
         return reservationRepository.save(reservation);
-    }
-
-    private ReservationTime findReservationTimeById(long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(NotFoundTimeException::new);
-    }
-
-    private Theme findThemeById(long id) {
-        return themeRepository.findById(id)
-                .orElseThrow(NotFoundThemeException::new);
     }
 
     private void validateDuplicateReservation(Reservation reservation) {
@@ -136,18 +124,13 @@ public class ReservationService {
     }
 
     public void deleteReservation(long reservationId, long memberId) {
-        Reservation reservation = findReservationById(reservationId);
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, memberId);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
                 waiting -> upgradeWaitingToReservationAndDeleteWaiting(reservation, waiting),
                 () -> reservationRepository.delete(reservation)
         );
-    }
-
-    private Reservation findReservationById(long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(NotFoundReservationException::new);
     }
 
     private void validateReservationMember(Reservation reservation, long memberId) {

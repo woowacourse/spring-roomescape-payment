@@ -56,11 +56,6 @@ public class ReservationWaitingService {
         return new ReservationWaitingResponse(savedReservationWaiting);
     }
 
-    private Reservation findByInfo(ReservationInfo info) {
-        return reservationRepository.findByInfo(info)
-                .orElseThrow(NotFoundReservationException::new);
-    }
-
     private void validateReservationForWaiting(Reservation reservation, Member member) {
         validateOwnedReservation(reservation, member);
         validateDuplicateWaiting(reservation, member);
@@ -96,12 +91,7 @@ public class ReservationWaitingService {
     }
 
     public void deleteAdminReservationWaiting(Long waitingId) {
-        ReservationWaiting waiting = findReservationWaitingById(waitingId);
+        ReservationWaiting waiting = reservationWaitingRepository.getReservationWaitingById(waitingId);
         reservationWaitingRepository.delete(waiting);
-    }
-
-    private ReservationWaiting findReservationWaitingById(Long id) {
-        return reservationWaitingRepository.findById(id)
-                .orElseThrow(NotFoundReservationWaitingException::new);
     }
 }

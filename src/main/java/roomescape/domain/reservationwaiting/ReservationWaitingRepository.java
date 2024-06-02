@@ -1,13 +1,21 @@
 package roomescape.domain.reservationwaiting;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+import roomescape.exception.reservationwaiting.NotFoundReservationWaitingException;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface ReservationWaitingRepository extends JpaRepository<ReservationWaiting, Long> {
+
+    default ReservationWaiting getReservationWaitingById(Long id) {
+        return findById(id)
+                .orElseThrow(NotFoundReservationWaitingException::new);
+    }
+
     boolean existsByReservationAndMember(Reservation reservation, Member member);
 
     @Query("""
