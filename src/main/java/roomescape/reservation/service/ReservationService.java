@@ -44,7 +44,6 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    @Transactional
     public Long save(ReservationCreateRequest reservationCreateRequest, LoginMemberInToken loginMemberInToken) {
         if (reservationRepository.existsByDateAndReservationTimeIdAndThemeId(reservationCreateRequest.date(),
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {
@@ -112,7 +111,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional
     public void delete(Long id) {
         Reservation reservation = reservationRepository.findById(id).get();
         reservationRepository.deleteById(id);
