@@ -1,33 +1,40 @@
 package roomescape.reservation.controller;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Map;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.PaymentRequest;
+import roomescape.payment.PaymentResponse;
+import roomescape.payment.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -42,9 +49,16 @@ public class ReservationControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @MockBean
+    private TossPaymentClient tossPaymentClient;
+
     @LocalServerPort
     private int port;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     @DisplayName("처음으로 등록하는 예약의 id는 1이다.")
@@ -60,6 +74,9 @@ public class ReservationControllerTest {
                 "timeId", "1",
                 "themeId", "1"
         );
+
+        when(tossPaymentClient.confirmPayment(any(PaymentRequest.class))).thenReturn(
+                new PaymentResponse("pk", "oi", 1000L));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -107,7 +124,8 @@ public class ReservationControllerTest {
 
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
-        Reservation reservation = reservationRepository.save(new Reservation(LocalDate.now(), reservationTime, theme, member));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, member));
 
         // when & then
         RestAssured.given().log().all()
@@ -129,7 +147,8 @@ public class ReservationControllerTest {
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
 
-        Reservation reservation = reservationRepository.save(new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
 
         // when & then
         RestAssured.given().log().all()
@@ -151,7 +170,8 @@ public class ReservationControllerTest {
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
         Member anotherMember = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
 
-        Reservation reservation = reservationRepository.save(new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
 
         // when & then
         RestAssured.given().log().all()
