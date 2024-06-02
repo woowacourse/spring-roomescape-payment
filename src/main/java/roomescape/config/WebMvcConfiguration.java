@@ -29,6 +29,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/reservations/**")
                 .addPathPatterns("/reservation/**")
                 .addPathPatterns("/members/reservations")
+                .addPathPatterns("/member/reservation")
+                .addPathPatterns("/reservation")
                 .addPathPatterns("/logout")
                 .addPathPatterns("/waitings/**");
         registry.addInterceptor(new AdminRoleHandlerInterceptor(tokenProvider, memberService))

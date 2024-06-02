@@ -5,7 +5,6 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.domain.theme.Theme;
 import roomescape.service.waiting.dto.WaitingRequest;
 
 public class WaitingFixture {
@@ -13,8 +12,8 @@ public class WaitingFixture {
         return new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
     }
 
-    public static WaitingRequest createWaitingRequest(Theme theme, ReservationDetail reservationDetail) {
+    public static WaitingRequest createWaitingRequest(ReservationDetail reservationDetail) {
         return new WaitingRequest(reservationDetail.getDate(),
-                reservationDetail.getReservationTime().getId(), theme.getId());
+                reservationDetail.getReservationTime().getId(), reservationDetail.getTheme().getId());
     }
 }

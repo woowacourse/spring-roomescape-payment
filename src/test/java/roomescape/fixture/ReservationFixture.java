@@ -1,11 +1,8 @@
 package roomescape.fixture;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.Schedule;
@@ -35,5 +32,12 @@ public class ReservationFixture {
 
     public static ReservationRequest createReservationRequest(LocalDate date, Long timeId, Theme theme) {
         return new ReservationRequest(date, timeId, theme.getId(), "paymentKey", "orderId", 1000L);
+    }
+
+    public static ReservationRequest createReservationRequest(ReservationDetail reservationDetail) {
+        return new ReservationRequest(reservationDetail.getDate(),
+                reservationDetail.getReservationTime().getId(),
+                reservationDetail.getTheme().getId(),
+                "paymentKey", "orderId", 1000L);
     }
 }

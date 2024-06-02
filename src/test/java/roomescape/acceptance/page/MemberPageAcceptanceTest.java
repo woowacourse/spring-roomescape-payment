@@ -1,22 +1,15 @@
 package roomescape.acceptance.page;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import roomescape.acceptance.AcceptanceTest;
-import roomescape.service.auth.dto.LoginRequest;
 
-import java.util.stream.Stream;
+import static org.hamcrest.Matchers.is;
 
 class MemberPageAcceptanceTest extends AcceptanceTest {
-
-    private String token;
-
-    @DisplayName("사용자 기본 Page 접근 성공 테스트")
+    @DisplayName("모든 사용자 기본 Page에 접근할 수 있다.")
     @Test
     void responseMemberMainPage() {
         RestAssured.given().log().all()
@@ -25,28 +18,27 @@ class MemberPageAcceptanceTest extends AcceptanceTest {
                 .assertThat().statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("사용자 예약 Page 접근 성공 테스트")
-    @TestFactory
-    Stream<DynamicTest> responseMemberReservationPage() {
-        return Stream.of(
-                DynamicTest.dynamicTest("로그인을 한다.", () -> {
-                    token = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .body(new LoginRequest("guest123", "guest@email.com"))
-                            .when().post("/login")
-                            .then().log().all().extract().cookie("token");
-                }),
-                DynamicTest.dynamicTest("예약 페이지를 들어간다.", () -> {
-                    RestAssured.given().log().all()
-                            .cookie("token", token)
-                            .when().get("/reservation")
-                            .then().log().all()
-                            .assertThat().statusCode(HttpStatus.OK.value());
-                })
-        );
+    @DisplayName("로그한 사용자는 예약 페이지에 들어갈 수 있다.")
+    @Test
+    void responseMemberReservationPage() {
+        RestAssured.given().log().all()
+                .cookie("token", guestToken)
+                .when().get("/reservation")
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("사용자 로그인 Page 접근 성공 테스트")
+    @DisplayName("로그인하지 않은 사용자는 예약 페이지에 들어갈 수 없다.")
+    @Test
+    void cannotResponseMemberReservationPage() {
+        RestAssured.given().log().all()
+                .when().get("/reservation")
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body("message", is("인증되지 않은 사용자입니다."));
+    }
+
+    @DisplayName("모든 사용자는 로그인 Page에 접근할 수 있다.")
     @Test
     void responseMemberLoginPage() {
         RestAssured.given().log().all()
@@ -55,7 +47,7 @@ class MemberPageAcceptanceTest extends AcceptanceTest {
                 .assertThat().statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("사용자 회원가입 Page 접근 성공 테스트")
+    @DisplayName("모든 사용자는 회원가입 Page에 접근할 수 있다.")
     @Test
     void responseMemberSignupPage() {
         RestAssured.given().log().all()
@@ -64,23 +56,23 @@ class MemberPageAcceptanceTest extends AcceptanceTest {
                 .assertThat().statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("사용자별 예약 Page 접근 성공 테스트")
-    @TestFactory
-    Stream<DynamicTest> responseMemberOwnReservationPage() {
-        return Stream.of(
-                DynamicTest.dynamicTest("로그인을 한다.", () -> {
-                    token = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .body(new LoginRequest("guest123", "guest@email.com"))
-                            .when().post("/login")
-                            .then().log().all().extract().cookie("token");
-                }),
-                DynamicTest.dynamicTest("본인의 예약 페이지를 들어간다", () -> {
-                    RestAssured.given().log().all()
-                            .when().get("/member/reservation")
-                            .then().log().all()
-                            .assertThat().statusCode(HttpStatus.OK.value());
-                })
-        );
+    @DisplayName("로그인한 사용자는 본인의 예약 Page에 접근할 수 있다.")
+    @Test
+    void responseMemberOwnReservationPage() {
+        RestAssured.given().log().all()
+                .cookie("token", guestToken)
+                .when().get("/member/reservation")
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.OK.value());
+    }
+
+    @DisplayName("로그인하지 않은 사용자는 본인의 예약 Page에 접근할 수 없다.")
+    @Test
+    void cannotResponseMemberOwnReservationPage() {
+        RestAssured.given().log().all()
+                .when().get("/member/reservation")
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body("message", is("인증되지 않은 사용자입니다."));
     }
 }

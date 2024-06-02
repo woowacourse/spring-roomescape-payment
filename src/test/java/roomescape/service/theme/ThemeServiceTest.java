@@ -36,12 +36,12 @@ class ThemeServiceTest extends ServiceTest {
         assertThat(themeResponse.id()).isNotZero();
     }
 
-    @DisplayName("테마를 생성한다.")
+    @DisplayName("중복된 테마를 생성할 수 없다.")
     @Test
     void cannotCreateByDuplicatedName() {
         //given
-        ThemeRequest themeRequest = ThemeFixture.createThemeRequest();
-        themeRepository.save(ThemeFixture.createTheme());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ThemeRequest themeRequest = ThemeFixture.createThemeRequest(theme.getName().getValue());
 
         //when&then
         assertThatThrownBy(() -> themeService.create(themeRequest))

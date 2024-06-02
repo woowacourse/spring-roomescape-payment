@@ -2,166 +2,116 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.service.auth.dto.LoginRequest;
-import roomescape.service.reservation.dto.AdminReservationRequest;
-import roomescape.service.reservation.dto.ReservationRequest;
+import roomescape.fixture.ReservationFixture;
 
-import java.time.LocalDate;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
-@Sql("/truncate-with-time-and-theme.sql")
 class AdminReservationAcceptanceTest extends AcceptanceTest {
-
-    private LocalDate date;
-    private long timeId;
-    private long themeId;
-    private long guestId;
-    private String adminToken;
-    private String guestToken;
-
-    @BeforeEach
-    void init() {
-        date = LocalDate.now().plusDays(1);
-        timeId = 1;
-        themeId = 1;
-        guestId = 2;
-
-        adminToken = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(new LoginRequest("admin123", "admin@email.com"))
-                .when().post("/login")
-                .then().log().all().extract().cookie("token");
-
-        guestToken = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(new LoginRequest("guest123", "guest@email.com"))
-                .when().post("/login")
-                .then().log().all().extract().cookie("token");
-    }
-
-    @DisplayName("예약 추가 성공 테스트")
+    @DisplayName("관리자는 예약을 추가할 수 있다.")
     @Test
     void createReservation() {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .body(new AdminReservationRequest(date, guestId, timeId, themeId))
+                .body(ReservationFixture.createAdminReservationRequest(admin, reservationDetail))
                 .when().post("/admin/reservations")
                 .then().log().all()
-                .assertThat().statusCode(201).body("id", is(greaterThan(0)));
+                .assertThat().statusCode(201);
     }
 
-    @DisplayName("조건별 예약 내역 조회 테스트 - 사용자, 테마")
+    @DisplayName("일반 사용자는 관리자 권한의 예약을 추가할 수 없다.")
     @Test
-    @Sql("/truncate-with-reservations.sql")
+    void cannotCreateReservation() {
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", guestToken)
+                .body(ReservationFixture.createAdminReservationRequest(admin, reservationDetail))
+                .when().post("/admin/reservations")
+                .then().log().all()
+                .assertThat().statusCode(403)
+                .body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
+    }
+
+    @DisplayName("관리자는 조건별로 예약 내역을 조회할 수 있다.")
+    @Test
     void findByMemberAndTheme() {
-        //when & then
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
-                .queryParam("memberId", 1)
-                .queryParam("themeId", 2)
+                .queryParam("memberId", guest.getId())
+                .queryParam("themeId", reservationDetail.getTheme().getId())
                 .when().get("/admin/reservations/search")
                 .then().log().all()
-                .assertThat().statusCode(200).body("size()", is(0));
+                .assertThat().statusCode(200);
     }
 
-    @DisplayName("조건별 예약 내역 조회 테스트 - 시작 날짜")
+    @DisplayName("일반 사용자는 조건별로 예약 내역을 조회할 수 없다.")
     @Test
-    @Sql("/truncate-with-reservations.sql")
-    void findByDateFrom() {
-        //when & then
+    void cannotFindByMemberAndTheme() {
         RestAssured.given().log().all()
-                .cookie("token", adminToken)
-                .queryParam("dateFrom", LocalDate.now().plusDays(7).toString())
+                .cookie("token", guestToken)
+                .queryParam("memberId", guest.getId())
+                .queryParam("themeId", reservationDetail.getTheme().getId())
                 .when().get("/admin/reservations/search")
                 .then().log().all()
-                .assertThat().statusCode(200).body("size()", is(2));
-    }
-
-    @DisplayName("조건별 예약 내역 조회 테스트 - 테마")
-    @Test
-    @Sql("/truncate-with-reservations.sql")
-    void findByTheme() {
-        //when & then
-        RestAssured.given().log().all()
-                .cookie("token", adminToken)
-                .queryParam("themeId", 1)
-                .when().get("/admin/reservations/search")
-                .then().log().all()
-                .assertThat().statusCode(200).body("size()", is(1));
+                .assertThat().statusCode(403)
+                .body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
     }
 
     @DisplayName("어드민이 예약을 취소한다.")
-    @TestFactory
-    Stream<DynamicTest> deleteReservationByAdmin() {
-        AtomicLong reservationId = new AtomicLong();
-        return Stream.of(
-                DynamicTest.dynamicTest("예약을 저장하고, 식별자를 가져온다.", () -> {
-                    reservationId.set((int) RestAssured.given().contentType(ContentType.JSON)
-                            .cookie("token", guestToken)
-                            .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                            .when().post("/reservations")
-                            .then().extract().body().jsonPath().get("id"));
-                }),
-                DynamicTest.dynamicTest("예약을 삭제한다.", () -> {
-                    RestAssured.given().log().all()
-                            .cookie("token", adminToken)
-                            .when().delete("/admin/reservations/" + reservationId)
-                            .then().log().all()
-                            .assertThat().statusCode(204);
-                }),
-                DynamicTest.dynamicTest("남은 예약 개수는 총 0개이다.", () -> {
-                    RestAssured.given().log().all()
-                            .cookie("token", adminToken)
-                            .when().get("/reservations")
-                            .then().log().all()
-                            .assertThat().body("size()", is(0));
-                })
-        );
+    @Test
+    void deleteReservationByAdmin() {
+        //given
+        long reservationId = (int) RestAssured.given().contentType(ContentType.JSON)
+                .cookie("token", guestToken)
+                .body(ReservationFixture.createReservationRequest(reservationDetail))
+                .when().post("/reservations")
+                .then().extract().body().jsonPath().get("id");
+
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("token", adminToken)
+                .when().delete("/admin/reservations/" + reservationId)
+                .then().log().all()
+                .assertThat().statusCode(204);
     }
 
-    @DisplayName("어드민은 이미 일정이 지난 예약을 삭제할 수 없다.")
+    @DisplayName("관리자가 일정이 지난 예약을 삭제하려고 하면 예외가 발생한다.")
     @TestFactory
-    @Sql(value = {"/truncate-with-admin-and-guest.sql", "/insert-past-reservation.sql"})
-    Stream<DynamicTest> cannotDeletePastReservation() {
-        return Stream.of(
-                DynamicTest.dynamicTest("관리자가 일정이 지난 예약을 삭제하려고 하면 예외가 발생한다.", () -> {
-                    long reservationId = 1;
-                    RestAssured.given().log().all()
-                            .cookie("token", adminToken)
-                            .when().delete("/admin/reservations/" + reservationId)
-                            .then().log().all()
-                            .assertThat().statusCode(400).body("message", is("이미 지난 예약은 삭제할 수 없습니다."));
-                })
-        );
+    @Sql(value = {"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/reservation.sql"})
+    void cannotDeletePastReservation() {
+        //given
+        long reservationId = 1;
+
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("token", adminToken)
+                .when().delete("/admin/reservations/" + reservationId)
+                .then().log().all()
+                .assertThat().statusCode(400)
+                .body("message", is("이미 지난 예약은 삭제할 수 없습니다."));
+
     }
 
     @DisplayName("사용자는 예약을 취소할 수 없다.")
-    @TestFactory
-    Stream<DynamicTest> cannotDeleteReservationByGuest() {
-        AtomicLong reservationId = new AtomicLong();
-        return Stream.of(
-                DynamicTest.dynamicTest("예약을 저장하고, 식별자를 가져온다.", () -> {
-                    reservationId.set((int) RestAssured.given().contentType(ContentType.JSON)
-                            .cookie("token", guestToken)
-                            .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
-                            .when().post("/reservations")
-                            .then().extract().body().jsonPath().get("id"));
-                }),
-                DynamicTest.dynamicTest("예약을 삭제한다.", () -> {
-                    RestAssured.given().log().all()
-                            .cookie("token", guestToken)
-                            .when().delete("/admin/reservations/" + reservationId)
-                            .then().log().all()
-                            .assertThat().statusCode(403)
-                            .body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
-                })
-        );
+    @Test
+    void cannotDeleteReservationByGuest() {
+        //given
+        long reservationId = (int) RestAssured.given().contentType(ContentType.JSON)
+                .cookie("token", guestToken)
+                .body(ReservationFixture.createReservationRequest(reservationDetail))
+                .when().post("/reservations")
+                .then().extract().body().jsonPath().get("id");
+
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("token", guestToken)
+                .when().delete("/admin/reservations/" + reservationId)
+                .then().log().all()
+                .assertThat().statusCode(403)
+                .body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
     }
 }

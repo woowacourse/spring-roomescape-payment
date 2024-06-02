@@ -31,7 +31,8 @@ class WaitingCreateServiceTest extends ServiceTest {
         Schedule schedule = ScheduleFixture.createFutureSchedule(time);
         ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
         reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
-        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(theme, reservationDetail);
+
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
 
         //when & then
         assertThatNoException().isThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, anotherMember.getId()));
@@ -47,7 +48,8 @@ class WaitingCreateServiceTest extends ServiceTest {
         Schedule schedule = ScheduleFixture.createFutureSchedule(time);
         ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
         reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
-        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(theme, reservationDetail);
+
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
 
         //when & then
         assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))

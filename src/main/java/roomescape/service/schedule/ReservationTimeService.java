@@ -68,8 +68,7 @@ public class ReservationTimeService {
         List<ReservationDetail> reservationDetails = reservationDetailRepository.findByScheduleDateAndThemeId(
                 ReservationDate.of(reservationTimeReadRequest.date()), reservationTimeReadRequest.themeId());
         return reservationTimeRepository.findAll().stream()
-                .map(time -> new AvailableReservationTimeResponse(time.getId(), time.getStartAt(),
-                        isBooked(reservationDetails, time)))
+                .map(time -> new AvailableReservationTimeResponse(time.getId(), time.getStartAt(), isBooked(reservationDetails, time)))
                 .toList();
     }
 

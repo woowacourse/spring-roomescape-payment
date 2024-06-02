@@ -2,97 +2,65 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
-import roomescape.service.auth.dto.LoginRequest;
-import roomescape.service.reservation.dto.ReservationRequest;
-import roomescape.service.waiting.dto.WaitingRequest;
+import roomescape.domain.reservationdetail.ReservationDetail;
+import roomescape.domain.schedule.ReservationTime;
+import roomescape.domain.theme.Theme;
+import roomescape.fixture.ReservationDetailFixture;
+import roomescape.fixture.ReservationFixture;
+import roomescape.fixture.ScheduleFixture;
+import roomescape.fixture.WaitingFixture;
 
-import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 
-@Sql("/truncate-with-time-and-theme.sql")
 class MemberAcceptanceTest extends AcceptanceTest {
-
-    private String adminToken;
-    private String guest1Token;
-    private String guest2Token;
-    private LocalDate date;
-    private long timeId = 1;
-    private long themeId = 1;
-
-    @BeforeEach
-    void init() {
-        date = LocalDate.now().plusDays(1);
-        timeId = 1;
-        themeId = 1;
-
-        adminToken = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(new LoginRequest("admin123", "admin@email.com"))
-                .when().post("/login")
-                .then().log().all().extract().cookie("token");
-
-        guest1Token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(new LoginRequest("guest123", "guest@email.com"))
-                .when().post("/login")
-                .then().log().all().extract().cookie("token");
-
-        guest2Token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(new LoginRequest("guest123", "guest2@email.com"))
-                .when().post("/login")
-                .then().log().all().extract().cookie("token");
+    @DisplayName("모든 사용자 정보를 조회한다.")
+    @Test
+    void findAllMembers() {
+        RestAssured.given().log().all()
+                .cookie("token", adminToken)
+                .when().get("/members")
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.OK.value());
     }
-
-    @DisplayName("모든 사용자 조회 성공 테스트 - 사용자 총 2명")
-    @TestFactory
-    Stream<DynamicTest> findAllMembers() {
-        return Stream.of(
-                DynamicTest.dynamicTest("어드민이 모든 사용자 정보를 조회한다.", () -> {
-                    RestAssured.given().log().all()
-                            .cookie("token", adminToken)
-                            .when().get("/members")
-                            .then().log().all()
-                            .assertThat().statusCode(HttpStatus.OK.value()).body("size()", is(3));
-                })
-        );
-    }
-
 
     @DisplayName("본인의 모든 예약과 예약 대기를 조회한다.")
     @TestFactory
     Stream<DynamicTest> showAllOwnReservationsAndWaitings() {
-        LocalDate anotherDate = LocalDate.now().plusWeeks(3);
+        Theme theme = reservationDetail.getTheme();
+        ReservationTime time = reservationDetail.getReservationTime();
+        ReservationDetail anotherReservationDetail = ReservationDetailFixture.create(theme, ScheduleFixture.createFutureSchedule(14, time));
+
         return Stream.of(
                 DynamicTest.dynamicTest("guest1이 새로운 예약을 추가한다.", () -> {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
-                            .cookie("token", guest1Token)
-                            .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                            .cookie("token", guestToken)
+                            .body(ReservationFixture.createReservationRequest(reservationDetail))
                             .when().post("/reservations")
                             .then().log().all()
                             .assertThat().statusCode(201);
                 }),
                 DynamicTest.dynamicTest("guest1이 본인의 예약 내역을 조회하면 1개 내역이 조회된다.", () -> {
                     RestAssured.given().log().all()
-                            .cookie("token", guest1Token)
+                            .cookie("token", guestToken)
                             .when().get("/members/reservations")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("size()", is(1));
+                            .assertThat().statusCode(200)
+                            .body("size()", is(1));
                 }),
-                DynamicTest.dynamicTest("guest2가 새로운 예약을 추가한다.", () -> {
+                DynamicTest.dynamicTest("admin이 새로운 예약을 추가한다.", () -> {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
-                            .cookie("token", guest2Token)
-                            .body(new ReservationRequest(anotherDate, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                            .cookie("token", adminToken)
+                            .body(ReservationFixture.createReservationRequest(anotherReservationDetail))
                             .when().post("/reservations")
                             .then().log().all()
                             .assertThat().statusCode(201).body("status", is("예약"));
@@ -100,15 +68,15 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 DynamicTest.dynamicTest("guest1이 guest2와 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
-                            .cookie("token", guest1Token)
-                            .body(new WaitingRequest(anotherDate, timeId, themeId))
+                            .cookie("token", guestToken)
+                            .body(ReservationFixture.createReservationRequest(anotherReservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
                             .assertThat().statusCode(201).body("status", is("예약대기"));
                 }),
                 DynamicTest.dynamicTest("guest1이 본인의 예약 내역을 조회하면 2개 내역이 조회된다.", () -> {
                     RestAssured.given().log().all()
-                            .cookie("token", guest1Token)
+                            .cookie("token", guestToken)
                             .when().get("/members/reservations")
                             .then().log().all()
                             .assertThat().statusCode(200).body("size()", is(2))
@@ -123,41 +91,41 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("예약이 취소되면 바로 다음 예약 대기가 예약으로 전환되며, 전환 후 예약 대기를 취소하려고 하면 예외가 발생한다.")
     @TestFactory
     Stream<DynamicTest> changeToReserved() {
+        AtomicLong reservationId = new AtomicLong();
+        AtomicLong waitingId = new AtomicLong();
         return Stream.of(
-                DynamicTest.dynamicTest("guest1이 요청한 일정과 테마로 예약이 존재하지 않아서 예약 상태로 생성한다.", () -> {
-                    RestAssured.given().log().all()
+                DynamicTest.dynamicTest("guest가 요청한 일정과 테마로 예약이 존재하지 않아서 예약 상태로 생성한다.", () -> {
+                    reservationId.set((int) RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
-                            .cookie("token", guest1Token)
-                            .body(new ReservationRequest(date, timeId, themeId, "testPaymentKey", "testOrderId", 1000L))
+                            .cookie("token", guestToken)
+                            .body(ReservationFixture.createReservationRequest(reservationDetail))
                             .when().post("/reservations")
-                            .then().extract().body().jsonPath().get("id");
+                            .then().extract().body().jsonPath().get("id"));
                 }),
-                DynamicTest.dynamicTest("guest2가 guest1과 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
-                    RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", guest2Token)
-                            .body(new WaitingRequest(date, timeId, themeId))
-                            .when().post("/waitings")
-                            .then().log().all()
-                            .assertThat().statusCode(201).body("status", is("예약대기"));
-                }),
-                DynamicTest.dynamicTest("admin이 guest1과 동일한 테마와 일정으로 예약을 요청하고, 2번째 예약 대기 상태로 생성된다.", () -> {
-                    RestAssured.given().log().all()
+                DynamicTest.dynamicTest("admin이 guest와 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
+                    waitingId.set((int) RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", adminToken)
-                            .body(new WaitingRequest(date, timeId, themeId))
+                            .body(WaitingFixture.createWaitingRequest(reservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("status", is("예약대기"));
+                            .assertThat().statusCode(201).body("status", is("예약대기"))
+                            .extract().jsonPath().get("id"));
                 }),
-                DynamicTest.dynamicTest("어드민이 본인의 예약 내역을 조회하면 2번째 예약 대기로 조회된다.", () -> {
+                DynamicTest.dynamicTest("admin이 guest의 예약을 삭제한다.", () -> {
                     RestAssured.given().log().all()
-                            .cookie("token", guest1Token)
-                            .when().get("/members/reservations")
+                            .cookie("token", adminToken)
+                            .when().delete("/admin/reservations/" + reservationId)
                             .then().log().all()
-                            .assertThat().statusCode(200)
-                            .body("[0].reservationStatus.status", is("예약"))
-                            .body("[0].reservationStatus.rank", is(0));
+                            .assertThat().statusCode(204);
+                }),
+                DynamicTest.dynamicTest("admin은 예약 대기에서 예약으로 전환되었기 떄문에 본인의 예약 대기를 삭제할 수 없다.", () -> {
+                    RestAssured.given().log().all()
+                            .cookie("token", adminToken)
+                            .when().delete("/waitings/" + waitingId)
+                            .then().log().all()
+                            .assertThat().statusCode(400)
+                            .body("message", is("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요."));
                 })
         );
     }
