@@ -2,32 +2,56 @@ package roomescape.infra.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import java.util.Arrays;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.exception.payment.PaymentFailException;
+import roomescape.exception.payment.PaymentClientException;
+import roomescape.exception.payment.PaymentServerException;
 
 @Component
+@RequiredArgsConstructor
 public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
 
-    public PaymentApiResponseErrorHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        HttpStatusCode statusCode = response.getStatusCode();
-        return statusCode.isError();
+        return response.getStatusCode().isError();
     }
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        byte[] bytes = response.getBody().readAllBytes();
-        String rawResponseBody = new String(bytes);
-        PaymentErrorResult apiError = objectMapper.readValue(rawResponseBody, PaymentErrorResult.class);
-        throw new PaymentFailException(apiError.message(), HttpStatus.BAD_REQUEST);
+        PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+        boolean isServerError = ServerErrorCode.isServerError(errorResponse.code());
+        if (isServerError) {
+            throw new PaymentServerException();
+        }
+        throw new PaymentClientException(errorResponse.message());
+    }
+
+    private enum ServerErrorCode {
+        INVALID_REQUEST,
+        INVALID_API_KEY,
+        NOT_FOUND_TERMINAL_ID,
+        INVALID_AUTHORIZE_AUTH,
+        INVALID_UNREGISTERED_SUBMALL,
+        NOT_REGISTERED_BUSINESS,
+        UNAPPROVED_ORDER_ID,
+        UNAUTHORIZED_KEY,
+        REJECT_CARD_COMPANY,
+        FORBIDDEN_REQUEST,
+        INCORRECT_BASIC_AUTH_FORMAT,
+        NOT_FOUND_PAYMENT,
+        NOT_FOUND_PAYMENT_SESSION,
+        FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING,
+        FAILED_INTERNAL_SYSTEM_PROCESSING,
+        UNKNOWN_PAYMENT_ERROR,
+        ;
+
+        public static boolean isServerError(String errorCode) {
+            return Arrays.stream(ServerErrorCode.values())
+                    .anyMatch(e -> e.name().equals(errorCode.toUpperCase()));
+        }
     }
 }
