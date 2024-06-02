@@ -3,7 +3,7 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
-import roomescape.domain.DomainService;
+import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -15,7 +15,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.RoomescapeException;
 
-@DomainService
+@Service
 public class ReservationFactory {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
