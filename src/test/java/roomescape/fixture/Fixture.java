@@ -2,6 +2,7 @@ package roomescape.fixture;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.detail.ReservationDetail;

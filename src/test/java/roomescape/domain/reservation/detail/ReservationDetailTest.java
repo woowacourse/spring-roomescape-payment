@@ -2,12 +2,14 @@ package roomescape.domain.reservation.detail;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import static roomescape.fixture.Fixture.DATE_1;
 import static roomescape.fixture.Fixture.RESERVATION_TIME_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import roomescape.domain.exception.DomainValidationException;
 
 class ReservationDetailTest {

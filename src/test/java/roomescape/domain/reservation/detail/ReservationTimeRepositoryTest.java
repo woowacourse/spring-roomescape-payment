@@ -1,6 +1,7 @@
 package roomescape.domain.reservation.detail;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
@@ -8,11 +9,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import roomescape.domain.exception.DomainNotFoundException;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;

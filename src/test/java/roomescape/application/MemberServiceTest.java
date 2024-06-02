@@ -3,10 +3,12 @@ package roomescape.application;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import roomescape.application.dto.request.SignupRequest;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.domain.member.Member;

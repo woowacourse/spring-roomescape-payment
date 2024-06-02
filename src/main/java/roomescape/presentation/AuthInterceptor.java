@@ -2,8 +2,10 @@ package roomescape.presentation;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import roomescape.application.AuthService;
 import roomescape.application.AuthorizationExtractor;
 import roomescape.application.MemberService;

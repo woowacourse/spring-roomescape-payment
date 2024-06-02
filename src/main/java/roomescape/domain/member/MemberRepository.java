@@ -1,7 +1,9 @@
 package roomescape.domain.member;
 
 import java.util.Optional;
+
 import org.springframework.data.repository.ListCrudRepository;
+
 import roomescape.domain.exception.DomainNotFoundException;
 
 public interface MemberRepository extends ListCrudRepository<Member, Long> {

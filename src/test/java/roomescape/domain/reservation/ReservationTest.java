@@ -2,6 +2,7 @@ package roomescape.domain.reservation;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import static roomescape.fixture.Fixture.DATE_1;
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.RESERVATION_DETAIL_1;
@@ -10,9 +11,11 @@ import static roomescape.fixture.Fixture.THEME_1;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import roomescape.domain.exception.DomainValidationException;
 import roomescape.domain.reservation.detail.ReservationDetail;
 

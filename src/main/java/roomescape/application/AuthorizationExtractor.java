@@ -1,7 +1,9 @@
 package roomescape.application;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.web.context.request.NativeWebRequest;
 
 public interface AuthorizationExtractor<T> {

@@ -1,10 +1,12 @@
 package roomescape.presentation.dto.request;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import roomescape.application.dto.request.WaitingRequest;
 
 public record WaitingWebRequest(

@@ -3,18 +3,20 @@ package roomescape.presentation.api;
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import roomescape.application.dto.response.AvailableReservationTimeResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.domain.member.Member;
