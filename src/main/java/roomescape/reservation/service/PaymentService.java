@@ -34,10 +34,12 @@ public class PaymentService {
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
 
-    public PaymentService(RestTemplateBuilder builder) {
+    public PaymentService(RestTemplateBuilder builder,
+                          @Value("${third-party-api.toss-payment.url}") String url,
+                          @Value("${third-party-api.toss-payment.path.payment}") String path) {
         RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(3000, ChronoUnit.MILLIS))
                 .setReadTimeout(Duration.of(1000, ChronoUnit.MILLIS))
-                .uriTemplateHandler(new DefaultUriBuilderFactory("https://api.tosspayments.com/v1/payments"))
+                .uriTemplateHandler(new DefaultUriBuilderFactory(url + path))
                 .build();
         tossRestClient = RestClient.create(tossPaymentRestTemplate);
     }
