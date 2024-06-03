@@ -10,8 +10,9 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossPaymentsErrorResponse;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.payment.dto.response.TossPaymentsErrorResponse;
 import roomescape.payment.exception.PaymentServerException;
 
 import java.io.IOException;
@@ -46,8 +47,8 @@ public class TossPaymentsClient {
         return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
     }
 
-    public void confirm(PaymentConfirmRequest request) {
-        restClient.post()
+    public PaymentConfirmResponse confirm(PaymentConfirmRequest request) {
+        return restClient.post()
                 .uri("/confirm")
                 .body(request)
                 .retrieve()
@@ -57,7 +58,7 @@ public class TossPaymentsClient {
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                     throw new PaymentServerException(extractErrorMessage(res));
                 })
-                .toBodilessEntity();
+                .body(PaymentConfirmResponse.class);
     }
 
     private String extractErrorMessage(ClientHttpResponse res) throws IOException {

@@ -4,7 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.TossPaymentsClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;

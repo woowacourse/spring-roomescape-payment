@@ -21,7 +21,7 @@ import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
