@@ -24,7 +24,7 @@ public class PaymentRequestResponseLoggingInterceptor implements ClientHttpReque
             return response;
         } catch (Exception e) {
             logger.error("Failed to log response: ", e);
-            throw new PaymentException("결제 서버 요청에 실패했습니다.");
+            throw new PaymentException();
         }
     }
 

@@ -22,7 +22,7 @@ public class PaymentTimeoutHandlerInterceptor implements ClientHttpRequestInterc
             throw new PaymentException("결제 서버 요청 시간이 초과되었습니다.");
         } catch (IOException e) {
             logger.error("Payment request failed", e);
-            throw new PaymentException("결제 서버 요청에 실패했습니다.");
+            throw new PaymentException();
         }
     }
 }
