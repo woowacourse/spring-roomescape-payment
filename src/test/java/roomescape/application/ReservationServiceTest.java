@@ -82,7 +82,7 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
-            softly.assertThat(reservation.getPayment()).isNotEmpty();
+            softly.assertThat(reservation.findPayment()).isNotEmpty();
         });
     }
 
@@ -117,7 +117,7 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.WAITING);
-            softly.assertThat(reservation.getPayment()).isEmpty();
+            softly.assertThat(reservation.findPayment()).isEmpty();
         });
     }
 
@@ -141,7 +141,7 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
-            softly.assertThat(reservation.getPayment()).isNotEmpty();
+            softly.assertThat(reservation.findPayment()).isNotEmpty();
         });
     }
 

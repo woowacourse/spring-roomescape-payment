@@ -105,7 +105,7 @@ public class Reservation {
         return this.status == Status.CANCELED;
     }
 
-    public Optional<Payment> getPayment() {
+    public Optional<Payment> findPayment() {
         return Optional.ofNullable(payment);
     }
 
