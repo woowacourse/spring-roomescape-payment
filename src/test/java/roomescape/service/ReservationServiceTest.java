@@ -39,14 +39,19 @@ class ReservationServiceTest {
     private final long timeId = 1L;
     private final long themeId = 1L;
     private final long memberId = 1L;
+
     @InjectMocks
     private ReservationService reservationService;
+
     @Mock
     private ReservationRepository reservationRepository;
+
     @Mock
     private ReservationTimeRepository reservationTimeRepository;
+
     @Mock
     private ThemeRepository themeRepository;
+
     @Mock
     private MemberRepository memberRepository;
 
@@ -74,7 +79,7 @@ class ReservationServiceTest {
 
         ReservationSaveAppRequest request = new ReservationSaveAppRequest(VALID_RESERVATION_DATE.getDate().toString(),
                 timeId,
-                themeId, memberId);
+                themeId, memberId, null);
         ReservationAppResponse actual = reservationService.save(request);
         ReservationAppResponse expected = new ReservationAppResponse(
                 reservationId,
@@ -89,7 +94,12 @@ class ReservationServiceTest {
     @DisplayName("실패: 존재하지 않는 시간,테마,사용자 ID 입력 시 예외가 발생한다.")
     @Test
     void save_TimeIdDoesntExist() {
-        assertThatThrownBy(() -> reservationService.save(new ReservationSaveAppRequest("2030-12-31", 1L, 1L, 1L)))
+        assertThatThrownBy(() -> reservationService.save(
+                new ReservationSaveAppRequest("2030-12-31",
+                        1L,
+                        1L,
+                        1L,
+                        null)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -109,7 +119,11 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(
-                () -> reservationService.save(new ReservationSaveAppRequest(rawDate, timeId, themeId, memberId)))
+                () -> reservationService.save(new ReservationSaveAppRequest(rawDate,
+                        timeId,
+                        themeId,
+                        memberId,
+                        null)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -127,7 +141,11 @@ class ReservationServiceTest {
 
         assertThatThrownBy(
                 () -> reservationService.save(
-                        new ReservationSaveAppRequest(yesterday.toString(), timeId, themeId, memberId))
+                        new ReservationSaveAppRequest(yesterday.toString(),
+                                timeId,
+                                themeId,
+                                memberId,
+                                null))
         ).isInstanceOf(RoomescapeException.class);
     }
 
@@ -148,7 +166,12 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(VALID_MEMBER));
 
         assertThatThrownBy(() ->
-                reservationService.save(new ReservationSaveAppRequest(today.toString(), timeId, themeId, memberId)))
+                reservationService.save(
+                        new ReservationSaveAppRequest(today.toString(),
+                                timeId,
+                                themeId,
+                                memberId,
+                                null)))
                 .isInstanceOf(RoomescapeException.class);
     }
 }

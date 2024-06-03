@@ -36,8 +36,8 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<AdminReservationResponse> reserve(
-            @Valid @RequestBody AdminReservationRequest request) {
-        ReservationSaveAppRequest appRequest = ReservationSaveAppRequest.from(request);
+            @Valid @RequestBody AdminReservationRequest adminReservationRequest) {
+        ReservationSaveAppRequest appRequest = ReservationSaveAppRequest.from(adminReservationRequest);
 
         ReservationAppResponse appResponse = reservationService.save(appRequest);
         AdminReservationResponse adminReservationResponse = AdminReservationResponse.from(appRequest);

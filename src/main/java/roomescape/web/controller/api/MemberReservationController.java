@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
-import roomescape.service.request.PaymentApproveAppRequest;
 import roomescape.service.request.ReservationSaveAppRequest;
 import roomescape.service.response.ReservationAppResponse;
 import roomescape.web.auth.Auth;
@@ -33,19 +32,13 @@ public class MemberReservationController {
 
     @PostMapping
     public ResponseEntity<MemberReservationResponse> reserve(
-            @Valid @RequestBody MemberReservationRequest reservationRequest,
+            @Valid @RequestBody MemberReservationRequest memberReservationRequest,
             @Valid @Auth LoginMember loginMember) {
-        PaymentApproveAppRequest paymentApproveAppRequest = PaymentApproveAppRequest.from(reservationRequest);
+        ReservationAppResponse reservationAppResponse = reservationService.save(
+                ReservationSaveAppRequest.of(memberReservationRequest, loginMember.id()));
 
-        ReservationAppResponse appResponse = reservationService.save(
-                new ReservationSaveAppRequest(reservationRequest.date(),
-                        reservationRequest.timeId(),
-                        reservationRequest.themeId(),
-                        loginMember.id()),
-                paymentApproveAppRequest);
-
-        Long id = appResponse.id();
-        MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);
+        Long id = reservationAppResponse.id();
+        MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(reservationAppResponse);
 
         return ResponseEntity.created(URI.create("/reservations/" + id))
                 .body(memberReservationResponse);

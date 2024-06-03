@@ -18,7 +18,6 @@ import roomescape.exception.RoomescapeException;
 import roomescape.service.request.AdminSearchedReservationAppRequest;
 import roomescape.service.request.PaymentApproveAppRequest;
 import roomescape.service.request.ReservationSaveAppRequest;
-import roomescape.service.response.PaymentApproveSuccessAppResponse;
 import roomescape.service.response.ReservationAppResponse;
 import roomescape.service.specification.ReservationSpecification;
 
@@ -30,22 +29,34 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentClient paymentManager;
+    private final PaymentClient paymentClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
-                              PaymentClient paymentManager) {
+                              PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentManager = paymentManager;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
     public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest) {
+        Reservation reservation = createReservation(reservationSaveAppRequest);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        PaymentApproveAppRequest paymentApproveAppRequest = reservationSaveAppRequest.paymentApproveAppRequest();
+        if (paymentApproveAppRequest != null) {
+            paymentClient.approve(paymentApproveAppRequest);
+        }
+
+        return ReservationAppResponse.from(savedReservation);
+    }
+
+    private Reservation createReservation(ReservationSaveAppRequest reservationSaveAppRequest) {
         Member member = findMember(reservationSaveAppRequest.memberId());
         ReservationDate date = new ReservationDate(reservationSaveAppRequest.date());
         ReservationTime time = findTime(reservationSaveAppRequest.timeId());
@@ -53,33 +64,19 @@ public class ReservationService {
         Reservation reservation = new Reservation(member, date, time, theme);
         validatePastReservation(reservation);
         validateDuplication(date, reservationSaveAppRequest.timeId(), reservationSaveAppRequest.themeId());
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return ReservationAppResponse.from(savedReservation);
-    }
-
-    @Transactional
-    public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest,
-                                       PaymentApproveAppRequest paymentApproveAppRequest) {
-        ReservationAppResponse reservationAppResponse = save(reservationSaveAppRequest);
-        PaymentApproveSuccessAppResponse approveSuccessResponse = paymentManager.approve(paymentApproveAppRequest);
-
-        return reservationAppResponse;
+        return reservation;
     }
 
     private ReservationTime findTime(Long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(
-                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TIME,
-                                "예약에 대한 예약시간이 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_TIME,
+                        "예약에 대한 예약시간이 존재하지 않습니다."));
     }
 
     private Theme findTheme(Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(
-                        () -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_THEME,
-                                "예약에 대한 테마가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_THEME,
+                        "예약에 대한 테마가 존재하지 않습니다."));
     }
 
     private Member findMember(Long memberId) {
