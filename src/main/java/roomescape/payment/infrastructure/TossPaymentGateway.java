@@ -13,6 +13,9 @@ import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.dto.TossErrorResponse;
 
+/**
+ * @see <a href="https://docs.tosspayments.com/reference">Toss Payments API</a>
+ */
 @Component
 public class TossPaymentGateway implements PaymentGateway {
 
@@ -24,6 +27,9 @@ public class TossPaymentGateway implements PaymentGateway {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * @see <a href="https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8">Toss Payments API - 결제 승인</a>
+     */
     @Override
     public PaymentConfirmResponse confirm(
             final String orderId,
