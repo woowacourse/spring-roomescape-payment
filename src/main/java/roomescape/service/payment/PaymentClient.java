@@ -2,7 +2,6 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
@@ -28,35 +27,32 @@ import java.util.Base64;
 public class PaymentClient {
     private static final String BASIC_DELIMITER = ":";
     private static final String AUTH_HEADER_PREFIX = "Basic ";
-    private final String secretKey;
-    private final String baseUrl;
+    private final PaymentProperties paymentProperties;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
     private final Logger logger;
 
-    public PaymentClient(@Value("${payment.secret-key}") String secretKey,
-                         @Value("${payment.url}") String baseUrl,
+    public PaymentClient(PaymentProperties paymentProperties,
                          RestClient.Builder restClientBuilder,
                          ObjectMapper objectMapper, Logger logger) {
-        this.secretKey = secretKey;
-        this.baseUrl = baseUrl;
+        this.paymentProperties = paymentProperties;
         this.objectMapper = objectMapper;
         this.logger = logger;
 
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(30))
-                .withReadTimeout(Duration.ofMinutes(30));
+                .withConnectTimeout(Duration.ofNanos(1))
+                .withReadTimeout(Duration.ofNanos(1));
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
         this.restClient = restClientBuilder.requestFactory(requestFactory).build();
     }
 
     public PaymentConfirmOutput confirmPayment(PaymentConfirmInput confirmRequest) {
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((paymentProperties.getSecretKey() + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
 
         return restClient.method(HttpMethod.POST)
-                .uri(baseUrl + "/confirm")
+                .uri(paymentProperties.getUrl() + "/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .body(confirmRequest)
