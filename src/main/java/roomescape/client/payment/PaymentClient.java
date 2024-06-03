@@ -87,7 +87,7 @@ public class PaymentClient {
         byte[] responseBodyBytes = responseBody.getBytes(StandardCharsets.UTF_8);
         return new ByteArrayInputStream(responseBodyBytes);
     }
-    
+
     public String getEncodedSecretKey() {
         return encodedSecretKey;
     }
