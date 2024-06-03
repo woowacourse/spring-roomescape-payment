@@ -2,12 +2,12 @@ package roomescape.service.dto;
 
 import roomescape.exception.RoomEscapeBusinessException;
 
-public record PaymentRequest(
+public record PaymentConfirmRequest(
         Integer amount,
         String orderId,
         String paymentKey
 ) {
-    public PaymentRequest {
+    public PaymentConfirmRequest {
         validateAmount(amount);
         validateOrderId(orderId);
         validatePaymentKey(paymentKey);

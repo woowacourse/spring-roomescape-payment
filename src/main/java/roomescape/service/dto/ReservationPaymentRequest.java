@@ -37,8 +37,8 @@ public record ReservationPaymentRequest(
         @NotBlank
         String paymentKey
 ) {
-    public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(amount, orderId, paymentKey);
+    public PaymentConfirmRequest toPaymentRequest() {
+        return new PaymentConfirmRequest(amount, orderId, paymentKey);
     }
 
     public ReservationRequest toReservationRequest() {

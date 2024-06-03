@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentException;
-import roomescape.service.dto.PaymentRequest;
+import roomescape.service.dto.PaymentConfirmRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -18,7 +18,7 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
     }
 
-    public void confirm(PaymentRequest request) {
+    public void confirmPayment(PaymentConfirmRequest request) {
         try {
             restClient.post()
                     .uri("/v1/payments/confirm")

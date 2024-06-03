@@ -73,11 +73,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 date, time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
-        PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
+        PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
 
         doThrow(PaymentException.class)
                 .when(paymentClient)
-                .confirm(paymentRequest);
+                .confirmPayment(paymentConfirmRequest);
 
         assertAll(
                 () -> assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))

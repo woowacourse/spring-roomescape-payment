@@ -51,8 +51,8 @@ public class ReservationService {
     @Transactional
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
         ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
-        PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
-        Runnable payment = () -> paymentClient.confirm(paymentRequest);
+        PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
+        Runnable payment = () -> paymentClient.confirmPayment(paymentConfirmRequest);
         return saveReservation(reservationRequest, payment);
     }
 
@@ -72,7 +72,7 @@ public class ReservationService {
         ReservationSlot slot = reservationSlotService.findSlot(waitingSaveRequest.toSlotRequest());
         return trySave(member, slot, () -> {
             throw new RoomEscapeBusinessException("해당 대기에 대한 예약이 존재하지 않습니다.");
-        }); // TODO: WaitingResponse 분리? => private 메서드 추출 못 함
+        });
     }
 
     private ReservationResponse trySave(Member member,
@@ -156,4 +156,3 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomEscapeBusinessException("회원이 존재하지 않습니다."));
     }
 }
-
