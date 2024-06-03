@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
-import roomescape.global.exception.ErrorResponse;
 import roomescape.global.exception.PaymentFailException;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
+import roomescape.payment.dto.TossErrorResponse;
 
 public class TossPaymentClient {
 
@@ -29,7 +29,7 @@ public class TossPaymentClient {
                 .body(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    ErrorResponse errorResponse = objectMapper.readValue(res.getBody(), ErrorResponse.class);
+                    TossErrorResponse errorResponse = objectMapper.readValue(res.getBody(), TossErrorResponse.class);
                     throw new PaymentFailException(errorResponse.message());
                 })
                 .toEntity(PaymentConfirmResponse.class)
