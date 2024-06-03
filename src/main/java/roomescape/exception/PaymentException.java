@@ -1,23 +1,23 @@
 package roomescape.exception;
 
 import org.springframework.http.HttpStatus;
-import roomescape.dto.response.reservation.TossExceptionResponse;
+import roomescape.dto.response.reservation.PaymentExceptionResponse;
 
 public class PaymentException extends RuntimeException {
     private final HttpStatus httpStatus;
-    private final TossExceptionResponse tossExceptionResponse;
+    private final PaymentExceptionResponse paymentExceptionResponse;
 
-    public PaymentException(HttpStatus httpStatus, TossExceptionResponse tossExceptionResponse) {
-        super(tossExceptionResponse.message());
+    public PaymentException(HttpStatus httpStatus, PaymentExceptionResponse paymentExceptionResponse) {
+        super(paymentExceptionResponse.message());
         this.httpStatus = httpStatus;
-        this.tossExceptionResponse = tossExceptionResponse;
+        this.paymentExceptionResponse = paymentExceptionResponse;
     }
 
     public HttpStatus getHttpStatus() {
         return httpStatus;
     }
 
-    public TossExceptionResponse getTossExceptionResponse() {
-        return tossExceptionResponse;
+    public PaymentExceptionResponse getTossExceptionResponse() {
+        return paymentExceptionResponse;
     }
 }

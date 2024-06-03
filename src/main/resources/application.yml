@@ -24,8 +24,9 @@ security:
       expire-milliseconds: 500000
 
 payment:
-  toss:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-    base-url: https://api.tosspayments.com
-    connection-time: 3
-    read-time: 30
+  properties:
+    - name: toss
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      base-url: https://api.tosspayments.com
+      connection-time: 3
+      read-time: 30

@@ -16,12 +16,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.mockito.BDDMockito;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
-import roomescape.dto.response.reservation.TossExceptionResponse;
+import roomescape.dto.response.reservation.PaymentExceptionResponse;
 import roomescape.exception.PaymentException;
 
 class ReservationAcceptanceTest extends BasicAcceptanceTest {
@@ -111,7 +110,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
                 request.paymentKey());
         given(paymentService.pay(paymentRequest))
                 .willThrow(new PaymentException(
-                        HttpStatus.BAD_REQUEST, new TossExceptionResponse("EXCEPTION", "exception")));
+                        HttpStatus.BAD_REQUEST, new PaymentExceptionResponse("EXCEPTION", "exception")));
 
         ReservationTestStep.postClientReservation(
                 clientToken, tomorrow.toString(), 1L, 1L, 400);

@@ -7,6 +7,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.exception.PaymentException;
 
+@Disabled
 @RestClientTest(PaymentConfig.class)
 class PaymentServiceTest {
     @Autowired

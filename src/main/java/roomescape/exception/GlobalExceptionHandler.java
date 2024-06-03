@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.dto.response.reservation.TossExceptionResponse;
+import roomescape.dto.response.reservation.PaymentExceptionResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends AbstractExceptionHandler {
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<TossExceptionResponse> exceptionHandler(PaymentException exception) {
+    public ResponseEntity<PaymentExceptionResponse> exceptionHandler(PaymentException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
                 .body(exception.getTossExceptionResponse());
