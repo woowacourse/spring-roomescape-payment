@@ -1,4 +1,4 @@
-package roomescape.infra.payment;
+package roomescape.infra.payment.toss;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

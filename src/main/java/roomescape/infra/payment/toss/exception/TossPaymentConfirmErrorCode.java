@@ -1,4 +1,4 @@
-package roomescape.infra.payment;
+package roomescape.infra.payment.toss.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -6,7 +6,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import java.util.Arrays;
 import org.springframework.http.HttpStatus;
 
-public enum PaymentConfirmErrorCode {
+public enum TossPaymentConfirmErrorCode {
 
     EXCEED_MAX_CARD_INSTALLMENT_PLAN(BAD_REQUEST, "설정 가능한 최대 할부 개월 수를 초과했습니다."),
     NOT_ALLOWED_POINT_USE(BAD_REQUEST, "포인트 사용이 불가한 카드로 카드 포인트 결제에 실패했습니다."),
@@ -45,12 +45,12 @@ public enum PaymentConfirmErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
 
-    PaymentConfirmErrorCode(HttpStatus httpStatus, String message) {
+    TossPaymentConfirmErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public static PaymentConfirmErrorCode fromCode(String code) {
+    public static TossPaymentConfirmErrorCode fromCode(String code) {
         return Arrays.stream(values())
                 .filter(errorCode -> errorCode.isSameCode(code))
                 .findFirst()

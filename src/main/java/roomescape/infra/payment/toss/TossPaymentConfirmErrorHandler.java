@@ -1,4 +1,4 @@
-package roomescape.infra.payment;
+package roomescape.infra.payment.toss;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.infra.payment.dto.PaymentErrorResponse;
-import roomescape.infra.payment.exception.PaymentConfirmException;
+import roomescape.infra.payment.toss.dto.TossPaymentErrorResponse;
+import roomescape.infra.payment.toss.exception.TossPaymentConfirmErrorCode;
+import roomescape.infra.payment.toss.exception.TossPaymentConfirmException;
 
 @Component
 public class TossPaymentConfirmErrorHandler implements ResponseErrorHandler {
@@ -27,11 +28,11 @@ public class TossPaymentConfirmErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-        PaymentConfirmErrorCode errorCode = PaymentConfirmErrorCode.fromCode(errorResponse.code());
+        TossPaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
+        TossPaymentConfirmErrorCode errorCode = TossPaymentConfirmErrorCode.fromCode(errorResponse.code());
 
         log.error("[PaymentConfirmException] code: {}, message: {}", errorResponse.code(), errorResponse.message());
-        throw new PaymentConfirmException(errorCode.getMessage(), errorCode.getHttpStatusCode());
+        throw new TossPaymentConfirmException(errorCode.getMessage(), errorCode.getHttpStatusCode());
     }
 
 }
