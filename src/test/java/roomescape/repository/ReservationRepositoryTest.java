@@ -29,8 +29,8 @@ class ReservationRepositoryTest {
         //then
         assertAll(
                 () -> assertThat(reservations).hasSize(3),
-                () -> assertThat(reservations.get(0).getDate()).isEqualTo("2024-05-01"),
-                () -> assertThat(reservations.get(2).getDate()).isEqualTo("2024-05-24")
+                () -> assertThat(reservations.get(0).getDate()).isEqualTo("2024-05-02"),
+                () -> assertThat(reservations.get(2).getDate()).isEqualTo("2024-06-02")
         );
     }
 
@@ -53,7 +53,7 @@ class ReservationRepositoryTest {
                 .findAllByMemberAndThemeAndDateBetween(ADMIN_MEMBER, THEME_ONE, FROM_DATE, TO_DATE);
 
         //then
-        assertThat(reservations).hasSize(1);
+        assertThat(reservations).hasSize(2);
     }
 
     @DisplayName("해당 theme에 예약이 존재하면 true를 반환한다.")

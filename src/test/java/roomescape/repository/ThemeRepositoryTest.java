@@ -13,6 +13,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static roomescape.fixture.DateFixture.FROM_DATE;
+import static roomescape.fixture.DateFixture.TO_DATE;
 
 @DataJpaTest
 class ThemeRepositoryTest {
@@ -25,12 +27,10 @@ class ThemeRepositoryTest {
     @Test
     void findThemesWithReservationsBetweenDates() {
         //given
-        LocalDate fromDate = LocalDate.of(2024, 5, 24);
-        LocalDate toDate = LocalDate.of(2024, 5, 26);
         Pageable pageable = PageRequest.of(0, 2);
 
         //when
-        List<Theme> themes = themeRepository.findThemesWithReservationsBetweenDates(fromDate, toDate, pageable);
+        List<Theme> themes = themeRepository.findThemesWithReservationsBetweenDates(FROM_DATE, TO_DATE, pageable);
 
         //then
         assertAll(

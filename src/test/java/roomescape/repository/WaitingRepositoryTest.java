@@ -33,8 +33,8 @@ class WaitingRepositoryTest {
         //then
         assertAll(
                 () -> assertThat(waitings).hasSize(4),
-                () -> assertThat(waitings.get(0).getWaiting().getDate()).isEqualTo("2024-05-17"),
-                () -> assertThat(waitings.get(3).getWaiting().getDate()).isEqualTo("2024-05-24")
+                () -> assertThat(waitings.get(0).getWaiting().getDate()).isEqualTo("2024-05-31"),
+                () -> assertThat(waitings.get(3).getWaiting().getDate()).isEqualTo("2099-04-29")
         );
     }
 
