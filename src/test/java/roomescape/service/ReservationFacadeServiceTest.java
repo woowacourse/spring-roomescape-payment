@@ -34,6 +34,7 @@ import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+import roomescape.service.facade.UserReservationGeneralService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -43,7 +44,7 @@ class ReservationFacadeServiceTest {
     int port;
 
     @Autowired
-    private ReservationFacadeService reservationFacadeService;
+    private UserReservationGeneralService reservationFacadeService;
 
     @Autowired
     private UserReservationService userReservationService;

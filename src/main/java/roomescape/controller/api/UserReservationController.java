@@ -20,15 +20,15 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
-import roomescape.service.ReservationFacadeService;
+import roomescape.service.facade.UserReservationGeneralService;
 
 @RestController
 @RequestMapping("/reservations")
 public class UserReservationController {
 
-    private final ReservationFacadeService reservationFacadeService;
+    private final UserReservationGeneralService reservationFacadeService;
 
-    public UserReservationController(ReservationFacadeService reservationFacadeService) {
+    public UserReservationController(UserReservationGeneralService reservationFacadeService) {
         this.reservationFacadeService = reservationFacadeService;
     }
 

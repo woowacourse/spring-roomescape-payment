@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.facade;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,14 +8,16 @@ import org.springframework.stereotype.Service;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
+import roomescape.service.PaymentService;
+import roomescape.service.UserReservationService;
 
 @Service
-public class ReservationFacadeService {
+public class UserReservationGeneralService {
 
     private final UserReservationService userReservationService;
     private final PaymentService paymentService;
 
-    public ReservationFacadeService(UserReservationService userReservationService, PaymentService paymentService) {
+    public UserReservationGeneralService(UserReservationService userReservationService, PaymentService paymentService) {
         this.userReservationService = userReservationService;
         this.paymentService = paymentService;
     }
