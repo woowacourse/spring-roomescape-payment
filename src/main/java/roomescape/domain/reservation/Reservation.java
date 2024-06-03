@@ -43,7 +43,7 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private ReservationDetail detail;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
