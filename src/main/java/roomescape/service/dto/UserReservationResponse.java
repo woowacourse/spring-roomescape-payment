@@ -20,21 +20,22 @@ public record UserReservationResponse(
         Integer amount
 ) {
 
-        public static Stream<UserReservationResponse> reservationsToResponseStream(List<BookedReservationResponse> bookedReservationResponses, List<PaymentResponse> paymentResponses) {
-                return bookedReservationResponses.stream()
+        public static Stream<UserReservationResponse> reservationsToResponseStream(List<UserBookedReservationResponse> userBookedReservationRespons, List<PaymentResponse> paymentResponses) {
+                return userBookedReservationRespons.stream()
                         .map(bookedMember -> createByReservation(bookedMember, paymentResponses));
         }
 
-        private static UserReservationResponse createByReservation(BookedReservationResponse bookedReservationResponse, List<PaymentResponse> paymentResponses) {
+        private static UserReservationResponse createByReservation(
+                UserBookedReservationResponse userBookedReservationResponse, List<PaymentResponse> paymentResponses) {
                 Optional<PaymentResponse> payment = paymentResponses.stream()
-                        .filter(paymentResponse -> paymentResponse.reservationId().equals(bookedReservationResponse.reservationId()))
+                        .filter(paymentResponse -> paymentResponse.reservationId().equals(userBookedReservationResponse.reservationId()))
                         .findFirst();
 
                 return new UserReservationResponse(
-                        bookedReservationResponse.id(),
-                        bookedReservationResponse.theme(),
-                        bookedReservationResponse.date(),
-                        bookedReservationResponse.startAt(),
+                        userBookedReservationResponse.id(),
+                        userBookedReservationResponse.theme(),
+                        userBookedReservationResponse.date(),
+                        userBookedReservationResponse.startAt(),
                         payment.isPresent() ?  ReservationStatus.BOOKED.getValue() : ReservationStatus.WAIT_PAYMENT.getValue(),
                         0L,
                         payment.isPresent() ? payment.get().paymentKey() : "",

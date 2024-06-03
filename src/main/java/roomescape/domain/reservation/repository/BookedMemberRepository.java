@@ -15,6 +15,7 @@ public interface BookedMemberRepository extends JpaRepository<BookedMember, Long
     @Query("""
             select new roomescape.domain.reservation.dto.BookedReservationReadOnly(
                 bm.id,
+                r.id,
                 bm.member.name,
                 r.date,
                 r.time.startAt,

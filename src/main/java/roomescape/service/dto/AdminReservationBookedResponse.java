@@ -7,25 +7,25 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import roomescape.domain.reservation.dto.BookedReservationReadOnly;
 
-public record ReservationBookedResponse(
+public record AdminReservationBookedResponse(
         Long id,
+        Long reservationId,
         String name,
         @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
         LocalDate date,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
         LocalTime time,
-        String theme,
-        String status
+        String theme
 ) {
 
-    public static ReservationBookedResponse from(BookedReservationReadOnly reservation) {
-        return new ReservationBookedResponse(
+    public static AdminReservationBookedResponse from(BookedReservationReadOnly reservation) {
+        return new AdminReservationBookedResponse(
                 reservation.id(),
+                reservation.reservationId(),
                 reservation.name(),
                 reservation.date(),
                 reservation.time(),
-                reservation.theme(),
-                "예약 확정"
+                reservation.theme()
         );
     }
 

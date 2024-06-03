@@ -21,9 +21,9 @@ import roomescape.domain.reservation.repository.WaitingMemberRepository;
 import roomescape.exception.AuthorizationException;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.BookedMemberResponse;
-import roomescape.service.dto.BookedReservationResponse;
+import roomescape.service.dto.UserBookedReservationResponse;
 import roomescape.service.dto.LoginMember;
-import roomescape.service.dto.ReservationBookedResponse;
+import roomescape.service.dto.AdminReservationBookedResponse;
 import roomescape.service.dto.ReservationConditionRequest;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
@@ -98,7 +98,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationBookedResponse> findBookedReservationsByCondition(
+    public List<AdminReservationBookedResponse> findBookedReservationsByCondition(
             ReservationConditionRequest reservationConditionRequest) {
         List<BookedReservationReadOnly> reservations = bookedMemberRepository.findByConditions(
                 reservationConditionRequest.dateFrom(),
@@ -108,8 +108,8 @@ public class ReservationService {
         );
 
         return reservations.stream()
-                .map(ReservationBookedResponse::from)
-                .sorted(Comparator.comparing(ReservationBookedResponse::dateTime))
+                .map(AdminReservationBookedResponse::from)
+                .sorted(Comparator.comparing(AdminReservationBookedResponse::dateTime))
                 .toList();
     }
 
@@ -121,10 +121,10 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookedReservationResponse> findBookedAfterDate(Long memberId, LocalDate date) {
+    public List<UserBookedReservationResponse> findBookedAfterDate(Long memberId, LocalDate date) {
         Member member = findMemberById(memberId);
         return bookedMemberRepository.findByMemberAndReservation_DateGreaterThanEqual(member, date).stream()
-                .map(BookedReservationResponse::from)
+                .map(UserBookedReservationResponse::from)
                 .toList();
     }
 

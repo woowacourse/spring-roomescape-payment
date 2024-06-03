@@ -54,4 +54,8 @@ public class PaymentService {
                     paymentRepository.save(payment);
                 });
     }
+
+    public List<Long> findDoneStatusReservationIds(List<Long> reservationIds) {
+        return paymentRepository.findReservationIdsByStatusAndList(PaymentStatus.DONE, reservationIds);
+    }
 }

@@ -36,6 +36,7 @@ function render(data) {
     row.insertCell(2).textContent = item.theme;      // 테마 name
     row.insertCell(3).textContent = item.date;            // date
     row.insertCell(4).textContent = item.time;    // 예약 시간 startAt
+    row.insertCell(5).textContent = item.status;    // 예약 시간 startAt
 
     const actionCell = row.insertCell(row.cells.length);
     actionCell.appendChild(createActionButton('삭제', 'btn-danger', deleteRow));

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
-import roomescape.service.dto.ReservationBookedResponse;
+import roomescape.service.dto.BookedPaymentResponse;
 import roomescape.service.dto.ReservationConditionRequest;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
@@ -48,12 +48,12 @@ public class AdminReservationController {
     }
 
     @GetMapping("/booked")
-    public ResponseEntity<List<ReservationBookedResponse>> findBookedReservations(
+    public ResponseEntity<List<BookedPaymentResponse>> findBookedReservations(
             @ModelAttribute @Valid ReservationConditionRequest reservationConditionRequest) {
-        List<ReservationBookedResponse> reservationResponses = reservationService.findBookedReservationsByCondition(reservationConditionRequest);
+        List<BookedPaymentResponse> bookedPaymentResponses = reservationPaymentService.findBookedPaymentByCondition(reservationConditionRequest);
 
         return ResponseEntity.ok()
-                .body(reservationResponses);
+                .body(bookedPaymentResponses);
     }
 
     @DeleteMapping("/booked/{id}")

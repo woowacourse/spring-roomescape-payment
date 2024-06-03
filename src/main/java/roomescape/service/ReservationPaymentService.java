@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.service.dto.BookedMemberResponse;
 import roomescape.service.dto.BookedPaymentRequest;
-import roomescape.service.dto.BookedReservationResponse;
+import roomescape.service.dto.BookedPaymentResponse;
+import roomescape.service.dto.UserBookedReservationResponse;
 import roomescape.service.dto.PaymentApproveRequest;
 import roomescape.service.dto.PaymentResponse;
+import roomescape.service.dto.AdminReservationBookedResponse;
+import roomescape.service.dto.ReservationConditionRequest;
 import roomescape.service.dto.ReservationPaymentRequest;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
@@ -44,7 +47,7 @@ public class ReservationPaymentService {
 
     @Transactional(readOnly = true)
     public List<UserReservationResponse> findMyAllReservationWithPayment(Long memberId, LocalDate date) {
-        List<BookedReservationResponse> bookedResponses = reservationService.findBookedAfterDate(memberId, date);
+        List<UserBookedReservationResponse> bookedResponses = reservationService.findBookedAfterDate(memberId, date);
         List<WaitingRankResponse> waitingRanks = reservationService.findWaitingRanksAfterDate(memberId, date);
         List<PaymentResponse> paymentResponses = paymentService.findPaidByMemberId(memberId);
 
@@ -69,5 +72,27 @@ public class ReservationPaymentService {
         BookedMemberResponse bookedMemberResponse = reservationService.findBookedMember(bookedPaymentRequest.id());
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.of(bookedMemberResponse, bookedPaymentRequest);
         paymentService.requestApproval(paymentApproveRequest);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookedPaymentResponse> findBookedPaymentByCondition(
+            ReservationConditionRequest reservationConditionRequest) {
+        List<AdminReservationBookedResponse> reservations = reservationService.findBookedReservationsByCondition(
+                reservationConditionRequest);
+
+        List<Long> reservationIds = reservations.stream()
+                .map(AdminReservationBookedResponse::reservationId)
+                .toList();
+
+        List<Long> paidReservationIds = paymentService.findDoneStatusReservationIds(reservationIds);
+
+        return reservations.stream()
+                .map(reservation ->
+                        BookedPaymentResponse.of(
+                                reservation,
+                                paidReservationIds.contains(reservation.reservationId())
+                        )
+                )
+                .toList();
     }
 }
