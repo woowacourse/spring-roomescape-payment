@@ -1,7 +1,7 @@
-package roomescape.domain;
+package roomescape.domain.payment;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import roomescape.domain.reservation.Reservation;

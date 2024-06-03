@@ -1,6 +1,6 @@
 package roomescape.dto.payment;
 
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.reservation.ReservationSaveRequest;
 
