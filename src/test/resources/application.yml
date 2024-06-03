@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql.init.mode: never
+
+jwt:
+  secret: testtesttesttesttesttesttesttesttesttesttest
+  expire-in-millis: 1800000
+
+payment:
+  providers:
+    - name: toss
+      secret: testtesttesttesttesttesttesttesttesttesttest
+      url: https://test.toss.aru
+      connection-timeout-in-seconds: 3s
+      read-timeout-in-seconds: 31s
