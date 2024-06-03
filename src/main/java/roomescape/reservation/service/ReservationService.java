@@ -1,6 +1,5 @@
 package roomescape.reservation.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,8 +69,8 @@ public class ReservationService {
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
-        validate(reservation);
 
+        validateExists(reservation);
         return createReservation(reservation);
     }
 
@@ -80,22 +79,11 @@ public class ReservationService {
         Member member = findMemberByMemberId(memberId);
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
-        Reservation reservation = request.createReservation(member, time, theme);
-        validate(reservation);
-        reservationRepository.save(reservation);
-
-        return new ReservationSaveResponse(reservation);
-    }
-
-    private void validate(Reservation reservation) {
-        validateIsAvailable(reservation);
+        Reservation reservation = request.makeReservation(member, time, theme);
         validateExists(reservation);
-    }
 
-    private void validateIsAvailable(Reservation reservation) {
-        if (reservation.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
-        }
+        reservationRepository.save(reservation);
+        return new ReservationSaveResponse(reservation);
     }
 
     private void validateExists(Reservation reservation) {

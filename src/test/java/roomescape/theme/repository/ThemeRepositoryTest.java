@@ -6,12 +6,15 @@ import static roomescape.fixture.ThemeFixture.THEME_1;
 import static roomescape.fixture.ThemeFixture.THEME_2;
 import static roomescape.fixture.ThemeFixture.THEME_3;
 import static roomescape.fixture.TimeFixture.TIME_1;
+import static roomescape.fixture.TimeFixture.TIME_2;
+import static roomescape.fixture.TimeFixture.TIME_3;
 
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.fixture.DateFixture;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.ReservationRepository;
@@ -37,24 +40,26 @@ class ThemeRepositoryTest extends RepositoryTest {
         Theme theme3 = themeRepository.save(THEME_3);
 
         ReservationTime time = timeRepository.save(TIME_1);
-        LocalDate date = LocalDate.now();
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(1), time, theme2, ReservationStatus.RESERVED));
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(2), time, theme2, ReservationStatus.RESERVED));
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(3), time, theme2, ReservationStatus.RESERVED));
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(4), time, theme3, ReservationStatus.RESERVED));
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(5), time, theme3, ReservationStatus.RESERVED));
-        reservationRepository.save(
-                new Reservation(MEMBER_BRI, date.minusDays(6), time, theme1, ReservationStatus.RESERVED));
+        ReservationTime time2 = timeRepository.save(TIME_2);
+        ReservationTime time3 = timeRepository.save(TIME_3);
 
-        LocalDate startDate = date.minusDays(6);
-        LocalDate endDate = date.minusDays(1);
+        LocalDate date = DateFixture.TOMORROW_DATE;
 
-        List<Theme> actual = themeRepository.findThemesSortedByCountOfReservation(startDate, endDate, 2);
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time2, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time3, theme2, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme3, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time2, theme3, ReservationStatus.RESERVED));
+        reservationRepository.save(
+                new Reservation(MEMBER_BRI, date, time, theme1, ReservationStatus.RESERVED));
+
+        List<Theme> actual = themeRepository.findThemesSortedByCountOfReservation(date, DateFixture.TWO_DAYS_LATER_DATE,
+                2);
 
         assertThat(actual).containsExactly(theme2, theme3);
     }

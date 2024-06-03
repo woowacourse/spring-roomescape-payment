@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.fixture.DateFixture;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.ReservationRepository;
@@ -35,7 +36,8 @@ class TimeRepositoryTest extends RepositoryTest {
         ReservationTime reservedTime = timeRepository.save(TIME_1);
         ReservationTime notReservedTime = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
-        LocalDate date = LocalDate.now();
+        LocalDate date = DateFixture.TOMORROW_DATE;
+        
         reservationRepository.save(new Reservation(MEMBER_BRI, date, reservedTime, theme, ReservationStatus.RESERVED));
 
         List<ReservationTime> actual = timeRepository.findTimesExistsReservationDateAndThemeId(date, theme.getId());

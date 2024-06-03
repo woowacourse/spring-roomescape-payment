@@ -19,7 +19,7 @@ public record ReservationCreateRequest(
         int amount,
         PaymentType paymentType
 ) {
-    public Reservation createReservation(Member member, ReservationTime time, Theme theme) {
+    public Reservation makeReservation(Member member, ReservationTime time, Theme theme) {
         return new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
     }
 }

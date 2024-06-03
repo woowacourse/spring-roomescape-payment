@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.fixture.DateFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -25,6 +26,7 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithOrder;
 
 class WaitingRepositoryTest extends RepositoryTest {
+    
     @Autowired
     private TimeRepository timeRepository;
     @Autowired
@@ -41,14 +43,14 @@ class WaitingRepositoryTest extends RepositoryTest {
     void findFirstByReservation_idOrderByCreatedAtAscTest() {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
-        LocalDate date = LocalDate.now();
+        LocalDate date = DateFixture.TOMORROW_DATE;
 
         Reservation reservation = reservationRepository.save(
                 new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
         Waiting firstWaiting = waitingRepository.save(new Waiting(reservation, MEMBER_BROWN));
-        Waiting secondWaiting = waitingRepository.save(new Waiting(reservation, MEMBER_DUCK));
+        waitingRepository.save(new Waiting(reservation, MEMBER_DUCK));
 
-        Waiting actual = waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(1L).get();
+        waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(1L).get();
 
         assertThat(firstWaiting).isEqualTo(firstWaiting);
     }
@@ -58,7 +60,7 @@ class WaitingRepositoryTest extends RepositoryTest {
     void findByMember_idTest() {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
-        LocalDate date = LocalDate.now();
+        LocalDate date = DateFixture.TOMORROW_DATE;
 
         Reservation reservation1 = reservationRepository.save(
                 new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
@@ -78,7 +80,7 @@ class WaitingRepositoryTest extends RepositoryTest {
     void existsByReservation_idAndMember_idTrueTest() {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
-        LocalDate date = LocalDate.now();
+        LocalDate date = DateFixture.TOMORROW_DATE;
 
         Reservation reservation = reservationRepository.save(
                 new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));
@@ -95,7 +97,7 @@ class WaitingRepositoryTest extends RepositoryTest {
     void existsByReservation_idAndMember_idFalseTest() {
         ReservationTime time = timeRepository.save(TIME_1);
         Theme theme = themeRepository.save(THEME_1);
-        LocalDate date = LocalDate.now();
+        LocalDate date = DateFixture.TOMORROW_DATE;
 
         Reservation reservation = reservationRepository.save(
                 new Reservation(MEMBER_BRI, date, time, theme, ReservationStatus.RESERVED));

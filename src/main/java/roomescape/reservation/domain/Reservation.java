@@ -40,30 +40,32 @@ public class Reservation {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme,
-                       ReservationStatus reservationStatus) {
-        this.id = null;
-        this.member = Objects.requireNonNull(member);
-        this.date = Objects.requireNonNull(date);
-        this.time = Objects.requireNonNull(time);
-        this.theme = Objects.requireNonNull(theme);
-        this.reservationStatus = reservationStatus;
-    }
-
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme,
                        ReservationStatus reservationStatus) {
-        this.id = Objects.requireNonNull(id);
+        this.id = id;
         this.member = Objects.requireNonNull(member);
         this.date = Objects.requireNonNull(date);
         this.time = Objects.requireNonNull(time);
         this.theme = Objects.requireNonNull(theme);
         this.reservationStatus = reservationStatus;
+        validateReservation();
+    }
+
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme,
+                       ReservationStatus reservationStatus) {
+        this(null, member, date, time, theme, reservationStatus);
     }
 
     protected Reservation() {
     }
 
-    public boolean isBefore(LocalDateTime currentDateTime) {
+    public void validateReservation() {
+        if (isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
+        }
+    }
+
+    private boolean isBefore(LocalDateTime currentDateTime) {
         LocalDate currentDate = currentDateTime.toLocalDate();
         if (date.isBefore(currentDate)) {
             return true;
