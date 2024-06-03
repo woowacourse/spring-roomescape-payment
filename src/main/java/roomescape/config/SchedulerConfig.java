@@ -1,9 +1,9 @@
-package roomescape.infra;
+package roomescape.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-public class InfraConfiguration {
+public class SchedulerConfig {
 }
