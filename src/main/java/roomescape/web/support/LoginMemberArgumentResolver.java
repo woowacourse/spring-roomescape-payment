@@ -1,10 +1,11 @@
-package roomescape.web.config;
+package roomescape.web.support;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -13,8 +14,12 @@ import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.security.JwtProvider;
 import roomescape.exception.AuthenticationException;
 
+@Component
 @RequiredArgsConstructor
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
+    private static final String TARGET_COOKIE_NAME = "token";
+
+    private final JwtProvider jwtProvider;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -22,11 +27,15 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory
+    ) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String token = extractCookie(request.getCookies(), "token");
-        return new MemberInfo(new JwtProvider().extractId(token));
+        String token = extractCookie(request.getCookies(), TARGET_COOKIE_NAME);
+        return new MemberInfo(jwtProvider.extractId(token));
     }
 
     private String extractCookie(Cookie[] cookies, String targetCookie) {
