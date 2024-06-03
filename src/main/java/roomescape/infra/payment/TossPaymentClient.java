@@ -55,7 +55,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
         try {
             return Optional.ofNullable(restClient.post()
                             .uri("/v1/payments/confirm")

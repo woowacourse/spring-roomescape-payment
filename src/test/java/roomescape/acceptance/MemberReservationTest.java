@@ -50,7 +50,7 @@ class MemberReservationTest {
                 "2024-08-01T00:00:00",
                 "2024-08-02T00:00:00");
 
-        when(paymentClient.confirm(any()))
+        when(paymentClient.confirmPayment(any()))
                 .thenReturn(responseBody);
     }
 

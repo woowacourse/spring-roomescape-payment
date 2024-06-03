@@ -48,7 +48,7 @@ public class ReservationService {
 
         if (reservation.isPaymentPending()) {
             PaymentRequest paymentRequest = request.toPaymentRequest();
-            PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+            PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
             Payment payment = paymentRepository.save(paymentResponse.toPayment());
             reservation.completePayment(payment);
         }
@@ -71,7 +71,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
         rejectIfNotOwner(reservation, memberId);
         PaymentRequest paymentRequest = request.toPaymentRequest();
-        PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
+        PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
         Payment payment = paymentRepository.save(paymentResponse.toPayment());
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);

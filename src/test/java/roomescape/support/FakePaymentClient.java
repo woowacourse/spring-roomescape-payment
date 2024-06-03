@@ -6,7 +6,7 @@ import roomescape.domain.payment.PaymentClient;
 
 public class FakePaymentClient implements PaymentClient {
     @Override
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
         return new PaymentResponse(
                 1000L,
                 "paymentKey",
