@@ -16,8 +16,9 @@ import roomescape.exception.InternalException;
 import roomescape.global.util.Authorization;
 import roomescape.global.util.Encoder;
 import roomescape.payment.TossPaymentProperties;
-import roomescape.payment.exception.PaymentException;
-import roomescape.payment.service.dto.PaymentErrorResponse;
+import roomescape.exception.PaymentException;
+import roomescape.payment.exception.toss.TossPaymentErrorResponse;
+import roomescape.payment.exception.toss.TossPaymentException;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 
@@ -88,7 +89,7 @@ public class PaymentClient {
 
     private ErrorHandler handleError() {
         return (request, response) -> {
-            throw new PaymentException(objectMapper.readValue(response.getBody(), PaymentErrorResponse.class));
+            throw new TossPaymentException(objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class));
         };
     }
 
