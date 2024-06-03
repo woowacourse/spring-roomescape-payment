@@ -1,7 +1,9 @@
 package roomescape.payment.dto;
 
+import java.math.BigDecimal;
+
 public record PaymentConfirmResponse(
-        int totalAmount,
+        BigDecimal totalAmount,
         String orderId,
         String paymentKey) {
 }
