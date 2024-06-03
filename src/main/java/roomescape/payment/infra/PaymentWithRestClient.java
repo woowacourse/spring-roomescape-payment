@@ -46,6 +46,7 @@ public class PaymentWithRestClient implements PaymentClient {
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + secretKey)
+                .header("TossPayments-Test-Code", "INVALID_CARD_EXPIRATION")
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(new TossPaymentErrorHandler())

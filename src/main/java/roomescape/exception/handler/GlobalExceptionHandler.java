@@ -65,9 +65,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ExceptionResponse> handlePaymentExceptionException(PaymentException e) {
         log.error(e.getMessage());
-        TossPaymentErrorType errorType = TossPaymentErrorType.findByErrorCode(e.getMessage());
-        return ResponseEntity.status(errorType.getHttpStatus())
-                .body(new ExceptionResponse(errorType.getMessage()));
+        return ResponseEntity.status(e.getStatus())
+                .body(new ExceptionResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
