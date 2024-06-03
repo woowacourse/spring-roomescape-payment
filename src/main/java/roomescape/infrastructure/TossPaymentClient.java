@@ -18,6 +18,7 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
     }
 
+    @Override
     public void confirmPayment(PaymentConfirmRequest request) {
         try {
             restClient.post()
