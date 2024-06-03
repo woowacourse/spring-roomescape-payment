@@ -16,6 +16,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.exception.ExceptionResponse;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
@@ -86,7 +87,7 @@ public class PaymentClient {
         byte[] responseBodyBytes = responseBody.getBytes(StandardCharsets.UTF_8);
         return new ByteArrayInputStream(responseBodyBytes);
     }
-
+    
     public String getEncodedSecretKey() {
         return encodedSecretKey;
     }
