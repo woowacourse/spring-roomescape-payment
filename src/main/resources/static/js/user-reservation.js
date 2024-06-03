@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }

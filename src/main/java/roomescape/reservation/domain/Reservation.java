@@ -56,15 +56,15 @@ public class Reservation {
         this(null, member, date, time, theme);
     }
 
+    protected Reservation() {
+    }
+
     public static Reservation createNewReservation(Member member, ReservationDate date, ReservationTime time,
                                                    Theme theme) {
         if (date.isPast()) {
             throw new IllegalRequestException("예약 날짜는 과거일 수 없습니다");
         }
         return new Reservation(member, date, time, theme);
-    }
-
-    protected Reservation() {
     }
 
     public boolean isReservedBy(Long memberId) {
