@@ -14,33 +14,39 @@ public class GlobalExceptionHandler {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ExceptionResponse> handlePaymentException(PaymentException e) {
+        log.warn("[PaymentException]", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toExceptionResponse());
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException e) {
-        log.warn(e.getMessage());
+        log.warn("[BadRequestException]", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getExceptionResponse());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
-        log.warn(e.getMessage());
+        log.warn("[NotFoundException]", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getExceptionResponse());
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException e) {
-        log.warn(e.getMessage());
+        log.warn("[AuthenticationException]", e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getExceptionResponse());
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ExceptionResponse> handleAuthorizationException(AuthorizationException e) {
-        log.warn(e.getMessage());
+        log.warn("[AuthorizationException]", e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getExceptionResponse());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.warn(e.getMessage());
+        log.warn("[MethodArgumentNotValidException]", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
@@ -48,14 +54,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse> handleHandlerMethodValidationException(
             HandlerMethodValidationException e) {
-        log.warn(e.getMessage());
+        log.warn("[HandlerMethodValidationException]", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        log.error(e.getMessage());
+        log.error("[Exception]", e);
         return ResponseEntity.internalServerError()
                 .body(ExceptionResponse.of(ErrorType.UNEXPECTED_SERVER_ERROR));
     }
