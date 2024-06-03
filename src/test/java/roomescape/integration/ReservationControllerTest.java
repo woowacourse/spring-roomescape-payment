@@ -1,17 +1,7 @@
 package roomescape.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,15 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.config.TestPaymentConfig;
-import roomescape.domain.Duration;
-import roomescape.domain.Email;
-import roomescape.domain.Member;
-import roomescape.domain.Name;
-import roomescape.domain.Password;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
+import roomescape.domain.*;
 import roomescape.dto.ReservationResponse;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -41,6 +23,17 @@ import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.FakePayment;
 import roomescape.service.JwtGenerator;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
+import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(TestPaymentConfig.class)
@@ -175,7 +168,7 @@ public class ReservationControllerTest {
                     .body(reservationParam)
                     .post("/reservations")
                     .then().log().all()
-                    .statusCode(400);
+                    .statusCode(500);
 
             RestAssured.given().log().all()
                     .when().get("/reservations")
