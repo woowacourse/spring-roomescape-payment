@@ -1,16 +1,27 @@
 package roomescape.core.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import roomescape.core.dto.auth.TokenRequest;
 import roomescape.core.dto.member.MemberRequest;
 import roomescape.utils.AdminGenerator;
@@ -31,35 +42,16 @@ class MemberControllerTest {
     @Autowired
     private AdminGenerator adminGenerator;
 
+    private RequestSpecification spec;
+
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation))
+                .build();
 
         databaseCleaner.executeTruncate();
         adminGenerator.generate();
-    }
-
-    @AfterEach
-    void tearDown() {
-        databaseCleaner.executeTruncate();
-    }
-
-    @Test
-    @DisplayName("예약 페이지로 이동한다.")
-    void moveToReservationPage() {
-        RestAssured.given().log().all()
-                .when().get("/reservation")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @Test
-    @DisplayName("로그인 페이지로 이동한다.")
-    void moveToLoginPage() {
-        RestAssured.given().log().all()
-                .when().get("/login")
-                .then().log().all()
-                .statusCode(200);
     }
 
     @Test
@@ -67,8 +59,17 @@ class MemberControllerTest {
     void login() {
         TokenRequest request = new TokenRequest("test@email.com", "password");
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
                 .contentType("application/json")
+                .accept("application/json")
+                .filter(document("login/post/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("로그인할 유저의 이메일"),
+                                fieldWithPath("password").description("로그인할 유저의 비밀번호")
+                        ),
+                        responseCookies(cookieWithName("token").description("로그인한 유저의 토큰"))))
                 .body(request)
                 .when().post("/login")
                 .then().log().all()
@@ -87,9 +88,17 @@ class MemberControllerTest {
                 .then().log().cookies().extract().cookie("token");
 
         Response response = RestAssured
-                .given().log().all()
+                .given(spec).log().all()
                 .cookies("token", accessToken)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .accept("application/json")
+                .filter(document("login/check/get/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestCookies(cookieWithName("token").description("로그인한 유저의 토큰")),
+                        responseFields(
+                                fieldWithPath("id").description("로그인한 유저의 id"),
+                                fieldWithPath("name").description("로그인한 유저의 이름")
+                        )))
                 .when().get("/login/check")
                 .then().log().all()
                 .statusCode(200).extract().response();
@@ -100,17 +109,22 @@ class MemberControllerTest {
     @Test
     @DisplayName("로그아웃을 수행한다.")
     void logout() {
-        RestAssured.given().log().all()
-                .when().post("/logout")
-                .then().log().all()
-                .statusCode(200);
-    }
+        String accessToken = RestAssured
+                .given().log().all()
+                .body(new TokenRequest(EMAIL, PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/login")
+                .then().log().cookies().extract().cookie("token");
 
-    @Test
-    @DisplayName("회원 가입 페이지로 이동한다.")
-    void moveToSignupPage() {
-        RestAssured.given().log().all()
-                .when().get("/signup")
+        RestAssured.given(spec).log().all()
+                .cookie("token", accessToken)
+                .accept("application/json")
+                .filter(document("logout/post/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestCookies(cookieWithName("token").description("로그인한 유저의 토큰"))))
+                .when().post("/logout")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -120,12 +134,42 @@ class MemberControllerTest {
     void signup() {
         final MemberRequest request = new MemberRequest("hello@email.com", "password", "test");
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
                 .contentType("application/json")
                 .body(request)
+                .accept("application/json")
+                .filter(document("members/post/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("회원 가입할 유저의 이름"),
+                                fieldWithPath("email").description("회원 가입할 유저의 이메일"),
+                                fieldWithPath("password").description("회원 가입할 유저의 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("회원 가입한 유저의 id"),
+                                fieldWithPath("name").description("회원 가입한 유저의 이름")
+                        )))
                 .when().post("/members")
                 .then().log().all()
                 .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("모든 회원 정보를 조회한다.")
+    void findMembers() {
+        RestAssured.given(spec).log().all()
+                .accept("application/json")
+                .filter(document("login/get/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("유저의 id"),
+                                fieldWithPath("[].name").description("유저의 이름")
+                        )))
+                .when().get("/members")
+                .then().log().all()
+                .statusCode(200);
     }
 
     @Test
@@ -139,23 +183,5 @@ class MemberControllerTest {
                 .when().post("/members")
                 .then().log().all()
                 .statusCode(400);
-    }
-
-    @Test
-    @DisplayName("모든 회원 정보를 조회한다.")
-    void findMembers() {
-        RestAssured.given().log().all()
-                .when().get("/members")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @Test
-    @DisplayName("로그인된 회원의 예약 목록 조회 페이지로 이동한다.")
-    void findMyReservation() {
-        RestAssured.given().log().all()
-                .when().get("/reservation-mine")
-                .then().log().all()
-                .statusCode(200);
     }
 }

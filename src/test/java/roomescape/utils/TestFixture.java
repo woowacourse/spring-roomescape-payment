@@ -43,6 +43,11 @@ public class TestFixture {
     }
 
     @Transactional
+    public void deleteAllReservation() {
+        reservationRepository.deleteAll();
+    }
+
+    @Transactional
     public void persistAdmin() {
         memberRepository.save(getAdmin());
     }

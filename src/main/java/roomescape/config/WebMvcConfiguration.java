@@ -1,5 +1,8 @@
 package roomescape.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import java.time.Duration;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -45,5 +48,19 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .requestFactory(factory)
                 .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
                 .build();
+    }
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .components(new Components())
+                .info(apiInfo());
+    }
+
+    private Info apiInfo() {
+        return new Info()
+                .title("AImage API Documenation")
+                .description("Springdoc을 이용한 AImage API 문서")
+                .version("1.0.0");
     }
 }
