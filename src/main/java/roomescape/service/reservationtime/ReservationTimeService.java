@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
-import roomescape.exception.time.DuplicatedTimeException;
-import roomescape.exception.time.NotFoundTimeException;
-import roomescape.exception.time.ReservationReferencedTimeException;
+import roomescape.exception.reservationtime.DuplicatedReservationTimeException;
+import roomescape.exception.reservationtime.NotFoundReservationTimeException;
+import roomescape.exception.reservationtime.ReservationReferencedTimeException;
 import roomescape.service.reservationtime.dto.ReservationTimeAvailableListResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeAvailableResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeListResponse;
@@ -53,7 +53,7 @@ public class ReservationTimeService {
 
     public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.getStartAt())) {
-            throw new DuplicatedTimeException();
+            throw new DuplicatedReservationTimeException();
         }
         ReservationTime reservationTime = request.toReservationTime();
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
@@ -70,6 +70,6 @@ public class ReservationTimeService {
 
     private ReservationTime findReservationTimeById(long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(NotFoundTimeException::new);
+                .orElseThrow(NotFoundReservationTimeException::new);
     }
 }

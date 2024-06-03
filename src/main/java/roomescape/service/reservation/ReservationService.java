@@ -28,8 +28,8 @@ import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.InvalidReservationMemberException;
 import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.exception.reservationtime.NotFoundReservationTimeException;
 import roomescape.exception.theme.NotFoundThemeException;
-import roomescape.exception.time.NotFoundTimeException;
 import roomescape.service.payment.PaymentClient;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
@@ -115,7 +115,7 @@ public class ReservationService {
 
     private ReservationTime findReservationTimeById(long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(NotFoundTimeException::new);
+                .orElseThrow(NotFoundReservationTimeException::new);
     }
 
     private Theme findThemeById(long id) {

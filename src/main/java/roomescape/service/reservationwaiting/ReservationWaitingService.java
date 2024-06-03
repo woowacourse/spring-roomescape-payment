@@ -14,7 +14,7 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.reservationwaiting.CannotCreateWaitingForOwnedReservationException;
 import roomescape.exception.reservationwaiting.DuplicatedReservationWaitingException;
-import roomescape.exception.reservationwaiting.InvalidDateTimeWaitingException;
+import roomescape.exception.reservationwaiting.InvalidDateTimeReservationWaitingException;
 import roomescape.exception.reservationwaiting.NotFoundReservationWaitingException;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingListResponse;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingRequest;
@@ -78,7 +78,7 @@ public class ReservationWaitingService {
 
     private void validateDateTimeWaiting(Reservation reservation) {
         if (reservation.isPast(LocalDateTime.now(clock))) {
-            throw new InvalidDateTimeWaitingException();
+            throw new InvalidDateTimeReservationWaitingException();
         }
     }
 

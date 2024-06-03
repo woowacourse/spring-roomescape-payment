@@ -15,9 +15,9 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
-import roomescape.exception.time.DuplicatedTimeException;
-import roomescape.exception.time.NotFoundTimeException;
-import roomescape.exception.time.ReservationReferencedTimeException;
+import roomescape.exception.reservationtime.DuplicatedReservationTimeException;
+import roomescape.exception.reservationtime.NotFoundReservationTimeException;
+import roomescape.exception.reservationtime.ReservationReferencedTimeException;
 import roomescape.service.reservationtime.ReservationTimeService;
 import roomescape.service.reservationtime.dto.ReservationTimeAvailableListResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeListResponse;
@@ -98,7 +98,7 @@ class ReservationTimeServiceTest extends ServiceTest {
             ReservationTimeRequest request = new ReservationTimeRequest(startAt);
 
             assertThatThrownBy(() -> reservationTimeService.saveReservationTime(request))
-                    .isInstanceOf(DuplicatedTimeException.class);
+                    .isInstanceOf(DuplicatedReservationTimeException.class);
         }
     }
 
@@ -126,7 +126,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         @Test
         void 존재하지_않는_시간_삭제_시_예외가_발생한다() {
             assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(13L))
-                    .isInstanceOf(NotFoundTimeException.class);
+                    .isInstanceOf(NotFoundReservationTimeException.class);
         }
 
         @Test
