@@ -2,9 +2,6 @@ package roomescape.infrastructure.payment;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
