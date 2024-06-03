@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
@@ -16,7 +15,6 @@ import roomescape.support.DatabaseCleanerExtension;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AcceptanceFixture.class)
 @ExtendWith(DatabaseCleanerExtension.class)
-@AutoConfigureMockRestServiceServer
 public abstract class AcceptanceTest {
 
     @LocalServerPort
