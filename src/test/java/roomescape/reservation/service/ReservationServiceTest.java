@@ -3,6 +3,11 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,11 +17,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.config.TestPaymentGatewayConfig;
+import roomescape.fixture.PaymentConfirmFixtures;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
+import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationDto;
 import roomescape.reservation.dto.SaveReservationRequest;
@@ -26,16 +32,21 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationWaitingRepository;
 
 @SpringBootTest
-@Import(TestPaymentGatewayConfig.class)
 @Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
+
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @MockBean
+    private PaymentGateway paymentGateway;
+
     @Autowired
     private PaymentService paymentService;
 
@@ -66,6 +77,8 @@ class ReservationServiceTest {
                 "paymentKey"
         );
         paymentService.saveCredential(new SavePaymentCredentialRequest(orderId, amount));
+        given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
 
         // When
         final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
@@ -77,7 +90,8 @@ class ReservationServiceTest {
                 () -> assertThat(reservation.id()).isEqualTo(17L),
                 () -> assertThat(reservation.member().id()).isEqualTo(3L),
                 () -> assertThat(reservation.date().getValue()).isEqualTo(date),
-                () -> assertThat(reservation.time().startAt()).isEqualTo(LocalTime.of(9, 30))
+                () -> assertThat(reservation.time().startAt()).isEqualTo(LocalTime.of(9, 30)),
+                () -> verify(paymentGateway, times(1)).confirm(anyString(), anyLong(), anyString())
         );
     }
 

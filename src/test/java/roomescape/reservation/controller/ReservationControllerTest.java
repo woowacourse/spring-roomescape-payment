@@ -1,6 +1,9 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -10,22 +13,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.auth.token.TokenProvider;
-import roomescape.config.TestPaymentGatewayConfig;
+import roomescape.fixture.PaymentConfirmFixtures;
 import roomescape.member.model.MemberRole;
+import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.reservation.dto.SaveReservationRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestPaymentGatewayConfig.class)
 @Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class ReservationControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    @MockBean
+    private PaymentGateway paymentGateway;
 
     @LocalServerPort
     private int randomServerPort;
@@ -48,6 +54,8 @@ class ReservationControllerTest {
                 1000L,
                 "paymentKey"
         );
+        given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
