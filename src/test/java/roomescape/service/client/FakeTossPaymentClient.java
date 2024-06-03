@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.controller.dto.PaymentErrorMessageResponse;
-import roomescape.service.client.PaymentClient;
 import roomescape.service.dto.PaymentRequestDto;
 
 public class FakeTossPaymentClient implements PaymentClient {

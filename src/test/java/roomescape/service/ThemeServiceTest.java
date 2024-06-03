@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,59 +63,72 @@ class ThemeServiceTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("성공: 테마 추가")
-    @Test
-    void save() {
-        CreateThemeResponse saved = themeService.save(name, description, thumbnail);
-        assertThat(saved.id()).isEqualTo(1L);
+    @Nested
+    @DisplayName("테마 생성")
+    class Save {
+
+        @DisplayName("성공: 테마 추가")
+        @Test
+        void save() {
+            CreateThemeResponse saved = themeService.save(name, description, thumbnail);
+            assertThat(saved.id()).isEqualTo(1L);
+        }
+
+        @DisplayName("실패: 이름이 동일한 방탈출 테마를 저장하면 예외 발생")
+        @Test
+        void save_DuplicatedName() {
+            themeService.save(name, description, thumbnail);
+
+            assertThatThrownBy(() -> themeService.save(name, "description", "https://new.com/new.jpg"))
+                    .isInstanceOf(RoomescapeException.class)
+                    .hasMessage("같은 이름의 테마가 이미 존재합니다.");
+        }
     }
 
-    @DisplayName("성공: 테마 삭제")
-    @Test
-    void delete() {
-        themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
-        themeRepository.save(new Theme("테마2", "d2", "https://test.com/test2.jpg"));
-        themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
+    @Nested
+    @DisplayName("전체 테마 조회")
+    class FindAll {
+        @DisplayName("성공: 전체 테마 조회")
+        @Test
+        void findAll() {
+            themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
+            themeRepository.save(new Theme("테마2", "d2", "https://test.com/test2.jpg"));
+            themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
 
-        themeService.delete(2L);
-        assertThat(themeService.findAll())
-                .extracting(FindThemeResponse::id)
-                .containsExactly(1L, 3L);
+            assertThat(themeService.findAll())
+                    .extracting(FindThemeResponse::id)
+                    .containsExactly(1L, 2L, 3L);
+        }
     }
 
-    @DisplayName("성공: 전체 테마 조회")
-    @Test
-    void findAll() {
-        themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
-        themeRepository.save(new Theme("테마2", "d2", "https://test.com/test2.jpg"));
-        themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
+    @Nested
+    @DisplayName("테마 삭제")
+    class Delete {
+        @DisplayName("성공: 테마 삭제")
+        @Test
+        void delete() {
+            themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
+            themeRepository.save(new Theme("테마2", "d2", "https://test.com/test2.jpg"));
+            themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
 
-        assertThat(themeService.findAll())
-                .extracting(FindThemeResponse::id)
-                .containsExactly(1L, 2L, 3L);
-    }
+            themeService.delete(2L);
+            assertThat(themeService.findAll())
+                    .extracting(FindThemeResponse::id)
+                    .containsExactly(1L, 3L);
+        }
 
-    @DisplayName("실패: 이름이 동일한 방탈출 테마를 저장하면 예외 발생")
-    @Test
-    void save_DuplicatedName() {
-        themeService.save(name, description, thumbnail);
+        @DisplayName("실패: 예약에 사용되는 테마 삭제 시도 시 예외 발생")
+        @Test
+        void delete_ReservationExists() {
+            Member member = memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
+            Theme theme = themeRepository.save(new Theme("테마1", "설명1", "https://test.com/test1.jpg"));
+            ReservationTime time = reservationTimeRepository.save(new ReservationTime("10:00"));
+            reservationRepository.save(new Reservation(
+                    member, LocalDate.parse("2060-01-01"), LocalDateTime.now(), time, theme, ReservationStatus.RESERVED));
 
-        assertThatThrownBy(() -> themeService.save(name, "description", "https://new.com/new.jpg"))
-                .isInstanceOf(RoomescapeException.class)
-                .hasMessage("같은 이름의 테마가 이미 존재합니다.");
-    }
-
-    @DisplayName("실패: 예약에 사용되는 테마 삭제 시도 시 예외 발생")
-    @Test
-    void delete_ReservationExists() {
-        Member member = memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
-        Theme theme = themeRepository.save(new Theme("테마1", "설명1", "https://test.com/test1.jpg"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime("10:00"));
-        reservationRepository.save(new Reservation(
-                member, LocalDate.parse("2060-01-01"), LocalDateTime.now(), time, theme, ReservationStatus.RESERVED));
-
-        assertThatThrownBy(() -> themeService.delete(1L))
-                .isInstanceOf(RoomescapeException.class)
-                .hasMessage("해당 테마를 사용하는 예약이 존재하여 삭제할 수 없습니다.");
+            assertThatThrownBy(() -> themeService.delete(1L))
+                    .isInstanceOf(RoomescapeException.class)
+                    .hasMessage("해당 테마를 사용하는 예약이 존재하여 삭제할 수 없습니다.");
+        }
     }
 }
