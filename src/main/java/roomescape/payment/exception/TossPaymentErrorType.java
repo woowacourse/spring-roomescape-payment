@@ -1,4 +1,4 @@
-package roomescape.payment.exception.toss;
+package roomescape.payment.exception;
 
 import java.util.Arrays;
 import roomescape.exception.ErrorType;

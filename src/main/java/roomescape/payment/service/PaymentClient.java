@@ -16,9 +16,8 @@ import roomescape.exception.InternalException;
 import roomescape.global.util.Authorization;
 import roomescape.global.util.Encoder;
 import roomescape.payment.TossPaymentProperties;
-import roomescape.exception.PaymentException;
-import roomescape.payment.exception.toss.TossPaymentErrorResponse;
-import roomescape.payment.exception.toss.TossPaymentException;
+import roomescape.payment.exception.TossPaymentErrorResponse;
+import roomescape.payment.exception.TossPaymentException;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 

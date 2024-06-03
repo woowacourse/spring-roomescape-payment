@@ -1,4 +1,4 @@
-package roomescape.payment.exception.toss;
+package roomescape.payment.exception;
 
 import roomescape.exception.ErrorType;
 import roomescape.exception.ExceptionResponse;

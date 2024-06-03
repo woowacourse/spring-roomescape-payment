@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.payment.exception.TossPaymentErrorType;
 
 @DisplayName("토스 결제 에러 코드")
 class TossPaymentErrorTypeTest {

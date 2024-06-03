@@ -30,7 +30,6 @@ import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentHistoryRepository;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.payment.exception.toss.TossPaymentErrorResponse;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.MemberReservation;

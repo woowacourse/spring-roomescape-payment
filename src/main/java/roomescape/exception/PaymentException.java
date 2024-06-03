@@ -1,7 +1,5 @@
 package roomescape.exception;
 
-import roomescape.payment.exception.toss.TossPaymentErrorResponse;
-
 public class PaymentException extends RuntimeException {
 
     protected final String code;

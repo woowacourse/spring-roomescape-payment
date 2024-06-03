@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import roomescape.exception.ErrorType;
 import roomescape.exception.InternalException;
 import roomescape.exception.PaymentException;
+import roomescape.payment.exception.TossPaymentErrorResponse;
+import roomescape.payment.exception.TossPaymentException;
 
 @DisplayName("토스 결제 예외 테스트")
 class TossPaymentExceptionTest {
