@@ -1,4 +1,4 @@
-package roomescape.infra.payment;
+package roomescape.infrastructure.payment;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package roomescape.infra.event;
+package roomescape.infrastructure.event;
 
 import java.time.Instant;
 import java.time.LocalDate;

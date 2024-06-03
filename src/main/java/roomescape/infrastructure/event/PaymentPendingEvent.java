@@ -1,4 +1,4 @@
-package roomescape.infra.event;
+package roomescape.infrastructure.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

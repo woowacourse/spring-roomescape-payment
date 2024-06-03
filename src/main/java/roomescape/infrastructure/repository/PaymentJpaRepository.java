@@ -1,4 +1,4 @@
-package roomescape.infra.repository;
+package roomescape.infrastructure.repository;
 
 
 import org.springframework.data.repository.Repository;

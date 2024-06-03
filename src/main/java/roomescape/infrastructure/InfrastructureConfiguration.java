@@ -1,4 +1,4 @@
-package roomescape.infra;
+package roomescape.infrastructure;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -15,14 +15,14 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestClient;
-import roomescape.infra.payment.PaymentApiResponseErrorHandler;
-import roomescape.infra.payment.PaymentProperties;
+import roomescape.infrastructure.payment.PaymentApiResponseErrorHandler;
+import roomescape.infrastructure.payment.PaymentProperties;
 
 @Configuration
 @EnableScheduling
 @RequiredArgsConstructor
 @EnableConfigurationProperties(PaymentProperties.class)
-public class InfraConfiguration {
+public class InfrastructureConfiguration {
     private final PaymentProperties paymentProperties;
 
     @Bean

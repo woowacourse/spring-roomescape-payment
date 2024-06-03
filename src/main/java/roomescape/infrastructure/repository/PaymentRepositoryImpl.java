@@ -1,4 +1,4 @@
-package roomescape.infra.repository;
+package roomescape.infrastructure.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
