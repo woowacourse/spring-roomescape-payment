@@ -64,7 +64,7 @@ class TossPaymentClientTest {
                     }
                 """;
         server.expect(manyTimes(), requestTo(property.url() + "/v1/payments/confirm"))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, Base64Utils.encode(property.secret() + ":")))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "BASIC " + Base64Utils.encode(property.secret() + ":")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
@@ -93,7 +93,7 @@ class TossPaymentClientTest {
                 HttpStatus.BAD_REQUEST
         );
         server.expect(manyTimes(), requestTo(property.url() + "/v1/payments/confirm"))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, Base64Utils.encode(property.secret() + ":")))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "BASIC " + Base64Utils.encode(property.secret() + ":")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(request -> response);
         PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
