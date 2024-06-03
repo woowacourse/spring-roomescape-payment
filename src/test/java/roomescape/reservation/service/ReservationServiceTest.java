@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -84,7 +85,7 @@ class ReservationServiceTest {
         memberRepository.save(reservation.getMember());
         ReservationRequest reservationRequest = new ReservationRequest(reservation.getDate(),
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
-                "paymentType", "paymentKey", "orderId", 1000);
+                "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
 
         ReservationResponse reservationResponse = reservationService
                 .addReservation(new RegistrationDto(
@@ -148,7 +149,7 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
 
         ReservationRequest reservationRequest = new ReservationRequest(BEFORE, 1L, 1L,
-                "paymentType", "paymentKey", "orderId", 0);
+                "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
 
         Throwable pastDateReservation = assertThrows(RoomEscapeException.class,
                 () -> reservationService.addReservation(new RegistrationDto(

@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
-                "paymentType", "paymentKey", "orderId", 1000);
+                "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
         willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
 
@@ -67,7 +68,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 0L,
-                "paymentType", "paymentKey", "orderId", 1000);
+                "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
         willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
 
