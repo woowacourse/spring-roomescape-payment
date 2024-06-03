@@ -70,19 +70,25 @@ public class ReservationService {
     }
 
     public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
-        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
-        ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
         PaymentResponse paymentResponse = paymentWithRestClient.confirm(paymentRequest);
 
-        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
+        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
+        Reservation reservation = findReservation(reservationRequest, memberId);
+
+        if (!Objects.equals(paymentResponse.totalAmount(), reservation.getAmount())) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
 
-        return reservationResponse;
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     public ReservationResponse createReservation(ReservationRequest reservationRequest, Long memberId) {
+        Reservation reservation = reservationRepository.save(findReservation(reservationRequest, memberId));
+        return ReservationResponse.from(reservation);
+    }
+
+    private Reservation findReservation(ReservationRequest reservationRequest, Long memberId) {
         LocalDate date = LocalDate.parse(reservationRequest.date());
         ReservationTime reservationTime = reservationTimeRepository.findById(reservationRequest.timeId())
                 .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
@@ -100,9 +106,7 @@ public class ReservationService {
             reservationStatus = ReservationStatus.WAITING;
         }
 
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, reservationSlot, reservationStatus));
-        return ReservationResponse.from(reservation.getId(), reservationSlot, member);
+        return new Reservation(member, reservationSlot, reservationStatus);
     }
 
     private void validateReservation(ReservationSlot reservationSlot, Member member) {

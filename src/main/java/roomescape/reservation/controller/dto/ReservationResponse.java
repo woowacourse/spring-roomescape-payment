@@ -15,16 +15,6 @@ public record ReservationResponse(
         ReservationTimeResponse time,
         ThemeResponse theme,
         Long amount) {
-    public static ReservationResponse from(long reservationId, ReservationSlot reservationSlot, Member member) {
-        return new ReservationResponse(
-                reservationId,
-                MemberResponse.from(member),
-                reservationSlot.getDate(),
-                ReservationTimeResponse.from(reservationSlot.getTime()),
-                ThemeResponse.from(reservationSlot.getTheme()),
-                1000L
-        );
-    }
 
     public static ReservationResponse from(Reservation reservation) {
         ReservationSlot reservationSlot = reservation.getReservationSlot();
