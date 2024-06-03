@@ -1,9 +1,9 @@
-package roomescape.domain;
+package roomescape.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
 @EnableJpaAuditing
-public class DomainConfiguration {
+public class JpaAuditingConfig {
 }
