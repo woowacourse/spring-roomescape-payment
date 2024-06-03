@@ -1,6 +1,5 @@
 package roomescape.member.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
@@ -9,6 +8,8 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.dto.MemberLoginCheckResponse;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
+
+import java.util.List;
 
 @Service
 public class MemberService {

@@ -1,7 +1,5 @@
 package roomescape.member.controller;
 
-import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
@@ -10,6 +8,9 @@ import roomescape.member.service.MemberService;
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.domain.waiting.service.WaitingService;
 import roomescape.registration.dto.RegistrationInfoDto;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 public class MemberController {

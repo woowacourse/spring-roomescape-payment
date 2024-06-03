@@ -10,8 +10,11 @@ import roomescape.client.payment.PaymentClient;
 public class ClientConfig {
 
     @Bean
-    public PaymentClient paymentClient(@Value("${payment.widget-secret-key}") String widgetSecretKey) {
+    public PaymentClient paymentClient(
+            @Value("${payment.toss.widget-secret-key}") String widgetSecretKey,
+            @Value("${payment.toss.base-url}") String baseUrl,
+            @Value("${payment.toss.confirm-url}") String confirmUrl) {
         RestClient restClient = RestClient.builder().build();
-        return new PaymentClient(widgetSecretKey, restClient);
+        return new PaymentClient(widgetSecretKey, baseUrl, confirmUrl, restClient);
     }
 }

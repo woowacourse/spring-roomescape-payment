@@ -1,6 +1,5 @@
 package roomescape.registration.domain.waiting.controller;
 
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +12,8 @@ import roomescape.auth.annotation.LoginMemberId;
 import roomescape.registration.domain.waiting.dto.WaitingRequest;
 import roomescape.registration.domain.waiting.dto.WaitingResponse;
 import roomescape.registration.domain.waiting.service.WaitingService;
+
+import java.util.List;
 
 @RestController
 public class WaitingController {

@@ -2,9 +2,10 @@ package roomescape.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import java.util.regex.Pattern;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.global.NameExceptionCode;
+
+import java.util.regex.Pattern;
 
 @Embeddable
 public class Name {

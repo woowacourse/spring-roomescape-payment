@@ -40,5 +40,7 @@ jwt:
   expiration: 1800000
 
 payment:
-  widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-
+  toss:
+    base-url: https://api.tosspayments.com
+    confirm-url: /v1/payments/confirm
+    widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

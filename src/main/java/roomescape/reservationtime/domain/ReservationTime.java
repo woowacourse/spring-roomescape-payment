@@ -5,10 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalTime;
-import java.util.Objects;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationTimeExceptionCode;
+
+import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
 public class ReservationTime {

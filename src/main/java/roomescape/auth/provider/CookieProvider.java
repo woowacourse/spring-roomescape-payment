@@ -1,11 +1,12 @@
 package roomescape.auth.provider;
 
 import jakarta.servlet.http.Cookie;
-import java.util.Arrays;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.exception.CookieException;
 import roomescape.exception.RoomEscapeException;
+
+import java.util.Arrays;
 
 public class CookieProvider {
 

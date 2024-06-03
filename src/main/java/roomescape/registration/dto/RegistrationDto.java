@@ -1,9 +1,10 @@
 package roomescape.registration.dto;
 
-import java.time.LocalDate;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.waiting.domain.Waiting;
+
+import java.time.LocalDate;
 
 public record RegistrationDto(LocalDate date, long themeId, long timeId, long memberId) {
 

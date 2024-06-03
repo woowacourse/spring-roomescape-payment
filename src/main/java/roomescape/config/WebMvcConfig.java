@@ -1,8 +1,6 @@
 package roomescape.config;
 
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +12,9 @@ import roomescape.auth.provider.model.TokenProvider;
 import roomescape.auth.resolver.TokenResolver;
 import roomescape.infra.MemberRoleInterceptor;
 import roomescape.member.service.MemberService;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

@@ -1,12 +1,13 @@
 package roomescape.registration.dto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.domain.ReservationStatus;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.domain.WaitingWithRank;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public record RegistrationInfoDto(long id, String themeName, LocalDate date, LocalTime time, String status) {
 

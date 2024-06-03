@@ -1,7 +1,5 @@
 package roomescape.client.payment;
 
-import java.io.IOException;
-import java.util.Base64;
 import org.json.JSONException;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
@@ -10,24 +8,34 @@ import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.PaymentException;
 
+import java.io.IOException;
+import java.util.Base64;
+
 public class PaymentClient {
 
     private final String widgetSecretKey;
+    private final String baseUrl;
+    private final String confirmUrl;
     private final RestClient restClient;
 
-    public PaymentClient(String widgetSecretKey, RestClient restClient) {
+    public PaymentClient(
+            String widgetSecretKey,
+            String baseUrl,
+            String confirmUrl,
+            RestClient restClient) {
         this.widgetSecretKey = widgetSecretKey;
         this.restClient = restClient;
+        this.baseUrl = baseUrl;
+        this.confirmUrl = confirmUrl;
     }
 
     public void sendPaymentConfirmToToss(PaymentConfirmToTossDto paymentConfirmToTossDto) throws JSONException {
-
         Base64.Encoder encoder = Base64.getEncoder();
         String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
         String authorizations = "Basic " + encodedBytes;
 
         restClient.post()
-                .uri("https://api.tosspayments.com/v1/payments/confirm")
+                .uri(baseUrl + confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", authorizations)
                 .body(paymentConfirmToTossDto)

@@ -1,7 +1,5 @@
 package roomescape.registration.domain.waiting.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.WaitingExceptionCode;
@@ -15,6 +13,9 @@ import roomescape.registration.domain.waiting.dto.WaitingRequest;
 import roomescape.registration.domain.waiting.dto.WaitingResponse;
 import roomescape.registration.domain.waiting.repository.WaitingRepository;
 import roomescape.registration.dto.RegistrationDto;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class WaitingService {

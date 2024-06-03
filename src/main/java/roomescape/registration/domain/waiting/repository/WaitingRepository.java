@@ -1,12 +1,13 @@
 package roomescape.registration.domain.waiting.repository;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.domain.WaitingWithRank;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 public interface WaitingRepository extends CrudRepository<Waiting, Long> {
 

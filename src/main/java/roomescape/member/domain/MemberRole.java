@@ -1,8 +1,9 @@
 package roomescape.member.domain;
 
-import java.util.Arrays;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
+
+import java.util.Arrays;
 
 public enum MemberRole {
 

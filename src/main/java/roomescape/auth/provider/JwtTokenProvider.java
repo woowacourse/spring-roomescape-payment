@@ -6,15 +6,16 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.auth.domain.Token;
 import roomescape.auth.exception.TokenException;
 import roomescape.auth.provider.model.TokenProvider;
 import roomescape.exception.RoomEscapeException;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {

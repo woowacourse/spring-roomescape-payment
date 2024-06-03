@@ -1,7 +1,8 @@
 package roomescape.client.payment.dto;
 
-import java.io.Serializable;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
+
+import java.io.Serializable;
 
 public record PaymentConfirmToTossDto(
         String orderId,

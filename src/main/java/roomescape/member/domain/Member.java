@@ -8,10 +8,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.regex.Pattern;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
 import roomescape.vo.Name;
+
+import java.util.regex.Pattern;
 
 @Entity
 public class Member {

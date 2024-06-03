@@ -7,10 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import roomescape.member.domain.Member;
 import roomescape.registration.domain.reservation.domain.Reservation;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Waiting {
