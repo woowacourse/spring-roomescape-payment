@@ -1,6 +1,7 @@
 package roomescape.client.payment;
 
 import org.json.JSONException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
@@ -38,7 +39,7 @@ public class TossPaymentClient implements PaymentClient {
         restClient.post()
                 .uri(baseUrl + confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", authorizations)
+                .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .body(paymentConfirmToTossDto)
                 .exchange((request, response) -> {
                     handlePaymentConfirmationException(response);
