@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.global.restclient.PaymentWithRestClient;
@@ -84,7 +85,39 @@ class ReservationServiceTest extends ServiceTest {
         ReservationResponse reservationResponse = reservationService.reserve(reservationPaymentRequest, getMemberTacan().getId());
         //then
         assertAll(() -> assertThat(reservationResponse.date()).isEqualTo(date),
-                () -> assertThat(reservationResponse.time().id()).isEqualTo(time.getId()));
+                () -> assertThat(reservationResponse.time().id()).isEqualTo(time.getId()),
+                () -> assertThat(reservationRepository.findAll().size()).isEqualTo(3));
+    }
+
+    @DisplayName("결제가 실패했을 경우 예약이 생성되지 않는다.")
+    @Test
+    void notCreateReservationWithPaymentFailure() {
+        BDDMockito.doReturn(new PaymentResponse("test", "test", 0L, "test", "test", "test"))
+                .when(paymentWithRestClient)
+                .confirm(any());
+
+        String date = "2100-04-18";
+        ReservationTime time = reservationTimeRepository.save(getNoon());
+        Theme theme = themeRepository.save(getTheme1());
+
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "testPaymentKey",
+                "testOrderId",
+                0L,
+                "test payment type");
+
+
+        reservationSlotRepository.save(new ReservationSlot(LocalDate.parse(date), time, theme));
+
+        //then
+        assertAll(
+                () -> assertThatThrownBy(() -> reservationService.reserve(reservationPaymentRequest, getMemberTacan().getId()))
+                        .isInstanceOf(BadRequestException.class),
+                () -> assertThat(reservationRepository.findAll().size()).isEqualTo(2)
+        );
     }
 
     @DisplayName("예약 조회에 성공한다.")
