@@ -45,10 +45,7 @@ public class PaymentClient {
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .body(confirmRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
                     throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
                 })
                 .body(PaymentConfirmOutput.class);
