@@ -1,8 +1,9 @@
 package roomescape.payment.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,8 @@ import roomescape.payment.dto.TossErrorResponse;
 @Component
 public class TossPaymentGateway implements PaymentGateway {
 
+    private static final Logger log = LoggerFactory.getLogger(TossPaymentGateway.class);
+
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -28,7 +31,8 @@ public class TossPaymentGateway implements PaymentGateway {
     }
 
     /**
-     * @see <a href="https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8">Toss Payments API - 결제 승인</a>
+     * @see <a href="https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8">Toss Payments API -
+     * 결제 승인</a>
      */
     @Override
     public PaymentConfirmResponse confirm(
@@ -49,7 +53,14 @@ public class TossPaymentGateway implements PaymentGateway {
     private ErrorHandler getErrorHandler() {
         return (request, response) -> {
             TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
-            throw new PaymentConfirmFailException(errorResponse.message(), (HttpStatus) response.getStatusCode());
+            TossErrorCode tossErrorCode = TossErrorCode.from(errorResponse.code());
+            PaymentApprovalErrorCode errorCode = PaymentApprovalErrorCode.from(tossErrorCode);
+            log.error("결제 승인 에러: 토스 에러(code:{}, message:{}), 서비스 에러(code:{}, message:{})",
+                    errorResponse.code(),
+                    errorResponse.message(),
+                    errorCode.name(),
+                    tossErrorCode.getMessage());
+            throw new PaymentConfirmFailException(tossErrorCode.getMessage(), errorCode.getStatusCode());
         };
     }
 }

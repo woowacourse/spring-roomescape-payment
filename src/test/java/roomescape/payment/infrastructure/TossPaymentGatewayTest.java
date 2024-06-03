@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
@@ -56,21 +55,24 @@ class TossPaymentGatewayTest {
     @DisplayName("토스 외부 요청이 원활하지 않으면 예외가 발생한다.")
     @Test
     void confirmWithException() {
-        String expectedBody = """
+        String errorCode = "INVALID_REQUEST";
+        TossErrorCode tossErrorCode = TossErrorCode.from(errorCode);
+        PaymentApprovalErrorCode paymentApprovalErrorCode = PaymentApprovalErrorCode.from(tossErrorCode);
+        String expectedBody = String.format("""
                 {
-                  "code": "NOT_FOUND_PAYMENT",
-                  "message": "존재하지 않는 결제입니다."
+                  "code": "%s",
+                  "message": "%s"
                 }
-                """;
+                """, errorCode, tossErrorCode.getMessage());
 
         mockServer.expect(requestTo("/confirm"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                .andRespond(withStatus(paymentApprovalErrorCode.getStatusCode())
                         .body(expectedBody)
                         .contentType(MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> paymentGateway.confirm("1234", 100L, "payKey"))
                 .isInstanceOf(PaymentConfirmFailException.class)
-                .hasMessage("존재하지 않는 결제입니다.");
+                .hasMessage(tossErrorCode.getMessage());
     }
 }
