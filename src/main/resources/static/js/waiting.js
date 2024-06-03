@@ -40,7 +40,7 @@ function approve(event) {
 
     const endpoint = '/api/v1/admin/reservations/' + id + "/waiting/approve";
     return fetch(endpoint, {
-        method: 'POST'
+        method: 'PUT'
     }).then(response => {
         if (response.status === 200) return;
         throw new Error('Delete failed');
@@ -53,7 +53,7 @@ function deny(event) {
 
     const endpoint = '/api/v1/admin/reservations/' + id + "/waiting/deny";
     return fetch(endpoint, {
-        method: 'POST'
+        method: 'PUT'
     }).then(response => {
         if (response.status === 200) return;
         throw new Error('Delete failed');
