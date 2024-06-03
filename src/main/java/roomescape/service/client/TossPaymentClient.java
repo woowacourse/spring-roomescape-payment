@@ -21,14 +21,18 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
 
     public TossPaymentClient(@Value("${toss-payment.test-secret-key}") String key) {
-        String tossPaymentTestKey = key + ":";
         this.restClient = RestClient.builder()
                 .baseUrl(TOSS_PAYMENTS_URL)
                 .build();
 
+        authorizations = createAuthorizations(key);
+    }
+
+    private String createAuthorizations(String key) {
+        String tossPaymentTestKey = key + ":";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode(tossPaymentTestKey.getBytes(StandardCharsets.UTF_8));
-        authorizations = AUTHORIZATION_PREFIX + new String(encodedBytes);
+        return AUTHORIZATION_PREFIX + new String(encodedBytes);
     }
 
     @Override
