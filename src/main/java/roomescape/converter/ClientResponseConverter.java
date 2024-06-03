@@ -10,7 +10,6 @@ public class ClientResponseConverter {
 
     private final ObjectMapper objectMapper = new ObjectMapper().configure(
             DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    ;
 
     public ClientResponseConverter() {
     }
