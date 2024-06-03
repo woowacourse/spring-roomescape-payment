@@ -10,6 +10,8 @@ import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_WAITIN
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.fixture.PaymentFixture.PAYMENT_REQUEST;
+import static roomescape.fixture.PaymentFixture.PAYMENT_RESPONSE;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;
@@ -23,30 +25,35 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.member.domain.LoginMember;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.Reservations;
-import roomescape.auth.domain.Role;
-import roomescape.reservation.domain.Waiting;
 import roomescape.admin.dto.AdminReservationDetailResponse;
-import roomescape.reservation.dto.ReservationDetailResponse;
-import roomescape.reservation.dto.ReservationRequest;
-import roomescape.reservation.dto.ReservationResponse;
-import roomescape.member.entity.Member;
-import roomescape.reservation.entity.Reservation;
+import roomescape.auth.domain.Role;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
+import roomescape.member.domain.LoginMember;
+import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.Reservations;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentResponse;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
 import roomescape.reservation.service.ReservationService;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.repository.ReservationTimeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -64,31 +71,37 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @MockBean
+    private PaymentService paymentService;
 
     @BeforeEach
     void initService() {
         reservationTimeRepository.save(DEFAULT_RESERVATION_TIME);
         themeRepository.save(DEFAULT_THEME);
         memberRepository.save(member);
+        Mockito.when(paymentService.payment(PAYMENT_REQUEST)).thenReturn(PAYMENT_RESPONSE);
     }
 
     @DisplayName("지나지 않은 시간에 대한 예약을 생성할 수 있다.")
     @Test
     void createFutureReservationTest() {
         //when
-        ReservationResponse saved = reservationService.save(
+        ReservationPaymentResponse saved = reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().plusDays(1),
+                        DEFAULT_THEME.getId(),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        DEFAULT_THEME.getId()
+                        PAYMENT_REQUEST.paymentKey(),
+                        PAYMENT_REQUEST.orderId(),
+                        PAYMENT_REQUEST.amount()
                 ));
 
         //then
         assertAll(
                 () -> assertThat(new Reservations(reservationRepository.findAll()).getReservations())
                         .hasSize(1),
-                () -> assertThat(saved.id()).isEqualTo(1L)
+                () -> assertThat(saved.reservationResponse().id()).isEqualTo(1L)
         );
     }
 
@@ -97,10 +110,13 @@ class ReservationServiceTest {
     void createPastReservationFailTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().minusDays(1),
+                        DEFAULT_THEME.getId(),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        DEFAULT_THEME.getId()
+                        PAYMENT_REQUEST.paymentKey(),
+                        PAYMENT_REQUEST.orderId(),
+                        PAYMENT_REQUEST.amount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
@@ -111,10 +127,13 @@ class ReservationServiceTest {
     void createReservationWithTimeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().minusDays(1),
+                        DEFAULT_THEME.getId(),
                         2L,
-                        DEFAULT_THEME.getId()
+                        PAYMENT_REQUEST.paymentKey(),
+                        PAYMENT_REQUEST.orderId(),
+                        PAYMENT_REQUEST.amount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
@@ -125,10 +144,13 @@ class ReservationServiceTest {
     void createReservationWithThemeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().plusDays(1),
-                        DEFAULT_THEME.getId(),
-                        2L
+                        2L,
+                        DEFAULT_RESERVATION_TIME.getId(),
+                        PAYMENT_REQUEST.paymentKey(),
+                        PAYMENT_REQUEST.orderId(),
+                        PAYMENT_REQUEST.amount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
@@ -289,7 +311,13 @@ class ReservationServiceTest {
         void duplicatedReservationFailTest() {
             assertThatThrownBy(() -> reservationService.save(
                     loginMember,
-                    new ReservationRequest(defaultDate, DEFAULT_RESERVATION_TIME.getId(), DEFAULT_THEME.getId())))
+                    new ReservationPaymentRequest(
+                            defaultDate,
+                            DEFAULT_RESERVATION_TIME.getId(),
+                            DEFAULT_THEME.getId(),
+                            PAYMENT_REQUEST.paymentKey(),
+                            PAYMENT_REQUEST.orderId(),
+                            PAYMENT_REQUEST.amount())))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(DUPLICATE_RESERVATION.getMessage());
         }

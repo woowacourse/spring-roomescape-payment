@@ -17,10 +17,7 @@ import roomescape.admin.dto.AdminReservationDetailResponse;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.auth.annotation.Authenticated;
 import roomescape.member.domain.LoginMember;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.dto.ReservationPaymentRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationDetailResponse;
 import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
@@ -30,20 +27,17 @@ import roomescape.reservation.service.ReservationService;
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationPaymentResponse> saveReservation(@Authenticated LoginMember loginMember,
                                                                       @RequestBody ReservationPaymentRequest request) {
-        PaymentResponse paymentResponse = paymentService.payment(PaymentRequest.from(request));
-        ReservationResponse savedReservationResponse = reservationService.save(loginMember, ReservationRequest.from(request));
-        return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
-                .body(new ReservationPaymentResponse(savedReservationResponse, paymentResponse));
+        ReservationPaymentResponse response = reservationService.save(loginMember, request);
+        return ResponseEntity.created(URI.create("/reservations/" + response.reservationResponse().id()))
+                .body(response);
     }
 
     @PostMapping("/reservations-waiting")
