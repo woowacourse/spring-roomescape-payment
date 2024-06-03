@@ -25,7 +25,7 @@ import java.util.Optional;
 public class TossPaymentRestClient {
 
     private static final long CONNECT_TIMEOUT_DURATION = 3L;
-    private static final long READ_TIMEOUT_DURATION = 30L;
+    private static final long READ_TIMEOUT_DURATION = 15L;
 
     private final RestClient restClient;
     private final Logger logger = LoggerFactory.getLogger(TossPaymentRestClient.class.getName());
