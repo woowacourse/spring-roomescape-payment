@@ -52,9 +52,9 @@ public class ExceptionApiController {
         return createErrorResponse(exception.getStatus(), exception.getMessage());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ProblemDetail> paymentExceptionHandler(RuntimeException exception) {
-        log.error("[RuntimeException]", exception);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ProblemDetail> exceptionHandler(Exception exception) {
+        log.error("[Exception]", exception);
 
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러입니다.");
     }
