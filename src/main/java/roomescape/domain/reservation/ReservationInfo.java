@@ -30,9 +30,7 @@ public class ReservationInfo {
     }
 
     public ReservationInfo(LocalDate date, Long timeId, Long themeId) {
-        this.date = date;
-        this.time = new ReservationTime(timeId);
-        this.theme = new Theme(themeId);
+        this(date, new ReservationTime(timeId), new Theme(themeId));
     }
 
     public boolean isPast(LocalDateTime now) {
