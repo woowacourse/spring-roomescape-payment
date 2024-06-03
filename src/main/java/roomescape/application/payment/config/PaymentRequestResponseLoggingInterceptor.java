@@ -36,9 +36,13 @@ public class PaymentRequestResponseLoggingInterceptor implements ClientHttpReque
                 headers.get(HttpHeaders.AUTHORIZATION), request.getURI(), request.getMethod(), requestBody);
     }
 
-    private void logResponse(URI uri, ClientHttpResponse response) throws IOException {
-        String responseBody = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
-        logger.info("Payment response (URI : {}, Status: {}) : {}",
-                uri, response.getStatusCode(), responseBody);
+    private void logResponse(URI uri, ClientHttpResponse response) {
+        try {
+            String responseBody = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
+            logger.info("Payment response (URI : {}, Status: {}) : {}",
+                    uri, response.getStatusCode(), responseBody);
+        } catch (IOException e) {
+            logger.error("Failed to log response: ", e);
+        }
     }
 }
