@@ -19,7 +19,7 @@ VALUES (1, '2024-05-01', 1, 1, 'BOOKING'),
        (1, '2024-05-02', 1, 1, 'BOOKING'),
        (2, '2024-05-26', 3, 3, 'BOOKING'),
        (2, '2024-05-25', 3, 3, 'BOOKING'),
-       (2, '2024-05-24', 3, 3, 'BOOKING'),
+       (2, '2024-06-02', 3, 3, 'BOOKING'),
        (2, '2099-04-30', 1, 1, 'BOOKING');
 
 INSERT INTO waiting(member_id, date, time_id, theme_id, status)
@@ -30,4 +30,3 @@ VALUES (2, '2024-05-01', 1, 1, 'WAITING'),
        (1, '2024-05-19', 3, 3, 'WAITING'),
        (1, '2024-05-18', 3, 3, 'WAITING'),
        (1, '2024-05-17', 3, 3, 'WAITING');
-
