@@ -1,7 +1,8 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static roomescape.core.utils.e2eTest.getAccessToken;
 
 import io.restassured.RestAssured;
@@ -16,20 +17,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 import roomescape.core.domain.Status;
 import roomescape.core.dto.auth.TokenRequest;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.utils.e2eTest;
-import roomescape.infrastructure.PaymentClient;
 
 /**
  * 로그인 정보 (어드민) { "id": 1 "name": 어드민 "email": test@email.com "password": password "role": ADMIN }
@@ -49,23 +50,27 @@ class ReservationControllerTest {
 
     private String accessToken;
 
+    @Autowired
+    private RestTemplate paymentApproveRestTemplate;
+    @Autowired
+    private RestTemplate paymentRefundRestTemplate;
+    private MockRestServiceServer paymentApproveMockServer;
+    private MockRestServiceServer paymentRefundMockServer;
+
     @LocalServerPort
     private int port;
-
-    @MockBean
-    private PaymentClient paymentClient;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
         accessToken = getAccessToken();
-
-        BDDMockito.doNothing()
-                .when(paymentClient).approvePayment(any(), any());
-
-        BDDMockito.doNothing()
-                .when(paymentClient).refundPayment(any(), any());
+        paymentApproveMockServer = MockRestServiceServer.bindTo(paymentApproveRestTemplate)
+                .ignoreExpectOrder(true)
+                .build();
+        paymentRefundMockServer = MockRestServiceServer.bindTo(paymentRefundRestTemplate)
+                .ignoreExpectOrder(true)
+                .build();
     }
 
     @ParameterizedTest
@@ -77,6 +82,7 @@ class ReservationControllerTest {
                 date, 1L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -87,6 +93,7 @@ class ReservationControllerTest {
                 "2020-10-10", 1L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -95,15 +102,14 @@ class ReservationControllerTest {
     void validateReservationWithTodayPastTime() {
         ReservationTimeRequest timeRequest = new ReservationTimeRequest(
                 LocalTime.now().minusMinutes(1).format(DateTimeFormatter.ofPattern("HH:mm")));
-
         ValidatableResponse timesResponse = e2eTest.post(timeRequest, "/admin/times", accessToken);
-        timesResponse.statusCode(201);
-
         MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
                 LocalDate.now().format(DateTimeFormatter.ISO_DATE), 4L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY,
                 ORDER_ID, AMOUNT);
 
         ValidatableResponse reservationsResponse = e2eTest.post(memberReservationRequest, "/reservations", accessToken);
+
+        timesResponse.statusCode(201);
         reservationsResponse.statusCode(400);
     }
 
@@ -114,6 +120,7 @@ class ReservationControllerTest {
                 TOMORROW, null, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -124,20 +131,24 @@ class ReservationControllerTest {
                 TOMORROW, 0L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
     @Test
     @DisplayName("예약 생성 시, 해당 날짜와 시간에 예약 내역이 있으면 예외가 발생한다.")
     void validateReservationWithDuplicatedDateAndTime() {
+        paymentApproveMockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withSuccess());
         MemberReservationRequest request = new MemberReservationRequest(
                 TOMORROW, 1L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse successResponse = e2eTest.post(request, "/reservations", accessToken);
-        successResponse.statusCode(201);
-
         ValidatableResponse failResponse = e2eTest.post(request, "/reservations", accessToken);
+
+        successResponse.statusCode(201);
         failResponse.statusCode(400);
+        paymentApproveMockServer.verify();
     }
 
     @Test
@@ -147,6 +158,7 @@ class ReservationControllerTest {
                 TOMORROW, 1L, null, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -157,6 +169,7 @@ class ReservationControllerTest {
                 TOMORROW, 1L, 0L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -164,6 +177,7 @@ class ReservationControllerTest {
     @DisplayName("모든 예약 내역을 조회한다.")
     void findAllReservations() {
         ValidatableResponse response = e2eTest.get("/reservations", accessToken);
+
         response.statusCode(200)
                 .body("size()", is(3));
     }
@@ -171,26 +185,24 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약을 삭제한다.")
     void validateReservationDelete() {
+        paymentRefundMockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/payment_key1/cancel"))
+                .andRespond(withSuccess());
+
         ValidatableResponse response = e2eTest.delete("/reservations/1", accessToken);
+
         response.statusCode(204);
+        paymentRefundMockServer.verify();
     }
 
     @Test
     @DisplayName("조건에 따라 예약을 조회한다.")
     void findReservationsByCondition() {
+        paymentApproveMockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withSuccess());
         MemberReservationRequest request = new MemberReservationRequest(
                 TOMORROW, 1L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response1 = e2eTest.post(request, "/reservations", accessToken);
-        response1.statusCode(201);
-
-        MemberReservationRequest request2 = new MemberReservationRequest(
-                DAY_AFTER_TOMORROW, 1L, 1L, Status.BOOKED.getValue(),
-                PAYMENT_KEY + "notUnique", ORDER_ID + "notUnique", AMOUNT);
-
-        ValidatableResponse response2 = e2eTest.post(request2, "/reservations", accessToken);
-        response2.statusCode(201);
-
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
                 .queryParams(
@@ -202,7 +214,10 @@ class ReservationControllerTest {
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(2));
+                .body("size()", is(1));
+
+        response1.statusCode(201);
+        paymentApproveMockServer.verify();
     }
 
     @Test
@@ -212,6 +227,7 @@ class ReservationControllerTest {
                 TOMORROW, 1L, 1L, Status.BOOKED.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         ValidatableResponse response = e2eTest.post(request, "/reservations", "invalid-token");
+
         response.statusCode(401);
     }
 
@@ -219,6 +235,7 @@ class ReservationControllerTest {
     @DisplayName("현재 로그인된 회원의 예약 목록을 조회한다.")
     void findLoginMemberReservation() {
         ValidatableResponse response = e2eTest.get("/reservations/mine", accessToken);
+
         response.statusCode(200)
                 .body("size()", is(2));
     }
@@ -234,16 +251,22 @@ class ReservationControllerTest {
     @DisplayName("나의 예약 목록의 예약 대기 상태에 대기 순번을 표시한다.")
     void findReservationWaitingRank() {
         ValidatableResponse response = e2eTest.get("/reservations/mine", accessToken);
+
         response.body("status", is(List.of("예약", "2번째 예약대기")));
     }
 
     @Test
     @DisplayName("예약 대기를 요청한다.")
     void createReservationWaiting() {
+        paymentApproveMockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withSuccess());
         MemberReservationRequest request = new MemberReservationRequest(
                 TOMORROW, 1L, 1L, Status.STANDBY.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
+
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(201);
+        paymentApproveMockServer.verify();
     }
 
     @Test
@@ -252,7 +275,9 @@ class ReservationControllerTest {
         String alreadyBookedDate = LocalDate.parse("2024-05-07").format(DateTimeFormatter.ISO_DATE);
         MemberReservationRequest request = new MemberReservationRequest(
                 alreadyBookedDate, 1L, 1L, Status.STANDBY.getValue(), PAYMENT_KEY, ORDER_ID, AMOUNT);
+
         ValidatableResponse response = e2eTest.post(request, "/reservations", accessToken);
+
         response.statusCode(400);
     }
 
@@ -275,10 +300,13 @@ class ReservationControllerTest {
     {"date": '2224-05-08', "member_id": 2, "time_id": 1, "theme_id": 1, "status": 'BOOKED'}
     {"date": '2224-05-08', "member_id": 3, "time_id": 1, "theme_id": 1, "status": 'STANDBY'}
     {"date": '2224-05-08', "member_id": 1, "time_id": 1, "theme_id": 1, "status": 'STANDBY'}
+    {"date": '2224-05-09', "member_id": 2, "time_id": 1, "theme_id": 1, "status": 'BOOKED'}
     */
     @Test
     @DisplayName("예약 상태인 예약을 삭제하는 경우, 첫번째 예약 대기가 예약으로 승격한다.")
     void updateFirstReservationWaiting_WhenReservationDeleted() {
+        paymentRefundMockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/payment_key2/cancel"))
+                .andRespond(withSuccess());
         String lilyToken = RestAssured
                 .given().log().all()
                 .body(new TokenRequest("lily@email.com", "password"))
@@ -289,6 +317,8 @@ class ReservationControllerTest {
 
         e2eTest.delete("/reservations/2", lilyToken);
         ValidatableResponse response = e2eTest.get("/reservations/mine", lilyToken);
+
         response.body("status", is(List.of("예약")));
+        paymentRefundMockServer.verify();
     }
 }

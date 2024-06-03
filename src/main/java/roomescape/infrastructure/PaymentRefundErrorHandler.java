@@ -12,7 +12,7 @@ import roomescape.core.exception.PaymentException;
 
 public class PaymentRefundErrorHandler implements ResponseErrorHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentApproveErrorHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentRefundErrorHandler.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

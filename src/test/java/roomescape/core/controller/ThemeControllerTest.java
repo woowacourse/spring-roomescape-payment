@@ -1,7 +1,8 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static roomescape.core.utils.e2eTest.getAccessToken;
 
 import io.restassured.RestAssured;
@@ -13,18 +14,19 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 import roomescape.core.domain.Status;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.utils.e2eTest;
-import roomescape.infrastructure.PaymentClient;
 
 /**
  * 로그인 정보 (어드민) { "id": 1 "name": 어드민 "email": test@email.com "password": password "role": ADMIN }
@@ -46,26 +48,21 @@ class ThemeControllerTest {
     @LocalServerPort
     private int port;
 
-    @MockBean
-    private PaymentClient paymentClient;
+    @Autowired
+    private RestTemplate paymentApproveRestTemplate;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
         accessToken = getAccessToken();
-
-        BDDMockito.doNothing()
-                .when(paymentClient).approvePayment(any(), any());
-
-        BDDMockito.doNothing()
-                .when(paymentClient).refundPayment(any(), any());
     }
 
     @Test
     @DisplayName("모든 테마 목록을 조회한다.")
     void findAllThemes() {
         ValidatableResponse response = e2eTest.get("/themes");
+
         response.statusCode(200)
                 .body("size()", is(5));
     }
@@ -73,18 +70,25 @@ class ThemeControllerTest {
     @Test
     @DisplayName("지난 한 주 동안의 인기 테마 목록을 조회한다.")
     void findPopularThemes() {
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(paymentApproveRestTemplate)
+                .ignoreExpectOrder(true)
+                .build();
+        mockServer.expect(ExpectedCount.times(2), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withSuccess());
         createReservationTimes();
         createReservations();
+
         ValidatableResponse response = e2eTest.get("/themes/popular");
+
         response.statusCode(200)
                 .body("size()", is(1))
                 .body("name", is(List.of("테마2")));
+        mockServer.verify();
     }
 
     private void createReservationTimes() {
         ReservationTimeRequest timeRequest = new ReservationTimeRequest(
                 LocalTime.now().plusMinutes(1).format(DateTimeFormatter.ofPattern("HH:mm")));
-
         ValidatableResponse response1 = e2eTest.post(timeRequest, "/admin/times", accessToken);
         response1.statusCode(201);
 

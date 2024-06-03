@@ -7,25 +7,30 @@ import roomescape.core.dto.auth.PaymentAuthorizationResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.repository.PaymentRepository;
+import roomescape.infrastructure.PaymentApproveClient;
 import roomescape.infrastructure.PaymentAuthorizationProvider;
-import roomescape.infrastructure.PaymentClient;
+import roomescape.infrastructure.PaymentRefundClient;
 
 @Service
 public class PaymentService {
 
     private final PaymentAuthorizationProvider paymentAuthorizationProvider;
     private final PaymentRepository paymentRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentApproveClient paymentApproveClient;
+    private final PaymentRefundClient paymentRefundClient;
 
     public PaymentService(final PaymentAuthorizationProvider paymentAuthorizationProvider,
-                          final PaymentRepository paymentRepository, final PaymentClient paymentClient) {
+                          final PaymentRepository paymentRepository,
+                          final PaymentApproveClient paymentApproveClient,
+                          final PaymentRefundClient paymentRefundClient) {
         this.paymentAuthorizationProvider = paymentAuthorizationProvider;
         this.paymentRepository = paymentRepository;
-        this.paymentClient = paymentClient;
+        this.paymentApproveClient = paymentApproveClient;
+        this.paymentRefundClient = paymentRefundClient;
     }
 
     public PaymentResponse approvePayment(final Reservation reservation, final PaymentRequest paymentRequest) {
-        paymentClient.approvePayment(paymentRequest, createPaymentAuthorization());
+        paymentApproveClient.approvePayment(paymentRequest, createPaymentAuthorization());
 
         final Payment payment = new Payment(reservation, paymentRequest.getPaymentKey(), paymentRequest.getAmount(),
                 paymentRequest.getOrderId());
@@ -40,7 +45,7 @@ public class PaymentService {
     public void refundPayment(Reservation reservation) {
         paymentRepository.findByReservation(reservation).ifPresent(
                 payment -> {
-                    paymentClient.refundPayment(new PaymentResponse(payment), createPaymentAuthorization());
+                    paymentRefundClient.refundPayment(new PaymentResponse(payment), createPaymentAuthorization());
                     paymentRepository.delete(payment);
                 }
         );
