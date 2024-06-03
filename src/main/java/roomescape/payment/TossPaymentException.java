@@ -1,4 +1,4 @@
-package roomescape.payment.exception;
+package roomescape.payment;
 
 import roomescape.exception.RoomescapeException;
 import roomescape.payment.dto.PaymentErrorResponse;

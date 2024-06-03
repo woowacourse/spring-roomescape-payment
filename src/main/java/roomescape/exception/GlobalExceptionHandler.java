@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import roomescape.controller.exception.AuthenticationException;
 import roomescape.controller.exception.AuthorizationException;
-import roomescape.payment.exception.TossPaymentException;
+import roomescape.payment.TossPaymentException;
 import roomescape.payment.dto.PaymentErrorResponse;
 
 @RestControllerAdvice
