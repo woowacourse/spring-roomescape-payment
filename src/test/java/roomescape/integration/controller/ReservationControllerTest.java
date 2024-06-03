@@ -19,18 +19,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.exception.PaymentException;
+import roomescape.exception.response.PaymentExceptionResponse;
+import roomescape.exception.type.PaymentExceptionType;
 import roomescape.payment.config.PaymentClient;
 import roomescape.auth.domain.Role;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.member.entity.Member;
 import roomescape.reservation.entity.Reservation;
@@ -168,6 +174,30 @@ public class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(200)
                     .body("reservationResponse.size()", is(11));
+        }
+
+        @DisplayName("결제에 실패한 경우 예약 생성을 할 수 없다.")
+        @Test
+        void failCreateReservationTest() {
+            Mockito.when(paymentClient.payment(new PaymentRequest("invalidPaymentKey", "invalidOrderId", 1000)))
+                    .thenThrow(new PaymentException(new PaymentExceptionResponse(HttpStatus.BAD_REQUEST, "INVALID_PAYMENT_KEY", "올바르지 않은 PaymentKey 입니다.")));
+            Map<String, Object> reservationParam = Map.of(
+                    "date", LocalDate.now().plusMonths(1).toString(),
+                    "timeId", "1",
+                    "themeId", "1",
+                    "paymentKey", "invalidPaymentKey",
+                    "orderId", "invalidOrderId",
+                    "amount", 1000);
+
+            RestAssured.given().log().all()
+                    .when()
+                    .cookie("token", token)
+                    .contentType(ContentType.JSON)
+                    .body(reservationParam)
+                    .post("/reservations")
+                    .then().log().all()
+                    .statusCode(400)
+                    .body("detail", is("올바르지 않은 PaymentKey 입니다."));
         }
 
         @DisplayName("예약 대기 하나를 생성할 수 있다.")
