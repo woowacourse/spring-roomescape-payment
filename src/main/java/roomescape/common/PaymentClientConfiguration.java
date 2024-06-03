@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.client.PaymentProperties;
@@ -40,7 +42,15 @@ public class PaymentClientConfiguration {
                         .baseUrl(tossBaseUrl)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
                         .defaultStatusHandler(new TossPaymentResponseErrorHandler())
+                        .requestFactory(getClientHttpRequestFactory())
                         .build()
         );
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        simpleClientHttpRequestFactory.setConnectTimeout(3000);
+        simpleClientHttpRequestFactory.setReadTimeout(3000);
+        return simpleClientHttpRequestFactory;
     }
 }
