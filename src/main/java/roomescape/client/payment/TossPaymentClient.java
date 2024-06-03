@@ -47,9 +47,10 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {
-        if (!response.getStatusCode().is2xxSuccessful()) {
+        if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
             PaymentConfirmFromTossDto paymentConfirmFromTossDto = response.bodyTo(PaymentConfirmFromTossDto.class);
 
+            //todo: null 처리 부분 추가
             throw new PaymentException(response.getStatusCode(), paymentConfirmFromTossDto.message());
         }
     }
