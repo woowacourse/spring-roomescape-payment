@@ -41,7 +41,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(IllegalRequestException e) {
-        log.error("Illegal Request Exception 발생: {}", e.getMessage(), e);
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 

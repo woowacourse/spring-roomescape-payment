@@ -8,6 +8,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static roomescape.reservation.fixture.ReservationFixture.MEMBER_ID_1_RESERVATION;
 import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS;
@@ -20,16 +23,26 @@ import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10
 
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
+import roomescape.member.domain.MemberRepository;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
+import roomescape.reservation.config.PaymentConfig;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWithWaiting;
@@ -40,9 +53,10 @@ import roomescape.theme.service.ThemeService;
 import roomescape.time.service.ReservationTimeService;
 
 @ExtendWith(MockitoExtension.class)
+@RestClientTest(TossPaymentClient.class)
+@Import(PaymentConfig.class)
 class ReservationServiceTest {
 
-    @InjectMocks
     private ReservationService reservationService;
 
     @Mock
@@ -55,10 +69,19 @@ class ReservationServiceTest {
     private ThemeService themeService;
 
     @Mock
-    private TossPaymentClient tossPaymentClient;
-
-    @Mock
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private TossPaymentClient paymentClient;
+
+    @Autowired
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setData() {
+        this.reservationService = new ReservationService(memberService, reservationTimeService,
+                themeService, reservationRepository, paymentClient);
+    }
 
     @DisplayName("전체 예약을 조회하고 응답 형태로 반환할 수 있다")
     @Test
@@ -118,9 +141,10 @@ class ReservationServiceTest {
     @DisplayName("결제가 4xx 에러로 인해 승인되지 않으면 멤버의 예약 저장에 실패한다")
     @Test
     void should_throw_exception_when_reservation_not_confirmed_payments_4xx_error() {
-        doThrow(IllegalRequestException.class)
-                .when(tossPaymentClient)
-                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
@@ -130,9 +154,10 @@ class ReservationServiceTest {
     @DisplayName("결제가 5xx 에러로 인해 승인되지 않으면 멤버의 예약 저장에 실패한다")
     @Test
     void should_throw_exception_when_reservation_not_confirmed_payments_5xx_error() {
-        doThrow(InternalServerException.class)
-                .when(tossPaymentClient)
-                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
@@ -142,7 +167,8 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
     @Test
     void should_save_member_reservation_when_payment_is_confirmed() {
-        doNothing().when(tossPaymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withStatus(HttpStatus.OK));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
