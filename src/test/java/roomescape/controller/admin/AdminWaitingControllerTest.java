@@ -36,7 +36,12 @@ class AdminWaitingControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", LocalDate.now().plusDays(1L).toString(),
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     createdId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -95,7 +100,12 @@ class AdminWaitingControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", LocalDate.now().plusDays(1L).toString(),
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     createdId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)

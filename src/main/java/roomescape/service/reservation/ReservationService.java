@@ -9,7 +9,6 @@ import roomescape.domain.repository.*;
 import roomescape.domain.reservation.*;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.*;
-import roomescape.service.dto.response.PaymentApproveResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.ReservationResponses;
 import roomescape.service.dto.response.UserReservationResponse;
@@ -48,14 +47,13 @@ public class ReservationService {
     }
 
     public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest) {
-        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-        ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        PaymentApproveResponse payResponse = paymentService.pay(paymentApproveRequest);
-
         try {
+            PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
+            paymentService.pay(paymentApproveRequest);
+            ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
             return saveReservation(reservationSaveRequest);
         } catch (RoomEscapeBusinessException | DataAccessException exception) {
-            paymentService.cancel(new PaymentCancelRequest(payResponse.paymentKey(), "예약이 정상적으로 처리되지 않음"));
+            paymentService.cancel(new PaymentCancelRequest(userReservationSaveRequest.paymentKey(), "예약이 정상적으로 처리되지 않음"));
             throw new RoomEscapeBusinessException(exception.getMessage());
         }
     }

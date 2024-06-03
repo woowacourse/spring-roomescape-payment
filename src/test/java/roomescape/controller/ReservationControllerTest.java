@@ -14,6 +14,7 @@ import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
+import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.response.ReservationResponses;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
@@ -161,9 +163,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 }),
                 dynamicTest("예약을 추가한다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", LocalDate.now().plusDays(1L).toString(),
+                            "date", "2025-10-06",
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     createdId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -187,9 +194,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 }),
                 dynamicTest("존재하지 않는 시간으로 예약을 추가할 수 없다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "date", "2025-10-05",
+                            "date", "2025-10-06",
                             "timeId", 100L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -201,10 +213,14 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 }),
                 dynamicTest("존재하지 않는 테마로 예약을 추가할 수 없다.", () -> {
                     Map<String, Object> params = Map.of(
-                            "memberId", 1L,
-                            "date", "2025-10-05",
+                            "date", "2025-10-06",
                             "timeId", 1L,
-                            "themeId", 100L);
+                            "themeId", 100L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -239,7 +255,11 @@ class ReservationControllerTest extends IntegrationTestSupport {
         Map<String, Object> params = Map.of(
                 "date", "2025-10-06",
                 "timeId", 1L,
-                "themeId", 1L
+                "themeId", 1L,
+                "paymentKey", "testKey",
+                "orderId", "testId",
+                "paymentType", "NORMAL",
+                "amount", "1000"
         );
 
         Mockito.when(paymentService.pay(any()))
@@ -254,13 +274,42 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 .statusCode(400);
     }
 
+    @DisplayName("결제에 성공했으나 예약에 실패할 시,결제가 취소되고 400이 반환된다")
+    @Test
+    void should_Return400StatusCode_When_InvalidReservation() {
+        Map<String, Object> params = Map.of(
+                "date", "2025-10-06",
+                "timeId", 100L,
+                "themeId", 1L,
+                "paymentKey", "testKey",
+                "orderId", "testId",
+                "paymentType", "NORMAL",
+                "amount", "1000"
+        );
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", USER_TOKEN)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+
+        Mockito.verify(paymentService, times(1))
+                .cancel(any(PaymentCancelRequest.class));
+    }
+
     @DisplayName("결제에 성공할 시, 예약에 성공한다")
     @Test
     void paymentSuccess() {
         Map<String, Object> params = Map.of(
                 "date", "2025-10-06",
                 "timeId", 1L,
-                "themeId", 1L
+                "themeId", 1L,
+                "paymentKey", "testKey",
+                "orderId", "testId",
+                "paymentType", "NORMAL",
+                "amount", "1000"
         );
 
         RestAssured.given().log().all()

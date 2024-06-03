@@ -46,7 +46,12 @@ class WaitingControllerTest extends IntegrationTestSupport {
                     Map<String, Object> params = Map.of(
                             "date", LocalDate.now().plusDays(1L).toString(),
                             "timeId", 1L,
-                            "themeId", 1L);
+                            "themeId", 1L,
+                            "paymentKey", "testKey",
+                            "orderId", "testId",
+                            "paymentType", "NORMAL",
+                            "amount", "1000"
+                    );
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
