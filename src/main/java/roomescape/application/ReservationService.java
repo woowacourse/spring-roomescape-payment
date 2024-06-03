@@ -29,7 +29,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
 
     public ReservationService(
@@ -38,14 +38,14 @@ public class ReservationService {
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
             WaitingRepository waitingRepository,
-            PaymentClient paymentClient
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -63,8 +63,10 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        PaymentApiRequest paymentApiRequest = PaymentApiRequest.from(request.payment());
-        paymentClient.confirmPayment(paymentApiRequest);
+        if (request.payment() != null) {
+            PaymentApiRequest paymentApiRequest = PaymentApiRequest.from(request.payment());
+            paymentService.confirmPayment(savedReservation, paymentApiRequest);
+        }
 
         return ReservationResponse.from(savedReservation);
     }

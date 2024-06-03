@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import roomescape.application.PaymentClient;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.MyReservationResponse;
+import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationStatus;
 import roomescape.application.dto.response.ReservationTimeResponse;
@@ -37,7 +38,6 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
-import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.ReservationWebRequest;
 
@@ -127,8 +127,7 @@ class ReservationControllerTest extends BaseControllerTest {
                     1L,
                     "test-paymentKey",
                     "test-orderId",
-                    BigDecimal.valueOf(1000L),
-                    "test-paymentType"
+                    BigDecimal.valueOf(1000L)
             );
 
             ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -171,8 +170,7 @@ class ReservationControllerTest extends BaseControllerTest {
                     1L,
                     "test-paymentKey",
                     "test-orderId",
-                    BigDecimal.valueOf(1000L),
-                    "test-paymentType"
+                    BigDecimal.valueOf(1000L)
             );
 
             ExtractableResponse<Response> response = RestAssured.given().log().all()

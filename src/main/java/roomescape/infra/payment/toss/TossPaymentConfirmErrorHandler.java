@@ -28,7 +28,8 @@ public class TossPaymentConfirmErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        TossPaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
+        TossPaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(),
+                TossPaymentErrorResponse.class);
         TossPaymentConfirmErrorCode errorCode = TossPaymentConfirmErrorCode.fromCode(errorResponse.code());
 
         log.error("[PaymentConfirmException] code: {}, message: {}", errorResponse.code(), errorResponse.message());

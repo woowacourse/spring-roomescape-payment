@@ -7,7 +7,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import roomescape.application.PaymentClient;
 import roomescape.application.dto.response.MemberResponse;
+import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.application.dto.response.ThemeResponse;
@@ -37,7 +37,6 @@ import roomescape.domain.reservation.detail.ReservationTimeRepository;
 import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
-import roomescape.application.dto.response.PaymentApiResponse;
 import roomescape.presentation.BaseControllerTest;
 import roomescape.presentation.dto.request.AdminReservationWebRequest;
 
@@ -122,10 +121,6 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     LocalDate.of(2024, 6, 22),
                     reservationTime.getId(),
                     theme.getId(),
-                    "test-paymentKey",
-                    "test-orderId",
-                    BigDecimal.valueOf(1000L),
-                    "test-paymentType",
                     admin.getId()
             );
 
@@ -162,10 +157,6 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     LocalDate.of(2024, 6, 22),
                     1L,
                     1L,
-                    null,
-                    null,
-                    null,
-                    null,
                     1L
             );
 

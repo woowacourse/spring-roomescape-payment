@@ -50,7 +50,6 @@ public class Fixture {
     public static final PaymentRequest PAYMENT_REQUEST = new PaymentRequest(
             "test-paymentKey",
             "test-orderId",
-            BigDecimal.valueOf(1000L),
-            "test-paymentType"
+            BigDecimal.valueOf(1000L)
     );
 }
