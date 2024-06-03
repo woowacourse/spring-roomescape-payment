@@ -12,7 +12,7 @@ public class CheckAdminInterceptor implements HandlerInterceptor {
     public boolean preHandle(final HttpServletRequest request,
                              final HttpServletResponse response, final Object handler) {
         final LoginMember loginMember = (LoginMember) request.getAttribute(CheckLoginInterceptor.LOGIN_MEMBER);
-        if (!loginMember.isAdmin()) {
+        if (loginMember.isNotAdmin()) {
             throw new AuthorizationException("어드민만 접근할 수 있습니다.");
         }
         return true;

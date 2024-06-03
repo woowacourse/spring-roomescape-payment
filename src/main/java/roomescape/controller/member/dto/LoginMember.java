@@ -14,7 +14,7 @@ public record LoginMember(
         @NotNull
         Role role) {
 
-    public boolean isAdmin() {
-        return Role.ADMIN == role;
+    public boolean isNotAdmin() {
+        return Role.ADMIN != role;
     }
 }
