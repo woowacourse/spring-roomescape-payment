@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.member.Member;
@@ -40,7 +40,7 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @SpyBean
+    @MockBean
     private CancelEventPublisher eventPublisher;
 
     private Member user;

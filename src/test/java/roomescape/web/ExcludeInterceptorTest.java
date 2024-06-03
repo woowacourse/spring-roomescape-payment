@@ -1,19 +1,21 @@
 package roomescape.web;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.web.support.AdminHandlerInterceptor;
 
 abstract class ExcludeInterceptorTest extends ControllerTest {
 
-    @SpyBean
+    @MockBean
     private AdminHandlerInterceptor adminHandlerInterceptor;
 
     @BeforeEach
     void setUp() {
-        doReturn(true).when(adminHandlerInterceptor).preHandle(any(), any(), any());
+        Mockito.doReturn(true)
+                .when(adminHandlerInterceptor)
+                .preHandle(any(), any(), any());
     }
 }
