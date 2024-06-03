@@ -40,8 +40,8 @@ public class MemberReservationController {
     }
 
     @GetMapping("/my")
-    public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
-        return reservationFacadeService.readMemberReservations(loginMember);
+    public List<MyReservationResponse> readMyReservations(LoginMember loginMember) {
+        return reservationFacadeService.readMyReservations(loginMember);
     }
 
     @DeleteMapping("/{id}")

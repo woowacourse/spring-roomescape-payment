@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import roomescape.exception.PaymentFailureException;
+import roomescape.exception.ResourceNotFoundException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
@@ -32,6 +33,11 @@ public class PaymentService {
         this.encodingService = encodingService;
     }
 
+    public Payment findByMemberReservation(MemberReservation memberReservation) {
+        return paymentRepository.findByMemberReservation(memberReservation)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 예약은 결제가 존재하지 않습니다."));
+    }
+
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
         PaymentResponse response = restClient.post(confirmUrl, request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
@@ -49,9 +55,13 @@ public class PaymentService {
     }
 
     private void postCancelPaymentRequest(Payment payment) {
-        String plainPaymentKey = encodingService.decrypt(payment.getPaymentKey());
+        String plainPaymentKey = getPlainPaymentKey(payment);
         String uri = String.format(cancelUrl, plainPaymentKey);
         Map<String, String> body = Map.of("cancelReason", "고객 변심");
         restClient.post(uri, body);
+    }
+
+    public String getPlainPaymentKey(Payment payment) {
+        return payment.getPaymentKey(encodingService);
     }
 }

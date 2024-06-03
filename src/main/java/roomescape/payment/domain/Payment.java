@@ -69,6 +69,10 @@ public class Payment {
         return paymentKey;
     }
 
+    public String getPaymentKey(EncodingService encodingService) {
+        return encodingService.decrypt(paymentKey);
+    }
+
     public String getOrderId() {
         return orderId;
     }
