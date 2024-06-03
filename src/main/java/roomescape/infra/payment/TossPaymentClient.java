@@ -25,15 +25,25 @@ public class TossPaymentClient implements PaymentClient {
     private final PaymentApiResponseErrorHandler errorHandler;
     private final TossPaymentProperties properties;
     private final RestClient restClient;
+    private final String encodedSecretKey;
 
     public TossPaymentClient(PaymentApiResponseErrorHandler errorHandler, TossPaymentProperties properties) {
         this.errorHandler = errorHandler;
         this.properties = properties;
-        this.restClient = RestClient.builder()
+        this.restClient = getRestClient(properties);
+        this.encodedSecretKey = getEncodedSecretKey(properties.secretKey());
+    }
+
+    private RestClient getRestClient(TossPaymentProperties properties) {
+        return RestClient.builder()
                 .requestInterceptor(new PaymentApiLoggingInterceptor())
                 .requestFactory(getClientHttpRequestFactory())
                 .baseUrl(properties.url())
                 .build();
+    }
+
+    private String getEncodedSecretKey(String secretKey) {
+        return Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
@@ -46,8 +56,6 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
-        String encodedSecretKey = Base64.getEncoder().encodeToString(properties.secretKey().getBytes());
-
         try {
             return Optional.ofNullable(restClient.post()
                             .uri("/v1/payments/confirm")
