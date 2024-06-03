@@ -29,7 +29,8 @@ class ReservationTest {
                 new Name("polla"),
                 "polla@gmail.com",
                 "polla99",
-                MemberRole.ADMIN);
+                MemberRole.ADMIN
+        );
         Reservation reservation = new Reservation(1L, TOMORROW, time, theme, member);
 
         assertAll(
