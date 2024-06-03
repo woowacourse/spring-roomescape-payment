@@ -1,0 +1,25 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:database
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+jwt:
+  secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
+
+payment:
+  payments:
+    - name: toss
+      url: https://api.tosspayments.com/v1/payments
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connection-timeout: 3
+      read-timeout: 40
