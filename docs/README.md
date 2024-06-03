@@ -4,6 +4,8 @@
   - [x] 결제 승인 API 호출
   - [x] 결제 실패 시, 사유 반환
 
+- [ ] 내 예약 페이지에서 결제 정보 반환
+
 ```http request
 POST /reservations HTTP/1.1
 content-type: application/json
