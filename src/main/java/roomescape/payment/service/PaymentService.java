@@ -15,7 +15,6 @@ public class PaymentService {
     }
 
     public PaymentResponse payment(PaymentRequest request) {
-        paymentClient.approve(request);
-        return paymentClient.readPayment(request.paymentKey());
+        return paymentClient.payment(request);
     }
 }
