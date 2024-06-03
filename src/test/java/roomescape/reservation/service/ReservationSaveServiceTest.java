@@ -2,10 +2,9 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.Fixture.HORROR_THEME;
 import static roomescape.Fixture.MEMBER_JOJO;
-import static roomescape.Fixture.PAYMENT_CONFIRM_RESPONSE;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
 
@@ -64,7 +63,7 @@ class ReservationSaveServiceTest {
                 jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
         );
 
-        when(paymentService.confirmPayment(any())).thenReturn(PAYMENT_CONFIRM_RESPONSE);
+        doNothing().when(paymentService).confirmPayment(any());
 
         reservationService.save(saveRequest);
 

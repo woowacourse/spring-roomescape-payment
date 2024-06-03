@@ -1,6 +1,6 @@
 package roomescape.payment.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -61,9 +61,8 @@ class PaymentServiceTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(request)))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
 
-        PaymentConfirmResponse actualResponse = paymentService.confirmPayment(request);
-
-        assertThat(actualResponse).isEqualTo(expectedResponse);
+        assertThatCode(() -> paymentService.confirmPayment(request))
+                .doesNotThrowAnyException();
         mockServer.verify();
     }
 
