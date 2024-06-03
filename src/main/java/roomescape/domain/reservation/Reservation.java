@@ -44,7 +44,6 @@ public class Reservation {
     private ReservationDetail detail;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
