@@ -32,19 +32,14 @@ public class MemberReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest reservationRequest,
+    public ResponseEntity<MemberReservationResponse> reserve(@Valid @RequestBody MemberReservationRequest memberReservationRequest,
                                                              @Valid @Auth LoginMember loginMember) {
-        PaymentApproveDto request = new PaymentApproveDto(reservationRequest.paymentKey(),
-                reservationRequest.orderId(), reservationRequest.amount());
+        PaymentApproveDto paymentApproveDto = memberReservationRequest.toPaymentApproveDto();
+        ReservationSaveDto reservationSaveDto = memberReservationRequest.toReservationSaveDto(loginMember.id());
+        ReservationDto reservationDto = reservationService.save(reservationSaveDto, paymentApproveDto);
+        MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(reservationDto);
 
-        ReservationDto appResponse = reservationService.save(
-                new ReservationSaveDto(reservationRequest.date(), reservationRequest.timeId(),
-                        reservationRequest.themeId(), loginMember.id()), request);
-
-        Long id = appResponse.id();
-        MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(appResponse);
-
-        return ResponseEntity.created(URI.create("/reservations/" + id))
+        return ResponseEntity.created(URI.create("/reservations/" + reservationDto.id()))
                 .body(memberReservationResponse);
     }
 
