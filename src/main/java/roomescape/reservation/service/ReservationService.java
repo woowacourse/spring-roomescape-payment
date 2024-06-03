@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
@@ -80,6 +81,7 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public Reservation createReservationWithPayment(final CreateReservationRequest createReservationRequest) {
         ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
         Theme theme = themeRepository.getById(createReservationRequest.themeId());
@@ -89,8 +91,9 @@ public class ReservationService {
                 reservationTime.getStartAt());
         Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
 
+        Reservation saveReservation = reservationRepository.save(reservation);
         paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
-        return reservationRepository.save(reservation);
+        return saveReservation;
     }
 
     private void checkAlreadyExistReservation(final CreateReservationRequest createReservationRequest,
@@ -100,7 +103,7 @@ public class ReservationService {
                 createReservationRequest.timeId(),
                 createReservationRequest.themeId())) {
             throw new IllegalArgumentException("이미 " + date + "의 " + themeName + " 테마에는 " + time
-                    + " 시의 예약이 존재하여 예약을 생성할 수 없습니다.");
+                                               + " 시의 예약이 존재하여 예약을 생성할 수 없습니다.");
         }
     }
 
