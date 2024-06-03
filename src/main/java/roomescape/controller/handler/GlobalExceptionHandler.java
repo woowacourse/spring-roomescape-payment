@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
+import roomescape.controller.handler.exception.PaymentException;
 import roomescape.dto.response.ExceptionInfo;
 
 @RestControllerAdvice
@@ -29,8 +29,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionInfo> handleHttpClientException(HttpClientErrorException exception) {
-        ExceptionInfo exceptionInfo = exception.getResponseBodyAs(ExceptionInfo.class);
+    public ResponseEntity<ExceptionInfo> PaymentException(PaymentException exception) {
+        ExceptionInfo exceptionInfo = exception.getExceptionInfo();
         return ResponseEntity.badRequest().body(exceptionInfo);
     }
 }

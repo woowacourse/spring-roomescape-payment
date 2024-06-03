@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import roomescape.controller.handler.exception.PaymentException;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.request.MemberReservationRequest;
+import roomescape.dto.response.ExceptionInfo;
 
 @Service
 public class PaymentService {
@@ -27,11 +30,16 @@ public class PaymentService {
         PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
         String base64SecretKey = Base64.getEncoder().encodeToString((secretKey).getBytes());
 
-        return restClient.post()
-                .uri("https://api.tosspayments.com/v1/payments/confirm")
-                .header("Authorization", "Basic " + base64SecretKey)
-                .body(paymentInfo)
-                .retrieve()
-                .body(PaymentInfo.class);
+        try {
+            return restClient.post()
+                    .uri("https://api.tosspayments.com/v1/payments/confirm")
+                    .header("Authorization", "Basic " + base64SecretKey)
+                    .body(paymentInfo)
+                    .retrieve()
+                    .body(PaymentInfo.class);
+        } catch (HttpClientErrorException exception) {
+            ExceptionInfo exceptionInfo = exception.getResponseBodyAs(ExceptionInfo.class);
+            throw new PaymentException(exceptionInfo);
+        }
     }
 }
