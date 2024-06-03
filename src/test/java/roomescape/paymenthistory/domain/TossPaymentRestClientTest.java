@@ -31,9 +31,9 @@ class TossPaymentRestClientTest {
     }
 
     @Disabled
-    @DisplayName("결제 시간이 만료된 경우 커스텀 예외를 발생한다.")
+    @DisplayName("예외가 발생하는 경우 예외를 적절히 변환하여 반환한다.")
     @Test
-    void approvePaymentTest_whenInvalidSecretKey() {
+    void approvePaymentTest_whenOverPaymentTime() {
         PaymentCreateRequest paymentCreateRequest = new PaymentCreateRequest(
                 "tgen_20240528211", "MC40MTMwMTk0ODU0ODU4", 1000, new Reservation(1L, MemberFixture.MEMBER_BRI,
                 LocalDate.now().plusDays(1), TimeFixture.TIME_1, ThemeFixture.THEME_1, ReservationStatus.RESERVED));
