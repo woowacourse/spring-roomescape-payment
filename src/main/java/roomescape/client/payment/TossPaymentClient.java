@@ -51,8 +51,15 @@ public class TossPaymentClient implements PaymentClient {
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
             PaymentConfirmFromTossDto paymentConfirmFromTossDto = response.bodyTo(PaymentConfirmFromTossDto.class);
 
-            //todo: null 처리 부분 추가
-            throw new PaymentException(response.getStatusCode(), paymentConfirmFromTossDto.message());
+            throw new PaymentException(response.getStatusCode(), getMessage(paymentConfirmFromTossDto));
         }
+    }
+
+    private String getMessage(PaymentConfirmFromTossDto paymentConfirmFromTossDto) {
+        if(paymentConfirmFromTossDto == null) {
+            return "응답을 받아오지 못했습니다.";
+        }
+
+        return paymentConfirmFromTossDto.message();
     }
 }
