@@ -1,19 +1,14 @@
 package roomescape.payment.infra;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.dto.PaymentErrorDto;
-import roomescape.exception.custom.PaymentException;
 import roomescape.exception.handler.TossPaymentErrorHandler;
 import roomescape.payment.application.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
@@ -21,7 +16,7 @@ import roomescape.payment.dto.PaymentResponse;
 
 import java.time.Duration;
 
-@Service
+@Component
 public class PaymentWithRestClient implements PaymentClient {
 
     private final RestClient restClient;
