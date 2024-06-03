@@ -17,8 +17,6 @@ import roomescape.domain.payment.PaymentClient;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
-    @Value("${security.payment.secret-key}")
-    private String WIDGET_SECRET_KEY;
 
     public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
@@ -26,13 +24,9 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public Payment approve(PaymentRequest request) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
         return restClient.post()
             .uri("/v1/payments/confirm")
             .contentType(APPLICATION_JSON)
-            .header("Authorization", authorizations)
             .body(request)
             .retrieve()
             .body(Payment.class);
