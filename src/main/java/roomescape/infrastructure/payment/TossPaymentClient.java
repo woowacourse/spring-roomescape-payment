@@ -1,7 +1,6 @@
 package roomescape.infrastructure.payment;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -15,10 +14,8 @@ import java.util.Base64;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
-@Profile("!local")
 @EnableConfigurationProperties(TossPaymentClientProperties.class)
 public class TossPaymentClient implements PaymentClient {
-
     private final RestClient restClient;
     private final TossPaymentClientProperties properties;
 

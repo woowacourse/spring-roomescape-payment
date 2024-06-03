@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import roomescape.auth.TokenProvider;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -17,8 +18,10 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.fixture.*;
 import roomescape.helper.DatabaseCleanerExtension;
+import roomescape.helper.PaymentClientTestConfiguration;
 
 @ExtendWith(DatabaseCleanerExtension.class)
+@Import(PaymentClientTestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
 
