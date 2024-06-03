@@ -16,6 +16,8 @@ import roomescape.util.Base64Utils;
 
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentRestClientBuilders {
+    private static final String BASIC_AUTH_PREFIX = "BASIC ";
+
     private final Map<String, RestClient.Builder> builders;
 
     public PaymentRestClientBuilders(PaymentClientProperties properties) {
@@ -27,7 +29,10 @@ public class PaymentRestClientBuilders {
     private Builder createBuilder(PaymentClientProperty property) {
         return RestClient.builder()
                 .requestFactory(new BufferingClientHttpRequestFactory(createRequestFactory(property)))
-                .defaultHeader(HttpHeaders.AUTHORIZATION, Base64Utils.encode(property.secret() + ":"))
+                .defaultHeader(
+                        HttpHeaders.AUTHORIZATION,
+                        BASIC_AUTH_PREFIX + Base64Utils.encode(property.secret() + ":")
+                )
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .requestInterceptor(new PaymentRequestResponseLoggingInterceptor())
                 .requestInterceptor(new PaymentTimeoutHandlerInterceptor())
