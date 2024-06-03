@@ -1,13 +1,8 @@
 package roomescape.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -24,6 +19,8 @@ public class Member {
     private final String password;
     @Enumerated(value = EnumType.STRING)
     private final Role role;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Reservation> reservations;
 
     protected Member() {
         this.id = null;
@@ -59,6 +56,10 @@ public class Member {
 
     public Role getRole() {
         return role;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
     }
 
     @Override

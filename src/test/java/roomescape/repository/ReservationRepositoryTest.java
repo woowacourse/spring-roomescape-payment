@@ -28,6 +28,9 @@ class ReservationRepositoryTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     @DisplayName("모든 예약 목록을 조회한다.")
     void findAll() {
@@ -135,5 +138,17 @@ class ReservationRepositoryTest {
                                 new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2)
                         ))
         );
+    }
+
+    @Test
+    @DisplayName("멤버를 삭제하면, 관련된 예약도 삭제된다.")
+    void deleteMemberTest() {
+        long memberId = 1L;
+        int totalReservationCount = reservationRepository.findAll().size();
+        int memberReservationCount = reservationRepository.findAllByMemberId(memberId).size();
+
+        memberRepository.deleteById(memberId);
+
+        assertThat(reservationRepository.findAll()).hasSize(totalReservationCount - memberReservationCount);
     }
 }
