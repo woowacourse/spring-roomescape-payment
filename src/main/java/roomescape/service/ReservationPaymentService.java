@@ -60,12 +60,13 @@ public class ReservationPaymentService {
     }
 
     public void cancelBookedAndRefund(Long bookedMemberId) {
-        BookedMemberResponse bookedMemberResponse = reservationService.cancelBooked(bookedMemberId);
-
-        Long reservationId = bookedMemberResponse.reservationId();
-        Long memberId = bookedMemberResponse.memberId();
+        BookedMemberResponse bookedMember = reservationService.findBookedMember(bookedMemberId);
+        Long reservationId = bookedMember.reservationId();
+        Long memberId = bookedMember.memberId();
 
         paymentService.requestRefund(reservationId, memberId);
+
+        reservationService.cancelBooked(bookedMemberId);
     }
 
     public void liquidateReservation(BookedPaymentRequest bookedPaymentRequest) {

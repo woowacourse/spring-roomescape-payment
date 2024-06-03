@@ -74,15 +74,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public BookedMemberResponse cancelBooked(Long bookedMemberId) {
+    public void cancelBooked(Long bookedMemberId) {
         BookedMember bookedMember = bookedMemberRepository.findById(bookedMemberId)
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 예약입니다."));
 
         Reservation reservation = bookedMember.getReservation();
-
         reservation.cancelBooked();
-
-        return BookedMemberResponse.from(bookedMember);
     }
 
     @Transactional
