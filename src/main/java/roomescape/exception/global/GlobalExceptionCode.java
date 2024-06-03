@@ -6,9 +6,10 @@ import roomescape.exception.ExceptionCode;
 public enum GlobalExceptionCode implements ExceptionCode {
 
     METHOD_ARGUMENT_TYPE_INVALID(HttpStatus.BAD_REQUEST, "타입이 일치하지 않습니다."),
+    HTTP_RESPONSE_DATA_INVALID(HttpStatus.BAD_REQUEST, "http 응답 body의 데이터에서 문제가 발생했습니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버에서 에러가 발생했습니다."),
-    INVALID_JSON_DATA(HttpStatus.INTERNAL_SERVER_ERROR, "Json 변환에 실패하였습니다.");
+    JSON_DATA_INVALID(HttpStatus.INTERNAL_SERVER_ERROR, "Json 변환에 실패하였습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
