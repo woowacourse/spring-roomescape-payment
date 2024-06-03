@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.infrastructure;
 
 import java.math.BigDecimal;
 import java.util.Base64;
@@ -12,13 +12,13 @@ import roomescape.dto.request.MemberReservationRequest;
 import roomescape.dto.response.ExceptionInfo;
 
 @Service
-public class PaymentService {
+public class PaymentClient {
 
     @Value("${atto.ash.secret-key}")
     private String secretKey;
     private final RestClient restClient;
 
-    public PaymentService(RestClient restClient) {
+    public PaymentClient(RestClient restClient) {
         this.restClient = restClient;
     }
 

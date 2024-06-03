@@ -22,7 +22,7 @@ import roomescape.dto.response.ThemeResponse;
 import roomescape.dto.response.TimeSlotResponse;
 import roomescape.infrastructure.CheckAuthenticationInterceptor;
 import roomescape.infrastructure.LoginMemberArgumentResolver;
-import roomescape.service.PaymentService;
+import roomescape.infrastructure.PaymentClient;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(ReservationController.class)
@@ -31,7 +31,7 @@ public class MockReservationTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private PaymentService paymentService;
+    private PaymentClient paymentClient;
     @MockBean
     private ReservationService reservationService;
     @MockBean
@@ -50,7 +50,7 @@ public class MockReservationTest {
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 
         given(reservationService.checkAvailableReservation(any(), any())).willReturn(null);
-        given(paymentService.payment(any())).willReturn(paymentInfo);
+        given(paymentClient.payment(any())).willReturn(paymentInfo);
         given(reservationService.confirmReservationByClient(any())).willReturn(reservationResponse);
 
         String jsonRequest = """
@@ -81,7 +81,7 @@ public class MockReservationTest {
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 
         given(reservationService.checkAvailableReservation(any(), any())).willReturn(null);
-        given(paymentService.payment(any())).willReturn(paymentInfo);
+        given(paymentClient.payment(any())).willReturn(paymentInfo);
         given(reservationService.confirmReservationByClient(any())).willReturn(reservationResponse);
 
         String jsonRequest = """
