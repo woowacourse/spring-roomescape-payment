@@ -15,19 +15,15 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.fixture.CookieProvider;
-import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.member.domain.Member;
+import roomescape.model.SpringBootTestBase;
 import roomescape.paymenthistory.PaymentType;
 import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
@@ -35,17 +31,8 @@ import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.waiting.dto.WaitingCreateRequest;
 import roomescape.waiting.dto.WaitingResponse;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @AutoConfigureMockMvc
-class WaitingControllerTest {
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+class WaitingControllerTest extends SpringBootTestBase {
 
     @MockBean
     private TossPaymentHistoryService tossPaymentHistoryService;
@@ -55,21 +42,21 @@ class WaitingControllerTest {
     void findCreateDeleteWaitingsTest() {
         doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
-        Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies adminCookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
 
         // 예약 추가
         Member reservationMember = MEMBER_BRI;
-        Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);
+        Cookies reservationMemberCookies = restAssuredTemplate.makeUserCookie(reservationMember);
         ReservationCreateRequest reservationParams =
                 new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 10000, PaymentType.NORMAL);
-        RestAssuredTemplate.create(reservationParams, reservationMemberCookies);
+        restAssuredTemplate.create(reservationParams, reservationMemberCookies);
 
         // 대기 추가
         Member waitingMember = MEMBER_BROWN;
-        Cookies waitingMemberCookies = RestAssuredTemplate.makeUserCookie(waitingMember);
+        Cookies waitingMemberCookies = restAssuredTemplate.makeUserCookie(waitingMember);
         WaitingCreateRequest params = new WaitingCreateRequest(date, themeId, timeId);
         WaitingResponse response = RestAssured.given().log().all()
                 .cookies(waitingMemberCookies)
@@ -114,15 +101,15 @@ class WaitingControllerTest {
     @DisplayName("자신이 예약한 방탈출에 대해 예약 대기를 할 수 없다.")
     @Test
     void createWaiting_whenAlreadyReserve() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies cookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         // 예약 추가
         AdminReservationCreateRequest reservationParams =
                 new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
-        RestAssuredTemplate.create(reservationParams, cookies);
+        restAssuredTemplate.create(reservationParams, cookies);
 
         // 대기 추가
         WaitingCreateRequest waitingParams = new WaitingCreateRequest(date, themeId, timeId);
@@ -141,21 +128,21 @@ class WaitingControllerTest {
     void createWaiting_whenDuplicateWaiting() {
         doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
-        Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies adminCookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
 
         // 예약 추가
         Member reservationMember = MEMBER_BRI;
-        Cookies reservationMemberCookies = RestAssuredTemplate.makeUserCookie(reservationMember);
+        Cookies reservationMemberCookies = restAssuredTemplate.makeUserCookie(reservationMember);
         ReservationCreateRequest reservationParams =
                 new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 10000, PaymentType.NORMAL);
-        RestAssuredTemplate.create(reservationParams, reservationMemberCookies);
+        restAssuredTemplate.create(reservationParams, reservationMemberCookies);
 
         // 대기 추가
         Member waitingMember = MEMBER_BROWN;
-        Cookies waitingMemberCookies = RestAssuredTemplate.makeUserCookie(waitingMember);
+        Cookies waitingMemberCookies = restAssuredTemplate.makeUserCookie(waitingMember);
         WaitingCreateRequest params = new WaitingCreateRequest(date, themeId, timeId);
         RestAssured.given().log().all()
                 .cookies(waitingMemberCookies)

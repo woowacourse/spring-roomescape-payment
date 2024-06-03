@@ -11,36 +11,17 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
+import roomescape.model.SpringBootTestBase;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.time.dto.AvailableTimeResponse;
 import roomescape.time.dto.TimeCreateRequest;
 import roomescape.time.dto.TimeResponse;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class TimeControllerTest {
-    private final int COUNT_OF_TIME = 3;
-
-    @LocalServerPort
-    private int port;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+class TimeControllerTest extends SpringBootTestBase {
 
     @DisplayName("시간을 조회, 추가, 삭제 할 수 있다.")
     @Test
@@ -84,17 +65,17 @@ class TimeControllerTest {
     @DisplayName("예약 가능한 시간 목록을 읽을 수 있다.")
     @Test
     void findAvailableTimes() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies cookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.of(2100, 1, 1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        TimeResponse reservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1),
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        TimeResponse reservedTimeResponse = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1),
                 cookies);
-        TimeResponse notReservedTimeResponse = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_2),
+        TimeResponse notReservedTimeResponse = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_2),
                 cookies);
 
         AdminReservationCreateRequest reservationParams =
                 new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, reservedTimeResponse.id(), themeId);
-        RestAssuredTemplate.create(reservationParams, cookies);
+        restAssuredTemplate.create(reservationParams, cookies);
 
         List<AvailableTimeResponse> expected = List.of(
                 new AvailableTimeResponse(reservedTimeResponse, true),

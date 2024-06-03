@@ -1,6 +1,7 @@
 package roomescape.paymenthistory.service;
 
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import roomescape.paymenthistory.domain.PaymentHistory;
 import roomescape.paymenthistory.domain.TossPaymentRestClient;
@@ -20,9 +21,14 @@ public class TossPaymentHistoryService {
     }
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {
-        restClient.approvePayment(paymentCreateRequest);
-        paymentHistoryRepository.save(new PaymentHistory(paymentCreateRequest.Reservation(),
-                paymentCreateRequest.paymentKey()));
+        try {
+            restClient.approvePayment(paymentCreateRequest);
+            paymentHistoryRepository.save(new PaymentHistory(paymentCreateRequest.Reservation(),
+                    paymentCreateRequest.paymentKey()));
+        } catch (DataIntegrityViolationException e) {
+            restClient.cancelPayment(paymentCreateRequest.paymentKey());
+            throw e;
+        }
     }
 
     public void cancelPayment(Long reservationId) {

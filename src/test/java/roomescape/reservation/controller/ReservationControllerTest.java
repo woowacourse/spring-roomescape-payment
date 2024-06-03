@@ -14,54 +14,35 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.fixture.CookieProvider;
-import roomescape.fixture.RestAssuredTemplate;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
+import roomescape.model.SpringBootTestBase;
 import roomescape.paymenthistory.PaymentType;
 import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.repository.ReservationRepository;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @AutoConfigureMockMvc
-class ReservationControllerTest {
-
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
+class ReservationControllerTest extends SpringBootTestBase {
 
     @MockBean
     private TossPaymentHistoryService tossPaymentHistoryService;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @DisplayName("예약을 조회, 추가, 삭제할 수 있다.")
     @Test
     void findCreateDeleteReservations() {
         doNothing().when(tossPaymentHistoryService).approvePayment(any());
 
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_BRI);
+        Cookies cookies = restAssuredTemplate.makeUserCookie(MEMBER_BRI);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         ReservationCreateRequest params = new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId",
                 1000, PaymentType.NORMAL);
@@ -110,9 +91,9 @@ class ReservationControllerTest {
     @DisplayName("예약 추가 시 인자 중 null이 있을 경우, 예약을 추가할 수 없다.")
     @Test
     void createReservation_whenNameIsNull() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Cookies cookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         AdminReservationCreateRequest params = new AdminReservationCreateRequest
                 (null, null, timeId, themeId);
@@ -131,14 +112,14 @@ class ReservationControllerTest {
     @DisplayName("예약 삭제 시 예약 대기가 존재하지 않는다면 삭제된다.")
     @Test
     void deleteReservation_whenWaitingNotExists() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies cookies = restAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         AdminReservationCreateRequest reservationParams =
                 new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
-        ReservationResponse response = RestAssuredTemplate.create(reservationParams, cookies);
+        ReservationResponse response = restAssuredTemplate.create(reservationParams, cookies);
 
         // 예약 삭제
         RestAssured.given().log().all()

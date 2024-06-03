@@ -1,10 +1,19 @@
 package roomescape.fixture;
 
+import static io.restassured.RestAssured.given;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.TestComponent;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.member.domain.Member;
+import roomescape.paymenthistory.domain.TossPaymentRestClient;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -15,11 +24,17 @@ import roomescape.time.dto.TimeResponse;
 import roomescape.waiting.dto.WaitingCreateRequest;
 import roomescape.waiting.dto.WaitingResponse;
 
+@TestComponent
+@ExtendWith(MockitoExtension.class)
 public class RestAssuredTemplate {
-    public static Cookies makeUserCookie(Member member) {
+
+    @MockBean
+    private TossPaymentRestClient tossPaymentRestClient;
+
+    public Cookies makeUserCookie(Member member) {
         LoginRequest request = new LoginRequest(member.getEmail(), member.getPassword());
 
-        return RestAssured.given().log().all()
+        return given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/login")
@@ -28,8 +43,8 @@ public class RestAssuredTemplate {
                 .extract().detailedCookies();
     }
 
-    public static ThemeResponse create(ThemeCreateRequest params, Cookies cookies) {
-        return RestAssured.given().log().all()
+    public ThemeResponse create(ThemeCreateRequest params, Cookies cookies) {
+        return given().log().all()
                 .cookies(cookies)
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -41,8 +56,8 @@ public class RestAssuredTemplate {
                 .getObject("", ThemeResponse.class);
     }
 
-    public static TimeResponse create(TimeCreateRequest params, Cookies cookies) {
-        return RestAssured.given().log().all()
+    public TimeResponse create(TimeCreateRequest params, Cookies cookies) {
+        return given().log().all()
                 .cookies(cookies)
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -54,8 +69,10 @@ public class RestAssuredTemplate {
                 .getObject("", TimeResponse.class);
     }
 
-    public static ReservationResponse create(ReservationCreateRequest params, Cookies cookies) {
-        return RestAssured.given().log().all()
+    public ReservationResponse create(ReservationCreateRequest params, Cookies cookies) {
+        doNothing().when(tossPaymentRestClient).approvePayment(any());
+
+        return given().log().all()
                 .cookies(cookies)
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -80,8 +97,8 @@ public class RestAssuredTemplate {
                 .getObject("", ReservationResponse.class);
     }
 
-    public static WaitingResponse create(WaitingCreateRequest params, Cookies cookies) {
-        return RestAssured.given().log().all()
+    public WaitingResponse create(WaitingCreateRequest params, Cookies cookies) {
+        return given().log().all()
                 .cookies(cookies)
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -91,12 +108,5 @@ public class RestAssuredTemplate {
                 .extract()
                 .jsonPath()
                 .getObject("", WaitingResponse.class);
-    }
-
-    public static void delete(String uri) {
-        RestAssured.given().log().all()
-                .when().delete(uri)
-                .then().log().all()
-                .statusCode(204);
     }
 }
