@@ -5,6 +5,8 @@ import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -23,9 +25,18 @@ public class TossPaymentClient implements PaymentClient {
     public TossPaymentClient(@Value("${toss-payment.test-secret-key}") String key) {
         this.restClient = RestClient.builder()
                 .baseUrl(TOSS_PAYMENTS_URL)
+                .requestFactory(clientHttpRequestFactory())
                 .build();
 
         authorizations = createAuthorizations(key);
+    }
+
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3000);
+        factory.setReadTimeout(3000);
+
+        return factory;
     }
 
     private String createAuthorizations(String key) {
