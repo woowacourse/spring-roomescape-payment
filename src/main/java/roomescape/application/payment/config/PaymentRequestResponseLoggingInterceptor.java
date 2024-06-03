@@ -28,7 +28,7 @@ public class PaymentRequestResponseLoggingInterceptor implements ClientHttpReque
         }
     }
 
-    private void logRequest(HttpRequest request, byte[] body){
+    private void logRequest(HttpRequest request, byte[] body) {
         String requestBody = new String(body);
         logger.info("Payment request (URI : {}, Method: {}, Body: {})",
                 request.getURI(), request.getMethod(), requestBody);

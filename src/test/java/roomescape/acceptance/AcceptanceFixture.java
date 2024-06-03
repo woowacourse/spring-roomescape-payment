@@ -19,7 +19,6 @@ import roomescape.application.auth.dto.TokenPayload;
 import roomescape.application.member.dto.request.MemberLoginRequest;
 import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.payment.PaymentClient;
-import roomescape.application.payment.dto.PaymentResponse;
 import roomescape.application.payment.dto.PaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
