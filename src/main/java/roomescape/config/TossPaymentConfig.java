@@ -29,9 +29,9 @@ public class TossPaymentConfig {
 
     private String authorizationHeader() {
         String secretKey = tossPaymentProperties.secretKey() + ":";
-        String base64SecretKey = Base64.getEncoder()
+        String credentials = Base64.getEncoder()
                 .encodeToString((secretKey).getBytes());
 
-        return "Basic " + base64SecretKey;
+        return "Basic " + credentials;
     }
 }

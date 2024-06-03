@@ -14,17 +14,17 @@ public class PaymentService {
         this.restClient = restClient;
     }
 
-    public PaymentInfo payment(MemberReservationRequest memberReservationRequest) {
+    public void payment(MemberReservationRequest memberReservationRequest) {
         Long amount = memberReservationRequest.amount();
         String orderId = memberReservationRequest.orderId();
         String paymentKey = memberReservationRequest.paymentKey();
 
         PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
 
-        return restClient.post()
+        restClient.post()
                 .uri("/v1/payments/confirm")
                 .body(paymentInfo)
                 .retrieve()
-                .body(PaymentInfo.class);
+                .toBodilessEntity();
     }
 }
