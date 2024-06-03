@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import roomescape.exception.customexception.api.AbstractApiException;
 import roomescape.exception.customexception.api.ApiBadRequestException;
 import roomescape.exception.customexception.api.ApiException;
+import roomescape.exception.customexception.api.ApiTimeOutException;
 import roomescape.exception.customexception.business.AbstractBusinessException;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.exception.customexception.security.AbstractSecurityException;
@@ -48,6 +49,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleApiBadRequestException(ApiException e) {
         logger.error(e.getMessage(), e);
         return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER, e.getMessage());
+    }
+
+    @ExceptionHandler(ApiTimeOutException.class)
+    public ResponseEntity<Object> handleApiTimeoutException(ApiException e) {
+        logger.error(e.getMessage(), e);
+        return makeErrorResponseEntity(ErrorCode.INTERNAL_SERVER, e.getMessage());
     }
 
     @ExceptionHandler(ApiException.class)

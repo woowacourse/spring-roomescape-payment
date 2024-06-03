@@ -2,7 +2,7 @@ package roomescape.exception;
 
 import java.util.stream.Stream;
 
-public enum ApiBadRequestException {
+public enum ApiBadRequestExceptions {
     INVALID_REQUEST,
     NOT_ALLOWED_POINT_USE,
     INVALID_REJECT_CARD,
