@@ -1,8 +1,5 @@
 package roomescape.reservation.integration;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.BDDMockito.willDoNothing;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -18,11 +15,14 @@ import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.willDoNothing;
+
 @ExtendWith(MockitoExtension.class)
 class ReservationIntegrationTest extends IntegrationTest {
 
     @MockBean
-    private PaymentClient paymentClient;
+    private PaymentClient paymentClient; // todo: 실제로 토스거를 받고, 테스트 이름을 변경하는 식으로 변경
 
     @Test
     @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회, 삭제한다.")
@@ -32,7 +32,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
                 "paymentType", "paymentKey", "orderId", 1000);
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
+        willDoNothing().given(paymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
 
         int id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -69,7 +69,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 0L,
                 "paymentType", "paymentKey", "orderId", 1000);
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
+        willDoNothing().given(paymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

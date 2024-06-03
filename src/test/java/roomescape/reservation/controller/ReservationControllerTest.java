@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.TossPaymentClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.model.ControllerTest;
@@ -54,7 +54,7 @@ class ReservationControllerTest extends ControllerTest {
     private ReservationService reservationService;
 
     @MockBean
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClient;
 
     @Test
     @DisplayName("예약 정보를 잘 불러오는지 확인한다.")

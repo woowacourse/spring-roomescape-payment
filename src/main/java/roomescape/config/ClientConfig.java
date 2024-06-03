@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.TossPaymentClient;
 
 @Configuration
 public class ClientConfig {
@@ -15,6 +16,6 @@ public class ClientConfig {
             @Value("${payment.toss.base-url}") String baseUrl,
             @Value("${payment.toss.confirm-url}") String confirmUrl) {
         RestClient restClient = RestClient.builder().build();
-        return new PaymentClient(widgetSecretKey, baseUrl, confirmUrl, restClient);
+        return new TossPaymentClient(widgetSecretKey, baseUrl, confirmUrl, restClient);
     }
 }

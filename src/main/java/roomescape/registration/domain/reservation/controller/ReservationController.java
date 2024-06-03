@@ -38,7 +38,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
                                                                @LoginMemberId long id) {
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        paymentClient.sendPaymentConfirmToToss(paymentConfirmToTossDto);
+        paymentClient.sendPaymentConfirm(paymentConfirmToTossDto);
 
         RegistrationDto registrationDto = RegistrationDto.of(reservationRequest, id);
         ReservationResponse reservationResponse = reservationService.addReservation(registrationDto);
