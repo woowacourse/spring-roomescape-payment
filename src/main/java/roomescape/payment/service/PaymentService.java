@@ -27,11 +27,7 @@ public class PaymentService {
         this.objectMapper = objectMapper;
     }
 
-    /***
-     * 토스 결제 요청 api 호출하여 응답받는다.
-     * @param confirmRequest 결제 요청 정보를 담고 있는 DTO
-     * @return paymentConfirmResponse - 결제 요청 성공 응답을 담고 있는 DTO
-     */
+    // 결제 승인 api https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
     public PaymentConfirmResponse confirmPayment(PaymentConfirmRequest confirmRequest) {
         PaymentConfirmResponse confirmResponse = restClient.post()
                 .uri("/v1/payments/confirm")
@@ -43,22 +39,7 @@ public class PaymentService {
         return confirmResponse;
     }
 
-    /***
-     * 토스 결제 api 응답을 검증하고 응답 DTO로 변환한다.
-     * @param response 토스 결제 api 응답<br>
-     * @return paymentConfirmResponse - 결제 요청 성공 응답을 담고 있는 DTO
-     * @throws PaymentException 토스 결제 요청 실패 시, 에러 메시지와 코드를 변환하여 다시 던짐<br>
-     * <pre>
-     *     {@code
-     *          토스 결제 실패 응답 :
-     *          {
-     *              "code": "ALREADY_PROCESSED_PAYMENT",
-     *              "message": "이미 처리된 결제 입니다."
-     *          }
-     *     }
-     * </pre>
-     * @throws IOException getStatusCode(), readValue() 메서드 호출 시 발생하는 에러
-     */
+    // 결제 승인 에러 코드 https://docs.tosspayments.com/reference/error-codes#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
     private PaymentConfirmResponse createPaymentConfirmResponse(ConvertibleClientHttpResponse response)
             throws IOException {
         if (response.getStatusCode().isError()) {
