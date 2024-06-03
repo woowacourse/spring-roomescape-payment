@@ -14,6 +14,42 @@ import roomescape.exception.RoomEscapeBusinessException;
 
 class ReservationTest {
 
+    @DisplayName("예약을 한다.")
+    @Test
+    void book() {
+        // given
+        Member member = new Member(1L, "비밥", "uu@naver.com", "1234", Role.USER);
+        LocalDate date = LocalDate.parse("2024-06-01");
+        ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
+        Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
+
+        Reservation reservation = new Reservation(date, time, theme);
+
+        // when
+        BookedMember bookedMember = reservation.book(member);
+
+        // then
+        assertThat(bookedMember.isMember(member)).isTrue();
+    }
+
+    @DisplayName("이미 예약 되어있으면 예약을 할 수 없다.")
+    @Test
+    void duplicatedBook() {
+        // given
+        Member member = new Member(1L, "비밥", "uu@naver.com", "1234", Role.USER);
+        LocalDate date = LocalDate.parse("2024-06-01");
+        ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
+        Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
+
+        Reservation reservation = new Reservation(date, time, theme);
+        reservation.book(member);
+
+        // when // then
+        assertThatThrownBy(() -> reservation.book(member))
+                .isInstanceOf(RoomEscapeBusinessException.class)
+                .hasMessageContaining("이미 예약한 사람이 존재합니다.");
+    }
+
     @DisplayName("이미 예약을 한 사람은 예약 대기를 할 수 없다.")
     @Test
     void addWaitingByDuplicateReservationMember() {

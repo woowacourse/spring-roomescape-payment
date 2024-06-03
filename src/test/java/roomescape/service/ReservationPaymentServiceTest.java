@@ -20,7 +20,10 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
+import roomescape.service.dto.BookedPaymentResponse;
+import roomescape.service.dto.ReservationConditionRequest;
 import roomescape.service.dto.ReservationPaymentRequest;
+import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
 import roomescape.service.dto.UserReservationResponse;
 
@@ -29,6 +32,9 @@ class ReservationPaymentServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private ReservationPaymentService reservationPaymentService;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -51,7 +57,8 @@ class ReservationPaymentServiceTest extends IntegrationTestSupport {
 
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
-        ReservationResponse reservationResponse = reservationPaymentService.saveReservationWithPayment(reservationPaymentRequest);
+        ReservationResponse reservationResponse = reservationPaymentService.saveReservationWithPayment(
+                reservationPaymentRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -62,8 +69,10 @@ class ReservationPaymentServiceTest extends IntegrationTestSupport {
                 () -> assertThat(reservationResponse.theme().name()).isEqualTo(theme.getName()),
                 () -> assertThat(reservationResponse.theme().description()).isEqualTo(theme.getDescription()),
                 () -> assertThat(reservationResponse.theme().thumbnail()).isEqualTo(theme.getThumbnail()),
-                () -> assertThat(paymentRepository.findByReservationIdAndMemberIdAndStatus(reservationResponse.reservationId(), member.getId(),
-                        PaymentStatus.DONE)).isPresent()
+                () -> assertThat(
+                        paymentRepository.findByReservationIdAndMemberIdAndStatus(reservationResponse.reservationId(),
+                                member.getId(),
+                                PaymentStatus.DONE)).isPresent()
         );
     }
 
@@ -82,5 +91,36 @@ class ReservationPaymentServiceTest extends IntegrationTestSupport {
                         tuple(2L, "예약대기", 2L),
                         tuple(3L, "예약대기", 1L)
                 );
+    }
+
+    @DisplayName("예약 내역 중 결제 대기여부를 판별한다.")
+    @Test
+    void isPaymentWait() {
+        // given
+        ReservationTime time1 = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("01:00")));
+        Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
+        Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
+                LocalDate.parse("2025-11-11"), time1.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+
+        reservationPaymentService.saveReservationWithPayment(reservationPaymentRequest);
+
+        ReservationTime time2 = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("02:00")));
+        ReservationRequest reservationRequest = new ReservationRequest(member.getId(), LocalDate.parse("2025-11-11"),
+                time2.getId(), theme.getId());
+
+        reservationService.saveReservation(reservationRequest);
+
+        ReservationConditionRequest request = new ReservationConditionRequest(theme.getId(), member.getId(),
+                LocalDate.parse("2025-11-11"), LocalDate.parse("2025-11-11"));
+
+        // when
+        List<BookedPaymentResponse> bookedPaymentResponses = reservationPaymentService.findBookedPaymentByCondition(
+                request);
+
+        // then
+        assertThat(bookedPaymentResponses).hasSize(2)
+                .extracting("status")
+                .containsExactly("예약", "결제 대기");
     }
 }
