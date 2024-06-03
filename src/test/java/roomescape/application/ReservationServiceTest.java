@@ -26,6 +26,7 @@ import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
+import roomescape.exception.member.AuthorizationFailureException;
 import roomescape.fixture.CommonFixture;
 
 class ReservationServiceTest extends BaseServiceTest {
@@ -135,7 +136,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        ReservationResponse response = reservationService.paymentForPending(request, user.getId());
+        ReservationResponse response = reservationService.paymentForPending(request, admin.getId());
 
         // then
         Reservation reservation = reservationRepository.getReservation(response.id());
@@ -143,6 +144,25 @@ class ReservationServiceTest extends BaseServiceTest {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThat(reservation.findPayment()).isNotEmpty();
         });
+    }
+
+    @DisplayName("다른 사람의 예약을 결제 시, 권한이 없는 예외가 발생한다")
+    @Test
+    void when_paymentForPending_then_throwAuthorizationFailureException() {
+        // given
+        Reservation pendingReservation = reservationRepository.save(
+                new Reservation(admin, detail1, Status.PAYMENT_PENDING));
+        Long userId = user.getId();
+
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
+                pendingReservation.getId(),
+                CommonFixture.amount,
+                CommonFixture.orderId,
+                CommonFixture.paymentKey);
+
+        // when
+        Assertions.assertThatThrownBy(() -> reservationService.paymentForPending(request, userId))
+                .isInstanceOf(AuthorizationFailureException.class);
     }
 
     @DisplayName("예약 상태의 예약을 모두 조회한다")

@@ -25,6 +25,7 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailFactory;
 import roomescape.exception.member.AuthenticationFailureException;
+import roomescape.exception.member.AuthorizationFailureException;
 
 @Service
 @RequiredArgsConstructor
@@ -68,13 +69,18 @@ public class ReservationService {
     @Transactional
     public ReservationResponse paymentForPending(ReservationPaymentRequest request, Long memberId) {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
-        reservation.isOwner(memberId);
-
+        rejectIfNotOwner(reservation, memberId);
         PaymentRequest paymentRequest = request.toPaymentRequest();
         PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
         Payment payment = paymentRepository.save(paymentResponse.toPayment());
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
+    }
+
+    private void rejectIfNotOwner(Reservation reservation, Long memberId) {
+        if (reservation.isNotOwner(memberId)) {
+            throw new AuthorizationFailureException();
+        }
     }
 
     public List<ReservationResponse> findAllReservedReservations() {
