@@ -211,7 +211,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     if (!response.ok) {
       return response.json().then(errorBody => {
         console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-        window.alert("예약 결제 실패 메시지");
+        window.alert("예약 결제 실패 : " + errorBody.message);
       });
     } else {
       response.json().then(successBody => {
@@ -220,6 +220,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
       });
     }
   }).catch(error => {
+    alert(error.message);
     console.error(error.message);
   });
 }
@@ -244,19 +245,24 @@ function onWaitButtonClick() {
       body: JSON.stringify(reservationData)
     })
         .then(response => {
-          if (!response.ok) throw new Error('Reservation waiting failed');
-          return response.json();
-        })
-        .then(data => {
-          alert('Reservation waiting successful!');
-          window.location.href = "/";
+          if (!response.ok) {
+            return response.json().then(errorBody => {
+              window.alert("예약 대기 실패 : " + errorBody.message);
+              console.error("예약 대기 실패 : " + JSON.stringify(errorBody));
+            });
+          } else {
+            response.json().then(successBody => {
+              console.log("예약 대기 성공 : " + JSON.stringify(successBody));
+              window.location.href = "/";
+            });
+          }
         })
         .catch(error => {
-          alert("An error occurred while making the reservation waiting.");
-          console.error(error);
+          alert(error.message);
+          console.error(error.message);
         });
   } else {
-    alert("Please select a date, theme, and time before making a reservation waiting.");
+    alert("예약 대기를 하기 전 날짜, 테마, 시간을 선택해 주세요.");
   }
 }
 

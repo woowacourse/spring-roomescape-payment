@@ -36,9 +36,9 @@ function render(data) {
 function approve(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
-    const endpoint = '/admin/waitings/' + id;
+    const endpoint = '/admin/waitings/' + id + '/approve';
     return fetch(endpoint, {
-        method: 'PUT'
+        method: 'PATCH'
     }).then(response => {
         if (response.status === 200) return;
         throw new Error('Approve failed');
