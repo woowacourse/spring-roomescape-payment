@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         logger.error(exception.getMessage(), exception);
         return ResponseEntity
                 .status(exception.getHttpStatus())
-                .body(exception.getMessage());
+                .body(exception.getFailureCode() + "\n" + exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
