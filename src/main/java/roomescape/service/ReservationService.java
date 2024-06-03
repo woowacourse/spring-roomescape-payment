@@ -44,23 +44,24 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservation(ReservationRequest reservationRequest) {
-        Runnable payment = () -> {};
-        return saveReservation(reservationRequest, payment);
+        Runnable paymentStrategy = () -> {};
+        return saveReservation(reservationRequest, paymentStrategy);
     }
 
     @Transactional
     public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
         ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
         PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
-        Runnable payment = () -> paymentClient.confirmPayment(paymentConfirmRequest);
-        return saveReservation(reservationRequest, payment);
+
+        Runnable paymentStrategy = () -> paymentClient.confirmPayment(paymentConfirmRequest);
+        return saveReservation(reservationRequest, paymentStrategy);
     }
 
-    private ReservationResponse saveReservation(ReservationRequest reservationRequest, Runnable payment) {
+    private ReservationResponse saveReservation(ReservationRequest reservationRequest, Runnable paymentStrategy) {
         Member member = findMemberById(reservationRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
         return trySave(member, slot, () -> {
-            payment.run();
+            paymentStrategy.run();
             Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
             return ReservationResponse.createByReservation(savedReservation);
         });
