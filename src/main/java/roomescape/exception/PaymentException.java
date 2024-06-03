@@ -8,10 +8,10 @@ public class PaymentException extends RuntimeException {
 
     protected final String message;
 
-    public PaymentException(TossPaymentErrorResponse tossPaymentErrorResponse) {
-        super(tossPaymentErrorResponse.message());
-        this.code = tossPaymentErrorResponse.code();
-        this.message = tossPaymentErrorResponse.message();
+    public PaymentException(ExceptionResponse exceptionResponse) {
+        super(exceptionResponse.message());
+        this.code = exceptionResponse.code();
+        this.message = exceptionResponse.message();
     }
 
     public ExceptionResponse toExceptionResponse() {

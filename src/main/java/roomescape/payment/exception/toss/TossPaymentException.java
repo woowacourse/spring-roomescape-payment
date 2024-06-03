@@ -1,6 +1,7 @@
 package roomescape.payment.exception.toss;
 
 import roomescape.exception.ErrorType;
+import roomescape.exception.ExceptionResponse;
 import roomescape.exception.InternalException;
 import roomescape.exception.PaymentException;
 
@@ -10,10 +11,10 @@ public class TossPaymentException extends PaymentException {
         super(filterError(tossPaymentErrorResponse));
     }
 
-    private static TossPaymentErrorResponse filterError(TossPaymentErrorResponse response) {
+    private static ExceptionResponse filterError(TossPaymentErrorResponse response) {
         TossPaymentErrorType errorType = TossPaymentErrorType.valueOf(response.code());
         if (errorType.isExpose()) {
-            return response;
+            return response.toExceptionResponse();
         }
         throw new InternalException(ErrorType.PAYMENT_ERROR);
     }

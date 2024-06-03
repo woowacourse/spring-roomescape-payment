@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.exception.ExceptionResponse;
 import roomescape.exception.PaymentException;
 import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
@@ -105,7 +106,7 @@ class PaymentServiceTest extends ServiceTest {
     void throw_exception() {
         //given
         doThrow(new PaymentException(
-                new TossPaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
+                new ExceptionResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
                 .when(paymentClient).confirm(any());
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz",
                 "tgen_20240528172021mxEG4");
