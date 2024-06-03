@@ -136,6 +136,14 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public BookedMemberResponse findBookedMember(Long bookedMemberId) {
+        BookedMember bookedMember = bookedMemberRepository.findById(bookedMemberId)
+                .orElseThrow(() -> new RoomEscapeBusinessException("예약이 존재하지 않습니다."));
+
+        return BookedMemberResponse.from(bookedMember);
+    }
+
     private Reservation findReservation(LocalDate date, Long timeId, Long themeId) {
         ReservationTime time = findTimeById(timeId);
         Theme theme = findThemeById(themeId);

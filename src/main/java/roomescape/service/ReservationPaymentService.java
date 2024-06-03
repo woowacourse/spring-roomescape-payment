@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.service.dto.BookedMemberResponse;
+import roomescape.service.dto.BookedPaymentRequest;
 import roomescape.service.dto.BookedReservationResponse;
 import roomescape.service.dto.PaymentApproveRequest;
 import roomescape.service.dto.PaymentResponse;
@@ -62,5 +63,11 @@ public class ReservationPaymentService {
         Long memberId = bookedMemberResponse.memberId();
 
         paymentService.requestRefund(reservationId, memberId);
+    }
+
+    public void liquidateReservation(BookedPaymentRequest bookedPaymentRequest) {
+        BookedMemberResponse bookedMemberResponse = reservationService.findBookedMember(bookedPaymentRequest.id());
+        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.of(bookedMemberResponse, bookedPaymentRequest);
+        paymentService.requestApproval(paymentApproveRequest);
     }
 }

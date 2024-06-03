@@ -16,6 +16,7 @@ import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.infrastructure.Login;
 import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
+import roomescape.service.dto.BookedPaymentRequest;
 import roomescape.service.dto.LoginMember;
 import roomescape.service.dto.ReservationRequest;
 import roomescape.service.dto.ReservationResponse;
@@ -79,6 +80,12 @@ public class ReservationController {
     @DeleteMapping("/reservations/waiting/{id}")
     public ResponseEntity<Void> cancelWaiting(@Login LoginMember member, @PathVariable Long id) {
         reservationService.cancelWaiting(id, member);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reservations/booked/payment")
+    public ResponseEntity<Void> liquidateReservation(@RequestBody @Valid BookedPaymentRequest bookedPaymentRequest) {
+        reservationPaymentService.liquidateReservation(bookedPaymentRequest);
         return ResponseEntity.noContent().build();
     }
 }

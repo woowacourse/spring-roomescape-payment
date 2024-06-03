@@ -10,6 +10,19 @@ public record PaymentApproveRequest(
         String orderId,
         Integer amount
 ) {
+    public static PaymentApproveRequest of(
+            BookedMemberResponse bookedMemberResponse,
+            BookedPaymentRequest bookedPaymentRequest
+    ) {
+        return new PaymentApproveRequest(
+                bookedMemberResponse.reservationId(),
+                bookedMemberResponse.memberId(),
+                bookedPaymentRequest.paymentKey(),
+                bookedPaymentRequest.orderId(),
+                bookedPaymentRequest.amount()
+        );
+    }
+
     public PaymentRequest toPaymentRequest() {
         return new PaymentRequest(amount, paymentKey, orderId);
     }
