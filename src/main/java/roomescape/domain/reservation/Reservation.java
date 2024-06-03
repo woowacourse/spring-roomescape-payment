@@ -27,7 +27,7 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public void acceptWaiting(Waiting waiting){
+    public void acceptWaiting(Waiting waiting) {
         this.member = waiting.getMember();
     }
 

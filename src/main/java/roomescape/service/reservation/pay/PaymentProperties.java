@@ -20,20 +20,20 @@ public class PaymentProperties {
         return approveUrl;
     }
 
-    public String getCancelUrl() {
-        return cancelUrl;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
     public void setApproveUrl(String approveUrl) {
         this.approveUrl = approveUrl;
     }
 
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+
     public void setCancelUrl(String cancelUrl) {
         this.cancelUrl = cancelUrl;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 
     public void setSecretKey(String secretKey) {

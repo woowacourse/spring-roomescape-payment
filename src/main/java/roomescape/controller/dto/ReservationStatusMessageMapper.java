@@ -16,7 +16,7 @@ public enum ReservationStatusMessageMapper {
     }
 
     public static String mapTo(ReservationStatus status, OptionalLong rank) {
-        if(rank.isPresent()) {
+        if (rank.isPresent()) {
             return rank.getAsLong() + WAITING_MESSAGE.message;
         }
         return RESERVED_MESSAGE.message;

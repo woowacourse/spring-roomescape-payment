@@ -7,8 +7,8 @@ public class HeaderGeneratorImpl implements HeaderGenerator {
 
     @Override
     public HttpHeaders generate() {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return headers;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 }

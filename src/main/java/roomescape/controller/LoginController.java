@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.auth.Login;
 import roomescape.controller.dto.TokenRequest;
 import roomescape.service.auth.AuthService;
-import roomescape.service.reservation.MemberService;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.response.MemberResponse;
+import roomescape.service.reservation.MemberService;
 
 @Controller
 public class LoginController {

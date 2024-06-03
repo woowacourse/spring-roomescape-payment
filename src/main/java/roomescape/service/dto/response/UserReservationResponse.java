@@ -1,9 +1,10 @@
 package roomescape.service.dto.response;
 
-import roomescape.domain.reservation.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationSlot;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.WaitingWithRank;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.OptionalLong;
 
 import static roomescape.domain.reservation.ReservationStatus.RESERVED;

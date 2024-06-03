@@ -17,7 +17,6 @@ import roomescape.exception.customexception.business.RoomEscapeBusinessException
 import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.response.ReservationResponses;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -58,7 +57,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "date", "2025-10-06",
                             "timeId", 1L,
                             "themeId", 1L
-                                );
+                    );
 
                     createdId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)

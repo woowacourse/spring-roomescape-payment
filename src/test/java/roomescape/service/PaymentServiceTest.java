@@ -32,7 +32,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @EnableConfigurationProperties({PaymentProperties.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(methodMode =  DirtiesContext.MethodMode.BEFORE_METHOD)
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 class PaymentServiceTest {
 
     @Autowired

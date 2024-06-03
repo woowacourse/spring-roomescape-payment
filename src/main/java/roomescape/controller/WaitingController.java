@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.Login;
-import roomescape.service.reservation.WaitingService;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.request.WaitingRequest;
 import roomescape.service.dto.response.WaitingResponse;
+import roomescape.service.reservation.WaitingService;
 
 @RestController
 @RequestMapping("/waitings")

@@ -2,8 +2,8 @@ package roomescape.controller.admin;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.service.reservation.WaitingService;
 import roomescape.service.dto.response.WaitingResponses;
+import roomescape.service.reservation.WaitingService;
 
 @RestController
 @RequestMapping("/admin/waitings")

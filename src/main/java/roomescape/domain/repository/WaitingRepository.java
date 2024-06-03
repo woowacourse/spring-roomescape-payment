@@ -13,11 +13,11 @@ import java.util.List;
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     @Query("""
-    select w
-    from Waiting w
-    join fetch w.member
-    join fetch w.reservation
-    """)
+            select w
+            from Waiting w
+            join fetch w.member
+            join fetch w.reservation
+            """)
     List<Waiting> findAll();
 
     @Override

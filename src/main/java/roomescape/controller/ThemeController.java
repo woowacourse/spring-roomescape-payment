@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.service.reservation.ThemeService;
 import roomescape.service.dto.request.PopularThemeRequest;
 import roomescape.service.dto.response.ThemeResponses;
+import roomescape.service.reservation.ThemeService;
 
 @RestController
 @RequestMapping("/themes")

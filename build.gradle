@@ -37,6 +37,9 @@ dependencies {
 
     testImplementation 'org.mockito:mockito-core:3.7.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
+
+    implementation("org.springframework.retry:spring-retry")
+    implementation("org.springframework:spring-aspects")
 }
 
 test {

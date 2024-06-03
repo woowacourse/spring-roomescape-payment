@@ -3,10 +3,10 @@ package roomescape.controller.admin;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.service.reservation.ReservationTimeService;
 import roomescape.service.dto.request.ReservationTimeSaveRequest;
 import roomescape.service.dto.response.ReservationTimeResponse;
 import roomescape.service.dto.response.ReservationTimeResponses;
+import roomescape.service.reservation.ReservationTimeService;
 
 import java.net.URI;
 

@@ -171,11 +171,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
         //then
         assertAll(
-                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
-                ()-> assertThat(reservationResponse.date()).isEqualTo(request.date()),
-                ()-> assertThat(reservationResponse.theme().id()).isEqualTo(request.themeId()),
-                ()-> assertThat(reservationResponse.time().id()).isEqualTo(request.timeId()),
-                ()-> assertThat(reservationResponse.member().id()).isEqualTo(member.id())
+                () -> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
+                () -> assertThat(reservationResponse.date()).isEqualTo(request.date()),
+                () -> assertThat(reservationResponse.theme().id()).isEqualTo(request.themeId()),
+                () -> assertThat(reservationResponse.time().id()).isEqualTo(request.timeId()),
+                () -> assertThat(reservationResponse.member().id()).isEqualTo(member.id())
         );
     }
 
@@ -199,9 +199,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
         //when - then
         assertAll(
-                ()-> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
+                () -> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
                         .isInstanceOf(RoomEscapeBusinessException.class),
-                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class))
+                () -> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class))
         );
     }
 
@@ -224,10 +224,10 @@ class ReservationServiceTest extends IntegrationTestSupport {
 
         //when - then
         assertAll(
-                ()-> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
+                () -> assertThatThrownBy(() -> reservationService.saveUserReservation(member, request))
                         .isInstanceOf(RoomEscapeBusinessException.class),
-                ()-> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
-                ()-> Mockito.verify(paymentService, times(1)).cancel(any(PaymentCancelRequest.class))
+                () -> Mockito.verify(paymentService, times(1)).pay(any(PaymentApproveRequest.class)),
+                () -> Mockito.verify(paymentService, times(1)).cancel(any(PaymentCancelRequest.class))
         );
     }
 }
