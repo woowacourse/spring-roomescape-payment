@@ -2,7 +2,6 @@ package roomescape.application.payment;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
 import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.payment.ReservationPaymentRepository;
@@ -21,10 +20,10 @@ public class PaymentService {
 
     @Transactional
     public void purchase(Reservation reservation, PaymentRequest request) {
-        Payment payment = paymentClient.requestPurchase(request);
         ReservationPayment reservationPayment = new ReservationPayment(
-                payment.orderId(), reservation, request.paymentKey(), payment.totalAmount()
+                request.orderId(), reservation, request.paymentKey(), request.amount()
         );
         reservationPaymentRepository.save(reservationPayment);
+        paymentClient.requestPurchase(request);
     }
 }
