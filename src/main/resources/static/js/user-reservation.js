@@ -215,6 +215,7 @@ function checkDateAndThemeAndTime() {
 function onReservationButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const theme = document.querySelector('.theme-slot.active')?.textContent;
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
     const price = document.getElementById('price-amount').getAttribute('priceAmount');
     if (selectedDate && selectedThemeId && selectedTimeId) {
@@ -233,11 +234,12 @@ function onReservationButtonClick(event, paymentWidget) {
         const orderIdPrefix = "WTEST";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
-            orderName: "테스트 방탈출 예약 결제 1건",
+            orderName: theme + " 예약 결제",
             amount: price,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
+            alert("결제가 완료되었습니다.");
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러

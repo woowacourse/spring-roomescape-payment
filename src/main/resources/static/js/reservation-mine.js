@@ -65,7 +65,7 @@ function render(data) {
             cancelButton.className = 'btn btn-info';
             cancelButton.onclick =
                 function onReservationButtonClickWithPaymentWidget(event) {
-                    popupModal(price, item.id);
+                    popupModal(price, item.id, theme);
                 }
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
@@ -74,7 +74,7 @@ function render(data) {
     });
 }
 
-function popupModal(price, id) {
+function popupModal(price, id, theme) {
     let modal = document.getElementsByClassName("payment-modal-back")[0]; // 첫 번째 요소 선택
     if (modal) { // modal이 존재하는지 확인
         modal.style.display = 'block'; // display를 block으로 설정하여 모달 띄우기
@@ -94,11 +94,11 @@ function popupModal(price, id) {
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
 
     function onReservationButtonClickWithPaymentWidget(event) {
-        onReservationButtonClick(event, paymentWidget, id, price);
+        onReservationButtonClick(event, paymentWidget, id, price, theme);
     }
 }
 
-function onReservationButtonClick(event, paymentWidget, id, price) {
+function onReservationButtonClick(event, paymentWidget, id, price, theme) {
 
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
@@ -108,11 +108,12 @@ function onReservationButtonClick(event, paymentWidget, id, price) {
     const orderIdPrefix = "WTEST";
     paymentWidget.requestPayment({
         orderId: orderIdPrefix + generateRandomString(),
-        orderName: "테스트 방탈출 예약 결제 1건",
+        orderName: theme + " 예약 결제",
         amount: price,
     }).then(function (data) {
         console.debug(data);
         fetchReservationPayment(data, id);
+        alert("결제가 완료되었습니다.");
     }).catch(function (error) {
         // TOSS 에러 처리: 에러 목록을 확인하세요
         // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
