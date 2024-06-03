@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.exception.reservation.DuplicatedReservationException;
+import roomescape.exception.RoomEscapeException;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class ReservationFactory {
 
     private void rejectDuplicateReservation(ReservationDetail detail, Member member) {
         if (reservationRepository.existsReservation(detail, member, Status.getStatusWithoutCancel())) {
-            throw new DuplicatedReservationException();
+            throw new RoomEscapeException("중복된 예약입니다.");
         }
     }
 

@@ -26,7 +26,7 @@ import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
-import roomescape.exception.member.AuthorizationFailureException;
+import roomescape.exception.AuthorizationException;
 import roomescape.fixture.CommonFixture;
 import roomescape.support.FakePaymentClient;
 
@@ -188,7 +188,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
         // when
         Assertions.assertThatThrownBy(() -> reservationService.paymentForPending(request, userId))
-                .isInstanceOf(AuthorizationFailureException.class);
+                .isInstanceOf(AuthorizationException.class);
     }
 
     @DisplayName("예약 상태의 예약을 모두 조회한다")

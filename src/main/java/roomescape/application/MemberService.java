@@ -10,8 +10,8 @@ import roomescape.application.dto.response.member.MemberResponse;
 import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.exception.member.AuthenticationFailureException;
-import roomescape.exception.member.DuplicatedEmailException;
+import roomescape.exception.AuthenticationException;
+import roomescape.exception.RoomEscapeException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class MemberService {
 
     public String login(LoginRequest loginRequest) {
         Member findMember = memberRepository.findMember(loginRequest.email(), loginRequest.password())
-                .orElseThrow(AuthenticationFailureException::new);
+                .orElseThrow(AuthenticationException::new);
         return "token=" + jwtProvider.encode(findMember);
     }
 
@@ -42,13 +42,13 @@ public class MemberService {
 
     private void checkDuplicateEmail(String email) {
         if (memberRepository.existsMember(email)) {
-            throw new DuplicatedEmailException();
+            throw new RoomEscapeException("이미 가입된 이메일입니다.");
         }
     }
 
     @Transactional
     public void withdrawal(Long memberId) {
-        Member findMember = memberRepository.findMember(memberId).orElseThrow(AuthenticationFailureException::new);
+        Member findMember = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
         memberRepository.deleteMember(findMember);
     }
 }

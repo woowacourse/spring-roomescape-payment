@@ -24,6 +24,7 @@ public class DatabaseCleaner {
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
+    // todo: 클래스 레벨에서 entity를 갖고 와서 삭제하기
     private List<String> getTruncateQueries() {
         String sql = """
                 SELECT Concat('TRUNCATE TABLE ', TABLE_NAME, ' RESTART IDENTITY', ';') AS q

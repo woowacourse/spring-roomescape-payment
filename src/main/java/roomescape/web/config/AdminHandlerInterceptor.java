@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.domain.member.Role;
-import roomescape.exception.member.AuthenticationFailureException;
-import roomescape.exception.member.AuthorizationFailureException;
 import roomescape.application.security.JwtProvider;
+import roomescape.domain.member.Role;
+import roomescape.exception.AuthenticationException;
+import roomescape.exception.AuthorizationException;
 
 @RequiredArgsConstructor
 public class AdminHandlerInterceptor implements HandlerInterceptor {
@@ -22,7 +22,7 @@ public class AdminHandlerInterceptor implements HandlerInterceptor {
         String token = tokenCookie.getValue();
         Role role = jwtProvider.extractRole(token);
         if (!role.isAdmin()) {
-            throw new AuthorizationFailureException();
+            throw new AuthorizationException();
         }
         return true;
     }
@@ -35,7 +35,7 @@ public class AdminHandlerInterceptor implements HandlerInterceptor {
         return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findAny()
-                .orElseThrow(AuthenticationFailureException::new);
+                .orElseThrow(AuthenticationException::new);
     }
 
 }

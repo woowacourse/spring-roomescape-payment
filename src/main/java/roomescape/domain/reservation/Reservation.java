@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.exception.reservation.CancelReservationException;
+import roomescape.exception.RoomEscapeException;
 
 @Entity
 @Getter
@@ -61,21 +61,21 @@ public class Reservation {
 
     public void toPending() {
         if (this.isCanceled()) {
-            throw new CancelReservationException("이미 취소된 예약입니다.");
+            throw new RoomEscapeException("이미 취소된 예약입니다.");
         }
         this.status = Status.PAYMENT_PENDING;
     }
 
     public void cancel(Long memberId) {
         if (this.isNotOwner(memberId)) {
-            throw new CancelReservationException("다른 회원의 예약을 취소할 수 없습니다.");
+            throw new RoomEscapeException("다른 회원의 예약을 취소할 수 없습니다.");
         }
         this.status = Status.CANCELED;
     }
 
     public void cancelByAdmin() {
         if (this.isCanceled()) {
-            throw new CancelReservationException("이미 취소된 예약입니다.");
+            throw new RoomEscapeException("이미 취소된 예약입니다.");
         }
         this.status = Status.CANCELED;
     }

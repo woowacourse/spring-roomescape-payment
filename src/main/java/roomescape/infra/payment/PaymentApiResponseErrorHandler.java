@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.exception.payment.PaymentClientException;
-import roomescape.exception.payment.PaymentServerException;
+import roomescape.exception.PaymentClientException;
+import roomescape.exception.PaymentServerException;
 
 @Component
 @RequiredArgsConstructor

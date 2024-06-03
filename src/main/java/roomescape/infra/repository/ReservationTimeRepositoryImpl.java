@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
-import roomescape.exception.time.NotFoundReservationTimeException;
+import roomescape.exception.RoomEscapeException;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class ReservationTimeRepositoryImpl implements ReservationTimeRepository 
     @Override
     public ReservationTime getReservationTime(Long id) {
         return reservationTimeJpaRepository.findById(id)
-                .orElseThrow(NotFoundReservationTimeException::new);
+                .orElseThrow(() -> new RoomEscapeException("존재하지 않는 시간입니다."));
     }
 
     @Override

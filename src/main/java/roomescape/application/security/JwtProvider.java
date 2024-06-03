@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.exception.member.AuthenticationFailureException;
+import roomescape.exception.AuthenticationException;
 
 @Component
 public class JwtProvider {
@@ -45,7 +45,7 @@ public class JwtProvider {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
-            throw new AuthenticationFailureException();
+            throw new AuthenticationException();
         }
     }
 

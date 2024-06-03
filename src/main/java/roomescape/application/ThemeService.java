@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
-import roomescape.exception.theme.ReservationReferencedThemeException;
 import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.application.policy.RankingPolicy;
+import roomescape.domain.reservationdetail.Theme;
+import roomescape.domain.reservationdetail.ThemeRepository;
+import roomescape.exception.RoomEscapeException;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class ThemeService {
         try {
             themeRepository.delete(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ReservationReferencedThemeException();
+            throw new RoomEscapeException("예약이 존재하는 테마입니다.");
         }
     }
 }

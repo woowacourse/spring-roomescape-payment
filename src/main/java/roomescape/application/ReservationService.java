@@ -24,8 +24,8 @@ import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailFactory;
-import roomescape.exception.member.AuthenticationFailureException;
-import roomescape.exception.member.AuthorizationFailureException;
+import roomescape.exception.AuthenticationException;
+import roomescape.exception.AuthorizationException;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
-        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationFailureException::new);
+        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
@@ -58,7 +58,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse saveReservationByAdmin(ReservationRequest request) {
         Member member = memberRepository.findMember(request.memberId())
-                .orElseThrow(AuthenticationFailureException::new);
+                .orElseThrow(AuthenticationException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
                 request.date(), request.timeId(), request.themeId());
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
@@ -79,7 +79,7 @@ public class ReservationService {
 
     private void rejectIfNotOwner(Reservation reservation, Long memberId) {
         if (reservation.isNotOwner(memberId)) {
-            throw new AuthorizationFailureException();
+            throw new AuthorizationException();
         }
     }
 

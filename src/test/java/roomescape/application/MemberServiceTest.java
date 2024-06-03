@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.dto.request.member.LoginRequest;
 import roomescape.application.dto.request.member.SignupRequest;
-import roomescape.exception.member.AuthenticationFailureException;
+import roomescape.exception.AuthenticationException;
 import roomescape.fixture.CommonFixture;
 
 class MemberServiceTest extends BaseServiceTest {
@@ -17,7 +17,8 @@ class MemberServiceTest extends BaseServiceTest {
 
     @BeforeEach
     void setUp() {
-        SignupRequest request = new SignupRequest(CommonFixture.username, CommonFixture.userMangEmail, CommonFixture.password);
+        SignupRequest request = new SignupRequest(CommonFixture.username, CommonFixture.userMangEmail,
+                CommonFixture.password);
         memberService.signup(request);
     }
 
@@ -40,7 +41,7 @@ class MemberServiceTest extends BaseServiceTest {
 
         // when, then
         Assertions.assertThatThrownBy(() -> memberService.login(request))
-                .isExactlyInstanceOf(AuthenticationFailureException.class);
+                .isExactlyInstanceOf(AuthenticationException.class);
     }
 
     @DisplayName("회원 탈퇴 시, 로그인할 수 없다")
@@ -56,6 +57,6 @@ class MemberServiceTest extends BaseServiceTest {
 
         // then
         Assertions.assertThatThrownBy(() -> memberService.login(request))
-                .isExactlyInstanceOf(AuthenticationFailureException.class);
+                .isExactlyInstanceOf(AuthenticationException.class);
     }
 }

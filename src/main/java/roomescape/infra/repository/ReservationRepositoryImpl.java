@@ -11,7 +11,7 @@ import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
-import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.exception.RoomEscapeException;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public Reservation getReservation(Long id) {
         return findReservation(id)
-                .orElseThrow(NotFoundReservationException::new);
+                .orElseThrow(() -> new RoomEscapeException("존재하지 않는 예약입니다."));
     }
 
     @Override

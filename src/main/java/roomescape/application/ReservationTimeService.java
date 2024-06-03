@@ -11,9 +11,7 @@ import roomescape.application.dto.response.time.AvailableReservationTimeResponse
 import roomescape.application.dto.response.time.ReservationTimeResponse;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
-import roomescape.exception.time.DuplicatedTimeException;
-import roomescape.exception.time.NotFoundTimeException;
-import roomescape.exception.time.ReservationReferencedTimeException;
+import roomescape.exception.RoomEscapeException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class ReservationTimeService {
     @Transactional
     public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            throw new DuplicatedTimeException();
+            throw new RoomEscapeException("중복된 예약시간입니다.");
         }
         ReservationTime reservationTime = request.toReservationTime();
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
@@ -53,12 +51,12 @@ public class ReservationTimeService {
         try {
             reservationTimeRepository.delete(reservationTime);
         } catch (DataIntegrityViolationException e) {
-            throw new ReservationReferencedTimeException();
+            throw new RoomEscapeException("예약이 존재하는 시간입니다.");
         }
     }
 
     private ReservationTime findReservationTimeById(Long id) {
         return reservationTimeRepository.findReservationTime(id)
-                .orElseThrow(NotFoundTimeException::new);
+                .orElseThrow(() -> new RoomEscapeException("존재하지 않는 시간입니다."));
     }
 }

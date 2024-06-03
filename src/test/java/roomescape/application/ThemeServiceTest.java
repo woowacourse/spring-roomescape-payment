@@ -23,7 +23,7 @@ import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
-import roomescape.exception.theme.NotFoundThemeException;
+import roomescape.exception.RoomEscapeException;
 
 class ThemeServiceTest extends BaseServiceTest {
 
@@ -116,7 +116,7 @@ class ThemeServiceTest extends BaseServiceTest {
 
         // then
         Assertions.assertThatThrownBy(() -> themeRepository.getById(themeId))
-                .isInstanceOf(NotFoundThemeException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     private static class TimeFixture {

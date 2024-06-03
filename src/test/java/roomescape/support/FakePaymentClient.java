@@ -3,7 +3,7 @@ package roomescape.support;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentClient;
-import roomescape.exception.payment.PaymentClientException;
+    import roomescape.exception.PaymentClientException;
 
 public class FakePaymentClient implements PaymentClient {
     private static final String INVALID_PAYMENT_KEY = "invalidPaymentKey";

@@ -9,9 +9,9 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.exception.member.AuthenticationFailureException;
-import roomescape.application.security.JwtProvider;
 import roomescape.application.dto.request.member.MemberInfo;
+import roomescape.application.security.JwtProvider;
+import roomescape.exception.AuthenticationException;
 
 @RequiredArgsConstructor
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
@@ -34,6 +34,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
                 .filter(cookie -> cookie.getName().equals(targetCookie))
                 .findAny()
                 .map(Cookie::getValue)
-                .orElseThrow(AuthenticationFailureException::new);
+                .orElseThrow(AuthenticationException::new);
     }
 }

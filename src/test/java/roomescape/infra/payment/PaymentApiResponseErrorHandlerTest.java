@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.client.MockClientHttpResponse;
-import roomescape.exception.payment.PaymentClientException;
-import roomescape.exception.payment.PaymentServerException;
+import roomescape.exception.PaymentClientException;
+import roomescape.exception.PaymentServerException;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @SpringBootTest

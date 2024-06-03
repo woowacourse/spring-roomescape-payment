@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClientException;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentClient;
-import roomescape.exception.payment.PaymentServerException;
+import roomescape.exception.PaymentServerException;
 
 @Component
 @EnableConfigurationProperties(TossPaymentProperties.class)

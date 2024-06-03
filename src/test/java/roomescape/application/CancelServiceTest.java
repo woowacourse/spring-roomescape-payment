@@ -30,8 +30,6 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private CancelService cancelService;
     @Autowired
-    private ReservationService reservationService;
-    @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
