@@ -25,9 +25,9 @@ import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.Builder;
-import roomescape.application.payment.config.PaymentClientConfig;
 import roomescape.application.payment.config.PaymentClientProperties;
 import roomescape.application.payment.config.PaymentClientProperty;
+import roomescape.application.payment.config.PaymentRestClientBuilders;
 import roomescape.application.payment.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.payment.PaymentException;
@@ -37,10 +37,10 @@ class TossPaymentClientTest {
     private final PaymentClientProperty property = new PaymentClientProperty(
             "test", "https://test-toss-url.com", "test-secret",
             Duration.ofSeconds(3L), Duration.ofSeconds(31L));
-    private final PaymentClientConfig config = new PaymentClientConfig(
+    private final PaymentRestClientBuilders builders = new PaymentRestClientBuilders(
             new PaymentClientProperties(List.of(property))
     );
-    private final RestClient.Builder builder = config.builders().get("test")
+    private final RestClient.Builder builder = builders.get("test")
             .defaultStatusHandler(new PaymentErrorHandler());
     private final MockRestServiceServer server = MockRestServiceServer.bindTo(builder)
             .bufferContent()
