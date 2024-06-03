@@ -1,0 +1,7 @@
+payment:
+  base-url: https://api.tosspayments.com
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+  request-url:
+    v1:
+      confirm-payment: /v1/payments/confirm

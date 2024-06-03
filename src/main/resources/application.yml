@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active:
+      - dev
+      - default
+    group:
+      dev:
+        - db
+        - logging
+        - security
+        - payment
