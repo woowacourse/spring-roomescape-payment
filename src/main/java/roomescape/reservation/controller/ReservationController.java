@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.service.ReservationPaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -22,9 +23,12 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPaymentService reservationPaymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService,
+                                 ReservationPaymentService reservationPaymentService) {
         this.reservationService = reservationService;
+        this.reservationPaymentService = reservationPaymentService;
     }
 
     @GetMapping
@@ -36,7 +40,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody ReservationCreateRequest request,
             LoggedInMember member) {
-        ReservationResponse response = reservationService.createReservation(request, member.id());
+        ReservationResponse response = reservationPaymentService.saveReservationWithPayment(request, member);
 
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location)
@@ -46,6 +50,6 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable Long id) {
-        reservationService.deleteReservation(id);
+        reservationService.deleteWaiting(id);
     }
 }

@@ -12,6 +12,7 @@ import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.ReservationSaveResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -75,17 +76,15 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(ReservationCreateRequest request, Long memberId) {
+    public ReservationSaveResponse createReservation(ReservationCreateRequest request, Long memberId) {
         Member member = findMemberByMemberId(memberId);
         ReservationTime time = findTimeByTimeId(request.timeId());
         Theme theme = findThemeByThemeId(request.themeId());
         Reservation reservation = request.createReservation(member, time, theme);
         validate(reservation);
+        reservationRepository.save(reservation);
 
-        ReservationResponse reservationResponse = createReservation(reservation);
-        tossPaymentHistoryService.approvePayment(request.createPaymentRequest(reservation));
-
-        return reservationResponse;
+        return new ReservationSaveResponse(reservation);
     }
 
     private void validate(Reservation reservation) {
@@ -127,10 +126,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteReservation(Long id) {
+    public void deleteWaiting(Long id) {
         waitingRepository.findFirstByReservation_idOrderByCreatedAtAsc(id)
-                .ifPresentOrElse(this::promoteWaiting, () -> cancelReservation(id));
+                .ifPresentOrElse(this::promoteWaiting, () -> cancelReservationAndPayment(id));
 
+    }
+
+    public void deleteReservation(Long reservationId) {
+        reservationRepository.deleteById(reservationId);
     }
 
     private void promoteWaiting(Waiting waiting) {
@@ -141,7 +144,7 @@ public class ReservationService {
         waitingRepository.deleteById(waiting.getId());
     }
 
-    private void cancelReservation(Long id) {
+    private void cancelReservationAndPayment(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약은 존재하지 않습니다."));
 
