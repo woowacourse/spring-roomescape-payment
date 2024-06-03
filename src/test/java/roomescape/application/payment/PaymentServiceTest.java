@@ -16,11 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.application.ServiceTest;
-import roomescape.application.payment.dto.Payment;
-import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.application.payment.dto.PaymentRequest;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.payment.ReservationPayment;
-import roomescape.domain.payment.ReservationPaymentRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.BookStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTimeRepository;
@@ -32,7 +31,7 @@ import roomescape.domain.reservation.ThemeRepository;
 class PaymentServiceTest {
 
     @Autowired
-    private ReservationPaymentRepository reservationPaymentRepository;
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -61,13 +60,14 @@ class PaymentServiceTest {
                 LocalDateTime.now().minusDays(1),
                 BookStatus.BOOKED
         );
-        PaymentRequest request = new PaymentRequest("orderId", theme.getPrice(), "paymentKey");
+        String orderId = reservation.getOrderId();
+        PaymentRequest request = new PaymentRequest(orderId, theme.getPrice(), "paymentKey");
         given(paymentClient.requestPurchase(any(PaymentRequest.class)))
-                .willReturn(new Payment("paymentKey", "orderId", "DONE", theme.getPrice()));
+                .willReturn(new Payment(orderId, "paymentKey", theme.getPrice()));
 
-        paymentService.purchase(reservation, request);
+        paymentService.purchase(request);
 
-        ReservationPayment reservationPayment = reservationPaymentRepository.getByOrderId("orderId");
-        assertThat(reservationPayment.getPaymentKey()).isEqualTo("paymentKey");
+        Payment payment = paymentRepository.getByOrderId(orderId);
+        assertThat(payment.getPaymentKey()).isEqualTo("paymentKey");
     }
 }

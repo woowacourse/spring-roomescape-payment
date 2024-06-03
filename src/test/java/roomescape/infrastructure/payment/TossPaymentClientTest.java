@@ -2,6 +2,7 @@ package roomescape.infrastructure.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.ExpectedCount.manyTimes;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -28,8 +29,8 @@ import roomescape.application.payment.config.PaymentClientConfig;
 import roomescape.application.payment.config.PaymentClientProperties;
 import roomescape.application.payment.config.PaymentClientProperty;
 import roomescape.application.payment.config.PaymentErrorHandler;
-import roomescape.application.payment.dto.Payment;
-import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.application.payment.dto.PaymentRequest;
+import roomescape.domain.payment.Payment;
 import roomescape.exception.payment.PaymentException;
 import roomescape.util.Base64Utils;
 
@@ -72,8 +73,11 @@ class TossPaymentClientTest {
         Payment payment = paymentClient.requestPurchase(request);
 
         server.verify();
-        assertThat(payment)
-                .isEqualTo(new Payment("qwer", "1234abcd", "DONE", 1000L));
+        assertAll(
+                () -> assertThat(payment.getPaymentKey()).isEqualTo("qwer"),
+                () -> assertThat(payment.getOrderId()).isEqualTo("1234abcd"),
+                () -> assertThat(payment.getAmount()).isEqualTo(1000L)
+        );
     }
 
     @Test
@@ -98,6 +102,7 @@ class TossPaymentClientTest {
         assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessageStartingWith("카드 정보를 다시 확인해주세요.");
+        response.close();
     }
 
     @Test
@@ -117,6 +122,7 @@ class TossPaymentClientTest {
         assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제에 실패했습니다.");
+        response.close();
     }
 
     @Test

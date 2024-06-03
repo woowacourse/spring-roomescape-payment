@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.application.payment.dto.response.ErrorResponse;
+import roomescape.infrastructure.payment.TossErrorResponse;
 import roomescape.exception.payment.PaymentException;
 
 public class PaymentErrorHandler implements ResponseErrorHandler {
@@ -19,7 +19,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        ErrorResponse errorResponse = mapper.readValue(response.getBody(), ErrorResponse.class);
+        TossErrorResponse errorResponse = mapper.readValue(response.getBody(), TossErrorResponse.class);
         throw new PaymentException(errorResponse.message());
     }
 }

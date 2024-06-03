@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.UUID;
 import roomescape.domain.member.Member;
 
 @Entity
@@ -46,6 +47,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private BookStatus status;
 
+    @Column(name = "order_id", nullable = false)
+    private String orderId;
+
     protected Reservation() {
     }
 
@@ -59,6 +63,7 @@ public class Reservation {
         this.time = time;
         this.createdAt = createdAt;
         this.status = status;
+        this.orderId = UUID.randomUUID().toString();
     }
 
     public Reservation(Member member, Theme theme, LocalDate date, ReservationTime time,
@@ -135,5 +140,9 @@ public class Reservation {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public String getOrderId() {
+        return orderId;
     }
 }

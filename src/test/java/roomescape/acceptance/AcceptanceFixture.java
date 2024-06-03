@@ -19,8 +19,8 @@ import roomescape.application.auth.dto.TokenPayload;
 import roomescape.application.member.dto.request.MemberLoginRequest;
 import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.payment.PaymentClient;
-import roomescape.application.payment.dto.Payment;
-import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.application.payment.dto.PaymentResponse;
+import roomescape.application.payment.dto.PaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.request.ReservationTimeRequest;
@@ -29,6 +29,7 @@ import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationTimeResponse;
 import roomescape.application.reservation.dto.response.ThemeResponse;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 
 @TestComponent
 @ExtendWith(MockitoExtension.class)
@@ -95,7 +96,7 @@ public class AcceptanceFixture {
 
     public ReservationResponse createReservation(String token, ReservationRequest request) {
         given(paymentClient.requestPurchase(any(PaymentRequest.class)))
-                .willReturn(new Payment("paymentKey", "orderId", "DONE", 10000L));
+                .willReturn(new Payment("paymentKey", "orderId", 10000L));
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
                 request.memberId(), request.themeId(), request.date(), request.timeId(),
                 "paymentKey", "orderId"

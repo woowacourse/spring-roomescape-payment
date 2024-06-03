@@ -3,7 +3,7 @@ package roomescape.application.reservation.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import roomescape.application.payment.dto.request.PaymentRequest;
+import roomescape.application.payment.dto.PaymentRequest;
 
 public record ReservationPaymentRequest(
         Long memberId,
