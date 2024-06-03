@@ -3,7 +3,6 @@ package roomescape.reservation.dto;
 import java.time.LocalDate;
 
 import roomescape.member.entity.Member;
-import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.entity.Reservation;
 import roomescape.theme.entity.Theme;

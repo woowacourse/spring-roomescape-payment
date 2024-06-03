@@ -17,7 +17,7 @@ import roomescape.admin.dto.AdminReservationDetailResponse;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.auth.annotation.Authenticated;
 import roomescape.member.domain.LoginMember;
-import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationDetailResponse;
 import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;

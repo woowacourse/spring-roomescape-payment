@@ -40,7 +40,7 @@ import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;

@@ -22,7 +22,7 @@ import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
