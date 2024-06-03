@@ -5,6 +5,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.payment.dto.PaymentErrorResponse;
+import roomescape.payment.exception.PaymentResponseExchangeException;
+import roomescape.payment.exception.TossPaymentException;
 
 import java.io.IOException;
 
@@ -23,8 +25,12 @@ public class PaymentResponseErrorHandler implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(final ClientHttpResponse response) throws IOException {
-        final PaymentErrorResponse tossError = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-        throw new TossPaymentException(tossError);
+    public void handleError(final ClientHttpResponse response) {
+        try {
+            final PaymentErrorResponse tossError = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+            throw new TossPaymentException(tossError);
+        } catch (final IOException e) {
+            throw new PaymentResponseExchangeException(e.getMessage());
+        }
     }
 }
