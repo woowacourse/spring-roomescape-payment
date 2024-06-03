@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -29,9 +30,10 @@ public class PaymentRequestResponseLoggingInterceptor implements ClientHttpReque
     }
 
     private void logRequest(HttpRequest request, byte[] body) {
+        HttpHeaders headers = request.getHeaders();
         String requestBody = new String(body);
-        logger.info("Payment request (URI : {}, Method: {}, Body: {})",
-                request.getURI(), request.getMethod(), requestBody);
+        logger.info("Payment request (Header Auth: {}, URI: {}, Method: {}, Body: {})",
+                headers.get(HttpHeaders.AUTHORIZATION), request.getURI(), request.getMethod(), requestBody);
     }
 
     private void logResponse(URI uri, ClientHttpResponse response) throws IOException {
