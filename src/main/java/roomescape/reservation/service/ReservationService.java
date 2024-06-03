@@ -1,15 +1,12 @@
 package roomescape.reservation.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
 import roomescape.reservation.dto.request.CreateReservationRequest;
@@ -27,11 +24,14 @@ import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 import roomescape.waiting.service.WaitingService;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
 @Service
 public class ReservationService {
 
     private final WaitingService waitingService;
-    private final PaymentService paymentService;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -39,19 +39,22 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
+    private final PaymentClient paymentClient;
+
     public ReservationService(final WaitingService waitingService,
-                              final PaymentService paymentService, final ReservationRepository reservationRepository,
+                              final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
-                              final WaitingRepository waitingRepository) {
+                              final WaitingRepository waitingRepository,
+                              final PaymentClient paymentClient) {
         this.waitingService = waitingService;
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentClient = paymentClient;
     }
 
     public CreateReservationResponse createMyReservation(final AuthInfo authInfo,
@@ -86,7 +89,7 @@ public class ReservationService {
                 reservationTime.getStartAt());
         Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
 
-        paymentService.createPayment(ConfirmPaymentRequest.from(createReservationRequest));
+        paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
         return reservationRepository.save(reservation);
     }
 
