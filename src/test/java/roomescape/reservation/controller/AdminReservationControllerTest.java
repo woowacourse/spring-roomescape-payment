@@ -3,17 +3,20 @@ package roomescape.reservation.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.Fixtures;
 import roomescape.auth.service.TokenCookieService;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.PaymentFailureException;
 import roomescape.payment.service.TossPaymentRestClient;
 import roomescape.reservation.domain.entity.ReservationStatus;
 
@@ -155,7 +158,6 @@ class AdminReservationControllerTest {
     }
 
     @DisplayName("어드민 예약 컨트롤러는 id 값에 따라 예약 삭제 시 204을 응답한다.")
-    @Disabled
     @Test
     void deleteReservation() {
         // given
@@ -166,9 +168,8 @@ class AdminReservationControllerTest {
                 .statusCode(200)
                 .body("size()", is(11));
 
-        Map<String, String> body = Map.of("cancelReason", "reason");
-//        Mockito.when(restClient.post("/testPaymentKey/cancel", body))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.cancel("고객 변심"))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         RestAssured.given().log().all()
@@ -184,6 +185,36 @@ class AdminReservationControllerTest {
                 .then()
                 .statusCode(200)
                 .body("size()", is(10));
+    }
+
+    @Test
+    @DisplayName("어드민 예약 컨트롤러에서 예약 취소 도중 잘못된 페이먼츠 요청을 할 경우 400을 반환한다.")
+    void deleteReservationWithInvalidRequest() {
+        // given
+        Mockito.when(restClient.cancel("고객 변심"))
+                .thenThrow(new BadRequestException("은행 서비스 시간이 아닙니다."));
+
+        // when & then
+        RestAssured.given().log().all()
+                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
+                .when().delete("/admin/reservations/1")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("어드민 예약 컨트롤러에서 예약 취소 도중 페이먼츠 서버에 문제가 생길 경우 500을 반환한다.")
+    void deleteReservationWithServerError() {
+        // given
+        Mockito.when(restClient.cancel("고객 변심"))
+                .thenThrow(new PaymentFailureException("은행 점검, 해약 계좌 등의 사유로 부분 환불이 실패했습니다."));
+
+        // when & then
+        RestAssured.given().log().all()
+                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
+                .when().delete("/admin/reservations/1")
+                .then().log().all()
+                .statusCode(500);
     }
 
     @DisplayName("어드민 예약 컨트롤러는 예약 대기 승인시 200을 응답한다.")

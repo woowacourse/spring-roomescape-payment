@@ -24,18 +24,10 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("예약 서비스")
 class ReservationServiceTest {
 
-    private final ReservationService reservationService;
-    private final MemberReservationRepository memberReservationRepository;
-
-    private final Long id;
-
     @Autowired
-    public ReservationServiceTest(ReservationService reservationService,
-                                  MemberReservationRepository memberReservationRepository) {
-        this.reservationService = reservationService;
-        this.memberReservationRepository = memberReservationRepository;
-        this.id = 1L;
-    }
+    private ReservationService reservationService;
+    @Autowired
+    private MemberReservationRepository memberReservationRepository;
 
     @DisplayName("예약 서비스는 예약 확정 상태인 예약들을 조회한다.")
     @Test
@@ -65,6 +57,7 @@ class ReservationServiceTest {
     @Test
     void deleteReservation() {
         // when & then
+        Long id = 2L;
         MemberReservation memberReservation = memberReservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
         assertThatCode(() -> reservationService.deleteReservation(memberReservation))

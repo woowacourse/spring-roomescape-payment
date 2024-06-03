@@ -165,3 +165,6 @@ INSERT INTO member_reservation(member_id, reservation_id) -- 13
 VALUES (3, 12);
 INSERT INTO member_reservation(member_id, reservation_id, status) -- 14
 VALUES (3, 12, 'CANCELLATION_WAITING');
+
+INSERT INTO payment (amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, '2024-06-03T10:02:37.465', 1, 'testOrderId1', 'testPaymentKey1');

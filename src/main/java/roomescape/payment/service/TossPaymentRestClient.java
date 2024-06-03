@@ -68,7 +68,7 @@ public class TossPaymentRestClient {
                 .body(PaymentResponse.class);
     }
 
-    public <T> PaymentResponse confirm(PaymentRequest request) {
+    public PaymentResponse confirm(PaymentRequest request) {
         URI uri = UriComponentsBuilder.fromPath(properties.baseUrl())
                 .path(properties.endpointConfirm())
                 .build()
@@ -76,7 +76,7 @@ public class TossPaymentRestClient {
         return post(uri, request);
     }
 
-    public <T> PaymentResponse cancel(String cancelReason) {
+    public PaymentResponse cancel(String cancelReason) {
         URI uri = UriComponentsBuilder.fromPath(properties.baseUrl())
                 .path(properties.endpointCancel())
                 .build()

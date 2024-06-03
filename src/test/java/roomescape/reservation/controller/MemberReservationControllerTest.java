@@ -3,18 +3,19 @@ package roomescape.reservation.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.Fixtures;
 import roomescape.auth.service.TokenCookieService;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.TossPaymentRestClient;
@@ -73,7 +74,6 @@ class MemberReservationControllerTest {
     }
 
     @DisplayName("사용자 예약 컨트롤러는 예약 생성 시 생성된 값을 반환한다.")
-    @Disabled
     @Test
     void createMemberReservation() {
         // given
@@ -87,8 +87,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String name = RestAssured.given().log().all()
@@ -150,7 +150,6 @@ class MemberReservationControllerTest {
     }
 
     @DisplayName("사용자 예약 컨트롤러는 지난 날짜로 예약 생성 요청 시 400을 응답한다.")
-    @Disabled
     @Test
     void createReservationWithBeforeDate() {
         // given
@@ -164,8 +163,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
 
         // when
@@ -184,7 +183,6 @@ class MemberReservationControllerTest {
     }
 
     @DisplayName("사용자 예약 컨트롤러는 중복 예약 생성 요청 시 400을 응답한다.")
-    @Disabled
     @Test
     void createReservationWithDuplicated() {
         // given
@@ -198,8 +196,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -244,7 +242,6 @@ class MemberReservationControllerTest {
 
 
     @DisplayName("사용자 예약 컨트롤러는 존재하지 않는 시간으로 예약 생성을 요청할 경우 404를 응답한다.")
-    @Disabled
     @Test
     void createReservationWithNonExistsTime() {
         // given
@@ -258,8 +255,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String detailMessage = RestAssured.given().log().all()
@@ -277,7 +274,6 @@ class MemberReservationControllerTest {
     }
 
     @DisplayName("사용자 예약 컨트롤러는 존재하지 않는 테마로 예약 생성을 요청할 경우 404를 응답한다.")
-    @Disabled
     @Test
     void createReservationWithNonExistsTheme() {
         // given
@@ -291,8 +287,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         // when
         String detailMessage = RestAssured.given().log().all()
@@ -338,7 +334,6 @@ class MemberReservationControllerTest {
     }
 
     @DisplayName("사용자 예약 컨트롤러는 예약 대기 삭제 요청시 204를 응답한다.")
-    @Disabled
     @Test
     void deleteMemberReservation() {
         // given
@@ -352,8 +347,8 @@ class MemberReservationControllerTest {
         reservation.put("amount", 21000);
 
         PaymentRequest paymentRequest = new PaymentRequest("test", "test", BigDecimal.valueOf(21000));
-//        Mockito.when(restClient.post("/confirm", paymentRequest))
-//                .thenReturn(Fixtures.paymentResponseFixture);
+        Mockito.when(restClient.confirm(paymentRequest))
+                .thenReturn(Fixtures.paymentResponseFixture);
 
         long id = RestAssured.given()
                 .contentType(ContentType.JSON)
