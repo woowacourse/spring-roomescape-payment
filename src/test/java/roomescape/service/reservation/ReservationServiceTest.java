@@ -33,10 +33,12 @@ import roomescape.service.ServiceTestBase;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
+import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @ExtendWith(SpringExtension.class)
 class ReservationServiceTest extends ServiceTestBase {
+
     @Autowired
     private ReservationService reservationService;
     @Autowired
@@ -61,9 +63,9 @@ class ReservationServiceTest extends ServiceTestBase {
         member = memberRepository.save(Fixture.member);
     }
 
-    @DisplayName("새로운 예약을 저장한다.")
+    @DisplayName("관리자로부터 요청된 새로운 예약을 저장한다.")
     @Test
-    void create() {
+    void create_AdminReservationRequest() {
         // given
         LocalDate date = Fixture.tomorrow;
         AdminReservationRequest adminReservationRequest = new AdminReservationRequest(
@@ -72,6 +74,32 @@ class ReservationServiceTest extends ServiceTestBase {
 
         // when
         ReservationResponse result = reservationService.create(adminReservationRequest);
+
+        // then
+        SoftAssertions assertions = new SoftAssertions();
+        assertions.assertThat(result.id()).isNotZero();
+        assertions.assertThat(result.time().id()).isEqualTo(reservationTime.getId());
+        assertions.assertThat(result.theme().id()).isEqualTo(theme.getId());
+        assertions.assertAll();
+    }
+
+    @DisplayName("일반 사용자로부터 요청된 새로운 예약을 저장한다.")
+    @Test
+    void create_ReservationRequest() {
+        // given
+        LocalDate date = Fixture.tomorrow;
+        ReservationRequest reservationRequest = new ReservationRequest(
+                date,
+                Fixture.reservationTime.getId(),
+                Fixture.theme.getId(),
+                Fixture.TEST_PAYMENT_KEY,
+                Fixture.TEST_ORDER_ID,
+                Fixture.TEST_ORDER_AMOUNT,
+                Fixture.TEST_PAYMENT_TYPE
+        );
+
+        // when
+        ReservationResponse result = reservationService.create(reservationRequest, member.getId());
 
         // then
         SoftAssertions assertions = new SoftAssertions();
@@ -137,7 +165,8 @@ class ReservationServiceTest extends ServiceTestBase {
     void findReservationsOf() {
         // given
         reservationTime = reservationTimeRepository.save(
-                new ReservationTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS))
+                new ReservationTime(LocalTime.now()
+                        .truncatedTo(ChronoUnit.SECONDS))
         );
         theme = themeRepository.save(Fixture.theme);
         member = memberRepository.save(Fixture.member);
@@ -188,8 +217,10 @@ class ReservationServiceTest extends ServiceTestBase {
         long savedWaitingId = savedWaiting.getId();
         long memberId = member.getId();
         SoftAssertions assertions = new SoftAssertions();
-        assertions.assertThat(reservationWaitingRepository.findById(savedWaitingId)).isNotPresent();
-        assertions.assertThat(reservationRepository.findByMemberId(memberId)).hasSize(1);
+        assertions.assertThat(reservationWaitingRepository.findById(savedWaitingId))
+                .isNotPresent();
+        assertions.assertThat(reservationRepository.findByMemberId(memberId))
+                .hasSize(1);
         assertions.assertAll();
     }
 
@@ -239,4 +270,5 @@ class ReservationServiceTest extends ServiceTestBase {
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 테마입니다.");
     }
+
 }
