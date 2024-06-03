@@ -28,6 +28,7 @@ import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.member.AuthorizationFailureException;
 import roomescape.fixture.CommonFixture;
+import roomescape.support.FakePaymentClient;
 
 class ReservationServiceTest extends BaseServiceTest {
 
@@ -85,6 +86,31 @@ class ReservationServiceTest extends BaseServiceTest {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThat(reservation.findPayment()).isNotEmpty();
         });
+    }
+
+    @DisplayName("결제에 실패하면 예약되지 않는다")
+    @Test
+    void when_paymentFailed_then_noReservation() {
+        // given
+        int reservationCount = reservationRepository.findAll().size();
+        UserReservationRequest request = new UserReservationRequest(
+                CommonFixture.tomorrow,
+                time.getId(),
+                theme.getId(),
+                CommonFixture.amount,
+                CommonFixture.orderId,
+                FakePaymentClient.getInvalidPaymentKey(),
+                CommonFixture.paymentType);
+
+        // when
+        try {
+            reservationService.saveReservation(request, user.getId());
+        } catch (Exception ignored) {
+        }
+
+        // then
+        Assertions.assertThat(reservationRepository.findAll())
+                .hasSize(reservationCount);
     }
 
     @DisplayName("예약 대기 시, 결제가 진행되지 않아서 결제 정보가 없다")
