@@ -7,6 +7,8 @@ import static roomescape.exception.RoomescapeExceptionType.EMPTY_TIME;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +34,9 @@ public class Reservation implements Comparable<Reservation> {
     private Member member;
     @Column(nullable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private ReservationStatus reservationStatus;
 
     protected Reservation() {
 
@@ -65,6 +70,7 @@ public class Reservation implements Comparable<Reservation> {
         this.theme = theme;
         this.member = member;
         this.createdAt = createdAt;
+        this.reservationStatus = ReservationStatus.WAITING;
     }
 
     private void validateTheme(Theme theme) {
@@ -89,6 +95,13 @@ public class Reservation implements Comparable<Reservation> {
         if (member == null) {
             throw new RoomescapeException(EMPTY_MEMBER);
         }
+    }
+
+    public void book() {
+        if(reservationStatus != ReservationStatus.WAITING) {
+            //todo 예외 처리
+        }
+        this.reservationStatus = ReservationStatus.BOOKED;
     }
 
     public boolean isBefore(LocalDateTime base) {
@@ -161,6 +174,10 @@ public class Reservation implements Comparable<Reservation> {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
     }
 
     @Override
