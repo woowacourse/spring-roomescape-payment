@@ -1,9 +1,9 @@
 package roomescape.service.payment;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "payment")
 public class PaymentProperties {
     private String secretKey;
