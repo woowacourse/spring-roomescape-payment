@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.FilterInfo;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
+import roomescape.client.payment.TossPaymentClient;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
 import roomescape.exception.model.ReservationExceptionCode;
@@ -13,12 +15,12 @@ import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
+import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.repository.WaitingRepository;
-import roomescape.registration.dto.RegistrationDto;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
@@ -37,31 +39,39 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final TossPaymentClient tossPaymentClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                              MemberRepository memberRepository, WaitingRepository waitingRepository) {
+                              MemberRepository memberRepository, WaitingRepository waitingRepository,
+                              TossPaymentClient tossPaymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.tossPaymentClient = tossPaymentClient;
     }
 
-    public ReservationResponse addReservation(RegistrationDto registrationDto) {
-        ReservationTime time = reservationTimeRepository.findById(registrationDto.timeId())
+    @Transactional
+    public ReservationResponse addReservation(ReservationRequest reservationRequest, long id) {
+        ReservationTime time = reservationTimeRepository.findById(reservationRequest.timeId())
                 .orElseThrow(() -> new RoomEscapeException(ReservationTimeExceptionCode.FOUND_TIME_IS_NULL_EXCEPTION));
-        Theme theme = themeRepository.findById(registrationDto.themeId())
+        Theme theme = themeRepository.findById(reservationRequest.themeId())
                 .orElseThrow(() -> new RoomEscapeException(ThemeExceptionCode.FOUND_THEME_IS_NULL_EXCEPTION));
-        Member member = memberRepository.findMemberById(registrationDto.memberId())
+        Member member = memberRepository.findMemberById(id)
                 .orElseThrow(() -> new RoomEscapeException(ThemeExceptionCode.FOUND_MEMBER_IS_NULL_EXCEPTION));
+        validateDateAndTimeWhenSave(reservationRequest.date(), time);
 
-        validateDateAndTimeWhenSave(registrationDto.date(), time);
-        Reservation saveReservation = new Reservation(registrationDto.date(), time, theme, member);
+        Reservation saveReservation = new Reservation(reservationRequest.date(), time, theme, member);
+        Reservation reservation = reservationRepository.save(saveReservation);
 
-        return ReservationResponse.from(reservationRepository.save(saveReservation));
+        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
+        tossPaymentClient.sendPaymentConfirm(paymentConfirmToTossDto);
+        return ReservationResponse.from(reservation);
     }
 
+    @Transactional
     public void addAdminReservation(AdminReservationRequest adminReservationRequest) {
         ReservationTime time = reservationTimeRepository.findById(adminReservationRequest.timeId())
                 .orElseThrow(() -> new RoomEscapeException(ReservationTimeExceptionCode.FOUND_TIME_IS_NULL_EXCEPTION));
@@ -75,6 +85,7 @@ public class ReservationService {
         ReservationResponse.from(reservationRepository.save(saveReservation));
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> findReservations() {
         List<Reservation> reservations = reservationRepository.findAllByOrderByDateAscReservationTimeAsc();
 
@@ -83,6 +94,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationTimeAvailabilityResponse> findTimeAvailability(long themeId, LocalDate date) {
         List<ReservationTime> allTimes = reservationTimeRepository.findAllByOrderByStartAt();
         List<Reservation> reservations = reservationRepository.findAllByThemeIdAndDate(themeId, date);
@@ -93,6 +105,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> findFilteredReservations(ReservationFilterRequest reservationFilterRequest) {
         FilterInfo filterInfo = reservationFilterRequest.toFilterInfo();
 
@@ -102,6 +115,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> findMemberReservations(long id) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
 

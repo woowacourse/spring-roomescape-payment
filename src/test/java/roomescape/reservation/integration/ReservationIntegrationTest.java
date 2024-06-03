@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
-import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.TossPaymentClient;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 class ReservationIntegrationTest extends IntegrationTest {
 
     @MockBean
-    private PaymentClient paymentClient; // todo: 실제로 토스거를 받고, 테스트 이름을 변경하는 식으로 변경
+    private TossPaymentClient tossPaymentClient;
 
     @Test
     @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회, 삭제한다.")
@@ -32,7 +32,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
                 "paymentType", "paymentKey", "orderId", 1000);
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
+        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
 
         int id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -69,7 +69,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 0L,
                 "paymentType", "paymentKey", "orderId", 1000);
         PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
+        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

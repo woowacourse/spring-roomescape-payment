@@ -1,22 +1,15 @@
 package roomescape.reservation.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.member.domain.Member;
@@ -29,12 +22,23 @@ import roomescape.registration.domain.reservation.repository.ReservationReposito
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.repository.WaitingRepository;
-import roomescape.registration.dto.RegistrationDto;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.vo.Name;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.willDoNothing;
 
 @Sql(scripts = "/init.sql")
 @Transactional
@@ -76,6 +80,9 @@ class ReservationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @MockBean
+    private PaymentClient paymentClient;
+
     @Test
     @DisplayName("예약을 추가한다.")
     void addReservation() {
@@ -85,13 +92,11 @@ class ReservationServiceTest {
         ReservationRequest reservationRequest = new ReservationRequest(reservation.getDate(),
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
                 "paymentType", "paymentKey", "orderId", 1000);
+        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
+        willDoNothing().given(paymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
 
         ReservationResponse reservationResponse = reservationService
-                .addReservation(new RegistrationDto(
-                        reservationRequest.date(),
-                        reservationRequest.themeId(),
-                        reservationRequest.timeId(),
-                        reservation.getMember().getId()));
+                .addReservation(reservationRequest, 1L);
 
         assertThat(reservationResponse.id()).isEqualTo(1);
     }
@@ -149,14 +154,8 @@ class ReservationServiceTest {
 
         ReservationRequest reservationRequest = new ReservationRequest(BEFORE, 1L, 1L,
                 "paymentType", "paymentKey", "orderId", 0);
-
         Throwable pastDateReservation = assertThrows(RoomEscapeException.class,
-                () -> reservationService.addReservation(new RegistrationDto(
-                        reservationRequest.date(),
-                        reservationRequest.themeId(),
-                        reservationRequest.timeId(),
-                        reservation.getMember().getId()
-                )));
+                () -> reservationService.addReservation(reservationRequest, 1L));
 
         assertEquals(ReservationExceptionCode.RESERVATION_DATE_IS_PAST_EXCEPTION.getMessage(),
                 pastDateReservation.getMessage());

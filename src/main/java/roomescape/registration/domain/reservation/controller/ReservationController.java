@@ -11,13 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
-import roomescape.client.payment.PaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
-import roomescape.registration.dto.RegistrationDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,21 +24,15 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentClient paymentClient;
 
-    public ReservationController(ReservationService reservationService, PaymentClient paymentClient) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentClient = paymentClient;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
                                                                @LoginMemberId long id) {
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        paymentClient.sendPaymentConfirm(paymentConfirmToTossDto);
-
-        RegistrationDto registrationDto = RegistrationDto.of(reservationRequest, id);
-        ReservationResponse reservationResponse = reservationService.addReservation(registrationDto);
+        ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, id);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
