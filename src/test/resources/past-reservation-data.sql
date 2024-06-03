@@ -16,8 +16,8 @@ INSERT INTO member (name, email, password, role)
 VALUES ('토미', 'tommy@gmail.com', 'jyefr', 'USER');
 
 INSERT INTO reservation (date, member_id, theme_id, time_id, status)
-VALUES (CURRENT_DATE() - 7, 1, 1, 1, 'BOOKING');
+VALUES (SUBDATE(CURRENT_DATE(), 7), 1, 1, 1, 'BOOKING');
 INSERT INTO reservation (date, member_id, theme_id, time_id, status)
-VALUES (CURRENT_DATE() - 2, 2, 2, 1, 'BOOKING');
+VALUES (SUBDATE(CURRENT_DATE(), 2), 2, 2, 1, 'BOOKING');
 INSERT INTO reservation (date, member_id, theme_id, time_id, status)
-VALUES (CURRENT_DATE() - 1, 3, 2, 2, 'BOOKING');
+VALUES (SUBDATE(CURRENT_DATE(), 1), 3, 2, 2, 'BOOKING');
