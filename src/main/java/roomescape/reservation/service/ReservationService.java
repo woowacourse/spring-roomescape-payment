@@ -71,16 +71,16 @@ public class ReservationService {
 
     public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
-        ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
+        PaymentResponse paymentResponse = paymentWithRestClient.confirm(paymentRequest);
 
-        if (!Objects.equals(paymentRequest.amount(), reservationResponse.amount())) {
+        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
+        Reservation reservation = findReservation(reservationRequest, memberId);
+
+        if (!Objects.equals(paymentResponse.totalAmount(), reservation.getAmount())) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
 
-        paymentWithRestClient.confirm(paymentRequest);
-
-        return reservationResponse;
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     public ReservationResponse createReservation(ReservationRequest reservationRequest, Long memberId) {
