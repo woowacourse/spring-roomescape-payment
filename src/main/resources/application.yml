@@ -18,13 +18,6 @@ spring:
       okhttp:
         enabled: true
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: beans
-
-
 security:
   jwt:
     secret-key: hogihogihogihogihogihogihogihogihogihogiHOGIhogihogihogihogi
