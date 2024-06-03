@@ -20,7 +20,7 @@ public class ReservationTime {
     }
 
     public ReservationTime(LocalTime startAt) {
-        this.startAt = startAt;
+        this.startAt = startAt.withNano(0);
     }
 
     public boolean isSame(ReservationTime other) {
