@@ -93,7 +93,7 @@ public class ReservationService {
 
     private void validateDuplication(ReservationDate date, Long timeId, Long themeId) {
         if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new RoomescapeException(RoomescapeErrorCode.ALREADY_RESERVED, "이미 존재하는 예약 정보 입니다.");
+            throw new RoomescapeException(RoomescapeErrorCode.DUPLICATED_RESERVATION, "이미 존재하는 예약 정보 입니다.");
         }
     }
 

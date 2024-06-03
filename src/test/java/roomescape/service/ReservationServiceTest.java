@@ -1,177 +1,175 @@
 package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.Fixture.VALID_MEMBER;
-import static roomescape.Fixture.VALID_RESERVATION;
-import static roomescape.Fixture.VALID_RESERVATION_DATE;
 import static roomescape.Fixture.VALID_RESERVATION_TIME;
 import static roomescape.Fixture.VALID_THEME;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.Reservation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.jdbc.Sql;
+import roomescape.controller.payment.TestPaymentConfiguration;
+import roomescape.domain.Member;
 import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
+import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationSaveAppRequest;
 import roomescape.service.response.ReservationAppResponse;
 import roomescape.service.response.ReservationTimeAppResponse;
 import roomescape.service.response.ThemeAppResponse;
+import roomescape.web.controller.request.MemberReservationRequest;
 
-@ExtendWith(MockitoExtension.class)
+@Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = TestPaymentConfiguration.class)
 class ReservationServiceTest {
 
-    private final long timeId = 1L;
-    private final long themeId = 1L;
-    private final long memberId = 1L;
-
-    @InjectMocks
+    @Autowired
     private ReservationService reservationService;
 
-    @Mock
-    private ReservationRepository reservationRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
-    @Mock
+    @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
-    @Mock
+    @Autowired
     private ThemeRepository themeRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
 
     @DisplayName("예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
     @Test
     void save() {
-        long reservationId = 1L;
-        Reservation reservation = VALID_RESERVATION;
+        LocalDate reservationDate = LocalDate.now().plusDays(1);
+        ReservationTime reservationTime = reservationTimeRepository.save(VALID_RESERVATION_TIME);
+        Theme theme = themeRepository.save(VALID_THEME);
+        Member member = memberRepository.save(VALID_MEMBER);
 
-        when(reservationTimeRepository.findById(timeId))
-                .thenReturn(Optional.of(VALID_RESERVATION_TIME));
-        when(themeRepository.findById(themeId))
-                .thenReturn(Optional.of(VALID_THEME));
-        when(memberRepository.findById(memberId))
-                .thenReturn(Optional.of(VALID_MEMBER));
+        ReservationAppResponse reservationAppResponse = reservationService.save(
+                ReservationSaveAppRequest.of(
+                        new MemberReservationRequest(
+                                LocalDate.now().plusDays(1).toString(),
+                                reservationTime.getId(),
+                                theme.getId(),
+                                "paymentKey",
+                                "orderId",
+                                BigDecimal.valueOf(1000)
+                        ), member.getId()
+                )
+        );
 
-        when(reservationRepository.save(any(Reservation.class)))
-                .thenReturn(new Reservation(
-                        reservationId,
-                        VALID_MEMBER,
-                        VALID_RESERVATION_DATE,
-                        VALID_RESERVATION_TIME,
-                        VALID_THEME)
-                );
+        ReservationDate date = reservationAppResponse.date();
+        ReservationTimeAppResponse reservationTimeAppResponse = reservationAppResponse.reservationTimeAppResponse();
+        ThemeAppResponse themeAppResponse = reservationAppResponse.themeAppResponse();
 
-        ReservationSaveAppRequest request = new ReservationSaveAppRequest(VALID_RESERVATION_DATE.getDate().toString(),
-                timeId,
-                themeId, memberId, null);
-        ReservationAppResponse actual = reservationService.save(request);
-        ReservationAppResponse expected = new ReservationAppResponse(
-                reservationId,
-                reservation.getMember().getName(),
-                reservation.getDate(),
-                ReservationTimeAppResponse.from(reservation.getTime()),
-                ThemeAppResponse.from(reservation.getTheme()));
-
-        assertThat(actual).isEqualTo(expected);
+        assertAll(
+                () -> assertThat(reservationAppResponse.id()).isEqualTo(1L),
+                () -> assertThat(date.getDate()).isEqualTo(reservationDate),
+                () -> assertThat(reservationAppResponse.name()).isEqualTo(member.getName()),
+                () -> assertThat(reservationTimeAppResponse.id()).isEqualTo(reservationTime.getId()),
+                () -> assertThat(themeAppResponse.id()).isEqualTo(theme.getId())
+        );
     }
 
     @DisplayName("실패: 존재하지 않는 시간,테마,사용자 ID 입력 시 예외가 발생한다.")
     @Test
     void save_TimeIdDoesntExist() {
-        assertThatThrownBy(() -> reservationService.save(
-                new ReservationSaveAppRequest("2030-12-31",
+        assertThatCode(() -> reservationService.save(ReservationSaveAppRequest.of(
+                new MemberReservationRequest(LocalDate.now().plusDays(1).toString(),
                         1L,
                         1L,
-                        1L,
-                        null)))
+                        "paymentKey",
+                        "orderId",
+                        BigDecimal.valueOf(1000)), 1L)))
                 .isInstanceOf(RoomescapeException.class);
     }
 
     @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
     @Test
     void save_Duplication() {
-        String rawDate = "2030-12-31";
+        LocalDate reservationDate = LocalDate.now().plusDays(1);
+        ReservationTime reservationTime = reservationTimeRepository.save(VALID_RESERVATION_TIME);
+        Theme theme = themeRepository.save(VALID_THEME);
+        Member member = memberRepository.save(VALID_MEMBER);
 
-        when(themeRepository.findById(themeId))
-                .thenReturn(Optional.of(VALID_THEME));
-        when(reservationTimeRepository.findById(timeId))
-                .thenReturn(Optional.of(VALID_RESERVATION_TIME));
-        when(memberRepository.findById(memberId))
-                .thenReturn(Optional.of(VALID_MEMBER));
+        ReservationAppResponse reservationAppResponse = reservationService.save(
+                ReservationSaveAppRequest.of(
+                        new MemberReservationRequest(
+                                reservationDate.toString(),
+                                reservationTime.getId(),
+                                theme.getId(),
+                                "paymentKey",
+                                "orderId",
+                                BigDecimal.valueOf(1000)
+                        ), member.getId()
+                )
+        );
 
-        when(reservationRepository.existsByDateAndTimeIdAndThemeId(new ReservationDate(rawDate), timeId, themeId))
-                .thenReturn(true);
-
-        assertThatThrownBy(
-                () -> reservationService.save(new ReservationSaveAppRequest(rawDate,
-                        timeId,
-                        themeId,
-                        memberId,
-                        null)))
-                .isInstanceOf(RoomescapeException.class);
+        assertThatCode(() -> reservationService.save(ReservationSaveAppRequest.of(
+                new MemberReservationRequest(
+                        LocalDate.now().plusDays(1).toString(),
+                        reservationTime.getId(),
+                        theme.getId(),
+                        "paymentKey",
+                        "orderId",
+                        BigDecimal.valueOf(1000)), member.getId()
+        )))
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.DUPLICATED_RESERVATION);
     }
 
     @DisplayName("실패: 어제 날짜에 대한 예약을 생성하면 예외가 발생한다.")
     @Test
     void save_PastDateReservation() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate reservationDate = LocalDate.now().minusDays(1);
+        ReservationTime reservationTime = reservationTimeRepository.save(VALID_RESERVATION_TIME);
+        Theme theme = themeRepository.save(VALID_THEME);
+        Member member = memberRepository.save(VALID_MEMBER);
 
-        when(reservationTimeRepository.findById(timeId))
-                .thenReturn(Optional.of(VALID_RESERVATION_TIME));
-        when(themeRepository.findById(themeId))
-                .thenReturn(Optional.of(VALID_THEME));
-        when(memberRepository.findById(memberId))
-                .thenReturn(Optional.of(VALID_MEMBER));
-
-        assertThatThrownBy(
-                () -> reservationService.save(
-                        new ReservationSaveAppRequest(yesterday.toString(),
-                                timeId,
-                                themeId,
-                                memberId,
-                                null))
-        ).isInstanceOf(RoomescapeException.class);
+        assertThatCode(() -> reservationService.save(ReservationSaveAppRequest.of(
+                new MemberReservationRequest(
+                        reservationDate.toString(),
+                        reservationTime.getId(),
+                        theme.getId(),
+                        "paymentKey",
+                        "orderId",
+                        BigDecimal.valueOf(1000)), member.getId()
+        )))
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.PAST_REQUEST);
     }
 
     @DisplayName("실패: 같은 날짜에 대한 과거 시간 예약을 생성하면 예외가 발생한다.")
     @Test
     void save_TodayPastTimeReservation() {
-        LocalDate today = LocalDate.now();
-        String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
+        LocalDate reservationDate = LocalDate.now();
+        ReservationTime reservationTime = reservationTimeRepository.save(VALID_RESERVATION_TIME);
+        Theme theme = themeRepository.save(VALID_THEME);
+        Member member = memberRepository.save(VALID_MEMBER);
 
-        ReservationTime reservationTime = new ReservationTime(oneMinuteAgo);
-        Theme theme = new Theme("방탈출1", "방탈출1을 한다.", "https://url");
-
-        when(reservationTimeRepository.findById(timeId))
-                .thenReturn(Optional.of(reservationTime));
-        when(themeRepository.findById(themeId))
-                .thenReturn(Optional.of(theme));
-        when(memberRepository.findById(memberId))
-                .thenReturn(Optional.of(VALID_MEMBER));
-
-        assertThatThrownBy(() ->
-                reservationService.save(
-                        new ReservationSaveAppRequest(today.toString(),
-                                timeId,
-                                themeId,
-                                memberId,
-                                null)))
-                .isInstanceOf(RoomescapeException.class);
+        assertThatCode(() -> reservationService.save(ReservationSaveAppRequest.of(
+                new MemberReservationRequest(
+                        reservationDate.toString(),
+                        reservationTime.getId(),
+                        theme.getId(),
+                        "paymentKey",
+                        "orderId",
+                        BigDecimal.valueOf(1000)), member.getId()
+        )))
+                .isInstanceOf(RoomescapeException.class)
+                .extracting("errorCode")
+                .isEqualTo(RoomescapeErrorCode.PAST_REQUEST);
     }
 }
