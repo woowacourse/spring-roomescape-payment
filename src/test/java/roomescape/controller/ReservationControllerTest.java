@@ -242,7 +242,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 "themeId", 1L
         );
 
-        Mockito.when(paymentService.pay(any(), any()))
+        Mockito.when(paymentService.pay(any()))
                 .thenThrow(RoomEscapeBusinessException.class);
 
         RestAssured.given().log().all()

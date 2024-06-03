@@ -5,9 +5,9 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import roomescape.controller.HeaderGenerator;
 import roomescape.controller.PaymentApproveResponse;
 import roomescape.controller.dto.PaymentApproveRequest;
 
@@ -23,8 +23,9 @@ public class PaymentService {
         this.restTemplate = restTemplate;
     }
 
-    public PaymentApproveResponse pay(HeaderGenerator headerGenerator, PaymentApproveRequest paymentApproveRequest) {
-        HttpHeaders headers = headerGenerator.generate();
+    public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(encodeSecretKey());
         HttpEntity<PaymentApproveRequest> httpEntity = new HttpEntity<>(paymentApproveRequest, headers);
 
