@@ -28,4 +28,4 @@ security:
 
 toss-payment:
   payment-approval-url: https://api.tosspayments.com/v1/payments/confirm
-  test-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  test-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"

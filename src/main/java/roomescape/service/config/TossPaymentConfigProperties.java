@@ -10,7 +10,7 @@ public class TossPaymentConfigProperties {
 
     public TossPaymentConfigProperties(String paymentApprovalUrl, String testSecretKey) {
         this.paymentApprovalUrl = paymentApprovalUrl;
-        this.testSecretKey = testSecretKey + ":";
+        this.testSecretKey = testSecretKey;
     }
 
     public String getPaymentApprovalUrl() {
