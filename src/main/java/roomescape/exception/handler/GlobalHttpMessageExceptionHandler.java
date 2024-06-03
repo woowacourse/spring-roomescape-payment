@@ -1,4 +1,4 @@
-package roomescape.controller.handler;
+package roomescape.exception.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
