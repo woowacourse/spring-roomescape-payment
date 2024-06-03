@@ -39,7 +39,8 @@ public class PaymentClientConfiguration {
                 RestClient.builder()
                         .baseUrl(tossBaseUrl)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
-                .build()
+                        .defaultStatusHandler(new TossPaymentResponseErrorHandler())
+                        .build()
         );
     }
 }

@@ -3,9 +3,6 @@ package roomescape.common;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import io.jsonwebtoken.JwtException;
-import java.util.NoSuchElementException;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
@@ -15,10 +12,13 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
+import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.common.exception.UnAuthorizationException;
+
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,8 +43,8 @@ public class GlobalExceptionHandler {
         String exceptionMessage = "잘못된 JSON 형식입니다.";
         if (ex.getCause() instanceof JsonMappingException jsonMappingException) {
             exceptionMessage = jsonMappingException.getPath().stream()
-                    .map(Reference::getFieldName)
-                    .collect(Collectors.joining(" ")) + " 필드의 형식이 잘못되었습니다.";
+                                       .map(Reference::getFieldName)
+                                       .collect(Collectors.joining(" ")) + " 필드의 형식이 잘못되었습니다.";
         }
 
         return ResponseEntity.status(400)
@@ -52,21 +52,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> catchHttpClientErrorException(HttpClientErrorException ex) {
+    public ResponseEntity<ProblemDetail> catchClientException(ClientException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getMessage());
 
-        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ProblemDetail> catchHttpServerErrorException(HttpServerErrorException ex) {
-        logger.warning(EXCEPTION_PREFIX + ex.getMessage());
-
-        PaymentClientErrorResponse response = ex.getResponseBodyAs(PaymentClientErrorResponse.class);
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(ProblemDetail.forStatusAndDetail(ex.getStatusCode(), response.message()));
+        return ResponseEntity.status(500)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
     @ExceptionHandler
