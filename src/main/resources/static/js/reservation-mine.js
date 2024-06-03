@@ -62,7 +62,7 @@ function render(data) {
             const cancelCell = row.insertCell(5);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '결제';
-            cancelButton.className = 'btn btn-danger';
+            cancelButton.className = 'btn btn-info';
             cancelButton.onclick =
                 function onReservationButtonClickWithPaymentWidget(event) {
                     popupModal(price, item.id);
