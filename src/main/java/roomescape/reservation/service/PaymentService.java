@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.PaymentResponse;
-import roomescape.reservation.encoder.TossSecretKeyEncoder;
+import roomescape.reservation.encoder.BasicAuthEncoder;
 
 @Service
 public class PaymentService {
@@ -43,7 +43,7 @@ public class PaymentService {
     }
 
     public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
-        String authorization = TossSecretKeyEncoder.encode(tossSecretKey);
+        String authorization = BasicAuthEncoder.encode(tossSecretKey);
 
         return tossRestClient.post()
                 .uri("/confirm")

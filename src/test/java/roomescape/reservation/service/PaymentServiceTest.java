@@ -24,7 +24,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.PaymentResponse;
-import roomescape.reservation.encoder.TossSecretKeyEncoder;
+import roomescape.reservation.encoder.BasicAuthEncoder;
 
 @RestClientTest(PaymentService.class)
 class PaymentServiceTest {
@@ -46,7 +46,7 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        encodedSecretKey = TossSecretKeyEncoder.encode(secretKey);
+        encodedSecretKey = BasicAuthEncoder.encode(secretKey);
     }
 
     @DisplayName("토스 결제를 정상적으로 처리한다.")
