@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql.init.mode: never
+
+jwt:
+  secret: testtesttesttesttesttesttesttesttesttesttest
+  expire-in-millis: 1800000
+
+payment:
+  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  url: https://test.wib.aru
