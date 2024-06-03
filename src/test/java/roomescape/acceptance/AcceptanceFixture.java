@@ -19,7 +19,7 @@ import roomescape.application.auth.dto.TokenPayload;
 import roomescape.application.member.dto.request.MemberLoginRequest;
 import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.payment.PaymentClient;
-import roomescape.application.payment.dto.PaymentRequest;
+import roomescape.application.payment.dto.PaymentClientRequest;
 import roomescape.application.reservation.dto.request.ReservationPaymentRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.request.ReservationTimeRequest;
@@ -94,7 +94,7 @@ public class AcceptanceFixture {
     }
 
     public ReservationResponse createReservation(String token, ReservationRequest request) {
-        given(paymentClient.requestPurchase(any(PaymentRequest.class)))
+        given(paymentClient.requestPurchase(any(PaymentClientRequest.class)))
                 .willReturn(new Payment("paymentKey", "orderId", 10000L));
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
                 request.memberId(), request.themeId(), request.date(), request.timeId(),

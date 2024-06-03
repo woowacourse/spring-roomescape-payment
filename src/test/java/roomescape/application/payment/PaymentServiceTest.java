@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.application.ServiceTest;
-import roomescape.application.payment.dto.PaymentRequest;
+import roomescape.application.payment.dto.PaymentClientRequest;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
@@ -61,8 +61,8 @@ class PaymentServiceTest {
                 BookStatus.BOOKED
         );
         String orderId = reservation.getOrderId();
-        PaymentRequest request = new PaymentRequest(orderId, theme.getPrice(), "paymentKey");
-        given(paymentClient.requestPurchase(any(PaymentRequest.class)))
+        PaymentClientRequest request = new PaymentClientRequest(orderId, theme.getPrice(), "paymentKey");
+        given(paymentClient.requestPurchase(any(PaymentClientRequest.class)))
                 .willReturn(new Payment(orderId, "paymentKey", theme.getPrice()));
 
         paymentService.purchase(request);

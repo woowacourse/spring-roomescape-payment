@@ -28,7 +28,7 @@ import org.springframework.web.client.RestClient.Builder;
 import roomescape.application.payment.config.PaymentClientProperties;
 import roomescape.application.payment.config.PaymentClientProperty;
 import roomescape.application.payment.config.PaymentRestClientBuilders;
-import roomescape.application.payment.dto.PaymentRequest;
+import roomescape.application.payment.dto.PaymentClientRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.payment.PaymentException;
 import roomescape.util.Base64Utils;
@@ -68,7 +68,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
-        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
         Payment payment = paymentClient.requestPurchase(request);
 
         server.verify();
@@ -96,7 +96,7 @@ class TossPaymentClientTest {
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "BASIC " + Base64Utils.encode(property.secret() + ":")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(request -> response);
-        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
 
         assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class)
@@ -116,7 +116,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(request -> response);
 
-        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
 
         assertThatCode(() -> paymentClient.requestPurchase(request))
                 .isInstanceOf(PaymentException.class)
@@ -137,7 +137,7 @@ class TossPaymentClientTest {
         Builder timeoutBuilder = builder.requestFactory(factory);
         TossPaymentClient timeoutClient = new TossPaymentClient(timeoutBuilder.build());
 
-        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
         server.expect(manyTimes(), requestTo(property.url() + "/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST));
 
@@ -159,7 +159,7 @@ class TossPaymentClientTest {
         Builder timeoutBuilder = builder.requestFactory(factory);
         TossPaymentClient timeoutClient = new TossPaymentClient(timeoutBuilder.build());
 
-        PaymentRequest request = new PaymentRequest("1234abcd", 1000, "");
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
         server.expect(manyTimes(), requestTo(property.url() + "/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST));
 

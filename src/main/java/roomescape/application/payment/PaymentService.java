@@ -1,7 +1,7 @@
 package roomescape.application.payment;
 
 import org.springframework.stereotype.Service;
-import roomescape.application.payment.dto.PaymentRequest;
+import roomescape.application.payment.dto.PaymentClientRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 
@@ -16,7 +16,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public Payment purchase(PaymentRequest request) {
+    public Payment purchase(PaymentClientRequest request) {
         Payment payment = paymentClient.requestPurchase(request);
         return paymentRepository.save(payment);
     }
