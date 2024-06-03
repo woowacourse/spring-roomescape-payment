@@ -22,7 +22,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
             return statusCode.isError();
         } catch (IOException e) {
             logger.error("Failed to read response status code", e);
-            throw new PaymentException("결제 서버 요청에 실패했습니다.");
+            throw new PaymentException();
         }
     }
 
@@ -34,7 +34,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
             throw new PaymentException(errorResponse.message());
         }
         logger.error("Payment request failed (Code {}): {}", errorResponse.code(), errorResponse.message());
-        throw new PaymentException("결제 서버 요청에 실패했습니다. ");
+        throw new PaymentException();
     }
 
     private TossErrorResponse readErrorResponse(ClientHttpResponse response) {
@@ -42,7 +42,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
             return mapper.readValue(response.getBody(), TossErrorResponse.class);
         } catch (IOException e) {
             logger.error("Failed to read error response", e);
-            throw new PaymentException("결제 서버 요청에 실패했습니다.");
+            throw new PaymentException();
         }
     }
 }
