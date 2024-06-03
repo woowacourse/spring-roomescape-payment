@@ -22,7 +22,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
@@ -43,7 +42,6 @@ import roomescape.waiting.service.WaitingService;
 @JpaRepositoryTest
 @DatabaseIsolation
 @Import({ReservationService.class,
-        PaymentService.class,
         WaitingService.class,
         FakePaymentClient.class,
         PaymentClientConfiguration.class})
