@@ -21,7 +21,7 @@ public class PaymentController {
     }
     
     @PostMapping
-    public ResponseEntity<PaymentResponse> savePaymentAndUpdateReservationStatus(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<PaymentResponse> savePayment(@RequestBody PaymentRequest paymentRequest) {
         PaymentResponse response = paymentService.savePaymentAndUpdateReservationStatus(paymentRequest);
 
         return ResponseEntity.created(URI.create("/payments/" + response.id()))
