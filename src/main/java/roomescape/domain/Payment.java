@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 
@@ -20,12 +21,12 @@ public class Payment {
 
     private String orderId;
 
-    private Long amount;
+    private BigDecimal amount;
 
     protected Payment() {
     }
 
-    public Payment(Long id, String paymentKey, String orderId, Long amount) {
+    public Payment(Long id, String paymentKey, String orderId, BigDecimal amount) {
         validatePaymentKey(paymentKey);
         validateOrderId(orderId);
         validateAmount(amount);
@@ -51,11 +52,11 @@ public class Payment {
         }
     }
 
-    private void validateAmount(Long amount) {
+    private void validateAmount(BigDecimal amount) {
         if (amount == null) {
             throw new RoomescapeException(ExceptionType.EMPTY_AMOUNT);
         }
-        if (amount < 0) {
+        if (amount.signum() < 0) {
             throw new RoomescapeException(ExceptionType.INVALID_AMOUNT);
         }
     }
@@ -72,7 +73,7 @@ public class Payment {
         return orderId;
     }
 
-    public Long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 }

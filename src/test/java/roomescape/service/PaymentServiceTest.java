@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,9 +85,10 @@ class PaymentServiceTest {
                 .status(status)
                 .build());
 
-        PaymentRequest request = new PaymentRequest(reservation.getId(), "paymentKey", "WTESTzzzzz", 1000L);
+        PaymentRequest request = new PaymentRequest(
+                reservation.getId(), "paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L));
         given(paymentRestClient.requestPaymentApproval(any(PaymentRequest.class)))
-                .willReturn(new Payment(null, "paymentKey", "WTESTzzzzz", 1000L));
+                .willReturn(new Payment(null, "paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L)));
 
         // when & then
         assertThatCode(() -> paymentService.savePaymentAndUpdateReservationStatus(request))

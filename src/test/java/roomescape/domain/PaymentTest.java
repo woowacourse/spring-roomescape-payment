@@ -3,14 +3,11 @@ package roomescape.domain;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static roomescape.exception.ExceptionType.EMPTY_AMOUNT;
-import static roomescape.exception.ExceptionType.EMPTY_ORDER_ID;
-import static roomescape.exception.ExceptionType.EMPTY_PAYMENT_KEY;
-import static roomescape.exception.ExceptionType.INVALID_AMOUNT;
-import static roomescape.exception.ExceptionType.INVALID_ORDER_ID;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 
 class PaymentTest {
@@ -18,7 +15,8 @@ class PaymentTest {
     private static final Long DEFAULT_ID = 1L;
     private static final String VALID_PAYMENT_KEY = "validPaymentKey";
     private static final String VALID_ORDER_ID = "WTEST12345";
-    private static final Long VALID_AMOUNT = 1000L;
+    private static final BigDecimal VALID_AMOUNT = BigDecimal.valueOf(1000L);
+    private static final BigDecimal INVALID_AMOUNT = BigDecimal.valueOf(-1000L);
 
     @Test
     @DisplayName("결제 키가 비어있는 경우 생성할 수 없는지 확인")
@@ -26,10 +24,10 @@ class PaymentTest {
         assertAll(
                 () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, null, VALID_ORDER_ID, VALID_AMOUNT))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_PAYMENT_KEY.getMessage()),
+                        .hasMessage(ExceptionType.EMPTY_PAYMENT_KEY.getMessage()),
                 () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, "", VALID_ORDER_ID, VALID_AMOUNT))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_PAYMENT_KEY.getMessage())
+                        .hasMessage(ExceptionType.EMPTY_PAYMENT_KEY.getMessage())
         );
     }
 
@@ -39,10 +37,10 @@ class PaymentTest {
         assertAll(
                 () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, null, VALID_AMOUNT))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_ORDER_ID.getMessage()),
+                        .hasMessage(ExceptionType.EMPTY_ORDER_ID.getMessage()),
                 () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, "", VALID_AMOUNT))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_ORDER_ID.getMessage())
+                        .hasMessage(ExceptionType.EMPTY_ORDER_ID.getMessage())
         );
     }
 
@@ -51,7 +49,7 @@ class PaymentTest {
     void createFailWhenInvalidOrderId() {
         assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, "INVALID123", VALID_AMOUNT))
                 .isInstanceOf(RoomescapeException.class)
-                .hasMessage(INVALID_ORDER_ID.getMessage());
+                .hasMessage(ExceptionType.INVALID_ORDER_ID.getMessage());
     }
 
     @Test
@@ -60,17 +58,17 @@ class PaymentTest {
         assertAll(
                 () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, null))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(EMPTY_AMOUNT.getMessage())
+                        .hasMessage(ExceptionType.EMPTY_AMOUNT.getMessage())
         );
     }
 
     @Test
-    @DisplayName("금액이 비어있는 경우 생성할 수 없는지 확인")
+    @DisplayName("금액이 음수인 경우 생성할 수 없는지 확인")
     void createFailWhenInvalidAmount() {
         assertAll(
-                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, -1000L))
+                () -> assertThatThrownBy(() -> new Payment(DEFAULT_ID, VALID_PAYMENT_KEY, VALID_ORDER_ID, INVALID_AMOUNT))
                         .isInstanceOf(RoomescapeException.class)
-                        .hasMessage(INVALID_AMOUNT.getMessage())
+                        .hasMessage(ExceptionType.INVALID_AMOUNT.getMessage())
         );
     }
 
