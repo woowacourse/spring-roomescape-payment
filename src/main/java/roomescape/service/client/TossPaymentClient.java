@@ -5,8 +5,6 @@ import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -27,7 +25,6 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
         this.authorizations = createAuthorizations(key);
     }
-
 
 
     private String createAuthorizations(String key) {
