@@ -7,7 +7,7 @@ import roomescape.exception.PaymentErrorHandler;
 import roomescape.infra.PaymentRestClient;
 
 @Configuration
-public class ClientConfig {
+public class PaymentClientConfig {
 
     @Bean
     public PaymentErrorHandler paymentErrorHandler() {
