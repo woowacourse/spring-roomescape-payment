@@ -9,10 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.PaymentException;
-
-import java.time.LocalDate;
+import roomescape.service.fixture.ReservationRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
@@ -42,9 +40,7 @@ class PaymentServiceTest {
     @Test
     void should_throw_exception_when_different_amount() {
         assertThatThrownBy(() ->
-                paymentService.confirmReservationPayments(
-                        new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234)
-                ))
+                paymentService.confirmReservationPayments(ReservationRequestBuilder.builder().amount(1234L).build()))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("[ERROR] 클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [1234]");
     }
@@ -55,10 +51,7 @@ class PaymentServiceTest {
         mockServer.expect(anything())
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST));
 
-        assertThatThrownBy(() ->
-                paymentService.confirmReservationPayments(
-                        new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1999999)
-                ))
+        assertThatThrownBy(() -> paymentService.confirmReservationPayments(ReservationRequestBuilder.builder().build()))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("[ERROR] 결제에 실패했습니다.");
     }
@@ -69,10 +62,7 @@ class PaymentServiceTest {
         mockServer.expect(anything())
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
-        assertThatThrownBy(() ->
-                paymentService.confirmReservationPayments(
-                        new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1999999)
-                ))
+        assertThatThrownBy(() -> paymentService.confirmReservationPayments(ReservationRequestBuilder.builder().build()))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("[ERROR] 결제 서버에 오류가 발생했습니다.");
     }

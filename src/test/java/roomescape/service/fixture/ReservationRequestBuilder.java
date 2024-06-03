@@ -6,12 +6,12 @@ import java.time.LocalDate;
 
 public class ReservationRequestBuilder {
 
-    private LocalDate date = LocalDate.now().plusDays(1);
+    private LocalDate date = LocalDate.now().plusDays(99);
     private Long timeId = 1L;
     private Long themeId = 1L;
     private String orderId = "orderId";
     private String paymentKey = "paymentKey";
-    private Long amount = 1234L;
+    private Long amount = 1999999L;
 
     public static ReservationRequestBuilder builder() {
         return new ReservationRequestBuilder();

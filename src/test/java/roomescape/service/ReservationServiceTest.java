@@ -60,7 +60,7 @@ class ReservationServiceTest {
     @DisplayName("사용자가 예약 시간을 추가한다")
     @Test
     void should_add_reservation_times_when_give_member_request() {
-        Member member = memberRepository.findById(1L).get();
+        Member member = memberRepository.findById(2L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().build();
 
         reservationService.addReservation(request, member);
