@@ -6,12 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
@@ -61,7 +63,7 @@ class ReservationServiceTest {
 
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(1L, Role.USER, "카키", "kaki@email.com");
         ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                LocalDate.now(), 1L, 1L, "a", "a", 1000, "a");
+                LocalDate.now(), 1L, 1L, "a", "a", 1000L, "a");
 
         assertThatThrownBy(() -> reservationService.save(reservationCreateRequest, loginMemberInToken))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -102,7 +104,7 @@ class ReservationServiceTest {
 
         reservationService.delete(reservation2.getId());
         Reservation findReservation = reservationRepository.findById(reservation1.getId()).get();
-        
+
         assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS);
     }
 }
