@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationSaveRequest;
@@ -41,6 +44,7 @@ import static roomescape.domain.reservation.ReservationStatus.RESERVED;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
+@EnableRetry
 class ReservationServiceTest extends IntegrationTestSupport {
 
     @Autowired

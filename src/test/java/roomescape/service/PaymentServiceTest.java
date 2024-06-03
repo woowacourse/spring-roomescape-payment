@@ -6,12 +6,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.customexception.api.ApiBadRequestException;
@@ -26,6 +28,8 @@ import roomescape.service.reservation.pay.PaymentService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
@@ -102,7 +106,7 @@ class PaymentServiceTest {
         PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
         TestErrorResponse response = new TestErrorResponse("INVALID_REQUEST", "test_error");
 
-        mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
+        mockServer.expect(ExpectedCount.manyTimes(), requestTo(paymentProperties.getApproveUrl()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest().body(makeJsonFrom(response)));
 
@@ -121,7 +125,26 @@ class PaymentServiceTest {
         PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
         TestErrorResponse response = new TestErrorResponse("INTERNAL_SERVER_ERROR", "test_error");
 
-        mockServer.expect(requestTo(paymentProperties.getApproveUrl()))
+        mockServer.expect(ExpectedCount.manyTimes(), requestTo(paymentProperties.getApproveUrl()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withServerError().body(makeJsonFrom(response)));
+
+
+        assertAll(
+                () -> assertThatThrownBy(() -> paymentService.pay(request))
+                        .isInstanceOf(ApiException.class),
+                () -> mockServer.verify()
+        );
+
+    }
+
+    @Test
+    @DisplayName("에러 반환 시 총 5회 재시도한다.")
+    void retryPayment() {
+        PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
+        TestErrorResponse response = new TestErrorResponse("INTERNAL_SERVER_ERROR", "test_error");
+
+        mockServer.expect(ExpectedCount.times(5), requestTo(paymentProperties.getApproveUrl()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withServerError().body(makeJsonFrom(response)));
 
@@ -130,7 +153,6 @@ class PaymentServiceTest {
                         .isInstanceOf(ApiException.class),
                 () -> mockServer.verify()
         );
-
     }
 
     private String makeJsonFrom(PaymentApproveResponse response) {

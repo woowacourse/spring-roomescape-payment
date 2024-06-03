@@ -1,6 +1,8 @@
 package roomescape.service.reservation.pay;
 
 import org.springframework.http.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.customexception.api.ApiException;
@@ -14,6 +16,8 @@ import java.util.Base64;
 
 @Service
 public class PaymentService {
+    private static final int RETRY_ATTEMPT = 5;
+
     private final IdemPotencyKeyGenerator generator;
     private final PaymentProperties paymentProperties;
     private final RestTemplate restTemplate;
@@ -28,7 +32,7 @@ public class PaymentService {
         this.restTemplate = restTemplate;
     }
 
-
+    @Retryable(maxAttempts = RETRY_ATTEMPT)
     public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest) {
         ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 paymentProperties.getApproveUrl(),
@@ -40,6 +44,7 @@ public class PaymentService {
         return response.getBody();
     }
 
+    @Retryable(maxAttempts = RETRY_ATTEMPT)
     public PaymentCancelResponse cancel(PaymentCancelRequest paymentCancelRequest) {
         HttpHeaders headers = header();
         headers.add("cancelReason", paymentCancelRequest.cancelReason());
