@@ -17,9 +17,9 @@ values (1, '12:00'),
        (4, '15:00'),
        (5, '16:00');
 
-insert into reservation (id, member_id, date, theme_id, time_id, created_at, status)
-values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED'),
-       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED');
+insert into reservation (id, member_id, date, theme_id, time_id, created_at, status, order_id)
+values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED', 'order12'),
+       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED', 'order11');
 
 alter table member alter column id restart with 1000;
 alter table theme alter column id restart with 1000;

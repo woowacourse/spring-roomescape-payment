@@ -34,18 +34,18 @@ create table if not exists reservation
     theme_id   bigint      not null,
     created_at timestamp   not null,
     status     varchar(10) not null,
+    order_id   varchar(50) not null,
     primary key (id),
     foreign key (member_id) references member (id),
     foreign key (time_id) references reservation_time (id),
     foreign key (theme_id) references theme (id)
 );
 
-create table if not exists reservation_payments
+create table if not exists payment
 (
-    order_id varchar(50) not null,
-    reservation_id bigint not null,
+    id          bigint      not null,
+    order_id    varchar(50) not null,
     payment_key varchar(50) not null,
-    amount bigint not null,
-    primary key (order_id),
-    foreign key (reservation_id) references reservation (id)
+    amount      bigint      not null,
+    primary key (id)
 );
