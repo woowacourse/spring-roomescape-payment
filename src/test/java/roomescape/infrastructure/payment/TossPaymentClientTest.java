@@ -28,7 +28,6 @@ import org.springframework.web.client.RestClient.Builder;
 import roomescape.application.payment.config.PaymentClientConfig;
 import roomescape.application.payment.config.PaymentClientProperties;
 import roomescape.application.payment.config.PaymentClientProperty;
-import roomescape.application.payment.config.PaymentErrorHandler;
 import roomescape.application.payment.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.payment.PaymentException;

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient.Builder;
 import roomescape.application.payment.PaymentClient;
+import roomescape.infrastructure.payment.PaymentErrorHandler;
 import roomescape.infrastructure.payment.TossPaymentClient;
 
 @Configuration
