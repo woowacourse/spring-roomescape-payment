@@ -96,7 +96,7 @@ class CancelServiceTest extends BaseServiceTest {
         // given
         MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
-        Reservation nextReservation = reservationRepository.save(new Reservation(user, detail, Status.WAITING));
+        reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
         cancelService.cancelReservation(reservation.getId(), memberInfo);

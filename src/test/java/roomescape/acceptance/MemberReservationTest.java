@@ -1,10 +1,8 @@
 package roomescape.acceptance;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import java.util.HashMap;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -27,7 +26,6 @@ import roomescape.support.DatabaseCleanerExtension;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MemberReservationTest {
     private static final Map<String, String> TOKEN_CACHE = new HashMap<>();
-    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
     @MockBean
     private PaymentClient paymentClient;
@@ -50,7 +48,7 @@ class MemberReservationTest {
                 "2024-08-01T00:00:00",
                 "2024-08-02T00:00:00");
 
-        when(paymentClient.confirmPayment(any()))
+        Mockito.when(paymentClient.confirmPayment(any()))
                 .thenReturn(responseBody);
     }
 
@@ -61,7 +59,7 @@ class MemberReservationTest {
 
         String requestBody = String.format("{\"email\":\"%s\", \"password\":\"%s\"}", email, password);
 
-        String token = given().log().all()
+        String token = RestAssured.given().log().all()
                 .contentType("application/json")
                 .body(requestBody)
                 .when().post("/login")
@@ -93,7 +91,7 @@ class MemberReservationTest {
         );
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -123,7 +121,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -133,7 +131,7 @@ class MemberReservationTest {
                 .body("status", equalTo("RESERVED"));
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -163,7 +161,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -172,7 +170,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -201,7 +199,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -209,7 +207,7 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(201);
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -218,7 +216,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -247,7 +245,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -256,7 +254,7 @@ class MemberReservationTest {
                 .statusCode(201)
                 .body("status", equalTo("RESERVED"));
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -266,7 +264,7 @@ class MemberReservationTest {
                 .body("status", equalTo("WAITING"));
 
         // when
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().delete("/reservations/" + 2)
@@ -275,7 +273,7 @@ class MemberReservationTest {
                 .statusCode(204);
 
         // then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -305,7 +303,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -313,7 +311,7 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(201);
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userJazzEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -322,7 +320,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/2")
                 .then().log().all()
@@ -350,7 +348,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -359,7 +357,7 @@ class MemberReservationTest {
                 .statusCode(201)
                 .body("status", equalTo("RESERVED"));
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -368,7 +366,7 @@ class MemberReservationTest {
                 .statusCode(201)
                 .body("status", equalTo("WAITING"));
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userJazzEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -378,7 +376,7 @@ class MemberReservationTest {
                 .body("status", equalTo("WAITING"));
 
         // when
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 2)
                 .then().log().all()
@@ -386,7 +384,7 @@ class MemberReservationTest {
                 .statusCode(204);
 
         // then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -417,7 +415,7 @@ class MemberReservationTest {
         );
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -447,7 +445,7 @@ class MemberReservationTest {
         );
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -477,7 +475,7 @@ class MemberReservationTest {
         );
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -507,7 +505,7 @@ class MemberReservationTest {
         );
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -521,10 +519,10 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_noReservation_then_throwException() {
         // given
-        Long reservationId = 1L;
+        long reservationId = 1L;
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + reservationId)
                 .then().log().all()
@@ -537,7 +535,7 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_cancelPastTimeReservation_then_nothingHappens() {
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/1")
                 .then().log().all()
@@ -551,7 +549,7 @@ class MemberReservationTest {
             "/test-data/reservations-details.sql", "/test-data/reservations.sql"})
     void when_getReservations_then_returnReservations() {
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().get("/reservations-mine")
                 .then().log().all()
@@ -568,7 +566,7 @@ class MemberReservationTest {
             "/test-data/reservations-details.sql", "/test-data/reservations.sql", "/test-data/past-reservations.sql"})
     void when_getReservations_then_doesNotReturnPastReservations() {
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().get("/reservations-mine")
                 .then().log().all()
@@ -584,7 +582,7 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_myWaitingReservationExists_then_deleteWaitingReservation() {
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
@@ -597,7 +595,7 @@ class MemberReservationTest {
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_noWaitingReservation_then_canNotDeleteWaitingReservation() {
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
@@ -625,7 +623,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -633,7 +631,7 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(201);
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -642,14 +640,14 @@ class MemberReservationTest {
                 .statusCode(201);
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .when().delete("/admin/reservations/" + 1)
                 .then().log().all()
                 .assertThat()
                 .statusCode(204);
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/" + 1)
                 .then().log().all()
@@ -677,7 +675,7 @@ class MemberReservationTest {
                 CommonFixture.paymentType
         );
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.adminEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -685,7 +683,7 @@ class MemberReservationTest {
                 .assertThat()
                 .statusCode(201);
 
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .body(requestBody).contentType("application/json")
                 .when().post("/reservations")
@@ -694,7 +692,7 @@ class MemberReservationTest {
                 .statusCode(201);
 
         // when, then
-        given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
                 .when().delete("/reservations/1")
                 .then().log().all().statusCode(400);
