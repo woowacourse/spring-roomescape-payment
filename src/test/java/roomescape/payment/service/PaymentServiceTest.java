@@ -32,8 +32,8 @@ class PaymentServiceTest {
     @DisplayName("결제 확인 되었을 경우 정상 처리한다.")
     @Test
     void confirmPaymentTest() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
-
+        PaymentConfirmRequest request = new PaymentConfirmRequest(
+                "testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withSuccess());
 
@@ -43,14 +43,15 @@ class PaymentServiceTest {
     @DisplayName("결제 확인 오류가 발생한 경우 예외를 던진다.")
     @Test
     void confirmPaymentTest_whenNotConfirmed() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
-
+        PaymentConfirmRequest request = new PaymentConfirmRequest(
+                "testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
         String errorResponse = """
                 {
                   "code": "NOT_FOUND_PAYMENT",
                   "message": "존재하지 않는 결제 입니다."
                 }
                 """;
+
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
@@ -62,7 +63,8 @@ class PaymentServiceTest {
     @DisplayName("결제 확인시 인증오류 발생한 경우 예외를 던진다.")
     @Test
     void confirmPaymentTest_whenUnauthorized() {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId", BigDecimal.valueOf(1000));
+        PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
+                BigDecimal.valueOf(1000));
 
         String errorResponse = """
                 {
@@ -79,14 +81,8 @@ class PaymentServiceTest {
 
     @TestConfiguration
     static class TestConfig {
-        private final RestClient.Builder builder;
-
-        TestConfig(RestClient.Builder builder) {
-            this.builder = builder;
-        }
-
         @Bean
-        PaymentService paymentService() {
+        PaymentService paymentService(RestClient.Builder builder) {
             return new PaymentService(builder.build(), "test");
         }
     }
