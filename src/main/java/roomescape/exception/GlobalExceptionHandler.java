@@ -3,6 +3,7 @@ package roomescape.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -37,10 +38,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponseEntity(ErrorCode.INVALID_PARAMETER, e.getMessage());
     }
 
-    @ExceptionHandler(ThirdPartyAPIException.class)
-    public ResponseEntity<Object> handleThirdPartyAPIException(ThirdPartyAPIException e) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<Object> handlePaymentException(PaymentException e) {
         logger.error(e.getMessage(), e);
-        return makeErrorResponseEntity(ErrorCode.INTERNAL_SERVER, e.getMessage());
+        return makeErrorResponseEntity(e.getHttpStatus(), e.getMessage());
     }
 
     @Override
@@ -83,6 +84,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> makeErrorResponseEntity(ErrorCode code, String errorMessage) {
         ErrorResponse errorResponse = new ErrorResponse(code, errorMessage);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    private ResponseEntity<Object> makeErrorResponseEntity(HttpStatus httpStatus, String errorMessage) {
+        ErrorResponse errorResponse = new ErrorResponse(httpStatus, errorMessage);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 

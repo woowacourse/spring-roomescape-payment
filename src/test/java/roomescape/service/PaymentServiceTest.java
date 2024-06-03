@@ -19,8 +19,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.RestTemplateConfig;
 import roomescape.controller.PaymentApproveResponse;
 import roomescape.controller.dto.PaymentApproveRequest;
-import roomescape.exception.customexception.RoomEscapeBusinessException;
-import roomescape.exception.customexception.ThirdPartyAPIException;
+import roomescape.exception.customexception.PaymentException;
 
 
 @RestClientTest(value = PaymentService.class)
@@ -132,7 +131,7 @@ class PaymentServiceTest {
 
         // when & then
         assertThatThrownBy(() -> paymentService.pay(request))
-                .isInstanceOf(RoomEscapeBusinessException.class);
+                .isInstanceOf(PaymentException.class);
 
         mockServer.verify();
     }
@@ -147,7 +146,7 @@ class PaymentServiceTest {
 
         // when & then
         assertThatThrownBy(() -> paymentService.pay(request))
-                .isInstanceOf(ThirdPartyAPIException.class);
+                .isInstanceOf(PaymentException.class);
 
         mockServer.verify();
     }
