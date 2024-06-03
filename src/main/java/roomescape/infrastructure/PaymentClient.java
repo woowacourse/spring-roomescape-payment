@@ -1,7 +1,6 @@
 package roomescape.infrastructure;
 
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -14,19 +13,17 @@ import roomescape.core.dto.payment.PaymentResponse;
 public class PaymentClient {
 
     private final RestClient restClient;
-    @Value("${toss.payments.api.confirm-url}")
-    private String confirmUrl;
-    @Value("${toss.payments.api.refund-url-template}")
-    private String refundUrlTemplate;
+    private final TossPaymentsProperties tossPaymentsProperties;
 
-    public PaymentClient(RestClient restClient) {
+    public PaymentClient(final RestClient restClient, final TossPaymentsProperties tossPaymentsProperties) {
         this.restClient = restClient;
+        this.tossPaymentsProperties = tossPaymentsProperties;
     }
 
-    public void approvePayment(PaymentRequest paymentRequest,
-                               PaymentAuthorizationResponse paymentAuthorizationResponse) {
+    public void approvePayment(final PaymentRequest paymentRequest,
+                               final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         restClient.post()
-                .uri(confirmUrl)
+                .uri(tossPaymentsProperties.getApi().getConfirmUrl())
                 .header(HttpHeaders.AUTHORIZATION, paymentAuthorizationResponse.getPaymentAuthorization())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
@@ -35,9 +32,11 @@ public class PaymentClient {
                 .toBodilessEntity();
     }
 
-    public void refundPayment(PaymentResponse paymentResponse,
-                              PaymentAuthorizationResponse paymentAuthorizationResponse) {
-        String refundUrl = refundUrlTemplate.replace("{paymentKey}", paymentResponse.getPaymentKey());
+    public void refundPayment(final PaymentResponse paymentResponse,
+                              final PaymentAuthorizationResponse paymentAuthorizationResponse) {
+        final String refundUrl = tossPaymentsProperties.getApi()
+                .getRefundUrlTemplate()
+                .replace("{paymentKey}", paymentResponse.getPaymentKey());
 
         restClient.post()
                 .uri(refundUrl)
