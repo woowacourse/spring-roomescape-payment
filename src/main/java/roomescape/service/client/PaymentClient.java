@@ -1,4 +1,4 @@
-package roomescape.service.conponent;
+package roomescape.service.client;
 
 import org.springframework.stereotype.Component;
 

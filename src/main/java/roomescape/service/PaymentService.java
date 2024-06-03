@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
-import roomescape.service.conponent.PaymentClient;
+import roomescape.service.client.PaymentClient;
 import roomescape.service.dto.PaymentRequestDto;
 
 @Service
