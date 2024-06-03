@@ -1,12 +1,18 @@
 package roomescape.reservation.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static roomescape.util.Fixture.HORROR_THEME;
+import static roomescape.util.Fixture.KAKI;
+import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +20,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentSaveResponse;
+import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.util.CookieUtils;
 
@@ -59,8 +69,6 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
-
-        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

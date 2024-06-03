@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.common.domain.AuditedEntity;
 import roomescape.member.domain.Member;
 
 @Entity

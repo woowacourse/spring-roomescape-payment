@@ -8,6 +8,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -31,6 +32,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
 
     public ReservationService(
@@ -38,12 +40,14 @@ public class ReservationService {
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
+            PaymentRepository paymentRepository,
             PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
     }
 
@@ -55,7 +59,7 @@ public class ReservationService {
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
         if (loginMember.role().isUser()) {
-            paymentService.pay(PaymentRequest.from(reservationSaveRequest));
+            paymentService.payForReservation(PaymentRequest.from(reservationSaveRequest), savedReservation);
         }
 
         return ReservationResponse.toResponse(savedReservation);
@@ -137,10 +141,10 @@ public class ReservationService {
         Waitings waitings = new Waitings(waitingReservations);
 
         return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
-                .map(reservation -> MemberReservationResponse.toResponse(
-                        reservation,
-                        waitings.findMemberRank(reservation, loginMember.id())
-                )).toList();
+                .map(reservation -> paymentRepository.findByReservationId(reservation.getId())
+                        .map(payment -> MemberReservationResponse.toResponse(reservation, payment))
+                        .orElseGet(() -> MemberReservationResponse.toResponse(reservation, waitings.findMemberRank(reservation, loginMember.id()))))
+                .toList();
     }
 
     @Transactional(readOnly = true)

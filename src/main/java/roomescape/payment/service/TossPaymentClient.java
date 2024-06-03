@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentErrorHandler;
 
 @Component
@@ -32,14 +33,14 @@ public class TossPaymentClient {
                 .build();
     }
 
-    public void requestPayment(PaymentRequest paymentRequest) {
-        restClient.post()
+    public TossPaymentResponse requestPayment(PaymentRequest paymentRequest) {
+        return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
-                .toBodilessEntity();
+                .body(TossPaymentResponse.class);
     }
 
     private String createAuthorizations() {

@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.HORROR_THEME;
 import static roomescape.util.Fixture.JOJO;
@@ -13,6 +14,7 @@ import static roomescape.util.Fixture.RESERVATION_HOUR_11;
 import static roomescape.util.Fixture.TODAY;
 import static roomescape.util.Fixture.TOMORROW;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -80,7 +82,7 @@ class ReservationServiceTest {
         ReservationSaveRequest reservationSaveRequest =
                 new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
 
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        doThrow(PaymentFailException.class).when(paymentService).payForReservation(any(PaymentRequest.class), any(Reservation.class));
 
         assertThatThrownBy(() -> reservationService.saveReservationSuccess(reservationSaveRequest, loginMember))
                 .isInstanceOf(PaymentFailException.class);
