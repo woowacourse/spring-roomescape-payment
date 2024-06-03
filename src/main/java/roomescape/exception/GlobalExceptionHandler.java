@@ -20,21 +20,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
-        logger.error(e.getMessage(), e);
+        logger.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .build();
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(final AuthorizationException e) {
-        logger.error(e.getMessage(), e);
+        logger.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
     }
 
     @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleRoomescapeException(final RoomescapeException e) {
-        logger.error(e.getMessage(), e);
+        logger.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             final MethodArgumentNotValidException e) {
-        logger.error(e.getMessage(), e);
+        logger.info(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -50,14 +50,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             final HttpMessageNotReadableException e) {
-        logger.error(e.getMessage(), e);
+        logger.info(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(final NoResourceFoundException e) {
-        logger.error(e.getMessage(), e);
+        logger.info(e.getMessage(), e);
         return ResponseEntity.notFound()
                 .build();
     }
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<PaymentErrorResponse> handleHttpClientErrorException(final HttpClientErrorException e) {
         final PaymentErrorResponse response = e.getResponseBodyAs(PaymentErrorResponse.class);
-        logger.error(e.getMessage(), e);
+        logger.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(response);
     }
