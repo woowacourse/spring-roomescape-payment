@@ -19,25 +19,16 @@ public class TossPaymentClient implements PaymentClient {
     private static final String AUTHORIZATION_PREFIX = "Basic ";
     private static final String TOSS_PAYMENTS_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
-    private final String authorizations;
+
     private final RestClient restClient;
+    private final String authorizations;
 
-    public TossPaymentClient(@Value("${toss-payment.test-secret-key}") String key) {
-        this.restClient = RestClient.builder()
-                .baseUrl(TOSS_PAYMENTS_URL)
-                .requestFactory(clientHttpRequestFactory())
-                .build();
-
-        authorizations = createAuthorizations(key);
+    public TossPaymentClient(RestClient restClient, @Value("${toss-payment.test-secret-key}") String key) {
+        this.restClient = restClient;
+        this.authorizations = createAuthorizations(key);
     }
 
-    private ClientHttpRequestFactory clientHttpRequestFactory() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(3000);
-        factory.setReadTimeout(3000);
 
-        return factory;
-    }
 
     private String createAuthorizations(String key) {
         String tossPaymentTestKey = key + ":";
