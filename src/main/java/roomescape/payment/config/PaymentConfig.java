@@ -7,7 +7,9 @@ import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import roomescape.common.exception.PaymentErrorHandler;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -22,7 +24,8 @@ public class PaymentConfig {
     @Bean
     public RestClientCustomizer paymentRestClientCustomizer() {
         return builder -> builder.baseUrl(paymentProperties.getBaseUrl())
-                .defaultHeader("Authorization", paymentProperties.getEncodedSecretKey())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, paymentProperties.getEncodedSecretKey())
+                .defaultStatusHandler(new PaymentErrorHandler())
                 .requestFactory(clientHttpRequestFactory())
                 .build();
     }

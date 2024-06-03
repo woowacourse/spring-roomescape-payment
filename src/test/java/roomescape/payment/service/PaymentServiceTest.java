@@ -10,6 +10,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,11 @@ class PaymentServiceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setUp() {
+        mockServer.reset();
+    }
+
     @DisplayName("결제 승인 요청 성공 시 올바른 응답을 반환받는다.")
     @Test
     void confirmPayment() throws JsonProcessingException {
@@ -58,6 +64,7 @@ class PaymentServiceTest {
         PaymentConfirmResponse actualResponse = paymentService.confirmPayment(request);
 
         assertThat(actualResponse).isEqualTo(expectedResponse);
+        mockServer.verify();
     }
 
     @DisplayName("결제 승인 요청 실패 시 예외가 발생한다.")
@@ -76,5 +83,6 @@ class PaymentServiceTest {
 
         assertThatThrownBy(() -> paymentService.confirmPayment(request))
                 .isInstanceOf(PaymentException.class);
+        mockServer.verify();
     }
 }
