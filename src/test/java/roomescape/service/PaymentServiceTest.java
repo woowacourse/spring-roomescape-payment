@@ -14,7 +14,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.service.client.FakeTossPaymentClient;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class PaymentServiceTest {
 
