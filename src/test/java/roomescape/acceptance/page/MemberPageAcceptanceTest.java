@@ -8,9 +8,11 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.acceptance.AcceptanceTest;
 import roomescape.service.auth.dto.LoginRequest;
 
+@Sql({"/truncate.sql", "/member.sql"})
 class MemberPageAcceptanceTest extends AcceptanceTest {
 
     private String token;
@@ -31,7 +33,7 @@ class MemberPageAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("로그인을 한다.", () -> {
                 token = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("guest123", "guest@email.com"))
+                    .body(new LoginRequest("lily123", "lily@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token");
             }),

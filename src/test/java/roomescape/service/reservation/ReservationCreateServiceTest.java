@@ -95,5 +95,4 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
             .isInstanceOf(InvalidReservationException.class)
             .hasMessage("더이상 존재하지 않는 테마입니다.");
     }
-
 }

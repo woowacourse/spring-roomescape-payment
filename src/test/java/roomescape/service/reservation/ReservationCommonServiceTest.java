@@ -26,13 +26,14 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
 
     @DisplayName("모든 예약 내역을 조회한다.")
     @Test
-    @Sql({"/truncate-with-time-and-theme.sql", "/insert-past-reservation.sql"})
     void findAllReservations() {
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        reservationRepository.save(reservation);
         //when
         List<ReservationResponse> reservations = reservationCommonService.findAll();
 
         //then
-        assertThat(reservations).hasSize(3);
+        assertThat(reservations).hasSize(1);
     }
 
     @DisplayName("사용자 조건으로 예약 내역을 조회한다.")
@@ -103,7 +104,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
 
     @DisplayName("관리자가 과거 예약을 삭제하려고 하면 예외가 발생한다.")
     @Test
-    @Sql({"/truncate.sql", "/insert-past-reservation.sql"})
+    @Sql({"/truncate.sql", "/time.sql", "/theme.sql", "/reservation-detail.sql", "/member.sql", "/reservation.sql"})
     void cannotDeleteReservationByIdIfPast() {
         //given
         long id = 1;

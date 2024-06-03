@@ -8,44 +8,21 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.service.auth.dto.LoginRequest;
+import roomescape.fixture.TokenFixture;
 import roomescape.service.theme.dto.ThemeRequest;
 
-@Sql("/truncate-with-reservations.sql")
+@Sql({"/truncate.sql", "/member.sql", "/theme.sql", "/time.sql", "/reservation-detail.sql", "/reservation.sql"})
 class AdminThemeAcceptanceTest extends AcceptanceTest {
 
-    private LocalDate date;
-    private long timeId;
-    private long themeId;
-    private long guestId;
-    private String adminToken;
-    private String guestToken;
-
-    @BeforeEach
-    void init() {
-        date = LocalDate.now().plusDays(1);
-        timeId = 1;
-        themeId = 1;
-        guestId = 2;
-
-        adminToken = RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(new LoginRequest("admin123", "admin@email.com"))
-            .when().post("/login")
-            .then().log().all().extract().cookie("token");
-
-        guestToken = RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(new LoginRequest("guest123", "guest@email.com"))
-            .when().post("/login")
-            .then().log().all().extract().cookie("token");
-    }
+    private final LocalDate date = LocalDate.now().plusDays(1);
+    private final long timeId = 1;
+    private final long themeId = 1;
+    private final long guestId = 2;
 
     @DisplayName("테마 삭제 성공 테스트")
     @TestFactory
@@ -56,14 +33,14 @@ class AdminThemeAcceptanceTest extends AcceptanceTest {
         return Stream.of(
             DynamicTest.dynamicTest("테마를 생성한다.", () -> {
                 themeId.set((int) RestAssured.given().log().all()
-                    .cookie("token", adminToken)
+                    .cookie("token", TokenFixture.getAdminToken())
                     .contentType(ContentType.JSON).body(themeRequest)
                     .when().post("/admin/themes")
                     .then().extract().response().jsonPath().get("id"));
             }),
             DynamicTest.dynamicTest("테마를 삭제한다.", () -> {
                 RestAssured.given().log().all()
-                    .cookie("token", adminToken)
+                    .cookie("token", TokenFixture.getAdminToken())
                     .when().delete("/admin/themes/" + themeId)
                     .then().log().all().statusCode(204);
 
@@ -86,14 +63,14 @@ class AdminThemeAcceptanceTest extends AcceptanceTest {
         return Stream.of(
             DynamicTest.dynamicTest("테마를 생성한다.", () -> {
                 themeId.set((int) RestAssured.given().log().all()
-                    .cookie("token", adminToken)
+                    .cookie("token", TokenFixture.getAdminToken())
                     .contentType(ContentType.JSON).body(themeRequest)
                     .when().post("/admin/themes")
                     .then().extract().response().jsonPath().get("id"));
             }),
             DynamicTest.dynamicTest("테마를 삭제한다.", () -> {
                 RestAssured.given().log().all()
-                    .cookie("token", guestToken)
+                    .cookie("token", TokenFixture.getGuestLilyToken())
                     .when().delete("/admin/themes/" + themeId)
                     .then().log().all()
                     .assertThat().statusCode(403).body("message", is("권한이 없습니다. 관리자에게 문의해주세요."));
@@ -111,7 +88,7 @@ class AdminThemeAcceptanceTest extends AcceptanceTest {
 
         //when&then
         RestAssured.given().log().all()
-            .cookie("token", adminToken)
+            .cookie("token", TokenFixture.getAdminToken())
             .contentType(ContentType.JSON).body(themeRequest)
             .when().post("/admin/themes")
             .then().log().all().statusCode(201).body("id", is(greaterThan(0)));
@@ -126,7 +103,7 @@ class AdminThemeAcceptanceTest extends AcceptanceTest {
 
         //when&then
         RestAssured.given().log().all()
-            .cookie("token", guestToken)
+            .cookie("token", TokenFixture.getGuestLilyToken())
             .contentType(ContentType.JSON).body(themeRequest)
             .when().post("/admin/themes")
             .then().log().all()
@@ -142,7 +119,7 @@ class AdminThemeAcceptanceTest extends AcceptanceTest {
 
         //when&then
         RestAssured.given().log().all()
-            .cookie("token", adminToken)
+            .cookie("token", TokenFixture.getAdminToken())
             .contentType(ContentType.JSON).body(themeRequest)
             .when().post("/admin/themes")
             .then().log().all().statusCode(400).body("message", is("올바르지 않은 썸네일 형식입니다."));

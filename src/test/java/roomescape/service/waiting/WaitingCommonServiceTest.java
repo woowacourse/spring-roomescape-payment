@@ -32,7 +32,7 @@ import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@Sql("/truncate-with-time-and-theme.sql")
+@Sql("/truncate.sql")
 class WaitingCommonServiceTest {
 
 
@@ -66,7 +66,7 @@ class WaitingCommonServiceTest {
 
     @DisplayName("모든 예약 대기 내역을 조회한다.")
     @Test
-    @Sql({"/truncate-with-time-and-theme.sql", "/insert-past-waiting.sql"})
+    @Sql({"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-detail.sql", "/member.sql", "/reservation.sql"})
     void findAllWaitings() {
         //when
         List<ReservationResponse> reservations = waitingCommonService.findAll();

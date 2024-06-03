@@ -13,11 +13,12 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
+import roomescape.fixture.ThemeFixture;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Sql("/truncate-with-guests.sql")
+@Sql("/truncate.sql")
 class ThemeServiceTest {
 
     @Autowired
@@ -43,7 +44,7 @@ class ThemeServiceTest {
     @Test
     void cannotCreateByDuplicatedName() {
         //given
-        Theme theme = new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
+        Theme theme = ThemeFixture.create("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
         themeRepository.save(theme);
 
@@ -84,7 +85,7 @@ class ThemeServiceTest {
 
     @DisplayName("예약이 존재하는 테마를 삭제하면 예외가 발생한다.")
     @Test
-    @Sql("/truncate-with-reservations.sql")
+    @Sql({"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-detail.sql", "/member.sql", "/reservation.sql"})
     void cannotDeleteByReservation() {
         //given
         long themeId = 1;
@@ -108,8 +109,7 @@ class ThemeServiceTest {
     }
 
     private Theme createTheme() {
-        Theme theme = new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
+        Theme theme = ThemeFixture.create();
         return themeRepository.save(theme);
     }
 }

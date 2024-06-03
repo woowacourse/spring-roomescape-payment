@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.member.Role;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -29,13 +28,16 @@ import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
+import roomescape.fixture.MemberFixture;
+import roomescape.fixture.ReservationTimeFixture;
+import roomescape.fixture.ThemeFixture;
 import roomescape.service.schedule.dto.AvailableReservationTimeResponse;
 import roomescape.service.schedule.dto.ReservationTimeCreateRequest;
 import roomescape.service.schedule.dto.ReservationTimeReadRequest;
 import roomescape.service.schedule.dto.ReservationTimeResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Sql("/truncate-with-guests.sql")
+@Sql("/truncate.sql")
 class ReservationTimeServiceTest {
 
     @Autowired
@@ -73,7 +75,7 @@ class ReservationTimeServiceTest {
     @Test
     void findAll() {
         //given
-        reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
+        reservationTimeRepository.save(ReservationTimeFixture.create10AM());
 
         //when
         List<ReservationTimeResponse> reservationTimes = reservationTimeService.findAll();
@@ -88,7 +90,7 @@ class ReservationTimeServiceTest {
         //given
         LocalTime time = LocalTime.of(10, 0);
         ;
-        reservationTimeRepository.save(new ReservationTime(time));
+        reservationTimeRepository.save(ReservationTimeFixture.create10AM());
 
         ReservationTimeCreateRequest reservationTimeCreateRequest = new ReservationTimeCreateRequest(time);
 
@@ -103,10 +105,9 @@ class ReservationTimeServiceTest {
     void cannotDeleteTime() {
         //given
         ReservationDate reservationDate = ReservationDate.of(LocalDate.MAX);
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
-        Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
-        Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
+        ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.create10AM());
+        Theme theme = themeRepository.save(ThemeFixture.create());
+        Member member = memberRepository.save(MemberFixture.createGuest("lily", "lily@email.com", "lily123"));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, reservationTime), theme));
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);
@@ -127,9 +128,8 @@ class ReservationTimeServiceTest {
         ReservationTime bookedReservationTime = reservationTimeRepository.save(new ReservationTime(time));
         ReservationTime notBookedReservationTime = reservationTimeRepository.save(
             new ReservationTime(time.plusHours(5)));
-        Theme theme = themeRepository.save(new Theme("레벨2 탈출", "우테코 레벨2를 탈출하는 내용입니다.",
-            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"));
-        Member member = memberRepository.save(new Member("lily", "lily@email.com", "lily123", Role.GUEST));
+        Theme theme = themeRepository.save(ThemeFixture.create());
+        Member member = memberRepository.save(MemberFixture.createGuest("lily", "lily@email.com", "lily123"));
         ReservationDetail reservationDetail = reservationDetailRepository.save(new ReservationDetail(new Schedule(reservationDate, bookedReservationTime), theme));
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         reservationRepository.save(reservation);

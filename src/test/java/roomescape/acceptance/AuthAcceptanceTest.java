@@ -15,7 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.service.auth.dto.LoginRequest;
 import roomescape.service.auth.dto.SignUpRequest;
 
-@Sql("/truncate-with-time-and-theme.sql")
+@Sql({"/truncate.sql", "/member.sql"})
 class AuthAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("로그인 성공 테스트")
@@ -23,7 +23,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
     void login() {
         RestAssured.given().log().all()
             .contentType(ContentType.JSON)
-            .body(new LoginRequest("guest123", "guest@email.com"))
+            .body(new LoginRequest("lily123", "lily@email.com"))
             .when().post("/login")
             .then().log().all()
             .assertThat().statusCode(HttpStatus.OK.value());
@@ -37,7 +37,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("로그인을 한다.", () -> {
                 token.set(RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("guest123", "guest@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token"));
             }),
@@ -60,7 +60,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("로그인을 한다.", () -> {
                 token.set(RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("guest123", "guest@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token"));
             }),
@@ -69,7 +69,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
                     .cookie("token", token)
                     .when().get("/login/check")
                     .then().log().all()
-                    .assertThat().statusCode(HttpStatus.OK.value()).body("name", is("guest"));
+                    .assertThat().statusCode(HttpStatus.OK.value()).body("name", is("리니"));
             })
         );
     }
@@ -79,7 +79,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
     void signUp() {
         RestAssured.given().log().all()
             .contentType(ContentType.JSON)
-            .body(new SignUpRequest("lini", "lini@email.com", "lini123"))
+            .body(new SignUpRequest("user", "user@email.com", "user123"))
             .when().post("/signup")
             .then().log().all()
             .assertThat().statusCode(HttpStatus.CREATED.value());

@@ -1,6 +1,7 @@
 package roomescape.service.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.fixture.MemberFixture.createGuest;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.member.Role;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -49,22 +49,20 @@ class MemberServiceTest {
     @Test
     void findAll() {
         //given
-        memberRepository.save(new Member("lini", "lini@email.com", "lini123", Role.GUEST));
-        memberRepository.save(new Member("lini2", "lini2@email.com", "lini123", Role.GUEST));
-        memberRepository.save(new Member("lini3", "lini3@email.com", "lini123", Role.GUEST));
+        memberRepository.save(createGuest());
 
         //when
         List<MemberResponse> memberResponses = memberService.findAll();
 
         //then
-        assertThat(memberResponses).hasSize(3);
+        assertThat(memberResponses).hasSize(1);
     }
 
     @DisplayName("id로 사용자를 조회한다.")
     @Test
     void findById() {
         //given
-        Member member = memberRepository.save(new Member("lini", "lini@email.com", "lini123", Role.GUEST));
+        Member member = memberRepository.save(createGuest());
 
         //when
         Member result = memberService.findById(member.getId());
@@ -77,8 +75,8 @@ class MemberServiceTest {
     @Test
     void findReservations() {
         //given
-        Member member = memberRepository.save(new Member("lini", "lini@email.com", "lini123", Role.GUEST));
-        Member member2 = memberRepository.save(new Member("pedro", "pedro@email.com", "pedro123", Role.GUEST));
+        Member member = memberRepository.save(createGuest("lini", "lini@email.com", "lini123"));
+        Member member2 = memberRepository.save(createGuest("pedro", "pedro@email.com", "pedro123"));
         ReservationDetail reservationDetail = createReservationDetail();
         Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
         Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
@@ -86,7 +84,6 @@ class MemberServiceTest {
         reservationRepository.save(reservation);
         reservationRepository.save(reservation2);
         reservationRepository.save(reservation3);
-
     }
 
     private ReservationDetail createReservationDetail() {

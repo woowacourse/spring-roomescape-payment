@@ -19,5 +19,4 @@ class PasswordTest {
             .isInstanceOf(InvalidMemberException.class)
             .hasMessage("비밀번호는 6자 이상 12자 이하여야 합니다.");
     }
-
 }

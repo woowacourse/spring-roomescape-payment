@@ -32,7 +32,7 @@ import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.waiting.dto.WaitingRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@Sql("/truncate-with-time-and-theme.sql")
+@Sql("/truncate.sql")
 class WaitingCreateServiceTest {
 
     @Autowired

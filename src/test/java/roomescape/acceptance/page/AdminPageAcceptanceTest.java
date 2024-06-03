@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.acceptance.AcceptanceTest;
 import roomescape.service.auth.dto.LoginRequest;
 
-@Sql("/truncate-with-admin-and-guest.sql")
+@Sql({"/truncate.sql", "/member.sql"})
 class AdminPageAcceptanceTest extends AcceptanceTest {
 
     private String token;
@@ -23,7 +23,7 @@ class AdminPageAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("어드민이 로그인한다.", () -> {
                 token = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("admin123", "admin@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token");
             }),
@@ -44,7 +44,7 @@ class AdminPageAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("어드민이 로그인한다.", () -> {
                 token = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("admin123", "admin@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token");
             }),
@@ -65,7 +65,7 @@ class AdminPageAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("어드민이 로그인한다.", () -> {
                 token = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("admin123", "admin@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token");
             }),
@@ -86,7 +86,7 @@ class AdminPageAcceptanceTest extends AcceptanceTest {
             DynamicTest.dynamicTest("어드민이 로그인한다.", () -> {
                 token = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
-                    .body(new LoginRequest("admin123", "admin@email.com"))
+                    .body(new LoginRequest("lini123", "lini@email.com"))
                     .when().post("/login")
                     .then().log().all().extract().cookie("token");
             }),
