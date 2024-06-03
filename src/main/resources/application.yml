@@ -19,7 +19,14 @@ security:
       expire-length: 3600000
 
 payment:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    url:
+      base: https://api.tosspayments.com
+      payment-confirm: /v1/payments/confirm
+    time-out:
+      connection: 3
+      read: 30
 
 logging:
   level:

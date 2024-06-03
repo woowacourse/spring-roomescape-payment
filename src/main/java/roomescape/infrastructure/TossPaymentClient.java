@@ -13,16 +13,18 @@ public class TossPaymentClient implements PaymentClient {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RestClient restClient;
+    private final PaymentProperties paymentProperties;
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient, PaymentProperties paymentProperties) {
         this.restClient = restClient;
+        this.paymentProperties = paymentProperties;
     }
 
     @Override
     public void confirmPayment(PaymentConfirmRequest request) {
         try {
             restClient.post()
-                    .uri("/v1/payments/confirm")
+                    .uri(paymentProperties.url().paymentConfirm())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()

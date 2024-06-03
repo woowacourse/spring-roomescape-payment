@@ -30,13 +30,13 @@ public class PaymentConfig {
 
     @Bean
     public PaymentClient paymentClient() {
-        return new TossPaymentClient(restClient());
+        return new TossPaymentClient(restClient(), paymentProperties);
     }
 
     private RestClient restClient() {
         return RestClient
                 .builder()
-                .baseUrl("https://api.tosspayments.com")
+                .baseUrl(paymentProperties.url().base())
                 .defaultHeader("Authorization", authorizationHeader())
                 .defaultStatusHandler(exceptionHandler())
                 .requestFactory(requestFactory())
@@ -56,8 +56,8 @@ public class PaymentConfig {
 
     private ClientHttpRequestFactory requestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(3L))
-                .withReadTimeout(Duration.ofSeconds(30L));
+                .withConnectTimeout(Duration.ofSeconds(paymentProperties.timeOut().connection()))
+                .withReadTimeout(Duration.ofSeconds(paymentProperties.timeOut().read()));
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }
