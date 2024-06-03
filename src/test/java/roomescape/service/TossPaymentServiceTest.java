@@ -17,8 +17,9 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import roomescape.global.exception.RoomescapeException;
+import roomescape.global.exception.PaymentException;
 import roomescape.service.config.TossPaymentConfigProperties;
+import roomescape.service.util.TossPaymentErrorCodeUtils;
 
 @EnableConfigurationProperties(value = TossPaymentConfigProperties.class)
 @TestPropertySource("classpath:application.yml")
@@ -40,7 +41,7 @@ class TossPaymentServiceTest {
         @Autowired TossPaymentConfigProperties properties
     ) {
         this.restTemplate = builder.build();
-        this.paymentService = new TossPaymentService(properties, restTemplate);
+        this.paymentService = new TossPaymentService(properties, restTemplate, new TossPaymentErrorCodeUtils());
     }
 
     @BeforeEach
@@ -63,8 +64,8 @@ class TossPaymentServiceTest {
         server.expect(requestTo(TOSS_PAYMENTS_URL))
             .andRespond(withBadRequest());
         assertThatThrownBy(() -> paymentService.pay(ORDER_ID, AMOUNT, PAYMENT_KEY))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("결제가 승인되지 않았습니다.");
+            .isInstanceOf(PaymentException.class)
+            .hasMessage("결제가 승인되지 않았습니다. 같은 문제가 반복된다면 은행이나 카드사로 문의 바랍니다.");
     }
 
     @DisplayName("실패: 결제 과정에서 500 에러 발생")
@@ -73,7 +74,7 @@ class TossPaymentServiceTest {
         server.expect(requestTo(TOSS_PAYMENTS_URL))
             .andRespond(withServerError());
         assertThatThrownBy(() -> paymentService.pay(ORDER_ID, AMOUNT, PAYMENT_KEY))
-            .isInstanceOf(RoomescapeException.class)
-            .hasMessage("결제가 승인되지 않았습니다.");
+            .isInstanceOf(PaymentException.class)
+            .hasMessage("결제가 승인되지 않았습니다. 같은 문제가 반복된다면 은행이나 카드사로 문의 바랍니다.");
     }
 }
