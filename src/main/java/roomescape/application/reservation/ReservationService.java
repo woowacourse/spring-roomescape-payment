@@ -50,21 +50,19 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse bookReservation(ReservationPaymentRequest request) {
-        Reservation reservation = getReservationFromRequest(request.toReservationRequest());
-        Reservation savedReservation = reservationRepository.save(reservation);
-        Theme theme = reservation.getTheme();
+        Reservation savedReservation = saveReservation(request.toReservationRequest());
+        Theme theme = savedReservation.getTheme();
         paymentService.purchase(savedReservation, request.toPaymentRequest(theme.getPrice()));
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(savedReservation);
     }
 
     @Transactional
     public ReservationResponse bookReservationWithoutPurchase(ReservationRequest request) {
-        Reservation reservation = getReservationFromRequest(request);
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Reservation savedReservation = saveReservation(request);
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation getReservationFromRequest(ReservationRequest request) {
+    private Reservation saveReservation(ReservationRequest request) {
         if (reservationRepository.existsActiveReservation(
                 request.themeId(), request.date(), request.timeId())
         ) {
@@ -74,7 +72,8 @@ public class ReservationService {
         Theme theme = themeRepository.getById(request.themeId());
         ReservationTime time = reservationTimeRepository.getById(request.timeId());
         LocalDateTime now = LocalDateTime.now(clock);
-        return new Reservation(member, theme, request.date(), time, now, BookStatus.BOOKED);
+        Reservation newReservation = new Reservation(member, theme, request.date(), time, now, BookStatus.BOOKED);
+        return reservationRepository.save(newReservation);
     }
 
     @Transactional
