@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.controller.dto.ErrorMessageResponse;
 import roomescape.global.exception.AuthorizationException;
+import roomescape.global.exception.PaymentException;
 import roomescape.global.exception.RoomescapeException;
 
 @RestControllerAdvice
@@ -21,9 +22,15 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(RoomescapeException.class)
-    public ResponseEntity<ErrorMessageResponse> handleIllegalArgumentException(RoomescapeException e) {
+    public ResponseEntity<ErrorMessageResponse> handleRoomescapeException(RoomescapeException e) {
         ErrorMessageResponse response = new ErrorMessageResponse(e.getMessage());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorMessageResponse> handlePaymentException(PaymentException e) {
+        ErrorMessageResponse response = new ErrorMessageResponse(e.getMessage());
+        return ResponseEntity.internalServerError().body(response);
     }
 
     @ExceptionHandler(AuthorizationException.class)
