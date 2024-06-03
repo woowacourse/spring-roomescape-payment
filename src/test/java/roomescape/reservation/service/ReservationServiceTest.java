@@ -3,16 +3,20 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 
 import roomescape.reservation.dto.SaveReservationRequest;
@@ -24,6 +28,14 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
+
+    @MockBean
+    PaymentService paymentService;
+
+    @BeforeEach
+    void doNothingWithPaymentService() {
+        Mockito.when(paymentService.requestTossPayment(any())).thenReturn(null);
+    }
 
     @DisplayName("전체 예약 정보를 조회한다.")
     @Test

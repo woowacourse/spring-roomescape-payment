@@ -27,7 +27,7 @@ public class ReservationController {
     public ReservationController(final ReservationService reservationService, final WaitingService waitingService,final PaymentService paymentService) {
         this.reservationService = reservationService;
         this.waitingService = waitingService;
-        this.paymentService=paymentService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -45,8 +45,6 @@ public class ReservationController {
     ) {
         final Reservation savedReservation = reservationService.saveReservation(
                 request.setMemberId(authenticatedMember.id()));
-
-        paymentService.requestTossPayment(request.toPaymentRequest()); // 200 -> 성공 400,500 실패
 
         return ResponseEntity.created(URI.create("/reservations/" + savedReservation.getId()))
                 .body(ReservationResponse.from(savedReservation));
