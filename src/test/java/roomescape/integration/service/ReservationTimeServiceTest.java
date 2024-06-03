@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.DELETE_USED_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION_TIME;
 import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 import java.time.LocalDate;

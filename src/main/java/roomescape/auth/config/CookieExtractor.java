@@ -1,6 +1,6 @@
 package roomescape.auth.config;
 
-import static roomescape.exception.ExceptionType.REQUIRED_LOGIN;
+import static roomescape.exception.type.RoomescapeExceptionType.REQUIRED_LOGIN;
 
 import java.util.Arrays;
 import java.util.Optional;

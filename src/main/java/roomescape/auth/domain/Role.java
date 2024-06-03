@@ -2,7 +2,7 @@ package roomescape.auth.domain;
 
 import java.util.Arrays;
 
-import roomescape.exception.ExceptionType;
+import roomescape.exception.type.RoomescapeExceptionType;
 import roomescape.exception.RoomescapeException;
 
 public enum Role {
@@ -19,7 +19,7 @@ public enum Role {
         return Arrays.stream(values())
                 .filter(role -> role.tokenValue.equals(value))
                 .findFirst()
-                .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_ROLE));
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionType.NOT_FOUND_ROLE));
     }
 
 

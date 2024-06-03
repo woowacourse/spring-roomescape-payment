@@ -1,7 +1,7 @@
 package roomescape.theme.service;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
-import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_THEME;
 
 import java.util.List;
 

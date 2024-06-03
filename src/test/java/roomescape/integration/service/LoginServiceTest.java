@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
+import static roomescape.exception.type.RoomescapeExceptionType.WRONG_PASSWORD;
 
 import java.util.Map;
 

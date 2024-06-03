@@ -1,8 +1,8 @@
 package roomescape.theme.entity;
 
-import static roomescape.exception.ExceptionType.EMPTY_DESCRIPTION;
-import static roomescape.exception.ExceptionType.EMPTY_NAME;
-import static roomescape.exception.ExceptionType.EMPTY_THUMBNAIL;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_DESCRIPTION;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_NAME;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_THUMBNAIL;
 
 import java.util.Objects;
 

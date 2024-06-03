@@ -1,11 +1,11 @@
 package roomescape.reservation.service;
 
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.DUPLICATE_WAITING_RESERVATION;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_ID;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_WAITING_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_MEMBER_BY_ID;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

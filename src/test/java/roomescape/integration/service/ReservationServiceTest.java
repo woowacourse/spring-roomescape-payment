@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.DUPLICATE_WAITING_RESERVATION;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_WAITING_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;

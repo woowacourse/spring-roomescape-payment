@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import static roomescape.exception.ExceptionType.EMPTY_DATE;
-import static roomescape.exception.ExceptionType.EMPTY_MEMBER;
-import static roomescape.exception.ExceptionType.EMPTY_THEME;
-import static roomescape.exception.ExceptionType.EMPTY_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_DATE;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_MEMBER;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_TIME;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

@@ -2,8 +2,8 @@ package roomescape.integration.controller;
 
 import static org.hamcrest.Matchers.is;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
-import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_THEME;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndTheme;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;

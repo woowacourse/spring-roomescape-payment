@@ -1,4 +1,4 @@
-package roomescape.exception;
+package roomescape.exception.type;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -7,7 +7,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import org.springframework.http.HttpStatus;
 
-public enum ExceptionType {
+public enum RoomescapeExceptionType {
     EMPTY_NAME(BAD_REQUEST, "이름은 필수 값입니다.",
             "Name is missing in the request."),
     EMPTY_TIME(BAD_REQUEST, "시작 시간은 필수 값입니다.",
@@ -71,7 +71,7 @@ public enum ExceptionType {
     private final String message;
     private final String logMessage;
 
-    ExceptionType(HttpStatus status, String message, String logMessage) {
+    RoomescapeExceptionType(HttpStatus status, String message, String logMessage) {
         this.status = status;
         this.message = message;
         this.logMessage = logMessage;

@@ -3,9 +3,9 @@ package roomescape.integration.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.NO_QUERY_PARAMETER;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION;
+import static roomescape.exception.type.RoomescapeExceptionType.NO_QUERY_PARAMETER;
+import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndTheme;

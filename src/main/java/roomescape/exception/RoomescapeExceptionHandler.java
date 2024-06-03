@@ -1,8 +1,8 @@
 package roomescape.exception;
 
-import static roomescape.exception.ExceptionType.INVALID_DATE_TIME_FORMAT;
-import static roomescape.exception.ExceptionType.NO_QUERY_PARAMETER;
-import static roomescape.exception.ExceptionType.UN_EXPECTED_ERROR;
+import static roomescape.exception.type.RoomescapeExceptionType.INVALID_DATE_TIME_FORMAT;
+import static roomescape.exception.type.RoomescapeExceptionType.NO_QUERY_PARAMETER;
+import static roomescape.exception.type.RoomescapeExceptionType.UN_EXPECTED_ERROR;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,8 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import roomescape.exception.response.PaymentExceptionResponse;
 
 @ControllerAdvice
 public class RoomescapeExceptionHandler {
@@ -27,14 +29,15 @@ public class RoomescapeExceptionHandler {
     @ExceptionHandler(RoomescapeException.class)
     public ErrorResponse handle(RoomescapeException e) {
         logger.error(e.getLogMessage());
-        return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
+        return ErrorResponse.builder(e, e.getExceptionType().getStatus(), e.getMessage())
                 .build();
     }
 
     @ExceptionHandler(PaymentException.class)
     public ErrorResponse handle(PaymentException e) {
-        logger.error(e.getMessage());
-        return ErrorResponse.builder(e, e.getHttpStatus(), e.getMessage())
+        PaymentExceptionResponse paymentExceptionResponse = e.getPaymentExceptionResponse();
+        logger.error("{}{}{}", paymentExceptionResponse.getErrorCode(), System.lineSeparator(), paymentExceptionResponse.getMessage());
+        return ErrorResponse.builder(e, paymentExceptionResponse.getHttpStatusCode(), paymentExceptionResponse.getMessage())
                 .build();
     }
 

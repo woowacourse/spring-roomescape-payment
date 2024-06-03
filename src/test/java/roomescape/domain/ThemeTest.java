@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import static roomescape.exception.ExceptionType.EMPTY_DESCRIPTION;
-import static roomescape.exception.ExceptionType.EMPTY_NAME;
-import static roomescape.exception.ExceptionType.EMPTY_THUMBNAIL;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_DESCRIPTION;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_NAME;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_THUMBNAIL;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package roomescape.time.entity;
 
-import static roomescape.exception.ExceptionType.EMPTY_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.EMPTY_TIME;
 
 import java.time.LocalTime;
 import java.util.Objects;

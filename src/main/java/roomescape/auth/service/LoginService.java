@@ -1,8 +1,8 @@
 package roomescape.auth.service;
 
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
-import static roomescape.exception.ExceptionType.REQUIRED_LOGIN;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
+import static roomescape.exception.type.RoomescapeExceptionType.REQUIRED_LOGIN;
+import static roomescape.exception.type.RoomescapeExceptionType.WRONG_PASSWORD;
 
 import java.util.Map;
 

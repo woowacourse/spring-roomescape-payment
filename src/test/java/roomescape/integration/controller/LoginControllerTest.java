@@ -2,8 +2,8 @@ package roomescape.integration.controller;
 
 import static org.hamcrest.Matchers.is;
 
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_MEMBER_BY_EMAIL;
+import static roomescape.exception.type.RoomescapeExceptionType.WRONG_PASSWORD;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 
 import java.util.Map;

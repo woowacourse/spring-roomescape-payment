@@ -3,8 +3,8 @@ package roomescape.integration.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.DELETE_USED_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION_TIME;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
 import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;

@@ -1,30 +1,30 @@
 package roomescape.exception;
 
-import org.springframework.http.HttpStatus;
+import roomescape.exception.type.RoomescapeExceptionType;
 
 public class RoomescapeException extends RuntimeException {
-    private final ExceptionType exceptionType;
+    private final RoomescapeExceptionType roomescapeExceptionType;
     private final String logMessage;
 
-    public RoomescapeException(ExceptionType exceptionType) {
-        super(exceptionType.getMessage());
-        this.exceptionType = exceptionType;
-        this.logMessage = exceptionType.getLogMessage();
+    public RoomescapeException(RoomescapeExceptionType roomescapeExceptionType) {
+        super(roomescapeExceptionType.getMessage());
+        this.roomescapeExceptionType = roomescapeExceptionType;
+        this.logMessage = roomescapeExceptionType.getLogMessage();
     }
 
-    public RoomescapeException(ExceptionType exceptionType, Object... resource) {
-        super(exceptionType.getMessage());
-        this.exceptionType = exceptionType;
-        this.logMessage = String.format(exceptionType.getLogMessage(), resource);
+    public RoomescapeException(RoomescapeExceptionType roomescapeExceptionType, Object... resource) {
+        super(roomescapeExceptionType.getMessage());
+        this.roomescapeExceptionType = roomescapeExceptionType;
+        this.logMessage = String.format(roomescapeExceptionType.getLogMessage(), resource);
     }
 
     @Override
     public String getMessage() {
-        return exceptionType.getMessage();
+        return roomescapeExceptionType.getMessage();
     }
 
-    public HttpStatus getHttpStatus() {
-        return exceptionType.getStatus();
+    public RoomescapeExceptionType getExceptionType() {
+        return roomescapeExceptionType;
     }
 
     public String getLogMessage() {

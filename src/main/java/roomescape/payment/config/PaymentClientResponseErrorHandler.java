@@ -13,10 +13,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.exception.PaymentException;
+import roomescape.exception.response.PaymentExceptionResponse;
 
 @Component
 public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
 
+    private static final String ERROR_MESSAGE = "message";
+    private static final String ERROR_CODE = "code";
+    private static final String DEFAULT_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";
+    private static final String DEFAULT_ERROR_CODE = "Unknown Error";
     private final ObjectMapper objectMapper;
 
     public PaymentClientResponseErrorHandler(ObjectMapper objectMapper) {
@@ -34,7 +39,13 @@ public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
         BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getBody()));
         String responseBody = reader.lines().collect(Collectors.joining(""));
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        String errorMessage = jsonNode.path("message").asText("Unknown error");
-        throw new PaymentException(httpResponse.getStatusCode(), errorMessage);
+        String errorCode = jsonNode.path(ERROR_CODE).asText(DEFAULT_ERROR_CODE);
+        String errorMessage = jsonNode.path(ERROR_MESSAGE).asText(DEFAULT_ERROR_MESSAGE);
+        throw new PaymentException(
+                PaymentExceptionResponse.of(
+                        httpResponse.getStatusCode(),
+                        errorCode,
+                        errorMessage)
+        );
     }
 }

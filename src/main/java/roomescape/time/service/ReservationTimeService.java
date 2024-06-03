@@ -1,8 +1,8 @@
 package roomescape.time.service;
 
-import static roomescape.exception.ExceptionType.DELETE_USED_TIME;
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.type.RoomescapeExceptionType.DELETE_USED_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION_TIME;
+import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
 
 import java.time.LocalDate;
 import java.util.List;
