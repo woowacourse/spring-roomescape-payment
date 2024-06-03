@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import roomescape.service.dto.request.ReservationSaveRequest;
 
 import java.time.LocalDate;
-// TODO valid 일관성 지키기
+
 public record UserReservationSaveRequest(
         @NotNull(message = "날짜를 입력해주세요")
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
@@ -19,9 +19,17 @@ public record UserReservationSaveRequest(
         @NotNull(message = "테마를 선택해주세요")
         @Positive(message = "잘못된 테마입력이 들어왔습니다")
         Long themeId,
+
+        @NotNull(message = "paymentKey가 발급되지 않았습니다.")
         String paymentKey,
+
+        @NotNull(message = "결제 id 가 비어있습니다")
         String orderId,
+
+        @NotNull(message = "결제 금액이 정상입력되지 않았습니다.")
         String amount,
+
+        @NotNull(message = "결제 타입이 비어있습니다.")
         String paymentType
 ) {
     public ReservationSaveRequest toReservationSaveRequest(Long memberId) {
