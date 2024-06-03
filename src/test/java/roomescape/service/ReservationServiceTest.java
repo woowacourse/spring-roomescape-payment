@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.TestFixture;
+import roomescape.domain.Payment;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -50,6 +51,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -205,15 +209,17 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("특정 사용자의 예약 및 예약 대기 목록을 조회한다.")
-    void findMyReservations2() {
+    void findMyReservations() {
         // given
         final LoginMember loginMember = new LoginMember(1L, MEMBER_TENNY_NAME, MEMBER_TENNY_EMAIL, Role.MEMBER);
         final Reservation memberReservation = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
         final Reservation memberWaiting = new Reservation(4L, MEMBER_TENNY(), DATE_MAY_NINTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
-        given(reservationRepository.findByMemberId(loginMember.id()))
-                .willReturn(List.of(memberReservation, memberWaiting));
+        final Payment reservationPayment = new Payment(memberReservation, PAYMENT_KEY, ORDER_ID, AMOUNT);
+
+        given(reservationRepository.findByMemberId(loginMember.id())).willReturn(List.of(memberReservation, memberWaiting));
+        given(paymentRepository.findByReservation(memberReservation)).willReturn(Optional.of(reservationPayment));
         given(reservationRepository.countByDateAndThemeIdAndTimeIdAndStatusAndIdLessThan(
                 memberReservation.getDate(), memberReservation.getTheme().getId(),
                 memberReservation.getTime().getId(), memberReservation.getStatus(), memberReservation.getId()))
@@ -231,8 +237,12 @@ class ReservationServiceTest {
                 () -> assertThat(actual).hasSize(2),
                 () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED.getValue()),
                 () -> assertThat(actual.get(0).getRank()).isEqualTo(1L),
+                () -> assertThat(actual.get(0).getPaymentKey()).isEqualTo(PAYMENT_KEY),
+                () -> assertThat(actual.get(0).getAmount()).isEqualTo(AMOUNT),
                 () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING.getValue()),
-                () -> assertThat(actual.get(1).getRank()).isEqualTo(2L)
+                () -> assertThat(actual.get(1).getRank()).isEqualTo(2L),
+                () -> assertThat(actual.get(1).getPaymentKey()).isNull(),
+                () -> assertThat(actual.get(1).getAmount()).isNull()
         );
     }
 }
