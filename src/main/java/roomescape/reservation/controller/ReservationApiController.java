@@ -1,10 +1,12 @@
 package roomescape.reservation.controller;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import roomescape.auth.Login;
 import roomescape.client.PaymentClient;
 import roomescape.member.dto.LoginMemberInToken;
@@ -20,13 +23,13 @@ import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
-import roomescape.reservation.dto.response.PaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationApiController {
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     private final ReservationService reservationService;
     private final PaymentClient paymentClient;
@@ -57,7 +60,7 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        PaymentResponse paymentResponse = paymentClient.paymentReservation(getAuthorizations(),
+        paymentClient.paymentReservation(getAuthorizations(),
                 PaymentRequest.toRequest(reservationCreateRequest)).getBody();
 
         Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
@@ -67,9 +70,8 @@ public class ReservationApiController {
     }
 
     private String getAuthorizations() {
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw";
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }
 

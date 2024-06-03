@@ -1,7 +1,9 @@
 package roomescape.reservation.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+
+import jakarta.validation.constraints.NotNull;
+
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -14,7 +16,7 @@ public record ReservationCreateRequest(
         @NotNull Long timeId,
         @NotNull String paymentKey,
         @NotNull String orderId,
-        @NotNull Integer amount,
+        @NotNull Long amount,
         @NotNull String paymentType
 ) {
 
