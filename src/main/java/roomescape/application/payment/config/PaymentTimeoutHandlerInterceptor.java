@@ -1,4 +1,4 @@
-package roomescape.application.config;
+package roomescape.application.payment.config;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
