@@ -7,6 +7,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.payment.repository.PaymentRepository;
+import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.PaymentApproveRequest;
 import roomescape.service.dto.PaymentRequest;
 import roomescape.service.dto.PaymentResponse;
@@ -23,11 +24,19 @@ public class PaymentService {
     }
 
     public void requestApproval(PaymentApproveRequest reservationPaymentRequest) {
+        validateDuplicate(reservationPaymentRequest.reservationId());
         PaymentRequest paymentRequest = reservationPaymentRequest.toPaymentRequest();
         paymentClient.requestApproval(paymentRequest);
 
         Payment payment = reservationPaymentRequest.toPayment(PaymentStatus.DONE);
         paymentRepository.save(payment);
+    }
+
+    private void validateDuplicate(Long reservationId) {
+        paymentRepository.findByReservationIdAndStatus(reservationId, PaymentStatus.DONE)
+        .ifPresent(payment -> {
+            throw new RoomEscapeBusinessException("이미 결제된 예약입니다.");
+        });
     }
 
     @Transactional(readOnly = true)

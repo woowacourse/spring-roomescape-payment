@@ -11,4 +11,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByMemberIdAndStatus(Long memberId, PaymentStatus status);
 
     Optional<Payment> findByReservationIdAndMemberIdAndStatus(Long reservationId, Long memberId, PaymentStatus status);
+
+    Optional<Payment> findByReservationIdAndStatus(Long reservationId, PaymentStatus status);
+
 }
