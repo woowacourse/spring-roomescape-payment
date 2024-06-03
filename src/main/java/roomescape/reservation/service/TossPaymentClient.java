@@ -29,8 +29,6 @@ public class TossPaymentClient implements PaymentClient {
     @Value("${third-party-api.payment.secret-key}")
     private String secretKey;
     private final RestClient restClient;
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public TossPaymentClient() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
@@ -47,9 +45,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    PaymentErrorResponse errorResponse = objectMapper.readValue(res.getBody(),
-                            PaymentErrorResponse.class);
-                    throw new IllegalRequestException(errorResponse.getMessage());
+                    throw new IllegalRequestException("결제 승인 요청에 대한 문제가 있습니다.");
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                     throw new InternalServerException("결제 승인 도중 알 수 없는 예외가 발생했습니다");
