@@ -34,10 +34,12 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest, Long memberId) {
-        Long id = reservationRegisterService.registerReservation(
-                ReservationRequest.of(userReservationPaymentRequest, memberId));
+        ReservationRequest reservationRequest = ReservationRequest.of(userReservationPaymentRequest, memberId);
+        Long id = reservationRegisterService.registerReservation(reservationRequest);
+
         PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
         paymentService.pay(paymentRequest);
+
         return findReservation(id);
     }
 
@@ -61,6 +63,7 @@ public class ReservationService {
         return reservationSearchService.findReservationsByFilter(filter);
     }
 
+    @Transactional
     public void deleteReservation(Long reservationId) {
         reservationCancelService.deleteReservation(reservationId);
     }
