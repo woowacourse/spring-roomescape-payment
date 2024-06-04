@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -18,7 +19,6 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.AuthorizationException;
@@ -238,15 +238,35 @@ class ReservationControllerTest extends ControllerTest {
         //when
         doReturn(reservationResponse)
                 .when(reservationApplicationService)
-                .addWaiting(any());
+                .deleteWaiting(any(), anyLong());
 
         //then
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
-                .when().delete(String.format("/api/v1/reservations/%d/waiting", reservationResponse.memberReservationId()))
+                .when()
+                .delete(String.format("/api/v1/reservations/%d/waiting", reservationResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("waiting/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("대기 등록한 사용자가 아닌 타사용자가 취소 시, 403을 반환한다.")
+    @Test
+    void delete_NotReservationMember() {
+        //given & when
+        doThrow(new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER))
+                .when(reservationApplicationService)
+                .deleteWaiting(any(), anyLong());
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when()
+                .delete(String.format("/api/v1/reservations/%d/waiting", 3))
+                .then().log().all()
+                .apply(document("waiting/delete/fail/invalid-auth"))
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

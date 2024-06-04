@@ -43,27 +43,19 @@ import roomescape.util.ServiceTest;
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest extends ServiceTest {
 
+    ReservationTime time;
+    Theme theme1;
+    Member memberChoco;
+    Reservation reservation;
+    MemberReservation memberReservation;
     @Autowired
     private PaymentService paymentService;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private PaymentRepository paymentRepository;
-
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
-
-    ReservationTime time;
-
-    Theme theme1;
-
-    Member memberChoco;
-
-    Reservation reservation;
-
-    MemberReservation memberReservation;
 
     @BeforeEach
     void setUp() {

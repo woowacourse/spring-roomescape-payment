@@ -4,9 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
 
 import io.restassured.http.ContentType;
@@ -17,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.controller.dto.TokenResponse;
+import roomescape.exception.AuthenticationException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.util.ControllerTest;
@@ -57,6 +55,29 @@ class AuthControllerTest extends ControllerTest {
                 .statusCode(HttpStatus.OK.value());
     }
 
+    @DisplayName("비밀번호가 다를 경우, 401을 반환한다.")
+    @Test
+    void invalidPassword() {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("email", getMemberChoco().getEmail());
+        params.put("password", "wrongPassword");
+
+        //when
+        doThrow(AuthenticationException.class)
+                .when(authService)
+                .authenticate(any());
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/api/v1/login")
+                .then().log().all()
+                .apply(document("login/fail/invalid-password"))
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
     @DisplayName("토큰을 통해 회원을 검증할 경우, 200을 반환한다.")
     @Test
     void loginCheck() {
@@ -68,6 +89,26 @@ class AuthControllerTest extends ControllerTest {
                 .then().log().all()
                 .apply(document("login/check/success"))
                 .statusCode(HttpStatus.OK.value());
+    }
+
+    @DisplayName("토큰 오류 발생 시, 401을 반환한다.")
+    @Test
+    void invalidTokenCheck() {
+        //given
+        String invalidToken = "invalidToken";
+
+        doThrow(new AuthenticationException(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE))
+                .when(authService)
+                .fetchByToken(invalidToken);
+
+        // when & then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", invalidToken)
+                .when().get("/api/v1/login/check")
+                .then().log().all()
+                .apply(document("login/check/fail/invalid-token"))
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @DisplayName("토큰을 통해 로그아웃할 경우, 200을 반환한다.")

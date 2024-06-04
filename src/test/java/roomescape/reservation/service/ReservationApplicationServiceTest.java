@@ -168,7 +168,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         Price price = new Price(BigDecimal.valueOf(1000));
         paymentRepository.save(
                 new Payment(paymentKey, PaymentType.CARD, price, firstReservation));
-        paymentHistoryRepository.save(new PaymentHistory(paymentKey, PaymentType.CARD, PaymentStatus.PAID, price, memberChoco));
+        paymentHistoryRepository.save(
+                new PaymentHistory(paymentKey, PaymentType.CARD, PaymentStatus.PAID, price, memberChoco));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
 

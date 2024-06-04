@@ -7,7 +7,6 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import roomescape.util.ControllerTest;
 
 @DisplayName("회원 페이지 통합 테스트")

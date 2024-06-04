@@ -6,6 +6,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -16,9 +18,9 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.NotFoundException;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.util.ControllerTest;
@@ -118,20 +120,67 @@ class ReservationTimeControllerTest extends ControllerTest {
     @Test
     void getAvailable() {
         //given
-        AvailableTimeResponse availableTimeResponse = new AvailableTimeResponse(1L, LocalTime.NOON, true);
+        LocalDate date = LocalDate.now().plusDays(1);
+        long themeId = 2L;
+        AvailableTimeResponse availableTimeResponse1 = new AvailableTimeResponse(1L, LocalTime.NOON, true);
+        AvailableTimeResponse availableTimeResponse2 = new AvailableTimeResponse(2L, LocalTime.MIDNIGHT, false);
 
         //when
-        doReturn(List.of(availableTimeResponse))
+        doReturn(List.of(availableTimeResponse1, availableTimeResponse2))
                 .when(reservationTimeService)
-                .findAvailableTimes(isA(LocalDate.class), isA(Long.class));
+                .findAvailableTimes(any(), isA(Long.class));
 
         //then
         restDocs
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
-                .when().get("/api/v1/times")
+                .when().get(String.format("/api/v1/times/available?date=%s&themeId=%d", date, themeId))
                 .then().log().all()
-                .apply(document("available-times/find/success"))
+                .apply(document("available-times/find/success",
+                        responseFields(
+                                fieldWithPath("[].timeId").description("예약 시간의 식별자"),
+                                fieldWithPath("[].startAt").description("예약 시간"),
+                                fieldWithPath("[].alreadyBooked").description("가능 여부")
+                        )))
                 .statusCode(HttpStatus.OK.value());
+    }
+
+    @DisplayName("과거 시간의 가능한 예약 시간 검색 시, 400을 반환한다.")
+    @Test
+    void getAvailable_invalidDate() {
+        //given
+        LocalDate date = LocalDate.EPOCH;
+        long themeId = 2L;
+
+        //when & then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().get(String.format("/api/v1/times/available?date=%s&themeId=%d", date, themeId))
+                .then().log().all()
+                .apply(document("available-times/find/fail/invalid-date"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("존재하지 않는 테마의 가능한 예약 시간 검색 시, 404를 반환한다.")
+    @Test
+    void getAvailable_invalidTheme() {
+        //given
+        LocalDate date = LocalDate.now().plusDays(1);
+        long themeId = 99999999999L;
+
+        //when
+        doThrow(new NotFoundException(ErrorType.THEME_NOT_FOUND))
+                .when(reservationTimeService)
+                .findAvailableTimes(any(), isA(Long.class));
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().get(String.format("/api/v1/times/available?date=%s&themeId=%d", date, themeId))
+                .then().log().all()
+                .apply(document("available-times/find/fail/theme-not-found"))
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 }

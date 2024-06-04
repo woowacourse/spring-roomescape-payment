@@ -4,7 +4,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import io.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +35,7 @@ import roomescape.reservation.controller.ThemeController;
 import roomescape.reservation.service.ReservationApplicationService;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
+import roomescape.reservation.service.components.WaitingReservationService;
 
 @WebMvcTest({
         LoginUserArgumentResolver.class,
@@ -71,6 +71,9 @@ public class ControllerTest {
     @MockBean
     protected MemberService memberService;
 
+    @MockBean
+    protected WaitingReservationService waitingReservationService;
+
     @Autowired
     protected LoginUserArgumentResolver loginUserArgumentResolver;
 
@@ -88,7 +91,7 @@ public class ControllerTest {
     }
 
     void setUpRestDocs(WebApplicationContext webApplicationContext,
-                               RestDocumentationContextProvider restDocumentation) {
+                       RestDocumentationContextProvider restDocumentation) {
         restDocs = RestAssuredMockMvc.given()
                 .mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext)
                         .apply(documentationConfiguration(restDocumentation)

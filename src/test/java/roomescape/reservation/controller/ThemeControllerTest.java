@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.NotFoundException;
 import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.util.ControllerTest;
 
@@ -118,6 +118,27 @@ class ThemeControllerTest extends ControllerTest {
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("존재하지 않는 테마 삭제 시, 404를 반환한다.")
+    @Test
+    void delete_invalidThemeId() {
+        //given
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
+
+        //when
+        doThrow(new NotFoundException(ErrorType.THEME_NOT_FOUND))
+                .when(themeService)
+                .delete(isA(Long.class));
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().delete("/api/v1/themes/" + themeResponse.id())
+                .then().log().all()
+                .apply(document("themes/delete/fail/theme-not-found"))
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("인기 테마 조회 시, 200을 반환한다.")
     @Test
     void getPopular() {
@@ -183,7 +204,8 @@ class ThemeControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", memberToken)
                 .when()
-                .get(String.format("/api/v1/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate, limit))
+                .get(String.format("/api/v1/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate,
+                        limit))
                 .then().log().all()
                 .apply(document("popular-themes/find/fail/invalid-limit"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
