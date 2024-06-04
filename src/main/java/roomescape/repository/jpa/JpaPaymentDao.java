@@ -9,4 +9,6 @@ import roomescape.domain.payment.Payment;
 public interface JpaPaymentDao extends JpaRepository<Payment, Long> {
     @EntityGraph(attributePaths = {"reservation"})
     List<Payment> findAllByReservationIn(List<Reservation> reservations);
+
+    void deleteByReservation_Id(long reservationId);
 }

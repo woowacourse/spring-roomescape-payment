@@ -3,6 +3,7 @@ package roomescape.service;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static roomescape.fixture.MemberFixture.DEFAULT_ADMIN;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
+import static roomescape.fixture.ReservationFixture.DEFAULT_RESERVATION;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_TIME;
 import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
@@ -12,6 +13,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.domain.payment.Payment;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.ExceptionType;
@@ -19,10 +21,12 @@ import roomescape.exception.RoomescapeException;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ReservationWaitingFixture;
 import roomescape.repository.CollectionMemberRepository;
+import roomescape.repository.CollectionPaymentRepository;
 import roomescape.repository.CollectionReservationRepository;
 import roomescape.repository.CollectionReservationTimeRepository;
 import roomescape.repository.CollectionReservationWaitingRepository;
 import roomescape.repository.CollectionThemeRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationWaitingRepository;
 import roomescape.service.finder.ReservationFinder;
@@ -34,6 +38,7 @@ class ReservationServiceTest {
     private CollectionThemeRepository themeRepository;
     private CollectionMemberRepository memberRepository;
     private ReservationWaitingRepository waitingRepository;
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void initService() {
@@ -44,8 +49,9 @@ class ReservationServiceTest {
         reservationRepository = new CollectionReservationRepository();
         ReservationFinder reservationFinder = new ReservationFinder(reservationRepository, reservationTimeRepository,
                 memberRepository, themeRepository);
+        paymentRepository = new CollectionPaymentRepository();
         reservationService = new ReservationService(reservationRepository, waitingRepository, reservationFinder,
-                memberRepository);
+                memberRepository, paymentRepository);
     }
 
     @Test
@@ -97,8 +103,9 @@ class ReservationServiceTest {
         reservationRepository = new CollectionReservationRepository();
         ReservationFinder reservationFinder = new ReservationFinder(reservationRepository, reservationTimeRepository,
                 memberRepository, themeRepository);
+        paymentRepository = new CollectionPaymentRepository();
         reservationService = new ReservationService(reservationRepository, waitingRepository, reservationFinder,
-                memberRepository);
+                memberRepository, paymentRepository);
     }
 
     @Test
@@ -162,5 +169,23 @@ class ReservationServiceTest {
                 .equals(DEFAULT_ADMIN);
         Assertions.assertThat(reservationMemberIsAdmin)
                 .isTrue();
+    }
+
+    @Test
+    @DisplayName("예약이 취소된 경우 결제가 삭제되는지 확인")
+    void paymentDeleteWhenReservationCancel() {
+        initServiceWithMember();
+        reservationTimeRepository.save(DEFAULT_TIME);
+        themeRepository.save(DEFAULT_THEME);
+
+        ReservationResponse saved = reservationService.save(ReservationFixture.DEFAULT_REQUEST);
+        waitingRepository.save(ReservationWaitingFixture.DEFAULT_WAITING);
+
+        reservationService.cancel(DEFAULT_ADMIN.getId(), saved.id());
+
+        List<Payment> reservationIn = paymentRepository.findAllByReservationIn(List.of(DEFAULT_RESERVATION));
+
+        Assertions.assertThat(reservationIn)
+                .isEmpty();
     }
 }

@@ -23,4 +23,9 @@ public class JpaPaymentRepository implements PaymentRepository {
     public List<Payment> findAllByReservationIn(List<Reservation> reservations) {
         return jpaPaymentDao.findAllByReservationIn(reservations);
     }
+
+    @Override
+    public void deleteByReservationId(long reservationId) {
+        jpaPaymentDao.deleteByReservation_Id(reservationId);
+    }
 }

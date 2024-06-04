@@ -16,6 +16,7 @@ import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationWaitingRepository;
 import roomescape.service.finder.ReservationFinder;
@@ -28,14 +29,17 @@ public class ReservationService {
     private final ReservationWaitingRepository waitingRepository;
     private final ReservationFinder reservationFinder;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationWaitingRepository waitingRepository,
-                              ReservationFinder reservationFinder, MemberRepository memberFinder) {
+                              ReservationFinder reservationFinder, MemberRepository memberRepository,
+                              PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.reservationFinder = reservationFinder;
-        this.memberRepository = memberFinder;
+        this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse save(ReservationRequest reservationRequest) {
@@ -68,6 +72,8 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
+
+        paymentRepository.deleteByReservationId(reservation.getId());
 
         waitingRepository.findTopWaitingByReservation(reservation)
                 .ifPresentOrElse(waiting -> updateReservationAndDeleteTopWaiting(reservation, waiting),

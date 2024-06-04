@@ -32,4 +32,12 @@ public class CollectionPaymentRepository implements PaymentRepository {
                 .filter(payment -> reservationSet.contains(payment.getReservation()))
                 .toList();
     }
+
+    @Override
+    public void deleteByReservationId(long reservationId) {
+        payments.stream()
+                .filter(payment -> payment.getReservation().hasIdOf(reservationId))
+                .findAny()
+                .ifPresent(payments::remove);
+    }
 }

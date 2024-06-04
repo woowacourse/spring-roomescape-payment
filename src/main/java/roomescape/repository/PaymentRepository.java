@@ -8,4 +8,6 @@ public interface PaymentRepository {
     Payment save(Payment payment);
 
     List<Payment> findAllByReservationIn(List<Reservation> reservations);
+
+    void deleteByReservationId(long reservationId);
 }
