@@ -106,15 +106,6 @@ public class UserReservationService {
         }
 
         reservationRepository.deleteById(reservation.getId());
-        approveNextWaiting(reservation);
-    }
-
-    private void approveNextWaiting(Reservation reservation) {
-        reservationRepository.findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
-        ).ifPresent(Reservation::reserve);
     }
 
     @Transactional(readOnly = true)

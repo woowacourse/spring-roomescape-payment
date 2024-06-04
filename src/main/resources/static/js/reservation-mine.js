@@ -19,7 +19,17 @@ function render(data) {
     const date = item.date;
     const time = item.time;
     const rank = item.rank;
-    const status = item.status === 'RESERVED' ? '예약' : rank + '번째 예약대기';
+
+    let status;
+    if (item.status === 'RESERVED') {
+      status = '예약';
+    } else {
+      if (item.rank === 0) {
+        status = '결제대기';
+      } else {
+        status = rank + '번째 예약대기';
+      }
+    }
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
