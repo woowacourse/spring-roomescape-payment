@@ -14,6 +14,10 @@ spring:
       ddl-auto: none
 
 payments:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  password: ":"
+  clients:
+    toss:
+      secretKey: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      password: ":"
+      connectionTimeoutSeconds: 3
+      readTimeoutSeconds: 5
 payment-timeout: 60
