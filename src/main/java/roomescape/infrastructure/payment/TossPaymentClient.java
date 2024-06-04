@@ -21,9 +21,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
     private final TossPaymentClientProperties properties;
+    private final PaymentErrorHandler paymentErrorHandler;
 
-    public TossPaymentClient(TossPaymentClientProperties properties) {
+    public TossPaymentClient(TossPaymentClientProperties properties, PaymentErrorHandler paymentErrorHandler) {
         this.properties = properties;
+        this.paymentErrorHandler = paymentErrorHandler;
         this.restClient = getRestClient();
     }
 
@@ -31,6 +33,7 @@ public class TossPaymentClient implements PaymentClient {
         return RestClient.builder()
                 .requestFactory(getRequestFactory())
                 .baseUrl(properties.baseUrl())
+                .defaultStatusHandler(paymentErrorHandler)
                 .build();
     }
 

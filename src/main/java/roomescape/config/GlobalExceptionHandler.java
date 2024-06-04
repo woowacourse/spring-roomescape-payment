@@ -7,9 +7,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 import roomescape.exception.*;
 
 import java.time.format.DateTimeParseException;
@@ -49,8 +46,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new ExceptionTemplate("잘못된 요청입니다."));
     }
 
-    @ExceptionHandler(value = {HttpClientErrorException.class, HttpServerErrorException.class})
-    public ResponseEntity<ExceptionTemplate> handlerForbiddenException(HttpStatusCodeException exception) {
-        return ResponseEntity.status(exception.getStatusCode()).body(new ExceptionTemplate(exception.getMessage()));
+    @ExceptionHandler(value = {InvalidPaymentException.class})
+    public ResponseEntity<ExceptionTemplate> handlerForbiddenException(InvalidPaymentException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionTemplate(exception.getMessage()));
     }
 }
