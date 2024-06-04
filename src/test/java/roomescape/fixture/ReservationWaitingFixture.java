@@ -12,7 +12,7 @@ public class ReservationWaitingFixture {
             DEFAULT_ADMIN);
     public static final ReservationRequest DEFAULT_REQUEST = new ReservationRequest(DEFAULT_RESERVATION.getDate(),
             DEFAULT_ADMIN.getId(), DEFAULT_RESERVATION.getReservationTime().getId(),
-            DEFAULT_RESERVATION.getTheme().getId(), null);
+            DEFAULT_RESERVATION.getTheme().getId());
 
     public static final ReservationWaitingResponse DEFAULT_RESPONSE = new ReservationWaitingResponse(
             DEFAULT_WAITING.getId(), DEFAULT_WAITING.getWaitingMember().getName(),

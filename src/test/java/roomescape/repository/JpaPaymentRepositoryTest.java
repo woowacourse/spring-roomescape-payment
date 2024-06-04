@@ -20,4 +20,8 @@ class JpaPaymentRepositoryTest extends DatabaseClearBeforeEachTest {
         Assertions.assertThat(saved.getId())
                 .isNotNull();
     }
+
+    @Test
+    void findAllByReservationIn() {
+    }
 }

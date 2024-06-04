@@ -1,6 +1,8 @@
 package roomescape.repository;
 
+import java.util.List;
 import org.springframework.stereotype.Repository;
+import roomescape.domain.Reservation;
 import roomescape.domain.payment.Payment;
 import roomescape.repository.jpa.JpaPaymentDao;
 
@@ -15,5 +17,10 @@ public class JpaPaymentRepository implements PaymentRepository {
     @Override
     public Payment save(Payment payment) {
         return jpaPaymentDao.save(payment);
+    }
+
+    @Override
+    public List<Payment> findAllByReservationIn(List<Reservation> reservations) {
+        return jpaPaymentDao.findAllByReservationIn(reservations);
     }
 }

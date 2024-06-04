@@ -1,26 +1,36 @@
 package roomescape.service.mapper;
 
 import roomescape.domain.Reservation;
+import roomescape.domain.payment.Payment;
 import roomescape.dto.LoginMemberReservationResponse;
-import roomescape.dto.ReservationWaitingResponse;
 
 public class LoginMemberReservationResponseMapper {
-    public static LoginMemberReservationResponse toResponse(Reservation reservation) {
+    public static LoginMemberReservationResponse toResponse(Reservation reservation, Payment payment) {
+        if (payment == null) {
+            return makeNonPaidResponse(reservation);
+        }
+        return makePaidResponse(reservation, payment);
+    }
+
+    private static LoginMemberReservationResponse makeNonPaidResponse(Reservation reservation) {
         return new LoginMemberReservationResponse(
                 reservation.getId(),
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getTime(),
-                "예약");
+                "결제 대기",
+                null,
+                null);
     }
 
-    public static LoginMemberReservationResponse from(ReservationWaitingResponse waitingResponse) {
+    private static LoginMemberReservationResponse makePaidResponse(Reservation reservation, Payment payment) {
         return new LoginMemberReservationResponse(
-                waitingResponse.id(),
-                waitingResponse.themeName(),
-                waitingResponse.date(),
-                waitingResponse.startAt(),
-                "%d번째 예약 대기".formatted(waitingResponse.priority())
-        );
+                reservation.getId(),
+                reservation.getThemeName(),
+                reservation.getDate(),
+                reservation.getTime(),
+                "예약",
+                payment.getPaymentKey(),
+                payment.getAmount());
     }
 }
