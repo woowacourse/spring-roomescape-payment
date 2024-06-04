@@ -3,6 +3,7 @@ package roomescape.infrastructure.payment;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.net.SocketTimeoutException;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -32,6 +33,9 @@ public class TossPaymentClient implements PaymentClient {
     @Override
     public Payment approve(PaymentRequest request) {
         try {
+            String timestamp = Instant.now().toString();
+            logger.debug("Request body: {} Request time: {}", request, timestamp);
+            
             return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(APPLICATION_JSON)
