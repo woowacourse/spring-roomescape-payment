@@ -12,7 +12,7 @@ import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 @Component
 public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
-    private final Logger logger = LoggerFactory.getLogger(PaymentClientResponseErrorHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public PaymentClientResponseErrorHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
