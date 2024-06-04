@@ -93,6 +93,7 @@ public class ReservationService {
             ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
         paymentClient.confirmPayment(paymentConfirmInput);
+
         return new ReservationResponse(savedReservation);
     }
 

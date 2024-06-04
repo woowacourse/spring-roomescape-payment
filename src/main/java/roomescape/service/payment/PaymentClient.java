@@ -10,10 +10,13 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+import roomescape.exception.payment.PaymentTimeoutException;
 import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
@@ -50,20 +53,23 @@ public class PaymentClient {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((paymentProperties.getSecretKey() + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
-
-        return restClient.method(HttpMethod.POST)
-                .uri(paymentProperties.getUrl() + "/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, authorizations)
-                .body(confirmRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
-                })
-                .body(PaymentConfirmOutput.class);
+        try {
+            return restClient.method(HttpMethod.POST)
+                    .uri(paymentProperties.getUrl() + "/confirm")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, authorizations)
+                    .body(confirmRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                        throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
+                    })
+                    .body(PaymentConfirmOutput.class);
+        } catch (ResourceAccessException e) {
+            throw new PaymentTimeoutException(e);
+        }
     }
 
     private PaymentConfirmErrorCode getPaymentConfirmErrorCode(final ClientHttpResponse response) throws IOException {

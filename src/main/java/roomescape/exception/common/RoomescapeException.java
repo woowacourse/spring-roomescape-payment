@@ -11,6 +11,11 @@ public abstract class RoomescapeException extends RuntimeException {
         this.status = status;
     }
 
+    protected RoomescapeException(String message, HttpStatus status, Throwable throwable) {
+        super(message, throwable);
+        this.status = status;
+    }
+
     public HttpStatus getStatus() {
         return status;
     }
