@@ -7,12 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
+import roomescape.infrastructure.FakePaymentClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class PaymentServiceTest {
 
+    private final PaymentService paymentService;
+
     @Autowired
-    private PaymentService paymentService;
+    public PaymentServiceTest(PaymentRepository paymentRepository, FakePaymentClient fakePaymentClient) {
+        this.paymentService = new PaymentService(paymentRepository, fakePaymentClient);
+    }
 
     @DisplayName("결제를 승인한다.")
     @Test
