@@ -3,11 +3,12 @@ package roomescape.controller;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
-import roomescape.controller.payment.TestPaymentConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
 import roomescape.domain.MemberRole;
+import roomescape.infrastructure.payment.PaymentManager;
+import roomescape.service.response.PaymentDto;
 import roomescape.web.controller.request.MemberReservationRequest;
 
 import java.time.LocalDate;
@@ -15,11 +16,15 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static roomescape.Fixture.*;
 
 @ExtendWith(MockitoExtension.class)
-@Import(TestPaymentConfiguration.class)
 class ReservationControllerTest extends ControllerTest {
+
+    @MockBean
+    private PaymentManager paymentManager;
 
     @BeforeEach
     void setInitialData() {
@@ -36,10 +41,13 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약을 저장한다. -> 201")
     @Test
     void reserve() {
+        PaymentDto paymentDto = new PaymentDto("paymentKey", "orderId", 1000L);
+        when(paymentManager.approve(any())).thenReturn(paymentDto);
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId", 1000L);
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(201)
-                .body("name", is(VALID_USER_NAME.getName()));
+                .body("name", is(VALID_USER_NAME.getName()))
+                .body("payment.paymentKey", is(paymentDto.paymentKey()));
     }
 
     @DisplayName("예약을 삭제한다. -> 204")
