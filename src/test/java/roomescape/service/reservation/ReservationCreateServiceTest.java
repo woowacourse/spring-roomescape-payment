@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.InvalidReservationException;
+import roomescape.exception.TossPaymentException;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
@@ -42,7 +43,7 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
     void createMemberReservation() {
         //given
         ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
-            reservationDetail.getReservationTime().getId(), theme.getId(), "", "", 0L);
+            reservationDetail.getReservationTime().getId(), theme.getId(), "testPaymentKey", "testOrderId", 1000L);
 
         //when
         ReservationResponse result = reservationCreateService.createMemberReservation(reservationRequest, member.getId());
@@ -54,6 +55,18 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
             () -> assertThat(result.theme().id()).isEqualTo(theme.getId()),
             () -> assertThat(result.status()).isEqualTo(ReservationStatus.RESERVED.getDescription())
         );
+    }
+
+    @DisplayName("예약 요청시 결제가 실패하면 예외가 발생한다.")
+    @Test
+    void cannotCreateByInvalidPaymentKey() {
+        //given
+        ReservationRequest reservationRequest = new ReservationRequest(reservationDetail.getDate(),
+            reservationDetail.getReservationTime().getId(), theme.getId(), "failPaymentKey", "testOrderId", 1000L);
+
+        //when & then
+        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
+            .isInstanceOf(TossPaymentException.class);
     }
 
     @DisplayName("사용자가 이미 예약인 상태에서 예약 요청을 한다면 예외가 발생한다.")
