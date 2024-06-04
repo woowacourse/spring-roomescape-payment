@@ -2,11 +2,13 @@ package roomescape.infrastructure.repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
+import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationdetail.Theme;
 
-public interface ThemeJpaRepository extends Repository<Theme, Long> {
+@Repository
+public interface ThemeJpaRepository extends JpaRepository<Theme, Long> {
 
     Theme save(Theme theme);
 
