@@ -43,6 +43,8 @@ function render(data) {
                 requestDeleteWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
         } else { // 예약 완료 상태일 때
             /*
             TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
