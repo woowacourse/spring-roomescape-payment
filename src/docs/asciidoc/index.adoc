@@ -13,9 +13,15 @@
 === 로그인
 ==== 성공
 operation::login/success[snippets='http-request,http-response']
+==== 실패
+===== 비밀번호가 다를 경우
+operation::login/fail/invalid-password[snippets='http-request,http-response']
 === 로그인 사용 검증
 ==== 성공
 operation::login/check/success[snippets='http-request,http-response']
+==== 실패
+===== 유효하지 않는 토큰일 경우
+operation::login/check/fail/invalid-token[snippets='http-request,http-response']
 === 로그아웃
 ==== 성공
 operation::logout/success[snippets='http-request,http-response']
@@ -49,6 +55,9 @@ operation::waiting/create/success[snippets='http-request,http-response']
 === 예약 대기 삭제
 ==== 성공
 operation::waiting/delete/success[snippets='http-request,http-response']
+==== 실패
+===== 타인의 대기를 삭제할 경우
+operation::waiting/delete/fail/invalid-auth[snippets='http-request,http-response']
 
 == 예약 시간
 === 생성
@@ -66,6 +75,12 @@ operation::times/delete/fail/reservation-exist[snippets='http-request,http-respo
 === 가능한 시간 조회
 ==== 성공
 operation::available-times/find/success[snippets='http-request,http-response']
+==== 실패
+===== 조회하는 날짜가 과거인 경우
+operation::available-times/find/fail/invalid-date[snippets='http-request,http-response']
+===== 테마가 존재하지 않는 경우
+operation::available-times/find/fail/theme-not-found[snippets='http-request,http-response']
+
 
 == 테마
 === 생성
@@ -74,7 +89,6 @@ operation::themes/create/success[snippets='http-request,http-response']
 ==== 실패
 ===== 잘못된 테마 이름일 경우
 operation::themes/create/fail/invalid-name[snippets='http-request,http-response']
-
 === 조회
 ==== 성공
 operation::themes/find/success[snippets='http-request,http-response']
@@ -84,6 +98,8 @@ operation::themes/find/success[snippets='http-request,http-response']
 ==== 실패
 ===== 테마를 갖는 예약이 존재하는 경우
 operation::themes/delete/fail/reservation-exist[snippets='http-request,http-response']
+===== 존재하지 않는 테마를 삭제하는 경우
+operation::themes/delete/fail/theme-not-found[snippets='http-request,http-response']
 === 인기 테마 조회
 ==== 성공
 operation::popular-themes/find/success[snippets='http-request,http-response']
@@ -91,20 +107,31 @@ operation::popular-themes/find/success[snippets='http-request,http-response']
 ===== 1에서 20사이의 limit이 아닐 경우
 operation::popular-themes/find/fail/invalid-limit[snippets='http-request,http-response']
 
-
 == 관리자
 === 예약 목록 조회
 ==== 성공
 operation::admin-reservations/find/success[snippets='http-request,http-response']
+==== 실패
+===== 존재하지 않는 매개변수
+operation::admin-reservations/create/fail/invalid-parameter[snippets='http-request,http-response']
 === 예약 생성
 ==== 성공
 operation::admin-reservations/create/success[snippets='http-request,http-response']
 === 예약 삭제
 ==== 성공
 operation::admin-reservations/delete/success[snippets='http-request,http-response']
+==== 실패
+===== 예약이 존재하지 않는 경우
+operation::admin-reservations/delete/reservation-not-found[snippets='http-request,http-response']
 === 예약 대기 승인
 ==== 성공
 operation::approve/change/success[snippets='http-request,http-response']
+==== 실패
+===== 대기중인 예약이 아닌 경우
+operation::approve/change/fail/not-waiting[snippets='http-request,http-response']
 === 예약 대기 거절
 ==== 성공
 operation::deny/change/success[snippets='http-request,http-response']
+==== 실패
+===== 대기중인 예약이 아닌 경우
+operation::deny/change/fail/not-waiting[snippets='http-request,http-response']
