@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -57,11 +58,12 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
+    @Transactional
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        paymentService.confirm(reservationRequest.toPaymentRequest());
         Reservation savedReservation = reservationRepository.save(reservation);
 
+        paymentService.confirm(reservationRequest.toPaymentRequest());
         return new ReservationResponse(savedReservation);
     }
 
