@@ -11,7 +11,7 @@ public class RoomEscapeException extends RuntimeException {
         problemDetail.setTitle(title.getTitle());
     }
 
-    public RoomEscapeException(String message, Throwable cause, ExceptionTitle title) {
+    public RoomEscapeException(String message, ExceptionTitle title, Throwable cause) {
         super(message, cause);
         problemDetail = ProblemDetail.forStatusAndDetail(title.getStatusCode(), message);
         problemDetail.setTitle(title.getTitle());
