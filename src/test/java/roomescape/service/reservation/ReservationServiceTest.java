@@ -29,6 +29,7 @@ import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
+import roomescape.exception.PaymentException;
 import roomescape.service.ServiceTestBase;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
@@ -55,7 +56,6 @@ class ReservationServiceTest extends ServiceTestBase {
 
     @BeforeEach
     void setUp() {
-
         reservationTime = reservationTimeRepository.save(Fixture.reservationTime);
         theme = themeRepository.save(Fixture.theme);
         member = memberRepository.save(Fixture.member);
@@ -80,6 +80,25 @@ class ReservationServiceTest extends ServiceTestBase {
         assertions.assertThat(result.time().id()).isEqualTo(reservationTime.getId());
         assertions.assertThat(result.theme().id()).isEqualTo(theme.getId());
         assertions.assertAll();
+    }
+
+    @DisplayName("결제 승인 중 오류가 발생하면 예약이 저장되지 않는다.")
+    @Test
+    void cannotCreateReservationWhenPaymentConfirmationFailed() {
+        // given
+        LocalDate date = Fixture.tomorrow;
+        ReservationRequest request = new ReservationRequest(
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.PAYMENT_ERROR_KEY, Fixture.TEST_ORDER_ID, Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
+        );
+
+        // when & then
+        try {
+            ReservationResponse result = reservationService.create(request, member.getId());
+            long id = result.id();
+            assertThat(reservationRepository.findById(id)).isNotPresent();
+        } catch (PaymentException ignored) {
+        }
     }
 
     @DisplayName("모든 예약 내역을 조회한다.")
