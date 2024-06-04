@@ -16,6 +16,7 @@ import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -39,17 +40,22 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
+
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
-                              final PaymentClient paymentClient) {
+                              final PaymentRepository paymentRepository,
+                              final PaymentClient paymentClient
+    ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
 
@@ -102,9 +108,10 @@ public class ReservationService {
         final TossPaymentConfirmResponse tossPaymentConfirmResponse = paymentClient.postPayment(
                 new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
         final Reservation reservation = new Reservation(null, member, date, time, theme);
-        final PaymentInfo payment = tossPaymentConfirmResponse.toPayment(reservation); //TODO 이거 저장
-
-        return reservationRepository.save(reservation);
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        final PaymentInfo payment = tossPaymentConfirmResponse.toPayment(savedReservation);
+        paymentRepository.save(payment);
+        return savedReservation;
     }
 
     private void validateReservation(final Member member, final Theme theme, final ReservationTime time, final LocalDate date) {
