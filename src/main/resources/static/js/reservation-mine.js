@@ -38,8 +38,19 @@ function renderMyReservation(data) {
     cancelButton.onclick = function () {
       requestDeleteReservation(item.reservationId).then(() => window.location.reload());
     };
-    row.insertCell(5).textContent = item.paymentKey;
-    row.insertCell(6).textContent = item.amount;
+    if (item.paymentKey == null) {
+      const paymentCell = row.insertCell(5);
+      const paymentButton = document.createElement('button');
+      paymentButton.textContent = '결제';
+      paymentButton.className = 'btn btn-primary';
+      paymentButton.onclick = function () {
+        window.location.href = `/payment?reservationId=${item.reservationId}`;
+      };
+      paymentCell.appendChild(paymentButton);
+    }else {
+      row.insertCell(5).textContent = item.paymentKey;
+      row.insertCell(6).textContent = item.amount;
+    }
     cancelCell.appendChild(cancelButton);
   });
 }
