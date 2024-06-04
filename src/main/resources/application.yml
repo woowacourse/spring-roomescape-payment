@@ -15,9 +15,11 @@ spring:
     defer-datasource-initialization: true
   cloud:
     openfeign:
-      okhttp:
-        enabled: true
-
+      client:
+        config:
+          PaymentClient:
+            connect-timeout: 1000
+            read-timeout: 10000
 security:
   jwt:
     secret-key: hogihogihogihogihogihogihogihogihogihogiHOGIhogihogihogihogi

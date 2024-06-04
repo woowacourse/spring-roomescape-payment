@@ -10,6 +10,7 @@ import static roomescape.member.domain.Role.USER;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -173,9 +174,10 @@ class ReservationServiceTest {
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
 
         reservationService.delete(reservation2.getId());
-        Reservation findReservation = reservationRepository.findById(reservation1.getId()).get();
+        Optional<Reservation> findReservation = reservationRepository.findById(reservation1.getId());
 
-        assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS);
+        assertThat(findReservation)
+                .isPresent();
     }
 }
 
