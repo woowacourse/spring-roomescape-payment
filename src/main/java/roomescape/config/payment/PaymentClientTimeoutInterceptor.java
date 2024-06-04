@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.payment;
 
 import java.io.IOException;
 import org.springframework.http.HttpRequest;

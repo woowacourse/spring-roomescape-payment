@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.controller.auth.RoleAllowed;
+import roomescape.config.auth.RoleAllowed;
 import roomescape.domain.member.MemberRole;
 import roomescape.service.theme.ThemeService;
 import roomescape.service.theme.dto.ThemeListResponse;
