@@ -17,24 +17,24 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.RestTemplateConfig;
-import roomescape.controller.PaymentApproveResponse;
-import roomescape.controller.dto.PaymentApproveRequest;
+import roomescape.service.dto.response.PaymentResponse;
+import roomescape.controller.dto.PaymentRequest;
 import roomescape.exception.customexception.PaymentException;
 
 
-@RestClientTest(value = PaymentService.class)
+@RestClientTest(value = PaymentClient.class)
 @Import(RestTemplateConfig.class)
-class PaymentServiceTest {
+class PaymentClientTest {
 
     @Autowired
-    private PaymentService paymentService;
+    private PaymentClient paymentClient;
 
     @Autowired
     private MockRestServiceServer mockServer;
 
-    private PaymentApproveRequest request = new PaymentApproveRequest("paymentKey", "orderId", "amount");
-    private String expectedAPIUrl = "https://api.tosspayments.com/v1/payments/confirm";
-    private String expectedError = """
+    private final PaymentRequest request = new PaymentRequest("paymentKey", "orderId", "amount");
+    private final String expectedAPIUrl = "https://api.tosspayments.com/v1/payments/confirm";
+    private final String expectedError = """
             {
                "code": "NOT_FOUND_PAYMENT",
                "message": "존재하지 않는 결제 입니다."
@@ -114,7 +114,7 @@ class PaymentServiceTest {
                 .andRespond(withSuccess(expectedJson, MediaType.APPLICATION_JSON));
 
         // when
-        PaymentApproveResponse response = paymentService.pay(request);
+        PaymentResponse response = paymentClient.pay(request);
         mockServer.verify();
 
         // then
@@ -130,7 +130,7 @@ class PaymentServiceTest {
                 .andRespond(withBadRequest().body(expectedError).contentType(MediaType.APPLICATION_JSON));
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay(request))
+        assertThatThrownBy(() -> paymentClient.pay(request))
                 .isInstanceOf(PaymentException.class);
 
         mockServer.verify();
@@ -145,7 +145,7 @@ class PaymentServiceTest {
                 .andRespond(withServerError().body(expectedError).contentType(MediaType.APPLICATION_JSON));
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay(request))
+        assertThatThrownBy(() -> paymentClient.pay(request))
                 .isInstanceOf(PaymentException.class);
 
         mockServer.verify();

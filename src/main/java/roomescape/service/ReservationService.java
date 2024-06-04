@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.dto.PaymentApproveRequest;
-import roomescape.controller.dto.UserReservationSaveRequest;
+import roomescape.controller.dto.PaymentRequest;
+import roomescape.controller.dto.MemberReservationSaveRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
@@ -55,19 +55,24 @@ public class ReservationService {
         this.timeRepository = timeRepository;
     }
 
-    public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
-        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-        paymentService.pay(paymentApproveRequest);
+    public ReservationResponse saveMemberReservation(LoginMember member, MemberReservationSaveRequest memberReservationSaveRequest){
+        ReservationSaveRequest reservationSaveRequest = memberReservationSaveRequest.toReservationSaveRequest(member.id());
+        Reservation reservation = saveReservation(reservationSaveRequest);
 
-        ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        return saveReservation(reservationSaveRequest);
+        PaymentRequest paymentRequest = PaymentRequest.from(memberReservationSaveRequest);
+        paymentService.pay(reservation, paymentRequest);
+        return new ReservationResponse(reservation);
     }
 
-    public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
+    public ReservationResponse saveAdminReservation(ReservationSaveRequest reservationSaveRequest) {
+        Reservation reservation = saveReservation(reservationSaveRequest);
+        return new ReservationResponse(reservation);
+    }
+
+    private Reservation saveReservation(ReservationSaveRequest reservationSaveRequest) {
         Reservation reservation = createReservation(reservationSaveRequest);
         validateUnique(reservation);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private void validateUnique(Reservation reservation) {

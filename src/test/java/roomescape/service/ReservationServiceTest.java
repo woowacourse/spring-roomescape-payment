@@ -55,7 +55,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
                 LocalDate.parse("2025-11-11"),
                 time.getId(), theme.getId());
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveAdminReservation(reservationSaveRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -77,7 +77,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), 100L, 1L);
         assertThatThrownBy(() -> {
-            reservationService.saveReservation(reservationSaveRequest);
+            reservationService.saveAdminReservation(reservationSaveRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -110,7 +110,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void saveDuplicatedReservation() {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(1L, LocalDate.parse("2024-05-04"),
                 1L, 1L);
-        assertThatThrownBy(() -> reservationService.saveReservation(reservationSaveRequest))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(reservationSaveRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -120,7 +120,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         // given
         long memberId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(memberId, LocalDate.now().plusDays(1L), 1L, 1L);
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveAdminReservation(reservationSaveRequest);
 
         // when
         List<UserReservationResponse> allUserReservation = reservationService.findAllUserReservation(memberId);

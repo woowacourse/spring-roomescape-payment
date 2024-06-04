@@ -1,44 +1,27 @@
 package roomescape.service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import roomescape.controller.PaymentApproveResponse;
-import roomescape.controller.dto.PaymentApproveRequest;
+import roomescape.service.dto.response.PaymentResponse;
+import roomescape.controller.dto.PaymentRequest;
+import roomescape.domain.repository.PaymentRepository;
+import roomescape.domain.reservation.Payment;
+import roomescape.domain.reservation.Reservation;
 
 @Service
 public class PaymentService {
-    private static final String PAYMENT_APPROVE_ENDPOINT = "https://api.tosspayments.com/v1/payments/confirm";
 
-    @Value("${payment.secret-key}")
-    private String secretKey;
-    private final RestTemplate restTemplate;
+    private final PaymentRepository paymentRepository;
+    private final PaymentClient paymentClient;
 
-    public PaymentService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public PaymentService(PaymentRepository paymentRepository, PaymentClient paymentClient) {
+        this.paymentRepository = paymentRepository;
+        this.paymentClient = paymentClient;
     }
 
-    public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth(encodeSecretKey());
-        HttpEntity<PaymentApproveRequest> httpEntity = new HttpEntity<>(paymentApproveRequest, headers);
+    public void pay(Reservation reservation, PaymentRequest paymentRequest) {
+        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
 
-        return restTemplate.postForEntity(
-                PAYMENT_APPROVE_ENDPOINT,
-                httpEntity,
-                PaymentApproveResponse.class
-        ).getBody();
-    }
-
-    private String encodeSecretKey() {
-        return Base64.getEncoder()
-                .encodeToString((secretKey + ":")
-                        .getBytes(StandardCharsets.UTF_8));
+        Payment payment = paymentResponse.toPayment(reservation);
+        paymentRepository.save(payment);
     }
 }
