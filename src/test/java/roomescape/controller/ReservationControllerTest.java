@@ -15,13 +15,14 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.request.AdminReservationRequest;
 import roomescape.controller.request.MemberLoginRequest;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.exception.InvalidPaymentInformationException;
+import roomescape.exception.PaymentServerErrorException;
 import roomescape.service.PaymentService;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -197,5 +198,61 @@ class ReservationControllerTest {
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("결제 정보가 잘못된 경우 400을 응답한다.")
+    @Test
+    void should_return_status_400_when_invalid_payment_information() {
+        doThrow(new InvalidPaymentInformationException()).when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
+
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
+
+        String cookie = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when().post("/login")
+                .then().statusCode(200)
+                .extract().header("Set-Cookie");
+
+        ReservationRequest request = new ReservationRequest(
+                LocalDate.of(2030, 8, 5), 6L, 10L,
+                "asdfsdf", "dfadf", 1999999L);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .cookie(cookie)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @DisplayName("결제 시스템이 오류인 경우 400을 응답한다.")
+    @Test
+    void should_return_status_400_when_bad_payment_server() {
+        doThrow(new PaymentServerErrorException()).when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
+
+        MemberLoginRequest loginRequest = new MemberLoginRequest("1234", "otter@email.com");
+
+        String cookie = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when().post("/login")
+                .then().statusCode(200)
+                .extract().header("Set-Cookie");
+
+        ReservationRequest request = new ReservationRequest(
+                LocalDate.of(2030, 8, 5), 6L, 10L,
+                "asdfsdf", "dfadf", 1999999L);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .cookie(cookie)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
     }
 }
