@@ -11,7 +11,7 @@ import roomescape.exception.payment.PaymentClientResponseErrorHandler;
 import roomescape.service.payment.PaymentClient;
 
 @Configuration
-public class ClientConfig {
+public class PaymentClientConfig {
     private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     private static final String BASIC_DELIMITER = ":";
     private static final String AUTH_HEADER_PREFIX = "Basic ";
