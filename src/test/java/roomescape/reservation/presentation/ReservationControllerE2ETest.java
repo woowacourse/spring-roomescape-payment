@@ -24,8 +24,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.PaymentConfirmResponse;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.response.PaymentConfirmResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
