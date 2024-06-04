@@ -7,8 +7,8 @@ public record ReservationDto(
         Long id,
         String name,
         ReservationDate date,
-        ReservationTimeDto reservationTimeDto,
-        ThemeDto themeDto) {
+        ReservationTimeDto time,
+        ThemeDto theme) {
 
     public ReservationDto(Reservation reservation) {
         this(

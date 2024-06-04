@@ -8,7 +8,7 @@ import roomescape.domain.repository.*;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.PaidReservationDto;
+import roomescape.service.response.ReservationPaymentDto;
 import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
@@ -47,12 +47,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public PaidReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+    public ReservationPaymentDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         Reservation reservation = validateAndSave(reservationSaveDto);
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        PaidReservation paidReservation = saveReservationPayment(reservation, paymentDto);
+        ReservationPayment reservationPayment = saveReservationPayment(reservation, paymentDto);
 
-        return new PaidReservationDto(paidReservation);
+        return new ReservationPaymentDto(reservationPayment);
     }
 
     private Reservation validateAndSave(ReservationSaveDto reservationSaveDto) {
@@ -67,11 +67,13 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    private PaidReservation saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
+    private ReservationPayment saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
         Payment savedPayment = paymentRepository.save(payment);
 
-        return new PaidReservation(savedPayment);
+        return new ReservationPayment(reservation,
+                savedPayment.getId(), savedPayment.getPaymentKey(),
+                savedPayment.getOrderId(), savedPayment.getTotalAmount());
     }
 
     private ReservationTime findTime(Long timeId) {
@@ -120,11 +122,11 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationDto> findByMemberId(Long id) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
+    public List<ReservationPaymentDto> findByMemberId(Long id) {
+        List<ReservationPayment> reservationPayments = reservationRepository.findReservationPaymentByMemberId(id);
 
-        return reservations.stream()
-                .map(ReservationDto::new)
+        return reservationPayments.stream()
+                .map(ReservationPaymentDto::new)
                 .toList();
     }
 }

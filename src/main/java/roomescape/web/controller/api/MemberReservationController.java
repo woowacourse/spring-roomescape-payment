@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
 import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.PaidReservationDto;
+import roomescape.service.response.ReservationPaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.web.auth.Auth;
 import roomescape.web.controller.request.LoginMember;
@@ -38,10 +38,10 @@ public class MemberReservationController {
         PaymentApproveDto paymentApproveDto = memberReservationRequest.toPaymentApproveDto();
         ReservationSaveDto reservationSaveDto = memberReservationRequest.toReservationSaveDto(loginMember.id());
 
-        PaidReservationDto paidReservationDto = reservationService.save(reservationSaveDto, paymentApproveDto);
-        MemberReservationResponse memberReservationResponse = new MemberReservationResponse(paidReservationDto);
+        ReservationPaymentDto reservationPaymentDto = reservationService.save(reservationSaveDto, paymentApproveDto);
+        MemberReservationResponse memberReservationResponse = new MemberReservationResponse(reservationPaymentDto);
 
-        return ResponseEntity.created(URI.create("/reservations/" + paidReservationDto.id()))
+        return ResponseEntity.created(URI.create("/reservations/" + reservationPaymentDto.reservationDto().id()))
                 .body(memberReservationResponse);
     }
 
@@ -64,12 +64,12 @@ public class MemberReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@Auth LoginMember loginMember) {
-        List<ReservationMineResponse> reservationMineRespons = reservationService.findByMemberId(loginMember.id())
+        List<ReservationMineResponse> reservationMineResponses = reservationService.findByMemberId(loginMember.id())
                 .stream()
                 .map(ReservationMineResponse::new)
                 .toList();
 
-        return ResponseEntity.ok(reservationMineRespons);
+        return ResponseEntity.ok(reservationMineResponses);
     }
 
 }
