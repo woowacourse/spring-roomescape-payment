@@ -50,6 +50,7 @@ public class PaymentClient {
                 .uri("v1/payments/{paymentKey}", paymentKey)
                 .header("Authorization", "Basic " + basic)
                 .retrieve()
+                .onStatus(new PaymentClientResponseErrorHandler())
                 .body(String.class);
         try {
             JsonNode rootNode = objectMapper.readTree(response);
