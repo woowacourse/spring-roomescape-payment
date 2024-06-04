@@ -5,12 +5,14 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.service.TossPaymentResponse;
 import roomescape.exception.PaymentErrorHandler;
 
+@Component
 public class PaymentRestClient {
 
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
