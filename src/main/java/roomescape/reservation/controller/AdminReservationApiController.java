@@ -16,33 +16,16 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.AdminReservationService;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminReservationApiController {
 
-    private final ReservationService reservationService;
+    private final AdminReservationService adminReservationService;
 
-    public AdminReservationApiController(ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
-
-    @GetMapping("/reservations/search")
-    public ResponseEntity<MultipleResponses<ReservationResponse>> findAllBySearchCond(
-            @Valid @ModelAttribute ReservationSearchConditionRequest reservationSearchConditionRequest
-    ) {
-        List<ReservationResponse> reservationResponses = reservationService.findAllBySearchCondition(
-                reservationSearchConditionRequest);
-
-        return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
-    }
-
-    @GetMapping("/reservations/waiting")
-    public ResponseEntity<MultipleResponses<ReservationWaitingResponse>> findWaitingReservations() {
-        List<ReservationWaitingResponse> waitingReservations = reservationService.findWaitingReservations();
-
-        return ResponseEntity.ok(new MultipleResponses<>(waitingReservations));
+    public AdminReservationApiController(AdminReservationService adminReservationService) {
+        this.adminReservationService = adminReservationService;
     }
 
     @PostMapping("/reservations")
@@ -50,9 +33,26 @@ public class AdminReservationApiController {
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
+        ReservationResponse reservationResponse = adminReservationService.save(reservationSaveRequest, loginMember);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
+    }
+
+    @GetMapping("/reservations/search")
+    public ResponseEntity<MultipleResponses<ReservationResponse>> findAllBySearchCond(
+            @Valid @ModelAttribute ReservationSearchConditionRequest reservationSearchConditionRequest
+    ) {
+        List<ReservationResponse> reservationResponses = adminReservationService.findAllBySearchCondition(
+                reservationSearchConditionRequest);
+
+        return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
+    }
+
+    @GetMapping("/reservations/waiting")
+    public ResponseEntity<MultipleResponses<ReservationWaitingResponse>> findWaitingReservations() {
+        List<ReservationWaitingResponse> waitingReservations = adminReservationService.findWaitingReservations();
+
+        return ResponseEntity.ok(new MultipleResponses<>(waitingReservations));
     }
 }
