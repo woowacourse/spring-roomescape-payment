@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -20,6 +22,7 @@ public class ClientConfiguration {
         return RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
             .defaultHeader("Authorization", getAuthorization())
+            .requestFactory(getClientHttpRequestFactory())
             .build();
     }
 
@@ -27,5 +30,12 @@ public class ClientConfiguration {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(3000);
+        clientHttpRequestFactory.setReadTimeout(10000);
+        return clientHttpRequestFactory;
     }
 }
