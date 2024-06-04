@@ -20,13 +20,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(RoomescapeException exception) {
-        logger.error(exception.getMessage());
+        logError(exception);
         return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), exception.getStatus());
     }
 
     @ExceptionHandler(value = HttpMessageConversionException.class)
     public ResponseEntity<ErrorResponse> handleJsonParsingException(HttpMessageConversionException exception) {
-        logger.error(exception.getMessage());
+        logError(exception);
         return new ResponseEntity<>(new ErrorResponse("요청 body에 유효하지 않은 필드가 존재합니다."), HttpStatus.BAD_REQUEST);
     }
 
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException.class
     })
     public ResponseEntity<ErrorResponse> handleRequestValidateException(Exception exception) {
-        logger.error(exception.getMessage());
+        logError(exception);
         return new ResponseEntity<>(new ErrorResponse("요청 null 또는 유효하지 않은 값이 존재합니다."), HttpStatus.BAD_REQUEST);
     }
 
@@ -44,13 +44,22 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException.class,
             MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ErrorResponse> handleRequestException(Exception exception) {
-        logger.error(exception.getMessage());
+        logError(exception);
         return new ResponseEntity<>(new ErrorResponse("요청 경로에 필요한 변수가 제공되지 않았습니다."), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-        logger.error(exception.getMessage());
+        logError(exception);
         return new ResponseEntity<>(new ErrorResponse("서버 에러입니다."), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private void logError(Exception exception) {
+        String exceptionMessage = exception.getMessage();
+        if (!exceptionMessage.isEmpty()) {
+            logger.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
+            return;
+        }
+        logger.error(String.valueOf(exception.getStackTrace()[0]));
     }
 }
