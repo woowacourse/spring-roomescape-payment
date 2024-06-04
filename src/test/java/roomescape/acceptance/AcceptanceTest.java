@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.common.DatabaseCleaner;
+import roomescape.common.TestClientConfiguration;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;

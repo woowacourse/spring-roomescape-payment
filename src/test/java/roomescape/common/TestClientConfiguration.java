@@ -1,8 +1,8 @@
-package roomescape.acceptance;
+package roomescape.common;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.domain.PaymentClient;
 
 import static org.mockito.Mockito.mock;
 
@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 public class TestClientConfiguration {
 
     @Bean
-    public TossPaymentsClient tossPaymentsClient() {
-        return mock(TossPaymentsClient.class);
+    public PaymentClient paymentClient() {
+        return mock(PaymentClient.class);
     }
 }

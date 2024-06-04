@@ -1,13 +1,13 @@
 package roomescape.reservation.application;
 
 import roomescape.member.domain.Member;
-import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 
 public class DummyReservationManageService extends ReservationManageService {
-    public DummyReservationManageService(ReservationRepository reservationRepository, TossPaymentsClient tossPaymentsClient) {
-        super(reservationRepository, tossPaymentsClient);
+    public DummyReservationManageService(ReservationRepository reservationRepository, PaymentClient paymentClient) {
+        super(reservationRepository, paymentClient);
     }
 
     @Override
