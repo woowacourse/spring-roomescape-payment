@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
-import roomescape.payment.model.Payment;
+import roomescape.payment.model.PaymentInfoFromClient;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -16,12 +16,12 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public Payment confirm(ConfirmPaymentRequest confirmPaymentRequest) {
+    public PaymentInfoFromClient confirm(ConfirmPaymentRequest confirmPaymentRequest) {
         return restClient.post()
                 .uri("/confirm")
                 .body(confirmPaymentRequest)
                 .retrieve()
-                .toEntity(Payment.class)
+                .toEntity(PaymentInfoFromClient.class)
                 .getBody();
     }
 }
