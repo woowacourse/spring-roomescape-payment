@@ -33,7 +33,7 @@ public class PaymentService {
 
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
-    @Value("${third-party-api.toss-payment.path.payment}")
+    @Value("${third-party-api.toss-payment.path.payment-confirm}")
     private String confirmPath;
 
     public PaymentService(RestTemplateBuilder builder,
