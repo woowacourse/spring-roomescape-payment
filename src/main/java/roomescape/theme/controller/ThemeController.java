@@ -1,6 +1,7 @@
 package roomescape.theme.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class ThemeController {
 
     @Operation(summary = "테마 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<ThemeResponse> readTheme(@PathVariable Long id) {
+    public ResponseEntity<ThemeResponse> readTheme(@Parameter(description = "Theme id") @PathVariable Long id) {
         ThemeResponse themeResponse = themeService.readTheme(id);
         return ResponseEntity.ok(themeResponse);
     }
@@ -53,7 +54,7 @@ public class ThemeController {
 
     @Operation(summary = "테마 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTheme(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTheme(@Parameter(description = "Theme id") @PathVariable Long id) {
         themeService.deleteTheme(id);
         return ResponseEntity.noContent().build();
     }

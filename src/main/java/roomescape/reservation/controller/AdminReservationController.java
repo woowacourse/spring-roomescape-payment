@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -49,13 +50,13 @@ public class AdminReservationController {
 
     @Operation(summary = "예약 대기 승인")
     @PutMapping("/waiting/{id}")
-    public void confirmWaitingReservation(@PathVariable Long id) {
+    public void confirmWaitingReservation(@Parameter(description = "MemberReservation id") @PathVariable Long id) {
         reservationFacadeService.confirmWaitingReservation(id);
     }
 
     @Operation(summary = "예약 대기 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteReservation(@Parameter(description = "MemberReservation id") @PathVariable Long id) {
         reservationFacadeService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }

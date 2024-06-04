@@ -36,7 +36,9 @@ public class MemberReservationController {
 
     @Operation(summary = "사용자 예약 결제")
     @PostMapping("/{id}/payments/confirm")
-    public ResponseEntity<Void> confirmPendingReservation(@PathVariable Long id,
+    public ResponseEntity<Void> confirmPendingReservation(@Parameter(description = "MemberReservation id")
+                                                          @PathVariable
+                                                          Long id,
                                                           @RequestBody PaymentRequest paymentRequest
     ) {
         reservationFacadeService.confirmPendingReservation(id, paymentRequest);
@@ -51,7 +53,9 @@ public class MemberReservationController {
 
     @Operation(summary = "사용자 예약 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMemberReservation(@PathVariable Long id,
+    public ResponseEntity<Void> deleteMemberReservation(@Parameter(description = "MemberReservation id")
+                                                        @PathVariable
+                                                        Long id,
                                                         @Parameter(hidden = true) LoginMember loginMember
     ) {
         reservationFacadeService.deleteReservation(id, loginMember);

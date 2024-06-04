@@ -1,6 +1,7 @@
 package roomescape.time.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class ReservationTimeController {
 
     @Operation(summary = "예약 조회")
     @GetMapping("/{id}")
-    public ReservationTimeResponse readTime(@PathVariable Long id) {
+    public ReservationTimeResponse readTime(@Parameter(description = "Time id") @PathVariable Long id) {
         return reservationTimeService.readReservationTime(id);
 
     }
@@ -52,7 +53,7 @@ public class ReservationTimeController {
 
     @Operation(summary = "예약 시간 삭제")
     @DeleteMapping("/{id}")
-    public void deleteTime(@PathVariable Long id) {
+    public void deleteTime(@Parameter(description = "Time id") @PathVariable Long id) {
         reservationTimeService.deleteTime(id);
     }
 }
