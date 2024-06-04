@@ -374,6 +374,8 @@ class MemberReservationControllerTest {
     void deleteMemberReservationNotOwner() {
         // given
         long id = 2L;
+        Mockito.when(restClient.post("/paymentKey/cancel", Map.of("cancelReason", "reason")))
+                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
 
         // when
         String detailMessage = RestAssured.given().log().all()

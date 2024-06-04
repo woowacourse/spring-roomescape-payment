@@ -56,24 +56,24 @@ create table payment
 );
 alter table if exists member_reservation
     add constraint FK3tx7yq7tw0xo0rhvt5sesw9s5
-    foreign key (member_id)
-    references member;
+        foreign key (member_id)
+            references member;
 alter table if exists member_reservation
     add constraint FK4e01kps1ha814vtuwja2swih9
-    foreign key (reservation_id)
-    references reservation;
+        foreign key (reservation_id)
+            references reservation;
 alter table if exists reservation
     add constraint FKlthp3qwugirblkd0anlpuu9gh
-    foreign key (theme_id)
-    references theme;
+        foreign key (theme_id)
+            references theme;
 alter table if exists reservation
     add constraint FKnp181b4qd37y68p57h9nhosqo
-    foreign key (time_id)
-    references reservation_time;
+        foreign key (time_id)
+            references reservation_time;
 alter table if exists payment
     add constraint FKjvgu5md0ffa5evlolks0ixrmi
-    foreign key (member_reservation_id)
-    references member_reservation;
+        foreign key (member_reservation_id)
+            references member_reservation;
 
 INSERT INTO member(name, email, password)
 VALUES ('클로버', 'test@gmail.com', 'password');
@@ -165,3 +165,24 @@ INSERT INTO member_reservation(member_id, reservation_id) -- 13
 VALUES (3, 12);
 INSERT INTO member_reservation(member_id, reservation_id, status) -- 14
 VALUES (3, 12, 'WAITING');
+
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 1, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 2, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 3, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 4, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 5, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 6, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 7, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 8, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 9, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');
+INSERT INTO payment(amount, created_at, member_reservation_id, order_id, payment_key)
+VALUES (21000, CURRENT_TIMESTAMP(), 10, 'orderId', 'hn033shCcu/KePrCzOL6dmmfg2Ra6RK7nAASgXYVjrOoOFigb16TefVFMYeRrJsk');

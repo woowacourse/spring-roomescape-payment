@@ -65,7 +65,7 @@ class ReservationServiceTest {
     @Test
     void deleteReservation() {
         // when & then
-        MemberReservation memberReservation = memberReservationRepository.findById(id)
+        MemberReservation memberReservation = memberReservationRepository.findById(13L)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
         assertThatCode(() -> reservationService.deleteReservation(memberReservation))
                 .doesNotThrowAnyException();

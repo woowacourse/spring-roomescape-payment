@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException exception) {
         String message = exception.getMessage();
-        logger.warn(message);
+        logger.warn("message: {}", message, exception.getCause());
         ErrorResponse data = new ErrorResponse(message);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(data);
     }
@@ -29,14 +29,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception) {
         String message = exception.getMessage();
-        logger.warn(message);
+        logger.warn("message: {}", message, exception.getCause());
         ErrorResponse data = new ErrorResponse(message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
-        logger.warn(exception.getMessage());
+        logger.warn("message: {}", exception.getMessage(), exception.getCause());
 
         if (exception.getRootCause() instanceof DateTimeException) {
             return handleDateTimeParseException();
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
         String message = exception.getBindingResult()
                 .getFieldError()
                 .getDefaultMessage();
-        logger.warn(message);
+        logger.warn("message: {}", exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse(message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
     }
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception) {
         String message = exception.getMessage();
-        logger.warn(message);
+        logger.warn("message: {}", exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse(message);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(data);
     }
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception) {
         String message = exception.getMessage();
-        logger.warn(message);
+        logger.warn("message: {}", exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse(message);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(data);
     }
@@ -81,14 +81,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingRequestParameterException(
             MissingServletRequestParameterException exception
     ) {
-        logger.warn(exception.getMessage());
+        logger.warn("message: {}", exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse("모든 파라미터를 입력해야 합니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
     }
 
     @ExceptionHandler(value = {IllegalArgumentException.class, Exception.class})
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception exception) {
-        logger.error(exception.getMessage(), exception.getCause());
+        logger.error("message: {}", exception.getMessage(), exception.getCause());
         ErrorResponse data = new ErrorResponse("서버에 오류가 발생했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(data);
     }
