@@ -186,7 +186,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
             });
         } else {
             console.log("예약 결제 성공");
-            window.location.href = "/reservation-mine";
+            window.location.href = "reservation-mine";
         }
     }).catch(error => {
         console.error(error.message);
