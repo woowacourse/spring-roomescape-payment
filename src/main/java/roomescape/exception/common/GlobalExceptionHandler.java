@@ -1,5 +1,6 @@
 package roomescape.exception.common;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +56,10 @@ public class GlobalExceptionHandler {
 
     private void logError(Exception exception) {
         String exceptionMessage = exception.getMessage();
-        if (!exceptionMessage.isEmpty()) {
+        if (!StringUtils.isBlank(exceptionMessage)) {
             LOGGER.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
             return;
         }
-        LOGGER.error(String.valueOf(exception.getStackTrace()[0]));
+        LOGGER.error(exceptionMessage);
     }
 }
