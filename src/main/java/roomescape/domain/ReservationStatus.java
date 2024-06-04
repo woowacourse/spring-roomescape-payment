@@ -25,4 +25,8 @@ public enum ReservationStatus {
         }
         throw new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION_STATUS);
     }
+
+    public boolean isCompleted() {
+        return this == RESERVED_COMPLETE;
+    }
 }

@@ -124,12 +124,23 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        if (member.isAdmin() || reservation.isAuthor(member)) {
-            reservationRepository.deleteById(reservationId);
-            approveNextReservationAutomatically(reservation);
-            return;
+        validateAuthority(member, reservation);
+        validateCompleted(reservation);
+
+        reservationRepository.deleteById(reservationId);
+        approveNextReservationAutomatically(reservation);
+    }
+
+    private void validateAuthority(Member member, Reservation reservation) {
+        if (member.isNotAdmin() || reservation.isNotAuthor(member)) {
+            throw new RoomescapeException(ExceptionType.NO_AUTHORITY);
         }
-        throw new RoomescapeException(ExceptionType.NO_AUTHORITY);
+    }
+
+    private void validateCompleted(Reservation reservation) {
+        if (reservation.isCompleted()) {
+            throw new RoomescapeException(ExceptionType.COMPLETED_RESERVATION_DELETION);
+        }
     }
 
     private void approveNextReservationAutomatically(Reservation reservation) {

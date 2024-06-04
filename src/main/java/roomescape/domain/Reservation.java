@@ -85,17 +85,21 @@ public class Reservation {
         }
     }
 
+    public static ReservationBuilder builder() {
+        return new ReservationBuilder();
+    }
+
     public void updateAsCompleted(Payment payment) {
         this.status = ReservationStatus.RESERVED_COMPLETE;
         this.payment = payment;
     }
 
-    public static ReservationBuilder builder() {
-        return new ReservationBuilder();
+    public boolean isNotAuthor(Member member) {
+        return this.reservationMember != member;
     }
 
-    public boolean isAuthor(Member member) {
-        return this.reservationMember == member;
+    public boolean isCompleted() {
+        return status.isCompleted();
     }
 
     public void approve() {
