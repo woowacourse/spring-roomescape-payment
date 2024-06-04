@@ -3,6 +3,7 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.domain.reservation.ReservationStatus.RESERVED;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
@@ -36,6 +38,12 @@ class UserReservationServiceTest {
 
     @Autowired
     private UserReservationService userReservationService;
+
+    @Autowired
+    private AdminReservationService adminReservationService;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -201,5 +209,53 @@ class UserReservationServiceTest {
         assertThat(reservations)
             .extracting(FindMyReservationResponse::rank)
             .containsExactly(1L, 0L, 0L);
+    }
+
+    @DisplayName("성공: 예약대기를 결제 상태로 변경")
+    @Test
+    void updateStatusToReserved() {
+        userReservationService.reserve(adminId, date, timeId, themeId);
+        userReservationService.standby(userId, date, timeId, themeId);
+        adminReservationService.deleteById(1L);
+
+        userReservationService.updateStatusToReserved(2L, memberRepository.findById(userId).get());
+
+        assertThat(reservationRepository.findById(2L).get().getStatus()).isEqualTo(RESERVED);
+    }
+
+    @DisplayName("실패: 다른 회원의 예약대기를 결제")
+    @Test
+    void updateStatusToReserved_AnotherMember() {
+        userReservationService.reserve(adminId, date, timeId, themeId);
+        userReservationService.standby(userId, date, timeId, themeId);
+        adminReservationService.deleteById(1L);
+
+        assertThatThrownBy(
+            () -> userReservationService.updateStatusToReserved(2L, memberRepository.findById(adminId).get())
+        ).isInstanceOf(RoomescapeException.class)
+            .hasMessage("자신의 예약만 결제할 수 있습니다.");
+    }
+
+    @DisplayName("실패: 대기순번이 안 돌아온 예약대기를 결제")
+    @Test
+    void updateStatusToReserved_IllegalStandbyOrder() {
+        userReservationService.reserve(adminId, date, timeId, themeId);
+        userReservationService.standby(userId, date, timeId, themeId);
+
+        assertThatThrownBy(
+            () -> userReservationService.updateStatusToReserved(2L, memberRepository.findById(userId).get())
+        ).isInstanceOf(RoomescapeException.class)
+            .hasMessage("결제대기 상태에서만 결제할 수 있습니다.");
+    }
+
+    @DisplayName("실패: 이미 예약확정된 예약을 결제")
+    @Test
+    void updateStatusToReserved_AlreadyPaid() {
+        userReservationService.reserve(adminId, date, timeId, themeId);
+
+        assertThatThrownBy(
+            () -> userReservationService.updateStatusToReserved(1L, memberRepository.findById(adminId).get())
+        ).isInstanceOf(RoomescapeException.class)
+            .hasMessage("이미 결제된 예약입니다.");
     }
 }

@@ -35,12 +35,13 @@ function render(data) {
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
     row.insertCell(3).textContent = status;
-    row.insertCell(4).textContent = '';
-    row.insertCell(5).textContent = item.paymentKey;
-    row.insertCell(6).textContent = item.amount;
+    row.insertCell(4).textContent = item.paymentKey;
+    row.insertCell(5).textContent = item.amount;
+    row.insertCell(6).textContent = '';
 
-    if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
-      const cancelCell = row.insertCell(4);
+    if (item.status === 'STANDBY' && item.rank !== 0) {
+      // 예약대기 상태
+      const cancelCell = row.insertCell(6);
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '취소';
       cancelButton.className = 'btn btn-danger';
@@ -48,8 +49,19 @@ function render(data) {
         requestDeleteWaiting(item.id).then(() => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
-    } else { // 예약 완료 상태일 때
-      row.insertCell(4).textContent = '';
+    } else if (item.status === 'STANDBY' && item.rank === 0) {
+      // 결제대기 상태
+      const paySell = row.insertCell(6);
+      const payButton = document.createElement('button');
+      payButton.textContent = '결제';
+      payButton.className = 'btn btn-primary';
+      payButton.onclick = function () {
+        window.open("payment?id=" + item.id, "결제 창", "width=900, height=600, location=no");
+      };
+      paySell.appendChild(payButton);
+    } else {
+      // 예약 완료 상태
+      row.insertCell(6).textContent = '';
     }
   });
 }

@@ -117,4 +117,27 @@ public class UserReservationService {
             .map(data -> FindMyReservationResponse.from(data.reservation(), data.rank()))
             .toList();
     }
+
+    @Transactional
+    public CreateReservationResponse updateStatusToReserved(Long id, Member member) {
+        Reservation reservation = reservationRepository.findById(id)
+            .orElseThrow(() -> new RoomescapeException("예약이 존재하지 않습니다."));
+        if (reservation.isReserved()) {
+            throw new RoomescapeException("이미 결제된 예약입니다.");
+        }
+        if (reservation.isNotReservedBy(member)) {
+            throw new RoomescapeException("자신의 예약만 결제할 수 있습니다.");
+        }
+        if (reservationRepository.countByTimeAndThemeAndDateAndCreatedAtBefore(
+            reservation.getTime(),
+            reservation.getTheme(),
+            reservation.getDate(),
+            reservation.getCreatedAt()) > 0
+        ) {
+            throw new RoomescapeException("결제대기 상태에서만 결제할 수 있습니다.");
+        }
+
+        reservation.reserve();
+        return CreateReservationResponse.from(reservation);
+    }
 }

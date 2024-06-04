@@ -82,13 +82,11 @@ class AdminReservationControllerTest {
             .then().extract().cookie("token");
     }
 
-    @DisplayName("성공: 예약 삭제 가능, 다음 순위 예약대기는 자동 예약")
+    @DisplayName("성공: 예약 삭제")
     @Test
     void delete() {
         userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
         userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()
             .cookie("token", adminToken)
@@ -101,14 +99,7 @@ class AdminReservationControllerTest {
             .when().get("/admin/reservations")
             .then().log().all()
             .statusCode(200)
-            .body("id", contains(2, 3));
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/admin/reservations/standby")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(4));
+            .body("id", contains(2));
     }
 
     @DisplayName("실패: 일반 유저가 예약 삭제 -> 401")

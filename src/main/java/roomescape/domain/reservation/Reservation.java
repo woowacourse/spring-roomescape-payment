@@ -78,6 +78,10 @@ public class Reservation {
         return !this.member.getId().equals(member.getId());
     }
 
+    public boolean isReserved() {
+        return this.status == ReservationStatus.RESERVED;
+    }
+
     public void reserve() {
         this.status = ReservationStatus.RESERVED;
     }
@@ -108,5 +112,9 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

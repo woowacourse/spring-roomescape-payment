@@ -15,6 +15,7 @@ import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
 import roomescape.service.TossPaymentService;
@@ -49,6 +50,17 @@ public class UserReservationController {
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
             .body(response);
+    }
+
+    @PostMapping("/pay")
+    public ResponseEntity<CreateReservationResponse> payStandby(
+        @RequestBody PayStandbyRequest request,
+        @AuthenticationPrincipal Member member) {
+
+        tossPaymentService.pay(request.orderId(), request.amount(), request.paymentKey());
+        CreateReservationResponse response =
+            userReservationService.updateStatusToReserved(request.reservationId(), member);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/standby")
