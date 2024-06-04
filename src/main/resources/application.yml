@@ -23,3 +23,6 @@ payment:
   api:
     base: https://api.tosspayments.com
     confirm: /v1/payments/confirm
+  timeout:
+    connection: 5
+    read: 3

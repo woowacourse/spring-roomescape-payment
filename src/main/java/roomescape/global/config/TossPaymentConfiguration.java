@@ -17,18 +17,23 @@ import roomescape.payment.TossPaymentClient;
 @Configuration
 public class TossPaymentConfiguration {
 
-    private static final int CONNECTION_TIMEOUT_DURATION = 5;
-    private static final int READ_TIMEOUT_DURATION = 3;
     private static final String HEADER_NAME = "Authorization";
     private static final String AUTHENTICATION_TYPE = "Basic";
     private static final String KEY_DELIMITER = ":";
     private static final ResponseErrorHandler HANDLER = new ClientExceptionHandler();
+
 
     @Value("${payment.secret-key}")
     private String widgetSecretKey;
 
     @Value("${payment.api.base}")
     private String apiBaseUrl;
+
+    @Value("${payment.timeout.connection}")
+    private int connectionTimeoutDuration;
+
+    @Value("${payment.timeout.read}")
+    private int readTimeoutDuration;
 
     @Bean
     public TossPaymentClient tossPaymentClient() {
@@ -46,8 +51,8 @@ public class TossPaymentConfiguration {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT_DURATION))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT_DURATION));
+                .withConnectTimeout(Duration.ofSeconds(connectionTimeoutDuration))
+                .withReadTimeout(Duration.ofSeconds(readTimeoutDuration));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
