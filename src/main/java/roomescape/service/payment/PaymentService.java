@@ -1,6 +1,7 @@
 package roomescape.service.payment;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.service.payment.dto.PaymentRequest;
@@ -23,6 +24,7 @@ public class PaymentService {
         );
     }
 
+    @Transactional
     public void cancel(Payment payment) {
         paymentRepository.deleteById(payment.getId());
         paymentClient.cancel(payment);
