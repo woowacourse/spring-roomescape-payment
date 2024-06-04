@@ -13,14 +13,18 @@ public record ReservationSaveRequest(
         @NotNull Long memberId,
         @NotNull LocalDate date,
         @NotNull Long themeId,
-        @NotNull Long timeId
+        @NotNull Long timeId,
+        String paymentKey,
+        long amount
 ) {
     public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, long memberId) {
         return new ReservationSaveRequest(
                 memberId,
                 detail.date(),
                 detail.themeId(),
-                detail.timeId()
+                detail.timeId(),
+                detail.paymentKey(),
+                detail.amount()
         );
     }
 
@@ -29,11 +33,13 @@ public record ReservationSaveRequest(
                 request.memberId(),
                 request.date(),
                 request.themeId(),
-                request.timeId()
+                request.timeId(),
+                request.paymentKey(),
+                request.amount()
         );
     }
 
     public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS);
+        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS, paymentKey, amount);
     }
 }

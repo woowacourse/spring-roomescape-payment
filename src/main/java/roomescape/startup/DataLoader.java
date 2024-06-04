@@ -120,22 +120,22 @@ public class DataLoader implements ApplicationRunner {
 
         // reservation
         List<Reservation> reservations = List.of(
-                new Reservation(jojo, TODAY, horror, time10_00, SUCCESS),
-                new Reservation(solar, TODAY, horror, time10_00, WAIT),
-                new Reservation(brown, TODAY, sf, time12_00, SUCCESS),
-                new Reservation(jojo, TODAY, sf, time12_00, WAIT),
-                new Reservation(googoo, TOMORROW, zombie, time14_30, SUCCESS),
-                new Reservation(jojo, TOMORROW, zombie, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30, SUCCESS),
-                new Reservation(neo, TODAY.plusDays(3), virus, time11_30, SUCCESS),
-                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30, SUCCESS),
-                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30, SUCCESS),
-                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30, SUCCESS),
-                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00, SUCCESS),
-                new Reservation(solar, TODAY.plusDays(2), horror, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), horror, time14_30, WAIT)
+                new Reservation(jojo, TODAY, horror, time10_00, SUCCESS, "paymentKey", 1000L),
+                new Reservation(solar, TODAY, horror, time10_00, WAIT, "paymentKey", 1000L),
+                new Reservation(brown, TODAY, sf, time12_00, SUCCESS, "paymentKey", 1000L),
+                new Reservation(jojo, TODAY, sf, time12_00, WAIT, "paymentKey", 1000L),
+                new Reservation(googoo, TOMORROW, zombie, time14_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(jojo, TOMORROW, zombie, time14_30, WAIT, "paymentKey", 1000L),
+                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00, SUCCESS, "paymentKey", 1000L),
+                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00, SUCCESS, "paymentKey", 1000L),
+                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(neo, TODAY.plusDays(3), virus, time11_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30, SUCCESS, "paymentKey", 1000L),
+                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00, SUCCESS, "paymentKey", 1000L),
+                new Reservation(solar, TODAY.plusDays(2), horror, time14_30, WAIT, "paymentKey", 1000L),
+                new Reservation(jojo, TODAY.plusDays(2), horror, time14_30, WAIT, "paymentKey", 1000L)
         );
         reservationRepository.saveAll(reservations);
     }

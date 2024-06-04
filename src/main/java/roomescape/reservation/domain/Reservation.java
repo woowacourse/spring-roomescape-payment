@@ -44,44 +44,42 @@ public class Reservation {
     @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
+    // TODO: nullable 로 DDL이 생성되는 지 확인하기
+    private String paymentKey;
+
+    private Long amount;
+
     protected Reservation() {
     }
 
     public Reservation(
-            Member member,
-            LocalDate date,
-            Theme theme,
-            ReservationTime reservationTime,
-            Status status
-    ) {
-        validateLastDate(date);
-        this.member = member;
-        this.date = date;
-        this.theme = theme;
-        this.reservationTime = reservationTime;
-        this.status = status;
-    }
-
-    public Reservation(
-            Long id,
-            Member member,
-            LocalDate date,
-            Theme theme,
-            ReservationTime reservationTime,
-            Status status
+            Long id, Member member, LocalDate date,
+            Theme theme, ReservationTime reservationTime, Status status,
+            String paymentKey, long amount
     ) {
         this.id = id;
         this.member = member;
+        validateLastDate(date);
         this.date = date;
         this.theme = theme;
         this.reservationTime = reservationTime;
         this.status = status;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     private void validateLastDate(LocalDate date) {
         if (date.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("지난 날짜는 예약할 수 없습니다.");
         }
+    }
+
+    public Reservation(
+            Member member, LocalDate date, Theme theme,
+            ReservationTime reservationTime, Status status,
+            String paymentKey, Long amount
+    ) {
+        this(null, member, date, theme, reservationTime, status, paymentKey, amount);
     }
 
     public void updatePaymentPending() {
@@ -136,5 +134,13 @@ public class Reservation {
 
     public String getStatusDisplayName() {
         return status.getDisplayName();
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public long getAmount() {
+        return amount;
     }
 }

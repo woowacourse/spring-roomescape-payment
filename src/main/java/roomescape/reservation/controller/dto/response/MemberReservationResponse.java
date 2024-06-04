@@ -12,7 +12,9 @@ public record MemberReservationResponse(
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
-        long waitingRank
+        long waitingRank,
+        String paymentKey,
+        long amount
 ) {
 
     public static MemberReservationResponse toResponse(ReservationWithRank reservationWithRank) {
@@ -24,7 +26,9 @@ public record MemberReservationResponse(
                 reservation.getDate(),
                 reservation.getStartAt(),
                 reservation.getStatusDisplayName(),
-                reservationWithRank.getRank()
+                reservationWithRank.getRank(),
+                reservation.getPaymentKey(),
+                reservation.getAmount()
         );
     }
 }
