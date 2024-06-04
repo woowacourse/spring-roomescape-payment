@@ -8,14 +8,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withUnauthorizedRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -24,14 +22,11 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.util.LogSaver;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TossPaymentClientTest {
 
-    @Autowired
-    LogSaver logSaver;
-
-    private final RestClient.Builder testBuilder = RestClient.builder();
+    private final LogSaver logSaver = new LogSaver(new ObjectMapper());
+    private final RestClient.Builder testBuilder = new PaymentConfig().createBuilder("toss");
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
     private TossPaymentClient tossPaymentClient;
@@ -120,5 +115,31 @@ class TossPaymentClientTest {
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("clientStatusCode",  HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+//    //    @Disabled
+//    @Test
+//    void 타임아웃시_예외_발생() {
+//        // given
+//
+//        String errorResponse = """
+//                {
+//                  "code": "NOT_FOUND_PAYMENT",
+//                  "message": "존재하지 않는 결제 입니다."
+//                }
+//                """;
+//
+//        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+//                .andRespond(withException(new ResourceAccessException("요청 시간을 초과하였습니다.")).body(errorResponse).contentType(MediaType.APPLICATION_JSON));
+////                .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
+//
+//        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000),
+//                "paymentType");
+//
+//        // when && then
+//        assertThatThrownBy(() -> tossPaymentClient.confirm(paymentRequest))
+//                .isInstanceOf(PaymentException.class)
+//                .hasMessage("요청 시간을 초과하였습니다.");
+//    }
 }
 

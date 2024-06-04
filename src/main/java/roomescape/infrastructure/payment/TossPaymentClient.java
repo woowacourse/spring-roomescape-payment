@@ -2,11 +2,13 @@ package roomescape.infrastructure.payment;
 
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.dto.payment.PaymentRequest;
@@ -48,20 +50,16 @@ public class TossPaymentClient {
             logSaver.logInfo(paymentResponse);
             return paymentResponse;
 
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
+        }catch (HttpClientErrorException | HttpServerErrorException e) {
             TossErrorResponse errorResponse = getErrorResponse(e);
-            HttpStatusCode clientStatusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(),
-                    errorResponse.code());
-            throw new PaymentException(
-                    e.getClass().getName(),
-                    e.getStatusCode(),
-                    clientStatusCode,
-                    errorResponse.message(),
-                    paymentRequest.paymentKey()
-            );
+            HttpStatusCode clientStatusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(), errorResponse.code());
+            throw new PaymentException(e, clientStatusCode, errorResponse.message(), paymentRequest);
 
-        } catch (Exception e) {
-            throw new PaymentInternalException(e.getClass().getName(), "시스템에서 오류가 발생했습니다.");
+        } catch (ResourceAccessException e) {
+            throw new PaymentException(e, HttpStatus.INTERNAL_SERVER_ERROR, "요청 시간을 초과하였습니다.", paymentRequest);
+
+        }  catch (Exception e) {
+            throw new PaymentInternalException(e, "시스템에서 오류가 발생했습니다.");
         }
     }
 
@@ -69,7 +67,7 @@ public class TossPaymentClient {
         try {
             return exception.getResponseBodyAs(TossErrorResponse.class);
         } catch (RestClientResponseException e) {
-            throw new PaymentInternalException(e.getClass().getName(), "결제 오류 객체를 생성하는 과정에서 오류가 발생했습니다.");
+            throw new PaymentInternalException(e, "결제 오류 객체를 생성하는 과정에서 오류가 발생했습니다.");
         }
     }
 }

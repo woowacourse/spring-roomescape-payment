@@ -36,7 +36,7 @@ public class PaymentConfig {
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 
-    private Builder createBuilder(String vendor) {
+    public Builder createBuilder(String vendor) {
         PaymentProperty property = paymentProperties.get(vendor);
 
         return RestClient.builder()
