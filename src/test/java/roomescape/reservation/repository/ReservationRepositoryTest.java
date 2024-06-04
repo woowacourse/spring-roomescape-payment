@@ -139,8 +139,9 @@ public class ReservationRepositoryTest {
         reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
         reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.WAIT));
 
-        List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndDateAndTimeStartAt(
+        List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(
                 kaki.getId(),
+                horrorTheme,
                 TODAY,
                 hour10.getStartAt()
         );

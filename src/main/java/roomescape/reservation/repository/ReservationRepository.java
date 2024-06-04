@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -73,7 +74,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
            select r.status from Reservation r
            join ReservationTime rt on r.time.id = rt.id
-           where r.member.id = :memberId and r.date = :date and rt.startAt = :startAt
+           where r.member.id = :memberId and r.theme = :theme and r.date = :date and rt.startAt = :startAt
             """)
-    List<ReservationStatus> findStatusesByMemberIdAndDateAndTimeStartAt(Long memberId, LocalDate date, LocalTime startAt);
+    List<ReservationStatus> findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(Long memberId, Theme theme, LocalDate date, LocalTime startAt);
 }
