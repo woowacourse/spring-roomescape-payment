@@ -125,7 +125,7 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
         validateAuthority(member, reservation);
-        validateCompleted(reservation);
+        validatePaid(reservation);
 
         reservationRepository.deleteById(reservationId);
         approveNextReservationAutomatically(reservation);
@@ -137,9 +137,9 @@ public class ReservationService {
         }
     }
 
-    private void validateCompleted(Reservation reservation) {
-        if (reservation.isCompleted()) {
-            throw new RoomescapeException(ExceptionType.COMPLETED_RESERVATION_DELETION);
+    private void validatePaid(Reservation reservation) {
+        if (reservation.isPaid()) {
+            throw new RoomescapeException(ExceptionType.PAID_RESERVATION_DELETION);
         }
     }
 

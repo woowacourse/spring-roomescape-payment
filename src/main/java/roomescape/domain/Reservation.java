@@ -89,8 +89,8 @@ public class Reservation {
         return new ReservationBuilder();
     }
 
-    public void updateAsCompleted(Payment payment) {
-        this.status = ReservationStatus.RESERVED_COMPLETE;
+    public void updateAsPaid(Payment payment) {
+        this.status = ReservationStatus.RESERVED_PAID;
         this.payment = payment;
     }
 
@@ -98,8 +98,8 @@ public class Reservation {
         return this.reservationMember != member;
     }
 
-    public boolean isCompleted() {
-        return status.isCompleted();
+    public boolean isPaid() {
+        return status.isPaid();
     }
 
     public void approve() {

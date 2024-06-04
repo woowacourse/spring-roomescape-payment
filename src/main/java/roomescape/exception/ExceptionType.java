@@ -21,7 +21,7 @@ public enum ExceptionType {
     EMPTY_AMOUNT(BAD_REQUEST, "amount는 필수값 입니다."),
     INVALID_AMOUNT(BAD_REQUEST, "amount는 0이상의 정수여야 합니다."),
     NOT_URL_BASE_THUMBNAIL(BAD_REQUEST, "테마 썸네일이 url 형태가 아닙니다."),
-    COMPLETED_RESERVATION_DELETION(BAD_REQUEST, "이미 결제된 예약은 취소할 수 없습니다."),
+    PAID_RESERVATION_DELETION(BAD_REQUEST, "이미 결제된 예약은 취소할 수 없습니다."),
     PAST_TIME_RESERVATION(BAD_REQUEST, "이미 지난 시간에 예약할 수 없습니다."),
     DUPLICATE_RESERVATION(BAD_REQUEST, "동일한 날짜/시간/테마에 중복으로 예약할 수 없습니다."),
     DUPLICATE_RESERVATION_TIME(BAD_REQUEST, "이미 예약시간이 존재합니다."),

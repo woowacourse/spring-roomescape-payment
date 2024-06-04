@@ -36,7 +36,7 @@ public class PaymentService {
 
         Payment payment = paymentRestClient.requestPaymentApproval(request);
         Payment saved = paymentRepository.save(payment);
-        reservation.updateAsCompleted(payment);
+        reservation.updateAsPaid(payment);
 
         return new PaymentResponse(saved.getId(), saved.getPaymentKey(), saved.getOrderId(), saved.getAmount());
     }
