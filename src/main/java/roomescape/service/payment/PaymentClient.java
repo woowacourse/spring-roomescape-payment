@@ -1,7 +1,6 @@
 package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
@@ -33,19 +32,17 @@ public class PaymentClient {
     private final PaymentProperties paymentProperties;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
-    private final Logger logger;
 
     public PaymentClient(PaymentProperties paymentProperties,
                          RestClient.Builder restClientBuilder,
-                         ObjectMapper objectMapper, Logger logger) {
+                         ObjectMapper objectMapper) {
         this.paymentProperties = paymentProperties;
         this.objectMapper = objectMapper;
-        this.logger = logger;
 
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofNanos(1))
-                .withReadTimeout(Duration.ofNanos(1));
-        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+                .withConnectTimeout(Duration.ofSeconds(1))
+                .withReadTimeout(Duration.ofSeconds(30));
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory.class, settings);
         this.restClient = restClientBuilder.requestFactory(requestFactory).build();
     }
 
