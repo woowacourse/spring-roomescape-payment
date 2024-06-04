@@ -20,9 +20,9 @@ security:
 payment:
   properties:
     - company: toss
-      secretKey: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-      baseUrl: https://api.tosspayments.com/v1/payments
-      readTimeout: 30
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      base-url: https://api.tosspayments.com/v1/payments
+      read-timeout: 30
 logging:
   level:
     org:
