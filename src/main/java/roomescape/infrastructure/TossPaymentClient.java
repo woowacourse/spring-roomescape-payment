@@ -4,9 +4,11 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.TossPaymentClientErrorHandler;
+import roomescape.payment.exception.PaymentServerException;
 import roomescape.service.dto.request.PaymentRequest;
 
 @Component
@@ -32,13 +34,17 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void confirm(PaymentRequest paymentRequest) {
-        restClient.post()
-                .uri(uri)
-                .header("Authorization", "Basic " + encodedSecretKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
-                .retrieve()
-                .onStatus(tossPaymentClientErrorHandler)
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri(uri)
+                    .header("Authorization", "Basic " + encodedSecretKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(paymentRequest)
+                    .retrieve()
+                    .onStatus(tossPaymentClientErrorHandler)
+                    .toBodilessEntity();
+        } catch (ResourceAccessException e) {
+            throw new PaymentServerException(e.getMessage());
+        }
     }
 }

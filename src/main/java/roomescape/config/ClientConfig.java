@@ -1,23 +1,28 @@
 package roomescape.config;
 
+import java.time.Duration;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
 public class ClientConfig {
 
-    private static final int CONNECT_TIMEOUT_MILLISECONDS = 60_000;
-    private static final int CONNECTION_REQUEST_TIMEOUT_MILLISECONDS = 30_000;
+    private static final int CONNECT_TIMEOUT_SECONDS = 3;
+    private static final int READ_TIMEOUT_SECONDS = 30;
 
     @Bean
     public RestClient restClient() {
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        clientHttpRequestFactory.setConnectTimeout(CONNECT_TIMEOUT_MILLISECONDS);
-        clientHttpRequestFactory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT_MILLISECONDS);
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+                .withReadTimeout(Duration.ofMillis(READ_TIMEOUT_SECONDS));
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+
         return RestClient.builder()
-                .requestFactory(clientHttpRequestFactory)
+                .requestFactory(requestFactory)
                 .build();
     }
 }
