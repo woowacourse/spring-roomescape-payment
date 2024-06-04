@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
-
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeService(ReservationTimeRepository reservationTimeRepository,
@@ -28,7 +27,6 @@ public class ReservationTimeService {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
-
 
     @Transactional(readOnly = true)
     public List<ReservationTime> findAllReservationTimes() {

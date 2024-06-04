@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfiguration {
+
     private final static String AUTH_TYPE = "Basic ";
     @Value("${payment.toss.base-url}")
     private String TossPaymentBaseUrl;

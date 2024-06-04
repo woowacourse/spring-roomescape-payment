@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
+
     String test = "SELECT r.theme FROM Reservation";
 
     List<Reservation> findAll();
@@ -25,7 +26,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
             AND (:dateTo IS NULL OR r.date <= :dateTo)
             """)
     List<Reservation> findByConditions(Theme theme, Member member, LocalDate dateFrom,
-                                                         LocalDate dateTo);
+                                       LocalDate dateTo);
 
     void deleteById(long id);
 
