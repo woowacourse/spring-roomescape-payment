@@ -20,6 +20,7 @@ public class FakePayment implements PaymentClient {
                 && CORRECT_REQ.amount() == paymentRequest.amount()) {
             return;
         }
-        throw new PaymentException(INVALID_REQUEST.getHttpStatus(), INVALID_REQUEST.getMessage(), new RuntimeException());
+        throw new PaymentException(INVALID_REQUEST.getHttpStatus(), INVALID_REQUEST.getMessage(),
+                new RuntimeException());
     }
 }

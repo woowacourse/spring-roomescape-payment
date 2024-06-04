@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
-import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
@@ -85,7 +84,7 @@ public class ReservationService {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
         Reservation savedReservation = reservationRepository.save(reservation);
-        if(reservationRepository.calculateIndexOf(savedReservation) == 1) {
+        if (reservationRepository.calculateIndexOf(savedReservation) == 1) {
             savedReservation.book();
         }
         return ReservationResponse.from(savedReservation);

@@ -39,7 +39,6 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-import roomescape.service.FakePayment;
 import roomescape.service.JwtGenerator;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TestPaymentConfig.class)
@@ -188,7 +187,7 @@ public class ReservationControllerTest {
         @DisplayName("예약 생성시 결제를 실패하면 저장을 실패한다.")
         @Test
         @Disabled
-        //todo 결제 테스트 분리
+            //todo 결제 테스트 분리
         void paymentFailTest() {
             Map<String, Object> reservationParam = Map.of(
                     "date", savedReservation.getDate().plusDays(1).toString(),

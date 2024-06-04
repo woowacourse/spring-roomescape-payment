@@ -24,8 +24,8 @@ import roomescape.dto.LoginMemberRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
-import roomescape.exception.RoomescapeExceptionType;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionType;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = TestPaymentConfig.class)
 class ReservationServiceTest extends FixtureUsingTest {

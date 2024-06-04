@@ -98,7 +98,7 @@ public class Reservation implements Comparable<Reservation> {
     }
 
     public void book() {
-        if(reservationStatus != ReservationStatus.WAITING) {
+        if (reservationStatus != ReservationStatus.WAITING) {
             //todo 예외 처리
         }
         this.reservationStatus = ReservationStatus.BOOKED;

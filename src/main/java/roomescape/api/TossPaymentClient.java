@@ -40,7 +40,8 @@ public class TossPaymentClient implements PaymentClient {
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             PaymentErrorResponse errorResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             TossPaymentExceptionType tossPaymentExceptionType = TossPaymentExceptionType.findBy(errorResponse.code());
-            throw new PaymentException(tossPaymentExceptionType.getHttpStatus(), tossPaymentExceptionType.getMessage(), e);
+            throw new PaymentException(tossPaymentExceptionType.getHttpStatus(), tossPaymentExceptionType.getMessage(),
+                    e);
         }
     }
 }
