@@ -13,13 +13,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
-  cloud:
-    openfeign:
-      client:
-        config:
-          PaymentClient:
-            connect-timeout: 1000
-            read-timeout: 10000
+    
 security:
   jwt:
     secret-key: hogihogihogihogihogihogihogihogihogihogiHOGIhogihogihogihogi
