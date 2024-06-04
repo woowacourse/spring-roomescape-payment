@@ -19,8 +19,7 @@ public enum PaymentConfirmErrorCode {
     FAILED_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
     UNKNOWN_PAYMENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
 
-    PAYMENT_CONFIRM_ERROR_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정에서 서버 에러가 발생했습니다."),
-    ;
+    PAYMENT_CONFIRM_ERROR_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정에서 서버 에러가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
