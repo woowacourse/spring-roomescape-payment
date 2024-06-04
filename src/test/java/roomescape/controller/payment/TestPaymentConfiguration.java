@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.infrastructure.payment.PaymentManager;
-import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.response.PaymentDto;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -19,6 +19,6 @@ public class TestPaymentConfiguration {
     private void initMock()
     {
         when(paymentManager.approve(any()))
-                .thenReturn(new PaymentApproveDto("paymentKey", "orderId", 1000L));
+                .thenReturn(new PaymentDto("paymentKey", "orderId", 1000L));
     }
 }

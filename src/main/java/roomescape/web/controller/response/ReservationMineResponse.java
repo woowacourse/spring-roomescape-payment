@@ -9,8 +9,8 @@ public record ReservationMineResponse(Long reservationId, ThemeResponse theme, L
 
     public ReservationMineResponse(ReservationDto reservation) {
         this(reservation.id(),
-                ThemeResponse.from(reservation.themeDto()),
+                new ThemeResponse(reservation.themeDto()),
                 reservation.date().getDate(),
-                ReservationTimeResponse.from(reservation.reservationTimeDto()));
+                new ReservationTimeResponse(reservation.reservationTimeDto()));
     }
 }

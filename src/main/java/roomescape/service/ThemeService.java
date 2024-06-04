@@ -31,7 +31,7 @@ public class ThemeService {
         validateDuplication(request);
         Theme savedTheme = themeRepository.save(theme);
 
-        return ThemeDto.from(savedTheme);
+        return new ThemeDto(savedTheme);
     }
 
     private void validateDuplication(ThemeSaveDto request) {
@@ -49,7 +49,7 @@ public class ThemeService {
 
     public List<ThemeDto> findAll() {
         return themeRepository.findAll().stream()
-                .map(ThemeDto::from)
+                .map(ThemeDto::new)
                 .toList();
     }
 
@@ -58,7 +58,7 @@ public class ThemeService {
         LocalDate to = LocalDate.now().minusDays(1);
         return themeRepository.findMostReservedThemesInPeriod(from, to,
                         PageRequest.of(0, MAX_POPULAR_THEME_COUNT)).stream()
-                .map(ThemeDto::from)
+                .map(ThemeDto::new)
                 .toList();
     }
 }

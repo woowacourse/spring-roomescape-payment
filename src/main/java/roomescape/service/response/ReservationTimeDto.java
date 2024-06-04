@@ -6,7 +6,7 @@ import roomescape.domain.ReservationTime;
 
 public record ReservationTimeDto(Long id, LocalTime startAt) {
 
-    public static ReservationTimeDto from(ReservationTime reservationTime) {
-        return new ReservationTimeDto(reservationTime.getId(), reservationTime.getStartAt());
+    public ReservationTimeDto(ReservationTime reservationTime) {
+        this(reservationTime.getId(), reservationTime.getStartAt());
     }
 }

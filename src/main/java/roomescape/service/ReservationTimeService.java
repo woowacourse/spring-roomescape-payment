@@ -32,7 +32,7 @@ public class ReservationTimeService {
         validateDuplication(newReservationTime.getStartAt());
         ReservationTime savedTime = reservationTimeRepository.save(newReservationTime);
 
-        return ReservationTimeDto.from(savedTime);
+        return new ReservationTimeDto(savedTime);
     }
 
     private void validateDuplication(LocalTime parsedTime) {
@@ -50,7 +50,7 @@ public class ReservationTimeService {
 
     public List<ReservationTimeDto> findAll() {
         return reservationTimeRepository.findAll().stream()
-                .map(ReservationTimeDto::from)
+                .map(ReservationTimeDto::new)
                 .toList();
     }
 

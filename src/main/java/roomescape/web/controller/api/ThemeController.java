@@ -35,7 +35,7 @@ public class ThemeController {
                 new ThemeSaveDto(request.name(), request.description(), request.thumbnail()));
 
         Long id = appResponse.id();
-        ThemeResponse webResponse = ThemeResponse.from(appResponse);
+        ThemeResponse webResponse = new ThemeResponse(appResponse);
 
         return ResponseEntity.created(URI.create("/themes/" + id)).body(webResponse);
     }
@@ -44,7 +44,7 @@ public class ThemeController {
     public ResponseEntity<List<ThemeResponse>> findAll() {
         List<ThemeResponse> response = themeService.findAll()
                 .stream()
-                .map(ThemeResponse::from).toList();
+                .map(ThemeResponse::new).toList();
 
         return ResponseEntity.ok().body(response);
     }
@@ -53,7 +53,7 @@ public class ThemeController {
     public ResponseEntity<List<ThemeResponse>> findPopular() {
         List<ThemeResponse> response = themeService.findPopular()
                 .stream()
-                .map(ThemeResponse::from)
+                .map(ThemeResponse::new)
                 .toList();
 
         return ResponseEntity.ok().body(response);

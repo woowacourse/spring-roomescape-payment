@@ -57,7 +57,7 @@ public class AdminReservationController {
         List<ReservationDto> appResponses = reservationService.findAllSearched(appRequest);
 
         List<MemberReservationResponse> webResponse = appResponses.stream()
-                .map(MemberReservationResponse::from)
+                .map(MemberReservationResponse::new)
                 .toList();
 
         return ResponseEntity.ok().body(webResponse);

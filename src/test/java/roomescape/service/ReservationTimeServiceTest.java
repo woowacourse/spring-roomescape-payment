@@ -46,7 +46,7 @@ class ReservationTimeServiceTest {
                 .thenReturn(reservationTime);
 
         ReservationTimeDto actual = reservationTimeService.save(new ReservationTimeSaveDto(startAt));
-        ReservationTimeDto expected = ReservationTimeDto.from(reservationTime);
+        ReservationTimeDto expected = new ReservationTimeDto(reservationTime);
 
         assertThat(actual).isEqualTo(expected);
     }

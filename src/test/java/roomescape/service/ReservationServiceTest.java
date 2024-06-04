@@ -78,8 +78,8 @@ class ReservationServiceTest {
                 reservationId,
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
-                ReservationTimeDto.from(reservation.getTime()),
-                ThemeDto.from(reservation.getTheme()));
+                new ReservationTimeDto(reservation.getTime()),
+                new ThemeDto(reservation.getTheme()));
 
         assertThat(actual).isEqualTo(expected);
     }
