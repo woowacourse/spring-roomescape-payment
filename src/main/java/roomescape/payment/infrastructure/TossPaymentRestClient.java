@@ -13,7 +13,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.BadRequestException;
+import roomescape.exception.PaymentFailureException;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.dto.TossFailure;
 
@@ -44,7 +44,8 @@ public class TossPaymentRestClient {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + authorizationToken)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     TossFailure tossFailure = objectMapper.readValue(response.getBody(), TossFailure.class);
-                    throw new BadRequestException(tossFailure.message());
+                    logger.warn("message: {}", tossFailure.message());
+                    throw PaymentFailureException.of(tossFailure.code(), tossFailure.message());
                 }))
                 .build();
     }
@@ -67,7 +68,7 @@ public class TossPaymentRestClient {
                             .body(PaymentResponse.class)
             );
         } catch (ResourceAccessException exception) {
-            logger.error(exception.getMessage(), exception.getCause());
+            logger.error("message: {}", exception.getMessage(), exception.getCause());
             throw new IllegalStateException("토스 API와 통신하던 중 문제가 발생하였습니다.");
         }
     }
