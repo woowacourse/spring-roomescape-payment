@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.util.CookieUtils;
 
 class AdminReservationApiControllerTest extends IntegrationTest {
@@ -65,7 +65,7 @@ class AdminReservationApiControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(1L, TODAY, 1L, 1L);
+        AdminReservationSaveRequest reservationSaveRequest = new AdminReservationSaveRequest( TODAY, 1L, 1L, 1L);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getAdminToken())

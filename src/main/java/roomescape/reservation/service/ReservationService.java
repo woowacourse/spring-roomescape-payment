@@ -18,7 +18,7 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -51,26 +51,26 @@ public class ReservationService {
     }
 
     public ReservationResponse save(
-            ReservationSaveRequest reservationSaveRequest,
+            UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember,
             ReservationStatus status
     ) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(reservationSaveRequest.getTimeId())
+        ReservationTime reservationTime = reservationTimeRepository.findById(userReservationSaveRequest.timeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
 
-        Theme theme = themeRepository.findById(reservationSaveRequest.getThemeId())
+        Theme theme = themeRepository.findById(userReservationSaveRequest.themeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
 
         Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        Reservation reservation = reservationSaveRequest.toReservation(member, theme, reservationTime, status);
+        Reservation reservation = userReservationSaveRequest.toEntity(member, theme, reservationTime, status);
 
         Reservation savedReservation = null;
         if (status.isSuccess()) {
             validateDuplicatedReservationSuccess(reservation);
             savedReservation = reservationRepository.save(reservation);
-            paymentService.payForReservation(PaymentRequest.from(reservationSaveRequest), savedReservation);
+            paymentService.payForReservation(PaymentRequest.from(userReservationSaveRequest), savedReservation);
         }
         if (status.isWait()) {
             validateReservationWait(loginMember, reservation);

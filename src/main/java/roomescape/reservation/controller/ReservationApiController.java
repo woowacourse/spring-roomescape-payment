@@ -17,7 +17,7 @@ import roomescape.common.dto.MultipleResponses;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -47,10 +47,10 @@ public class ReservationApiController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
-            @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
+            @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
@@ -58,10 +58,10 @@ public class ReservationApiController {
 
     @PostMapping("/reservations/waiting")
     public ResponseEntity<ReservationResponse> saveReservationWaiting(
-            @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
+            @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
+        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

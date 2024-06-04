@@ -26,7 +26,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -66,12 +66,12 @@ class AdminReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest =
-                new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        AdminReservationSaveRequest adminReservationSaveRequest =
+                new AdminReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), loginMember.id());
 
-        adminReservationService.save(reservationSaveRequest, loginMember);
+        adminReservationService.save(adminReservationSaveRequest, loginMember);
 
-        assertThatThrownBy(() -> adminReservationService.save(reservationSaveRequest, loginMember))
+        assertThatThrownBy(() -> adminReservationService.save(adminReservationSaveRequest, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

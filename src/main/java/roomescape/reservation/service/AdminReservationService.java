@@ -11,8 +11,8 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
@@ -41,19 +41,19 @@ public class AdminReservationService {
     }
 
     public ReservationResponse save(
-            ReservationSaveRequest reservationSaveRequest,
+            AdminReservationSaveRequest adminReservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(reservationSaveRequest.getTimeId())
+        ReservationTime reservationTime = reservationTimeRepository.findById(adminReservationSaveRequest.timeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
 
-        Theme theme = themeRepository.findById(reservationSaveRequest.getThemeId())
+        Theme theme = themeRepository.findById(adminReservationSaveRequest.themeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
 
         Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        Reservation reservation = reservationSaveRequest.toReservation(member, theme, reservationTime, ReservationStatus.SUCCESS);
+        Reservation reservation = adminReservationSaveRequest.toEntity(member, theme, reservationTime, ReservationStatus.SUCCESS);
         if (reservationRepository.existsByDateAndTimeStartAtAndStatus(
                 reservation.getDate(),
                 reservation.getStartAt(),

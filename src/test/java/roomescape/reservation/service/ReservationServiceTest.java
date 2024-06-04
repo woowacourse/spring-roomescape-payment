@@ -34,7 +34,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -70,18 +70,18 @@ class ReservationServiceTest {
 
     @DisplayName("예약 시 결제에 실패하면 예외가 발생한다.")
     @Test
-    void paymentFailExceptionTest() {
+    void saveExceptionByPaymentFail() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest =
-                new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
 
         doThrow(PaymentFailException.class).when(paymentService).payForReservation(any(PaymentRequest.class), any(Reservation.class));
 
-        assertThatThrownBy(() -> reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
+        assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
                 .isInstanceOf(PaymentFailException.class);
     }
 
@@ -91,9 +91,10 @@ class ReservationServiceTest {
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), 11L);
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), 11L, "testKey", "testId", 1000);
 
-        assertThatThrownBy(() -> reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
+        assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -107,10 +108,12 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
-        assertThatThrownBy(() -> reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+
+        assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -124,10 +127,11 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT);
 
-        assertThatThrownBy(() -> reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.WAIT))
+        assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -141,10 +145,11 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
-        assertThatThrownBy(() -> reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.WAIT))
+        assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -158,13 +163,14 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
         memberRepository.save(JOJO);
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
 
         LoginMember loginMember1 = LOGIN_MEMBER_KAKI;
-        reservationService.save(reservationSaveRequest, loginMember1, ReservationStatus.WAIT);
+        reservationService.save(userReservationSaveRequest, loginMember1, ReservationStatus.WAIT);
 
         LoginMember loginMember2 = LOGIN_MEMBER_JOJO;
-        reservationService.save(reservationSaveRequest, loginMember2, ReservationStatus.WAIT);
+        reservationService.save(userReservationSaveRequest, loginMember2, ReservationStatus.WAIT);
 
         List<MemberReservationResponse> memberReservationResponses = reservationService.findMemberReservations(loginMember2);
 
@@ -189,8 +195,9 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        ReservationResponse reservationResponse = reservationService.save(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         assertThatThrownBy(() -> reservationService.cancelById(reservationResponse.id()))
                 .isInstanceOf(IllegalArgumentException.class);

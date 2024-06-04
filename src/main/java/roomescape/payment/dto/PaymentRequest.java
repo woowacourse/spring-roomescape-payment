@@ -1,9 +1,8 @@
 package roomescape.payment.dto;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.constraints.Range;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 
 public record PaymentRequest(
         @NotNull
@@ -16,11 +15,11 @@ public record PaymentRequest(
         String paymentKey
 ) {
 
-    public static PaymentRequest from(ReservationSaveRequest reservationSaveRequest) {
+    public static PaymentRequest from(UserReservationSaveRequest userReservationSaveRequest) {
         return new PaymentRequest(
-                reservationSaveRequest.getOrderId(),
-                reservationSaveRequest.getAmount(),
-                reservationSaveRequest.getPaymentKey()
+                userReservationSaveRequest.orderId(),
+                userReservationSaveRequest.amount(),
+                userReservationSaveRequest.paymentKey()
         );
     }
 }
