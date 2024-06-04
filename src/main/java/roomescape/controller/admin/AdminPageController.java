@@ -10,26 +10,26 @@ public class AdminPageController {
 
     @GetMapping
     public String home() {
-        return "/admin/index";
+        return "admin/index";
     }
 
     @GetMapping("/reservation")
     public String reservation() {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @GetMapping("/time")
     public String time() {
-        return "/admin/time";
+        return "admin/time";
     }
 
     @GetMapping("/theme")
     public String theme() {
-        return "/admin/theme";
+        return "admin/theme";
     }
 
     @GetMapping("/waiting")
     public String waiting() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 }
