@@ -17,14 +17,14 @@ import roomescape.service.payment.dto.PaymentErrorResult;
 import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.payment.dto.PaymentResult;
 
-public class PaymentRestClient {
+public class TossPaymentClient {
     @Value("${tosspay.secret_key}")
     private String secretKey;
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentRestClient(RestClient restClient, ObjectMapper objectMapper) {
+    public TossPaymentClient(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }

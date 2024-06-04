@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.TossPaymentClient;
 
 @Configuration
 public class RestClientConfig {
@@ -21,8 +21,8 @@ public class RestClientConfig {
     }
 
     @Bean
-    public PaymentRestClient paymentRestClient(ClientHttpRequestFactory factory, ObjectMapper objectMapper) {
-        return new PaymentRestClient(
+    public TossPaymentClient tossPaymentClient(ClientHttpRequestFactory factory, ObjectMapper objectMapper) {
+        return new TossPaymentClient(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com/v1/payments")
                         .requestFactory(factory)

@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.TossPaymentClient;
 import roomescape.service.payment.dto.PaymentResult;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,7 +23,7 @@ public abstract class ControllerTestBase {
     private int port;
 
     @MockBean
-    protected PaymentRestClient restClient;
+    protected TossPaymentClient restClient;
 
     @BeforeEach
     void initPort() {

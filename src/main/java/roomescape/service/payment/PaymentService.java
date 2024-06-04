@@ -8,10 +8,10 @@ import roomescape.service.payment.dto.PaymentResult;
 
 @Service
 public class PaymentService {
-    private final PaymentRestClient paymentClient;
+    private final TossPaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(PaymentRestClient paymentClient, PaymentRepository paymentRepository) {
+    public PaymentService(TossPaymentClient paymentClient, PaymentRepository paymentRepository) {
         this.paymentClient = paymentClient;
         this.paymentRepository = paymentRepository;
     }

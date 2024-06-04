@@ -14,7 +14,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.domain.payment.Payment;
-import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.TossPaymentClient;
 import roomescape.service.payment.dto.PaymentResult;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -23,7 +23,7 @@ import roomescape.service.payment.dto.PaymentResult;
 @Sql("/truncate.sql")
 public abstract class ServiceTestBase {
     @MockBean
-    protected PaymentRestClient restClient;
+    protected TossPaymentClient restClient;
 
     @BeforeEach
     void setUpPaymentResult() {
