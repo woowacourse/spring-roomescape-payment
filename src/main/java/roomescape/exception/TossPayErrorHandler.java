@@ -1,5 +1,6 @@
 package roomescape.exception;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
@@ -10,7 +11,7 @@ public class TossPayErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
 
     public TossPayErrorHandler() {
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Override
