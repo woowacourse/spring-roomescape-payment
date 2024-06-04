@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.model.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
@@ -54,13 +56,14 @@ public class ReservationService {
         this.waitingRepository = waitingRepository;
     }
 
+    @Transactional
     public CreateReservationResponse createMyReservation(final AuthInfo authInfo,
                                                          final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
                 createMyReservationRequest);
-        Reservation reservation = convertToReservation(createReservationRequest);
-        paymentService.createPayment(ConfirmPaymentRequest.from(createMyReservationRequest));
-        return CreateReservationResponse.from(reservationRepository.save(reservation));
+        Reservation reservation = reservationRepository.save(convertToReservation(createReservationRequest));
+        Payment payment = paymentService.createPayment(ConfirmPaymentRequest.from(createMyReservationRequest), reservation);
+        return CreateReservationResponse.from(reservation, payment);
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {

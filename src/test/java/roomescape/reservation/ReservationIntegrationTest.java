@@ -28,6 +28,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
@@ -50,18 +51,21 @@ class ReservationIntegrationTest {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     ReservationIntegrationTest(final MemberRepository memberRepository,
                                final ReservationTimeRepository reservationTimeRepository,
                                final ThemeRepository themeRepository,
                                final ReservationRepository reservationRepository,
-                               final WaitingRepository waitingRepository) {
+                               final WaitingRepository waitingRepository,
+                               final PaymentRepository paymentRepository) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @LocalServerPort
@@ -105,7 +109,7 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 실패: 결제 실패")
+    @DisplayName("방탈출 예약 생성 실패: 결제 실패 시, 결제 및 예약 정보 모두 저장되지 않음")
     void createReservationTime_WhenPaymentClientException() {
         // given
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
@@ -124,6 +128,9 @@ class ReservationIntegrationTest {
 
                 .statusCode(500)
                 .body("detail", equalTo("결제 오류입니다. 같은 문제가 반복된다면 문의해주세요."));
+        assertThat(reservationRepository.count()).isZero();
+        assertThat(paymentRepository.count()).isZero();
+
     }
 
     @Test
