@@ -9,6 +9,20 @@
 5. 어드민이 예약을 취소하면 예약자는 결제 금액을 환불받고 대기 1번이 예약된다.
    - 단, 결제가 되지 않아 마이페이지에서 결제를 해야한다.
 
+### 3단계
+배포 URL
+http://43.201.59.111:8080
+
+서버 실행 자동화 스크립트
+```shell
+#!/bin/sh
+cd spring-roomescape-payment
+git pull origin step2
+./gradlew bootJar
+cd build/libs
+nohup java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar >> ../../log/spring-roomescape-payment-log.log &
+```
+
 ### 2단계 구현 기능 목록
 - [x] 내 예약 내역 조회에 결제 정보 추가
 - [x] 결제시 결제 정보 저장
