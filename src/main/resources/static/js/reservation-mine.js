@@ -38,18 +38,24 @@ function render(data) {
     row.insertCell(4).textContent = item.paymentKey;
     row.insertCell(5).textContent = item.amount;
     row.insertCell(6).textContent = '';
+    row.insertCell(7).textContent = '';
 
-    if (item.status === 'STANDBY' && item.rank !== 0) {
+    if (item.status === 'STANDBY') {
       // 예약대기 상태
-      const cancelCell = row.insertCell(6);
+      const cancelCell = row.insertCell(7);
       const cancelButton = document.createElement('button');
-      cancelButton.textContent = '취소';
+      cancelButton.textContent = '대기취소';
       cancelButton.className = 'btn btn-danger';
       cancelButton.onclick = function () {
         requestDeleteWaiting(item.id).then(() => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
-    } else if (item.status === 'STANDBY' && item.rank === 0) {
+    } else {
+      // 예약 완료 상태
+      row.insertCell(7).textContent = '';
+    }
+
+    if (item.status === 'STANDBY' && item.rank === 0) {
       // 결제대기 상태
       const paySell = row.insertCell(6);
       const payButton = document.createElement('button');
@@ -59,9 +65,6 @@ function render(data) {
         window.open("payment?id=" + item.id, "결제 창", "width=900, height=600, location=no");
       };
       paySell.appendChild(payButton);
-    } else {
-      // 예약 완료 상태
-      row.insertCell(6).textContent = '';
     }
   });
 }
