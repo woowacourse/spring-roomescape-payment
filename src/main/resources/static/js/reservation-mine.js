@@ -25,6 +25,9 @@ function render(data) {
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
     row.insertCell(3).textContent = status;
+    row.insertCell(4).textContent = '';
+    row.insertCell(5).textContent = item.paymentKey;
+    row.insertCell(6).textContent = item.amount;
 
     if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
       const cancelCell = row.insertCell(4);
