@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
-import org.springframework.context.ApplicationEventPublisher;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -31,8 +30,7 @@ class ReservationManageServiceTest {
     @BeforeEach
     void setUp() {
         this.reservationRepository = mock(ReservationRepository.class);
-        this.reservationManageService = new DummyReservationManageService(
-                reservationRepository, mock(ApplicationEventPublisher.class));
+        this.reservationManageService = new DummyReservationManageService(reservationRepository);
     }
 
     @ParameterizedTest

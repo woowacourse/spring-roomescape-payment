@@ -1,6 +1,5 @@
 package roomescape.reservation.application;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
@@ -10,8 +9,8 @@ import roomescape.reservation.domain.ReservationStatus;
 
 @Service
 public class WaitingManageService extends ReservationManageService {
-    public WaitingManageService(ReservationRepository reservationRepository, ApplicationEventPublisher eventPublisher) {
-        super(reservationRepository, eventPublisher);
+    public WaitingManageService(ReservationRepository reservationRepository) {
+        super(reservationRepository);
     }
 
     @Override

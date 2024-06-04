@@ -2,18 +2,32 @@ package roomescape.reservation.application;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.event.ReservationFailedEvent;
+import roomescape.reservation.event.ReservationSavedEvent;
 
 import java.util.Optional;
 
 @Service
 public class BookingManageService extends ReservationManageService {
+    private final ApplicationEventPublisher eventPublisher;
+
     public BookingManageService(ReservationRepository reservationRepository, ApplicationEventPublisher eventPublisher) {
-        super(reservationRepository, eventPublisher);
+        super(reservationRepository);
+        this.eventPublisher = eventPublisher;
+    }
+
+    @Transactional
+    public Reservation createWithPayment(Reservation reservation, Payment payment) {
+        eventPublisher.publishEvent(new ReservationFailedEvent(payment));
+        eventPublisher.publishEvent(new ReservationSavedEvent(payment));
+        return create(reservation);
     }
 
     @Override

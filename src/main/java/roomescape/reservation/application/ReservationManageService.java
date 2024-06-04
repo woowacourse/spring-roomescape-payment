@@ -1,15 +1,11 @@
 package roomescape.reservation.application;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.event.ReservationFailedEvent;
-import roomescape.reservation.event.ReservationSavedEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,12 +14,9 @@ public abstract class ReservationManageService {
     protected static final int MAX_RESERVATION_NUMBER_IN_TIME_SLOT = 1;
 
     protected final ReservationRepository reservationRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
-    public ReservationManageService(ReservationRepository reservationRepository,
-                                    ApplicationEventPublisher eventPublisher) {
+    public ReservationManageService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
-        this.eventPublisher = eventPublisher;
     }
 
     abstract protected void correctReservationStatus(int bookingCount, Reservation reservation);
@@ -39,13 +32,6 @@ public abstract class ReservationManageService {
         validateReservationDate(reservation);
         validateDuplicatedReservation(reservation);
         return reservationRepository.save(reservation);
-    }
-
-    @Transactional
-    public Reservation createWithPayment(Reservation reservation, Payment payment) {
-        eventPublisher.publishEvent(new ReservationFailedEvent(payment));
-        eventPublisher.publishEvent(new ReservationSavedEvent(payment));
-        return create(reservation);
     }
 
     private void validateReservationDate(Reservation reservation) {

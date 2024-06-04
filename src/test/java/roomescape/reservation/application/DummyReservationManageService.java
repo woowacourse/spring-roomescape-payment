@@ -1,13 +1,12 @@
 package roomescape.reservation.application;
 
-import org.springframework.context.ApplicationEventPublisher;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 
 public class DummyReservationManageService extends ReservationManageService {
-    public DummyReservationManageService(ReservationRepository reservationRepository, ApplicationEventPublisher eventPublisher) {
-        super(reservationRepository, eventPublisher);
+    public DummyReservationManageService(ReservationRepository reservationRepository) {
+        super(reservationRepository);
     }
 
     @Override
