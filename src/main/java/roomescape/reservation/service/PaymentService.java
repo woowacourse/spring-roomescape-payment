@@ -33,6 +33,8 @@ public class PaymentService {
 
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
+    @Value("${third-party-api.toss-payment.path.payment}")
+    private String confirmPath;
 
     public PaymentService(RestTemplateBuilder builder,
                           @Value("${third-party-api.toss-payment.url}") String url,
@@ -48,7 +50,7 @@ public class PaymentService {
         String authorization = BasicAuthEncoder.encode(tossSecretKey);
 
         return tossRestClient.post()
-                .uri("/confirm")
+                .uri(confirmPath)
                 .header("Authorization", authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })

@@ -44,5 +44,5 @@ third-party-api:
     url: "https://api.tosspayments.com"
     path:
       payment: "/v1/payments"
-
+      payment-confirm: "/confirm"
 
