@@ -3,6 +3,7 @@ package roomescape.payment.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.dto.response.TossPaymentsErrorResponse;
@@ -10,6 +11,7 @@ import roomescape.payment.exception.PaymentServerException;
 
 import java.io.IOException;
 
+@Component
 public class PaymentClientErrorHandler implements ResponseErrorHandler {
     private final ObjectMapper objectMapper;
 

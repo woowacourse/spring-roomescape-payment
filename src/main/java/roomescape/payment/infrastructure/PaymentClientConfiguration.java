@@ -18,11 +18,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @EnableConfigurationProperties(PaymentGatewayProperties.class)
 public class PaymentClientConfiguration {
     private final PaymentGatewayProperties paymentProperties;
-    private final ObjectMapper objectMapper;
 
-    public PaymentClientConfiguration(PaymentGatewayProperties paymentProperties, ObjectMapper objectMapper) {
+    public PaymentClientConfiguration(PaymentGatewayProperties paymentProperties) {
         this.paymentProperties = paymentProperties;
-        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -42,10 +40,5 @@ public class PaymentClientConfiguration {
 
     private String encodeSecretKey(String secretKey) {
         return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
-    }
-
-    @Bean
-    public PaymentClientErrorHandler paymentGatewayErrorHandler() {
-        return new PaymentClientErrorHandler(objectMapper);
     }
 }
