@@ -22,17 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.client.PaymentClient;
 import roomescape.config.ControllerConfig;
 import roomescape.member.dto.MemberResponse;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
-import roomescape.reservation.dto.response.PaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 import roomescape.reservation.dto.response.TimeResponse;
@@ -44,9 +40,6 @@ class ReservationApiControllerTest {
 
     @MockBean
     private ReservationService reservationService;
-
-    @MockBean
-    private PaymentClient paymentClient;
 
     @Autowired
     private MockMvc mockMvc;
@@ -104,8 +97,6 @@ class ReservationApiControllerTest {
 
         Mockito.when(reservationService.save(any(), any()))
                 .thenReturn(1L);
-        Mockito.when(paymentClient.paymentReservation(any(), any()))
-                .thenReturn(new ResponseEntity<>(new PaymentResponse(""), HttpStatus.OK));
         Mockito.when(reservationService.findById(anyLong()))
                 .thenReturn(response);
 

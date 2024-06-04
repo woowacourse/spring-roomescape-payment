@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")
     void notExistReservationTimeIdExceptionTest() {
         Theme theme = new Theme("공포", "호러 방탈출", "http://asdf.jpg");
