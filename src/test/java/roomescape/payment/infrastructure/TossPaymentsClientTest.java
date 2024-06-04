@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
+import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.payment.exception.PaymentServerException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +43,7 @@ class TossPaymentsClientTest {
     @DisplayName("토스 결제 승인 API에서 승인 응답을 받는다.")
     void confirm() throws Exception {
         // given
-        PaymentConfirmResponse expectedResponse = new PaymentConfirmResponse("paymentKey", "orderId", 10);
+        ConfirmedPayment expectedResponse = new ConfirmedPayment("paymentKey", "orderId", 10);
         mockRestServiceServer.expect(requestTo(CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
@@ -51,7 +51,7 @@ class TossPaymentsClientTest {
         PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 10L, "paymentType");
 
         // when
-        PaymentConfirmResponse response = tossPaymentClient.confirm(request);
+        ConfirmedPayment response = tossPaymentClient.confirm(request);
 
         // then
         assertThat(response.orderId()).isEqualTo(expectedResponse.orderId());

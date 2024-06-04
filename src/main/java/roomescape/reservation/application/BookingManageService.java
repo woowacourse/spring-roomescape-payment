@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
@@ -24,10 +24,12 @@ public class BookingManageService extends ReservationManageService {
     }
 
     @Transactional
-    public Reservation createWithPayment(Reservation reservation, Payment payment) {
-        eventPublisher.publishEvent(new ReservationFailedEvent(payment));
-        eventPublisher.publishEvent(new ReservationSavedEvent(payment));
-        return create(reservation);
+    public Reservation createWithPayment(Reservation reservation, ConfirmedPayment confirmedPayment) {
+        eventPublisher.publishEvent(new ReservationFailedEvent(confirmedPayment));
+
+        Reservation savedReservation = create(reservation);
+        eventPublisher.publishEvent(new ReservationSavedEvent(savedReservation, confirmedPayment));
+        return savedReservation;
     }
 
     @Override

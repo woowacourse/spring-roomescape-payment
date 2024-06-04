@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -63,9 +62,8 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
-        PaymentConfirmResponse paymentConfirmResponse = paymentService.confirm(request.paymentConfirmRequest());
-        Payment payment = paymentConfirmResponse.toModel(newReservation);
-        Reservation createdReservation = bookingManageService.createWithPayment(newReservation, payment);
+        ConfirmedPayment confirmedPayment = paymentService.confirm(request.paymentConfirmRequest());
+        Reservation createdReservation = bookingManageService.createWithPayment(newReservation, confirmedPayment);
         Reservation scheduledReservation = bookingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));

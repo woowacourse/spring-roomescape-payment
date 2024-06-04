@@ -20,8 +20,8 @@ import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -101,7 +101,7 @@ class ReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
-        PaymentConfirmResponse expectedPaymentConfirmResponse = new PaymentConfirmResponse("paymentKey", "orderId", 10);
+        ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
         BDDMockito.given(bookingManageService.scheduleRecentReservation(any()))
                 .willReturn(expectedReservation);
@@ -110,7 +110,7 @@ class ReservationControllerTest extends ControllerTest {
         BDDMockito.given(themeService.findById(anyLong()))
                 .willReturn(expectedTheme);
         BDDMockito.given(paymentService.confirm(any()))
-                .willReturn(expectedPaymentConfirmResponse);
+                .willReturn(expectedConfirmedPayment);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -179,7 +179,7 @@ class ReservationControllerTest extends ControllerTest {
         Long timeId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
-        PaymentConfirmResponse expectedPaymentConfirmResponse = new PaymentConfirmResponse("paymentKey", "orderId", 10);
+        ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
         BDDMockito.given(themeService.findById(themeId))
                 .willReturn(WOOTECO_THEME(themeId));
@@ -189,7 +189,7 @@ class ReservationControllerTest extends ControllerTest {
                 .given(bookingManageService)
                 .scheduleRecentReservation(any());
         BDDMockito.given(paymentService.confirm(any()))
-                .willReturn(expectedPaymentConfirmResponse);
+                .willReturn(expectedConfirmedPayment);
 
         // when & then
         mockMvc.perform(post("/reservations")

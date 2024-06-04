@@ -1,6 +1,6 @@
 package roomescape.reservation.event;
 
-import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.ConfirmedPayment;
 
-public record ReservationFailedEvent(Payment payment) {
+public record ReservationFailedEvent(ConfirmedPayment confirmedPayment) {
 }

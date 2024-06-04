@@ -1,9 +1,8 @@
-package roomescape.payment.dto.response;
+package roomescape.payment.domain;
 
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 
-public record PaymentConfirmResponse(
+public record ConfirmedPayment(
         String paymentKey,
         String orderId,
         long totalAmount
