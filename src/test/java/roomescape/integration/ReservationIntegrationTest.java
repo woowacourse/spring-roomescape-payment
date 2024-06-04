@@ -12,14 +12,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+import roomescape.service.payment.PaymentClient;
 
 class ReservationIntegrationTest extends IntegrationTest {
+    @MockBean
+    private PaymentClient paymentClient;
+
     @Nested
     @DisplayName("예약 목록 조회 API")
     class FindAllReservation {

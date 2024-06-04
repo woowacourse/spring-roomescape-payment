@@ -20,16 +20,12 @@ import roomescape.helper.domain.ReservationFixture;
 import roomescape.helper.domain.ReservationTimeFixture;
 import roomescape.helper.domain.ThemeFixture;
 import roomescape.helper.domain.WaitingFixture;
-import roomescape.service.payment.PaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
     @LocalServerPort
     int port;
-
-    @MockBean
-    protected PaymentClient paymentClient;
 
     @Autowired
     protected DatabaseCleaner databaseCleaner;
