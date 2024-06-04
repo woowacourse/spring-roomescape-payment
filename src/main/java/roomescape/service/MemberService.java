@@ -12,6 +12,7 @@ import roomescape.repository.MemberRepository;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 public class MemberService {
 
@@ -21,20 +22,17 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    @Transactional(readOnly = true)
     public Member findMemberByEmailAndPassword(MemberLoginRequest request) {
         return memberRepository.findByEmailAndPassword(request.email(), request.password())
                 .orElseThrow(() -> new AuthenticationException(
                         "사용자(email: %s, password: %s)가 존재하지 않습니다.".formatted(request.email(), request.password())));
     }
 
-    @Transactional(readOnly = true)
     public Member findMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("id가 %s인 사용자가 존재하지 않습니다."));
     }
 
-    @Transactional(readOnly = true)
     public List<Member> findAllMembers() {
         return memberRepository.findAll();
     }

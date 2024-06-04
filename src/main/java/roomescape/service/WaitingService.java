@@ -11,6 +11,7 @@ import roomescape.repository.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 public class WaitingService {
 
@@ -58,7 +59,6 @@ public class WaitingService {
         }
     }
 
-    @Transactional(readOnly = true)
     public boolean existsWaiting(Theme theme, LocalDate date, ReservationTime time) {
         return waitingRepository.existsWaitingByThemeAndDateAndTime(theme, date, time);
     }
@@ -76,7 +76,6 @@ public class WaitingService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<WaitingWithRank> findMemberWaiting(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->
@@ -84,12 +83,10 @@ public class WaitingService {
         return waitingRepository.findWaitingWithRankByMemberId(member.getId());
     }
 
-    @Transactional(readOnly = true)
     public List<Waiting> findAllWaiting() {
         return waitingRepository.findAll();
     }
 
-    @Transactional(readOnly = true)
     public Waiting findFirstWaitingByCondition(Theme theme, LocalDate date, ReservationTime time) {
         return waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time)
                 .orElseThrow(() ->

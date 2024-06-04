@@ -19,6 +19,7 @@ import roomescape.repository.ThemeRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 public class ReservationService {
 
@@ -41,7 +42,6 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    @Transactional(readOnly = true)
     public List<Reservation> filterReservation(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo) {
         Theme theme = themeRepository.findById(themeId)
                 .orElse(null);
@@ -97,13 +97,11 @@ public class ReservationService {
         findById(reservationRepository, id);
     }
 
-    @Transactional(readOnly = true)
     public List<Reservation> findMemberReservations(Long memberId) {
         Member member = findById(memberRepository, memberId);
         return reservationRepository.findAllByMember(member);
     }
 
-    @Transactional(readOnly = true)
     public Reservation findById(Long id) {
         return findById(reservationRepository, id);
     }

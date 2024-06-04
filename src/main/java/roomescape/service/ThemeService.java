@@ -9,6 +9,7 @@ import roomescape.repository.ThemeRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 public class ThemeService {
 
@@ -32,7 +33,6 @@ public class ThemeService {
         themeRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     public List<Theme> findPopularThemes() {
         LocalDate before = LocalDate.now().minusDays(8);
         LocalDate after = LocalDate.now().minusDays(1);

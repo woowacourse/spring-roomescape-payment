@@ -12,6 +12,7 @@ import roomescape.repository.WaitingRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 public class ReservationWaitingService {
 
@@ -25,7 +26,6 @@ public class ReservationWaitingService {
         this.memberRepository = memberRepository;
     }
 
-    @Transactional(readOnly = true)
     public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));

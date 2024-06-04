@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Transactional(readOnly = true)
 @Service
 public class ReservationTimeService {
 
@@ -28,7 +29,6 @@ public class ReservationTimeService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationTime> findAllReservationTimes() {
         return reservationTimeRepository.findAll();
     }
@@ -50,12 +50,10 @@ public class ReservationTimeService {
         }
     }
 
-    @Transactional(readOnly = true)
     public ReservationTime findReservationTime(long id) {
         return findById(id);
     }
 
-    @Transactional(readOnly = true)
     public List<IsReservedTimeResponse> getIsReservedTime(LocalDate date, long themeId) {
         List<ReservationTime> allTimes = reservationTimeRepository.findAll();
         List<ReservationTime> bookedTimes = reservationTimeRepository.findAllReservedTimes(date, themeId);
