@@ -22,7 +22,6 @@ import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.payment.PaymentService;
-import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
@@ -48,14 +47,6 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.paymentService = paymentService;
-    }
-
-    public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
-        ReservationRequest reservationRequest = ReservationRequest.fromAdminRequest(adminReservationRequest);
-        Reservation reservation = generateValidReservation(reservationRequest, adminReservationRequest.memberId());
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return new ReservationResponse(savedReservation);
     }
 
     @Transactional

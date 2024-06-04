@@ -32,6 +32,6 @@ public class Fixture {
     public static final String TEST_PAYMENT_KEY = "TEST_PAYMENT_KEY";
     public static final String TEST_ORDER_ID = "TEST_ORDER_ID";
     public static final BigDecimal TEST_ORDER_AMOUNT = new BigDecimal("2000000");
-    public static final String TEST_PAYMENT_TYPE = "TEST_PAYMENT_TYPE";
-    public static final Payment payment = new Payment(TEST_ORDER_ID, TEST_PAYMENT_KEY, TEST_ORDER_AMOUNT);
+    public static final String TEST_PAYMENT_TYPE = "NORMAL";
+    public static final Payment payment = new Payment(TEST_ORDER_ID, TEST_PAYMENT_KEY, TEST_ORDER_AMOUNT, TEST_PAYMENT_TYPE);
 }

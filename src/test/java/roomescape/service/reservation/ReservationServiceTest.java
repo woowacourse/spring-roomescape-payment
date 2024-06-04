@@ -31,8 +31,8 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.ServiceTestBase;
 import roomescape.service.member.dto.MemberReservationResponse;
-import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
+import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @ExtendWith(SpringExtension.class)
@@ -66,12 +66,13 @@ class ReservationServiceTest extends ServiceTestBase {
     void create() {
         // given
         LocalDate date = Fixture.tomorrow;
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(
-                date, member.getId(), reservationTime.getId(), theme.getId()
+        ReservationRequest request = new ReservationRequest(
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID, Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
         );
 
         // when
-        ReservationResponse result = reservationService.create(adminReservationRequest);
+        ReservationResponse result = reservationService.create(request, member.getId());
 
         // then
         SoftAssertions assertions = new SoftAssertions();
@@ -202,11 +203,14 @@ class ReservationServiceTest extends ServiceTestBase {
         Reservation reservation = new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
 
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(date, member.getId(),
-                reservationTime.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID, Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
+        );
 
         // when & then
-        assertThatThrownBy(() -> reservationService.create(adminReservationRequest))
+        long memberId = member.getId();
+        assertThatThrownBy(() -> reservationService.create(request, memberId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("선택하신 테마와 일정은 이미 예약이 존재합니다.");
     }
@@ -216,12 +220,14 @@ class ReservationServiceTest extends ServiceTestBase {
     void cannotCreateByUnknownTime() {
         // given
         LocalDate date = Fixture.tomorrow;
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(
-                date, member.getId(), 0L, theme.getId()
+        ReservationRequest request = new ReservationRequest(
+                date, 0L, theme.getId(),
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID, Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
         );
 
         // when & then
-        assertThatThrownBy(() -> reservationService.create(adminReservationRequest))
+        long memberId = member.getId();
+        assertThatThrownBy(() -> reservationService.create(request, memberId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 시간입니다.");
     }
@@ -231,11 +237,14 @@ class ReservationServiceTest extends ServiceTestBase {
     void cannotCreateByUnknownTheme() {
         // given
         LocalDate date = Fixture.tomorrow;
-        AdminReservationRequest adminReservationRequest = new AdminReservationRequest(date, member.getId(),
-                reservationTime.getId(), 0L);
+        ReservationRequest request = new ReservationRequest(
+                date, reservationTime.getId(), 0L,
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID, Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
+        );
 
         // when & then
-        assertThatThrownBy(() -> reservationService.create(adminReservationRequest))
+        long memberId = member.getId();
+        assertThatThrownBy(() -> reservationService.create(request, memberId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 테마입니다.");
     }

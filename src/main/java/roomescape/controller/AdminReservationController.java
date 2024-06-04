@@ -16,6 +16,7 @@ import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservationWaitingService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
+import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationWaitingResponse;
 
@@ -34,7 +35,9 @@ public class AdminReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
-        ReservationResponse reservationResponse = reservationService.create(adminReservationRequest);
+        ReservationResponse reservationResponse = reservationService.create(
+                ReservationRequest.fromAdminRequest(adminReservationRequest), adminReservationRequest.memberId()
+        );
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
     }

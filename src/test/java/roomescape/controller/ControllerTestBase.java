@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static roomescape.Fixture.TEST_ORDER_AMOUNT;
 import static roomescape.Fixture.TEST_ORDER_ID;
 import static roomescape.Fixture.TEST_PAYMENT_KEY;
+import static roomescape.Fixture.TEST_PAYMENT_TYPE;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,6 @@ public abstract class ControllerTestBase {
     @BeforeEach
     void initPort() {
         RestAssured.port = port;
-        Mockito.when(restClient.confirm(any())).thenReturn(new PaymentResult(TEST_ORDER_AMOUNT, TEST_ORDER_ID, TEST_PAYMENT_KEY));
+        Mockito.when(restClient.confirm(any())).thenReturn(new PaymentResult(TEST_ORDER_AMOUNT, TEST_ORDER_ID, TEST_PAYMENT_KEY, TEST_PAYMENT_TYPE));
     }
 }

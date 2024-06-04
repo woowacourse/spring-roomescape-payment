@@ -18,15 +18,23 @@ public class PaymentService {
     }
 
     public Payment confirm(PaymentRequest paymentRequest) {
+        if (paymentRequest.paymentType().isByAdmin()) {
+            return paymentRepository.save(Payment.ofAdmin());
+        }
         PaymentResult paymentResult = paymentClient.confirm(paymentRequest);
         return paymentRepository.save(
-                new Payment(paymentResult.orderId(), paymentResult.paymentKey(), paymentResult.totalAmount())
+                new Payment(
+                        paymentResult.orderId(), paymentResult.paymentKey(),
+                        paymentResult.totalAmount(), paymentResult.type()
+                )
         );
     }
 
     @Transactional
     public void cancel(Payment payment) {
         paymentRepository.deleteById(payment.getId());
-        paymentClient.cancel(payment);
+        if (!payment.isByAdmin()) {
+            paymentClient.cancel(payment);
+        }
     }
 }

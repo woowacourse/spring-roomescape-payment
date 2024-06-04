@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public record PaymentResult(
         BigDecimal totalAmount,
         String orderId,
-        String paymentKey
+        String paymentKey,
+        String type
 ) {
 }
