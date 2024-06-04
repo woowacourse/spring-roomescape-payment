@@ -12,8 +12,7 @@ public class TossPaymentExceptionHandler extends DefaultResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         PaymentExceptionResponse paymentExceptionResponse = getTossExceptionResponse(response);
-        if (paymentExceptionResponse.code().equals("INVALID_API_KEY") || paymentExceptionResponse.code().equals("INVALID_AUTHORIZE_AUTH")
-        || paymentExceptionResponse.code().equals("UNAUTHORIZED_KEY") || paymentExceptionResponse.code().equals("INCORRECT_BASIC_AUTH_FORMAT")) {
+        if (TossConvertedErrorCode.canConvert(paymentExceptionResponse.code())) {
             PaymentExceptionResponse changePaymentExceptionResponse = new PaymentExceptionResponse(
                     paymentExceptionResponse.code(),
                     "결제 시스템에 문제가 발생했습니다."
