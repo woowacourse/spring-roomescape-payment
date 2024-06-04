@@ -12,16 +12,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.exception.PaymentException;
-import roomescape.payment.api.PaymentClient;
+import roomescape.payment.api.TossPaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.service.PaymentService;
 
 @ExtendWith(MockitoExtension.class)
-class PaymentServiceTest {
+class TossPaymentServiceTest {
 
     @Mock
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @InjectMocks
     private PaymentService paymentService;
@@ -37,7 +37,7 @@ class PaymentServiceTest {
                 "KRW",
                 1000);
 
-        Mockito.when(paymentClient.payment(validPaymentRequest)).thenReturn(validPaymentResponse);
+        Mockito.when(tossPaymentClient.payment(validPaymentRequest)).thenReturn(validPaymentResponse);
 
         assertThat(paymentService.payment(validPaymentRequest)).isEqualTo(validPaymentResponse);
     }
@@ -47,7 +47,7 @@ class PaymentServiceTest {
     void failPayment() {
         PaymentRequest invalidPaymentRequest = new PaymentRequest("invalid", "invalidOrderId", 1000);
 
-        Mockito.when(paymentClient.payment(invalidPaymentRequest)).thenThrow(PaymentException.class);
+        Mockito.when(tossPaymentClient.payment(invalidPaymentRequest)).thenThrow(PaymentException.class);
 
         assertThatThrownBy(() -> paymentService.payment(invalidPaymentRequest)).isInstanceOf(PaymentException.class);
     }

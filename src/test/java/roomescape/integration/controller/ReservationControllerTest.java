@@ -31,21 +31,21 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.auth.config.JwtGenerator;
+import roomescape.auth.domain.Role;
 import roomescape.exception.PaymentException;
 import roomescape.exception.response.PaymentExceptionResponse;
+import roomescape.fixture.ThemeFixture;
+import roomescape.member.entity.Member;
+import roomescape.member.repository.MemberRepository;
 import roomescape.payment.api.PaymentClient;
-import roomescape.auth.domain.Role;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.member.entity.Member;
 import roomescape.reservation.entity.Reservation;
-import roomescape.theme.entity.Theme;
-import roomescape.fixture.ThemeFixture;
-import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.time.repository.ReservationTimeRepository;
+import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.auth.config.JwtGenerator;
+import roomescape.time.repository.ReservationTimeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
