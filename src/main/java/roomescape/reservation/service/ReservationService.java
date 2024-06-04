@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.client.feign.PaymentClient;
+import roomescape.client.PaymentClient;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
@@ -53,7 +53,7 @@ public class ReservationService {
     }
 
     public Long save(ReservationCreateRequest reservationCreateRequest, LoginMemberInToken loginMemberInToken) {
-        paymentClient.paymentReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest));
+        paymentClient.payForReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest));
 
         if (reservationRepository.existsByDateAndReservationTimeIdAndThemeId(reservationCreateRequest.date(),
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {

@@ -20,10 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
+import roomescape.client.PaymentClient;
 import roomescape.client.PaymentException;
-import roomescape.client.feign.PaymentClient;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
@@ -35,7 +35,6 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
-import roomescape.reservation.dto.response.PaymentResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -65,13 +64,12 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약이 생성한다.")
     void saveReservationWhenAccountIsCompleted() {
-        Mockito.when(paymentClient.paymentReservation(anyString(), any(PaymentRequest.class)))
-                .thenReturn(ResponseEntity.ok(new PaymentResponse("")));
+        Mockito.when(paymentClient.payForReservation(anyString(), any(PaymentRequest.class)))
+                .thenReturn(HttpStatus.class);
 
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("n", "e", "p"));
-
         ReservationCreateRequest reservationCreateRequest
                 = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "", "", 1000L,
                 "");
@@ -86,8 +84,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName(" 지난 날짜에 대한 예약 시 예외를 발생 시킨다.")
     void saveShouldThrowExceptionWhenReservationDateIsExpire() {
-        Mockito.when(paymentClient.paymentReservation(anyString(), any(PaymentRequest.class)))
-                .thenReturn(ResponseEntity.ok(new PaymentResponse("")));
+        Mockito.when(paymentClient.payForReservation(anyString(), any(PaymentRequest.class)))
+                .thenReturn(HttpStatus.class);
 
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
@@ -106,8 +104,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")
     void notExistReservationTimeIdExceptionTest() {
-        Mockito.when(paymentClient.paymentReservation(anyString(), any(PaymentRequest.class)))
-                .thenReturn(ResponseEntity.ok(new PaymentResponse("")));
+        Mockito.when(paymentClient.payForReservation(anyString(), any(PaymentRequest.class)))
+                .thenReturn(HttpStatus.class);
 
         Theme theme = new Theme("공포", "호러 방탈출", "http://asdf.jpg");
         Long themeId = themeRepository.save(theme).getId();
@@ -123,7 +121,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("예약 생성 중 결제에 실패하면 예외를 발생시킨다.")
     void saveShouldThrowExceptionWhenAccountFailed() {
-        Mockito.when(paymentClient.paymentReservation(anyString(), any(PaymentRequest.class)))
+        Mockito.when(paymentClient.payForReservation(anyString(), any(PaymentRequest.class)))
                 .thenThrow(PaymentException.class);
 
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));

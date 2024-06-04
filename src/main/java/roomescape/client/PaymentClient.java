@@ -10,19 +10,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import roomescape.reservation.dto.request.PaymentRequest;
 
 @Component
-public class PaymentRestClient {
+public class PaymentClient {
     private final RestClient client;
     private final ObjectMapper mapper;
 
-    public PaymentRestClient(ObjectMapper mapper) {
+    public PaymentClient(ObjectMapper mapper) {
         this.mapper = mapper;
         this.client = RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/")
                 .build();
     }
 
-    public void payForReservation(String authorization, PaymentRequest paymentRequest) {
-        client.post()
+    public Object payForReservation(String authorization, PaymentRequest paymentRequest) {
+        return client.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", authorization)
@@ -33,9 +33,9 @@ public class PaymentRestClient {
     private ExchangeFunction<Object> invokeErrorCheck() {
         return (request, response) -> {
             if (response.getStatusCode().isError()) {
-                return new PaymentException(mapper.readValue(response.getBody(), TossErrorResponse.class));
+                throw new PaymentException(mapper.readValue(response.getBody(), TossErrorResponse.class));
             }
-            return response;
+            return response.getStatusCode();
         };
     }
 }
