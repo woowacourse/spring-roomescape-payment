@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRestClient;
 import roomescape.payment.dto.PaymentCreateRequest;
+import roomescape.payment.dto.RestClientPaymentApproveResponse;
 import roomescape.payment.repository.PaymentRepository;
 
 @Service
@@ -20,9 +21,9 @@ public class PaymentService {
     }
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {
-        restClient.approvePayment(paymentCreateRequest);
-        paymentRepository.save(new Payment(paymentCreateRequest.Reservation(),
-                paymentCreateRequest.paymentKey()));
+        RestClientPaymentApproveResponse restClientPaymentApproveResponse =
+                restClient.approvePayment(paymentCreateRequest);
+        paymentRepository.save(restClientPaymentApproveResponse.createPayment(paymentCreateRequest.reservation()));
     }
 
     public void cancelPayment(Long reservationId) {

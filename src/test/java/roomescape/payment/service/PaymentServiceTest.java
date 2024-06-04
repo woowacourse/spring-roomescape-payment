@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import roomescape.fixture.TimeFixture;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRestClient;
 import roomescape.payment.dto.PaymentCreateRequest;
+import roomescape.payment.dto.RestClientPaymentApproveResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -43,8 +46,12 @@ class PaymentServiceTest {
     void approvePayment() {
         PaymentCreateRequest paymentCreateRequest = new PaymentCreateRequest("paymentKey",
                 "orderId", BigDecimal.valueOf(1000), RESERVATION);
+        RestClientPaymentApproveResponse response = new RestClientPaymentApproveResponse(
+                "paymentKey", "orderId", BigDecimal.valueOf(1000), ZonedDateTime.now()
+        );
 
-        doNothing().when(paymentRestClient).approvePayment(paymentCreateRequest);
+        when(paymentRestClient.approvePayment(paymentCreateRequest))
+                .thenReturn(response);
 
         assertThatCode(() -> paymentService.approvePayment(paymentCreateRequest))
                 .doesNotThrowAnyException();
@@ -55,7 +62,8 @@ class PaymentServiceTest {
     void cancelPayment() {
         doNothing().when(paymentRestClient).cancelPayment("paymentKey");
         when(paymentRepository.findByReservation_Id(1L))
-                .thenReturn(new Payment(RESERVATION, "paymentKey"));
+                .thenReturn(new Payment(RESERVATION, "paymentKey", BigDecimal.valueOf(1000), "orderId",
+                        LocalDateTime.now()));
 
         assertThatCode(() -> paymentService.cancelPayment(1L))
                 .doesNotThrowAnyException();

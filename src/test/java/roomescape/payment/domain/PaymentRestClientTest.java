@@ -58,12 +58,21 @@ class PaymentRestClientTest {
     void approvePaymentTest() throws JsonProcessingException {
         // given
         String request = objectMapper.writeValueAsString(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest());
+        String response = """
+                {
+                  "paymentKey": "tgen_20240528211",
+                  "orderId": "MC40MTMwMTk0ODU0ODU4",
+                  "totalAmount": "1000",
+                  "approvedAt": "2024-02-13T12:18:14+09:00",
+                  "status": "DONE"
+                }
+                """;
 
         mockServer.expect(ExpectedCount.manyTimes(), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "Basic " + paymentRestClient.getSecretKey()))
                 .andExpect(content().json(request))
-                .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when & then
         assertThatCode(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
