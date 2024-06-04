@@ -85,7 +85,7 @@ public class Reservation {
         }
     }
 
-    public void updatePayment(Payment payment) {
+    public void updateAsCompleted(Payment payment) {
         this.status = ReservationStatus.RESERVED_COMPLETE;
         this.payment = payment;
     }
