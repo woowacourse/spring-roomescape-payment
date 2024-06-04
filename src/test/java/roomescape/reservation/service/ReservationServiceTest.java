@@ -85,7 +85,7 @@ class ReservationServiceTest {
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when
-        CreateReservationResponse createReservationResponse = reservationService.createMyReservation(
+        CreateReservationResponse createReservationResponse = reservationService.createMyReservationWithPayment(
                 authInfo,
                 createReservationRequest);
 
@@ -105,7 +105,7 @@ class ReservationServiceTest {
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createReservationRequest))
+        assertThatThrownBy(() -> reservationService.createMyReservationWithPayment(authInfo, createReservationRequest))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("식별자 1에 해당하는 시간이 존재하지 않습니다.");
     }
@@ -122,7 +122,7 @@ class ReservationServiceTest {
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createReservationRequest))
+        assertThatThrownBy(() -> reservationService.createMyReservationWithPayment(authInfo, createReservationRequest))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("식별자 1에 해당하는 테마가 존재하지 않습니다.");
     }
@@ -142,7 +142,7 @@ class ReservationServiceTest {
         AuthInfo authInfo = new AuthInfo(members.get(1).getId(), members.get(1).getName(), members.get(1).getRole());
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createReservationRequest))
+        assertThatThrownBy(() -> reservationService.createMyReservationWithPayment(authInfo, createReservationRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 2024-10-10의 테마 이름 테마에는 10:00 시의 예약이 존재하여 예약을 생성할 수 없습니다.");
     }
@@ -161,7 +161,7 @@ class ReservationServiceTest {
         AuthInfo authInfo = new AuthInfo(members.get(1).getId(), members.get(1).getName(), members.get(1).getRole());
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createReservationRequest))
+        assertThatThrownBy(() -> reservationService.createMyReservationWithPayment(authInfo, createReservationRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("2024-04-10는 지나간 시간임으로 예약 생성이 불가능합니다. 현재 이후 날짜로 재예약해주세요.");
     }

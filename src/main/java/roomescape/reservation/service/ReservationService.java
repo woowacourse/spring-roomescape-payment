@@ -3,6 +3,7 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -58,11 +59,19 @@ public class ReservationService {
         this.paymentClient = paymentClient;
     }
 
-    public CreateReservationResponse createMyReservation(final AuthInfo authInfo,
-                                                         final CreateMyReservationRequest createMyReservationRequest) {
+    public CreateReservationResponse createMyReservationWithPayment(final AuthInfo authInfo,
+                                                                    final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
                 createMyReservationRequest);
-        return CreateReservationResponse.from(createReservationWithPayment(createReservationRequest));
+        Reservation reservation = createReservation(createReservationRequest);
+
+        try {
+            paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
+        } catch (ClientException e) {
+            reservationRepository.delete(reservation);
+            throw e;
+        }
+        return CreateReservationResponse.from(reservation);
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
@@ -70,6 +79,7 @@ public class ReservationService {
         return CreateReservationResponse.from(createReservation(createReservationRequest));
     }
 
+    @Transactional
     public Reservation createReservation(final CreateReservationRequest createReservationRequest) {
         ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
         Theme theme = themeRepository.getById(createReservationRequest.themeId());
@@ -79,21 +89,6 @@ public class ReservationService {
                 reservationTime.getStartAt());
         Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
         return reservationRepository.save(reservation);
-    }
-
-    @Transactional
-    public Reservation createReservationWithPayment(final CreateReservationRequest createReservationRequest) {
-        ReservationTime reservationTime = reservationTimeRepository.getById(createReservationRequest.timeId());
-        Theme theme = themeRepository.getById(createReservationRequest.themeId());
-        Member member = memberRepository.getById(createReservationRequest.memberId());
-
-        checkAlreadyExistReservation(createReservationRequest, createReservationRequest.date(), theme.getName(),
-                reservationTime.getStartAt());
-        Reservation reservation = createReservationRequest.toReservation(member, reservationTime, theme);
-
-        Reservation saveReservation = reservationRepository.save(reservation);
-        paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
-        return saveReservation;
     }
 
     private void checkAlreadyExistReservation(final CreateReservationRequest createReservationRequest,

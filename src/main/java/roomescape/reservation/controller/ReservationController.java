@@ -36,7 +36,7 @@ public class ReservationController {
             @AuthenticationPrincipal AuthInfo authInfo,
             @Valid @RequestBody CreateMyReservationRequest createReservationRequest) {
         CreateReservationResponse createReservationResponse =
-                reservationService.createMyReservation(authInfo, createReservationRequest);
+                reservationService.createMyReservationWithPayment(authInfo, createReservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + createReservationResponse.id()))
                 .body(createReservationResponse);
     }
