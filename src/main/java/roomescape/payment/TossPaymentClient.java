@@ -3,8 +3,6 @@ package roomescape.payment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
@@ -17,11 +15,9 @@ import roomescape.system.exception.RoomEscapeException;
 public class TossPaymentClient {
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final RestClient restClient;
-    private final PaymentProperties paymentProperties;
 
-    public TossPaymentClient(RestClient restClient, PaymentProperties paymentProperties) {
+    public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
-        this.paymentProperties = paymentProperties;
     }
 
     public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
@@ -29,7 +25,6 @@ public class TossPaymentClient {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", getAuthorizations())
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -41,12 +36,6 @@ public class TossPaymentClient {
         log.error("결제 승인 요청: paymentKey={}, orderId={}, amount={}, paymentType={}",
                 paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount(),
                 paymentRequest.paymentType());
-    }
-
-    private String getAuthorizations() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((paymentProperties.getSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
     }
 
     private void handlePaymentError(ClientHttpResponse res)
