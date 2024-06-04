@@ -15,12 +15,14 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+import roomescape.exception.payment.PaymentIOException;
 import roomescape.exception.payment.PaymentTimeoutException;
 import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -40,7 +42,7 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
 
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(1))
+                .withConnectTimeout(Duration.ofMillis(1))
                 .withReadTimeout(Duration.ofSeconds(30));
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory.class, settings);
         this.restClient = restClientBuilder.requestFactory(requestFactory).build();
@@ -50,6 +52,7 @@ public class PaymentClient {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((paymentProperties.getSecretKey() + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
         String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
+
         try {
             return restClient.method(HttpMethod.POST)
                     .uri(paymentProperties.getUrl() + "/confirm")
@@ -64,8 +67,14 @@ public class PaymentClient {
                         throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
                     })
                     .body(PaymentConfirmOutput.class);
+
         } catch (ResourceAccessException e) {
-            throw new PaymentTimeoutException(e);
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new PaymentTimeoutException(e);
+            }
+            throw new PaymentIOException(e);
+        } catch (Exception e) {
+            throw new PaymentConfirmException(e);
         }
     }
 
