@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.common.exception.UnAuthorizationException;
 import roomescape.payment.client.toss.TossClientErrorResponse;
@@ -112,7 +113,10 @@ public class GlobalExceptionHandler {
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            SocketTimeoutException.class,
+            ResourceAccessException.class
+    })
     public ResponseEntity<ProblemDetail> catchSocketTimeoutException(SocketTimeoutException ex) {
         logger.warning(EXCEPTION_PREFIX + ex.getClass() + " " + ex.getMessage());
         String exceptionMessage = "요청 처리 중 처리 중단(Timeout)이 발생했습니다. 잠시 후 다시 시도해 주세요.";
