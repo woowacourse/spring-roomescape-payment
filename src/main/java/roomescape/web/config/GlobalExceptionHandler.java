@@ -13,6 +13,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.CustomException;
+import roomescape.exception.ErrorResult;
 
 @Slf4j
 @RestControllerAdvice
@@ -20,33 +21,29 @@ public class GlobalExceptionHandler {
     private static final String ERROR_PREFIX = "exception occur : {}";
 
     @ExceptionHandler(value = CustomException.class)
-    public ResponseEntity<String> handleCustomException(CustomException exception) {
-        log.error(ERROR_PREFIX, exception);
-        return new ResponseEntity<>(exception.getMessage(), exception.getStatus());
+    public ResponseEntity<ErrorResult> handleCustomException(CustomException exception) {
+        return new ResponseEntity<>(new ErrorResult(exception.getMessage()), exception.getStatus());
     }
 
     @ExceptionHandler(value = BindException.class)
-    public ResponseEntity<String> handleValidationException(BindException exception) {
-        log.error(ERROR_PREFIX, exception);
-        return new ResponseEntity<>(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
-                BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleValidationException(BindException exception) {
+        String message = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        return new ResponseEntity<>(new ErrorResult(message), BAD_REQUEST);
     }
 
     @ExceptionHandler(value = HttpMessageConversionException.class)
-    public ResponseEntity<String> handleJsonParsingException(HttpMessageConversionException exception) {
-        log.error(ERROR_PREFIX, exception);
-        return new ResponseEntity<>("유효하지 않은 필드가 존재합니다.", BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleJsonParsingException(HttpMessageConversionException exception) {
+        return new ResponseEntity<>(new ErrorResult("유효하지 않은 필드가 존재합니다."), BAD_REQUEST);
     }
 
     @ExceptionHandler(value = JwtException.class)
     public ProblemDetail handleJwtException(JwtException exception) {
-        log.error(ERROR_PREFIX, exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<String> handleException(Exception exception) {
+    public ResponseEntity<ErrorResult> handleException(Exception exception) {
         log.error(ERROR_PREFIX, exception);
-        return new ResponseEntity<>("서버 에러입니다.", INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ErrorResult("서버 에러입니다."), INTERNAL_SERVER_ERROR);
     }
 }
