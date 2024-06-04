@@ -1,13 +1,7 @@
 package roomescape.integration;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +12,13 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 class ReservationIntegrationTest extends IntegrationTest {
     @Nested
@@ -148,7 +149,7 @@ class ReservationIntegrationTest extends IntegrationTest {
                     .body(params)
                     .when().post("/reservations")
                     .then().log().all()
-                    .statusCode(500);
+                    .statusCode(502);
         }
 
         @Test
