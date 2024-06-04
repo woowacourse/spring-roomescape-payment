@@ -18,7 +18,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;

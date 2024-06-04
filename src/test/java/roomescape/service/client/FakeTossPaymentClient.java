@@ -9,11 +9,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.controller.dto.PaymentErrorMessageResponse;
-import roomescape.service.dto.PaymentRequestDto;
+import roomescape.service.dto.PaymentRequest;
 
 public class FakeTossPaymentClient implements PaymentClient {
     @Override
-    public void requestPayment(PaymentRequestDto body) {
+    public void requestPayment(PaymentRequest body) {
         if (body.orderId().isBlank() || body.paymentKey().isBlank()) {
             try {
                 PaymentErrorMessageResponse request = new PaymentErrorMessageResponse("INVALID_AUTHORIZE_AUTH", "유효하지 않은 인증 방식입니다.");

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;

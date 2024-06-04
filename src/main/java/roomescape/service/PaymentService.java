@@ -8,12 +8,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.service.client.PaymentClient;
-import roomescape.service.dto.PaymentRequestDto;
+import roomescape.service.dto.PaymentRequest;
 
 @Service
 public class PaymentService {
@@ -26,8 +25,7 @@ public class PaymentService {
 
     public void pay(CreateUserReservationRequest request) {
         try {
-            PaymentRequestDto requestDto = new PaymentRequestDto(request.orderId(), request.amount(), request.paymentKey());
-            paymentClient.requestPayment(requestDto);
+            paymentClient.requestPayment(new PaymentRequest(request.orderId(), request.amount(), request.paymentKey()));
         } catch (HttpClientErrorException e) {
             try {
                 byte[] responseBody = e.getResponseBodyAsByteArray();

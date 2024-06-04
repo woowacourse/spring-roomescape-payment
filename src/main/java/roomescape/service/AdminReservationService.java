@@ -126,7 +126,7 @@ public class AdminReservationService {
         }
         List<Reservation> reservations =
                 reservationRepository.findAllByThemeIdAndMemberIdAndDateIsBetweenOrderByDateAscTimeStartAtAsc(
-        request.themeId(), request.memberId(), request.dateFrom(), request.dateTo());
+                        request.themeId(), request.memberId(), request.dateFrom(), request.dateTo());
         return reservations.stream()
                 .map(FindReservationResponse::from)
                 .toList();

@@ -32,7 +32,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("성공: 결제 요청 성공")
         void pay() {
-            CreateUserReservationRequest request = new CreateUserReservationRequest(LocalDate.now(), 1L, 1L, "paymentKey", "orderId",1000, "카드");
+            CreateUserReservationRequest request = new CreateUserReservationRequest(LocalDate.now(), 1L, 1L, "paymentKey", "orderId", 1000, "카드");
             assertThatCode(
                     () -> paymentService.pay(request))
                     .doesNotThrowAnyException();
@@ -41,7 +41,7 @@ class PaymentServiceTest {
         @Test
         @DisplayName("실패: 잘못된 orderId나 paymentKey 입력 시 예외가 발생한다")
         void pay_roomEscapeException() {
-            CreateUserReservationRequest request = new CreateUserReservationRequest(LocalDate.now(), 1L, 1L, "", "",1000, "카드");
+            CreateUserReservationRequest request = new CreateUserReservationRequest(LocalDate.now(), 1L, 1L, "", "", 1000, "카드");
             assertThatThrownBy(
                     () -> paymentService.pay(request))
                     .isInstanceOf(RoomescapeException.class);

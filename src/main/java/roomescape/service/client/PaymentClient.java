@@ -1,8 +1,8 @@
 package roomescape.service.client;
 
-import roomescape.service.dto.PaymentRequestDto;
+import roomescape.service.dto.PaymentRequest;
 
 public interface PaymentClient {
 
-    void requestPayment(PaymentRequestDto body);
+    void requestPayment(PaymentRequest body);
 }
