@@ -39,7 +39,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Profile("!test")
     public RestClient restClient() {
         final JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
-        factory.setReadTimeout(Duration.ofSeconds(5));
+        factory.setReadTimeout(Duration.ofSeconds(3));
 
         return RestClient.builder()
                 .requestFactory(factory)
