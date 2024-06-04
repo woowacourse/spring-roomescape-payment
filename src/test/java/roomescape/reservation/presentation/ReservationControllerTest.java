@@ -16,12 +16,13 @@ import org.springframework.http.MediaType;
 import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
-import roomescape.common.TestClientConfiguration;
 import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -59,7 +60,7 @@ import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_ME
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
-@Import({TestWebMvcConfiguration.class, TestClientConfiguration.class})
+@Import(TestWebMvcConfiguration.class)
 @WebMvcTest(
         value = ReservationController.class,
         excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE,
@@ -90,6 +91,9 @@ class ReservationControllerTest extends ControllerTest {
     @MockBean
     private ThemeService themeService;
 
+    @MockBean
+    private PaymentService paymentService;
+
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
     void createReservation() throws Exception {
@@ -99,6 +103,7 @@ class ReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
+        PaymentConfirmResponse expectedPaymentConfirmResponse = new PaymentConfirmResponse("paymentKey", "orderId", 10);
 
         BDDMockito.given(bookingManageService.scheduleRecentReservation(any()))
                 .willReturn(expectedReservation);
@@ -106,6 +111,8 @@ class ReservationControllerTest extends ControllerTest {
                 .willReturn(expectedTime);
         BDDMockito.given(themeService.findById(anyLong()))
                 .willReturn(expectedTheme);
+        BDDMockito.given(paymentService.confirm(any()))
+                .willReturn(expectedPaymentConfirmResponse);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -174,6 +181,7 @@ class ReservationControllerTest extends ControllerTest {
         Long timeId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        PaymentConfirmResponse expectedPaymentConfirmResponse = new PaymentConfirmResponse("paymentKey", "orderId", 10);
 
         BDDMockito.given(themeService.findById(themeId))
                 .willReturn(WOOTECO_THEME(themeId));
@@ -182,6 +190,8 @@ class ReservationControllerTest extends ControllerTest {
         BDDMockito.willThrow(new ViolationException(TEST_ERROR_MESSAGE))
                 .given(bookingManageService)
                 .scheduleRecentReservation(any());
+        BDDMockito.given(paymentService.confirm(any()))
+                .willReturn(expectedPaymentConfirmResponse);
 
         // when & then
         mockMvc.perform(post("/reservations")
