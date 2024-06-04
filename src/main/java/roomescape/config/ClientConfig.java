@@ -1,6 +1,5 @@
 package roomescape.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
+import roomescape.exception.payment.PaymentClientResponseErrorHandler;
 import roomescape.service.payment.PaymentClient;
 
 @Configuration
@@ -20,8 +20,8 @@ public class ClientConfig {
     private String secretKey;
 
     @Bean
-    public PaymentClient paymentClient(ObjectMapper objectMapper) {
-        return new PaymentClient(objectMapper, createRestClient());
+    public PaymentClient paymentClient(PaymentClientResponseErrorHandler errorHandler) {
+        return new PaymentClient(createRestClient(), errorHandler);
     }
 
     private RestClient createRestClient() {
