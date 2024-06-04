@@ -1,24 +1,23 @@
 package roomescape.payment;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
+import roomescape.global.config.TossPaymentProperties;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 
 public class TossPaymentClient {
 
     private final RestClient restClient;
+    private final TossPaymentProperties tossPaymentProperties;
 
-    @Value("${payment.toss.api.confirm}")
-    private String confirmApi;
-
-    public TossPaymentClient(final RestClient restClient) {
+    public TossPaymentClient(RestClient restClient, TossPaymentProperties tossPaymentProperties) {
         this.restClient = restClient;
+        this.tossPaymentProperties = tossPaymentProperties;
     }
 
     public PaymentConfirmResponse confirmPayments(PaymentConfirmRequest request) {
         return restClient.post()
-                .uri(confirmApi)
+                .uri(tossPaymentProperties.api().confirm())
                 .body(request)
                 .retrieve()
                 .toEntity(PaymentConfirmResponse.class)
