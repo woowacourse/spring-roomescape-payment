@@ -22,7 +22,7 @@ public class MyReservationWithRankResponse {
         this.theme = reservation.getThemeName();
         this.date = reservation.getDate();
         this.time = reservation.getTime().getStartAt().format(FORMATTER);
-        this.status = reservation.getStatus().getValue();
+        this.status = reservation.getStatus().value();
         this.rank = rank;
     }
 

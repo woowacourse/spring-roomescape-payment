@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+
 import static roomescape.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -218,9 +218,9 @@ class ReservationServiceTest {
         // then
         assertAll(
                 () -> assertThat(actual).hasSize(2),
-                () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED.getValue()),
+                () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED.value()),
                 () -> assertThat(actual.get(0).getRank()).isEqualTo(1L),
-                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING.getValue()),
+                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING.value()),
                 () -> assertThat(actual.get(1).getRank()).isEqualTo(2L)
         );
     }

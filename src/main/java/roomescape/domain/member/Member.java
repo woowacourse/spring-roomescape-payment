@@ -86,11 +86,16 @@ public class Member {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Member member = (Member) o;
-        return Objects.equals(id, member.id) && Objects.equals(name, member.name) && Objects.equals(email, member.email) && Objects.equals(password, member.password);
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        return object instanceof Member other
+                && Objects.equals(getId(), other.getId())
+                && Objects.equals(getName(), other.getName())
+                && Objects.equals(getEmail(), other.getEmail())
+                && Objects.equals(getPassword(), other.getPassword())
+                && Objects.equals(getRole(), other.getRole());
     }
 
     @Override

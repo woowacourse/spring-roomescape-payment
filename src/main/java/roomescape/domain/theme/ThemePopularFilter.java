@@ -36,11 +36,14 @@ public class ThemePopularFilter {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ThemePopularFilter that = (ThemePopularFilter) o;
-        return limit == that.limit && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        return object instanceof ThemePopularFilter other
+                && Objects.equals(startDate, other.startDate)
+                && Objects.equals(endDate, other.endDate)
+                && limit == other.limit;
     }
 
     @Override

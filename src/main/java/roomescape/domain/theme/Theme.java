@@ -1,6 +1,12 @@
 package roomescape.domain.theme;
 
-import jakarta.persistence.*;
+import java.util.Objects;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Theme {
@@ -46,5 +52,22 @@ public class Theme {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        return object instanceof Theme other
+                && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name)
+                && Objects.equals(description, other.description)
+                && Objects.equals(thumbnail, other.thumbnail);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, thumbnail);
     }
 }
