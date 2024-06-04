@@ -8,7 +8,7 @@ import java.util.Optional;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.UnAuthorizedException;
 
 public class CookieExtractor {
     private CookieExtractor() {
@@ -17,7 +17,7 @@ public class CookieExtractor {
     public static Cookie getTokenCookie(HttpServletRequest webRequest) {
         Optional<Cookie> accessTokenCookie = CookieExtractor.getCookie(webRequest, "token");
         if (accessTokenCookie.isEmpty()) {
-            throw new RoomescapeException(REQUIRED_LOGIN);
+            throw new UnAuthorizedException(REQUIRED_LOGIN);
         }
         return accessTokenCookie.get();
     }

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.exception.PaymentException;
-import roomescape.exception.response.PaymentExceptionResponse;
+import roomescape.exception.response.UserPaymentExceptionResponse;
 import roomescape.payment.api.TossPaymentClient;
 import roomescape.payment.config.PaymentClientResponseErrorHandler;
 import roomescape.payment.dto.PaymentRequest;
@@ -75,7 +75,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).body(errorMessage));
         when(responseErrorHandler.hasError(any()))
-                .thenThrow(new PaymentException(PaymentExceptionResponse.of(HttpStatus.BAD_REQUEST, "INVALID_ERRORCIDE", errorMessage)));
+                .thenThrow(new PaymentException(UserPaymentExceptionResponse.of("INVALID_ERROR_CODE", errorMessage)));
 
         assertThatThrownBy(() -> tossPaymentClient.payment(invalidPaymentRequest))
                 .isInstanceOf(PaymentException.class)

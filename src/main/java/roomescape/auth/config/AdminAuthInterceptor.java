@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import roomescape.auth.service.LoginService;
+import roomescape.exception.ForbiddenException;
 import roomescape.exception.type.RoomescapeExceptionType;
-import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
 
 @Component
@@ -25,7 +25,7 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
         String accessToken = CookieExtractor.getTokenCookie(request).getValue();
         LoginMember loginMember = loginService.checkLogin(accessToken);
         if (!loginMember.isAdmin()) {
-            throw new RoomescapeException(RoomescapeExceptionType.PERMISSION_DENIED, loginMember.getRole());
+            throw new ForbiddenException(RoomescapeExceptionType.PERMISSION_DENIED, loginMember.getRole());
         }
         return true;
     }

@@ -1,16 +1,16 @@
 package roomescape.exception;
 
-import roomescape.exception.response.PaymentExceptionResponse;
+import roomescape.exception.response.UserPaymentExceptionResponse;
 
 public class PaymentException extends RuntimeException {
-    private final PaymentExceptionResponse paymentExceptionResponse;
+    private final UserPaymentExceptionResponse userPaymentExceptionResponse;
 
-    public PaymentException(PaymentExceptionResponse paymentExceptionResponse) {
-        super(paymentExceptionResponse.getMessage());
-        this.paymentExceptionResponse = paymentExceptionResponse;
+    public PaymentException(UserPaymentExceptionResponse userPaymentExceptionResponse) {
+        super(userPaymentExceptionResponse.getMessage());
+        this.userPaymentExceptionResponse = userPaymentExceptionResponse;
     }
 
-    public PaymentExceptionResponse getPaymentExceptionResponse() {
-        return paymentExceptionResponse;
+    public UserPaymentExceptionResponse getUserPaymentExceptionResponse() {
+        return userPaymentExceptionResponse;
     }
 }

@@ -19,14 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import roomescape.application.service.ReservationApplicationService;
 import roomescape.auth.dto.LoginMemberResponse;
 import roomescape.exception.PaymentException;
-import roomescape.exception.response.PaymentExceptionResponse;
+import roomescape.exception.response.UserPaymentExceptionResponse;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.repository.MemberRepository;
@@ -102,7 +101,7 @@ class ReservationApplicationServiceTest {
                 invalidPaymentRequest.amount());
 
         Mockito.when(paymentClient.payment(invalidPaymentRequest))
-                .thenThrow(new PaymentException(new PaymentExceptionResponse(HttpStatus.BAD_REQUEST, "INVALID_PAYMENT_KEY", "올바르지 않은 PaymentKey 입니다.")));
+                .thenThrow(new PaymentException(UserPaymentExceptionResponse.of("INVALID_PAYMENT_KEY", "올바르지 않은 PaymentKey 입니다.")));
 
         assertThatThrownBy(() -> reservationApplicationService.reservationPayment(loginMember, request))
                 .isInstanceOf(PaymentException.class);

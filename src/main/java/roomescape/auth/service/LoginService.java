@@ -14,6 +14,7 @@ import roomescape.auth.config.JwtGenerator;
 import roomescape.auth.domain.Role;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.UnAuthorizedException;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
@@ -52,7 +53,7 @@ public class LoginService {
                     Role.findByValue(claims.get("role", String.class))
             );
         } catch (ExpiredJwtException e) {
-            throw new RoomescapeException(REQUIRED_LOGIN);
+            throw new UnAuthorizedException(REQUIRED_LOGIN);
         }
     }
 }
