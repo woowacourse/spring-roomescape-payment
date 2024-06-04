@@ -2,9 +2,9 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,19 +29,21 @@ public class TossPaymentClient {
         this.objectMapper = objectMapper;
     }
 
+    private record ConfirmRequest(BigDecimal amount, String orderId, String paymentKey) {
+    }
+
+    private record CancelRequest(String cancelReason) {
+    }
+
     public PaymentResult confirm(PaymentRequest request) {
         HttpHeaders headers = generateHttpHeaders();
-        Map<String, Object> amount = Map.of(
-                "amount", request.amount(),
-                "orderId", request.orderId(),
-                "paymentKey", request.paymentKey()
-        );
+        ConfirmRequest requestData = new ConfirmRequest(request.amount(), request.orderId(), request.paymentKey());
 
         try {
             return restClient.post()
                     .uri("/confirm")
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .body(amount)
+                    .body(requestData)
                     .retrieve()
                     .body(PaymentResult.class);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -53,13 +55,13 @@ public class TossPaymentClient {
     public void cancel(Payment payment) {
         validatePayment(payment);
         HttpHeaders headers = generateHttpHeaders();
-        Map<String, String> cancelReason = Map.of("cancelReason", "고객이 취소를 원함");
+        CancelRequest cancelRequest = new CancelRequest("고객이 취소를 원함");
 
         try {
             restClient.post()
                     .uri(String.format("/%s/cancel", payment.getPaymentKey()))
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .body(cancelReason)
+                    .body(cancelRequest)
                     .retrieve();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             String responseBody = e.getResponseBodyAsString();
