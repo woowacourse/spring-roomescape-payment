@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.theme.PopularThemeFilter;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.service.dto.request.CreateThemeRequest;
@@ -15,10 +16,6 @@ import roomescape.service.dto.response.ThemeResponse;
 @Service
 @Transactional(readOnly = true)
 public class ThemeService {
-
-    private static final int POPULAR_THEME_END_DATE_OFFSET = 1;
-    private static final int POPULAR_THEME_DAYS_AGO = 6;
-    private static final int POPULAR_THEME_LIMIT = 10;
 
     private final ReservationRepository reservationRepository;
     private final ThemeRepository themeRepository;
@@ -71,34 +68,16 @@ public class ThemeService {
     }
 
     public List<ThemeResponse> getPopularThemes(LocalDate date, Integer days, Integer limit) {
-        LocalDate endDate = getOrDefaultEndDate(date);
-        LocalDate startDate = getOrDefaultStartDate(days, endDate);
-        limit = getOrDefaultLimit(limit);
-
-        List<Theme> themes = themeRepository.findPopularThemes(startDate, endDate, limit);
+        PopularThemeFilter filter = new PopularThemeFilter(date, days, limit, clock);
+        List<Theme> themes = getPopularThemesByFilter(filter);
         return themes.stream()
                 .map(ThemeResponse::from)
                 .toList();
     }
 
-    private LocalDate getOrDefaultEndDate(LocalDate date) {
-        if (date == null) {
-            return LocalDate.now(clock).minusDays(POPULAR_THEME_END_DATE_OFFSET);
-        }
-        return date;
-    }
-
-    private LocalDate getOrDefaultStartDate(Integer days, LocalDate endDate) {
-        if (days == null) {
-            return endDate.minusDays(POPULAR_THEME_DAYS_AGO);
-        }
-        return endDate.minusDays(days);
-    }
-
-    private Integer getOrDefaultLimit(Integer limit) {
-        if (limit == null) {
-            return POPULAR_THEME_LIMIT;
-        }
-        return limit;
+    private List<Theme> getPopularThemesByFilter(PopularThemeFilter filter) {
+        return themeRepository.findPopularThemes(
+                filter.getStartDate(), filter.getEndDate(), filter.getLimit()
+        );
     }
 }
