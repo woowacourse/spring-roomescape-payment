@@ -19,6 +19,7 @@ import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
@@ -103,9 +104,9 @@ public class ReservationService {
         return FindReservationResponse.from(reservation);
     }
 
-    public List<FindReservationResponse> getReservations(final AuthInfo authInfo) {
-        return reservationRepository.findAllByMemberId(authInfo.getMemberId()).stream()
-                .map(FindReservationResponse::from)
+    public List<FindReservationWithPaymentResponse> getReservations(final AuthInfo authInfo) {
+        return reservationRepository.findReservationWithPaymentsByMemberId(authInfo.getMemberId()).stream()
+                .map(FindReservationWithPaymentResponse::from)
                 .toList();
     }
 
