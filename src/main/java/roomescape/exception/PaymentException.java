@@ -1,40 +1,33 @@
 package roomescape.exception;
 
 import org.springframework.http.HttpStatusCode;
+import roomescape.dto.payment.PaymentRequest;
 
 public class PaymentException extends RuntimeException {
 
-    private final String exceptionClass;
-    private final HttpStatusCode serverStatusCode;
-    private final String paymentKey;
     private final HttpStatusCode clientStatusCode;
+    private final PaymentRequest paymentRequest;
+    private final Exception exception;
 
-    public PaymentException(final String exceptionClass,
-                            final HttpStatusCode serverStatusCode,
+    public PaymentException(final Exception exception,
                             final HttpStatusCode clientStatusCode,
-                            final String message,
-                            final String paymentKey
-                            ) {
-        super(message);
-        this.exceptionClass = exceptionClass;
-        this.serverStatusCode = serverStatusCode;
+                            final String errorMessage,
+                            final PaymentRequest paymentRequest) {
+        super(errorMessage);
+        this.exception = exception;
         this.clientStatusCode = clientStatusCode;
-        this.paymentKey = paymentKey;
+        this.paymentRequest = paymentRequest;
     }
 
-    public String getExceptionClass() {
-        return exceptionClass;
-    }
-
-    public HttpStatusCode getServerStatusCode() {
-        return serverStatusCode;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
+    public PaymentRequest getPaymentRequest() {
+        return paymentRequest;
     }
 
     public HttpStatusCode getClientStatusCode() {
         return clientStatusCode;
+    }
+
+    public Exception getException() {
+        return exception;
     }
 }
