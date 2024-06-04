@@ -22,25 +22,37 @@ public class RestClientConfig {
 
     @Bean
     public Builder restClientBuilder() {
+        PoolingHttpClientConnectionManager connManager = getPoolingHttpClientConnectionManager();
+
+        RequestConfig requestConfig = getRequestConfig();
+
+        CloseableHttpClient httpClient = getHttpClient(connManager, requestConfig);
+
+        return RestClient.builder()
+                .requestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
+    }
+
+    private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
                 .setConnectTimeout(CONNECTION_TIMEOUT)
                 .setSocketTimeout(SOCKET_TIMEOUT)
                 .build();
 
-        PoolingHttpClientConnectionManager connManager = PoolingHttpClientConnectionManagerBuilder.create()
+        return PoolingHttpClientConnectionManagerBuilder.create()
                 .setDefaultConnectionConfig(connectionConfig)
                 .build();
+    }
 
-        RequestConfig requestConfig = RequestConfig.custom()
+    private RequestConfig getRequestConfig() {
+        return RequestConfig.custom()
                 .setResponseTimeout(READ_TIMEOUT)
                 .build();
+    }
 
-        CloseableHttpClient httpClient = HttpClients.custom()
+    private CloseableHttpClient getHttpClient(PoolingHttpClientConnectionManager connManager, RequestConfig requestConfig) {
+        return HttpClients.custom()
                 .setConnectionManager(connManager)
                 .setDefaultRequestConfig(requestConfig)
                 .build();
-
-        return RestClient.builder()
-                .requestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
     }
 }
