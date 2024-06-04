@@ -60,6 +60,11 @@ public class Reservation implements Comparable<Reservation> {
 
     public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
                        LocalDateTime createdAt) {
+        this(id, date, time, theme, member, createdAt, ReservationStatus.WAITING);
+    }
+
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
+                       LocalDateTime createdAt, ReservationStatus reservationStatus) {
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
@@ -70,7 +75,7 @@ public class Reservation implements Comparable<Reservation> {
         this.theme = theme;
         this.member = member;
         this.createdAt = createdAt;
-        this.reservationStatus = ReservationStatus.WAITING;
+        this.reservationStatus = reservationStatus;
     }
 
     private void validateTheme(Theme theme) {

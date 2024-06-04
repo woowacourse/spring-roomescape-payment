@@ -2,6 +2,7 @@ package roomescape.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.exception.RoomescapeExceptionType.FORBIDDEN_DELETE;
 import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
@@ -31,6 +32,7 @@ import roomescape.domain.Member;
 import roomescape.domain.Name;
 import roomescape.domain.Password;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
@@ -112,10 +114,13 @@ public class ReservationControllerTest {
         Member notSaveUser = otherMember;
 
         Reservation savedReservation = new Reservation(
+                null,
                 LocalDate.now().plusDays(1),
                 defaultTime,
                 defaultTheme1,
-                savedUser
+                savedUser,
+                LocalDateTime.now(),
+                ReservationStatus.BOOKED
         );
 
         @BeforeEach
@@ -274,6 +279,47 @@ public class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(200)
                     .body("size()", is(0));
+        }
+
+        @DisplayName("예약을 삭제하면 첫 번째 예약 대기가 예약이 된다.")
+        @Test
+        void updateWaitingWhenReservationDeletedTest() {
+            //given
+            Map<String, Object> reservationParam = Map.of(
+                    "date", savedReservation.getDate().toString(),
+                    "timeId", savedReservation.getReservationTime().getId(),
+                    "themeId", savedReservation.getTheme().getId());
+
+            RestAssured.given().log().all()
+                    .when()
+                    .cookie("token", othersToken)
+                    .contentType(ContentType.JSON)
+                    .body(reservationParam)
+                    .post("/reservations")
+                    .then().log().all()
+                    .body("reservationStatus", is("예약 대기"))
+                    .extract().jsonPath().get("id");
+
+            //when
+            RestAssured.given().log().all()
+                    .when()
+                    .cookie("token", token)
+                    .delete("/reservations/" + savedReservation.getId())
+                    .then().log().all()
+                    .statusCode(204);
+
+            //then
+            ReservationResponse[] reservationResponses = RestAssured.given().log().all()
+                    .when().get("/reservations")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("size()", is(1))
+                    .extract().as(ReservationResponse[].class);
+
+            assertAll(
+                    () -> assertThat(reservationResponses.length).isEqualTo(1),
+                    () -> assertThat(reservationResponses[0].reservationStatus()).isEqualTo("예약")
+            );
         }
 
         @DisplayName("본인의 예약 대기를 삭제할 수 있다.")
