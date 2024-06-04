@@ -24,6 +24,7 @@ http://43.201.59.111:8080
 서버 실행 자동화 스크립트
 ```shell
 #!/bin/sh
+pidof java spring-roomescape-payment-0.0.1-SNAPSHOT.jar | xargs kill -9
 cd spring-roomescape-payment
 git pull origin step2
 ./gradlew bootJar
