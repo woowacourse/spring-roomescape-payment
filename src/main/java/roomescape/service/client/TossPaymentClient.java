@@ -4,10 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import roomescape.service.client.handler.TossPaymentErrorHandler;
 import roomescape.service.dto.PaymentRequest;
 
 @Component
@@ -41,6 +43,7 @@ public class TossPaymentClient implements PaymentClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, authorizations)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, new TossPaymentErrorHandler())
                 .toBodilessEntity();
     }
 }
