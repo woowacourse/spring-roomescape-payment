@@ -74,9 +74,12 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final LocalDate date = LocalDate.now();
 
         final List<ReservationRankResponse> expected = List.of(
-                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1),
-                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1),
-                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2)
+                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1, "test_payment_key",
+                        1000),
+                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1, "test_payment_key",
+                        1000),
+                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2, "test_payment_key",
+                        1000)
         );
 
         assertThat(reservationsByMember).isEqualTo(expected);
