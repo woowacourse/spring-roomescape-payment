@@ -34,10 +34,19 @@ public class ReservationController {
             @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest
     ) {
         ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,
-                ReservationRequest.from(reservationWithPaymentRequest),
-                PaymentRequest.from(reservationWithPaymentRequest));
+                ReservationRequest.from(reservationWithPaymentRequest));
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
+    }
+
+    //todo 결제 정보 저장 필요
+    @PostMapping("/payment/reservations/{id}")
+    public void payReservation(
+            @PathVariable long id,
+            @Authenticated LoginMemberRequest loginMemberRequest,
+            @RequestBody PaymentRequest paymentRequest
+    ) {
+        reservationService.pay(id, paymentRequest);
     }
 
     @PostMapping("/admin/reservations")

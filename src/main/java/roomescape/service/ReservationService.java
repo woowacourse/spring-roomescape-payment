@@ -2,6 +2,7 @@ package roomescape.service;
 
 import static roomescape.exception.RoomescapeExceptionType.FORBIDDEN_DELETE;
 import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION;
 import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
 import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
@@ -11,8 +12,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
@@ -40,7 +43,8 @@ public class ReservationService {
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository, PaymentClient paymentClient) {
+                              MemberRepository memberRepository,
+                              PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -48,9 +52,9 @@ public class ReservationService {
         this.paymentClient = paymentClient;
     }
 
+    @Transactional
     public ReservationResponse saveByUser(LoginMemberRequest loginMemberRequest,
-                                          ReservationRequest reservationRequest,
-                                          PaymentRequest paymentRequest) {
+                                          ReservationRequest reservationRequest) {
         ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
         Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
@@ -58,14 +62,9 @@ public class ReservationService {
         Member requestedMember = memberRepository.findById(loginMemberRequest.id())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        Reservation beforeSaveReservation = reservationRequest.toReservation(requestedMember, requestedTime, requestedTheme);
-        if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
-            throw new RoomescapeException(PAST_TIME_RESERVATION);
-        }
-
-        paymentClient.pay(paymentRequest);
-        Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
-        return ReservationResponse.from(savedReservation);
+        return saveReservation(
+                new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
+                        LocalDateTime.now()));
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -76,14 +75,31 @@ public class ReservationService {
         Member requestedMember = memberRepository.findById(reservationRequest.memberId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        Reservation beforeSaveReservation = new Reservation(
-                reservationRequest.date(), requestedTime, requestedTheme, requestedMember);
-        if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
+        return saveReservation(
+                new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
+                        LocalDateTime.now()));
+    }
+
+    private ReservationResponse saveReservation(Reservation reservation) {
+        if (reservation.isBefore(LocalDateTime.now())) {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
-
-        Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        if(reservationRepository.calculateIndexOf(savedReservation) == 1) {
+            savedReservation.book();
+        }
         return ReservationResponse.from(savedReservation);
+    }
+
+    //todo -> 트랜잭션 내부에 외부 API 호출이 존재
+    //todo -> 결제 대기 상태 X
+    @Transactional
+    public void pay(long reservationId, PaymentRequest paymentRequest) {
+        Reservation requestedReservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
+        //todo -> 결제 메서드를 Reservation 내부로 이동 고려
+        paymentClient.pay(paymentRequest);
+        requestedReservation.book();
     }
 
     public List<ReservationResponse> findAll() {

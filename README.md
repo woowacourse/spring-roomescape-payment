@@ -477,3 +477,15 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
   }
 ]
 ```
+
+## 예약 결제
+
+### request
+
+> POST payment/reservations/{id}
+> cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> host: localhost:8080
+
+### response
+
+> HTTP/1.1 200
