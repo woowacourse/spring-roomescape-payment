@@ -1,0 +1,5 @@
+== 예약 시간 API
+
+=== 예약 시간 목록 조회
+
+operation::times[snippets='curl-request,http-request,http-response,response-body,response-fields']
