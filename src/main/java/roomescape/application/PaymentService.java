@@ -24,10 +24,10 @@ public class PaymentService {
         Payment payment = new Payment(
                 request.paymentKey(),
                 request.orderId(),
-                request.amount(),
-                reservation
+                request.amount()
         );
         paymentRepository.save(payment);
+        reservation.assignPayment(payment);
 
         paymentClient.confirmPayment(request);
     }

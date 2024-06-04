@@ -2,12 +2,9 @@ package roomescape.domain.reservation;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.domain.exception.DomainValidationException;
@@ -28,28 +25,23 @@ public class Payment {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private Reservation reservation;
-
     protected Payment() {
     }
 
-    public Payment(String paymentKey, String orderId, BigDecimal amount, Reservation reservation) {
-        this(null, paymentKey, orderId, amount, reservation);
+    public Payment(String paymentKey, String orderId, BigDecimal amount) {
+        this(null, paymentKey, orderId, amount);
     }
 
-    public Payment(Long id, String paymentKey, String orderId, BigDecimal amount, Reservation reservation) {
-        validate(paymentKey, orderId, amount, reservation);
+    public Payment(Long id, String paymentKey, String orderId, BigDecimal amount) {
+        validate(paymentKey, orderId, amount);
 
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-        this.reservation = reservation;
     }
 
-    private void validate(String paymentKey, String orderId, BigDecimal amount, Reservation reservation) {
+    private void validate(String paymentKey, String orderId, BigDecimal amount) {
         if (paymentKey == null || paymentKey.isBlank()) {
             throw new DomainValidationException("결제 키는 필수 값입니다.");
         }
@@ -60,10 +52,6 @@ public class Payment {
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new DomainValidationException("금액은 0보다 커야 합니다.");
-        }
-
-        if (reservation == null) {
-            throw new DomainValidationException("예약 정보는 필수 값입니다.");
         }
     }
 
@@ -98,9 +86,5 @@ public class Payment {
 
     public BigDecimal getAmount() {
         return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
     }
 }

@@ -13,7 +13,8 @@ public record MyReservationResponse(
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String theme,
         ReservationStatus status,
-        Long rank
+        Long rank,
+        PaymentResponse payment
 ) {
     public static MyReservationResponse from(Reservation reservation) {
         return new MyReservationResponse(
@@ -22,7 +23,8 @@ public record MyReservationResponse(
                 reservation.getDetail().getTime().getStartAt(),
                 reservation.getDetail().getTheme().getName(),
                 ReservationStatus.RESERVED,
-                0L
+                0L,
+                PaymentResponse.from(reservation.getPayment())
         );
     }
 
@@ -36,7 +38,8 @@ public record MyReservationResponse(
                 waiting.getDetail().getTime().getStartAt(),
                 waiting.getDetail().getTheme().getName(),
                 ReservationStatus.WAITING,
-                rank
+                rank,
+                null
         );
     }
 }

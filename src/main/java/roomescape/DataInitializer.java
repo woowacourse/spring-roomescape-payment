@@ -1,5 +1,6 @@
 package roomescape;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.boot.ApplicationArguments;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.Payment;
+import roomescape.domain.reservation.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Waiting;
@@ -30,18 +33,21 @@ public class DataInitializer implements ApplicationRunner {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public DataInitializer(
             ThemeRepository themeRepository,
             ReservationTimeRepository reservationTimeRepository, MemberRepository memberRepository,
             ReservationRepository reservationRepository,
-            WaitingRepository waitingRepository
+            WaitingRepository waitingRepository,
+            PaymentRepository paymentRepository
     ) {
         this.themeRepository = themeRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -107,6 +113,31 @@ public class DataInitializer implements ApplicationRunner {
                 new Reservation(new ReservationDetail(LocalDate.now().minusDays(1), time3, theme2), user));
         Reservation reservation8 = reservationRepository.save(
                 new Reservation(new ReservationDetail(LocalDate.now().plusDays(2), time1, theme1), user));
+
+        Payment payment1 = paymentRepository.save(
+                new Payment("tgen_20240604162216v123ba", "WTESTMC4xwNjE1MzMwOTI0Njc", BigDecimal.valueOf(1000)));
+        reservation1.assignPayment(payment1);
+        Payment payment2 = paymentRepository.save(
+                new Payment("tgen_20240604162216asdf12", "WTESTMC4xOTjE1MzI0NjcwNMw", BigDecimal.valueOf(1000)));
+        reservation2.assignPayment(payment2);
+        Payment payment3 = paymentRepository.save(
+                new Payment("tgen_20240604162216bd1234", "WTESTMC4xNOTI0NjcwjE1MzMw", BigDecimal.valueOf(1000)));
+        reservation3.assignPayment(payment3);
+        Payment payment4 = paymentRepository.save(
+                new Payment("tgen_20240604162216zxc12", "WTESTMCxOTI0NjcwN4jE1MzMw", BigDecimal.valueOf(1000)));
+        reservation4.assignPayment(payment4);
+        Payment payment5 = paymentRepository.save(
+                new Payment("tgen_20240604162216brl12", "WTESTMC4xOTI0N1MzMjcwNjEw", BigDecimal.valueOf(1000)));
+        reservation5.assignPayment(payment5);
+        Payment payment6 = paymentRepository.save(
+                new Payment("tgen_20240604162216mkl24", "WTESTMCxOTI0NjcwNjE14MzMw", BigDecimal.valueOf(1000)));
+        reservation6.assignPayment(payment6);
+        Payment payment7 = paymentRepository.save(
+                new Payment("tgen_20240604162216mlk56", "WTESTMC4xcwNjE1OTI0NjMzMw", BigDecimal.valueOf(1000)));
+        reservation7.assignPayment(payment7);
+        Payment payment8 = paymentRepository.save(
+                new Payment("tgen_20240604162216opt43", "WTESTOTI0NjMC4xcwNjE1MzMw", BigDecimal.valueOf(1000)));
+        reservation8.assignPayment(payment8);
 
         // Waiting
         Waiting waiting1 = waitingRepository.save(
