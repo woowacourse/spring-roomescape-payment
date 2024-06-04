@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.exception.PaymentException;
-import roomescape.payment.config.PaymentClient;
+import roomescape.payment.api.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.service.PaymentService;

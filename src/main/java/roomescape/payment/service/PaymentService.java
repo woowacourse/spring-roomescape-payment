@@ -2,7 +2,7 @@ package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
 
-import roomescape.payment.config.PaymentClient;
+import roomescape.payment.api.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 
