@@ -15,7 +15,6 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.dto.LoginMember;
-import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
@@ -24,20 +23,17 @@ import roomescape.exception.RoomescapeException;
 
 @Service
 public class ReservationCreateService {
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
     public ReservationCreateService(
-            PaymentService paymentService,
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository
     ) {
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -45,19 +41,13 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+    public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
         Reservation reservation = createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
                 reservationRequest.themeId()
         );
-        PaymentRequest paymentRequest = new PaymentRequest(
-                reservationRequest.orderId(),
-                reservationRequest.amount(),
-                reservationRequest.paymentKey()
-        );
-        paymentService.pay(paymentRequest);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
