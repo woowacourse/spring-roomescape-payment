@@ -42,7 +42,7 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
 
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofMillis(1))
+                .withConnectTimeout(Duration.ofSeconds(1))
                 .withReadTimeout(Duration.ofSeconds(30));
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory.class, settings);
         this.restClient = restClientBuilder.requestFactory(requestFactory).build();
