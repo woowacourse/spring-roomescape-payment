@@ -39,6 +39,7 @@ public class TossPaymentClient implements PaymentClient {
     @Override
     public PaymentResponse payment(PaymentRequest paymentRequest) {
         String uri = "/v1/payments/confirm";
+        log.info("URI: {}, RequestBody:{} ", uri, paymentRequest);
         PaymentResponse paymentResponse = restClient.post()
                 .uri(uri)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
@@ -46,7 +47,7 @@ public class TossPaymentClient implements PaymentClient {
                 .retrieve()
                 .onStatus(new PaymentClientResponseErrorHandler(objectMapper))
                 .body(PaymentResponse.class);
-        log.info("URI: {}, Method: {}, Body:{} ", uri, "POST", paymentResponse);
+        log.info("URI: {}, Method: {}, ResponseBody:{} ", uri, "POST", paymentResponse);
         return paymentResponse;
     }
 }
