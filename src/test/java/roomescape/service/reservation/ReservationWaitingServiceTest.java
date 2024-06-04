@@ -71,7 +71,9 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
         // given
         LocalDate date = Fixture.tomorrow;
         ReservationRequest request = new ReservationRequest(
-                date, reservationTime.getId(), theme.getId(), "invalid paymentkey", "orderId", 1000L, "pay type"
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID,
+                Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
         );
         saveReservationOfDate(date);
 
@@ -94,7 +96,9 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
         // given
         LocalDate date = Fixture.tomorrow;
         ReservationRequest request = new ReservationRequest(
-                date, reservationTime.getId(), theme.getId(), "invalid paymentkey", "orderId", 1000L, "pay type"
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID,
+                Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
         );
         saveReservationOfDate(date);
         reservationWaitingService.create(request, member.getId());

@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "payment")
@@ -17,12 +18,12 @@ public class Payment {
 
     private String paymentKey;
 
-    private long amount;
+    private BigDecimal amount;
 
     protected Payment() {
     }
 
-    public Payment(String orderId, String paymentKey, long amount) {
+    public Payment(String orderId, String paymentKey, BigDecimal amount) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -40,7 +41,7 @@ public class Payment {
         return paymentKey;
     }
 
-    public long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 }
