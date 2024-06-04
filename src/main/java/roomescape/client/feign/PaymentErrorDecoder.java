@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.client.feign;
 
 import java.io.IOException;
 
@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import roomescape.client.PaymentException;
+import roomescape.client.TossErrorResponse;
 
 public class PaymentErrorDecoder implements ErrorDecoder {
     private final ErrorDecoder defaultErrorDecoder = new Default();

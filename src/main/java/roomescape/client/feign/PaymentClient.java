@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.client.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
