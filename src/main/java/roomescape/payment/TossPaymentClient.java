@@ -9,7 +9,7 @@ public class TossPaymentClient {
 
     private final RestClient restClient;
 
-    @Value("${payment.api.confirm}")
+    @Value("${payment.toss.api.confirm}")
     private String confirmApi;
 
     public TossPaymentClient(final RestClient restClient) {

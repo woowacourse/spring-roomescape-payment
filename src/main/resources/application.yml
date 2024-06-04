@@ -19,10 +19,11 @@ jwt:
   expire-length: 3600000
 
 payment:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  api:
-    base: https://api.tosspayments.com
-    confirm: /v1/payments/confirm
-  timeout:
-    connection: 5
-    read: 3
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    api:
+      base: https://api.tosspayments.com
+      confirm: /v1/payments/confirm
+    timeout:
+      connection: 5
+      read: 3

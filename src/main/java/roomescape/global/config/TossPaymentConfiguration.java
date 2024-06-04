@@ -23,16 +23,16 @@ public class TossPaymentConfiguration {
     private static final ResponseErrorHandler HANDLER = new ClientExceptionHandler();
 
 
-    @Value("${payment.secret-key}")
+    @Value("${payment.toss.secret-key}")
     private String widgetSecretKey;
 
-    @Value("${payment.api.base}")
+    @Value("${payment.toss.api.base}")
     private String apiBaseUrl;
 
-    @Value("${payment.timeout.connection}")
+    @Value("${payment.toss.timeout.connection}")
     private int connectionTimeoutDuration;
 
-    @Value("${payment.timeout.read}")
+    @Value("${payment.toss.timeout.read}")
     private int readTimeoutDuration;
 
     @Bean
