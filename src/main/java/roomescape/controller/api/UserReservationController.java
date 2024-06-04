@@ -20,24 +20,28 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
+import roomescape.service.UserReservationService;
 import roomescape.service.facade.UserReservationGeneralService;
 
 @RestController
 @RequestMapping("/reservations")
 public class UserReservationController {
 
-    private final UserReservationGeneralService reservationFacadeService;
+    private final UserReservationGeneralService reservationGeneralService;
+    private final UserReservationService reservationService;
 
-    public UserReservationController(UserReservationGeneralService reservationFacadeService) {
-        this.reservationFacadeService = reservationFacadeService;
+    public UserReservationController(UserReservationGeneralService reservationGeneralService, UserReservationService reservationService) {
+        this.reservationGeneralService = reservationGeneralService;
+        this.reservationService = reservationService;
     }
+
 
     @PostMapping
     public ResponseEntity<CreateReservationResponse> save(
             @Valid @RequestBody CreateUserReservationRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationFacadeService.reserve(
+        CreateReservationResponse response = reservationGeneralService.reserve(
                 request.orderId(),
                 request.amount(),
                 request.paymentKey(),
@@ -56,7 +60,7 @@ public class UserReservationController {
             @Valid @RequestBody CreateUserReservationStandbyRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationFacadeService.standby(
+        CreateReservationResponse response = reservationService.standby(
                 member.getId(),
                 request.date(),
                 request.timeId(),
@@ -69,13 +73,13 @@ public class UserReservationController {
 
     @DeleteMapping("/standby/{id}")
     public ResponseEntity<Void> deleteStandby(@PathVariable Long id, @AuthenticationPrincipal Member member) {
-        reservationFacadeService.deleteStandby(id, member);
+        reservationService.deleteStandby(id, member);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/mine")
     public ResponseEntity<List<FindMyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
-        List<FindMyReservationResponse> response = reservationFacadeService.findMyReservationsWithRank(member.getId());
+        List<FindMyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
         return ResponseEntity.ok(response);
     }
 }
