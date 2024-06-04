@@ -11,8 +11,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.NewPayment;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentServerException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,10 +48,10 @@ class TossPaymentsClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 10L, "paymentType");
+        NewPayment newPayment = new NewPayment("paymentKey", "orderId", 10L, "paymentType");
 
         // when
-        ConfirmedPayment response = tossPaymentClient.confirm(request);
+        ConfirmedPayment response = tossPaymentClient.confirm(newPayment);
 
         // then
         assertThat(response.orderId()).isEqualTo(expectedResponse.orderId());
@@ -73,10 +73,10 @@ class TossPaymentsClientTest {
                         .body(expectedResponse)
                         .contentType(MediaType.APPLICATION_JSON));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 10L, "paymentType");
+        NewPayment newPayment = new NewPayment("paymentKey", "orderId", 10L, "paymentType");
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentClient.confirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirm(newPayment))
                 .isInstanceOf(ViolationException.class);
     }
 
@@ -96,10 +96,10 @@ class TossPaymentsClientTest {
                         .body(expectedResponse)
                         .contentType(MediaType.APPLICATION_JSON));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 10L, "paymentType");
+        NewPayment newPayment = new NewPayment("paymentKey", "orderId", 10L, "paymentType");
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentClient.confirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirm(newPayment))
                 .isInstanceOf(PaymentServerException.class);
     }
 }

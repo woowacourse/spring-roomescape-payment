@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.NewPayment;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
 
 @Component
 public class TossPaymentsClient implements PaymentClient {
@@ -19,10 +19,10 @@ public class TossPaymentsClient implements PaymentClient {
     }
 
     @Override
-    public ConfirmedPayment confirm(PaymentConfirmRequest request) {
+    public ConfirmedPayment confirm(NewPayment newPayment) {
         return restClient.post()
                 .uri("/confirm")
-                .body(request)
+                .body(newPayment)
                 .retrieve()
                 .onStatus(errorHandler)
                 .body(ConfirmedPayment.class);

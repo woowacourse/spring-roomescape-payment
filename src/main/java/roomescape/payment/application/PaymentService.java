@@ -3,10 +3,10 @@ package roomescape.payment.application;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.NewPayment;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.event.ReservationSavedEvent;
 
 @Service
@@ -19,8 +19,8 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public ConfirmedPayment confirm(PaymentConfirmRequest paymentConfirmRequest) {
-        return paymentClient.confirm(paymentConfirmRequest);
+    public ConfirmedPayment confirm(NewPayment newPayment) {
+        return paymentClient.confirm(newPayment);
     }
 
     @EventListener(ReservationSavedEvent.class)

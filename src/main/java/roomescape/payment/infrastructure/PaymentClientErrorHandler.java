@@ -6,7 +6,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.response.TossPaymentsErrorResponse;
 import roomescape.payment.exception.PaymentServerException;
 
 import java.io.IOException;
