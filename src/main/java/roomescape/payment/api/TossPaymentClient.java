@@ -19,6 +19,7 @@ public class TossPaymentClient implements PaymentClient {
     private static final String DELIMITER = ":";
     private static final String AUTH_HEADER = "Authorization";
     private static final String AUTH_METHOD = "Basic ";
+    private static final String APPROVE_PAYMENT_URI = "/v1/payments/confirm";
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final String encodedSecretKey;
     private final RestClient restClient;
@@ -38,16 +39,15 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentResponse payment(PaymentRequest paymentRequest) {
-        String uri = "/v1/payments/confirm";
-        log.info("URI: {}, RequestBody:{} ", uri, paymentRequest);
+        log.info("URI: {}, RequestBody:{} ", APPROVE_PAYMENT_URI, paymentRequest);
         PaymentResponse paymentResponse = restClient.post()
-                .uri(uri)
+                .uri(APPROVE_PAYMENT_URI)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(new PaymentClientResponseErrorHandler(objectMapper))
                 .body(PaymentResponse.class);
-        log.info("URI: {}, Method: {}, ResponseBody:{} ", uri, "POST", paymentResponse);
+        log.info("URI: {}, Method: {}, ResponseBody:{} ", APPROVE_PAYMENT_URI, "POST", paymentResponse);
         return paymentResponse;
     }
 }
