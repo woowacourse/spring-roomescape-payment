@@ -28,15 +28,20 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CheckLoginInterceptor(authService, authenticationExtractor))
+        registry.addInterceptor(new LogInterceptor())
                 .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/js/**", "/image/**");
+
+        registry.addInterceptor(new CheckLoginInterceptor(authService, authenticationExtractor))
+                .order(2)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/error", "/login", "/signup",
                         "/members", "/themes/popular",
                         "/css/**", "/*.ico", "/js/**", "/image/**");
 
         registry.addInterceptor(new CheckAdminInterceptor())
-                .order(2)
+                .order(3)
                 .addPathPatterns("/admin/**");
     }
 
