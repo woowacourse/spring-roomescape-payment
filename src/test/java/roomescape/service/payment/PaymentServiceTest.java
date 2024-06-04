@@ -72,8 +72,7 @@ class PaymentServiceTest extends ServiceTestBase {
         // then
         long paymentId = confirmed.getId();
         long actual = paymentRepository.findById(paymentId).orElseThrow().getAmount().longValue();
-        long expected = (int) amount;
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(amount);
     }
 
     @DisplayName("결제를 취소한다.")
