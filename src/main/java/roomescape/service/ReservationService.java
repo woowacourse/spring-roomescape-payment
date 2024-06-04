@@ -8,7 +8,7 @@ import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.controller.time.dto.IsMineRequest;
 import roomescape.domain.Member;
-import roomescape.domain.Payment;
+import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -82,7 +82,7 @@ public class ReservationService {
         final Member member = memberRepository.fetchById(request.memberId());
         final LocalDate date = request.date();
 
-        final Reservation reservation = new Reservation(null, member, date, time, theme, Payment.DEFAULT_PAYMENT);
+        final Reservation reservation = new Reservation(null, member, date, time, theme);
 
         final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
         validateBeforeDay(reservationDateTime);
@@ -101,8 +101,8 @@ public class ReservationService {
         validateBeforeDay(date.atTime(time.getStartAt()));
         final TossPaymentConfirmResponse tossPaymentConfirmResponse = paymentClient.postPayment(
                 new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
-        final Payment payment = tossPaymentConfirmResponse.toPayment();
-        final Reservation reservation = new Reservation(null, member, date, time, theme, payment);
+        final Reservation reservation = new Reservation(null, member, date, time, theme);
+        final PaymentInfo payment = tossPaymentConfirmResponse.toPayment(reservation); //TODO 이거 저장
 
         return reservationRepository.save(reservation);
     }

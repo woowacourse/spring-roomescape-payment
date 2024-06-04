@@ -16,22 +16,22 @@ VALUES ('레디', 'redddy@gmail.com', '3e2b2d79b2f6f90ba2f3ae18a90ae990b149b2fdb
        ('재즈', 'gkatjraud1@redddybabo.com', 'f8e5bc8fdaca1bccab597398b0f26a814c1486fb8a37515c075f4ff023abe726', 'USER'),
        ('제제', 'jinwuo0925@gmail.com', '4e5ef62cc65465fbd14118b6e894aa0fa3fbe72c31fcdb6829a3ea21163b3e3a', 'USER');
 
-INSERT INTO PAYMENT(ORDER_ID, PAYMENT_KEY, ORDER_NAME, TOTAL_AMOUNT)
-VALUES ('order_id1', 'peyment_key1', '방탈출1', 1000),
-       ('order_id2', 'peyment_key2', '방탈출2', 1000),
-       ('order_id3', 'peyment_key3', '방탈출2', 1000),
-       ('order_id4', 'peyment_key4', '방탈출2', 1000),
-       ('order_id5', 'peyment_key5', '방탈출3', 1000),
-       ('order_id6', 'peyment_key6', '방탈출3', 1000),
-       ('order_id7', 'peyment_key7', '방탈출3', 1000),
-       ('order_id8', 'peyment_key8', '방탈출3', 1000);
+INSERT INTO RESERVATION(MEMBER_ID, DATE, TIME_ID, THEME_ID)
+VALUES (1, CURRENT_DATE - 3, 1, 1),
+       (2, CURRENT_DATE - 2, 3, 2),
+       (1, CURRENT_DATE - 1, 2, 2),
+       (2, CURRENT_DATE - 1, 1, 2),
+       (3, CURRENT_DATE - 7, 1, 3),
+       (3, CURRENT_DATE + 3, 4, 3),
+       (2, CURRENT_DATE + 4, 4, 3),
+       (3, CURRENT_DATE + 4, 4, 3);
 
-INSERT INTO RESERVATION(MEMBER_ID, DATE, TIME_ID, THEME_ID, PAYMENT_ID)
-VALUES (1, CURRENT_DATE - 3, 1, 1, 1),
-       (2, CURRENT_DATE - 2, 3, 2, 2),
-       (1, CURRENT_DATE - 1, 2, 2, 3),
-       (2, CURRENT_DATE - 1, 1, 2, 4),
-       (3, CURRENT_DATE - 7, 1, 3, 5),
-       (3, CURRENT_DATE + 3, 4, 3, 6),
-       (2, CURRENT_DATE + 4, 4, 3, 7),
-       (3, CURRENT_DATE + 4, 4, 3, 8);
+INSERT INTO PAYMENT(ORDER_ID, PAYMENT_KEY, ORDER_NAME, TOTAL_AMOUNT, RESERVATION_ID)
+VALUES ('order_id1', 'peyment_key1', '방탈출1', 1000, 1),
+       ('order_id2', 'peyment_key2', '방탈출2', 1000, 2),
+       ('order_id3', 'peyment_key3', '방탈출2', 1000, 3),
+       ('order_id4', 'peyment_key4', '방탈출2', 1000, 4),
+       ('order_id5', 'peyment_key5', '방탈출3', 1000, 5),
+       ('order_id6', 'peyment_key6', '방탈출3', 1000, 6),
+       ('order_id7', 'peyment_key7', '방탈출3', 1000, 7),
+       ('order_id8', 'peyment_key8', '방탈출3', 1000, 8);

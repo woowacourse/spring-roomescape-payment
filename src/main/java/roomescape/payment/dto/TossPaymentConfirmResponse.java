@@ -1,7 +1,8 @@
 package roomescape.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import roomescape.domain.Payment;
+import roomescape.domain.PaymentInfo;
+import roomescape.domain.Reservation;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TossPaymentConfirmResponse(
@@ -11,7 +12,7 @@ public record TossPaymentConfirmResponse(
         Long totalAmount
 ) {
 
-    public Payment toPayment() {
-        return new Payment(null, orderId, paymentKey, orderName, totalAmount);
+    public PaymentInfo toPayment(final Reservation reservation) {
+        return new PaymentInfo(null, orderId, paymentKey, orderName, totalAmount, reservation);
     }
 }
