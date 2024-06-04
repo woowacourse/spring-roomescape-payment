@@ -36,10 +36,12 @@ public class TossPaymentClient {
                     .headers(headers -> headers.setBasicAuth(widgetSecretKey, password))
                     .body(request)
                     .retrieve()
-                    .toEntity(PaymentConfirmResponse.class)
-                    .getBody();
+                    .body(PaymentConfirmResponse.class);
         } catch (RestClientResponseException e) {
             TossErrorResponse errorResponse = e.getResponseBodyAs(TossErrorResponse.class);
+            if (errorResponse == null) {
+                throw new PaymentFailException("결제 승인 요청 중 오류가 발생했습니다.", e);
+            }
             if (errorResponse.isClientError()) {
                 log.error("Toss Payment Client Error 발생: {}", errorResponse.message(), e);
                 throw new IllegalRequestException(errorResponse.message(), e);
