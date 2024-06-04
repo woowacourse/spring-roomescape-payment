@@ -30,6 +30,8 @@ public class Fixture {
     public static final Member member3 = new Member("lini", "lini@email.com", "lini123", Role.MEMBER);
 
     public static final String TEST_PAYMENT_KEY = "TEST_PAYMENT_KEY";
+    public static final String PAYMENT_ERROR_KEY = "PAYMENT_ERROR_KEY";
+    public static final String CANCEL_ERROR_KEY = "CANCEL_ERROR_KEY";
     public static final String TEST_ORDER_ID = "TEST_ORDER_ID";
     public static final BigDecimal TEST_ORDER_AMOUNT = new BigDecimal("2000000");
     public static final String TEST_PAYMENT_TYPE = "NORMAL";
