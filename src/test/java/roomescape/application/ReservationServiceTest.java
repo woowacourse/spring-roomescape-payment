@@ -110,6 +110,8 @@ class ReservationServiceTest extends BaseServiceTest {
                 softly.assertThat(response.member()).isEqualTo(MemberResponse.from(member1));
                 softly.assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(time1));
                 softly.assertThat(response.theme()).isEqualTo(ThemeResponse.from(theme));
+                softly.assertThat(response.paymentKey()).isEqualTo("test-paymentKey");
+                softly.assertThat(response.amount()).isEqualTo(1L);
             });
         }
 

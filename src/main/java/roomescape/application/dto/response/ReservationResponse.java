@@ -9,7 +9,9 @@ public record ReservationResponse(
         LocalDate date,
         MemberResponse member,
         ReservationTimeResponse time,
-        ThemeResponse theme
+        ThemeResponse theme,
+        String paymentKey,
+        Long amount
 ) {
 
     public static ReservationResponse from(Reservation reservation) {
@@ -18,7 +20,9 @@ public record ReservationResponse(
                 reservation.getDetail().getDate(),
                 MemberResponse.from(reservation.getMember()),
                 ReservationTimeResponse.from(reservation.getDetail().getTime()),
-                ThemeResponse.from(reservation.getDetail().getTheme())
+                ThemeResponse.from(reservation.getDetail().getTheme()),
+                reservation.getPaymentKey(),
+                reservation.getPaymentAmount()
         );
     }
 }
