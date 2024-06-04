@@ -15,7 +15,7 @@ import roomescape.global.exception.ClientExceptionHandler;
 import roomescape.payment.TossPaymentClient;
 
 @Configuration
-public class RestClientConfiguration {
+public class TossPaymentConfiguration {
 
     private static final int CONNECTION_TIMEOUT_DURATION = 5;
     private static final int READ_TIMEOUT_DURATION = 3;
