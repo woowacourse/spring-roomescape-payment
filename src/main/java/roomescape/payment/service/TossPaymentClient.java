@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
 import roomescape.global.exception.PaymentErrorResponse;
-import roomescape.reservation.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmRequest;
 
 @Component
 public class TossPaymentClient implements PaymentClient {

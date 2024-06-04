@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.config;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
