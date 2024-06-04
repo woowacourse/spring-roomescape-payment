@@ -26,7 +26,7 @@ public class MemberManagementController {
         return ResponseEntity.created(URI.create("/members/" + createdId)).build();
     }
 
-    @GetMapping("/members")
+    @GetMapping("/admin/members")
     public ResponseEntity<List<MemberResponse>> findAllMembers() {
         List<MemberResponse> response = memberService.findAllMember();
         return ResponseEntity.ok(response);

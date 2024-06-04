@@ -1,4 +1,4 @@
-CREATE TABLE member
+CREATE TABLE IF NOT EXISTS member
 (
     id       BIGINT       NOT NULL AUTO_INCREMENT,
     email    VARCHAR(255) NOT NULL UNIQUE CHECK (email like '%@%'),
@@ -8,7 +8,7 @@ CREATE TABLE member
     PRIMARY KEY (id)
 );
 
-CREATE TABLE theme
+CREATE TABLE IF NOT EXISTS theme
 (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
     name        VARCHAR(255) NOT NULL,
@@ -17,14 +17,14 @@ CREATE TABLE theme
     PRIMARY KEY (id)
 );
 
-CREATE TABLE reservation_time
+CREATE TABLE IF NOT EXISTS reservation_time
 (
     id       BIGINT       NOT NULL AUTO_INCREMENT,
     start_at VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE reservation
+CREATE TABLE IF NOT EXISTS reservation
 (
     id                  BIGINT       NOT NULL AUTO_INCREMENT,
     member_id           BIGINT       NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE reservation
     FOREIGN KEY (reservation_time_id) REFERENCES reservation_time (id)
 );
 
-CREATE TABLE payment
+CREATE TABLE IF NOT EXISTS payment
 (
     id           BIGINT NOT NULL AUTO_INCREMENT,
     amount       INT NOT NULL,

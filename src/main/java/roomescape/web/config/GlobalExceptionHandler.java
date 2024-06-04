@@ -3,7 +3,10 @@ package roomescape.web.config;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindException;
@@ -33,6 +36,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleJsonParsingException(HttpMessageConversionException exception) {
         log.error(ERROR_PREFIX, exception);
         return new ResponseEntity<>("유효하지 않은 필드가 존재합니다.", BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = JwtException.class)
+    public ProblemDetail handleJwtException(JwtException exception) {
+        log.error(ERROR_PREFIX, exception);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
     @ExceptionHandler(value = Exception.class)
