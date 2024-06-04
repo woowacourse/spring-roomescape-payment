@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.InvalidReservationException;
 import roomescape.exception.TossPaymentException;
@@ -18,6 +19,8 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
 
     @Autowired
     private ReservationCreateService reservationCreateService;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @DisplayName("어드민이 새로운 예약을 저장한다.")
     @Test
@@ -65,8 +68,11 @@ class ReservationCreateServiceTest extends ReservationServiceTest {
             reservationDetail.getReservationTime().getId(), theme.getId(), "failPaymentKey", "testOrderId", 1000L);
 
         //when & then
-        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
-            .isInstanceOf(TossPaymentException.class);
+        assertAll(
+            () -> assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
+                .isInstanceOf(TossPaymentException.class),
+            () -> assertThat(reservationRepository.findAllByStatus(ReservationStatus.RESERVED)).hasSize(0)
+        );
     }
 
     @DisplayName("사용자가 이미 예약인 상태에서 예약 요청을 한다면 예외가 발생한다.")
