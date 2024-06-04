@@ -41,15 +41,7 @@ public class UserReservationController {
             @Valid @RequestBody CreateUserReservationRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationGeneralService.reserve(
-                request.orderId(),
-                request.amount(),
-                request.paymentKey(),
-                member.getId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+        CreateReservationResponse response = reservationGeneralService.reserve(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -60,12 +52,7 @@ public class UserReservationController {
             @Valid @RequestBody CreateUserReservationStandbyRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationService.standby(
-                member.getId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+        CreateReservationResponse response = reservationService.standby(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);

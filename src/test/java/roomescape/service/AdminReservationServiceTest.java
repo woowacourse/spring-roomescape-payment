@@ -20,9 +20,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
+import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindReservationResponse;
 import roomescape.controller.dto.FindReservationStandbyResponse;
+import roomescape.controller.dto.SearchReservationFilterRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
@@ -79,14 +82,16 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
         @Test
         void save() {
-            CreateReservationResponse saved = adminReservationService.reserve(userId, date, timeId, themeId);
+            CreateReservationResponse saved = adminReservationService.reserve(
+                    new CreateReservationRequest(userId, date, timeId, themeId));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
         @DisplayName("실패: 존재하지 않는 멤버 ID 입력 시 예외가 발생한다.")
         @Test
         void save_MemberIdDoesntExist() {
-            assertThatThrownBy(() -> adminReservationService.reserve(3L, date, timeId, themeId))
+            assertThatThrownBy(() -> adminReservationService.reserve(
+                    new CreateReservationRequest(3L, date, timeId, themeId)))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
@@ -94,7 +99,8 @@ class AdminReservationServiceTest {
         @DisplayName("실패: 존재하지 않는 시간 ID 입력 시 예외가 발생한다.")
         @Test
         void save_TimeIdDoesntExist() {
-            assertThatThrownBy(() -> adminReservationService.reserve(userId, date, 2L, themeId))
+            assertThatThrownBy(() -> adminReservationService.reserve(
+                    new CreateReservationRequest(userId, date, 2L, themeId)))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
@@ -102,9 +108,11 @@ class AdminReservationServiceTest {
         @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
         @Test
         void save_Duplication() {
-            adminReservationService.reserve(userId, date, timeId, themeId);
+            adminReservationService.reserve(
+                    new CreateReservationRequest(userId, date, timeId, themeId));
 
-            assertThatThrownBy(() -> adminReservationService.reserve(userId, date, timeId, themeId))
+            assertThatThrownBy(() -> adminReservationService.reserve(
+                    new CreateReservationRequest(userId, date, timeId, themeId)))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("해당 시간에 예약이 이미 존재합니다.");
         }
@@ -117,7 +125,8 @@ class AdminReservationServiceTest {
             void save_PastDateReservation() {
                 LocalDate yesterday = LocalDate.now().minusDays(1);
 
-                assertThatThrownBy(() -> adminReservationService.reserve(userId, yesterday, timeId, themeId))
+                assertThatThrownBy(() -> adminReservationService.reserve(
+                        new CreateReservationRequest(userId, yesterday, timeId, themeId)))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
@@ -131,7 +140,8 @@ class AdminReservationServiceTest {
 
                 ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
 
-                assertThatThrownBy(() -> adminReservationService.reserve(userId, today, savedTime.getId(), themeId))
+                assertThatThrownBy(() -> adminReservationService.reserve(
+                        new CreateReservationRequest(userId, today, savedTime.getId(), themeId)))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
@@ -144,9 +154,9 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 예약 삭제")
         @Test
         void deleteById() {
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-01"), timeId, themeId);
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-02"), timeId, themeId);
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-03"), timeId, themeId);
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-01"), timeId, themeId));
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-02"), timeId, themeId));
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-03"), timeId, themeId));
 
             adminReservationService.deleteById(2L);
 
@@ -162,8 +172,8 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 다른 회원의 예약대기 삭제")
         @Test
         void deleteStandby_ByAdmin() {
-            adminReservationService.reserve(adminId, date, timeId, themeId);
-            userReservationService.standby(userId, date, timeId, themeId);
+            adminReservationService.reserve(new CreateReservationRequest(adminId, date, timeId, themeId));
+            userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
 
             assertThatCode(() -> adminReservationService.deleteStandby(2L))
                     .doesNotThrowAnyException();
@@ -176,9 +186,9 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 전체 예약 조회")
         @Test
         void findAllReserved() {
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-01"), timeId, themeId);
-            adminReservationService.reserve(userId, LocalDate.parse("2060-01-02"), timeId, themeId);
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-03"), timeId, themeId);
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-01"), timeId, themeId));
+            adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-02"), timeId, themeId));
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-03"), timeId, themeId));
 
             assertThat(adminReservationService.findAllReserved())
                     .extracting(FindReservationResponse::id)
@@ -192,8 +202,8 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 전체 대기 조회")
         @Test
         void findAllStandby() {
-            adminReservationService.reserve(adminId, date, timeId, themeId);
-            userReservationService.standby(userId, date, timeId, themeId);
+            adminReservationService.reserve(new CreateReservationRequest(adminId, date, timeId, themeId));
+            userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
 
             assertThat(adminReservationService.findAllStandby())
                     .extracting(FindReservationStandbyResponse::id)
@@ -207,15 +217,15 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 검색 필터에 따라 조회")
         @Test
         void findAllByFilter() {
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-01"), 1L, 1L);
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-02"), 1L, 2L);
-            adminReservationService.reserve(adminId, LocalDate.parse("2060-01-03"), 1L, 1L);
-            adminReservationService.reserve(userId, LocalDate.parse("2060-01-04"), 1L, 2L);
-            adminReservationService.reserve(userId, LocalDate.parse("2060-01-05"), 1L, 1L);
-            adminReservationService.reserve(userId, LocalDate.parse("2060-01-06"), 1L, 2L);
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-01"), 1L, 1L));
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-02"), 1L, 2L));
+            adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-03"), 1L, 1L));
+            adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-04"), 1L, 2L));
+            adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-05"), 1L, 1L));
+            adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-06"), 1L, 2L));
 
             List<FindReservationResponse> reservations = adminReservationService.findAllByFilter(
-                    2L, userId, LocalDate.parse("2060-01-01"), LocalDate.parse("2060-01-06"));
+                    new SearchReservationFilterRequest(2L, userId, LocalDate.parse("2060-01-01"), LocalDate.parse("2060-01-06")));
 
             assertThat(reservations)
                     .extracting(FindReservationResponse::id)

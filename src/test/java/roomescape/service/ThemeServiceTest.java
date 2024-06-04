@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
+import roomescape.controller.dto.CreateThemeRequest;
 import roomescape.controller.dto.CreateThemeResponse;
 import roomescape.controller.dto.FindThemeResponse;
 import roomescape.domain.member.Member;
@@ -70,16 +71,16 @@ class ThemeServiceTest {
         @DisplayName("성공: 테마 추가")
         @Test
         void save() {
-            CreateThemeResponse saved = themeService.save(name, description, thumbnail);
+            CreateThemeResponse saved = themeService.save(new CreateThemeRequest(name, description, thumbnail));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
         @DisplayName("실패: 이름이 동일한 방탈출 테마를 저장하면 예외 발생")
         @Test
         void save_DuplicatedName() {
-            themeService.save(name, description, thumbnail);
+            themeService.save(new CreateThemeRequest(name, description, thumbnail));
 
-            assertThatThrownBy(() -> themeService.save(name, "description", "https://new.com/new.jpg"))
+            assertThatThrownBy(() -> themeService.save(new CreateThemeRequest(name, "description", "https://new.com/new.jpg")))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("같은 이름의 테마가 이미 존재합니다.");
         }

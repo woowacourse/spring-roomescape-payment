@@ -16,6 +16,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.controller.dto.CreateReservationRequest;
+import roomescape.controller.dto.CreateThemeRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -65,8 +67,8 @@ class UserReservationTimeControllerTest {
     void findAllWithAvailability() {
         reservationTimeService.save("10:00");
         reservationTimeService.save("23:00");
-        themeService.save("t1", "d1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
+        themeService.save(new CreateThemeRequest("t1", "d1", "https://test.com/test.jpg"));
+        adminReservationService.reserve(new CreateReservationRequest(1L, LocalDate.parse("2060-01-01"), 1L, 1L));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)

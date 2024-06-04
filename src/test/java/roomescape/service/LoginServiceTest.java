@@ -15,6 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
+import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.global.exception.AuthorizationException;
@@ -46,7 +47,7 @@ class LoginServiceTest {
         @Test
         void login() {
             memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
-            assertThatCode(() -> loginService.login("deock@test.com", "123a!"))
+            assertThatCode(() -> loginService.login(new LoginRequest("deock@test.com", "123a!")))
                     .doesNotThrowAnyException();
         }
 
@@ -54,7 +55,7 @@ class LoginServiceTest {
         @Test
         void login_InvalidPassword() {
             memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
-            assertThatThrownBy(() -> loginService.login("deock@test.com", "123b!"))
+            assertThatThrownBy(() -> loginService.login(new LoginRequest("deock@test.com", "123b!")))
                     .isInstanceOf(AuthorizationException.class)
                     .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
         }
@@ -63,7 +64,7 @@ class LoginServiceTest {
         @Test
         void login_NoSuchMember() {
             memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
-            assertThatThrownBy(() -> loginService.login("duck@test.com", "123a!"))
+            assertThatThrownBy(() -> loginService.login(new LoginRequest("duck@test.com", "123a!")))
                     .isInstanceOf(AuthorizationException.class)
                     .hasMessage("아이디 혹은 패스워드가 일치하지 않습니다.");
         }

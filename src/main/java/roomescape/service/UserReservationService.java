@@ -10,7 +10,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.CreateUserReservationRequest;
+import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
@@ -44,15 +47,33 @@ public class UserReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse reserve(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        validateDuplication(date, timeId, themeId);
-        return save(memberId, date, timeId, themeId, RESERVED);
+    public CreateReservationResponse reserve(CreateReservationRequest request) {
+        validateDuplication(request.date(), request.timeId(), request.themeId());
+        return save(request.memberId(), request.date(), request.timeId(), request.themeId(), RESERVED);
+    }
+
+    private void validateDuplication(LocalDate date, Long timeId, Long themeId) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+            throw new RoomescapeException("해당 시간에 예약이 이미 존재합니다.");
+        }
     }
 
     @Transactional
-    public CreateReservationResponse standby(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        validateAlreadyBookedByMember(memberId, date, timeId, themeId);
-        return save(memberId, date, timeId, themeId, STANDBY);
+    public CreateReservationResponse standby(Long memberId, CreateUserReservationStandbyRequest request) {
+        validateAlreadyBookedByMember(memberId, request.date(), request.timeId(), request.themeId());
+        return save(memberId, request.date(), request.timeId(), request.themeId(), STANDBY);
+    }
+
+    private void validateAlreadyBookedByMember(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
+                memberId, date, timeId, themeId, RESERVED)) {
+            throw new RoomescapeException("이미 예약하셨습니다. 대기 없이 이용 가능합니다.");
+        }
+
+        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
+                memberId, date, timeId, themeId, STANDBY)) {
+            throw new RoomescapeException("이미 대기중인 예약입니다.");
+        }
     }
 
     private CreateReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
@@ -69,24 +90,6 @@ public class UserReservationService {
         validatePastReservation(date, time);
 
         return CreateReservationResponse.from(reservationRepository.save(reservation));
-    }
-
-    private void validateDuplication(LocalDate date, Long timeId, Long themeId) {
-        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new RoomescapeException("해당 시간에 예약이 이미 존재합니다.");
-        }
-    }
-
-    private void validateAlreadyBookedByMember(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-                memberId, date, timeId, themeId, RESERVED)) {
-            throw new RoomescapeException("이미 예약하셨습니다. 대기 없이 이용 가능합니다.");
-        }
-
-        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-                memberId, date, timeId, themeId, STANDBY)) {
-            throw new RoomescapeException("이미 대기중인 예약입니다.");
-        }
     }
 
     private void validatePastReservation(LocalDate date, ReservationTime time) {

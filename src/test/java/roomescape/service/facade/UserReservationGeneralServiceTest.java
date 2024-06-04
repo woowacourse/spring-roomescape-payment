@@ -22,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
@@ -59,13 +60,13 @@ class UserReservationGeneralServiceTest {
     private ReservationTimeRepository reservationTimeRepository;
 
     private final LocalDate date = LocalDate.parse("2060-01-01");
-
     private final Long timeId = 1L;
     private final Long themeId = 1L;
     private final Long userId = 1L;
     private final String orderId = "";
     private final long amount = 1000;
     private final String paymentKey = "";
+    private final String paymentType = "카드";
 
     @BeforeEach
     void setUpData() {
@@ -78,7 +79,7 @@ class UserReservationGeneralServiceTest {
 
         doNothing()
                 .when(paymentService)
-                .pay(any(String.class), any(Long.class), any(String.class));
+                .pay(any(CreateUserReservationRequest.class));
     }
 
     @Nested
@@ -87,36 +88,38 @@ class UserReservationGeneralServiceTest {
         @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
         @Test
         void save() {
-            CreateReservationResponse saved = reservationFacadeService.reserve(orderId, amount, paymentKey, userId, date, timeId, themeId);
+            CreateUserReservationRequest request = new CreateUserReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
+            CreateReservationResponse saved = reservationFacadeService.reserve(userId, request);
             assertThat(saved.id()).isEqualTo(1L);
         }
 
         @DisplayName("실패: 존재하지 않는 멤버 ID 입력 시 예외가 발생한다.")
         @Test
         void save_MemberIdDoesntExist() {
-            assertThatThrownBy(
-                    () -> reservationFacadeService.reserve(orderId, amount, paymentKey, 3L, date, timeId, themeId)
-            ).isInstanceOf(RoomescapeException.class)
+            CreateUserReservationRequest request = new CreateUserReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
+            assertThatThrownBy(() -> reservationFacadeService.reserve(3L, request))
+                    .isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
 
         @DisplayName("실패: 존재하지 않는 시간 ID 입력 시 예외가 발생한다.")
         @Test
         void save_TimeIdDoesntExist() {
-            assertThatThrownBy(
-                    () -> reservationFacadeService.reserve(orderId, amount, paymentKey, userId, date, 2L, themeId)
-            ).isInstanceOf(RoomescapeException.class)
+            CreateUserReservationRequest request = new CreateUserReservationRequest(date, themeId, 2L, paymentKey, orderId, amount, paymentType);
+
+            assertThatThrownBy(() -> reservationFacadeService.reserve(userId, request))
+                    .isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
 
         @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
         @Test
         void save_Duplication() {
-            reservationFacadeService.reserve(orderId, amount, paymentKey, userId, date, timeId, themeId);
+            CreateUserReservationRequest request = new CreateUserReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
+            reservationFacadeService.reserve(userId, request);
 
-            assertThatThrownBy(
-                    () -> reservationFacadeService.reserve(orderId, amount, paymentKey, userId, date, timeId, themeId)
-            ).isInstanceOf(RoomescapeException.class)
+            assertThatThrownBy(() -> reservationFacadeService.reserve(userId, request))
+                    .isInstanceOf(RoomescapeException.class)
                     .hasMessage("해당 시간에 예약이 이미 존재합니다.");
         }
 
@@ -127,10 +130,10 @@ class UserReservationGeneralServiceTest {
             @Test
             void save_PastDateReservation() {
                 LocalDate yesterday = LocalDate.now().minusDays(1);
+                CreateUserReservationRequest request = new CreateUserReservationRequest(yesterday, themeId, timeId, paymentKey, orderId, amount, paymentType);
 
-                assertThatThrownBy(
-                        () -> reservationFacadeService.reserve(orderId, amount, paymentKey, userId, yesterday, timeId, themeId)
-                ).isInstanceOf(RoomescapeException.class)
+                assertThatThrownBy(() -> reservationFacadeService.reserve(userId, request))
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
 
@@ -142,10 +145,10 @@ class UserReservationGeneralServiceTest {
                 oneMinuteAgo = oneMinuteAgo.withNano(0);
 
                 ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
+                CreateUserReservationRequest request = new CreateUserReservationRequest(today, themeId, savedTime.getId(), paymentKey, orderId, amount, paymentType);
 
-                assertThatThrownBy(
-                        () -> reservationFacadeService.reserve(orderId, amount, paymentKey, userId, today, savedTime.getId(), themeId)
-                ).isInstanceOf(RoomescapeException.class)
+                assertThatThrownBy(() -> reservationFacadeService.reserve(userId, request))
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
         }

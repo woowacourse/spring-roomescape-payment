@@ -26,4 +26,7 @@ public record CreateReservationRequest(
         @Positive(message = "양수만 입력할 수 있습니다.")
         Long themeId
 ) {
+    public static CreateReservationRequest to(Long memberId, CreateUserReservationRequest request) {
+        return new CreateReservationRequest(memberId, request.date(), request.timeId(), request.themeId());
+    }
 }

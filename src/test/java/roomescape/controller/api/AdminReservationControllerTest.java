@@ -16,6 +16,10 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.controller.dto.CreateReservationRequest;
+import roomescape.controller.dto.CreateThemeRequest;
+import roomescape.controller.dto.CreateUserReservationRequest;
+import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -64,7 +68,7 @@ class AdminReservationControllerTest {
         RestAssured.port = port;
 
         reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
+        themeService.save(new CreateThemeRequest("테마1", "설명1", "https://test.com/test.jpg"));
         memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
         memberRepository.save(new Member("사용자", "user@a.com", "123a!", Role.USER));
 
@@ -87,10 +91,10 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 예약 삭제 가능, 다음 순위 예약대기는 자동 예약")
     @Test
     void delete() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID));
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
@@ -126,8 +130,8 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 전체 예약 조회 -> 200")
     @Test
     void findAll() {
-        adminReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        adminReservationService.reserve(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        adminReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID));
+        adminReservationService.reserve(new CreateReservationRequest(USER_ID, DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
@@ -150,10 +154,10 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 전체 대기목록 조회 -> 200")
     @Test
     void findAllStandby() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID));
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)

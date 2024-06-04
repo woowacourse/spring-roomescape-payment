@@ -21,7 +21,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
+import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -74,7 +76,7 @@ class UserReservationServiceTest {
         @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
         @Test
         void save() {
-            CreateReservationResponse saved = userReservationService.reserve(userId, date, timeId, themeId);
+            CreateReservationResponse saved = userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
@@ -82,7 +84,7 @@ class UserReservationServiceTest {
         @Test
         void save_MemberIdDoesntExist() {
             assertThatThrownBy(
-                    () -> userReservationService.reserve(3L, date, timeId, themeId)
+                    () -> userReservationService.reserve(new CreateReservationRequest(3L, date, timeId, themeId))
             ).isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
@@ -91,7 +93,7 @@ class UserReservationServiceTest {
         @Test
         void save_TimeIdDoesntExist() {
             assertThatThrownBy(
-                    () -> userReservationService.reserve(userId, date, 2L, themeId)
+                    () -> userReservationService.reserve(new CreateReservationRequest(userId, date, 2L, themeId))
             ).isInstanceOf(RoomescapeException.class)
                     .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
         }
@@ -99,10 +101,10 @@ class UserReservationServiceTest {
         @DisplayName("실패: 중복 예약을 생성하면 예외가 발생한다.")
         @Test
         void save_Duplication() {
-            userReservationService.reserve(userId, date, timeId, themeId);
+            userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId));
 
             assertThatThrownBy(
-                    () -> userReservationService.reserve(userId, date, timeId, themeId)
+                    () -> userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId))
             ).isInstanceOf(RoomescapeException.class)
                     .hasMessage("해당 시간에 예약이 이미 존재합니다.");
         }
@@ -116,7 +118,7 @@ class UserReservationServiceTest {
                 LocalDate yesterday = LocalDate.now().minusDays(1);
 
                 assertThatThrownBy(
-                        () -> userReservationService.reserve(userId, yesterday, timeId, themeId)
+                        () -> userReservationService.reserve(new CreateReservationRequest(userId, yesterday, timeId, themeId))
                 ).isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
@@ -131,7 +133,7 @@ class UserReservationServiceTest {
                 ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(oneMinuteAgo.toString()));
 
                 assertThatThrownBy(
-                        () -> userReservationService.reserve(userId, today, savedTime.getId(), themeId)
+                        () -> userReservationService.reserve(new CreateReservationRequest(userId, today, savedTime.getId(), themeId))
                 ).isInstanceOf(RoomescapeException.class)
                         .hasMessage("과거 예약을 추가할 수 없습니다.");
             }
@@ -144,16 +146,16 @@ class UserReservationServiceTest {
         @DisplayName("성공: 예약 대기")
         @Test
         void standby() {
-            CreateReservationResponse saved = userReservationService.standby(userId, date, timeId, themeId);
+            CreateReservationResponse saved = userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
         @DisplayName("실패: 본인의 예약에 대기를 걸 수 없다.")
         @Test
         void standby_CantReserveAndThenStandbyForTheSameReservation() {
-            userReservationService.reserve(userId, date, timeId, themeId);
+            userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId));
 
-            assertThatThrownBy(() -> userReservationService.standby(userId, date, timeId, themeId))
+            assertThatThrownBy(() -> userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId)))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("이미 예약하셨습니다. 대기 없이 이용 가능합니다.");
         }
@@ -161,10 +163,10 @@ class UserReservationServiceTest {
         @DisplayName("실패: 하나의 예약에 두 개 이상 대기를 걸 수 없다.")
         @Test
         void standby_CantStandbyMoreThanOnce() {
-            userReservationService.reserve(adminId, date, timeId, themeId);
-            userReservationService.standby(userId, date, timeId, themeId);
+            userReservationService.reserve(new CreateReservationRequest(adminId, date, timeId, themeId));
+            userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
 
-            assertThatThrownBy(() -> userReservationService.standby(userId, date, timeId, themeId))
+            assertThatThrownBy(() -> userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId)))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("이미 대기중인 예약입니다.");
         }
@@ -176,10 +178,10 @@ class UserReservationServiceTest {
         @DisplayName("성공: 특정 멤버가 예약한 예약 및 예약대기 목록 조회")
         @Test
         void findAllWithRankByMemberId() {
-            userReservationService.reserve(adminId, LocalDate.parse("2060-01-01"), timeId, themeId);
-            userReservationService.standby(userId, LocalDate.parse("2060-01-01"), timeId, themeId);
-            userReservationService.reserve(userId, LocalDate.parse("2060-01-02"), timeId, themeId);
-            userReservationService.reserve(userId, LocalDate.parse("2060-01-03"), timeId, themeId);
+            userReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-01"), timeId, themeId));
+            userReservationService.standby(userId, new CreateUserReservationStandbyRequest(LocalDate.parse("2060-01-01"), timeId, themeId));
+            userReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-02"), timeId, themeId));
+            userReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-03"), timeId, themeId));
 
             List<FindMyReservationResponse> reservations = userReservationService.findMyReservationsWithRank(userId);
             assertAll(
@@ -198,8 +200,8 @@ class UserReservationServiceTest {
             @DisplayName("성공: 일반유저는 본인의 예약대기를 삭제할 수 있다.")
             @Test
             void deleteStandby() {
-                userReservationService.reserve(adminId, date, timeId, themeId);
-                userReservationService.standby(userId, date, timeId, themeId);
+                userReservationService.reserve(new CreateReservationRequest(adminId, date, timeId, themeId));
+                userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
                 Member user = memberRepository.findById(userId).get();
 
                 assertThatCode(() -> userReservationService.deleteStandby(2L, user))
@@ -209,8 +211,8 @@ class UserReservationServiceTest {
             @DisplayName("실패: 일반유저는 타인의 예약대기를 삭제할 수 없다.")
             @Test
             void deleteStandby_ReservedByOther() {
-                userReservationService.reserve(userId, date, timeId, themeId);
-                userReservationService.standby(adminId, date, timeId, themeId);
+                userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId));
+                userReservationService.standby(adminId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
                 Member user = memberRepository.findById(userId).get();
 
                 assertThatThrownBy(() -> userReservationService.deleteStandby(2L, user))
@@ -221,8 +223,8 @@ class UserReservationServiceTest {
             @DisplayName("실패: 예약대기 삭제 메서드로 예약을 삭제할 수 없다.")
             @Test
             void deleteStandby_Cannot_Delete_Reserved() {
-                userReservationService.reserve(userId, date, timeId, themeId);
-                userReservationService.standby(adminId, date, timeId, themeId);
+                userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId));
+                userReservationService.standby(adminId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
                 Member user = memberRepository.findById(userId).get();
 
                 assertThatThrownBy(() -> userReservationService.deleteStandby(1L, user))

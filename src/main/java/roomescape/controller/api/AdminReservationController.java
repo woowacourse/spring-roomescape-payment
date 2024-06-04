@@ -33,12 +33,7 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<CreateReservationResponse> save(@Valid @RequestBody CreateReservationRequest request) {
-        CreateReservationResponse response = adminReservationService.reserve(
-                request.memberId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+        CreateReservationResponse response = adminReservationService.reserve(request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -70,8 +65,7 @@ public class AdminReservationController {
 
     @GetMapping("/search")
     public ResponseEntity<List<FindReservationResponse>> find(SearchReservationFilterRequest request) {
-        List<FindReservationResponse> response = adminReservationService.findAllByFilter(
-                request.themeId(), request.memberId(), request.dateFrom(), request.dateTo());
+        List<FindReservationResponse> response = adminReservationService.findAllByFilter(request);
         return ResponseEntity.ok(response);
     }
 }
