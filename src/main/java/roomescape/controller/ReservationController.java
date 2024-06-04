@@ -1,25 +1,14 @@
 package roomescape.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import roomescape.dto.*;
+import roomescape.service.PaymentService;
+import roomescape.service.ReservationService;
+
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import roomescape.dto.AdminReservationRequest;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.PaymentRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
-import roomescape.dto.ReservationWithPaymentRequest;
-import roomescape.service.PaymentService;
-import roomescape.service.ReservationService;
 
 @RestController
 public class ReservationController {
@@ -31,7 +20,6 @@ public class ReservationController {
         this.paymentService = paymentService;
     }
 
-
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Authenticated LoginMemberRequest loginMemberRequest,
@@ -40,7 +28,7 @@ public class ReservationController {
         paymentService.pay(PaymentRequest.from(reservationWithPaymentRequest));
 
         ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,
-                ReservationRequest.from(reservationWithPaymentRequest));
+                reservationWithPaymentRequest);
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
     }

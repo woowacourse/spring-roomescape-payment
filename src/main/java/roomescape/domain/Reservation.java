@@ -1,21 +1,14 @@
 package roomescape.domain;
 
-import static roomescape.exception.ExceptionType.EMPTY_DATE;
-import static roomescape.exception.ExceptionType.EMPTY_MEMBER;
-import static roomescape.exception.ExceptionType.EMPTY_THEME;
-import static roomescape.exception.ExceptionType.EMPTY_TIME;
+import jakarta.persistence.*;
+import roomescape.exception.RoomescapeException;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import roomescape.exception.RoomescapeException;
+
+import static roomescape.exception.ExceptionType.*;
 
 @Entity
 public class Reservation implements Comparable<Reservation> {
@@ -32,6 +25,10 @@ public class Reservation implements Comparable<Reservation> {
     private Member member;
     @Column(nullable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = true)//TODO
+    private String paymentKey;
+    @Column(nullable = true)//TODO
+    private Long amount;
 
     protected Reservation() {
 
@@ -42,19 +39,38 @@ public class Reservation implements Comparable<Reservation> {
                 reservationBeforeSave.date,
                 reservationBeforeSave.time,
                 reservationBeforeSave.theme,
-                reservationBeforeSave.member);
+                reservationBeforeSave.member,
+                reservationBeforeSave.paymentKey,
+                reservationBeforeSave.amount);
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
+    public Reservation(LocalDate date,
+                       ReservationTime time,
+                       Theme theme,
+                       Member member,
+                       String paymentKey,
+                       long amount) {
+        this(null, date, time, theme, member, paymentKey, amount);
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, date, time, theme, member, LocalDateTime.now());
+    public Reservation(Long id,
+                       LocalDate date,
+                       ReservationTime time,
+                       Theme theme,
+                       Member member,
+                       String paymentKey,
+                       long amount) {
+        this(id, date, time, theme, member, LocalDateTime.now(), paymentKey, amount);
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
-                       LocalDateTime createdAt) {
+    public Reservation(Long id,
+                       LocalDate date,
+                       ReservationTime time,
+                       Theme theme,
+                       Member member,
+                       LocalDateTime createdAt,
+                       String paymentKey,
+                       long amount) {
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
@@ -65,6 +81,8 @@ public class Reservation implements Comparable<Reservation> {
         this.theme = theme;
         this.member = member;
         this.createdAt = createdAt;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     private void validateTheme(Theme theme) {
@@ -161,6 +179,14 @@ public class Reservation implements Comparable<Reservation> {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public long getAmount() {
+        return amount;
     }
 
     @Override

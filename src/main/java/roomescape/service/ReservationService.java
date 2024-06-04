@@ -1,30 +1,23 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
-import roomescape.dto.AdminReservationRequest;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
+import roomescape.dto.*;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static roomescape.exception.ExceptionType.*;
 
 @Service
 public class ReservationService {
@@ -46,15 +39,15 @@ public class ReservationService {
     }
 
     public ReservationResponse saveByUser(LoginMemberRequest loginMemberRequest,
-                                          ReservationRequest reservationRequest) {
-        ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
+                                          ReservationWithPaymentRequest reservationWithPaymentRequest) {
+        ReservationTime requestedTime = reservationTimeRepository.findById(reservationWithPaymentRequest.timeId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
-        Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
+        Theme requestedTheme = themeRepository.findById(reservationWithPaymentRequest.themeId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
         Member requestedMember = memberRepository.findById(loginMemberRequest.id())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        return save(reservationRequest.toReservation(
+        return save(reservationWithPaymentRequest.toReservation(
                 requestedMember, requestedTime, requestedTheme));
     }
 
@@ -67,7 +60,7 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
         return save(new Reservation(
-                reservationRequest.date(), requestedTime, requestedTheme, requestedMember));
+                reservationRequest.date(), requestedTime, requestedTheme, requestedMember,null, 0L));
     }
 
     private ReservationResponse save(Reservation beforeSaveReservation) {

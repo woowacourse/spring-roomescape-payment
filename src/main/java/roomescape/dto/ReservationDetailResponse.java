@@ -1,16 +1,19 @@
 package roomescape.dto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public record ReservationDetailResponse(
         long id,
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        long amount
 ) {
     public static ReservationDetailResponse from(Reservation reservation, ReservationStatus status) {
         return new ReservationDetailResponse(
@@ -19,6 +22,11 @@ public record ReservationDetailResponse(
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
                 getStatusName(status)
+
+                , reservation.getPaymentKey(), reservation.getAmount()
+
+
+//                , "paymentKeySample",400
         );
     }
 
@@ -29,6 +37,10 @@ public record ReservationDetailResponse(
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
                 getStatusNameByIndex(index)
+
+
+                , reservation.getPaymentKey(), reservation.getAmount()
+//                , "paymentKeySample",400
         );
     }
 
