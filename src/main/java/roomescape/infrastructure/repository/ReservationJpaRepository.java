@@ -3,9 +3,10 @@ package roomescape.infrastructure.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationWithRank;
@@ -13,7 +14,8 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
 
-public interface ReservationJpaRepository extends Repository<Reservation, Long> {
+@Repository
+public interface ReservationJpaRepository extends JpaRepository<Reservation, Long> {
 
     Reservation save(Reservation reservation);
 
@@ -54,7 +56,7 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
             )
             from Reservation r
             where r.member.id = :memberId
-            and (r.date > current_date or (r.date = current_date and r.time.startAt > current_time))
+            and r.date > current_date
             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
 
