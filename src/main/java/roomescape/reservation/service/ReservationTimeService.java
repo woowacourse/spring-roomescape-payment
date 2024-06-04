@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
+import roomescape.reservation.dto.response.ReservationTimeInfoResponse;
+import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimesResponse;
 import roomescape.system.exception.ErrorType;
@@ -68,5 +71,23 @@ public class ReservationTimeService {
         }
 
         reservationTimeRepository.deleteById(id);
+    }
+
+
+    public ReservationTimeInfosResponse findAllAvailableTimesByDateAndTheme(final LocalDate date, final Long themeId) {
+        final List<ReservationTime> allTimes = reservationTimeRepository.findAll();
+        final List<Reservation> reservations = reservationRepository.findByThemeId(themeId);
+
+        final List<ReservationTimeInfoResponse> response = allTimes.stream()
+                .map(time -> new ReservationTimeInfoResponse(time.getId(), time.getStartAt(),
+                        isReservationBooked(reservations, date, time)))
+                .toList();
+
+        return new ReservationTimeInfosResponse(response);
+    }
+
+    private boolean isReservationBooked(List<Reservation> reservations, LocalDate date, ReservationTime time) {
+        return reservations.stream()
+                .anyMatch(reservation -> reservation.isSameDateAndTime(date, time));
     }
 }

@@ -24,7 +24,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             final ReservationStatus waiting
     );
 
-    List<Reservation> findByDateAndTheme(LocalDate date, Theme theme);
+    List<Reservation> findByThemeId(Long themeId);
 
     @Query("SELECT new roomescape.reservation.domain.WaitingWithRank(" +
             "    w, " +

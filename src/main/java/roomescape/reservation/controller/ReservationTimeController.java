@@ -3,6 +3,7 @@ package roomescape.reservation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
+import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimesResponse;
 import roomescape.reservation.service.ReservationTimeService;
@@ -56,5 +59,13 @@ public class ReservationTimeController {
         reservationTimeService.removeTimeById(id);
 
         return ApiResponse.success();
+    }
+
+    @GetMapping("/times/filter")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<ReservationTimeInfosResponse> findAllAvailableReservationTimes(
+            @NotNull(message = "날짜는 null일 수 없습니다.") @RequestParam final LocalDate date,
+            @NotNull(message = "themeId는 null일 수 없습니다.") @RequestParam final Long themeId) {
+        return ApiResponse.success(reservationTimeService.findAllAvailableTimesByDateAndTheme(date, themeId));
     }
 }

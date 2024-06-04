@@ -16,12 +16,9 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSpecification;
-import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeInfoResponse;
-import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.dto.response.WaitingWithRankResponse;
 import roomescape.reservation.dto.response.WaitingWithRanksResponse;
@@ -33,20 +30,17 @@ import roomescape.theme.service.ThemeService;
 @Service
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-    private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationTimeService reservationTimeService;
     private final MemberService memberService;
     private final ThemeService themeService;
 
     public ReservationService(
             final ReservationRepository reservationRepository,
-            final ReservationTimeRepository reservationTimeRepository,
             final ReservationTimeService reservationTimeService,
             final MemberService memberService,
             final ThemeService themeService
     ) {
         this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
         this.reservationTimeService = reservationTimeService;
         this.memberService = memberService;
         this.themeService = themeService;
@@ -59,31 +53,6 @@ public class ReservationService {
                 .toList();
 
         return new ReservationsResponse(response);
-    }
-
-    public ReservationTimeInfosResponse findReservationsByDateAndThemeId(final LocalDate date, final Long themeId) {
-        final List<ReservationTime> allTimes = reservationTimeRepository.findAll();
-        final Theme theme = themeService.findThemeById(themeId);
-        final List<Reservation> reservations = reservationRepository.findByDateAndTheme(date, theme);
-
-        final List<ReservationTimeInfoResponse> response = getReservationTimeInfoResponses(
-                allTimes, reservations);
-
-        return new ReservationTimeInfosResponse(response);
-    }
-
-    private List<ReservationTimeInfoResponse> getReservationTimeInfoResponses(
-            final List<ReservationTime> allTimes,
-            final List<Reservation> reservations
-    ) {
-        return allTimes.stream()
-                .map(time -> new ReservationTimeInfoResponse(
-                        time.getId(),
-                        time.getStartAt(),
-                        reservations.stream()
-                                .anyMatch(reservation -> reservation.getReservationTime() == time))
-                )
-                .toList();
     }
 
     public Reservation findReservationById(final Long id) {

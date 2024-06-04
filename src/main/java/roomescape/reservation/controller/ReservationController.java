@@ -3,7 +3,6 @@ package roomescape.reservation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +18,6 @@ import roomescape.payment.TossPaymentClient;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.dto.response.WaitingWithRanksResponse;
 import roomescape.reservation.service.ReservationService;
@@ -48,14 +46,6 @@ public class ReservationController {
     @GetMapping("/reservations-mine")
     public ApiResponse<WaitingWithRanksResponse> getMemberReservations(@MemberId final Long memberId) {
         return ApiResponse.success(reservationService.findWaitingWithRankById(memberId));
-    }
-
-    @GetMapping("/reservations/themes/{themeId}/times")
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationTimeInfosResponse> getReservationTimeInfos(
-            @NotNull(message = "themeId는 null일 수 없습니다.") @PathVariable final Long themeId,
-            @NotNull(message = "날짜는 null일 수 없습니다.") @RequestParam final LocalDate date) {
-        return ApiResponse.success(reservationService.findReservationsByDateAndThemeId(date, themeId));
     }
 
     @Admin

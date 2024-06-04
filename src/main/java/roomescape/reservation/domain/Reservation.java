@@ -121,4 +121,8 @@ public class Reservation {
     public Member getMember() {
         return member;
     }
+
+    public boolean isSameDateAndTime(LocalDate date, ReservationTime time) {
+        return this.date.equals(date) && time.getStartAt().equals(this.reservationTime.getStartAt());
+    }
 }

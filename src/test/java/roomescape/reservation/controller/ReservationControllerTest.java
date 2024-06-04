@@ -182,31 +182,6 @@ public class ReservationControllerTest {
                 .statusCode(204);
     }
 
-    @Test
-    @DisplayName("특정 날짜의 특정 테마 예약 현황을 조회한다.")
-    void readReservationByDateAndThemeId() {
-        // given
-        LocalDate today = LocalDate.now();
-        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 00)));
-        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
-        ReservationTime reservationTime3 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(18, 30)));
-        Theme theme = themeRepository.save(new Theme("테마명1", "설명", "썸네일URL"));
-        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
-
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime1, theme, member));
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime2, theme, member));
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime3, theme, member));
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .port(port)
-                .when().get("/reservations/themes/1/times?date=" + today.plusDays(1))
-                .then().log().all()
-                .statusCode(200)
-                .body("data.reservationTimes.size()", is(3));
-    }
-
     @ParameterizedTest
     @MethodSource("requestValidateSource")
     @DisplayName("예약 생성 시, 요청 값에 공백 또는 null이 포함되어 있으면 400 에러를 발생한다.")
