@@ -6,7 +6,6 @@ public record ReservationSearchRequest(
         Long themeId,
         Long memberId,
         LocalDate dateFrom,
-        LocalDate dateTo,
-        Boolean waiting
+        LocalDate dateTo
 ) {
 }

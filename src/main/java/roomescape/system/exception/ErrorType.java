@@ -6,6 +6,7 @@ public enum ErrorType {
     REQUEST_DATA_BLANK("요청 데이터에 유효하지 않은 값(null OR 공백)이 포함되어있습니다."),
     INVALID_REQUEST_DATA_TYPE("요청 데이터 형식이 올바르지 않습니다."),
     INVALID_REQUEST_DATA("요청 데이터 값이 올바르지 않습니다."),
+    INVALID_DATE_RANGE("종료 날짜는 시작 날짜 이전일 수 없습니다."),
 
     // 401 Unauthorized
     EXPIRED_TOKEN("만료된 JWT 토큰입니다."),

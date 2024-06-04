@@ -20,6 +20,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
@@ -87,6 +88,19 @@ class ReservationServiceTest {
                 new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
                         "orderId", "amount", "paymentType"),
                 NotExistMemberId))
+                .isInstanceOf(RoomEscapeException.class);
+    }
+
+    @Test
+    @DisplayName("예약을 조회할 때 종료 날짜가 시작 날짜 이전이면 예외를 발생한다.")
+    void invalidDateRange() {
+        // given
+        LocalDate dateFrom = LocalDate.now().plusDays(1);
+        LocalDate dateTo = LocalDate.now();
+        ReservationSearchRequest request = new ReservationSearchRequest(1L, 1L, dateFrom, dateTo);
+
+        // when & then
+        assertThatThrownBy(() -> reservationService.findFilteredReservations(request))
                 .isInstanceOf(RoomEscapeException.class);
     }
 }

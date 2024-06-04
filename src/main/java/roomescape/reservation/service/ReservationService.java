@@ -15,7 +15,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
-import roomescape.reservation.domain.repository.ReservationSpecification;
+import roomescape.reservation.domain.repository.ReservationSearchSpecification;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -131,18 +131,25 @@ public class ReservationService {
             final LocalDateTime now
     ) {
         final LocalDate today = now.toLocalDate();
-        final LocalTime nowTime = now.toLocalTime();
+        final LocalTime currentTime = now.toLocalTime();
 
         if (requestDate.isBefore(today)) {
             return true;
         }
-        return requestDate.isEqual(today) && requestReservationTime.getStartAt().isBefore(nowTime);
+        return requestDate.isEqual(today) && requestReservationTime.getStartAt().isBefore(currentTime);
     }
 
     public ReservationsResponse findFilteredReservations(final ReservationSearchRequest request) {
-        final Specification<Reservation> specification = getReservationSpecification(request);
+        validateDateForSearch(request.dateFrom(), request.dateTo());
+        final Specification<Reservation> spec = new ReservationSearchSpecification()
+                .sameThemeId(request.themeId())
+                .sameMemberId(request.memberId())
+                .dateStartFrom(request.dateFrom())
+                .dateEndAt(request.dateTo())
+                .sameStatus(ReservationStatus.CONFIRMED)
+                .build();
 
-        final List<ReservationResponse> response = reservationRepository.findAll(specification)
+        final List<ReservationResponse> response = reservationRepository.findAll(spec)
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -150,29 +157,14 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
-    private Specification<Reservation> getReservationSpecification(
-            final ReservationSearchRequest request
-    ) {
-        Specification<Reservation> specification = (root, query, criteriaBuilder) -> null;
-        if (request.themeId() != null) {
-            specification = specification.and(
-                    ReservationSpecification.withTheme(themeService.findThemeById(request.themeId()))
-            );
+    private void validateDateForSearch(LocalDate startFrom, LocalDate endAt) {
+        if (startFrom == null || endAt == null) {
+            return;
         }
-        if (request.memberId() != null) {
-            specification = specification.and(
-                    ReservationSpecification.withMember(memberService.findMemberById(request.memberId())));
+        if (startFrom.isAfter(endAt)) {
+            throw new RoomEscapeException(ErrorType.INVALID_DATE_RANGE,
+                    String.format("[startFrom: %s, endAt: %s", startFrom, endAt), HttpStatus.BAD_REQUEST);
         }
-        if (request.dateFrom() != null) {
-            specification = specification.and(ReservationSpecification.withDateFrom(request.dateFrom()));
-        }
-        if (request.dateTo() != null) {
-            specification = specification.and(ReservationSpecification.withDateTo(request.dateTo()));
-        }
-        if (request.waiting() != null) {
-            specification = specification.and(ReservationSpecification.withWaiting(request.waiting()));
-        }
-        return specification;
     }
 
     public WaitingWithRanksResponse findWaitingWithRankById(final Long myId) {
