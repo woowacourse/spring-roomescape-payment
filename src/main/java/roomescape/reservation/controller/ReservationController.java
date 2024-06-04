@@ -16,26 +16,26 @@ import roomescape.auth.dto.LoggedInMember;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
-import roomescape.reservation.service.ReservationCreateService;
 import roomescape.reservation.service.ReservationDeleteService;
 import roomescape.reservation.service.ReservationFindMineService;
 import roomescape.reservation.service.ReservationFindService;
+import roomescape.reservation.service.ReservationPayService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
+    private final ReservationPayService reservationPayService;
     private final ReservationFindService findService;
     private final ReservationFindMineService findMineService;
-    private final ReservationCreateService createService;
     private final ReservationDeleteService deleteService;
 
     public ReservationController(ReservationFindService findService,
                                  ReservationFindMineService findMineService,
-                                 ReservationCreateService createService,
+                                 ReservationPayService reservationPayService,
                                  ReservationDeleteService deleteService) {
         this.findService = findService;
         this.findMineService = findMineService;
-        this.createService = createService;
+        this.reservationPayService = reservationPayService;
         this.deleteService = deleteService;
     }
 
@@ -53,7 +53,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody UserReservationCreateRequest request,
             LoggedInMember member) {
-        ReservationResponse response = createService.createReservation(request, member.id());
+        ReservationResponse response = reservationPayService.createReservation(request, member.id());
 
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location)
