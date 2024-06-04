@@ -17,6 +17,9 @@ import roomescape.global.exception.auth.AuthorizationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "서버 관리자에게 문의하세요.";
+    private static final String TOSS_PAYMENT_SERVER_ERROR_MESSAGE = "결제에 실패했습니다. 관리자에게 문의하세요.";
+
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler
@@ -49,12 +52,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handlePaymentExceptionError(PaymentFailException e) {
         log.error("Toss Payment Server Error 발생: {}", e.getMessage(), e);
-        return ResponseEntity.internalServerError().body(new ErrorResponse("결제에 실패했습니다. 관리자에게 문의하세요."));
+        return ResponseEntity.internalServerError().body(new ErrorResponse(TOSS_PAYMENT_SERVER_ERROR_MESSAGE));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleInternalServerError(Exception e) {
         log.error("Internal Server Error 발생: {}", e.getMessage(), e);
-        return ResponseEntity.internalServerError().body(new ErrorResponse("서버 관리자에게 문의하세요."));
+        return ResponseEntity.internalServerError().body(new ErrorResponse(INTERNAL_SERVER_ERROR_MESSAGE));
     }
 }

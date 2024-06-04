@@ -2,6 +2,7 @@ package roomescape.global.config;
 
 import java.time.Duration;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +20,11 @@ import roomescape.payment.TossPaymentClient;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    private static final int CONNECTION_TIMEOUT_DURATION_OF_SECOND = 5;
-    private static final int READ_TIMEOUT_DURATION_OF_SECOND = 3;
+    @Value("${roomescape.payment.toss.connection-timeout-duration-of-second}")
+    private int connectionTimeoutDurationOfSecond;
 
+    @Value("${roomescape.payment.toss.read-timeout-duration-of-second}")
+    private int readTimeoutDurationOfSecond;
     private final AuthenticatedMemberArgumentResolver authenticatedMemberArgumentResolver;
     private final AdminHandlerInterceptor adminHandlerInterceptor;
 
@@ -56,8 +59,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT_DURATION_OF_SECOND))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT_DURATION_OF_SECOND));
+                .withConnectTimeout(Duration.ofSeconds(connectionTimeoutDurationOfSecond))
+                .withReadTimeout(Duration.ofSeconds(readTimeoutDurationOfSecond));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
