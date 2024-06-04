@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaidReservationDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.web.auth.Auth;
 import roomescape.web.controller.request.LoginMember;
@@ -36,10 +37,11 @@ public class MemberReservationController {
                                                              @Valid @Auth LoginMember loginMember) {
         PaymentApproveDto paymentApproveDto = memberReservationRequest.toPaymentApproveDto();
         ReservationSaveDto reservationSaveDto = memberReservationRequest.toReservationSaveDto(loginMember.id());
-        ReservationDto reservationDto = reservationService.save(reservationSaveDto, paymentApproveDto);
-        MemberReservationResponse memberReservationResponse = MemberReservationResponse.from(reservationDto);
 
-        return ResponseEntity.created(URI.create("/reservations/" + reservationDto.id()))
+        PaidReservationDto paidReservationDto = reservationService.save(reservationSaveDto, paymentApproveDto);
+        MemberReservationResponse memberReservationResponse = new MemberReservationResponse(paidReservationDto);
+
+        return ResponseEntity.created(URI.create("/reservations/" + paidReservationDto.id()))
                 .body(memberReservationResponse);
     }
 
@@ -54,7 +56,7 @@ public class MemberReservationController {
     public ResponseEntity<List<MemberReservationResponse>> getReservations() {
         List<ReservationDto> appResponses = reservationService.findAll();
         List<MemberReservationResponse> memberReservationResponse = appResponses.stream()
-                .map(MemberReservationResponse::from)
+                .map(MemberReservationResponse::new)
                 .toList();
 
         return ResponseEntity.ok(memberReservationResponse);

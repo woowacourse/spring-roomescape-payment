@@ -2,14 +2,14 @@ package roomescape.service;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.*;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
+import roomescape.domain.repository.*;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaidReservationDto;
+import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
 
@@ -26,20 +26,36 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentManager paymentManager;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentManager paymentManager) {
+            PaymentManager paymentManager, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentManager = paymentManager;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
+        Reservation savedReservation = validateAndSave(reservationSaveDto);
+        return new ReservationDto(savedReservation);
+    }
+
+    @Transactional
+    public PaidReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+        Reservation reservation = validateAndSave(reservationSaveDto);
+        PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
+        PaidReservation paidReservation = saveReservationPayment(reservation, paymentDto);
+
+        return new PaidReservationDto(paidReservation);
+    }
+
+    private Reservation validateAndSave(ReservationSaveDto reservationSaveDto) {
         Member member = findMember(reservationSaveDto.memberId());
         ReservationDate date = new ReservationDate(reservationSaveDto.date());
         ReservationTime time = findTime(reservationSaveDto.timeId());
@@ -48,14 +64,14 @@ public class ReservationService {
         validatePastReservation(reservation);
         validateDuplication(date, reservationSaveDto.timeId(), reservationSaveDto.themeId());
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return new ReservationDto(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
-    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
-        paymentManager.approve(paymentApproveDto);
-        return save(reservationSaveDto);
+    private PaidReservation saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
+        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return new PaidReservation(savedPayment);
     }
 
     private ReservationTime findTime(Long timeId) {
