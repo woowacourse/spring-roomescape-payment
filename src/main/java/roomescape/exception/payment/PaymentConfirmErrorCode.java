@@ -18,12 +18,12 @@ public enum PaymentConfirmErrorCode {
     NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "존재하지 않는 결제 정보 입니다."),
     NOT_FOUND_PAYMENT_SESSION(HttpStatus.BAD_REQUEST, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
 
-    INVALID_AUTHORIZE_AUTH(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 인증 방식입니다."),
-    NOT_AVAILABLE_PAYMENT(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 불가능한 시간대입니다"),
-    INCORRECT_BASIC_AUTH_FORMAT(HttpStatus.INTERNAL_SERVER_ERROR, "서버 측 오류로 결제에 실패했습니다. 관리자에게 문의해주세요."),
-    FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 완료되지 않았어요. 다시 시도해주세요."),
-    FAILED_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
-    UNKNOWN_PAYMENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
+    INVALID_AUTHORIZE_AUTH(HttpStatus.BAD_GATEWAY, "유효하지 않은 인증 방식입니다."),
+    NOT_AVAILABLE_PAYMENT(HttpStatus.BAD_GATEWAY, "결제가 불가능한 시간대입니다"),
+    INCORRECT_BASIC_AUTH_FORMAT(HttpStatus.BAD_GATEWAY, "서버 측 오류로 결제에 실패했습니다. 관리자에게 문의해주세요."),
+    FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(HttpStatus.BAD_GATEWAY, "결제가 완료되지 않았어요. 다시 시도해주세요."),
+    FAILED_INTERNAL_SYSTEM_PROCESSING(HttpStatus.BAD_GATEWAY, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
+    UNKNOWN_PAYMENT_ERROR(HttpStatus.BAD_GATEWAY, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
 
     PAYMENT_CONFIRM_ERROR_MISMATCH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정에서 서버 에러가 발생했습니다. 관리자에게 문의해주세요."),
     ;
