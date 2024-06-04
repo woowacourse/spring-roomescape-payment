@@ -25,6 +25,4 @@ public class PaymentClient {
                 .onStatus(errorHandler)
                 .body(PaymentConfirmOutput.class);
     }
-
-
 }
