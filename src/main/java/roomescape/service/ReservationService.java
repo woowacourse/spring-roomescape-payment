@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.request.AdminReservationRequest;
@@ -17,7 +18,6 @@ import roomescape.repository.ThemeRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservationService {
@@ -54,8 +54,7 @@ public class ReservationService {
     public Reservation addReservation(ReservationRequest request, Member member) {
         ReservationTime reservationTime = findReservationTime(request.date(), request.timeId(),
                 request.themeId());
-        Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(request.themeId())));
+        Theme theme = findTheme(request.themeId());
 
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
@@ -65,27 +64,22 @@ public class ReservationService {
     public Reservation addReservation(AdminReservationRequest request) {
         ReservationTime reservationTime = findReservationTime(request.date(), request.timeId(), request.themeId());
 
-        Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(request.themeId())));
-        Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 사용자가 존재하지 않습니다.".formatted(request.memberId())));
+        Theme theme = findTheme(request.themeId());
+        Member member = findMember(request.memberId());
 
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 
     private ReservationTime findReservationTime(LocalDate date, long timeId, long themeId) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(timeId)));
+        ReservationTime reservationTime = findReservationTime(timeId);
         validateDuplicatedReservation(date, themeId, timeId);
         return reservationTime;
     }
 
     private void validateDuplicatedReservation(LocalDate date, Long themeId, Long timeId) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new NoSuchElementException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(timeId)));
-        Theme theme = themeRepository.findById(themeId)
-                .orElseThrow(() -> new NoSuchElementException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(themeId)));
+        ReservationTime reservationTime = findReservationTime(timeId);
+        Theme theme = findTheme(themeId);
 
         boolean exists = reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
         if (exists) {
@@ -100,23 +94,37 @@ public class ReservationService {
     }
 
     private void validateExistReservation(long id) {
-        boolean exists = reservationRepository.existsById(id);
-        if (!exists) {
-            throw new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id));
-        }
+        findById(reservationRepository, id);
     }
 
     @Transactional(readOnly = true)
     public List<Reservation> findMemberReservations(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->
-                        new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
+        Member member = findById(memberRepository, memberId);
         return reservationRepository.findAllByMember(member);
     }
 
     @Transactional(readOnly = true)
     public Reservation findById(Long id) {
-        return reservationRepository.findById(id).orElseThrow(() ->
-                new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
+        return findById(reservationRepository, id);
+    }
+
+    private <T> T findById(CrudRepository<T, Long> repository, Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
+    }
+
+    private Theme findTheme(Long id) {
+        return themeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(id)));
+    }
+
+    private Member findMember(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("아이디가 %s인 사용자가 존재하지 않습니다.".formatted(id)));
+    }
+
+    private ReservationTime findReservationTime(Long id) {
+        return reservationTimeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
     }
 }

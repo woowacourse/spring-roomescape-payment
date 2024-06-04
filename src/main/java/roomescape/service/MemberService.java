@@ -29,13 +29,6 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public String findMemberNameById(Long id) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("id가 %s인 사용자가 존재하지 않습니다.".formatted(id)));
-        return member.getName();
-    }
-
-    @Transactional(readOnly = true)
     public Member findMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("id가 %s인 사용자가 존재하지 않습니다."));

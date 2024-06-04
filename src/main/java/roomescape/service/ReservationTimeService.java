@@ -54,8 +54,7 @@ public class ReservationTimeService {
 
     @Transactional(readOnly = true)
     public ReservationTime findReservationTime(long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
+        return findById(id);
     }
 
     @Transactional(readOnly = true)
@@ -79,8 +78,7 @@ public class ReservationTimeService {
     }
 
     private void validateReservedTime(long id) {
-        ReservationTime time = reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
+        ReservationTime time = findById(id);
 
         boolean exists = reservationRepository.existsByTime(time);
         if (exists) {
@@ -89,10 +87,7 @@ public class ReservationTimeService {
     }
 
     private void validateNotExistReservationTime(long id) {
-        boolean exists = reservationTimeRepository.existsById(id);
-        if (!exists) {
-            throw new NotFoundException("id(%s)에 해당하는 예약 시간이 존재하지 않습니다.".formatted(id));
-        }
+        findById(id);
     }
 
     private List<ReservationTime> filterNotBookedTimes(List<ReservationTime> times, List<ReservationTime> bookedTimes) {
@@ -110,5 +105,10 @@ public class ReservationTimeService {
     private List<IsReservedTimeResponse> concat(List<IsReservedTimeResponse> notBookedTimes,
                                                 List<IsReservedTimeResponse> bookedTimes) {
         return Stream.concat(notBookedTimes.stream(), bookedTimes.stream()).toList();
+    }
+
+    private ReservationTime findById(Long id) {
+        return reservationTimeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
     }
 }

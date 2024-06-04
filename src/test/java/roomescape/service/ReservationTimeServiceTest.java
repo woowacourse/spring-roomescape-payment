@@ -74,7 +74,7 @@ class ReservationTimeServiceTest {
     void should_throw_exception_when_not_exist_id() {
         assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(10000000))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("[ERROR] id(10000000)에 해당하는 예약 시간이 존재하지 않습니다.");
+                .hasMessage("[ERROR] 아이디가 10000000인 예약 시간이 존재하지 않습니다.");
     }
 
     @DisplayName("특정 시간에 대해 예약이 존재하는데, 그 시간을 삭제하려 할 때 예외가 발생한다.")

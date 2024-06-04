@@ -47,21 +47,6 @@ class MemberServiceTest {
 
     @DisplayName("아이디를 통해 사용자 이름을 조회한다.")
     @Test
-    void should_find_member_name_when_give_id() {
-        String memberNameById = memberService.findMemberNameById(1L);
-
-        assertThat(memberNameById).isEqualTo("수달");
-    }
-
-    @DisplayName("주어진 아이디에 해당하는 사용자가 없으면 예외가 발생한다.")
-    @Test
-    void should_throw_exception_when_member_id_not_exist() {
-        assertThatThrownBy(() -> memberService.findMemberNameById(99L))
-                .isInstanceOf(NotFoundException.class);
-    }
-
-    @DisplayName("아이디를 통해 사용자 이름을 조회한다.")
-    @Test
     void should_find_member_when_give_id() {
         Member memberById = memberService.findMemberById(1L);
 
