@@ -2,7 +2,7 @@ package roomescape.exception.common;
 
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -15,8 +15,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @Autowired
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value = RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(RoomescapeException exception) {
@@ -57,9 +56,9 @@ public class GlobalExceptionHandler {
     private void logError(Exception exception) {
         String exceptionMessage = exception.getMessage();
         if (!exceptionMessage.isEmpty()) {
-            logger.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
+            LOGGER.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
             return;
         }
-        logger.error(String.valueOf(exception.getStackTrace()[0]));
+        LOGGER.error(String.valueOf(exception.getStackTrace()[0]));
     }
 }
