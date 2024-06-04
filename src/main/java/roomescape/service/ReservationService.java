@@ -8,11 +8,13 @@ import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.controller.time.dto.IsMineRequest;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -80,7 +82,7 @@ public class ReservationService {
         final Member member = memberRepository.fetchById(request.memberId());
         final LocalDate date = request.date();
 
-        final Reservation reservation = new Reservation(null, member, date, time, theme);
+        final Reservation reservation = new Reservation(null, member, date, time, theme, Payment.DEFAULT_PAYMENT);
 
         final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
         validateBeforeDay(reservationDateTime);
@@ -95,13 +97,12 @@ public class ReservationService {
         final Theme theme = themeRepository.fetchById(request.themeId());
         final Member member = memberRepository.fetchById(request.memberId());
         final LocalDate date = request.date();
-
-        final Reservation reservation = new Reservation(null, member, date, time, theme);
-
-        final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
-        validateBeforeDay(reservationDateTime);
         validateReservation(member, theme, time, date);
-        paymentClient.postPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        validateBeforeDay(date.atTime(time.getStartAt()));
+        final TossPaymentConfirmResponse tossPaymentConfirmResponse = paymentClient.postPayment(
+                new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        final Payment payment = tossPaymentConfirmResponse.toPayment();
+        final Reservation reservation = new Reservation(null, member, date, time, theme, payment);
 
         return reservationRepository.save(reservation);
     }

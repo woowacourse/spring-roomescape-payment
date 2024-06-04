@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import roomescape.controller.exception.AuthorizationException;
 
 import java.time.LocalDate;
@@ -26,6 +27,8 @@ public class Reservation {
     private final ReservationTime time;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private final Theme theme;
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    private Payment payment;
 
     protected Reservation() {
         this.id = null;
@@ -33,6 +36,16 @@ public class Reservation {
         this.date = null;
         this.time = null;
         this.theme = null;
+        this.payment = null;
+    }
+
+    public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment) {
+        this.id = id;
+        this.member = member;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+        this.payment = payment;
     }
 
     public Reservation(final Long id, final Member member, final LocalDate date,

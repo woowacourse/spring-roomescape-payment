@@ -41,7 +41,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void postPayment(final PaymentRequest paymentRequest) {
+    public TossPaymentConfirmResponse postPayment(final PaymentRequest paymentRequest) {
         final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
         final TossPaymentConfirmResponse confirmResponse = restClient.post()
                 .uri(paymentApi)
@@ -52,5 +52,6 @@ public class TossPaymentClient implements PaymentClient {
                 .onStatus(errorHandler)
                 .body(TossPaymentConfirmResponse.class);
         log.info("토스 결제 응답 = {}", confirmResponse);
+        return confirmResponse;
     }
 }

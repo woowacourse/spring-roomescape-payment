@@ -1,8 +1,9 @@
 package roomescape.payment;
 
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 
 public interface PaymentClient {
 
-    void postPayment(PaymentRequest paymentRequest);
+    TossPaymentConfirmResponse postPayment(PaymentRequest paymentRequest);
 }
