@@ -21,14 +21,14 @@ public class RoomescapeExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ErrorResponse handle(HttpMessageNotReadableException e) {
-        logger.error("{}{}{}", INVALID_DATE_TIME_FORMAT.getLogMessage(), System.lineSeparator(), e.getMessage());
+        logger.error("LogMessage : {}, Message : {}", INVALID_DATE_TIME_FORMAT.getLogMessage(), e.getMessage());
         return ErrorResponse.builder(e, INVALID_DATE_TIME_FORMAT.getStatus(), INVALID_DATE_TIME_FORMAT.getMessage())
                 .build();
     }
 
     @ExceptionHandler(RoomescapeException.class)
     public ErrorResponse handle(RoomescapeException e) {
-        logger.error(e.getLogMessage());
+        logger.error("LogMessage : {}, Message : {}", e.getLogMessage(), e.getMessage());
         return ErrorResponse.builder(e, e.getExceptionType().getStatus(), e.getMessage())
                 .build();
     }
@@ -36,21 +36,21 @@ public class RoomescapeExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ErrorResponse handle(PaymentException e) {
         PaymentExceptionResponse paymentExceptionResponse = e.getPaymentExceptionResponse();
-        logger.error("{}{}{}", paymentExceptionResponse.getErrorCode(), System.lineSeparator(), paymentExceptionResponse.getMessage());
+        logger.error("ErrorCode : {}, Message : {}", paymentExceptionResponse.getErrorCode(), paymentExceptionResponse.getMessage());
         return ErrorResponse.builder(e, paymentExceptionResponse.getHttpStatusCode(), paymentExceptionResponse.getMessage())
                 .build();
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ErrorResponse handle(MissingServletRequestParameterException e) {
-        logger.error("{}{}{}", NO_QUERY_PARAMETER.getLogMessage(), System.lineSeparator(), e.getMessage());
+        logger.error("LogMessage : {}, Message : {}", NO_QUERY_PARAMETER.getLogMessage(), e.getMessage());
         return ErrorResponse.builder(e, NO_QUERY_PARAMETER.getStatus(), NO_QUERY_PARAMETER.getMessage())
                 .build();
     }
 
     @ExceptionHandler(Exception.class)
     public ErrorResponse handle(Exception e) {
-        logger.error("{}{}{}", UN_EXPECTED_ERROR.getLogMessage(), System.lineSeparator(), e.getMessage());
+        logger.error("LogMessage : {}, Message : {}", UN_EXPECTED_ERROR.getLogMessage(), e.getMessage());
         return ErrorResponse.builder(e, UN_EXPECTED_ERROR.getStatus(), UN_EXPECTED_ERROR.getMessage())
                 .build();
     }
