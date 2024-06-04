@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import roomescape.auth.domain.Role;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.reservation.dto.ReservationWithPaymentResponse;
 
 class WaitingsTest {
 
@@ -41,11 +42,12 @@ class WaitingsTest {
 
         Waitings waitings = new Waitings(List.of(kakiReservation1, kakiReservation2, jojoReservation1, jojoReservation2));
 
+        ReservationWithPaymentResponse reservationWithPaymentResponse
+                = new ReservationWithPaymentResponse(1L, theme, TODAY, hourTen, ReservationStatus.WAIT, "", 0);
+
         assertAll(
-                () -> assertThat(waitings.findMemberRank(kakiReservation1, kaki.getId())).isEqualTo(1),
-                () -> assertThat(waitings.findMemberRank(kakiReservation2, kaki.getId())).isEqualTo(1),
-                () -> assertThat(waitings.findMemberRank(jojoReservation1, jojo.getId())).isEqualTo(2),
-                () -> assertThat(waitings.findMemberRank(jojoReservation2, jojo.getId())).isEqualTo(1)
+                () -> assertThat(waitings.findMemberRank(reservationWithPaymentResponse, kaki.getId())).isEqualTo(1),
+                () -> assertThat(waitings.findMemberRank(reservationWithPaymentResponse, jojo.getId())).isEqualTo(2)
         );
     }
 }

@@ -22,6 +22,7 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
+import roomescape.reservation.dto.ReservationWithPaymentResponse;
 
 @DataJpaTest
 public class ReservationRepositoryTest {
@@ -50,24 +51,6 @@ public class ReservationRepositoryTest {
         reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
         List<Reservation> reservations = reservationRepository.findAll();
-
-        assertThat(reservations.size()).isEqualTo(1);
-    }
-
-    @DisplayName("회원 id로 예약 목록을 조회한다.")
-    @Test
-    void findAllByMemberId() {
-        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
-        Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
-        Member kaki = memberRepository.save(KAKI);
-        Member jojo = memberRepository.save(JOJO);
-
-        reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
-        reservationRepository.save(new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
-
-        List<Reservation> reservations = reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(kaki.getId(), TODAY);
 
         assertThat(reservations.size()).isEqualTo(1);
     }
@@ -227,5 +210,29 @@ public class ReservationRepositoryTest {
         List<Reservation> reservations = reservationRepository.findAll();
 
         assertThat(reservations.size()).isEqualTo(0);
+    }
+
+    @DisplayName("회원 아이디와 날짜로 예약 정보와 결제 정보를 가진 DTO를 조회한다.")
+    @Test
+    void findAllMemberReservationWithPayment() {
+        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
+
+        Theme horrorTheme = themeRepository.save(HORROR_THEME);
+
+        Member kaki = memberRepository.save(KAKI);
+        Member jojo = memberRepository.save(JOJO);
+
+        Reservation kakiReservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
+        reservationRepository.save(new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
+
+        List<ReservationWithPaymentResponse> reservationWithPayment
+                = reservationRepository.findAllMemberReservationWithPayment(kaki.getId(), TODAY);
+
+        assertAll(
+                () -> assertThat(reservationWithPayment).hasSize(1),
+                () -> assertThat(reservationWithPayment.get(0).getId()).isEqualTo(kakiReservation.getId()),
+                () -> assertThat(reservationWithPayment.get(0).getPaymentKey()).isEqualTo(""),
+                () -> assertThat(reservationWithPayment.get(0).getTotalAmount()).isEqualTo(0)
+        );
     }
 }

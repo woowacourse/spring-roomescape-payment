@@ -1,6 +1,7 @@
 package roomescape.reservation.domain;
 
 import java.util.List;
+import roomescape.reservation.dto.ReservationWithPaymentResponse;
 
 public class Waitings {
 
@@ -10,8 +11,8 @@ public class Waitings {
         this.waitings = List.copyOf(waitings);
     }
 
-    public int findMemberRank(Reservation reservation, Long memberId) {
-        if (reservation.getStatus() == ReservationStatus.SUCCESS) {
+    public int findMemberRank(ReservationWithPaymentResponse reservation, Long memberId) {
+        if (reservation.getStatus().isSuccess()) {
             return 0;
         }
 
