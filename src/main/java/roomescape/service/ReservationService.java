@@ -74,7 +74,7 @@ public class ReservationService {
     @Transactional
     public MyReservationResponse updatePayment(Long id, PaymentResponse paymentResponse) {
         final Reservation reservation = findReservation(id);
-        reservation.updatePaymentKey(paymentResponse.paymentKey());
+        reservation.updatePayment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
         return MyReservationResponse.from(reservation);
     }
 

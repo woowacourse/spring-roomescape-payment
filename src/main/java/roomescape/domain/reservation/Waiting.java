@@ -48,7 +48,7 @@ public class Waiting {
     }
 
     public Reservation toReservation() {
-        return new Reservation(member, date, time, theme, null);
+        return new Reservation(member, date, time, theme, null, 0);
     }
 
     public boolean isNotReservedBy(Member member) {

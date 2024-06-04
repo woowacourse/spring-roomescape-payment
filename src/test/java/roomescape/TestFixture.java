@@ -100,7 +100,7 @@ public class TestFixture {
     }
 
     public static Reservation RESERVATION() {
-        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완");
+        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완", 1000);
     }
 
     public static Waiting WAITING() {
@@ -108,7 +108,7 @@ public class TestFixture {
     }
 
     public static PaymentResponse DUMMY_PAYMENT_RESPONSE() {
-        return new PaymentResponse("dummy");
+        return new PaymentResponse("dummy", 0);
     }
 
 }

@@ -39,16 +39,20 @@ public class Reservation {
     @Column
     private String paymentKey;
 
+    @Column(nullable = false)
+    private Integer amount;
+
     protected Reservation() {
     }
 
-    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final String paymentKey) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final String paymentKey, final Integer amount) {
         this.id = null;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     public boolean hasSameDateTime(final LocalDate date, final ReservationTime time) {
@@ -64,8 +68,9 @@ public class Reservation {
         return !this.member.getId().equals(id);
     }
 
-    public void updatePaymentKey(String paymentKey) {
+    public void updatePayment(String paymentKey, Integer amount) {
         this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     public Long getReservationTimeId() {
@@ -110,6 +115,10 @@ public class Reservation {
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 
     @Override
