@@ -1,7 +1,10 @@
 package roomescape.infrastructure.payment;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.dto.PaymentRequest;
@@ -25,7 +28,16 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     public RestClient getRestClient() {
-        return RestClient.builder().baseUrl(properties.baseUrl()).build();
+        return RestClient.builder()
+                .requestFactory(getRequestFactory())
+                .baseUrl(properties.baseUrl())
+                .build();
+    }
+
+    private ClientHttpRequestFactory getRequestFactory() {
+        return ClientHttpRequestFactories.get(ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(properties.connectionTimeOut())
+                .withReadTimeout(properties.readTimeOut()));
     }
 
     @Override
