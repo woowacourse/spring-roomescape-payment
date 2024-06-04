@@ -2,7 +2,9 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
+
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.dto.request.TimeCreateRequest;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
@@ -12,7 +14,6 @@ import roomescape.reservation.repository.ReservationTimeRepository;
 
 @Service
 public class ReservationTimeService {
-
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
 

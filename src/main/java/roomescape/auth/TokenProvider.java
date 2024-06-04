@@ -1,20 +1,21 @@
 package roomescape.auth;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.LoginMemberInToken;
 
 @Component
 public class TokenProvider {
-
     private final String secretKey;
     private final long expirationTime;
 

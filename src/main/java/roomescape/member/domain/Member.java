@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 
 @Entity
 public class Member {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

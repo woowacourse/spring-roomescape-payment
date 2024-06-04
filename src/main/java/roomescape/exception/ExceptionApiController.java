@@ -16,10 +16,10 @@ import roomescape.client.PaymentException;
 public class ExceptionApiController {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionInfo> illegalArgExHandler(IllegalArgumentException exception) {
-        ExceptionInfo exceptionInfo = new ExceptionInfo(exception.getMessage());
+    public ResponseEntity<ErrorResponse> illegalArgExHandler(IllegalArgumentException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
 
-        return ResponseEntity.badRequest().body(exceptionInfo);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -35,9 +35,9 @@ public class ExceptionApiController {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ExceptionInfo> paymentExHandler(PaymentException paymentException) {
-        ExceptionInfo exceptionInfo = new ExceptionInfo(paymentException.getMessage());
+    public ResponseEntity<ErrorResponse> paymentExHandler(PaymentException paymentException) {
+        ErrorResponse errorResponse = new ErrorResponse(paymentException.getMessage());
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionInfo);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

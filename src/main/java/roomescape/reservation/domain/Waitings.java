@@ -4,10 +4,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Waitings {
-    private final List<Reservation> waitings;
+    private final List<Reservation> reservations;
 
     public Waitings(List<Reservation> waitingReservations) {
-        waitings = getWaitings(waitingReservations);
+        reservations = getWaitings(waitingReservations);
     }
 
     private List<Reservation> getWaitings(List<Reservation> waitingReservations) {
@@ -24,7 +24,7 @@ public class Waitings {
             return 0;
         }
 
-        return (int) waitings.stream()
+        return (int) reservations.stream()
                 .filter(waiting -> waiting.getTheme().sameThemeId(reservation.getTheme().getId()))
                 .filter(waiting -> waiting.getDate().equals(reservation.getDate()))
                 .filter(waiting -> waiting.getTime().getStartAt().equals(reservation.getTime().getStartAt()))
@@ -33,10 +33,10 @@ public class Waitings {
     }
 
     public Reservation getFirstWaiting() {
-        return waitings.get(0);
+        return reservations.get(0);
     }
 
     public boolean haveWaiting() {
-        return !waitings.isEmpty();
+        return !reservations.isEmpty();
     }
 }

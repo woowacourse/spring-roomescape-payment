@@ -2,8 +2,9 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
 import roomescape.reservation.domain.PopularThemes;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Theme;
@@ -15,8 +16,6 @@ import roomescape.reservation.repository.ThemeRepository;
 
 @Service
 public class ThemeService {
-
-    private static final int POPULAR_THEME_SIZE = 10;
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
@@ -55,7 +54,7 @@ public class ThemeService {
         PopularThemes popularThemes = new PopularThemes(themes);
         return popularThemes.getPopularThemes().stream()
                 .map(PopularThemeResponse::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Theme> getThemeBetweenWeek() {

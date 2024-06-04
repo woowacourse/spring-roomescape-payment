@@ -1,11 +1,11 @@
 package roomescape.auth;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
-public class CookieUtils {
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
+public class CookieUtils {
     public static final String TOKEN_KEY = "token";
 
     private CookieUtils() {

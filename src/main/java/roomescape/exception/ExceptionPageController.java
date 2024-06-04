@@ -11,7 +11,7 @@ public class ExceptionPageController {
 
     @ExceptionHandler(InValidRoleException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public String InValidRoleExceptionHandler(InValidRoleException exception) {
+    public String invalidRoleExceptionHandler(InValidRoleException exception) {
         return exception.getMessage();
     }
 }

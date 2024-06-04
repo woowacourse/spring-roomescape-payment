@@ -1,7 +1,9 @@
 package roomescape.member.service;
 
 import java.util.List;
+
 import org.springframework.stereotype.Service;
+
 import roomescape.auth.TokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
@@ -12,7 +14,6 @@ import roomescape.member.repository.MemberRepository;
 
 @Service
 public class MemberService {
-
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PopularThemes {
-
     private final List<Theme> populars;
 
     public PopularThemes(List<Theme> themes) {
@@ -17,7 +16,7 @@ public class PopularThemes {
         return themes.stream()
                 .collect(Collectors.groupingBy(theme -> theme, Collectors.counting()))
                 .entrySet().stream()
-                .sorted(Map.Entry.<Theme, Long>comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(10)
                 .map(Map.Entry::getKey)
                 .toList();
