@@ -44,7 +44,6 @@ public class Reservation {
     @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
-    // TODO: nullable 로 DDL이 생성되는 지 확인하기
     private String paymentKey;
 
     private Long amount;
@@ -55,7 +54,7 @@ public class Reservation {
     public Reservation(
             Long id, Member member, LocalDate date,
             Theme theme, ReservationTime reservationTime, Status status,
-            String paymentKey, long amount
+            String paymentKey, Long amount
     ) {
         this.id = id;
         this.member = member;
