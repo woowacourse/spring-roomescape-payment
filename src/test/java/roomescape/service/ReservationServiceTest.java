@@ -78,7 +78,6 @@ class ReservationServiceTest {
         assertThat(response).isNotNull();
     }
 
-
     @ParameterizedTest
     @MethodSource("invalidLocalDate")
     @DisplayName("예약 날짜가 현재 날짜 이후가 아닌 경우 예외가 발생한다.")
