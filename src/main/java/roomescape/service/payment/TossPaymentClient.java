@@ -18,9 +18,10 @@ import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.payment.dto.PaymentResult;
 
 public class TossPaymentClient {
+    private static final String BASIC_AUTH_PREFIX = "Basic ";
+
     @Value("${tosspay.secret_key}")
     private String secretKey;
-
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -77,10 +78,9 @@ public class TossPaymentClient {
 
     private HttpHeaders generateHttpHeaders() {
         String header = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + header);
+        headers.set(HttpHeaders.AUTHORIZATION, BASIC_AUTH_PREFIX + header);
         return headers;
     }
 
