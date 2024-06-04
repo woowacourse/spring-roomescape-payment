@@ -16,8 +16,8 @@ public class ClientConfig {
     @Bean
     public HttpComponentsClientHttpRequestFactory factory() {
         final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(3_000);
-        factory.setConnectionRequestTimeout(10_000);
+        factory.setConnectTimeout(3_000);               // 3 seconds for connection timeout
+        factory.setConnectionRequestTimeout(20_000);    // 20 seconds for request timeout
         return factory;
     }
 }
