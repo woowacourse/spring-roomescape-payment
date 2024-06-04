@@ -19,13 +19,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
@@ -33,13 +31,10 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import roomescape.auth.config.JwtGenerator;
 import roomescape.auth.domain.Role;
-import roomescape.exception.PaymentException;
-import roomescape.exception.response.PaymentExceptionResponse;
 import roomescape.fixture.ThemeFixture;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.api.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
@@ -64,7 +59,6 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
-
     @MockBean
     private PaymentClient paymentClient;
 
@@ -152,7 +146,10 @@ public class ReservationControllerTest {
             Map<String, Object> reservationParam = Map.of(
                     "date", LocalDate.now().plusMonths(1).toString(),
                     "timeId", "1",
-                    "themeId", "1");
+                    "themeId", "1",
+                    "paymentKey", "invalidPaymentKey",
+                    "orderId", "invalidOrderId",
+                    "amount", 1000);
 
             RestAssured.given().log().all()
                     .when()
@@ -173,30 +170,6 @@ public class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(200)
                     .body("reservationResponse.size()", is(11));
-        }
-
-        @DisplayName("결제에 실패한 경우 예약 생성을 할 수 없다.")
-        @Test
-        void failCreateReservationTest() {
-            Mockito.when(paymentClient.payment(new PaymentRequest("invalidPaymentKey", "invalidOrderId", 1000)))
-                    .thenThrow(new PaymentException(new PaymentExceptionResponse(HttpStatus.BAD_REQUEST, "INVALID_PAYMENT_KEY", "올바르지 않은 PaymentKey 입니다.")));
-            Map<String, Object> reservationParam = Map.of(
-                    "date", LocalDate.now().plusMonths(1).toString(),
-                    "timeId", "1",
-                    "themeId", "1",
-                    "paymentKey", "invalidPaymentKey",
-                    "orderId", "invalidOrderId",
-                    "amount", 1000);
-
-            RestAssured.given().log().all()
-                    .when()
-                    .cookie("token", token)
-                    .contentType(ContentType.JSON)
-                    .body(reservationParam)
-                    .post("/reservations")
-                    .then().log().all()
-                    .statusCode(400)
-                    .body("detail", is("올바르지 않은 PaymentKey 입니다."));
         }
 
         @DisplayName("예약 대기 하나를 생성할 수 있다.")
@@ -237,7 +210,10 @@ public class ReservationControllerTest {
             Map<String, Object> reservationParam = Map.of(
                     "date", LocalDate.now().minusMonths(1).toString(),
                     "timeId", "1",
-                    "themeId", "1");
+                    "themeId", "1",
+                    "paymentKey", "invalidPaymentKey",
+                    "orderId", "invalidOrderId",
+                    "amount", 1000);
 
             RestAssured.given().log().all()
                     .when()
@@ -260,7 +236,10 @@ public class ReservationControllerTest {
                     .body(Map.of(
                             "date", reservation7.getDate().toString(),
                             "timeId", reservation7.getReservationTime().getId(),
-                            "themeId", reservation7.getTheme().getId()))
+                            "themeId", reservation7.getTheme().getId(),
+                            "paymentKey", "invalidPaymentKey",
+                            "orderId", "invalidOrderId",
+                            "amount", 1000))
                     .post("/reservations")
                     .then().log().all()
                     .statusCode(400)

@@ -1,4 +1,4 @@
-package roomescape.payment.config;
+package roomescape.global.config;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;

@@ -20,15 +20,10 @@ import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.reservation.dto.ReservationPaymentRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
-import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -39,31 +34,26 @@ import roomescape.time.entity.ReservationTime;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class ReservationService {
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationService(PaymentService paymentService,
-                              ReservationRepository reservationRepository,
+    public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository) {
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
     }
 
-    public ReservationPaymentResponse save(LoginMember loginMember, ReservationPaymentRequest reservationRequest) {
+    @Transactional
+    public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
 
-        PaymentResponse paymentResponse = paymentService.payment(PaymentRequest.from(reservationRequest));
-
-        Reservation reservation = getReservation(loginMember.getId(), ReservationRequest.from(reservationRequest), ReservationStatus.BOOKED);
+        Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED);
 
         Reservations reservations = new Reservations(reservationRepository.findAll());
         if (reservations.hasSameReservation(reservation)) {
@@ -74,11 +64,10 @@ public class ReservationService {
                     reservationRequest.timeId());
         }
 
-        return new ReservationPaymentResponse(
-                ReservationResponse.from(reservationRepository.save(reservation)),
-                paymentResponse);
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
+    @Transactional
     public ReservationResponse saveWaiting(LoginMember loginMember, ReservationRequest reservationRequest) {
 
         Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.WAITING);
@@ -94,6 +83,7 @@ public class ReservationService {
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
+    @Transactional
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
 
         Reservation beforeSaveReservation = getReservation(
