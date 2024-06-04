@@ -31,7 +31,7 @@ import roomescape.repository.ThemeRepository;
 
 @Service
 public class ReservationService {
-    private static final int NOT_WAITING_INDEX = 1;
+    private static final int BOOKED_INDEX = 1;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -84,7 +84,7 @@ public class ReservationService {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
         Reservation savedReservation = reservationRepository.save(reservation);
-        if (reservationRepository.calculateIndexOf(savedReservation) == 1) {
+        if (reservationRepository.calculateIndexOf(savedReservation) == BOOKED_INDEX) {
             savedReservation.book();
         }
         return ReservationResponse.from(savedReservation);
@@ -164,7 +164,7 @@ public class ReservationService {
     }
 
     private boolean isNotWaiting(Reservation requestedReservation) {
-        return reservationRepository.calculateIndexOf(requestedReservation) == NOT_WAITING_INDEX;
+        return reservationRepository.calculateIndexOf(requestedReservation) == BOOKED_INDEX;
     }
 
     public List<ReservationResponse> findAllRemainedWaiting() {
