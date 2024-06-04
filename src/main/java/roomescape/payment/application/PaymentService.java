@@ -1,19 +1,32 @@
 package roomescape.payment.application;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.reservation.event.ReservationSavedEvent;
 
 @Service
 public class PaymentService {
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
-    public PaymentService(PaymentClient paymentClient) {
+    public PaymentService(PaymentClient paymentClient, PaymentRepository paymentRepository) {
         this.paymentClient = paymentClient;
+        this.paymentRepository = paymentRepository;
     }
 
-    public PaymentConfirmResponse confirm(PaymentConfirmRequest paymentConfirmRequest) {
+    public ConfirmedPayment confirm(PaymentConfirmRequest paymentConfirmRequest) {
         return paymentClient.confirm(paymentConfirmRequest);
+    }
+
+    @EventListener(ReservationSavedEvent.class)
+    public void create(ReservationSavedEvent event) {
+        ConfirmedPayment confirmedPayment = event.confirmedPayment();
+        Payment payment = confirmedPayment.toModel(event.reservation());
+        paymentRepository.save(payment);
     }
 }
