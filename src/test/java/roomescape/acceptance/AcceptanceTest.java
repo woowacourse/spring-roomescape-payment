@@ -17,8 +17,8 @@ import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.fixture.*;
-import roomescape.helper.DatabaseCleanerExtension;
-import roomescape.helper.PaymentClientTestConfiguration;
+import roomescape.util.DatabaseCleanerExtension;
+import roomescape.util.PaymentClientTestConfiguration;
 
 @ExtendWith(DatabaseCleanerExtension.class)
 @Import(PaymentClientTestConfiguration.class)

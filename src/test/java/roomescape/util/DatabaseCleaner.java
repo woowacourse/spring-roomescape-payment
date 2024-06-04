@@ -1,4 +1,4 @@
-package roomescape.helper;
+package roomescape.util;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;

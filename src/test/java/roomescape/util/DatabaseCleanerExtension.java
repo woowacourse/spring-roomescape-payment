@@ -1,4 +1,4 @@
-package roomescape.helper;
+package roomescape.util;
 
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

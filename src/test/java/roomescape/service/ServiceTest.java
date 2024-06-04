@@ -9,8 +9,8 @@ import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationdetail.ReservationDetailRepository;
 import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.helper.DatabaseCleanerExtension;
-import roomescape.helper.PaymentClientTestConfiguration;
+import roomescape.util.DatabaseCleanerExtension;
+import roomescape.util.PaymentClientTestConfiguration;
 
 @ExtendWith(DatabaseCleanerExtension.class)
 @Import(PaymentClientTestConfiguration.class)
