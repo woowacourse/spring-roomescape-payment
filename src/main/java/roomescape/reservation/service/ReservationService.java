@@ -93,30 +93,52 @@ public class ReservationService {
     }
 
     public ReservationResponse addReservation(final ReservationRequest request, final Long memberId) {
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDate requestDate = request.date();
-
-        final ReservationTime requestTime = reservationTimeService.findTimeById(request.timeId());
-        final Theme requestTheme = themeService.findThemeById(request.themeId());
-        final Member member = memberService.findMemberById(memberId);
-
-        validateDateAndTime(requestDate, requestTime, now);
-
-        final Optional<Reservation> optional = reservationRepository.findFirstByReservationTimeAndDateAndThemeAndReservationStatusOrderById(
-                requestTime, requestDate, requestTheme, ReservationStatus.CONFIRMED
-        );
-        final ReservationStatus state = optional.isEmpty() ? ReservationStatus.CONFIRMED : ReservationStatus.WAITING;
-        final Reservation saved = reservationRepository.save(
-                new Reservation(requestDate, requestTime, requestTheme, member, state));
+        validateIsReservationExist(request.themeId(), request.timeId(), request.date());
+        Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.CONFIRMED);
+        Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.from(saved);
+    }
+
+    public ReservationResponse addWaiting(final ReservationRequest request, final Long memberId) {
+        validateMemberAlreadyReserve(request.themeId(), request.timeId(), request.date(), memberId);
+        Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.WAITING);
+        Reservation saved = reservationRepository.save(reservation);
+        return ReservationResponse.from(saved);
+    }
+
+    private void validateMemberAlreadyReserve(Long themeId, Long timeId, LocalDate date, Long memberId) {
+        Specification<Reservation> spec = new ReservationSearchSpecification()
+                .sameMemberId(memberId)
+                .sameThemeId(themeId)
+                .sameTimeId(timeId)
+                .sameDate(date)
+                .build();
+
+        if (reservationRepository.exists(spec)) {
+            throw new RoomEscapeException(ErrorType.HAS_RESERVATION_OR_WAITING, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateIsReservationExist(Long themeId, Long timeId, LocalDate date) {
+        Specification<Reservation> spec = new ReservationSearchSpecification()
+                .sameThemeId(themeId)
+                .sameTimeId(timeId)
+                .sameDate(date)
+                .sameStatus(ReservationStatus.CONFIRMED)
+                .build();
+
+        if (reservationRepository.exists(spec)) {
+            throw new RoomEscapeException(ErrorType.RESERVATION_DUPLICATED, HttpStatus.CONFLICT);
+        }
     }
 
     private void validateDateAndTime(
             final LocalDate requestDate,
-            final ReservationTime requestReservationTime,
-            final LocalDateTime now
+            final ReservationTime requestReservationTime
     ) {
-        if (isReservationInPast(requestDate, requestReservationTime, now)) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime request = LocalDateTime.of(requestDate, requestReservationTime.getStartAt());
+        if (request.isBefore(now)) {
             throw new RoomEscapeException(ErrorType.RESERVATION_PERIOD_IN_PAST,
                     String.format("[now: %s %s | request: %s %s]",
                             now.toLocalDate(), now.toLocalTime(), requestDate, requestReservationTime.getStartAt()),
@@ -125,18 +147,13 @@ public class ReservationService {
         }
     }
 
-    private boolean isReservationInPast(
-            final LocalDate requestDate,
-            final ReservationTime requestReservationTime,
-            final LocalDateTime now
-    ) {
-        final LocalDate today = now.toLocalDate();
-        final LocalTime currentTime = now.toLocalTime();
+    private Reservation getReservationForSave(final ReservationRequest request, final Long memberId, final ReservationStatus status) {
+        final ReservationTime time = reservationTimeService.findTimeById(request.timeId());
+        final Theme theme = themeService.findThemeById(request.themeId());
+        final Member member = memberService.findMemberById(memberId);
 
-        if (requestDate.isBefore(today)) {
-            return true;
-        }
-        return requestDate.isEqual(today) && requestReservationTime.getStartAt().isBefore(currentTime);
+        validateDateAndTime(request.date(), time);
+        return new Reservation(request.date(), time, theme, member, status);
     }
 
     public ReservationsResponse findFilteredReservations(final ReservationSearchRequest request) {

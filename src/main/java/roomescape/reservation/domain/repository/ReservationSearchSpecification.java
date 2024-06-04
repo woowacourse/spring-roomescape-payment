@@ -33,7 +33,7 @@ public class ReservationSearchSpecification {
     public ReservationSearchSpecification sameTimeId(Long timeId) {
         if (timeId != null) {
             this.spec = this.spec.and(
-                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("time").get("id"), timeId));
+                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationTime").get("id"), timeId));
         }
         return this;
     }

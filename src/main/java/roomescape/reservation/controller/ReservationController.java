@@ -82,10 +82,19 @@ public class ReservationController {
         tossPaymentClient.confirmPayment(
                 new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(),
                         reservationRequest.amount(), reservationRequest.paymentType()));
-        final ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
+        ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
+        return getResponse(reservationResponse, response);
+    }
 
-        response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());
-        return ApiResponse.success(reservationResponse);
+    @PostMapping("/reservations/waiting")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<ReservationResponse> saveWaiting(
+            @Valid @RequestBody final ReservationRequest reservationRequest,
+            @MemberId final Long memberId,
+            final HttpServletResponse response
+    ) {
+        ReservationResponse reservationResponse = reservationService.addWaiting(reservationRequest, memberId);
+        return getResponse(reservationResponse, response);
     }
 
     @DeleteMapping("/reservations/{id}")
@@ -97,5 +106,13 @@ public class ReservationController {
         reservationService.removeReservationById(reservationId, memberId);
 
         return ApiResponse.success();
+    }
+
+    private ApiResponse<ReservationResponse> getResponse(
+            ReservationResponse reservationResponse,
+            HttpServletResponse response
+    ) {
+        response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());
+        return ApiResponse.success(reservationResponse);
     }
 }

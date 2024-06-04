@@ -43,7 +43,76 @@ class ReservationServiceTest {
     private ReservationService reservationService;
 
     @Test
-    @DisplayName("이미 지난 날짜로 예약을 생성하면 예외가 발생한다")
+    @DisplayName("예약을 추가할때 이미 예약이 존재하면 예외가 발생한다.")
+    void reservationAlreadyExistFail() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member1 = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        Member member2 = memberRepository.save(new Member("name2", "email2@email.com", "password", Role.MEMBER));
+        LocalDate date = LocalDate.now().plusDays(1L);
+
+        // when
+        reservationService.addReservation(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member2.getId());
+
+        // then
+        assertThatThrownBy(() -> reservationService.addReservation(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member1.getId()))
+                .isInstanceOf(RoomEscapeException.class);
+    }
+
+    @Test
+    @DisplayName("이미 예약한 멤버가 같은 테마에 대기를 신청하면 예외가 발생한다.")
+    void requestWaitWhenAlreadyReserveFail() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        LocalDate date = LocalDate.now().plusDays(1L);
+
+        // when
+        reservationService.addReservation(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId());
+
+        // then
+        assertThatThrownBy(() -> reservationService.addWaiting(
+                        new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                                "amount", "paymentType"), member.getId()))
+                .isInstanceOf(RoomEscapeException. class);
+    }
+
+    @Test
+    @DisplayName("예약 대기를 두 번 이상 요청하면 예외가 발생한다.")
+    void requestWaitTwiceFail() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        Member member1 = memberRepository.save(new Member("name1", "email1@email.com", "password", Role.MEMBER));
+        LocalDate date = LocalDate.now().plusDays(1L);
+
+        // when
+        reservationService.addReservation(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId());
+
+        reservationService.addWaiting(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member1.getId());
+
+        // then
+        assertThatThrownBy(() -> reservationService.addWaiting(
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member1.getId()))
+                .isInstanceOf(RoomEscapeException. class);
+    }
+
+    @Test
+    @DisplayName("이미 지난 날짜로 예약을 생성하면 예외가 발생한다.")
     void beforeDateReservationFail() {
         // given
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
@@ -59,7 +128,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("현재 날짜가 예약 당일이지만, 이미 지난 시간으로 예약을 생성하면 예외가 발생한다")
+    @DisplayName("현재 날짜가 예약 당일이지만, 이미 지난 시간으로 예약을 생성하면 예외가 발생한다.")
     void beforeTimeReservationFail() {
         // given
         LocalDateTime beforeTime = LocalDateTime.now().minusHours(1L);
@@ -75,7 +144,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원이 예약을 생성하려고 하면 예외를 발생한다.")
+    @DisplayName("존재하지 않는 회원이 예약을 생성하려고 하면 예외가 발생한다.")
     void notExistMemberReservationFail() {
         // given
         LocalDateTime beforeTime = LocalDateTime.now().minusHours(1L);
@@ -92,7 +161,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 조회할 때 종료 날짜가 시작 날짜 이전이면 예외를 발생한다.")
+    @DisplayName("예약을 조회할 때 종료 날짜가 시작 날짜 이전이면 예외가 발생한다.")
     void invalidDateRange() {
         // given
         LocalDate dateFrom = LocalDate.now().plusDays(1);

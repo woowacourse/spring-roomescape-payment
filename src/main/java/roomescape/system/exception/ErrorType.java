@@ -7,6 +7,7 @@ public enum ErrorType {
     INVALID_REQUEST_DATA_TYPE("요청 데이터 형식이 올바르지 않습니다."),
     INVALID_REQUEST_DATA("요청 데이터 값이 올바르지 않습니다."),
     INVALID_DATE_RANGE("종료 날짜는 시작 날짜 이전일 수 없습니다."),
+    HAS_RESERVATION_OR_WAITING("같은 테마에 대한 예약(대기)는 한 번만 가능합니다."),
 
     // 401 Unauthorized
     EXPIRED_TOKEN("만료된 JWT 토큰입니다."),
