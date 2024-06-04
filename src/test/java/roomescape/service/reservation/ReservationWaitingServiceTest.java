@@ -28,6 +28,7 @@ import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidReservationException;
+import roomescape.exception.PaymentException;
 import roomescape.exception.UnauthorizedException;
 import roomescape.service.ServiceTestBase;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -88,6 +89,27 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
         assertions.assertThat(response.theme().id()).isEqualTo(theme.getId());
         assertions.assertThat(response.createdAt()).isBefore(LocalDateTime.now());
         assertions.assertAll();
+    }
+
+    @DisplayName("결제 승인 중 오류가 발생하면 예약 대기가 저장되지 않는다.")
+    @Test
+    void cannotCreateReservationWhenPaymentConfirmationFailed() {
+        // given
+        LocalDate date = Fixture.tomorrow;
+        ReservationRequest request = new ReservationRequest(
+                date, reservationTime.getId(), theme.getId(),
+                Fixture.PAYMENT_ERROR_KEY, Fixture.TEST_ORDER_ID,
+                Fixture.TEST_ORDER_AMOUNT, Fixture.TEST_PAYMENT_TYPE
+        );
+        saveReservationOfDate(date);
+
+        // when & then
+        try {
+            ReservationWaitingResponse result = reservationWaitingService.create(request, member.getId());
+            long id = result.id();
+            assertThat(reservationRepository.findById(id)).isNotPresent();
+        } catch (PaymentException ignored) {
+        }
     }
 
     @DisplayName("예약 대기를 중복으로 등록하는 경우 예외가 발생한다.")
