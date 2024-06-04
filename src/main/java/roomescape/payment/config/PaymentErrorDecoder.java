@@ -1,14 +1,14 @@
-package roomescape.payment;
+package roomescape.payment.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import java.io.IOException;
 import org.springframework.http.HttpStatus;
+import roomescape.payment.dto.TossErrorResponse;
 
 public class PaymentErrorDecoder implements ErrorDecoder {
 
-    private final ErrorDecoder defaultErrorDecoder = new Default();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override

@@ -1,4 +1,6 @@
-package roomescape.payment;
+package roomescape.payment.config;
+
+import roomescape.payment.dto.TossErrorResponse;
 
 public class PaymentException extends RuntimeException {
 

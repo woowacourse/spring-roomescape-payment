@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.config;
 
 import feign.Client;
 import feign.codec.ErrorDecoder;

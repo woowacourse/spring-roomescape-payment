@@ -1,9 +1,10 @@
-package roomescape.payment;
+package roomescape.payment.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import roomescape.payment.controller.PaymentClient;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 
