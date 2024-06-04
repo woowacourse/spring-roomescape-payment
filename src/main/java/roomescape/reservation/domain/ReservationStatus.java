@@ -12,6 +12,14 @@ public enum ReservationStatus {
         this.displayName = displayName;
     }
 
+    public boolean isSuccess() {
+        return this == SUCCESS;
+    }
+
+    public boolean isWait() {
+        return this == WAIT;
+    }
+
     public String getDisplayName() {
         return displayName;
     }
