@@ -14,6 +14,6 @@ public class ClientExceptionHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) {
-        throw new PaymentFailException(BodyExtractor.getMessage(response));
+        throw new PaymentFailException(BodyExtractor.extractBody(response, ErrorResponse.class).message());
     }
 }
