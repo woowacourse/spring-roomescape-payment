@@ -3,7 +3,6 @@ package roomescape.reservation.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import roomescape.common.ServiceTest;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.application.MemberService;
@@ -32,8 +31,7 @@ class ReservationTimeServiceTest extends ServiceTest {
     private ReservationTimeService reservationTimeService;
 
     @Autowired
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @Autowired
     private ThemeService themeService;

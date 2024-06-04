@@ -3,7 +3,6 @@ package roomescape.reservation.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
 
@@ -24,12 +23,10 @@ class WaitingQueryServiceTest extends ReservationServiceTest {
     private WaitingQueryService waitingQueryService;
 
     @Autowired
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @Autowired
-    @Qualifier("waitingManageService")
-    private ReservationManageService waitingManageService;
+    private WaitingManageService waitingManageService;
 
     @Test
     @DisplayName("대기 중인 모든 예약 목록을 조회한다.")

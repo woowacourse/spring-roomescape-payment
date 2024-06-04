@@ -1,7 +1,6 @@
 package roomescape.reservation.presentation;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,10 +14,11 @@ import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
 import roomescape.reservation.application.ThemeService;
+import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -36,23 +36,23 @@ import java.util.List;
 @RequestMapping("/reservations")
 public class ReservationController {
     private final BookingQueryService bookingQueryService;
-    private final ReservationManageService waitingScheduler;
-    private final ReservationManageService bookingScheduler;
+    private final WaitingManageService waitingManageService;
+    private final BookingManageService bookingManageService;
     private final WaitingQueryService waitingQueryService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final PaymentService paymentService;
 
     public ReservationController(BookingQueryService bookingQueryService,
-                                 @Qualifier("waitingManageService") ReservationManageService waitingScheduler,
-                                 @Qualifier("bookingManageService") ReservationManageService bookingScheduler,
+                                 WaitingManageService waitingManageService,
+                                 BookingManageService bookingManageService,
                                  WaitingQueryService waitingQueryService,
                                  ReservationTimeService reservationTimeService,
                                  ThemeService themeService,
                                  PaymentService paymentService) {
         this.bookingQueryService = bookingQueryService;
-        this.waitingScheduler = waitingScheduler;
-        this.bookingScheduler = bookingScheduler;
+        this.waitingManageService = waitingManageService;
+        this.bookingManageService = bookingManageService;
         this.waitingQueryService = waitingQueryService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
@@ -65,8 +65,8 @@ public class ReservationController {
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
         PaymentConfirmResponse paymentConfirmResponse = paymentService.confirm(request.paymentConfirmRequest());
         Payment payment = paymentConfirmResponse.toModel(newReservation);
-        Reservation createdReservation = bookingScheduler.createWithPayment(newReservation, payment);
-        Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = bookingManageService.createWithPayment(newReservation, payment);
+        Reservation scheduledReservation = bookingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));
     }
@@ -75,8 +75,8 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createWaitingReservation(@RequestBody @Valid ReservationSaveRequest request,
                                                                         Member loginMember) {
         Reservation newReservation = toNewReservation(request, loginMember, ReservationStatus.WAITING);
-        Reservation createdReservation = waitingScheduler.create(newReservation);
-        Reservation scheduledReservation = waitingScheduler.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = waitingManageService.create(newReservation);
+        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));
     }
@@ -104,7 +104,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}/waiting")
     public ResponseEntity<Void> deleteMyWaitingReservation(@PathVariable Long id, Member loginMember) {
-        waitingScheduler.delete(id, loginMember);
+        waitingManageService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 }

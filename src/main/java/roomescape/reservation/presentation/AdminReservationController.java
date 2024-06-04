@@ -1,7 +1,6 @@
 package roomescape.reservation.presentation;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.application.MemberService;
 import roomescape.member.domain.Member;
+import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
 import roomescape.reservation.application.ThemeService;
 import roomescape.reservation.domain.Reservation;
@@ -31,18 +30,18 @@ import java.util.List;
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
     private final BookingQueryService bookingQueryService;
-    private final ReservationManageService bookingScheduler;
+    private final BookingManageService bookingManageService;
     private final MemberService memberService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
 
     public AdminReservationController(BookingQueryService bookingQueryService,
-                                      @Qualifier("bookingManageService") ReservationManageService bookingScheduler,
+                                      BookingManageService bookingManageService,
                                       MemberService memberService,
                                       ReservationTimeService reservationTimeService,
                                       ThemeService themeService) {
         this.bookingQueryService = bookingQueryService;
-        this.bookingScheduler = bookingScheduler;
+        this.bookingManageService = bookingManageService;
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
@@ -54,8 +53,8 @@ public class AdminReservationController {
         Theme theme = themeService.findById(request.themeId());
         Member member = memberService.findById(request.memberId());
         Reservation newReservation = request.toModel(theme, reservationTime, member);
-        Reservation createdReservation = bookingScheduler.create(newReservation);
-        Reservation schduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = bookingManageService.create(newReservation);
+        Reservation schduledReservation = bookingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(schduledReservation));
     }
@@ -81,7 +80,7 @@ public class AdminReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id, Member loginMember) {
-        bookingScheduler.delete(id, loginMember);
+        bookingManageService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 }

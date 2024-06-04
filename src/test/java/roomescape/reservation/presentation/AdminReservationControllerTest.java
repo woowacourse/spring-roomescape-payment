@@ -3,7 +3,6 @@ package roomescape.reservation.presentation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,8 +13,8 @@ import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.member.application.MemberService;
+import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
 import roomescape.reservation.application.ThemeService;
 import roomescape.reservation.application.WaitingQueryService;
@@ -57,8 +56,7 @@ class AdminReservationControllerTest extends ControllerTest {
     private WaitingQueryService waitingQueryService;
 
     @MockBean
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingScheduler;
+    private BookingManageService bookingManageService;
 
     @MockBean
     private MemberService memberService;
@@ -84,7 +82,7 @@ class AdminReservationControllerTest extends ControllerTest {
                 .willReturn(expectedTheme);
         BDDMockito.given(memberService.findById(anyLong()))
                 .willReturn(USER_MIA(1L));
-        BDDMockito.given(bookingScheduler.scheduleRecentReservation(any()))
+        BDDMockito.given(bookingManageService.scheduleRecentReservation(any()))
                 .willReturn(expectedReservation);
 
         // when
@@ -165,7 +163,7 @@ class AdminReservationControllerTest extends ControllerTest {
     void deleteReservation() throws Exception {
         // given
         BDDMockito.willDoNothing()
-                .given(bookingScheduler)
+                .given(bookingManageService)
                 .delete(1L, STUBBED_LOGIN_MEMBER);
 
         // when & then

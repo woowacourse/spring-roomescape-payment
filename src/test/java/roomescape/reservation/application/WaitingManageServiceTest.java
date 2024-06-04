@@ -3,7 +3,6 @@ package roomescape.reservation.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
@@ -20,12 +19,10 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class WaitingManageServiceTest extends ReservationServiceTest {
     @Autowired
-    @Qualifier("waitingManageService")
-    private ReservationManageService waitingManageService;
+    private WaitingManageService waitingManageService;
 
     @Autowired
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @Autowired
     private WaitingQueryService waitingQueryService;
