@@ -30,8 +30,7 @@ public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
-        return httpResponse.getStatusCode().is5xxServerError() ||
-                httpResponse.getStatusCode().is4xxClientError();
+        return httpResponse.getStatusCode().isError();
     }
 
     @Override
