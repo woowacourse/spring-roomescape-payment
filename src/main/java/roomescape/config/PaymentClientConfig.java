@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.payment.PaymentClientResponseErrorHandler;
 import roomescape.service.payment.PaymentClient;
 
 @Configuration
@@ -20,8 +19,8 @@ public class PaymentClientConfig {
     private String secretKey;
 
     @Bean
-    public PaymentClient paymentClient(PaymentClientResponseErrorHandler errorHandler) {
-        return new PaymentClient(createRestClient(), errorHandler);
+    public PaymentClient paymentClient() {
+        return new PaymentClient(createRestClient());
     }
 
     private RestClient createRestClient() {

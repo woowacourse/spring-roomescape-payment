@@ -5,18 +5,12 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 
-@Component
-public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
-    private final ObjectMapper objectMapper;
+public class PaymentConfirmResponseErrorHandler implements ResponseErrorHandler {
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    public PaymentClientResponseErrorHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
