@@ -4,7 +4,6 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -15,26 +14,28 @@ import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.payment.TossErrorResponse;
 import roomescape.exception.PaymentException;
 import roomescape.exception.PaymentInternalException;
+import roomescape.util.LogSaver;
 
 /**
  * @see <a href="https://docs.tosspayments.com/reference/error-codes">토스 결제 오류 코드 정의서</a>
  */
-@Component
 public class TossPaymentClient {
 
     @Value("${secret-key}")
     private String secretKey;
     private final RestClient restClient;
+    private final LogSaver logSaver;
 
-    public TossPaymentClient(RestClient.Builder restClient) {
-        this.restClient = restClient.build();
+    public TossPaymentClient(final RestClient restClient, final LogSaver logSaver) {
+        this.restClient = restClient;
+        this.logSaver = logSaver;
     }
 
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
         String authorizationKey = secretKey + ":";
 
         try {
-            return restClient.post()
+            PaymentResponse paymentResponse = restClient.post()
                     .uri("https://api.tosspayments.com/v1/payments/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Basic " + Base64.getEncoder()
@@ -43,9 +44,14 @@ public class TossPaymentClient {
                     .retrieve()
                     .body(PaymentResponse.class);
 
+            logSaver.logInfo(paymentRequest);
+            logSaver.logInfo(paymentResponse);
+            return paymentResponse;
+
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             TossErrorResponse errorResponse = getErrorResponse(e);
-            HttpStatusCode clientStatusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(), errorResponse.code());
+            HttpStatusCode clientStatusCode = TossErrorHandler.covertStatusCode(e.getStatusCode(),
+                    errorResponse.code());
             throw new PaymentException(
                     e.getClass().getName(),
                     e.getStatusCode(),
@@ -67,3 +73,4 @@ public class TossPaymentClient {
         }
     }
 }
+
