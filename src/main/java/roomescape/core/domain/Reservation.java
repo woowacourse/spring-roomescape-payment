@@ -39,31 +39,20 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    private String paymentKey;
-
-    private String orderId;
-
     public Reservation() {
     }
 
     public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme) {
-        this(null, member, date, time, theme, null, null);
-    }
-
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
-                       final String paymentKey, final String orderId) {
-        this(null, member, date, time, theme, paymentKey, orderId);
+        this(null, member, date, time, theme);
     }
 
     public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final String paymentKey, final String orderId) {
+                       final Theme theme) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);
         this.time = time;
         this.theme = theme;
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
     }
 
     private LocalDate parseDate(final String date) {
@@ -115,13 +104,5 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public String getOrderId() {
-        return orderId;
     }
 }

@@ -13,38 +13,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.core.dto.member.LoginMember;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
-import roomescape.infrastructure.PaymentClient;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService,
-                                 final PaymentClient paymentClient) {
+    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
         this.reservationService = reservationService;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
                                                       final LoginMember member) {
-        final PaymentConfirmResponse confirmResponse = paymentClient.getPaymentConfirmResponse(request);
+        final ReservationResponse response = getCreatedReservation(request, member);
+        paymentService.confirmPayment(response, request);
 
-        final ReservationRequest reservationRequest = new ReservationRequest(member.getId(), request.getDate(),
-                request.getTimeId(), request.getThemeId(), confirmResponse.getPaymentKey(),
-                confirmResponse.getOrderId());
-
-        final ReservationResponse response = reservationService.create(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);
+    }
+
+    private ReservationResponse getCreatedReservation(final ReservationPaymentRequest request,
+                                                      final LoginMember member) {
+        final ReservationRequest reservationRequest = new ReservationRequest(member.getId(), request.getDate(),
+                request.getTimeId(), request.getThemeId());
+
+        return reservationService.create(reservationRequest);
     }
 
     @GetMapping

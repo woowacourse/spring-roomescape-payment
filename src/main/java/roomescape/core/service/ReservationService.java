@@ -2,7 +2,7 @@ package roomescape.core.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +17,7 @@ import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
 import roomescape.core.repository.MemberRepository;
+import roomescape.core.repository.PaymentRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
@@ -37,17 +38,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
-                              final WaitingRepository waitingRepository) {
+                              final WaitingRepository waitingRepository,
+                              final PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -64,10 +68,8 @@ public class ReservationService {
         final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
-        final String paymentKey = request.getPaymentKey();
-        final String orderId = request.getOrderId();
 
-        final Reservation reservation = new Reservation(member, date, reservationTime, theme, paymentKey, orderId);
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme);
 
         validateDuplicatedReservation(reservation, reservationTime);
 
@@ -109,23 +111,39 @@ public class ReservationService {
     public List<MyReservationResponse> findAllByMember(final LoginMember loginMember) {
         final Member member = getMemberById(loginMember.getId());
 
-        final List<MyReservationResponse> waitings = getResponsesByWaiting(member);
-        final List<MyReservationResponse> reservations = getResponsesByReservation(member);
-        reservations.addAll(waitings);
+        final List<MyReservationResponse> waitings = getWaitingReservationResponses(member);
+        final List<MyReservationResponse> paidReservations = getPaidReservationResponses(member);
+        final List<MyReservationResponse> nonPaidReservations = getNonPaidReservationResponses(member);
 
-        return reservations;
+        return addAllResponses(List.of(waitings, paidReservations, nonPaidReservations));
     }
 
-    private List<MyReservationResponse> getResponsesByReservation(final Member member) {
-        return new ArrayList<>(reservationRepository.findAllByMember(member)
-                .stream()
-                .map(MyReservationResponse::from)
-                .toList());
+    private List<MyReservationResponse> addAllResponses(final List<List<MyReservationResponse>> responses) {
+        return responses.stream()
+                .flatMap(Collection::stream)
+                .toList();
     }
 
-    private List<MyReservationResponse> getResponsesByWaiting(final Member member) {
+    private List<MyReservationResponse> getWaitingReservationResponses(final Member member) {
         return waitingRepository.findAllWithRankByMember(member)
                 .stream()
+                .map(MyReservationResponse::from)
+                .toList();
+    }
+
+    private List<MyReservationResponse> getPaidReservationResponses(final Member member) {
+        return reservationRepository.findAllByMember(member)
+                .stream()
+                .filter(paymentRepository::existsByReservation)
+                .map(reservation -> MyReservationResponse.from(reservation,
+                        paymentRepository.findByReservation(reservation)))
+                .toList();
+    }
+
+    private List<MyReservationResponse> getNonPaidReservationResponses(final Member member) {
+        return reservationRepository.findAllByMember(member)
+                .stream()
+                .filter(reservation -> !paymentRepository.existsByReservation(reservation))
                 .map(MyReservationResponse::from)
                 .toList();
     }
