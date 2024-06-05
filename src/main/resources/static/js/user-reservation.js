@@ -42,27 +42,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function popupModal() {
-    let modal = document.getElementsByClassName("payment-modal-back")[0]; // 첫 번째 요소 선택
-    if (modal) { // modal이 존재하는지 확인
-        modal.style.display = 'block'; // display를 block으로 설정하여 모달 띄우기
+    const modal = document.getElementsByClassName("payment-modal-back")[0];
+    if (modal) {
+        modal.style.display = 'block';
     }
 
     const price = document.getElementById('price-amount').getAttribute('priceAmount');
-
-    // ------  결제위젯 초기화 ------
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: price},
-        {variantKey: "DEFAULT"}
-    );
+    paymentWidget.renderPaymentMethods("#payment-method", { value: price }, { variantKey: "DEFAULT" });
 
-    document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-    function onReservationButtonClickWithPaymentWidget(event) {
-        onReservationButtonClick(event, paymentWidget);
+    const reserveButton = document.getElementById('reserve-button');
+    reserveButton.removeEventListener('click', onReservationButtonClickWithPaymentWidget); // 기존 이벤트 제거
+    reserveButton.addEventListener('click', onReservationButtonClickWithPaymentWidget); // 새 이벤트 추가
+}
+
+function onReservationButtonClickWithPaymentWidget(event) {
+    const selectedDate = document.getElementById("datepicker").value;
+    const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const theme = document.querySelector('.theme-slot.active')?.textContent;
+    const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+    const price = document.getElementById('price-amount').getAttribute('priceAmount');
+
+    if (selectedDate && selectedThemeId && selectedTimeId) {
+        const reservationData = { date: selectedDate, themeId: selectedThemeId, timeId: selectedTimeId };
+        const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
+        const orderIdPrefix = "WTEST";
+
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingSpinner.style.display = 'block';
+        loadingOverlay.style.display = 'block';
+
+        paymentWidget.requestPayment({
+            orderId: orderIdPrefix + generateRandomString(),
+            orderName: theme + " 예약 결제",
+            amount: price,
+        }).then(function (data) {
+            loadingSpinner.style.display = 'none';
+            loadingOverlay.style.display = 'none';
+            fetchReservationPayment(data, reservationData);
+            alert("결제가 완료되었습니다.");
+        }).catch(function (error) {
+            loadingSpinner.style.display = 'none';
+            loadingOverlay.style.display = 'none';
+            alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
+        });
+    } else {
+        alert("예약날짜, 테마, 예약시간을 모두 선택하세요.");
     }
 }
 

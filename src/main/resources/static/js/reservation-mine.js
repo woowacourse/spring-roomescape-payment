@@ -1,14 +1,16 @@
-const PAYMENT_AMOUNT = 21000;
-
 document.addEventListener('DOMContentLoaded', () => {
-
+    showLoading();
     fetch('/api/v1/reservations/my') // 내 예약 목록 조회 API 호출
         .then(response => {
+            hideLoading();
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
         })
         .then(render)
-        .catch(error => console.error('Error fetching reservations:', error));
+        .catch(error => {
+            hideLoading();
+            console.error('Error fetching reservations:', error);
+        });
 
     document.getElementById("close-modal").addEventListener("click", function () {
         let modal = document.getElementsByClassName("payment-modal-back")[0];
@@ -19,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function render(data) {
-
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
 
@@ -44,7 +45,13 @@ function render(data) {
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick = function () {
-                requestDeleteWaiting(item.id).then(() => window.location.reload());
+                showLoading();
+                requestDeleteWaiting(item.id).then(() => {
+                    hideLoading();
+                    window.location.reload();
+                }).catch(() => {
+                    hideLoading();
+                });
             };
             cancelCell.appendChild(cancelButton);
         } else if (status === "예약") { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
@@ -54,7 +61,13 @@ function render(data) {
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick = function () {
-                requestDelete(item.id).then(() => window.location.reload());
+                showLoading();
+                requestDelete(item.id).then(() => {
+                    hideLoading();
+                    window.location.reload();
+                }).catch(() => {
+                    hideLoading();
+                });
             };
             cancelCell.appendChild(cancelButton);
         } else if (status === "결제 대기중") { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
@@ -63,10 +76,9 @@ function render(data) {
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '결제';
             cancelButton.className = 'btn btn-info';
-            cancelButton.onclick =
-                function onReservationButtonClickWithPaymentWidget(event) {
-                    popupModal(price, item.id, theme);
-                }
+            cancelButton.onclick = function onReservationButtonClickWithPaymentWidget(event) {
+                popupModal(price, item.id, theme);
+            };
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(5).textContent = '';
@@ -99,40 +111,44 @@ function popupModal(price, id, theme) {
 }
 
 function onReservationButtonClick(event, paymentWidget, id, price, theme) {
-
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
 
     // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
     // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
     const orderIdPrefix = "WTEST";
+    showLoading();
     paymentWidget.requestPayment({
         orderId: orderIdPrefix + generateRandomString(),
         orderName: theme + " 예약 결제",
         amount: price,
     }).then(function (data) {
         console.debug(data);
-        fetchReservationPayment(data, id);
-        alert("결제가 완료되었습니다.");
+        fetchReservationPayment(data, id).then(() => {
+            hideLoading();
+            alert("결제가 완료되었습니다.");
+        }).catch(() => {
+            hideLoading();
+        });
     }).catch(function (error) {
+        hideLoading();
         // TOSS 에러 처리: 에러 목록을 확인하세요
         // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-        alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+        alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
     });
 }
 
 async function fetchReservationPayment(paymentData, id) {
-
     const reservationPaymentRequest = {
         memberReservationId: id,
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
-    }
+    };
 
     const reservationURL = "/api/v1/reservations/payment";
-    fetch(reservationURL, {
+    return fetch(reservationURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -145,7 +161,7 @@ async function fetchReservationPayment(paymentData, id) {
                 window.alert("예약 결제 실패 메시지");
             });
         } else {
-            response.json().then(successBody => {
+            return response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                 window.location.reload();
             });
@@ -173,4 +189,14 @@ function requestDelete(id) {
         if (response.status === 204) return;
         throw new Error('삭제에 실패했습니다.');
     });
+}
+
+function showLoading() {
+    document.getElementById('loading-spinner').style.display = 'block';
+    document.getElementById('loading-overlay').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loading-spinner').style.display = 'none';
+    document.getElementById('loading-overlay').style.display = 'none';
 }
