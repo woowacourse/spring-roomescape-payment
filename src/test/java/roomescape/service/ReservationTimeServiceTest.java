@@ -16,7 +16,6 @@ import roomescape.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceTest {

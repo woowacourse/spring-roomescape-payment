@@ -1,4 +1,4 @@
-package roomescape;
+package roomescape.fixture;
 
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Name;

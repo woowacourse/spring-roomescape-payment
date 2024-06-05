@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.TestFixture.ADMIN;
-import static roomescape.TestFixture.MEMBER_TENNY;
+import static roomescape.fixture.TestFixture.ADMIN;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY;
 
 class RoleTest {
 

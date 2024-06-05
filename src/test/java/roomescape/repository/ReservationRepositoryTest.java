@@ -13,12 +13,11 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 @DataJpaTest
 class ReservationRepositoryTest {

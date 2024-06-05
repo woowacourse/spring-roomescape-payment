@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.TestFixture.RESERVATION_TIME_SEVEN;
-import static roomescape.TestFixture.RESERVATION_TIME_SIX;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SEVEN;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SIX;
 
 @DataJpaTest
 class ReservationTimeRepositoryTest {

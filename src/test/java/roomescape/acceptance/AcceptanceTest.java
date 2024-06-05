@@ -18,7 +18,7 @@ import roomescape.dto.reservation.ReservationWaitingSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)

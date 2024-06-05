@@ -14,7 +14,7 @@ import roomescape.exception.RoomescapeException;
 import roomescape.exception.TossPaymentErrorCode;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentClientTest {

@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import roomescape.dto.member.MemberResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.TestFixture.MEMBER_TENNY_EMAIL;
-import static roomescape.TestFixture.MEMBER_TENNY_NAME;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
 
 public class AuthAcceptanceTest extends AcceptanceTest {
 

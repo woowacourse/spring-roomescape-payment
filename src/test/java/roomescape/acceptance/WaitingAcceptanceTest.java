@@ -2,7 +2,7 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;

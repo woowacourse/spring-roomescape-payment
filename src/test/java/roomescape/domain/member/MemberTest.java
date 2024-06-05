@@ -2,7 +2,7 @@ package roomescape.domain.member;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.TestFixture;
+import roomescape.fixture.TestFixture;
 import roomescape.exception.RoomescapeException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;

@@ -9,7 +9,7 @@ import roomescape.exception.RoomescapeException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.TestFixture.MEMBER_TENNY_NAME;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
 
 class NameTest {
     

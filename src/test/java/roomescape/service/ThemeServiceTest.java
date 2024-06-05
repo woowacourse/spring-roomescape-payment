@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static roomescape.TestFixture.THEME_DETECTIVE;
-import static roomescape.TestFixture.THEME_HORROR;
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE;
+import static roomescape.fixture.TestFixture.THEME_HORROR;
 
 @ExtendWith(MockitoExtension.class)
 class ThemeServiceTest {

@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.TestFixture;
+import roomescape.fixture.TestFixture;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
-import static roomescape.TestFixture.*;
+import static roomescape.fixture.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {

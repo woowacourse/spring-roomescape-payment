@@ -2,8 +2,8 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.TestFixture.DATE_MAY_EIGHTH;
-import static roomescape.TestFixture.START_AT_SIX;
+import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.fixture.TestFixture.START_AT_SIX;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -14,8 +14,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.dto.reservation.ReservationTimeResponse;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
-
-import java.time.LocalDate;
 
 class ReservationTimeAcceptanceTest extends AcceptanceTest {
 

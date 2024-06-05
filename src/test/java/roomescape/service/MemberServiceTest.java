@@ -1,23 +1,25 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+
+import static roomescape.fixture.TestFixture.ADMIN;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import roomescape.domain.member.Member;
 import roomescape.dto.member.MemberResponse;
 import roomescape.repository.MemberRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static roomescape.TestFixture.ADMIN;
-import static roomescape.TestFixture.MEMBER_TENNY;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
