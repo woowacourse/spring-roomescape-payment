@@ -3,9 +3,11 @@ package roomescape.repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -67,4 +69,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     }
 
     List<Reservation> findAllByDateGreaterThanEqual(LocalDate date);
+
+    @Transactional
+    default void updateFirstWaiting(Reservation requestedReservation) {
+        findByDateAndThemeAndTime(requestedReservation.getDate(),
+                requestedReservation.getTheme(),
+                requestedReservation.getReservationTime()
+        ).ifPresent(Reservation::book);
+    }
+
+    Optional<Reservation> findByDateAndThemeAndTime(LocalDate date, Theme theme, ReservationTime time);
 }

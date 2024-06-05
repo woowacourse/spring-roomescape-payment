@@ -119,6 +119,8 @@
 
 ### Response
 
+#### 예약을 성공한 경우
+
 > HTTP/1.1 201
 >
 > Content-Type: application/json
@@ -138,7 +140,34 @@
     "name": "이름",
     "description": "설명",
     "thumbnail": "썸네일"
-  }
+  },
+  "status": "예약"
+}
+```
+
+#### 예약 대기인 경우
+
+> HTTP/1.1 201
+>
+> Content-Type: application/json
+> Location: /reservations/{id}
+
+```JSON
+{
+  "id": 1,
+  "name": "브라운",
+  "date": "2023-08-05",
+  "time": {
+    "id": 1,
+    "startAt": "10:00"
+  },
+  "theme": {
+    "id": 1,
+    "name": "이름",
+    "description": "설명",
+    "thumbnail": "썸네일"
+  },
+  "status": "예약 대기"
 }
 ```
 
@@ -150,7 +179,7 @@
 > content-type: application/json  
 > cookie:
 >
-token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI  
+token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
 > host: localhost:8080
 
 ```JSON
@@ -183,7 +212,8 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOI
     "name": "이름",
     "description": "설명",
     "thumbnail": "썸네일"
-  }
+  },
+  "status": "예약"
 }
 ```
 
@@ -447,3 +477,15 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
   }
 ]
 ```
+
+## 예약 결제
+
+### request
+
+> POST payment/reservations/{id}
+> cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> host: localhost:8080
+
+### response
+
+> HTTP/1.1 200

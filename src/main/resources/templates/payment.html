@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="stylesheet" href="/css/reservation.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/toss-style.css">
+  <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
@@ -48,43 +50,21 @@
 
 <!-- Content -->
 <div id="content-container" class="col-md-10 offset-md-1 p-5">
-  <h2 class="content-container-title">예약 페이지</h2>
-  <div class="d-flex" id="reservation-container" >
-    <!-- Date Section -->
-    <div class="section border rounded col-md-4 p-3" id="date-section">
-      <h3 class="fs-5 text-center mb-3">날짜 선택</h3>
-      <div class="d-flex justify-content-center p-3">
-        <div id="datepicker"></div>
-      </div>
-    </div>
+  <h2 class="content-container-title">결제 페이지</h2>
+</div>
 
-    <!-- Theme Section -->
-    <div class="section border rounded col-md-4 p-3 disabled" id="theme-section">
-      <h3 class="fs-5 text-center mb-3">테마 선택</h3>
-      <div class="p-3" id="theme-slots">
-        <!-- Dynamically generated theme slots will go here -->
-      </div>
+<!-- 결제창 ui -->
+<div id="payment-ui" class="wrapper w-100">
+  <div class="max-w-540 w-100">
+    <div id="payment-method" class="w-100"></div>
+    <div id="agreement" class="w-100"></div>
+    <div class="btn-wrapper w-100">
+      <button id="payment-button" class="btn primary w-100">결제하기</button>
     </div>
-
-    <!-- Time Section -->
-    <div class="section border rounded col-md-4 p-3 disabled" id="time-section">
-      <h3 class="fs-5 text-center mb-3">시간 선택</h3>
-      <div class="p-3" id="time-slots">
-        <!-- Dynamically generated time slots will go here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Reservation Button -->
-  <div class="button-group float-right">
-    <button id="reserve-button" class="btn btn-primary mt-3 disabled">예약하기</button>
-    <button id="wait-button" class="btn btn-secondary mt-3 disabled">예약대기</button>
   </div>
 </div>
 
-<script src="/js/user-scripts.js"></script>
-
+<script src="/js/payment.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="/js/user-reservation.js"></script>
 </body>
 </html>
