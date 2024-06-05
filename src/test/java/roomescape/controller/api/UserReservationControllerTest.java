@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 import io.restassured.RestAssured;
@@ -33,6 +33,7 @@ import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.TossPaymentService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.TossPaymentResponseDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -91,7 +92,7 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약 저장 -> 201")
     @Test
     void save() {
-        doNothing()
+        doReturn(new TossPaymentResponseDto("", 0, ""))
             .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
@@ -138,7 +139,7 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약대기 추가 -> 201")
     @Test
     void standby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         CreateUserReservationStandbyRequest request = new CreateUserReservationStandbyRequest(
             DATE_FIRST, THEME_ID, TIME_ID);
@@ -160,7 +161,7 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약대기 삭제 -> 204")
     @Test
     void deleteStandby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
         userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()
@@ -173,7 +174,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 다른 사람의 예약대기 삭제 -> 400")
     @Test
     void deleteStandby_ReservedByOther() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
         userReservationService.standby(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()
@@ -187,7 +188,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
     @Test
     void save_TimeIdNotFound() {
-        doNothing()
+        doReturn(new TossPaymentResponseDto("", 0, ""))
             .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
@@ -207,7 +208,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
     @Test
     void save_ThemeIdNotFound() {
-        doNothing()
+        doReturn(new TossPaymentResponseDto("", 0, ""))
             .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
@@ -227,11 +228,11 @@ class UserReservationControllerTest {
     @DisplayName("실패: 중복 예약 -> 400")
     @Test
     void save_Duplication() {
-        doNothing()
+        doReturn(new TossPaymentResponseDto("", 0, ""))
             .when(tossPaymentService)
             .pay(any(String.class), any(Long.class), any(String.class));
 
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
 
         CreateUserReservationRequest request
             = new CreateUserReservationRequest(DATE_FIRST, THEME_ID, TIME_ID, "123", "123", 1000, "123");
@@ -265,8 +266,8 @@ class UserReservationControllerTest {
     @DisplayName("성공: 나의 예약 목록 조회 -> 200")
     @Test
     void findMyReservations() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        adminReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ANOTHER_USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
         userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()

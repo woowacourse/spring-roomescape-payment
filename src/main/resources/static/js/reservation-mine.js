@@ -37,12 +37,13 @@ function render(data) {
     row.insertCell(3).textContent = status;
     row.insertCell(4).textContent = item.paymentKey;
     row.insertCell(5).textContent = item.amount;
-    row.insertCell(6).textContent = '';
+    row.insertCell(6).textContent = item.payMethod;
     row.insertCell(7).textContent = '';
+    row.insertCell(8).textContent = '';
 
     if (item.status === 'STANDBY') {
       // 예약대기 상태
-      const cancelCell = row.insertCell(7);
+      const cancelCell = row.insertCell(8);
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '대기취소';
       cancelButton.className = 'btn btn-danger';
@@ -52,12 +53,12 @@ function render(data) {
       cancelCell.appendChild(cancelButton);
     } else {
       // 예약 완료 상태
-      row.insertCell(7).textContent = '';
+      row.insertCell(8).textContent = '';
     }
 
     if (item.status === 'STANDBY' && item.rank === 0) {
       // 결제대기 상태
-      const paySell = row.insertCell(6);
+      const paySell = row.insertCell(7);
       const payButton = document.createElement('button');
       payButton.textContent = '결제';
       payButton.className = 'btn btn-primary';

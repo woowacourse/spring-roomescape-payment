@@ -85,8 +85,8 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 예약 삭제")
     @Test
     void delete() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()
             .cookie("token", adminToken)
@@ -139,9 +139,9 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 전체 대기목록 조회 -> 200")
     @Test
     void findAllStandby() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
         userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        adminReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
         userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
 
         RestAssured.given().log().all()

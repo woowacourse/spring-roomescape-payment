@@ -13,7 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.repository.dto.ReservationWithRank;
+import roomescape.repository.dto.MyReservationDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -59,7 +59,7 @@ class ReservationRepositoryTest {
             """);
 
         assertThat(reservationRepository.findReservationsWithRankByMemberId(5L))
-            .extracting(ReservationWithRank::rank)
+            .extracting(MyReservationDto::rank)
             .containsExactly(2L);
     }
 }

@@ -29,13 +29,13 @@ public class TossPaymentService {
     }
 
     @Transactional
-    public void pay(String orderId, long amount, String paymentKey) {
+    public TossPaymentResponseDto pay(String orderId, long amount, String paymentKey) {
         try {
-            TossPaymentResponseDto responseDto = restTemplate.postForEntity(
+            return restTemplate.postForObject(
                 properties.getPaymentApprovalUrl(),
                 new TossPaymentRequestDto(orderId, amount, paymentKey),
                 TossPaymentResponseDto.class
-            ).getBody();
+            );
         } catch (RestClientResponseException e) {
             PaymentErrorMessageResponse response = e.getResponseBodyAs(PaymentErrorMessageResponse.class);
             if (response == null || errorCodeUtils.isNotDisplayableErrorCode(response.code())) {

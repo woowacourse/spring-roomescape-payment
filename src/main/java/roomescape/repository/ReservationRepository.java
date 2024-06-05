@@ -13,7 +13,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
-import roomescape.repository.dto.ReservationWithRank;
+import roomescape.repository.dto.MyReservationDto;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -43,7 +43,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         ReservationTime time, Theme theme, LocalDate date, LocalDateTime createdAt);
 
     @Query("""
-        SELECT new roomescape.repository.dto.ReservationWithRank(
+        SELECT new roomescape.repository.dto.MyReservationDto(
             r, (
                 SELECT COUNT(r2)
                 FROM Reservation r2
@@ -51,13 +51,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 AND r2.date = r.date
                 AND r2.time = r.time
                 AND r2.createdAt < r.createdAt
-            )
+            ), p
         )
-        FROM Reservation r
+        FROM Reservation r LEFT JOIN PaymentInfo p ON p.reservation.id = r.id
         WHERE r.member.id = :memberId
         ORDER BY
             r.date ASC,
             r.time.startAt ASC
         """)
-    List<ReservationWithRank> findReservationsWithRankByMemberId(Long memberId);
+    List<MyReservationDto> findReservationsWithRankByMemberId(Long memberId);
 }
