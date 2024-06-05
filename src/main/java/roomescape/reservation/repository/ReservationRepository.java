@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.dto.ReservationWithPayment;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -28,15 +29,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findTimeIdsByDateAndThemeId(LocalDate date, Long themeId);
 
     @Query("""
-           select r from Reservation r
-           join fetch ReservationTime rt on rt.id = r.time.id
-           join fetch Theme t on t.id = r.theme.id
-           join fetch Member m on m.id = r.member.id
-           where m.id = :memberId
-           and r.date >= :date
-           order by r.date, rt.startAt, r.createdAt
-            """)
-    List<Reservation> findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(Long memberId, LocalDate date);
+            select new roomescape.reservation.dto.ReservationWithPayment(r, p.paymentKey, p.totalAmount) from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            left join fetch Payment p on p.reservationId = r.id
+            where m.id = :memberId
+            and r.date >= :date
+            order by r.date, rt.startAt, r.createdAt
+             """)
+    List<ReservationWithPayment> findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(Long memberId,
+                                                                                                   LocalDate date);
 
     @Query("""
             select r from Reservation r
@@ -58,22 +61,23 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     );
 
     @Query("""
-           select r from Reservation r
-           join fetch ReservationTime rt on rt.id = r.time.id
-           join fetch Theme t on t.id = r.theme.id
-           join fetch Member m on m.id = r.member.id
-           where r.status = :status and r.date >= :date
-           order by r.date, rt.startAt, r.createdAt
-            """)
+            select r from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            where r.status = :status and r.date >= :date
+            order by r.date, rt.startAt, r.createdAt
+             """)
     List<Reservation> findAllByStatusFromDate(ReservationStatus status, LocalDate date);
 
     @EntityGraph(attributePaths = {"time"})
     boolean existsByDateAndTimeStartAtAndStatus(LocalDate date, LocalTime startAt, ReservationStatus status);
 
     @Query("""
-           select r.status from Reservation r
-           join ReservationTime rt on r.time.id = rt.id
-           where r.member.id = :memberId and r.date = :date and rt.startAt = :startAt
-            """)
-    List<ReservationStatus> findStatusesByMemberIdAndDateAndTimeStartAt(Long memberId, LocalDate date, LocalTime startAt);
+            select r.status from Reservation r
+            join ReservationTime rt on r.time.id = rt.id
+            where r.member.id = :memberId and r.date = :date and rt.startAt = :startAt
+             """)
+    List<ReservationStatus> findStatusesByMemberIdAndDateAndTimeStartAt(Long memberId, LocalDate date,
+                                                                        LocalTime startAt);
 }

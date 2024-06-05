@@ -22,6 +22,7 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
+import roomescape.reservation.dto.ReservationWithPayment;
 
 @DataJpaTest
 public class ReservationRepositoryTest {
@@ -67,7 +68,8 @@ public class ReservationRepositoryTest {
         reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
         reservationRepository.save(new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
-        List<Reservation> reservations = reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(kaki.getId(), TODAY);
+        List<ReservationWithPayment> reservations =
+                reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(kaki.getId(), TODAY);
 
         assertThat(reservations.size()).isEqualTo(1);
     }
@@ -104,7 +106,8 @@ public class ReservationRepositoryTest {
         );
         reservationRepository.save(new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.WAIT));
 
-        Reservation firstWaitingReservation = reservationRepository.findFirstWaitingReservationBy(TODAY, hour10.getId(), horrorTheme.getId()).get();
+        Reservation firstWaitingReservation = reservationRepository.findFirstWaitingReservationBy(TODAY, hour10.getId(),
+                horrorTheme.getId()).get();
 
         assertThat(firstWaitingReservation.getId()).isEqualTo(kakiReservation.getId());
     }
@@ -122,7 +125,8 @@ public class ReservationRepositoryTest {
                 new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS)
         );
 
-        List<Long> timeIds = reservationRepository.findTimeIdsByDateAndThemeId(savedReservation.getDate(), horrorTheme.getId());
+        List<Long> timeIds = reservationRepository.findTimeIdsByDateAndThemeId(savedReservation.getDate(),
+                horrorTheme.getId());
 
         assertThat(timeIds).containsExactly(hour10.getId());
     }

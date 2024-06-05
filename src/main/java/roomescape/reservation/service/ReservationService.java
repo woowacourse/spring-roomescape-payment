@@ -129,9 +129,9 @@ public class ReservationService {
         Waitings waitings = new Waitings(waitingReservations);
 
         return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
-                .map(reservation -> MemberReservationResponse.toResponse(
-                        reservation,
-                        waitings.findMemberRank(reservation, loginMember.id())
+                .map(reservationWithPayment -> MemberReservationResponse.toResponse(
+                        reservationWithPayment,
+                        waitings.findMemberRank(reservationWithPayment.reservation(), loginMember.id())
                 )).toList();
     }
 

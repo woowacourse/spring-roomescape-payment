@@ -51,6 +51,8 @@ function render(data) {
             };
             cancelCell.appendChild(cancelButton);
         }
+        row.insertCell(5).textContent = item.paymentKey;
+        row.insertCell(6).textContent = item.totalAmount;
     });
 }
 
