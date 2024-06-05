@@ -12,17 +12,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          path: ~/$GITHUB_REPOSITORY
 
       - name: Build with Gradle
-        run: cd ~/$GITHUB_REPOSITORY && ./gradlew bootJar
+        run: ./gradlew bootJar
 
       - name: Stop the services
         run: sudo systemctl stop roomescape
 
-      - name: Run the application
-        run: java -jar build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar
+      - name: Copy runnable file
+        run: mkdir /home/ubuntu/${{ github.event.repository.name }} && \
+          cp ./build/lib/${{ github.event.repository.name }}-0.0.1-SNAPSHOT.jar \
+          /home/ubuntu/${{ github.event.repository.name }}/run.jar
 
       - name: Start the services
         run: sudo systemctl start roomescape

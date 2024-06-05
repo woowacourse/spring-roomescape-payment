@@ -28,7 +28,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String readLoginPage() {
-        return "/login";
+        return "login";
     }
 
     @ResponseBody

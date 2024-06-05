@@ -7,6 +7,8 @@ import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 
+import java.util.Optional;
+
 @Service
 public class PaymentService {
 
@@ -16,6 +18,10 @@ public class PaymentService {
     public PaymentService(PaymentRepository paymentRepository, TossPaymentRestClient paymentClient) {
         this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
+    }
+
+    public Optional<Payment> findByMemberReservation(MemberReservation memberReservation) {
+        return paymentRepository.findByMemberReservation(memberReservation);
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {

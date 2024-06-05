@@ -66,7 +66,7 @@ public class ReservationFacadeService {
 
         return Stream.concat(
                         confirmationReservations.stream()
-                                .map(MyReservationResponse::from),
+                                .map(this::convertToResponseWithPayment),
                         waitingReservations.stream()
                                 .map(MyReservationResponse::from)
                 )
@@ -74,6 +74,12 @@ public class ReservationFacadeService {
                         .thenComparing(MyReservationResponse::time)
                 )
                 .toList();
+    }
+
+    private MyReservationResponse convertToResponseWithPayment(MemberReservation memberReservation) {
+        return paymentService.findByMemberReservation(memberReservation)
+                .map(MyReservationResponse::from)
+                .orElseGet(() -> MyReservationResponse.from(memberReservation));
     }
 
     @Transactional(readOnly = true)
