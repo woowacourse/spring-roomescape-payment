@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@Transactional
 public class ReservationService {
 
     private final MemberRepository memberRepository;
@@ -70,6 +69,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest reservationRequest, Long memberId) {
         LocalDate date = LocalDate.parse(reservationRequest.date());
         ReservationTime reservationTime = reservationTimeRepository.findById(reservationRequest.timeId())
@@ -102,6 +102,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void deleteReservation(AuthInfo authInfo, long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 사용자 예약이 없습니다."));
@@ -113,11 +114,13 @@ public class ReservationService {
         reservationRepository.deleteById(reservationId);
     }
 
+    @Transactional
     public void delete(long reservationId) {
         reservationRepository.deleteByReservationSlot_Id(reservationId);
         reservationSlotRepository.deleteById(reservationId);
     }
 
+    @Transactional
     public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
         ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
         ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
