@@ -7,6 +7,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.reservationTimeFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -66,9 +67,8 @@ class ReservationTimeControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 시간의 id"),
-                                fieldWithPath("[].startAt").description("방탈출 시작 시간(예약 시간)")
-                        )))
+                                fieldWithPath("[]").description("전체 시간 목록"))
+                                .andWithPrefix("[].", reservationTimeFieldDescriptors())))
                 .when().get("/times")
                 .then().log().all()
                 .statusCode(200)
@@ -89,10 +89,12 @@ class ReservationTimeControllerTest {
                                 parameterWithName("date").description("날짜"),
                                 parameterWithName("theme").description("테마 id")),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 시간 id"),
-                                fieldWithPath("[].startAt").description("방탈출 시작 시간(예약 시간)"),
-                                fieldWithPath("[].alreadyBooked").description("예약되었는지 여부")
-                        )))
+                                fieldWithPath("[]").description("날짜, 테마에 따른 예약 정보가 포함된 시간 목록"))
+                                .andWithPrefix("[].",
+                                        fieldWithPath("id").description("시간 id"),
+                                        fieldWithPath("startAt").description("방탈출 시작 시간"),
+                                        fieldWithPath("alreadyBooked").description("예약되었는지 여부")
+                                )))
                 .when().get("/times?date=" + TOMORROW + "&theme=1")
                 .then().log().all()
                 .statusCode(200)

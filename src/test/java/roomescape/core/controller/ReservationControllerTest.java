@@ -6,16 +6,20 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.requestCo
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.deleteDocumentWithTokenAndIdDescription;
+import static roomescape.utils.RestDocumentGenerator.reservationFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,9 +88,8 @@ class ReservationControllerTest {
                                 fieldWithPath("amount").description("결제 금액")
                         ),
                         responseFields(
-                                fieldWithPath("reservationResponse.*.*").description("예약 정보"),
-                                fieldWithPath("reservationResponse.*").description("예약 정보"),
-                                fieldWithPath("paymentResponse.*").description("결제 정보")
+                                subsectionWithPath("reservationResponse").description("예약 정보"),
+                                subsectionWithPath("paymentResponse").description("결제 정보")
                         )))
                 .body(request)
                 .when().post("/reservations")
@@ -104,12 +107,8 @@ class ReservationControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 id"),
-                                fieldWithPath("[].date").description("예약 날짜"),
-                                fieldWithPath("[].member.*").description("예약자 정보"),
-                                fieldWithPath("[].time.*").description("예약 시간 정보"),
-                                fieldWithPath("[].theme.*").description("예약 테마 정보")
-                        )))
+                                fieldWithPath("[]").description("예약 목록"))
+                                .andWithPrefix("[].", reservationFieldDescriptors())))
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -122,11 +121,10 @@ class ReservationControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("reservations/delete/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 예약의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "reservations/delete/",
+                        "로그인한 회원의 토큰",
+                        "삭제할 예약의 id"))
                 .when().delete("/reservations/{id}", 1)
                 .then().log().all()
                 .statusCode(204);
@@ -137,15 +135,15 @@ class ReservationControllerTest {
     void findReservationsByCondition() {
         testFixture.persistReservationWithDateAndTimeAndTheme(TOMORROW, 1L, 1L);
         testFixture.persistReservationWithDateAndTimeAndTheme(DAY_AFTER_TOMORROW, 1L, 1L);
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("memberId", 1L);
+        queryParams.put("themeId", 1L);
+        queryParams.put("dateFrom", TOMORROW);
+        queryParams.put("dateTo", TOMORROW);
 
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
-                .queryParams(
-                        "memberId", 1L,
-                        "themeId", 1L,
-                        "dateFrom", TOMORROW,
-                        "dateTo", TOMORROW
-                )
+                .queryParams(queryParams)
                 .accept("application/json")
                 .filter(document("reservations/filter/get",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
@@ -157,12 +155,8 @@ class ReservationControllerTest {
                                 parameterWithName("dateTo").description("조회할 마지막 날짜")
                         ),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 id"),
-                                fieldWithPath("[].date").description("예약 날짜"),
-                                fieldWithPath("[].member.*").description("예약자 정보"),
-                                fieldWithPath("[].time.*").description("예약 시간 정보"),
-                                fieldWithPath("[].theme.*").description("예약 테마 정보")
-                        )))
+                                fieldWithPath("[]").description("조건에 맞는 예약 목록"))
+                                .andWithPrefix("[].", reservationFieldDescriptors())))
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -174,8 +168,7 @@ class ReservationControllerTest {
                         "memberId", 1L,
                         "themeId", 1L,
                         "dateFrom", TOMORROW,
-                        "dateTo", DAY_AFTER_TOMORROW
-                )
+                        "dateTo", DAY_AFTER_TOMORROW)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -203,14 +196,16 @@ class ReservationControllerTest {
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 id"),
-                                fieldWithPath("[].date").description("예약 날짜"),
-                                fieldWithPath("[].time").description("예약 시간"),
-                                fieldWithPath("[].theme").description("예약 테마 이름"),
-                                fieldWithPath("[].status").description("상태(예약 or 몇 번째 대기인지"),
-                                fieldWithPath("[].paymentKey").description("결제 키(nullable)"),
-                                fieldWithPath("[].amount").description("결제 금액(nullable)")
-                        )))
+                                fieldWithPath("[]").description("로그인한 회원의 예약 및 예약 대기 목록"))
+                                .andWithPrefix("[].",
+                                        fieldWithPath("id").description("예약 id"),
+                                        fieldWithPath("date").description("예약 날짜"),
+                                        fieldWithPath("time").description("예약 시간"),
+                                        fieldWithPath("theme").description("예약 테마 이름"),
+                                        fieldWithPath("status").description("상태(예약 or 몇 번째 대기인지)"),
+                                        fieldWithPath("paymentKey").description("결제 키(nullable)"),
+                                        fieldWithPath("amount").description("결제 금액(nullable)")
+                                )))
                 .when().get("/reservations/mine")
                 .then().log().all()
                 .statusCode(200)

@@ -5,10 +5,12 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.requestCo
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.deleteDocumentWithTokenAndIdDescription;
+import static roomescape.utils.RestDocumentGenerator.reservationFieldDescriptors;
+import static roomescape.utils.RestDocumentGenerator.reservationTimeFieldDescriptors;
+import static roomescape.utils.RestDocumentGenerator.themeFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -73,13 +75,8 @@ class AdminControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("어드민 토큰")),
-                        requestFields(
-                                fieldWithPath("startAt").description("생성할 방탈출 시작 시간")
-                        ),
-                        responseFields(
-                                fieldWithPath("id").description("생성한 시간의 id"),
-                                fieldWithPath("startAt").description("생성한 방탈출 시작 시간")
-                        )))
+                        requestFields(fieldWithPath("startAt").description("생성할 방탈출 시작 시간")),
+                        responseFields(reservationTimeFieldDescriptors())))
                 .body(request)
                 .when().post("/admin/times")
                 .then().log().all()
@@ -105,12 +102,7 @@ class AdminControllerTest {
                                 fieldWithPath("description").description("생성할 테마의 설명"),
                                 fieldWithPath("thumbnail").description("생성할 테마의 썸네일")
                         ),
-                        responseFields(
-                                fieldWithPath("id").description("생성한 테마의 id"),
-                                fieldWithPath("name").description("생성한 테마의 이름"),
-                                fieldWithPath("description").description("생성한 테마의 설명"),
-                                fieldWithPath("thumbnail").description("생성한 테마의 썸네일")
-                        )))
+                        responseFields(themeFieldDescriptors())))
                 .body(request)
                 .when().post("/admin/themes")
                 .then().log().all()
@@ -137,13 +129,7 @@ class AdminControllerTest {
                                 fieldWithPath("timeId").description("예약 시간 id"),
                                 fieldWithPath("themeId").description("예약 테마 id")
                         ),
-                        responseFields(
-                                fieldWithPath("id").description("예약 id"),
-                                fieldWithPath("date").description("예약 날짜"),
-                                fieldWithPath("member.*").description("예약자 정보"),
-                                fieldWithPath("time.*").description("예약 시간 정보"),
-                                fieldWithPath("theme.*").description("예약 테마 정보")
-                        )))
+                        responseFields(reservationFieldDescriptors())))
                 .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201);
@@ -156,11 +142,10 @@ class AdminControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
-                .filter(document("admin/times/delete",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 예약 시간의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "admin/times/delete",
+                        "어드민 토큰",
+                        "삭제할 예약 시간의 id"))
                 .when().delete("/admin/times/{id}", 1)
                 .then().log().all()
                 .statusCode(204);
@@ -173,11 +158,10 @@ class AdminControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
-                .filter(document("admin/themes/delete/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 예약 대기의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "admin/themes/delete/",
+                        "어드민 토큰",
+                        "삭제할 예약 대기의 id"))
                 .when().delete("/admin/themes/{id}", 1)
                 .then().log().all()
                 .statusCode(204);
@@ -189,11 +173,10 @@ class AdminControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("admin/reservations/delete/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 예약의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "admin/reservations/delete/",
+                        "어드민 토큰",
+                        "삭제할 예약의 id"))
                 .when().delete("/admin/reservations/{id}", 1)
                 .then().log().all()
                 .statusCode(204);
@@ -205,11 +188,10 @@ class AdminControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
-                .filter(document("admin/waitings/delete/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 예약 대기의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "admin/waitings/delete/",
+                        "어드민 토큰",
+                        "삭제할 예약 대기의 id"))
                 .when().delete("/admin/waitings/{id}", 1)
                 .then().log().all()
                 .statusCode(204);

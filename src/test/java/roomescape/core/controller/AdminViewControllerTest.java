@@ -1,9 +1,7 @@
 package roomescape.core.controller;
 
-import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
-import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.documentWithTokenDescription;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import roomescape.utils.AccessTokenGenerator;
 
 @AcceptanceTest
@@ -38,10 +35,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/admin/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰"))))
+                .filter(documentWithTokenDescription("page/admin/", "어드민 토큰"))
                 .when().get("/admin")
                 .then().log().all()
                 .statusCode(200);
@@ -53,10 +47,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/admin/reservation/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰"))))
+                .filter(documentWithTokenDescription("page/admin/reservation/", "어드민 토큰"))
                 .when().get("/admin/reservation")
                 .then().log().all()
                 .statusCode(200);
@@ -68,10 +59,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/admin/time/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰"))))
+                .filter(documentWithTokenDescription("page/admin/time/", "어드민 토큰"))
                 .when().get("/admin/time")
                 .then().log().all()
                 .statusCode(200);
@@ -83,10 +71,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/admin/theme/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰"))))
+                .filter(documentWithTokenDescription("page/admin/theme/", "어드민 토큰"))
                 .when().get("/admin/theme")
                 .then().log().all()
                 .statusCode(200);
@@ -98,10 +83,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/admin/waiting/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("어드민 토큰"))))
+                .filter(documentWithTokenDescription("page/admin/waiting/", "어드민 토큰"))
                 .when().get("/admin/waiting")
                 .then().log().all()
                 .statusCode(200);

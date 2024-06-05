@@ -1,9 +1,8 @@
 package roomescape.core.controller;
 
-import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
-import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.documentWithTokenDescription;
+import static roomescape.utils.RestDocumentGenerator.prettyPrintDocument;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import roomescape.core.dto.auth.TokenRequest;
 import roomescape.utils.TestFixture;
 
@@ -37,9 +35,7 @@ public class MemberViewControllerTest {
     void moveToReservationPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("page/reservation/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())))
+                .filter(prettyPrintDocument("page/reservation/"))
                 .when().get("/reservation")
                 .then().log().all()
                 .statusCode(200);
@@ -50,9 +46,7 @@ public class MemberViewControllerTest {
     void moveToLoginPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("page/login/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())))
+                .filter(prettyPrintDocument("page/login/"))
                 .when().get("/login")
                 .then().log().all()
                 .statusCode(200);
@@ -64,9 +58,7 @@ public class MemberViewControllerTest {
     void moveToSignupPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("page/signup/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())))
+                .filter(prettyPrintDocument("page/signup/"))
                 .when().get("/signup")
                 .then().log().all()
                 .statusCode(200);
@@ -86,10 +78,7 @@ public class MemberViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookie("token", accessToken)
                 .accept("application/json")
-                .filter(document("page/reservation-mine/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("로그인한 회원의 토큰"))))
+                .filter(documentWithTokenDescription("page/reservation-mine/", "로그인한 회원의 토큰"))
                 .when().get("/reservation-mine")
                 .then().log().all()
                 .statusCode(200);

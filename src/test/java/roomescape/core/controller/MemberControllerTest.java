@@ -9,6 +9,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.documentWithTokenDescription;
+import static roomescape.utils.RestDocumentGenerator.memberFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -95,10 +97,7 @@ class MemberControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("로그인한 유저의 토큰")),
-                        responseFields(
-                                fieldWithPath("id").description("로그인한 유저의 id"),
-                                fieldWithPath("name").description("로그인한 유저의 이름")
-                        )))
+                        responseFields(memberFieldDescriptors())))
                 .when().get("/login/check")
                 .then().log().all()
                 .statusCode(200).extract().response();
@@ -120,10 +119,7 @@ class MemberControllerTest {
         RestAssured.given(spec).log().all()
                 .cookie("token", accessToken)
                 .accept("application/json")
-                .filter(document("logout/post/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("로그인한 유저의 토큰"))))
+                .filter(documentWithTokenDescription("logout/post/", "로그인한 유저의 토큰"))
                 .when().post("/logout")
                 .then().log().all()
                 .statusCode(200);
@@ -146,10 +142,7 @@ class MemberControllerTest {
                                 fieldWithPath("email").description("회원 가입할 유저의 이메일"),
                                 fieldWithPath("password").description("회원 가입할 유저의 비밀번호")
                         ),
-                        responseFields(
-                                fieldWithPath("id").description("회원 가입한 유저의 id"),
-                                fieldWithPath("name").description("회원 가입한 유저의 이름")
-                        )))
+                        responseFields(memberFieldDescriptors())))
                 .when().post("/members")
                 .then().log().all()
                 .statusCode(201);
@@ -164,9 +157,8 @@ class MemberControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("유저의 id"),
-                                fieldWithPath("[].name").description("유저의 이름")
-                        )))
+                                fieldWithPath("[]").description("모든 회원 목록"))
+                                .andWithPrefix("[].", memberFieldDescriptors())))
                 .when().get("/members")
                 .then().log().all()
                 .statusCode(200);

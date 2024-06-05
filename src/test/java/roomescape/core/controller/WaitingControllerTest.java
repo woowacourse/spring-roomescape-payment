@@ -6,10 +6,10 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.requestCo
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.deleteDocumentWithTokenAndIdDescription;
+import static roomescape.utils.RestDocumentGenerator.waitingFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -75,13 +75,7 @@ class WaitingControllerTest {
                                 fieldWithPath("timeId").description("예약 대기 시간 id"),
                                 fieldWithPath("themeId").description("예약 대기 테마 id")
                         ),
-                        responseFields(
-                                fieldWithPath("id").description("예약 id"),
-                                fieldWithPath("date").description("예약 날짜"),
-                                fieldWithPath("member.*").description("예약 대기자 정보"),
-                                fieldWithPath("time.*").description("예약 대기 시간"),
-                                fieldWithPath("theme.*").description("예약 대기 테마")
-                        )))
+                        responseFields(waitingFieldDescriptors())))
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(201);
@@ -107,12 +101,9 @@ class WaitingControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("예약 id"),
-                                fieldWithPath("[].date").description("예약 날짜"),
-                                fieldWithPath("[].member.*").description("예약자 정보"),
-                                fieldWithPath("[].time.*").description("예약 시간 정보"),
-                                fieldWithPath("[].theme.*").description("예약 테마 정보")
-                        )))
+                                fieldWithPath("[]").description("전체 예약 대기 목록"))
+                                .andWithPrefix("[].", waitingFieldDescriptors()
+                                )))
                 .when().get("/waitings")
                 .then().log().all()
                 .statusCode(200)
@@ -135,11 +126,10 @@ class WaitingControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("waitings/delete/",
-                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        requestCookies(cookieWithName("token").description("예약 대기를 삭제할 멤버의 토큰")),
-                        pathParameters(parameterWithName("id").description("삭제할 대기 시간의 id"))))
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "waitings/delete/",
+                        "예약 대기를 삭제할 멤버의 토큰",
+                        "삭제할 대기 시간의 id"))
                 .when().delete("/waitings/{id}", 1)
                 .then().log().all()
                 .statusCode(204);

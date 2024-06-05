@@ -527,13 +527,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /admin/reservations HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 83
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNCwiZXhwIjoxNzE3NDAzNjI0fQ.1UtkN-It5hCf6c9FDnvpx9Gs9UJ_nDvqgU5w5o3fVR8
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
 
 {
   "memberId" : 1,
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "timeId" : 1,
   "themeId" : 1
 }</code></pre>
@@ -608,21 +608,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /reservations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:44 GMT
+Date: Wed, 05 Jun 2024 08:06:26 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 298
 
 {
   "id" : 2,
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "16:34"
+    "startAt" : "17:07"
   },
   "theme" : {
     "id" : 1,
@@ -661,18 +661,18 @@ Content-Length: 298
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 날짜</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>member.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>member</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약자 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>theme.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 테마 정보</p></td>
 </tr>
 </tbody>
@@ -687,8 +687,8 @@ Content-Length: 298
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /admin/reservations/1 HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyMSwiZXhwIjoxNzE3NDAzNjIxfQ.uuDfsrLD2MJxZ_r8fAzYS7TUROixbow0kvcB5Ys4GF8</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
 </div>
 </div>
 </div>
@@ -740,7 +740,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:40 GMT
+Date: Wed, 05 Jun 2024 08:06:25 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -756,9 +756,9 @@ Connection: keep-alive</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /admin/themes HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 161
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNCwiZXhwIjoxNzE3NDAzNjI0fQ.1UtkN-It5hCf6c9FDnvpx9Gs9UJ_nDvqgU5w5o3fVR8
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
 
 {
   "name" : "theme name",
@@ -831,7 +831,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /themes/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:43 GMT
+Date: Wed, 05 Jun 2024 08:06:26 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 174
@@ -864,22 +864,22 @@ Content-Length: 174
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 이름</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 이름</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 설명</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnail</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 썸네일</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 썸네일</p></td>
 </tr>
 </tbody>
 </table>
@@ -893,8 +893,8 @@ Content-Length: 174
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /admin/themes/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyMSwiZXhwIjoxNzE3NDAzNjIxfQ.uuDfsrLD2MJxZ_r8fAzYS7TUROixbow0kvcB5Ys4GF8</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
 </div>
 </div>
 </div>
@@ -946,7 +946,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:41 GMT
+Date: Wed, 05 Jun 2024 08:06:25 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -962,9 +962,9 @@ Connection: keep-alive</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /admin/themes HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 161
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNCwiZXhwIjoxNzE3NDAzNjI0fQ.1UtkN-It5hCf6c9FDnvpx9Gs9UJ_nDvqgU5w5o3fVR8
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
 
 {
   "name" : "theme name",
@@ -1037,7 +1037,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /themes/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:43 GMT
+Date: Wed, 05 Jun 2024 08:06:26 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 174
@@ -1070,22 +1070,22 @@ Content-Length: 174
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 이름</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 이름</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 설명</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnail</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">생성한 테마의 썸네일</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 썸네일</p></td>
 </tr>
 </tbody>
 </table>
@@ -1099,8 +1099,8 @@ Content-Length: 174
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /admin/themes/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyMSwiZXhwIjoxNzE3NDAzNjIxfQ.uuDfsrLD2MJxZ_r8fAzYS7TUROixbow0kvcB5Ys4GF8</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
 </div>
 </div>
 </div>
@@ -1152,7 +1152,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:41 GMT
+Date: Wed, 05 Jun 2024 08:06:25 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -1167,8 +1167,8 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /admin/waitings/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyMywiZXhwIjoxNzE3NDAzNjIzfQ.hP2JIvwF77qpg05iUL0xPlJOlLvrSYWni1ykjZ4zH_4</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M</code></pre>
 </div>
 </div>
 </div>
@@ -1220,7 +1220,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:43 GMT
+Date: Wed, 05 Jun 2024 08:06:26 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -1240,8 +1240,8 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNywiZXhwIjoxNzE3NDAzNjI3fQ.0_vENFBOjLMy89lZBfp14T3YgRNZHWN1DIbEqrVVsYk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -1274,7 +1274,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2363
@@ -1352,8 +1352,8 @@ Content-Length: 2363
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/reservation HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNywiZXhwIjoxNzE3NDAzNjI3fQ.0_vENFBOjLMy89lZBfp14T3YgRNZHWN1DIbEqrVVsYk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -1386,7 +1386,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 4040
@@ -1512,8 +1512,8 @@ Content-Length: 4040
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/theme HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNSwiZXhwIjoxNzE3NDAzNjI1fQ.n7O20-ZvD-XMhTBcfuSskgV_0OzqehBut8zuk9Ce5d0</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -1546,7 +1546,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:45 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2877
@@ -1643,8 +1643,8 @@ Content-Length: 2877
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/time HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNywiZXhwIjoxNzE3NDAzNjI3fQ.0_vENFBOjLMy89lZBfp14T3YgRNZHWN1DIbEqrVVsYk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -1677,7 +1677,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2805
@@ -1772,8 +1772,8 @@ Content-Length: 2805
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/waiting HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNiwiZXhwIjoxNzE3NDAzNjI2fQ.Hk0nxa0dMt7nP2XfNE-TEzi1MWFf9AK-_TOX93UmBGk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -1806,7 +1806,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2796
@@ -1906,7 +1906,7 @@ Content-Length: 2796
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /members HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 83
 
 {
@@ -1959,7 +1959,7 @@ Content-Length: 83
 Location: /members/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 36
@@ -1990,12 +1990,12 @@ Content-Length: 36
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">회원 가입한 유저의 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">회원 가입한 유저의 이름</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 이름</p></td>
 </tr>
 </tbody>
 </table>
@@ -2010,7 +2010,7 @@ Content-Length: 36
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /login HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 62
 
 {
@@ -2054,8 +2054,8 @@ Content-Length: 62
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyOCwiZXhwIjoxNzE3NDAzNjI4fQ.teBPzgW5ICYBMzV7p7jnCoGaOXz42hHXg26CDXccp5E; Path=/; HttpOnly
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU; Path=/; HttpOnly
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -2091,8 +2091,8 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /login/check HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNywiZXhwIjoxNzE3NDAzNjI3fQ.0_vENFBOjLMy89lZBfp14T3YgRNZHWN1DIbEqrVVsYk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -2124,7 +2124,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 38
@@ -2155,12 +2155,12 @@ Content-Length: 38
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">로그인한 유저의 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">로그인한 유저의 이름</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 이름</p></td>
 </tr>
 </tbody>
 </table>
@@ -2175,8 +2175,8 @@ Content-Length: 38
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /logout HTTP/1.1
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyNywiZXhwIjoxNzE3NDAzNjI3fQ.0_vENFBOjLMy89lZBfp14T3YgRNZHWN1DIbEqrVVsYk</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NywiZXhwIjoxNzE3NTc4Mzg3fQ.siJjfJlqGH4aqQ2xJGBj-fzxK3y_73SUB1HEVrQFJxM</code></pre>
 </div>
 </div>
 </div>
@@ -2207,7 +2207,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Set-Cookie: token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/
-Date: Mon, 03 Jun 2024 07:33:46 GMT
+Date: Wed, 05 Jun 2024 08:06:27 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -2320,7 +2320,7 @@ Content-Length: 2630
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /signup HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -2332,7 +2332,7 @@ Host: localhost:64007</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2727
@@ -2416,7 +2416,7 @@ Content-Length: 2727
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /login HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -2428,7 +2428,7 @@ Host: localhost:64007</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2630
@@ -2509,7 +2509,7 @@ Content-Length: 2630
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservation HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -2521,7 +2521,7 @@ Host: localhost:64007</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 4097
@@ -2637,8 +2637,8 @@ Content-Length: 4097
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservation-mine HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyOSwiZXhwIjoxNzE3NDAzNjI5fQ.sOdQvE17SZKrNyp2TADgOvlj623q1czgyPlTcgY_8VI</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
 </div>
 </div>
 </div>
@@ -2671,7 +2671,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2712
@@ -2763,12 +2763,12 @@ Content-Length: 2712
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /reservations HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 124
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMCwiZXhwIjoxNzE3NDAzNjMwfQ.VcxKYM1MDbyljCDidoOaJ5QJMDA-caGMFfU5kcxSckg
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8
 
 {
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "timeId" : 1,
   "themeId" : 1,
   "paymentKey" : "1",
@@ -2856,7 +2856,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /reservations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:49 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 480
@@ -2864,14 +2864,14 @@ Content-Length: 480
 {
   "reservationResponse" : {
     "id" : 2,
-    "date" : "2024-06-04",
+    "date" : "2024-06-06",
     "member" : {
       "id" : 1,
       "name" : "리건"
     },
     "time" : {
       "id" : 1,
-      "startAt" : "16:34"
+      "startAt" : "17:07"
     },
     "theme" : {
       "id" : 1,
@@ -2907,18 +2907,13 @@ Content-Length: 480
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reservationResponse.*.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reservationResponse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reservationResponse.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 정보</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>paymentResponse.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>paymentResponse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">결제 정보</p></td>
 </tr>
 </tbody>
@@ -2933,8 +2928,8 @@ Content-Length: 480
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations/mine HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMCwiZXhwIjoxNzE3NDAzNjMwfQ.VcxKYM1MDbyljCDidoOaJ5QJMDA-caGMFfU5kcxSckg</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8</code></pre>
 </div>
 </div>
 </div>
@@ -2966,7 +2961,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:49 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 329
@@ -2974,16 +2969,16 @@ Content-Length: 329
 [ {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-03",
-  "time" : "16:34",
+  "date" : "2024-06-05",
+  "time" : "17:07",
   "status" : "예약",
   "paymentKey" : null,
   "amount" : null
 }, {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-04",
-  "time" : "16:34",
+  "date" : "2024-06-06",
+  "time" : "17:07",
   "status" : "1번째 예약 대기",
   "paymentKey" : null,
   "amount" : null
@@ -3008,6 +3003,11 @@ Content-Length: 329
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">로그인한 회원의 예약 및 예약 대기 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 id</p></td>
@@ -3030,7 +3030,7 @@ Content-Length: 329
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].status</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">상태(예약 or 몇 번째 대기인지</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상태(예약 or 몇 번째 대기인지)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].paymentKey</code></p></td>
@@ -3054,8 +3054,8 @@ Content-Length: 329
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMCwiZXhwIjoxNzE3NDAzNjMwfQ.VcxKYM1MDbyljCDidoOaJ5QJMDA-caGMFfU5kcxSckg</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
 </div>
 </div>
 </div>
@@ -3066,21 +3066,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:49 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 1,
-  "date" : "2024-06-03",
+  "date" : "2024-06-05",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "16:34"
+    "startAt" : "17:07"
   },
   "theme" : {
     "id" : 1,
@@ -3109,6 +3109,11 @@ Content-Length: 302
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 id</p></td>
@@ -3119,18 +3124,18 @@ Content-Length: 302
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 날짜</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약자 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 테마 정보</p></td>
 </tr>
 </tbody>
@@ -3143,10 +3148,10 @@ Content-Length: 302
 <h4 id="_특정_조건을_만족하는_모든_예약_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations?memberId=1&amp;themeId=1&amp;dateFrom=2024-06-04&amp;dateTo=2024-06-04 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations?dateTo=2024-06-06&amp;themeId=1&amp;dateFrom=2024-06-06&amp;memberId=1 HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAyOSwiZXhwIjoxNzE3NDAzNjI5fQ.sOdQvE17SZKrNyp2TADgOvlj623q1czgyPlTcgY_8VI</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
 </div>
 </div>
 </div>
@@ -3190,21 +3195,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:48 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 2,
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "16:34"
+    "startAt" : "17:07"
   },
   "theme" : {
     "id" : 1,
@@ -3233,6 +3238,11 @@ Content-Length: 302
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">조건에 맞는 예약 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 id</p></td>
@@ -3243,18 +3253,18 @@ Content-Length: 302
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 날짜</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약자 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 테마 정보</p></td>
 </tr>
 </tbody>
@@ -3269,8 +3279,8 @@ Content-Length: 302
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /reservations/1 HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMCwiZXhwIjoxNzE3NDAzNjMwfQ.VcxKYM1MDbyljCDidoOaJ5QJMDA-caGMFfU5kcxSckg</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
 </div>
 </div>
 </div>
@@ -3322,7 +3332,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:49 GMT
+Date: Wed, 05 Jun 2024 08:06:28 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -3342,8 +3352,8 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /waitings HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMSwiZXhwIjoxNzE3NDAzNjMxfQ.odu_jRA445pzEcV2GoL9oeq_zmL7GNS8D_8Uq833ODM</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8</code></pre>
 </div>
 </div>
 </div>
@@ -3354,7 +3364,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:52 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
@@ -3365,10 +3375,10 @@ Content-Length: 302
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "time" : {
     "id" : 1,
-    "startAt" : "16:34"
+    "startAt" : "17:07"
   },
   "theme" : {
     "id" : 1,
@@ -3397,29 +3407,34 @@ Content-Length: 302
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">전체 예약 대기 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].date</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 날짜</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 날짜</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약자 정보</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].member</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기자 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 정보</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 시간 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 테마 정보</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 테마 정보</p></td>
 </tr>
 </tbody>
 </table>
@@ -3434,12 +3449,12 @@ Content-Length: 302
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /waitings HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:64007
+Host: localhost:61021
 Content-Length: 64
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMSwiZXhwIjoxNzE3NDAzNjMxfQ.odu_jRA445pzEcV2GoL9oeq_zmL7GNS8D_8Uq833ODM
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8
 
 {
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "timeId" : 1,
   "themeId" : 1
 }</code></pre>
@@ -3509,7 +3524,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /waitings/1
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 298
@@ -3520,10 +3535,10 @@ Content-Length: 298
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-04",
+  "date" : "2024-06-06",
   "time" : {
     "id" : 1,
-    "startAt" : "16:34"
+    "startAt" : "17:07"
   },
   "theme" : {
     "id" : 1,
@@ -3554,27 +3569,27 @@ Content-Length: 298
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>date</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 날짜</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 날짜</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>member.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>member</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기자 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 시간</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 시간 정보</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>theme.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Varies</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 테마</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 대기 테마 정보</p></td>
 </tr>
 </tbody>
 </table>
@@ -3588,8 +3603,8 @@ Content-Length: 298
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /waitings/1 HTTP/1.1
 Accept: application/json
-Host: localhost:64007
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzQwMDAzMSwiZXhwIjoxNzE3NDAzNjMxfQ.odu_jRA445pzEcV2GoL9oeq_zmL7GNS8D_8Uq833ODM</code></pre>
+Host: localhost:61021
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8</code></pre>
 </div>
 </div>
 </div>
@@ -3641,7 +3656,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -3661,7 +3676,7 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -3672,17 +3687,17 @@ Host: localhost:64007</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 86
 
 [ {
   "id" : 1,
-  "startAt" : "16:34"
+  "startAt" : "17:07"
 }, {
   "id" : 2,
-  "startAt" : "16:35"
+  "startAt" : "17:08"
 } ]</code></pre>
 </div>
 </div>
@@ -3704,14 +3719,19 @@ Content-Length: 86
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">전체 시간 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간의 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시간 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].startAt</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">방탈출 시작 시간(예약 시간)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방탈출 시작 시간</p></td>
 </tr>
 </tbody>
 </table>
@@ -3723,9 +3743,9 @@ Content-Length: 86
 <h4 id="_예약_시간을_날짜와_테마에_따른_예약_여부와_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times?date=2024-06-04&amp;theme=1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times?date=2024-06-06&amp;theme=1 HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -3736,18 +3756,18 @@ Host: localhost:64007</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 142
 
 [ {
   "id" : 1,
-  "startAt" : "16:34",
+  "startAt" : "17:07",
   "alreadyBooked" : false
 }, {
   "id" : 2,
-  "startAt" : "16:35",
+  "startAt" : "17:08",
   "alreadyBooked" : false
 } ]</code></pre>
 </div>
@@ -3770,14 +3790,19 @@ Content-Length: 142
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">날짜, 테마에 따른 예약 정보가 포함된 시간 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시간 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].startAt</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">방탈출 시작 시간(예약 시간)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방탈출 시작 시간</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].alreadyBooked</code></p></td>
@@ -3801,7 +3826,7 @@ Content-Length: 142
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /themes HTTP/1.1
 Accept: application/json
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -3812,7 +3837,7 @@ Host: localhost:64007</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 232
@@ -3848,9 +3873,14 @@ Content-Length: 232
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">전체 테마 목록</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">방탈출 테마 id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 id</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].name</code></p></td>
@@ -3860,7 +3890,7 @@ Content-Length: 232
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].description</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">테마에 대한 설명</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].thumbnail</code></p></td>
@@ -3878,7 +3908,7 @@ Content-Length: 232
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /themes/popular HTTP/1.1
-Host: localhost:64007</code></pre>
+Host: localhost:61021</code></pre>
 </div>
 </div>
 </div>
@@ -3889,7 +3919,7 @@ Host: localhost:64007</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 03 Jun 2024 07:33:51 GMT
+Date: Wed, 05 Jun 2024 08:06:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 232
@@ -3915,7 +3945,7 @@ Content-Length: 232
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 16:26:43 +0900
+Last updated 2024-06-04 13:59:22 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

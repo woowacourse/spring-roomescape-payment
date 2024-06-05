@@ -5,6 +5,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.themeFieldDescriptors;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -57,11 +58,8 @@ class ThemeControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("방탈출 테마 id"),
-                                fieldWithPath("[].name").description("테마 이름"),
-                                fieldWithPath("[].description").description("테마에 대한 설명"),
-                                fieldWithPath("[].thumbnail").description("테마 썸네일")
-                        )))
+                                fieldWithPath("[]").description("전체 테마 목록"))
+                                .andWithPrefix("[].", themeFieldDescriptors())))
                 .when().get("/themes")
                 .then().log().all()
                 .statusCode(200)
@@ -79,8 +77,8 @@ class ThemeControllerTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].*").description("지난 일주일간 예약순으로 조회")
-                        )))
+                                fieldWithPath("[]").description("한 주 동안 예약순으로 정렬된 상위 10개 테마 목록"))
+                                .andWithPrefix("[].", themeFieldDescriptors())))
                 .when().get("/themes/popular")
                 .then().log().all()
                 .statusCode(200)
