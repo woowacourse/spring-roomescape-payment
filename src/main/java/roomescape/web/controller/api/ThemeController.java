@@ -32,7 +32,7 @@ public class ThemeController {
     @PostMapping
     public ResponseEntity<ThemeResponse> create(@Valid @RequestBody ThemeRequest request) {
         ThemeDto appResponse = themeService.save(
-                new ThemeSaveDto(request.name(), request.description(), request.thumbnail()));
+                new ThemeSaveDto(request.name(), request.description(), request.thumbnail(), request.price()));
 
         Long id = appResponse.id();
         ThemeResponse webResponse = new ThemeResponse(appResponse);
@@ -64,5 +64,13 @@ public class ThemeController {
         themeService.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ThemeResponse> findById(@PathVariable Long id) {
+        ThemeDto themeDto = themeService.findById(id);
+        ThemeResponse themeResponse = new ThemeResponse(themeDto);
+
+        return ResponseEntity.ok(themeResponse);
     }
 }

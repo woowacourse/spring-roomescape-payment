@@ -16,13 +16,8 @@ public record ReservationWaitingDto(
                 waiting.getId(),
                 waiting.getMember().getName().getName(),
                 waiting.getDate(),
-                new ReservationTimeDto(
-                        waiting.getTime().getId(),
-                        waiting.getTime().getStartAt()),
-                new ThemeDto(waiting.getTheme().getId(),
-                        waiting.getTheme().getName(),
-                        waiting.getTheme().getDescription(),
-                        waiting.getTheme().getThumbnail()),
+                new ReservationTimeDto(waiting.getTime()),
+                new ThemeDto(waiting.getTheme()),
                 waiting.getDeniedAt()
         );
     }

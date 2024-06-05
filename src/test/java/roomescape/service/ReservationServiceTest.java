@@ -136,7 +136,7 @@ class ReservationServiceTest {
         String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
 
         ReservationTime reservationTime = new ReservationTime(oneMinuteAgo);
-        Theme theme = new Theme("방탈출1", "방탈출1을 한다.", "https://url");
+        Theme theme = new Theme("방탈출1", "방탈출1을 한다.", "https://url", 1000L);
 
         when(reservationTimeRepository.findById(timeId))
                 .thenReturn(Optional.of(reservationTime));

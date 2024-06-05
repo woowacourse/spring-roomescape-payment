@@ -29,8 +29,8 @@ class ReservationControllerTest extends ControllerTest {
     @BeforeEach
     void setInitialData() {
         jdbcTemplate.update("INSERT INTO reservation_time(start_at) VALUES (?)", "12:00");
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)", "방탈출1", "설명1",
-                "https://url1");
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)", "방탈출1", "설명1",
+                "https://url1", 1000L);
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
                 VALID_USER_NAME.getName(), VALID_USER_EMAIL.getEmail(),
                 VALID_USER_PASSWORD.getPassword(), MemberRole.USER.name());
@@ -145,8 +145,8 @@ class ReservationControllerTest extends ControllerTest {
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
                 VALID_ADMIN_NAME.getName(), VALID_ADMIN_EMAIL.getEmail(),
                 VALID_ADMIN_PASSWORD.getPassword(), MemberRole.ADMIN.name());
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)",
-                VALID_THEME.getName(), VALID_THEME.getDescription(), VALID_THEME.getThumbnail());
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)",
+                VALID_THEME.getName(), VALID_THEME.getDescription(), VALID_THEME.getThumbnail(), VALID_THEME.getPrice());
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",
                 "2026-02-01", 1L, 1L, 2L);
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",

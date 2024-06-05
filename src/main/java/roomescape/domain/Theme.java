@@ -14,22 +14,25 @@ public class Theme {
     private String name;
     private String description;
     private String thumbnail;
+    private Long price;
 
     public Theme() {
     }
 
-    public Theme(String name, String description, String thumbnail) {
-        this(null, name, description, thumbnail);
+    public Theme(String name, String description, String thumbnail, Long price) {
+        this(null, name, description, thumbnail, price);
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    public Theme(Long id, String name, String description, String thumbnail, Long price) {
         validateName(name);
         validateDescription(description);
         validateThumbnail(thumbnail);
+        validatePrice(price);
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
     private void validateName(String name) {
@@ -50,6 +53,15 @@ public class Theme {
         }
     }
 
+    private void validatePrice(Long price) {
+        if (price == null) {
+            throw new IllegalArgumentException("가격이 비어 있습니다.");
+        }
+        if (price < 0) {
+            throw new IllegalArgumentException("가격은 음수가 될 수 없습니다.");
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -66,4 +78,7 @@ public class Theme {
         return thumbnail;
     }
 
+    public Long getPrice() {
+        return price;
+    }
 }

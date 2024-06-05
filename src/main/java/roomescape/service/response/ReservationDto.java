@@ -15,13 +15,8 @@ public record ReservationDto(
                 reservation.getId(),
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
-                new ReservationTimeDto(
-                        reservation.getTime().getId(),
-                        reservation.getTime().getStartAt()),
-                new ThemeDto(reservation.getTheme().getId(),
-                        reservation.getTheme().getName(),
-                        reservation.getTheme().getDescription(),
-                        reservation.getTheme().getThumbnail())
+                new ReservationTimeDto(reservation.getTime()),
+                new ThemeDto(reservation.getTheme())
         );
     }
 }

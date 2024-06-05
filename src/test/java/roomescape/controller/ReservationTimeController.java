@@ -71,8 +71,8 @@ class ReservationTimeController extends ControllerTest {
     @DisplayName("예약이 존재하는 시간 삭제 -> 400")
     @Test
     void delete_ReservationExists() {
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)", "방탈출1", "설명1",
-                "https://url1");
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)", "방탈출1", "설명1",
+                "https://url1", 1000L);
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)", "wiib", "asd@naver.com",
                 "123asd", "ADMIN");
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",

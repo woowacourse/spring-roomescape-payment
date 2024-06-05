@@ -31,12 +31,13 @@ class ThemeServiceTest {
     private final String validName = "방탈출";
     private final String validDescription = "재밌는 방탈출 게임이다";
     private final String validThumbnail = "https://aaa.jpg";
+    private final Long validPrice = 1000L;
 
     @DisplayName("이름이 null 또는 빈 값이면 예외가 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
     void save_IllegalName(String name) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(name, validDescription, validThumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(name, validDescription, validThumbnail, validPrice)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -44,7 +45,7 @@ class ThemeServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void save_IllegalDescription(String description) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, description, validThumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, description, validThumbnail, validPrice)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -53,7 +54,7 @@ class ThemeServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"ftp://hello.jpg"})
     void save_IllegalThumbnail(String thumbnail) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, thumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, thumbnail, validPrice)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -63,7 +64,7 @@ class ThemeServiceTest {
         when(themeRepository.existsByName(validName))
                 .thenReturn(true);
 
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, validThumbnail)))
+        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, validDescription, validThumbnail, validPrice)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

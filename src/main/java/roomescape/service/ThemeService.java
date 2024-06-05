@@ -27,7 +27,7 @@ public class ThemeService {
     }
 
     public ThemeDto save(ThemeSaveDto request) {
-        Theme theme = new Theme(request.name(), request.description(), request.thumbnail());
+        Theme theme = new Theme(request.name(), request.description(), request.thumbnail(), request.price());
         validateDuplication(request);
         Theme savedTheme = themeRepository.save(theme);
 
@@ -60,5 +60,11 @@ public class ThemeService {
                         PageRequest.of(0, MAX_POPULAR_THEME_COUNT)).stream()
                 .map(ThemeDto::new)
                 .toList();
+    }
+
+    public ThemeDto findById(Long themeId) {
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("존재하지 않는 테마입니다. (id: %d)", themeId)));
+        return new ThemeDto(theme);
     }
 }
