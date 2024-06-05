@@ -1,10 +1,12 @@
 package roomescape.service.reservation.pay;
 
 import org.springframework.http.*;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import roomescape.domain.repository.PaymentRepository;
+import roomescape.domain.reservation.Payment;
+import roomescape.domain.reservation.Reservation;
 import roomescape.exception.customexception.api.ApiException;
 import roomescape.service.dto.request.PaymentApproveRequest;
 import roomescape.service.dto.request.PaymentCancelRequest;
@@ -21,27 +23,35 @@ public class PaymentService {
     private final IdemPotencyKeyGenerator generator;
     private final PaymentProperties paymentProperties;
     private final RestTemplate restTemplate;
+    private final PaymentRepository paymentRepository;
 
     public PaymentService(
             IdemPotencyKeyGenerator generator,
             PaymentProperties paymentProperties,
-            RestTemplate restTemplate
+            RestTemplate restTemplate,
+            PaymentRepository paymentRepository
     ) {
         this.generator = generator;
         this.paymentProperties = paymentProperties;
         this.restTemplate = restTemplate;
+        this.paymentRepository = paymentRepository;
     }
 
     @Retryable(maxAttempts = RETRY_ATTEMPT)
-    public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest) {
-        ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
+    public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest, Reservation reservation) {
+        ResponseEntity<PaymentApproveResponse> response = approvePay(paymentApproveRequest);
+        validateStatusCode(response.getStatusCode());
+        Payment payment = new Payment(paymentApproveRequest.paymentKey(), paymentApproveRequest.amount(), reservation);
+        paymentRepository.save(payment);
+        return response.getBody();
+    }
+
+    private ResponseEntity<PaymentApproveResponse> approvePay(PaymentApproveRequest paymentApproveRequest) {
+        return restTemplate.postForEntity(
                 paymentProperties.getApproveUrl(),
                 new HttpEntity<>(paymentApproveRequest, header()),
                 PaymentApproveResponse.class
         );
-
-        validateStatusCode(response.getStatusCode());
-        return response.getBody();
     }
 
     @Retryable(maxAttempts = RETRY_ATTEMPT)
