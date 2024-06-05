@@ -13,7 +13,6 @@ import roomescape.repository.ThemeRepository;
 import roomescape.repository.TimeSlotRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class BookService {
 
     private final ReservationRepository reservationRepository;
@@ -28,6 +27,7 @@ public class BookService {
         this.timeSlotRepository = timeSlotRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<BookResponse> findAvaliableBooks(LocalDate date, Long themeId) {
         Theme theme = findThemeById(themeId);
         List<Reservation> reservations = reservationRepository.findAllByDateAndTheme(date, theme);

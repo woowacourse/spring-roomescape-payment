@@ -10,7 +10,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ThemeRepository;
 
 @Service
-@Transactional
 public class ThemeService {
 
     private final ThemeRepository themeRepository;
@@ -35,12 +34,14 @@ public class ThemeService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 테마 입니다"));
     }
 
+    @Transactional
     public ThemeResponse create(ThemeRequest themeRequest) {
         Theme theme = themeRequest.toEntity();
         Theme createdTheme = themeRepository.save(theme);
         return ThemeResponse.from(createdTheme);
     }
 
+    @Transactional
     public void delete(Long id) {
         validateExistReservation(id);
         themeRepository.deleteById(id);

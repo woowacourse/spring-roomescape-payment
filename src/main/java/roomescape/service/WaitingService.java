@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@Transactional
 public class WaitingService {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
@@ -48,6 +47,7 @@ public class WaitingService {
                 .toList();
     }
 
+    @Transactional
     public WaitingResponse create(WaitingRequest waitingRequest) {
         Member member = memberService.findMemberById(waitingRequest.memberId());
         TimeSlot timeSlot = timeService.findTimeSlotById(waitingRequest.timeId());
@@ -60,6 +60,7 @@ public class WaitingService {
         return WaitingResponse.from(createdWaiting);
     }
 
+    @Transactional
     public void delete(Long id) {
         waitingRepository.deleteById(id);
     }

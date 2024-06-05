@@ -10,7 +10,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.TimeSlotRepository;
 
 @Service
-@Transactional
 public class TimeService {
 
     private final TimeSlotRepository timeSlotRepository;
@@ -35,6 +34,7 @@ public class TimeService {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 시간입니다"));
     }
 
+    @Transactional
     public TimeSlotResponse create(TimeSlotRequest timeSlotRequest) {
         validateDuplicatedTime(timeSlotRequest);
         TimeSlot timeSlot = timeSlotRequest.toEntity();
@@ -42,6 +42,7 @@ public class TimeService {
         return TimeSlotResponse.from(createdTimeSlot);
     }
 
+    @Transactional
     public void delete(Long id) {
         validateExistReservation(id);
         timeSlotRepository.deleteById(id);

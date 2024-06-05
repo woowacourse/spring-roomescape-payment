@@ -17,7 +17,6 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.repository.*;
 
 @Service
-@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -80,6 +79,7 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ReservationResponse createByAdmin(ReservationRequest reservationRequest) {
         Member member = memberService.findMemberById(reservationRequest.memberId());
         TimeSlot timeSlot = timeService.findTimeSlotById(reservationRequest.timeId());
@@ -92,12 +92,14 @@ public class ReservationService {
         return ReservationResponse.from(createdReservation);
     }
 
+    @Transactional
     public ReservationResponse createByClient(MemberReservationRequest reservationRequest, LoginMember member) {
         Reservation reservation = checkAvailableReservation(member.id(), reservationRequest);
         paymentService.payment(reservationRequest);
         return confirmReservationByClient(reservation);
     }
 
+    @Transactional
     public void delete(Long id) {
         Reservation currentReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 예약 내역이 존재하지 않습니다."));

@@ -14,7 +14,6 @@ import roomescape.infrastructure.TokenGenerator;
 import roomescape.repository.MemberRepository;
 
 @Service
-@Transactional
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -47,6 +46,7 @@ public class MemberService {
         return LoginMember.from(member);
     }
 
+    @Transactional
     public TokenResponse createToken(TokenRequest tokenRequest) {
         Member member = memberRepository.findByEmailAndPassword(tokenRequest.email(), tokenRequest.password())
                 .orElseThrow(() -> new JwtException("아이디 또는 비밀번호가 일치하지 않습니다."));
@@ -54,6 +54,7 @@ public class MemberService {
         return TokenResponse.from(accessToken);
     }
 
+    @Transactional
     public MemberResponse checkLogin(final LoginMember loginMember) {
         Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new JwtException("[ERROR] 로그인이 필요합니다."));
