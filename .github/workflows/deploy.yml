@@ -16,7 +16,7 @@ jobs:
           path: ~/$GITHUB_REPOSITORY
 
       - name: Build with Gradle
-        run: ./gradlew bootJar
+        run: cd ~/$GITHUB_REPOSITORY && ./gradlew bootJar
 
       - name: Stop the services
         run: sudo systemctl stop roomescape

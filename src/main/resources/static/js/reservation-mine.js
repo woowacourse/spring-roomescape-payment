@@ -30,18 +30,15 @@ function render(data) {
   data.forEach(item => {
     const row = tableBody.insertRow();
 
-    const theme = item.theme;
-    const date = item.date;
-    const time = item.time;
-    const status = item.status;
+    row.insertCell(0).textContent = item.theme;
+    row.insertCell(1).textContent = item.date;
+    row.insertCell(2).textContent = item.time;
+    row.insertCell(3).textContent = item.status;
+    row.insertCell(4).textContent = item.paymentKey;
+    row.insertCell(5).textContent = item.amount;
+    const lastCell = row.insertCell(6);
 
-    row.insertCell(0).textContent = theme;
-    row.insertCell(1).textContent = date;
-    row.insertCell(2).textContent = time;
-    row.insertCell(3).textContent = status;
-    const lastCell = row.insertCell(4);
-
-    if (status == "결제대기") { // 결제 대기 상태일 때 결제 버튼 추가하는 코드
+    if (item.status === "결제대기") { // 결제 대기 상태일 때 결제 버튼 추가하는 코드
       const paymentButton = document.createElement('button');
       paymentButton.textContent = '결제';
       paymentButton.className = 'btn primary';
@@ -50,7 +47,7 @@ function render(data) {
       lastCell.appendChild(paymentButton);
     }
 
-    if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드
+    if (item.status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '취소';
       cancelButton.className = 'btn btn-danger';
