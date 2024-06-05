@@ -5,11 +5,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.request.PaymentApiRequest;
+import roomescape.application.dto.request.PaymentConfirmApiRequest;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.reservation.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.WaitingRepository;
@@ -29,6 +30,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
 
 
@@ -38,6 +40,7 @@ public class ReservationService {
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
             WaitingRepository waitingRepository,
+            PaymentRepository paymentRepository,
             PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
@@ -45,6 +48,7 @@ public class ReservationService {
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
     }
 
@@ -64,8 +68,8 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
 
         if (request.payment() != null) {
-            PaymentApiRequest paymentApiRequest = PaymentApiRequest.from(request.payment());
-            paymentService.confirmPayment(savedReservation, paymentApiRequest);
+            PaymentConfirmApiRequest paymentConfirmApiRequest = PaymentConfirmApiRequest.from(request.payment());
+            paymentService.confirmPayment(savedReservation, paymentConfirmApiRequest);
         }
 
         return ReservationResponse.from(savedReservation);
@@ -88,6 +92,7 @@ public class ReservationService {
     public void deleteReservationById(Long id) {
         Reservation reservation = reservationRepository.getById(id);
 
+        paymentRepository.deleteByReservationId(id);
         reservationRepository.delete(reservation);
     }
 
