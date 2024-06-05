@@ -51,7 +51,7 @@ public class AdminReservationController {
     @AdminOnly
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody ReservationRequest reservationRequest) {
-        ReservationResponse saveResponse = reservationService.saveReservation(reservationRequest);
+        ReservationResponse saveResponse = reservationService.saveAdminReservation(reservationRequest);
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);
     }

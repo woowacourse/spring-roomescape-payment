@@ -30,7 +30,7 @@ import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.toss.TossPaymentClient;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWithWaiting;
@@ -55,7 +55,7 @@ class ReservationServiceTest {
     private ThemeService themeService;
 
     @Mock
-    private TossPaymentClient tossPaymentClient;
+    private PaymentService paymentService;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -88,7 +88,7 @@ class ReservationServiceTest {
         when(themeService.findById(1L)).thenReturn(THEME_1);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(MEMBER_ID_1_RESERVATION);
 
-        ReservationResponse savedReservation = reservationService.saveReservation(RESERVATION_REQUEST_1);
+        ReservationResponse savedReservation = reservationService.saveAdminReservation(RESERVATION_REQUEST_1);
 
         assertThat(savedReservation).isEqualTo(new ReservationResponse(MEMBER_ID_1_RESERVATION));
     }
@@ -100,7 +100,7 @@ class ReservationServiceTest {
         when(reservationTimeService.findById(1L)).thenReturn(RESERVATION_TIME_10_00_ID_1);
         when(themeService.findById(1L)).thenReturn(THEME_1);
 
-        assertThatThrownBy(() -> reservationService.saveReservation(PAST_DATE_RESERVATION_REQUEST))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(PAST_DATE_RESERVATION_REQUEST))
                 .isInstanceOf(IllegalRequestException.class);
     }
 
@@ -111,7 +111,7 @@ class ReservationServiceTest {
                 any(Long.class))).thenReturn(List.of(
                 MEMBER_ID_1_RESERVATION));
 
-        assertThatThrownBy(() -> reservationService.saveReservation(RESERVATION_REQUEST_1))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(RESERVATION_REQUEST_1))
                 .isInstanceOf(IllegalRequestException.class);
     }
 
@@ -120,8 +120,8 @@ class ReservationServiceTest {
     void should_throw_exception_when_reservation_not_confirmed_payments() {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         doThrow(IllegalRequestException.class)
-                .when(tossPaymentClient)
-                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+                .when(paymentService)
+                .confirmPayment(any(Reservation.class), any(PaymentConfirmRequest.class));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
@@ -131,7 +131,7 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
     @Test
     void should_save_member_reservation_when_payment_is_confirmed() {
-        doNothing().when(tossPaymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        doNothing().when(paymentService).confirmPayment(any(Reservation.class), any(PaymentConfirmRequest.class));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
