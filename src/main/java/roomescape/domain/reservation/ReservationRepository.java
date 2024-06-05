@@ -23,8 +23,10 @@ public interface ReservationRepository extends ListCrudRepository<Reservation, L
     @Query("""
                 SELECT r
                 FROM Reservation r
-                JOIN FETCH r.detail
-                LEFT JOIN Payment p ON r.payment.id = p.id
+                JOIN FETCH r.detail.time
+                JOIN FETCH r.detail.theme
+                JOIN FETCH r.member
+                LEFT JOIN FETCH Payment p ON r.payment.id = p.id
                 WHERE (:memberId IS NULL OR r.member.id = :memberId)
                 AND (:themeId IS NULL OR r.detail.theme.id = :themeId)
                 AND (:dateFrom IS NULL OR r.detail.date >= :dateFrom)
