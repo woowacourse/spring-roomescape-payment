@@ -1,8 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.TODAY;
 
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
 import roomescape.exception.PaymentFailException;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.util.CookieUtils;
@@ -90,7 +91,8 @@ class ReservationApiControllerTest extends IntegrationTest {
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
 
-        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), anyLong());
+        PaymentResponse paymentResponse = new PaymentResponse("testKey", new BigDecimal("1000"));
+        doReturn(paymentResponse).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -113,8 +115,7 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
-
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), anyLong());
+        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
