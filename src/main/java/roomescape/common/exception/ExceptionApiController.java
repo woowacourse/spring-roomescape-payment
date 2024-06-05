@@ -18,13 +18,8 @@ public class ExceptionApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionApiController.class);
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> IllegalArgExHandler(IllegalArgumentException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException exception) {
+    @ExceptionHandler({IllegalArgumentException.class, HttpMessageNotReadableException.class})
+    public ResponseEntity<String> handleBadRequestExceptions(RuntimeException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
@@ -58,6 +53,6 @@ public class ExceptionApiController {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> exceptionHandler(RuntimeException exception) {
         logger.error(exception.getMessage(), exception);
-        return ResponseEntity.status(500).body("서버 내부 오류입니다.");
+        return ResponseEntity.internalServerError().body("서버 내부 오류입니다.");
     }
 }
