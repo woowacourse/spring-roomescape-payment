@@ -20,7 +20,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.Fixture.*;
 
-@ExtendWith(MockitoExtension.class)
 class ReservationControllerTest extends ControllerTest {
 
     @MockBean
@@ -48,13 +47,6 @@ class ReservationControllerTest extends ControllerTest {
                 .statusCode(201)
                 .body("name", is(VALID_USER_NAME.getName()))
                 .body("payment.paymentKey", is(paymentDto.paymentKey()));
-    }
-
-    @DisplayName("예약을 삭제한다. -> 204")
-    @Test
-    void deleteBy() {
-        ReservationSteps.deleteReservation(1L)
-                .statusCode(204);
     }
 
     @DisplayName("예약을 조회한다. -> 200")

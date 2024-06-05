@@ -101,10 +101,6 @@ public class ReservationService {
         }
     }
 
-    public void delete(Long id) {
-        reservationRepository.deleteById(id);
-    }
-
     public List<ReservationDto> findAll() {
         return reservationRepository.findAll().stream()
                 .map(ReservationDto::new)
