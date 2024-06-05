@@ -75,7 +75,7 @@ public class WaitingService {
 
     private void checkMemberAuthentication(final Waiting waiting, final Long memberId) {
         if (waiting.isNotSameMember(memberId)) {
-            throw new ForbiddenException("회원의 권한이 없어, 식별자 " + memberId + "인 예약 대기를 삭제할 수 없습니다.");
+            throw new ForbiddenException("회원의 권한이 없어, 식별자 " + waiting.getId() + "인 예약 대기를 삭제할 수 없습니다.");
         }
     }
 }
