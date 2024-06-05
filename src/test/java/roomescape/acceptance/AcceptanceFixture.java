@@ -57,10 +57,10 @@ public class AcceptanceFixture {
                 .extract();
     }
 
-    public String loginAndGetToken(String email, String password) {
+    public String loginAndGetToken(MemberLoginRequest request) {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new MemberLoginRequest(email, password))
+                .body(request)
                 .when().post("/login")
                 .then().log().all()
                 .extract()

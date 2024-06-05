@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static roomescape.fixture.MemberFixture.MEMBER_ARU;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,8 @@ class MemberServiceTest {
     void registerTest() {
         MemberRegisterRequest request = new MemberRegisterRequest("hello", MEMBER_ARU.email(), "12341234");
         memberService.register(request);
-        assertThatCode(() -> memberRepository.getByEmail(new Email(MEMBER_ARU.email())))
-                .doesNotThrowAnyException();
+        Optional<Member> actual = memberRepository.findByEmail(new Email(MEMBER_ARU.email()));
+        assertThat(actual).isPresent();
     }
 
     @Test

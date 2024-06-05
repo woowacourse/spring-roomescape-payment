@@ -1,12 +1,12 @@
 package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.fixture.MemberFixture.MEMBER_ARU;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.request.ThemeRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
@@ -21,8 +21,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 new ThemeRequest("name", "desc", "url", 10_000L)
         ).id();
         long timeId = fixture.createReservationTime(10, 0).id();
-        fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
-        String token = fixture.loginAndGetToken("email@mail.com", "12341234");
+        fixture.registerMember(MEMBER_ARU.registerRequest());
+        String token = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
         ReservationResponse response = fixture.createReservation(
                 token,
                 new ReservationRequest(LocalDate.of(2024, 12, 25), timeId, themeId)
@@ -42,8 +42,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 new ThemeRequest("name", "desc", "url", 10_000L)
         ).id();
         long timeId = fixture.createReservationTime(10, 0).id();
-        fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "12341234"));
-        String token = fixture.loginAndGetToken("email@mail.com", "12341234");
+        fixture.registerMember(MEMBER_ARU.registerRequest());
+        String token = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
         fixture.createReservation(token, new ReservationRequest(LocalDate.of(2024, 12, 25), timeId, themeId));
 
         ReservationStatusResponse[] responses = RestAssured.given().log().all()

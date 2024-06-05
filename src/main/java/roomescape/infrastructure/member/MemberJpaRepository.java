@@ -12,15 +12,11 @@ public interface MemberJpaRepository extends MemberRepository, ListCrudRepositor
     @Override
     boolean existsByEmail(Email email);
 
+    @Override
     Optional<Member> findByEmail(Email email);
 
     @Override
     default Member getById(long id) {
         return findById(id).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
-    }
-
-    @Override
-    default Member getByEmail(Email email) {
-        return findByEmail(email).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
     }
 }

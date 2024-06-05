@@ -1,6 +1,7 @@
 package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.fixture.MemberFixture.MEMBER_ARU;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -11,7 +12,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.request.ReservationTimeRequest;
 import roomescape.application.reservation.dto.request.ThemeRequest;
@@ -64,8 +64,8 @@ class ReservationTimeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("예약 가능한 시간을 조회한다.")
     void findAvailableTimesTest() {
-        fixture.registerMember(new MemberRegisterRequest("name", "email@mail.com", "password"));
-        String token = fixture.loginAndGetToken("email@mail.com", "password");
+        fixture.registerMember(MEMBER_ARU.registerRequest());
+        String token = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
         fixture.createReservationTime(10, 0);
         fixture.createReservationTime(11, 30);
         long timeId = fixture.createReservationTime(13, 0).id();

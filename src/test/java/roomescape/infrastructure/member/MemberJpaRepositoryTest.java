@@ -1,7 +1,6 @@
 package roomescape.infrastructure.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,13 +27,5 @@ class MemberJpaRepositoryTest {
         entityManager.persist(new Member("name", "email@test.com", "password"));
         boolean existsByEmail = memberRepository.existsByEmail(new Email("email@test.com"));
         assertThat(existsByEmail).isTrue();
-    }
-
-    @Test
-    @DisplayName("이메일로 회원을 조회한다.")
-    void findByEmailTest() {
-        entityManager.persist(new Member("name", "email@test.com", "password"));
-        assertThatCode(() -> memberRepository.getByEmail(new Email("email@test.com")))
-                .doesNotThrowAnyException();
     }
 }
