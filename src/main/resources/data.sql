@@ -93,6 +93,7 @@ VALUES
     ('payment_key6','order_id6',1000,6),
     ('payment_key7','order_id7',1000,7),
     ('payment_key8','order_id8',1000,8),
+    ('payment_key9','order_id9',1000,9),
     ('payment_key12','order_id12',1000,12),
     ('payment_key13','order_id13',1000,13),
     ('payment_key14','order_id14',1000,14),
@@ -106,5 +107,4 @@ VALUES
     ('payment_key24','order_id24',1000,24),
     ('payment_key25','order_id25',1000,25),
     ('payment_key28','order_id28',1000,28),
-    ('payment_key29','order_id29',1000,29),
-    ('payment_key31','order_id31',1000,31);
+    ('payment_key29','order_id29',1000,29);
