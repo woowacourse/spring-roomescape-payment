@@ -54,18 +54,26 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time,
+    public Reservation(final Member member,
+                       final String date,
+                       final ReservationTime time,
                        final Theme theme) {
         this(member, parseDate(date), time, theme, PaymentStatus.ACCOUNT_TRANSFERRED, null);
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final PaymentStatus paymentStatus) {
+    public Reservation(final Member member,
+                       final String date,
+                       final ReservationTime time,
+                       final Theme theme,
+                       final PaymentStatus paymentStatus) {
         this(member, parseDate(date), time, theme, paymentStatus, null);
     }
 
-    private Reservation(final Member member, final LocalDate date, final ReservationTime time,
-                        final Theme theme, final PaymentStatus paymentStatus,
+    private Reservation(final Member member,
+                        final LocalDate date,
+                        final ReservationTime time,
+                        final Theme theme,
+                        final PaymentStatus paymentStatus,
                         final Payment payment) {
         this.id = null;
         this.member = member;
