@@ -1,5 +1,6 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -17,6 +18,7 @@ import roomescape.member.dto.MemberResponse;
 import roomescape.member.dto.MemberSignUpRequest;
 import roomescape.member.service.MemberService;
 
+@Tag(name = "Member API")
 @RestController
 public class MemberApiController {
 

@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -15,6 +16,7 @@ import roomescape.reservation.dto.response.PopularThemeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 import roomescape.reservation.service.ThemeService;
 
+@Tag(name = "Theme API")
 @RestController
 public class ThemeApiController {
 

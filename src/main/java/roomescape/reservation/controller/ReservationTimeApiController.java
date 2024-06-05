@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.response.TimeResponse;
 import roomescape.reservation.service.ReservationTimeService;
 
+@Tag(name = "Time API")
 @RestController
 public class ReservationTimeApiController {
 
