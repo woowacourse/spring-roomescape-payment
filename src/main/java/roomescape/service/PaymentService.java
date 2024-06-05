@@ -4,14 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.PaymentInfo;
 import roomescape.dto.request.MemberReservationRequest;
+import roomescape.infrastructure.TossPaymentProperties;
 
 @Service
 public class PaymentService {
 
     private final RestClient restClient;
+    private final TossPaymentProperties tossPaymentProperties;
 
-    public PaymentService(RestClient restClient) {
+    public PaymentService(RestClient restClient, TossPaymentProperties tossPaymentProperties) {
         this.restClient = restClient;
+        this.tossPaymentProperties = tossPaymentProperties;
     }
 
     public void payment(MemberReservationRequest memberReservationRequest) {
@@ -22,7 +25,7 @@ public class PaymentService {
         PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
 
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(tossPaymentProperties.url().confirm())
                 .body(paymentInfo)
                 .retrieve()
                 .toBodilessEntity();

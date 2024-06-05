@@ -19,12 +19,9 @@ import java.util.Base64;
 @EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentConfig {
 
-    public static final long CONNECTION_TIMEOUT = 3L;
-    public static final long READ_TIMEOUT = 30L;
-
     private final TossPaymentProperties tossPaymentProperties;
 
-    public TossPaymentConfig(final TossPaymentProperties tossPaymentProperties) {
+    public TossPaymentConfig(TossPaymentProperties tossPaymentProperties) {
         this.tossPaymentProperties = tossPaymentProperties;
     }
 
@@ -32,19 +29,18 @@ public class TossPaymentConfig {
     public RestClient restClient() {
         return RestClient
                 .builder()
-                .baseUrl("https://api.tosspayments.com")
+                .baseUrl(tossPaymentProperties.url().base())
                 .defaultHeader("Authorization", authorizationHeader())
                 .defaultStatusHandler(paymentExceptionHandler())
                 .requestFactory(requestFactory())
                 .build();
     }
 
-
     private String authorizationHeader() {
         String secretKey = tossPaymentProperties.secretKey() + ":";
         String credentials = Base64.getEncoder()
                 .encodeToString((secretKey).getBytes());
-
+        
         return "Basic " + credentials;
     }
 
@@ -53,9 +49,12 @@ public class TossPaymentConfig {
     }
 
     private ClientHttpRequestFactory requestFactory() {
+        final Long timeOutConnection = tossPaymentProperties.timeOut().connection();
+        final Long timeOutRead = tossPaymentProperties.timeOut().read();
+
         ClientHttpRequestFactorySettings timeOutSetting = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(CONNECTION_TIMEOUT))
-                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT));
+                .withConnectTimeout(Duration.ofSeconds(timeOutConnection))
+                .withReadTimeout(Duration.ofSeconds(timeOutRead));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, timeOutSetting);
     }
