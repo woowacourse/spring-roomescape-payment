@@ -31,33 +31,40 @@ import java.util.Base64;
 public class PaymentClient {
     private static final String BASIC_DELIMITER = ":";
     private static final String AUTH_HEADER_PREFIX = "Basic ";
-    private final PaymentProperties paymentProperties;
+    private static final int CONNECT_TIMEOUT_SECONDS = 1;
+    private static final int READ_TIMEOUT_SECONDS = 30;
+
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
 
     public PaymentClient(PaymentProperties paymentProperties,
-                         RestClient.Builder restClientBuilder,
                          ObjectMapper objectMapper) {
-        this.paymentProperties = paymentProperties;
         this.objectMapper = objectMapper;
+        this.restClient = RestClient.builder()
+                .requestFactory(createPaymentRequestFactory())
+                .baseUrl(paymentProperties.getUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, createPaymentAuthHeader(paymentProperties))
+                .build();
+    }
 
+    private ClientHttpRequestFactory createPaymentRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(1))
-                .withReadTimeout(Duration.ofSeconds(30));
-        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory.class, settings);
-        this.restClient = restClientBuilder.requestFactory(requestFactory).build();
+                .withConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+                .withReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS));
+
+        return ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory.class, settings);
+    }
+
+    private String createPaymentAuthHeader(PaymentProperties paymentProperties) {
+        byte[] encodedBytes = Base64.getEncoder().encode((paymentProperties.getSecretKey() + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
+        return AUTH_HEADER_PREFIX + new String(encodedBytes);
     }
 
     public PaymentConfirmOutput confirmPayment(PaymentConfirmInput confirmRequest) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((paymentProperties.getSecretKey() + BASIC_DELIMITER).getBytes(StandardCharsets.UTF_8));
-        String authorizations = AUTH_HEADER_PREFIX + new String(encodedBytes);
-
         try {
             return restClient.method(HttpMethod.POST)
-                    .uri(paymentProperties.getUrl() + "/confirm")
+                    .uri("/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, authorizations)
                     .body(confirmRequest)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
