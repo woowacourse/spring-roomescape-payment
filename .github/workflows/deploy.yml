@@ -20,7 +20,7 @@ jobs:
         run: sudo systemctl stop roomescape
 
       - name: Copy runnable file
-        run: mkdir /home/ubuntu/${{ github.event.repository.name }} && \
+        run: mkdir -p /home/ubuntu/${{ github.event.repository.name }} && \
           cp ./build/lib/${{ github.event.repository.name }}-0.0.1-SNAPSHOT.jar \
           /home/ubuntu/${{ github.event.repository.name }}/run.jar
 
