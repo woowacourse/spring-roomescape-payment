@@ -27,6 +27,7 @@ import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailFactory;
 import roomescape.exception.AuthenticationException;
 import roomescape.exception.AuthorizationException;
+import roomescape.exception.RoomEscapeException;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class ReservationService {
     public ReservationResponse reserve(UserReservationRequest request, Long memberId) {
         Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
         if (reservation.isPending()) {
-            Payment payment = savePayment(request.toPaymentRequest());
+            Payment payment = savePayment(request.toPaymentRequest(), reservation);
             reservation.completePayment(payment);
         }
         return ReservationResponse.from(reservation);
@@ -67,7 +68,10 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    private Payment savePayment(PaymentRequest paymentRequest) {
+    private Payment savePayment(PaymentRequest paymentRequest, Reservation reservation) {
+        if (reservation.isNotPending()) {
+            throw new RoomEscapeException("예약 대기 상태가 아닙니다");
+        }
         PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
         return paymentRepository.save(paymentResponse.toPayment());
     }
@@ -76,7 +80,7 @@ public class ReservationService {
     public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
         rejectIfNotOwner(reservation, memberId);
-        Payment payment = savePayment(request.toPaymentRequest());
+        Payment payment = savePayment(request.toPaymentRequest(), reservation);
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
     }

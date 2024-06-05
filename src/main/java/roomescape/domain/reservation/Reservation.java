@@ -99,6 +99,10 @@ public class Reservation {
         return this.status == Status.PAYMENT_PENDING;
     }
 
+    public boolean isNotPending() {
+        return this.status != Status.PAYMENT_PENDING;
+    }
+
     public boolean isWaiting() {
         return this.status == Status.WAITING;
     }
@@ -112,6 +116,9 @@ public class Reservation {
     }
 
     public void completePayment(Payment payment) {
+        if (this.isNotPending()) {
+            throw new RoomEscapeException("결제 대기 상태가 아닙니다");
+        }
         this.payment = payment;
         this.status = Status.RESERVED;
     }
