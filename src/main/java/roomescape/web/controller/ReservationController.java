@@ -15,7 +15,7 @@ import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
-import roomescape.dto.reservation.UserReservationResponse;
+import roomescape.dto.reservation.UserReservationPaymentResponse;
 import roomescape.service.booking.reservation.ReservationService;
 
 @RestController
@@ -58,8 +58,8 @@ class ReservationController {
     }
 
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<UserReservationResponse>> getReservationsMine(LoginMember loginMember) {
-        List<UserReservationResponse> userReservationResponses = reservationService.findReservationByMemberId(
+    public ResponseEntity<List<UserReservationPaymentResponse>> getReservationsMine(LoginMember loginMember) {
+        List<UserReservationPaymentResponse> userReservationResponses = reservationService.findReservationByMemberId(
                 loginMember.id());
 
         return ResponseEntity.ok(userReservationResponses);

@@ -75,8 +75,20 @@ public class ReservationService {
         return reservationSearchService.findAllReservations();
     }
 
-    public List<UserReservationResponse> findReservationByMemberId(Long memberId) {
-        return reservationSearchService.findReservationByMemberId(memberId);
+    public List<UserReservationPaymentResponse> findReservationByMemberId(Long memberId) {
+        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+        List<UserReservationPaymentResponse> reservationPaymentResponses = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            if (reservation.isReserved()) {
+                Payment payment = paymentRepository.findByReservation(reservation);
+                reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservation, payment));
+            }
+            if (!reservation.isReserved()) {
+                Waiting waiting = findWaitingByReservation(reservation);
+                reservationPaymentResponses.add(UserReservationPaymentResponse.of(waiting));
+            }
+        }
+        return reservationPaymentResponses;
     }
 
     public List<ReservationResponse> findReservationsByFilter(ReservationfilterRequest filter) {

@@ -73,7 +73,7 @@ public class ReservationSearchService {
                 ));
     }
 
-    private Waiting findWaitingByReservationId(Long reservationId) {
+    public Waiting findWaitingByReservationId(Long reservationId) {
         return waitingRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(
                         "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
