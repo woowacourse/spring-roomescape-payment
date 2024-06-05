@@ -1,0 +1,16 @@
+== 관리자 페이지
+
+=== 메인 페이지
+operation::page/admin[snippets="http-request,request-cookies,http-response"]
+
+=== 예약 페이지
+operation::page/admin/reservation[snippets="http-request,request-cookies,http-response"]
+
+=== 테마 페이지
+operation::page/admin/theme[snippets="http-request,request-cookies,http-response"]
+
+=== 시간 페이지
+operation::page/admin/time[snippets="http-request,request-cookies,http-response"]
+
+=== 예약 대기 페이지
+operation::page/admin/waiting[snippets="http-request,request-cookies,http-response"]

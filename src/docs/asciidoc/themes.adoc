@@ -1,0 +1,7 @@
+== 방탈출 테마
+
+=== 모든 테마 조회
+operation::themes/get[snippets = "http-request,http-response,response-fields"]
+
+=== 최근 일주일간 예약순으로 상위 10개 테마 조회
+operation::themes/popular/get[snippets = "http-request,http-response"]

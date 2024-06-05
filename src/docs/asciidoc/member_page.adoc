@@ -1,0 +1,16 @@
+== 사용자 페이지
+
+=== 메인 페이지
+operation::index[snippets="http-request,http-response"]
+
+=== 회원 가입 페이지
+operation::page/signup[snippets="http-request,http-response"]
+
+=== 로그인 페이지
+operation::page/login[snippets="http-request,http-response"]
+
+=== 방탈출 예약 페이지
+operation::page/reservation[snippets="http-request,http-response"]
+
+=== 나의 예약 목록 페이지
+operation::page/reservation-mine[snippets="http-request,request-cookies,http-response"]
