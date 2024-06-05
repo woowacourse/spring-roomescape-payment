@@ -3,7 +3,6 @@ package roomescape.reservation.facade;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
-import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.dto.WaitingReservationRanking;
@@ -78,16 +77,15 @@ public class ReservationFacadeService {
     }
 
     private MyReservationResponse createMyConfirmationReservationResponse(MemberReservation memberReservation) {
-        if (memberReservation.isConfirmationStatus()) {
-            Payment payment = paymentService.findByMemberReservation(memberReservation);
-            return MyReservationResponse.of(
-                    memberReservation,
-                    paymentService.getPlainPaymentKey(payment),
-                    payment.getAmount()
-            );
-        }
+        return paymentService.findByMemberReservation(memberReservation)
+                .map(payment -> MyReservationResponse.of(
+                                memberReservation,
+                                paymentService.getPlainPaymentKey(payment),
+                                payment.getAmount()
+                        )
+                )
+                .orElseGet(() -> MyReservationResponse.from(memberReservation));
 
-        return MyReservationResponse.from(memberReservation);
     }
 
     @Transactional(readOnly = true)
