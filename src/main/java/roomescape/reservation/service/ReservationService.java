@@ -46,7 +46,15 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(), ReservationStatus.SUCCESS);
+        validateDuplicatedReservationSuccess(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return ReservationResponse.toResponse(savedReservation);
+    }
+
+    public ReservationResponse saveReservationSuccessByAdmin(ReservationSaveRequest reservationSaveRequest) {
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, reservationSaveRequest.getMemberId(), ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -57,7 +65,7 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(), ReservationStatus.WAIT);
         validateDuplicatedReservationWaiting(reservation, loginMember);
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -66,7 +74,7 @@ public class ReservationService {
 
     private Reservation createValidatedReservationOfStatus(
             ReservationSaveRequest reservationSaveRequest,
-            LoginMember loginMember,
+            Long memberId,
             ReservationStatus reservationStatus
     ) {
         ReservationTime reservationTime = reservationTimeRepository.findById(reservationSaveRequest.getTimeId())
@@ -75,7 +83,7 @@ public class ReservationService {
         Theme theme = themeRepository.findById(reservationSaveRequest.getThemeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
 
-        Member member = memberRepository.findById(loginMember.id())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         return reservationSaveRequest.toReservation(member, theme, reservationTime, reservationStatus);

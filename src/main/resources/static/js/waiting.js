@@ -1,4 +1,4 @@
-const RESERVATION_API_ENDPOINT = '/reservations'
+const RESERVATION_API_ENDPOINT = '/admin/reservations'
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/admin/reservations/waiting') // 내 예약 목록 조회 API 호출
