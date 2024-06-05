@@ -5,6 +5,7 @@ import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Theme;
@@ -40,7 +41,7 @@ public class BookingQueryService {
         return reservationRepository.findAllByMemberAndThemeAndDateBetween(member, theme, fromDate, toDate);
     }
 
-    public List<Reservation> findAllByMember(Member member) {
-        return reservationRepository.findAllByMemberAndStatusWithDetails(member, ReservationStatus.BOOKING);
+    public List<ReservationPayment> findAllByMember(Member member) {
+        return reservationRepository.findReservationsByMemberAndStatusWithDetailsAndPayment(member, ReservationStatus.BOOKING);
     }
 }

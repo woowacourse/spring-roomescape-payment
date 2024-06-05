@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 
 import java.util.List;
 
@@ -82,8 +83,9 @@ class BookingManageServiceTest extends ReservationServiceTest {
         bookingManageService.delete(reservationInBooking.getId(), admin);
 
         // then
-        List<Reservation> changedBookings = bookingQueryService.findAllByMember(admin);
+        List<ReservationPayment> changedBookings = bookingQueryService.findAllByMember(admin);
         assertThat(changedBookings).hasSize(1)
+                .extracting(ReservationPayment::reservation)
                 .extracting(Reservation::getId)
                 .contains(reservationInWaiting.getId());
     }

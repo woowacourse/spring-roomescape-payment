@@ -34,13 +34,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findAllTimeIdsByDateAndTheme(@Param(value = "date") LocalDate date, @Param(value = "theme") Theme theme);
 
     @Query("""
-            SELECT r FROM Reservation r
+            SELECT new roomescape.reservation.domain.ReservationPayment(r, p)
+            FROM Reservation r
             JOIN FETCH r.time
             JOIN FETCH r.theme
+            LEFT OUTER JOIN Payment p
+            ON p.reservation = r
             WHERE r.member = :member AND r.status = :status
             """)
-    List<Reservation> findAllByMemberAndStatusWithDetails(@Param(value = "member") Member member,
-                                                          @Param(value = "status") ReservationStatus status);
+    List<ReservationPayment> findReservationsByMemberAndStatusWithDetailsAndPayment(@Param(value = "member") Member member,
+                                                                                    @Param(value = "status") ReservationStatus status);
 
     int countByTime(ReservationTime time);
 

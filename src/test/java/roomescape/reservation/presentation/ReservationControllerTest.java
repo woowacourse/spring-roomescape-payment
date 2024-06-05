@@ -21,6 +21,7 @@ import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -28,6 +29,7 @@ import roomescape.reservation.application.ThemeService;
 import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.WaitingReservation;
@@ -257,11 +259,13 @@ class ReservationControllerTest extends ControllerTest {
         // given
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
+        Payment expectedPayment = new Payment("paymentKey", "orderId", 10L, expectedReservation);
+        ReservationPayment expectedReservationPayment = new ReservationPayment(expectedReservation, expectedPayment);
         WaitingReservation expectedWaitingReservation = new WaitingReservation(
                 MIA_RESERVATION(expectedTime, HORROR_THEME(), USER_MIA(), WAITING), 0);
 
         BDDMockito.given(bookingQueryService.findAllByMember(any()))
-                .willReturn(List.of(expectedReservation));
+                .willReturn(List.of(expectedReservationPayment));
         BDDMockito.given(waitingQueryService.findAllWithPreviousCountByMember(any()))
                 .willReturn(List.of(expectedWaitingReservation));
 
@@ -273,6 +277,8 @@ class ReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
                 .andExpect(jsonPath("$[0].time").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].status").value("예약"))
+                .andExpect(jsonPath("$[0].paymentKey").value("paymentKey"))
+                .andExpect(jsonPath("$[0].amount").value(10L))
                 .andExpect(jsonPath("$[1].theme").value(HORROR_THEME_NAME))
                 .andExpect(jsonPath("$[1].status").value("1번째 예약대기"));
     }

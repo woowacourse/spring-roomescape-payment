@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 
@@ -80,10 +81,11 @@ class BookingQueryServiceTest extends ReservationServiceTest {
         bookingManageService.create(TOMMY_RESERVATION(miaReservationTime, wootecoTheme, tommy, BOOKING));
 
         // when
-        List<Reservation> reservations = bookingQueryService.findAllByMember(mia);
+        List<ReservationPayment> reservations = bookingQueryService.findAllByMember(mia);
 
         // then
         assertThat(reservations).hasSize(1)
+                .extracting(ReservationPayment::reservation)
                 .extracting(Reservation::getMember)
                 .extracting(Member::getId)
                 .contains(mia.getId());
