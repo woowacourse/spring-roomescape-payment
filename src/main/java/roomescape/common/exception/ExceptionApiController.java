@@ -47,7 +47,7 @@ public class ExceptionApiController {
             PaymentConfirmCustomException exception
     ) {
         logger.error(exception.getMessage(), exception);
-        return ResponseEntity.status(500).body("서버 내부 오류입니다.");
+        return ResponseEntity.internalServerError().body("서버 내부 오류입니다.");
     }
 
     @ExceptionHandler(RuntimeException.class)
