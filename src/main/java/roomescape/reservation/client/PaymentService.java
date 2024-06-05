@@ -81,7 +81,7 @@ public class PaymentService {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(30))
+                .withConnectTimeout(Duration.ofSeconds(10))
                 .withReadTimeout(Duration.ofSeconds(30));
         return ClientHttpRequestFactories.get(settings);
     }
