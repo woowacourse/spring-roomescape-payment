@@ -3,6 +3,7 @@ package roomescape.exception;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.InputStream;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -20,13 +21,13 @@ public class TossPayErrorHandler implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(ClientHttpResponse response) {
-        try {
-            PaymentErrorResponse paymentErrorResponse =
-                    objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
-            throw new PaymentFailException(paymentErrorResponse.code(), paymentErrorResponse.message());
-        } catch (IOException exception) {
-            throw new ParsingFailException(exception.getMessage());
+    public void handleError(ClientHttpResponse response) throws IOException {
+        InputStream responseBody = response.getBody();
+        PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(responseBody, PaymentErrorResponse.class);
+        if (paymentErrorResponse.isInvalid()) {
+            String data = new String(responseBody.readAllBytes());
+            throw new ParsingFailException("서버로부터 올바르지 않은 에러 데이터가 전달되었습니다.", data);
         }
+        throw new PaymentFailException(paymentErrorResponse.code(), paymentErrorResponse.message());
     }
 }
