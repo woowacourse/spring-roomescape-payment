@@ -19,12 +19,12 @@ VALUES ('paymentkey_1849139t7a0sfac973', 'roomescape_1133125', 1000),
        ('paymentkey_3osvd93p38vdae39br', 'roomescape_1133126', 2000);
 
 INSERT INTO reservation (date, member_id, time_id, theme_id, payment_status, payment_id)
-VALUES (NOW() - 4, 1, 1, 1, 'ACCOUNT_TRANSFERRED', null),
-       (NOW() - 3, 1, 2, 1, 'ACCOUNT_TRANSFERRED', null),
-       (NOW() - 2, 1, 3, 1, 'ACCOUNT_TRANSFERRED', null),
-       (NOW() - 1, 1, 1, 2, 'ACCOUNT_TRANSFERRED', 1),
-       (NOW() + 0, 1, 2, 2, 'ACCOUNT_TRANSFERRED', 2),
-       (NOW() + 1, 2, 1, 3, 'ACCOUNT_TRANSFERRED', null);
+VALUES (NOW() - 4, 1, 1, 1, 'PENDING', null),
+       (NOW() - 3, 1, 2, 1, 'PENDING', null),
+       (NOW() - 2, 1, 3, 1, 'PENDING', null),
+       (NOW() - 1, 1, 1, 2, 'WEB_PAID', 1),
+       (NOW() + 0, 1, 2, 2, 'WEB_PAID', 2),
+       (NOW() + 1, 2, 1, 3, 'PENDING', null);
 
 INSERT INTO waiting(date, member_id, time_id, theme_id)
 VALUES (NOW() + 1, 1, 1, 3)
