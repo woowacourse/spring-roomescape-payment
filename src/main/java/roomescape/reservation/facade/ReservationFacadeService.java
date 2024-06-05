@@ -130,7 +130,7 @@ public class ReservationFacadeService {
     @Transactional(rollbackFor = Exception.class)
     public void confirmPendingReservation(Long id, PaymentRequest paymentRequest) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        paymentService.confirmPayment(paymentRequest, memberReservation);
         reservationService.confirmPendingReservation(id);
+        paymentService.confirmPayment(paymentRequest, memberReservation);
     }
 }
