@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -25,6 +27,7 @@ import roomescape.reservation.service.dto.response.PaymentConfirmResponse;
 
 @Service
 public class PaymentService {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final RestClient restClient;
     private final String encodedSecretKey;
@@ -54,6 +57,7 @@ public class PaymentService {
                     .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
                     .toBodilessEntity();
         } catch (ResourceAccessException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
             throw new RuntimeException("외부 시스템과의 연동에 실패했거나 응답을 가져올 수 없습니다.");
         }
     }
@@ -70,9 +74,9 @@ public class PaymentService {
 
     private static void throwByCustomErrorResponse(PaymentConfirmResponse confirmResponse) {
         Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(confirmResponse.code());
-        if (customErrorCode.isPresent()) {
+        customErrorCode.ifPresent(code -> {
             throw new PaymentConfirmCustomException(customErrorCode.get(), confirmResponse.message());
-        }
+        });
     }
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
