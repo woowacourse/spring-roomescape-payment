@@ -1,0 +1,28 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - step2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: ~/$GITHUB_REPOSITORY
+
+      - name: Build with Gradle
+        run: ./gradlew bootJar
+
+      - name: Stop the services
+        run: sudo systemctl stop roomescape
+
+      - name: Run the application
+        run: java -jar build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar
+
+      - name: Start the services
+        run: sudo systemctl start roomescape
