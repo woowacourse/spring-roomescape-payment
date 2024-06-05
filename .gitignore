@@ -1,7 +1,3 @@
-**/application.yml
-**/application.properties
-**/application.yaml
-
 HELP.md
 .gradle
 build/
