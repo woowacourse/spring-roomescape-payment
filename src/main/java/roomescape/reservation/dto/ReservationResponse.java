@@ -13,13 +13,15 @@ public record ReservationResponse(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         TimeResponse time,
-        ThemeResponse theme) {
+        ThemeResponse theme,
+        String status) {
     public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(
                 reservation.getId(),
                 MemberResponse.from(reservation.getMember()),
                 reservation.getDate(),
                 TimeResponse.from(reservation.getTime()),
-                ThemeResponse.from(reservation.getTheme()));
+                ThemeResponse.from(reservation.getTheme()),
+                reservation.getReservationStatus().getName());
     }
 }

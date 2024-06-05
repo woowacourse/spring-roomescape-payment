@@ -14,7 +14,6 @@ public record MyReservationWaitingResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime startAt,
         String status) {
-    private static final String RESERVATION_STATUS = "예약";
     private static final String WAITING_STATUS = "%d번째 예약대기";
 
     public static MyReservationWaitingResponse from(Reservation reservation) {
@@ -23,7 +22,7 @@ public record MyReservationWaitingResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                RESERVATION_STATUS);
+                reservation.getReservationStatus().getName());
     }
 
     public static MyReservationWaitingResponse from(WaitingWithOrder waitingWithOrder) {
