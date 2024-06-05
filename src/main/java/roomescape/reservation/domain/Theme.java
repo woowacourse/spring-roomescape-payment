@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.payment.domain.PayAmount;
 
 @Entity
 public class Theme {
@@ -26,7 +27,7 @@ public class Theme {
     private String thumbnail;
 
     @Embedded
-    private Price price;
+    private PayAmount price;
 
     protected Theme() {
     }
@@ -37,7 +38,7 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-        this.price = new Price(price);
+        this.price = new PayAmount(BigDecimal.valueOf(price));
     }
 
     public Theme(String name, String description, String thumbnail, Long price) {
@@ -72,8 +73,8 @@ public class Theme {
         return thumbnail;
     }
 
-    public BigDecimal getPrice() {
-        return price.getPrice();
+    public PayAmount getPayAmount() {
+        return price;
     }
 
     @Override
