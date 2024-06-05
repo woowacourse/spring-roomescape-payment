@@ -12,6 +12,7 @@ import roomescape.infrastructure.payment.response.PaymentErrorResponse;
 import roomescape.infrastructure.payment.response.PaymentServerErrorCode;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentCancelDto;
 import roomescape.service.response.PaymentDto;
 
 import java.io.IOException;
@@ -50,6 +51,21 @@ class PaymentManagerTest {
         PaymentDto actualResponse = paymentManager.approve(paymentApproveDto);
 
         assertThat(actualResponse).isEqualTo(paymentResponse);
+        this.server.verify();
+    }
+
+    @DisplayName("올바르게 결체 취소 요청을 보낸다.")
+    @Test
+    void cancel() throws IOException {
+        String paymentKey = "paymentKey";
+        PaymentCancelDto paymentCancelDto = new PaymentCancelDto("취소요청");
+        String paymentCancelJson = objectMapper.writeValueAsString(paymentCancelDto);
+        this.server.expect(requestTo(String.format("https://api.tosspayments.com/v1/payments/%s/cancel", paymentKey)))
+                .andExpect(content().json(paymentCancelJson))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        paymentManager.cancel(paymentKey, paymentCancelDto);
+
         this.server.verify();
     }
 
