@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EncodingService {
+public class PaymentKeyEncodingService {
 
     private final AES256TextEncryptor textEncryptor;
 
-    public EncodingService(@Value("${jasypt.encryptor.password}") String encryptPassword) {
+    public PaymentKeyEncodingService(@Value("${jasypt.encryptor.password}") String encryptPassword) {
         this.textEncryptor = new AES256TextEncryptor();
         textEncryptor.setPassword(encryptPassword);
     }

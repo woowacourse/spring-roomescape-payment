@@ -18,7 +18,7 @@ public class PaymentService {
 
     private final TossPaymentRestClient restClient;
     private final PaymentRepository paymentRepository;
-    private final EncodingService encodingService;
+    private final PaymentKeyEncodingService paymentKeyEncodingService;
     @Value("${toss.url.confirm-payment}")
     private String confirmUrl;
     @Value("${toss.url.cancel-payment}")
@@ -26,11 +26,11 @@ public class PaymentService {
 
     public PaymentService(PaymentRepository paymentRepository,
                           TossPaymentRestClient restClient,
-                          EncodingService encodingService
+                          PaymentKeyEncodingService paymentKeyEncodingService
     ) {
         this.paymentRepository = paymentRepository;
         this.restClient = restClient;
-        this.encodingService = encodingService;
+        this.paymentKeyEncodingService = paymentKeyEncodingService;
     }
 
     public Payment findByMemberReservation(MemberReservation memberReservation) {
@@ -42,7 +42,7 @@ public class PaymentService {
         PaymentResponse response = restClient.post(confirmUrl, request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
-        Payment payment = Payment.of(response, memberReservation, encodingService);
+        Payment payment = Payment.of(response, memberReservation, paymentKeyEncodingService);
         paymentRepository.save(payment);
     }
 
@@ -62,6 +62,6 @@ public class PaymentService {
     }
 
     public String getPlainPaymentKey(Payment payment) {
-        return payment.getPaymentKey(encodingService);
+        return payment.getPaymentKey(paymentKeyEncodingService);
     }
 }

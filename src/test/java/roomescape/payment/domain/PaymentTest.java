@@ -3,7 +3,7 @@ package roomescape.payment.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.Fixtures;
-import roomescape.payment.service.EncodingService;
+import roomescape.payment.service.PaymentKeyEncodingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,11 +14,11 @@ class PaymentTest {
     @Test
     void getPlainPaymentKey() {
         // given
-        EncodingService encodingService = new EncodingService("testPassword");
-        Payment payment = Payment.of(Fixtures.paymentResponseFixture, Fixtures.memberReservationFixture, encodingService);
+        PaymentKeyEncodingService paymentKeyEncodingService = new PaymentKeyEncodingService("testPassword");
+        Payment payment = Payment.of(Fixtures.paymentResponseFixture, Fixtures.memberReservationFixture, paymentKeyEncodingService);
 
         // when
-        String actual = payment.getPaymentKey(encodingService);
+        String actual = payment.getPaymentKey(paymentKeyEncodingService);
 
         // then
         assertThat(actual).isEqualTo("testKey");

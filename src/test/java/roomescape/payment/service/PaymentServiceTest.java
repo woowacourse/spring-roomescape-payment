@@ -14,25 +14,25 @@ import roomescape.payment.infrastructure.TossPaymentRestClient;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(value = {PaymentService.class, EncodingService.class, TossPaymentRestClient.class, ObjectMapper.class})
+@Import(value = {PaymentService.class, PaymentKeyEncodingService.class, TossPaymentRestClient.class, ObjectMapper.class})
 @Sql(value = "/recreate_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("결제 서비스")
 class PaymentServiceTest {
 
     private final PaymentService paymentService;
-    private final EncodingService encodingService;
+    private final PaymentKeyEncodingService paymentKeyEncodingService;
 
     @Autowired
-    public PaymentServiceTest(PaymentService paymentService, EncodingService encodingService) {
+    public PaymentServiceTest(PaymentService paymentService, PaymentKeyEncodingService paymentKeyEncodingService) {
         this.paymentService = paymentService;
-        this.encodingService = encodingService;
+        this.paymentKeyEncodingService = paymentKeyEncodingService;
     }
 
     @DisplayName("결제 서비스는 주어진 결제 내역의 복호화 된 paymetKey를 반환한다.")
     @Test
     void getPlainPaymentKey() {
         // given
-        Payment payment = Payment.of(Fixtures.paymentResponseFixture, Fixtures.memberReservationFixture, encodingService);
+        Payment payment = Payment.of(Fixtures.paymentResponseFixture, Fixtures.memberReservationFixture, paymentKeyEncodingService);
 
         // when
         String actual = paymentService.getPlainPaymentKey(payment);
