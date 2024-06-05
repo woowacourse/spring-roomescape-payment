@@ -11,6 +11,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -36,14 +37,15 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
-        restClient.post()
+    public PaymentConfirmResponse requestConfirmPayment(PaymentConfirmRequest paymentConfirmRequest) {
+        return restClient.post()
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, TossPaymentErrorHandler::handle)
-                .toBodilessEntity();
+                .toEntity(PaymentConfirmResponse.class)
+                .getBody();
     }
 
     private String createAuthorizationValue(String secretKey) {
