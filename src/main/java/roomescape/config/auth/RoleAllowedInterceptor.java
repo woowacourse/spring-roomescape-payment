@@ -1,14 +1,15 @@
-package roomescape.controller.auth;
+package roomescape.config.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.controller.login.CookieExtractor;
 import roomescape.domain.member.MemberRole;
 import roomescape.exception.login.AccessDeniedException;
 import roomescape.service.login.LoginService;
+
+import java.lang.reflect.Method;
 
 public class RoleAllowedInterceptor implements HandlerInterceptor {
     private final LoginService loginService;

@@ -1,10 +1,11 @@
-package roomescape.controller.auth;
+package roomescape.config.auth;
+
+import roomescape.domain.member.MemberRole;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import roomescape.domain.member.MemberRole;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

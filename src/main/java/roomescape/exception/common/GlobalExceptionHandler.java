@@ -16,7 +16,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value = RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(RoomescapeException exception) {
@@ -57,9 +57,9 @@ public class GlobalExceptionHandler {
     private void logError(Exception exception) {
         String exceptionMessage = exception.getMessage();
         if (!StringUtils.isBlank(exceptionMessage)) {
-            LOGGER.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
+            logger.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
             return;
         }
-        LOGGER.error(exceptionMessage);
+        logger.error(exceptionMessage);
     }
 }
