@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import roomescape.global.entity.BaseEntity;
 import roomescape.reservation.domain.MemberReservation;
 
+import java.math.BigDecimal;
+
 @Entity
 public class Payment extends BaseEntity {
     @Id
@@ -60,6 +62,9 @@ public class Payment extends BaseEntity {
 
     public PayAmount getAmount() {
         return amount;
+    }
+    public BigDecimal getAmountAsValue(){
+        return amount.getAmount();
     }
 
     public MemberReservation getMemberReservation() {
