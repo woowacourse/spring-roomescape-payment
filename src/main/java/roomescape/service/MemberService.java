@@ -28,7 +28,7 @@ public class MemberService {
         final Member member = memberRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
         member.checkIncorrectPassword(request.password());
-        final String accessToken = jwtTokenProvider.createToken(member);
+        final String accessToken = jwtTokenProvider.createToken(member.getId());
         return new TokenResponse(accessToken);
     }
 
@@ -39,7 +39,7 @@ public class MemberService {
     }
 
     public MemberResponse findMemberByToken(final String accessToken) {
-        final Long memberId = jwtTokenProvider.getMemberIdByToken(accessToken);
+        final Long memberId = jwtTokenProvider.getMemberIdFrom(accessToken);
         return findById(memberId);
     }
 

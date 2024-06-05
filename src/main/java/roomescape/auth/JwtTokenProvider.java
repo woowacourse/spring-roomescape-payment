@@ -1,11 +1,16 @@
 package roomescape.auth;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.domain.member.Member;
+
+import io.jsonwebtoken.security.Keys;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenProvider {
@@ -16,24 +21,27 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.expire-length}")
     private long validityInMilliseconds;
 
-    public String createToken(final Member member) {
+    public String createToken(final long memberId) {
         final Date now = new Date();
-        final Date validity = new Date(now.getTime() + validityInMilliseconds);
-
+        final Date expiration = new Date(now.getTime() + validityInMilliseconds);
         return Jwts.builder()
-                .claim("name", member.getName())
-                .setSubject(member.getId().toString())
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .subject(String.valueOf(memberId))
+                .expiration(expiration)
+                .signWith(secretKey())
                 .compact();
     }
 
-    public Long getMemberIdByToken(final String accessToken) {
-        return Long.valueOf(Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(accessToken)
-                .getBody()
-                .getSubject());
+    public long getMemberIdFrom(final String token) {
+        return Long.parseLong(Jwts.parser()
+                .verifyWith(secretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject()
+        );
+    }
+
+    private SecretKey secretKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 }
