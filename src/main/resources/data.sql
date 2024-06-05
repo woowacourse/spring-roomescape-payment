@@ -21,7 +21,12 @@ insert into reservation (id, member_id, date, theme_id, time_id, created_at, sta
 values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED', 'order12'),
        (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED', 'order11');
 
+insert into payment (id, order_id, payment_key, amount)
+values (1, 'order12', 'paymentkey123', 10000),
+       (2, 'order11', 'paymentkey234', 20000);
+
 alter table member alter column id restart with 1000;
 alter table theme alter column id restart with 1000;
 alter table reservation_time alter column id restart with 1000;
 alter table reservation alter column id restart with 1000;
+alter table payment alter column id restart with 1000;
