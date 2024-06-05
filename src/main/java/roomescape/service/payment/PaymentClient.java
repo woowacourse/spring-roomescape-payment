@@ -17,6 +17,7 @@ import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.exception.payment.PaymentIOException;
 import roomescape.exception.payment.PaymentTimeoutException;
+import roomescape.service.payment.config.PaymentLoggingInterceptor;
 import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
@@ -43,6 +44,7 @@ public class PaymentClient {
         this.restClient = RestClient.builder()
                 .requestFactory(createPaymentRequestFactory())
                 .baseUrl(paymentProperties.getUrl())
+                .requestInterceptor(new PaymentLoggingInterceptor())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createPaymentAuthHeader(paymentProperties))
                 .build();
     }
