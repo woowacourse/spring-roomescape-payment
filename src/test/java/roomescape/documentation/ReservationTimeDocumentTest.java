@@ -26,8 +26,8 @@ class ReservationTimeDocumentTest extends AbstractDocumentTest {
     @MockBean
     private ReservationTimeService reservationTimeService;
 
-    @DisplayName("예약 시간 목록을 조회한다.")
     @Test
+    @DisplayName("예약 시간 목록을 조회한다.")
     void getAllReservationTimes() throws Exception {
         List<ReservationTimeResponse> responses = List.of(
                 ReservationTimeResponse.from(new ReservationTime(1L, LocalTime.of(10, 0))),
@@ -44,7 +44,7 @@ class ReservationTimeDocumentTest extends AbstractDocumentTest {
                 status().isOk(),
                 content().json(objectMapper.writeValueAsString(responses))
         ).andDo(
-                document("times",
+                document("times/list",
                         responseFields(
                                 fieldWithPath("[].id").description("예약 시간 식별자"),
                                 fieldWithPath("[].startAt").description("시작 시간")

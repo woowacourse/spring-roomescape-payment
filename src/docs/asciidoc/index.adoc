@@ -6,4 +6,6 @@
 
 = 방탈출
 
+include::adminTheme.adoc[]
+include::adminMember.adoc[]
 include::reservationtime.adoc[]

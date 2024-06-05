@@ -1,0 +1,5 @@
+== 어드민 테마 API
+
+=== 어드민 테마 생성
+
+operation::admin/themes/add[snippets='curl-request,http-request,http-response,response-body,response-fields']
