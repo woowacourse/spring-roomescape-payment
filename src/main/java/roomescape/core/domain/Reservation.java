@@ -58,7 +58,7 @@ public class Reservation {
                        final String date,
                        final ReservationTime time,
                        final Theme theme) {
-        this(member, parseDate(date), time, theme, PaymentStatus.ACCOUNT_TRANSFERRED, null);
+        this(member, parseDate(date), time, theme, PaymentStatus.PENDING, null);
     }
 
     public Reservation(final Member member,

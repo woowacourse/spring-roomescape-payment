@@ -68,7 +68,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(final ReservationRequest request) {
         final Reservation reservation
-                = createReservation(request, PaymentStatus.ACCOUNT_TRANSFERRED);
+                = createReservation(request, PaymentStatus.PENDING);
         final Reservation savedReservation = reservationRepository.save(reservation);
         return new ReservationResponse(savedReservation);
     }
