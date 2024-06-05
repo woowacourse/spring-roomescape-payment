@@ -2,9 +2,11 @@ package roomescape.core.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Payment {
@@ -22,15 +24,19 @@ public class Payment {
     @Column(unique = true, nullable = false)
     private String orderId;
 
-    public Payment(Long id, String paymentKey, Long amount, String orderId) {
+    @OneToOne(fetch = FetchType.LAZY)
+    private Reservation reservation;
+
+    public Payment(Long id, String paymentKey, Long amount, String orderId, Reservation reservation) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
+        this.reservation = reservation;
     }
 
-    public Payment(String paymentKey, Long amount, String orderId) {
-        this(null, paymentKey, amount, orderId);
+    public Payment(String paymentKey, Long amount, String orderId, Reservation reservation) {
+        this(null, paymentKey, amount, orderId, reservation);
     }
 
     public Payment() {
@@ -50,5 +56,9 @@ public class Payment {
 
     public String getOrderId() {
         return orderId;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
     }
 }

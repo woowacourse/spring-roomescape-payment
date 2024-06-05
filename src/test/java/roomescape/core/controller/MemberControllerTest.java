@@ -10,9 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 import roomescape.core.dto.auth.TokenRequest;
 import roomescape.core.dto.member.MemberRequest;
 import roomescape.core.dto.member.MemberResponse;
@@ -24,7 +24,8 @@ import roomescape.core.utils.e2eTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
+@Profile("test")
+//@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
 class MemberControllerTest {
     @LocalServerPort
     private int port;

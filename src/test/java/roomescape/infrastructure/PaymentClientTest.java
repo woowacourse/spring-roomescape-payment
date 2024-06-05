@@ -8,7 +8,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.util.Base64;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -34,7 +33,6 @@ class PaymentClientTest {
             .baseUrl("https://api.tosspayments.com/")
             .build());
 
-    @Disabled
     @Test
     @DisplayName("Toss Api 가 PaymentResponse 를 올바르게 반환한다.")
     void testTossPaymentApi() {

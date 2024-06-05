@@ -5,18 +5,22 @@ import jakarta.validation.constraints.NotNull;
 
 public class PaymentRequest {
     @NotBlank(message = "paymentKey 는 비어있을 수 없습니다.")
-    private String paymentKey;
+    private final String paymentKey;
 
     @NotBlank(message = "orderId 는 비어있을 수 없습니다.")
-    private String orderId;
+    private final String orderId;
 
     @NotNull(message = "amount 는 null일 수 없습니다.")
-    private Long amount;
+    private final Long amount;
 
-    public PaymentRequest(String paymentKey, String orderId, Long amount) {
+    @NotNull(message = "reservationId 는 null일 수 없습니다.")
+    private final Long reservationId;
+
+    public PaymentRequest(String paymentKey, String orderId, Long amount, Long reservationId) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+        this.reservationId = reservationId;
     }
 
     public String getPaymentKey() {
@@ -29,5 +33,9 @@ public class PaymentRequest {
 
     public Long getAmount() {
         return amount;
+    }
+
+    public Long getReservationId() {
+        return reservationId;
     }
 }

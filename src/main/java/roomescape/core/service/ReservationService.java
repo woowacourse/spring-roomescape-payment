@@ -6,13 +6,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
-import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
-import roomescape.core.dto.payment.TossPaymentResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
@@ -24,8 +22,6 @@ import roomescape.core.repository.ThemeRepository;
 
 @Service
 public class ReservationService {
-    private static final Integer rankOfBooked = 0;
-
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -48,10 +44,9 @@ public class ReservationService {
         final Member member = getMember(request);
         final ReservationTime reservationTime = getReservationTime(request);
         final Theme theme = getTheme(request);
-        final Payment payment = getPayment(request);
         final Reservation reservation = new Reservation(
                 member, request.getDate(), reservationTime, theme, Status.findStatus(request.getStatus()),
-                LocalDateTime.now(), payment);
+                LocalDateTime.now());
 
         validateDuplicateReservation(Status.findStatus(request.getStatus()), reservation);
         reservation.validateDateAndTime();
@@ -73,13 +68,6 @@ public class ReservationService {
     private Theme getTheme(final ReservationRequest request) {
         return themeRepository.findById(request.getThemeId())
                 .orElseThrow(IllegalArgumentException::new);
-    }
-
-    private Payment getPayment(ReservationRequest request) {
-        if (request.getPaymentId() == null) {
-            return null;
-        }
-        return paymentRepository.findById(request.getPaymentId()).orElseThrow(IllegalArgumentException::new);
     }
 
     private void validateDuplicateReservation(final Status status, final Reservation reservation) {
@@ -138,10 +126,8 @@ public class ReservationService {
     public void delete(final Long id) {
         Reservation delete = reservationRepository.findReservationById(id);
         updateReservationStatus(delete);
+        paymentRepository.deleteByReservationId(id);
         reservationRepository.deleteById(id);
-        if (delete.getPayment() != null) {
-            paymentRepository.delete(delete.getPayment());
-        }
     }
 
     private void updateReservationStatus(final Reservation delete) {
@@ -154,12 +140,6 @@ public class ReservationService {
                 .filter(reservation -> reservation.getStatus().equals(Status.STANDBY))
                 .findFirst()
                 .ifPresent(Reservation::approve);
-    }
-
-    @Transactional(readOnly = true)
-    public TossPaymentResponse findPaymentByDeleteReservation(final Long id) {
-        Reservation delete = reservationRepository.findReservationById(id);
-        return new TossPaymentResponse(delete.getPayment().getPaymentKey());
     }
 
     @Transactional(readOnly = true)
@@ -179,10 +159,5 @@ public class ReservationService {
         return reservations.stream()
                 .map(ReservationResponse::new)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Boolean isNotAdminReservation(final Long id) {
-        return reservationRepository.isNotAdminReservation(id);
     }
 }

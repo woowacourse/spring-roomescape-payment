@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.core.domain.Payment;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.payment.TossPaymentRequest;
@@ -46,13 +45,13 @@ public class ReservationController {
                 memberRequest.getOrderId(), memberRequest.getAmount());
         paymentClient.approvePayment(tossPaymentRequest, paymentService.createPaymentAuthorization());
 
-        final PaymentRequest paymentRequest = new PaymentRequest(memberRequest.getPaymentKey(),
-                memberRequest.getOrderId(), memberRequest.getAmount());
-        Payment payment = paymentService.save(paymentRequest);
-
         final ReservationRequest request = new ReservationRequest(member.getId(), memberRequest.getDate(),
-                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus(), payment.getId());
+                memberRequest.getTimeId(), memberRequest.getThemeId(), memberRequest.getStatus());
         final ReservationResponse result = reservationService.create(request);
+
+        final PaymentRequest paymentRequest = new PaymentRequest(memberRequest.getPaymentKey(),
+                memberRequest.getOrderId(), memberRequest.getAmount(), result.getId());
+        paymentService.save(paymentRequest);
         return ResponseEntity.created(URI.create("/reservations/" + result.getId()))
                 .body(result);
     }
@@ -84,8 +83,8 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
-        if (reservationService.isNotAdminReservation(id)) {
-            paymentClient.refundPayment(reservationService.findPaymentByDeleteReservation(id),
+        if (paymentService.existPaymentByReservationId(id)) {
+            paymentClient.refundPayment(paymentService.findPaymentByReservationId(id),
                     paymentService.createPaymentAuthorization());
         }
         reservationService.delete(id);

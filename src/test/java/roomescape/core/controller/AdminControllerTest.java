@@ -180,7 +180,7 @@ class AdminControllerTest {
     @DisplayName("예약자를 지정해서 예약을 생성할 수 있다.")
     void createReservationAsAdmin() {
         ReservationRequest request = new ReservationRequest(
-                2L, TOMORROW_DATE, 1L, 1L, Status.BOOKED.getValue(), null);
+                2L, TOMORROW_DATE, 1L, 1L, Status.BOOKED.getValue());
 
         ValidatableResponse failResponse = e2eTest.post(request, "/admin/reservations", accessToken);
         failResponse.statusCode(201);
