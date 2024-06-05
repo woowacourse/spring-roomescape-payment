@@ -25,7 +25,7 @@ public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
         PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
         boolean isServerError = ServerErrorCode.isServerError(errorResponse.code());
         if (isServerError) {
-            throw new PaymentServerException();
+            throw new PaymentServerException(errorResponse.message());
         }
         throw new PaymentClientException(errorResponse.message());
     }

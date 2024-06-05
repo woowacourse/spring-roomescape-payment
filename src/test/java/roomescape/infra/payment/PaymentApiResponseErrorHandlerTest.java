@@ -54,8 +54,7 @@ class PaymentApiResponseErrorHandlerTest {
         MockClientHttpResponse response = new MockClientHttpResponse(body.getBytes(), HttpStatus.BAD_REQUEST);
 
         Assertions.assertThatThrownBy(() -> paymentApiResponseErrorHandler.handleError(response))
-                .isExactlyInstanceOf(PaymentServerException.class)
-                .hasMessage("결제에 실패했어요. 같은 문제가 반복된다면 관리자에게 문의해주세요.");
+                .isExactlyInstanceOf(PaymentServerException.class);
     }
 
     private Stream<Arguments> serverErrorParameter() {

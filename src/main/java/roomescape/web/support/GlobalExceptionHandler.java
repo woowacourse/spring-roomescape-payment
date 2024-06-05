@@ -33,8 +33,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = PaymentServerException.class)
     public ResponseEntity<String> handlePaymentServerException(PaymentServerException exception) {
-        log.error("[Payment Client]", exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("[Payment Client]", exception);
+        return new ResponseEntity<>("결제에 실패했어요. 같은 문제가 반복된다면 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = BindException.class)
