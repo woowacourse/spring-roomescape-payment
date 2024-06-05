@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -14,19 +15,23 @@ public class PaymentRestClientConfig {
     private static final int READ_TIMEOUT = 30000;
 
     @Bean
-    public PaymentErrorHandler paymentErrorHandler() {
-        return new PaymentErrorHandler();
+    public RestClient restClient(RestClient.Builder builder) {
+        return builder.build();
     }
 
     @Bean
-    public RestClient restClient() {
+    public RestClientCustomizer restClientCustomizer() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(CONNECT_TIMEOUT);
         requestFactory.setReadTimeout(READ_TIMEOUT);
 
-        return RestClient.builder()
-                .baseUrl(BASE_URL)
+        return (restClientBuilder) -> restClientBuilder
                 .requestFactory(requestFactory)
-                .build();
+                .baseUrl(BASE_URL);
+    }
+
+    @Bean
+    public PaymentErrorHandler paymentErrorHandler() {
+        return new PaymentErrorHandler();
     }
 }
