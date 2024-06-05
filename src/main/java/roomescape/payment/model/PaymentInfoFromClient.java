@@ -4,8 +4,8 @@ import roomescape.reservation.model.Reservation;
 
 public record PaymentInfoFromClient(String paymentKey,
                                     String orderId,
-                                    Long amount) {
+                                    Long totalAmount) {
     public Payment toPayment(final Reservation reservation) {
-        return new Payment(paymentKey, orderId, amount, reservation);
+        return new Payment(paymentKey, orderId, totalAmount, reservation);
     }
 }
