@@ -2,18 +2,26 @@ package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.payment.client.TossPayRestClient;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
 
+    private final PaymentRepository paymentRepository;
     private final TossPayRestClient tossPayRestClient;
 
-    public PaymentService(TossPayRestClient tossPayRestClient) {
+    public PaymentService(PaymentRepository paymentRepository, TossPayRestClient tossPayRestClient) {
+        this.paymentRepository = paymentRepository;
         this.tossPayRestClient = tossPayRestClient;
     }
 
-    public void pay(PaymentRequest paymentRequest) {
-        tossPayRestClient.pay(paymentRequest);
+    public PaymentResponse pay(PaymentRequest paymentRequest) {
+        Payment payment = tossPayRestClient.pay(paymentRequest);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return PaymentResponse.toResponse(savedPayment);
     }
 }

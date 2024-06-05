@@ -1,7 +1,8 @@
 package roomescape.payment.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.exception.ParsingFailException;
 import roomescape.exception.PaymentFailException;
 import roomescape.exception.TossPayErrorHandler;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 
 class TossPayRestClientTest {
@@ -35,16 +37,27 @@ class TossPayRestClientTest {
         server.reset();
     }
 
-    @DisplayName("결제가 정상적으로 처리되면 예외가 발생하지 않는다.")
+    @DisplayName("결제가 정상적으로 처리되면 Payment 객체를 반환한다.")
     @Test
     void pay() {
+        String expectedBody = """
+                {
+                  "paymentKey": "paymentKey",
+                  "orderId": "orderId",
+                  "totalAmount": 1000
+                }
+                """;
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess());
+                .andRespond(withSuccess().body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
         PaymentRequest request = new PaymentRequest("orderId", 1000, "paymentKey");
 
-        assertDoesNotThrow(() -> tossPayRestClient.pay(request));
+        Payment result = tossPayRestClient.pay(request);
+        assertAll(
+                () -> assertThat(result.getPaymentKey()).isEqualTo("paymentKey"),
+                () -> assertThat(result.getOrderId()).isEqualTo("orderId")
+        );
     }
 
     @DisplayName("결제에 실패하면 예외가 발생한다.")

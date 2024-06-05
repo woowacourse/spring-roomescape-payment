@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentFailException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 
 public class TossPayRestClient {
@@ -19,14 +20,14 @@ public class TossPayRestClient {
         this.restClient = restClient;
     }
 
-    public void pay(PaymentRequest paymentRequest) {
+    public Payment pay(PaymentRequest paymentRequest) {
         try {
-            restClient.post()
+            return restClient.post()
                     .uri("/v1/payments/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
-                    .toBodilessEntity();
+                    .body(Payment.class);
         } catch (ResourceAccessException exception) {
             LOGGER.error(exception.getMessage(), exception);
             throw new PaymentFailException(
