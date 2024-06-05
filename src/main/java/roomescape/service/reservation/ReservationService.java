@@ -48,10 +48,15 @@ public class ReservationService {
 
     public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest) {
         try {
-            PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-            paymentService.pay(paymentApproveRequest);
             ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-            return saveReservation(reservationSaveRequest);
+            Reservation reservation = createReservation(reservationSaveRequest);
+            validateUnique(reservation);
+            Reservation savedReservation = reservationRepository.save(reservation);
+
+            PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
+            paymentService.pay(paymentApproveRequest, savedReservation);
+
+            return new ReservationResponse(savedReservation);
         } catch (RoomEscapeBusinessException | DataAccessException exception) {
             paymentService.cancel(new PaymentCancelRequest(userReservationSaveRequest.paymentKey(), "예약이 정상적으로 처리되지 않음"));
             throw new RoomEscapeBusinessException(exception.getMessage());
