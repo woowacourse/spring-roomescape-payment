@@ -27,7 +27,7 @@ class AdminReservationControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationSaveRequest adminRequest = new ReservationSaveRequest(2L, TOMORROW, 1L, 1L);
+        ReservationSaveRequest adminRequest = new ReservationSaveRequest(2L, TOMORROW, 1L, 1L, "paymentKey", 1000L);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getAdminToken())

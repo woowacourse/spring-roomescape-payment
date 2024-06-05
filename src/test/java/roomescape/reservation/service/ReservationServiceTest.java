@@ -92,9 +92,11 @@ class ReservationServiceTest {
         Member jojo = memberRepository.save(MEMBER_JOJO);
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
-        Reservation success = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS));
-        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT));
-        Reservation secondWait = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, WAIT));
+        Reservation success = reservationRepository.save(
+                new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS, "paymentKey", 1000L));
+        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT, "paymentKey", 1000L));
+        Reservation secondWait = reservationRepository.save(
+                new Reservation(jojo, TODAY, theme, reservationTime, WAIT, "paymentKey", 1000L));
 
         MemberReservationResponse expectedSuccess = MemberReservationResponse.toResponse(
                 new ReservationWithRank(success, 0)

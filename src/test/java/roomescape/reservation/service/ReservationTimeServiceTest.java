@@ -88,7 +88,9 @@ class ReservationTimeServiceTest {
                         LocalDate.now(),
                         theme,
                         hour10,
-                        Status.SUCCESS
+                        Status.SUCCESS,
+                        "paymentKey",
+                        1000L
                 )
         );
 
@@ -128,7 +130,8 @@ class ReservationTimeServiceTest {
 
         Member member = memberRepository.save(new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
 
-        reservationRepository.save(new Reservation(member, LocalDate.now(), theme, hour10, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(member, LocalDate.now(), theme, hour10, Status.SUCCESS, "paymentKey", 1000L));
 
         assertThatThrownBy(() -> reservationTimeService.delete(hour10.getId()))
                 .isInstanceOf(IllegalArgumentException.class);

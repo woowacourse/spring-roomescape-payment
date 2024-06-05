@@ -97,7 +97,8 @@ class ThemeRepositoryTest {
 
         Member member = memberRepository.save(new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
 
-        reservationRepository.save(new Reservation(member, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(member, LocalDate.now(), theme, reservationTime, Status.SUCCESS, "paymentKey", 1000L));
         boolean exist = !themeRepository.findThemesThatReservationReferById(theme.getId()).isEmpty();
 
         assertThat(exist).isTrue();
@@ -127,9 +128,12 @@ class ThemeRepositoryTest {
         Member kaki = memberRepository.save(new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
         Member jojo = memberRepository.save(new Member(new MemberName(JOJO_NAME), JOJO_EMAIL, JOJO_PASSWORD));
 
-        reservationRepository.save(new Reservation(kaki, LocalDate.now(), theme1, reservationTime, Status.SUCCESS));
-        reservationRepository.save(new Reservation(kaki, LocalDate.now(), theme2, reservationTime, Status.SUCCESS));
-        reservationRepository.save(new Reservation(jojo, LocalDate.now(), theme2, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(kaki, LocalDate.now(), theme1, reservationTime, Status.SUCCESS, "paymentKey", 1000L));
+        reservationRepository.save(
+                new Reservation(kaki, LocalDate.now(), theme2, reservationTime, Status.SUCCESS, "paymentKey", 1000L));
+        reservationRepository.save(
+                new Reservation(jojo, LocalDate.now(), theme2, reservationTime, Status.SUCCESS, "paymentKey", 1000L));
 
         LocalDate dateFrom = LocalDate.now().minusWeeks(1);
         List<Theme> themes = themeRepository.findPopularThemesDescOfLastWeekForLimit(dateFrom, 2);
