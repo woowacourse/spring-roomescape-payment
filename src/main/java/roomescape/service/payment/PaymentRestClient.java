@@ -2,12 +2,18 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.domain.payment.Payment;
 import roomescape.exception.PaymentException;
+import roomescape.exception.TossPaymentClientException;
+import roomescape.exception.TossPaymentServerException;
 import roomescape.service.payment.dto.PaymentErrorResult;
 import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -35,9 +41,9 @@ public class PaymentRestClient {
                     .body(generatedConfirmRequestBody(request))
                     .retrieve()
                     .body(PaymentResult.class);
-        } catch (RestClientResponseException exception) {
-            String responseBody = exception.getResponseBodyAsString();
-            throw new PaymentException(parseErrorBody(responseBody));
+        } catch (RestClientException exception) {
+            handleRestClientException(exception);
+            throw new PaymentException(exception.getMessage());
         }
     }
 
@@ -56,9 +62,8 @@ public class PaymentRestClient {
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
                     .body(generatedCancelRequestBody())
                     .retrieve();
-        } catch (RestClientResponseException exception) {
-            String responseBody = exception.getResponseBodyAsString();
-            throw new PaymentException(parseErrorBody(responseBody));
+        } catch (RestClientException exception) {
+            handleRestClientException(exception);
         }
     }
 
@@ -68,8 +73,22 @@ public class PaymentRestClient {
         );
     }
 
-    private PaymentErrorResult parseErrorBody(String responseBody) {
+    private void handleRestClientException(RestClientException exception) {
+        if (exception instanceof HttpServerErrorException) {
+            throw new TossPaymentServerException(parseErrorBody(exception));
+        }
+        if (exception instanceof HttpClientErrorException) {
+            throw new TossPaymentClientException(parseErrorBody(exception));
+        }
+        if (exception.getRootCause() instanceof SocketTimeoutException) {
+            throw new TossPaymentServerException("결제 서버 요청 대기 시간이 초과되었습니다.");
+        }
+        throw new PaymentException(exception.getMessage());
+    }
+
+    private PaymentErrorResult parseErrorBody(RestClientException exception) {
         try {
+            String responseBody = ((RestClientResponseException) exception).getResponseBodyAsString();
             return objectMapper.readValue(responseBody, PaymentErrorResult.class);
         } catch (IOException e) {
             throw new PaymentException("에러 메세지를 불러올 수 없습니다.");

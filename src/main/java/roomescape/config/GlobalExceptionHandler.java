@@ -14,6 +14,8 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.exception.PaymentException;
+import roomescape.exception.TossPaymentClientException;
+import roomescape.exception.TossPaymentServerException;
 import roomescape.exception.UnauthorizedException;
 
 @ControllerAdvice
@@ -52,5 +54,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = PaymentException.class)
     public ResponseEntity<ExceptionTemplate> handlePaymentException(PaymentException exception) {
         return ResponseEntity.badRequest().body(new ExceptionTemplate(exception.getMessage()));
+    }
+
+    @ExceptionHandler(value = TossPaymentClientException.class)
+    public ResponseEntity<ExceptionTemplate> handleTossPaymentException(TossPaymentClientException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionTemplate(exception.getMessage()));
+    }
+
+    @ExceptionHandler(value = TossPaymentServerException.class)
+    public ResponseEntity<ExceptionTemplate> handleTossPaymentException(TossPaymentServerException exception) {
+        return ResponseEntity.internalServerError().body(new ExceptionTemplate(exception.getMessage()));
     }
 }
