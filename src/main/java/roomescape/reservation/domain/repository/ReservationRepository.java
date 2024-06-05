@@ -1,28 +1,19 @@
 package roomescape.reservation.domain.repository;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import roomescape.member.domain.Member;
+import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.WaitingWithRank;
-import roomescape.theme.domain.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
     List<Reservation> findByReservationTime(ReservationTime reservationTime);
-
-    Optional<Reservation> findFirstByReservationTimeAndDateAndThemeAndReservationStatusOrderById(
-            ReservationTime reservationTime,
-            LocalDate date,
-            Theme theme,
-            final ReservationStatus waiting
-    );
 
     List<Reservation> findByThemeId(Long themeId);
 
@@ -38,4 +29,25 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             "WHERE w.member.id = :memberId")
     List<WaitingWithRank> findWaitingsWithRankByMemberId(Long memberId);
 
+    @Modifying
+    @Query("""
+            UPDATE Reservation r
+            SET r.reservationStatus = :status
+            WHERE r.id = :id
+            """)
+    int updateStatusByReservationId(@Param(value = "id") Long reservationId,
+                                    @Param("status") ReservationStatus statusForChange);
+
+    @Query("""
+            SELECT EXISTS (
+               SELECT 1 FROM Reservation r
+               WHERE r.theme.id = r2.theme.id
+                 AND r.reservationTime.id = r2.reservationTime.id
+                 AND r.date = r2.date
+                 AND r.reservationStatus = 'CONFIRMED'
+            )
+            FROM Reservation r2
+            WHERE r2.id = :id AND r2.reservationStatus = 'WAITING'
+            """)
+    boolean isExistConfirmedReservation(@Param("id") Long reservationId);
 }

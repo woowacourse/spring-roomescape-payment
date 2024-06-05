@@ -2,9 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -55,41 +53,10 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
-    public Reservation findReservationById(final Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
-                        String.format("[reservationId: %d]", id), HttpStatus.BAD_REQUEST));
-    }
-
     @Transactional
-    public void removeReservationById(final Long targetReservationId, final Long myMemberId) {
-        final Member requestMember = memberService.findMemberById(myMemberId);
-        final Reservation requestReservation = findReservationById(targetReservationId);
-
-        if (!requestMember.isAdmin() && !requestReservation.getMemberId().equals(myMemberId)) {
-            throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST, HttpStatus.FORBIDDEN);
-        }
-
-        reservationRepository.delete(requestReservation);
-        final Optional<Reservation> waitingOptional = reservationRepository.findFirstByReservationTimeAndDateAndThemeAndReservationStatusOrderById(
-                requestReservation.getReservationTime(),
-                requestReservation.getDate(),
-                requestReservation.getTheme(),
-                ReservationStatus.WAITING
-        );
-
-        if (requestReservation.isReserved() && waitingOptional.isPresent()) {
-            final Reservation waitingReservation = waitingOptional.get();
-            reservationRepository.delete(waitingReservation);
-            reservationRepository.save(new Reservation(
-                    waitingReservation.getDate(),
-                    waitingReservation.getReservationTime(),
-                    waitingReservation.getTheme(),
-                    waitingReservation.getMember(),
-                    ReservationStatus.CONFIRMED
-            ));
-        }
-
+    public void removeReservationById(final Long reservationId, final Long memberId) {
+        validateIsMemberAdmin(memberId);
+        reservationRepository.deleteById(reservationId);
     }
 
     public ReservationResponse addReservation(final ReservationRequest request, final Long memberId) {
@@ -147,7 +114,8 @@ public class ReservationService {
         }
     }
 
-    private Reservation getReservationForSave(final ReservationRequest request, final Long memberId, final ReservationStatus status) {
+    private Reservation getReservationForSave(final ReservationRequest request, final Long memberId,
+                                              final ReservationStatus status) {
         final ReservationTime time = reservationTimeService.findTimeById(request.timeId());
         final Theme theme = themeService.findThemeById(request.themeId());
         final Member member = memberService.findMemberById(memberId);
@@ -174,7 +142,7 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
-    private void validateDateForSearch(LocalDate startFrom, LocalDate endAt) {
+    private void validateDateForSearch(final LocalDate startFrom, final LocalDate endAt) {
         if (startFrom == null || endAt == null) {
             return;
         }
@@ -184,20 +152,41 @@ public class ReservationService {
         }
     }
 
-    public WaitingWithRanksResponse findWaitingWithRankById(final Long myId) {
+    public WaitingWithRanksResponse findWaitingWithRankById(final Long memberId) {
         final List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
-                        myId)
+                        memberId)
                 .stream()
                 .map(WaitingWithRankResponse::from)
                 .toList();
         return new WaitingWithRanksResponse(waitingWithRanks);
     }
 
-    public void updateState(final Long myId, final Long targetReservationId, final String status) {
-        String STATUS_DECLINE = "decline";
-        if (!status.equals(STATUS_DECLINE)) {
+    public void approveWaiting(final Long reservationId, final Long memberId) {
+        validateIsMemberAdmin(memberId);
+        if (reservationRepository.isExistConfirmedReservation(reservationId)) {
+            throw new RoomEscapeException(ErrorType.RESERVATION_DUPLICATED, HttpStatus.CONFLICT);
+        }
+        reservationRepository.updateStatusByReservationId(reservationId, ReservationStatus.CONFIRMED);
+    }
+
+    public void cancelWaiting(final Long reservationId) {
+        Reservation waiting = reservationRepository.findById(reservationId)
+                .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
+                        String.format("[reservationId: %d]", reservationId), HttpStatus.BAD_REQUEST));
+        reservationRepository.delete(waiting);
+    }
+
+    public void denyWaiting(Long reservationId, Long memberId) {
+        validateIsMemberAdmin(memberId);
+        cancelWaiting(reservationId);
+    }
+
+    private void validateIsMemberAdmin(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        if (member.isAdmin()) {
             return;
         }
-        removeReservationById(targetReservationId, myId);
+        throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST, HttpStatus.FORBIDDEN);
     }
 }

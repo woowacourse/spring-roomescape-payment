@@ -60,14 +60,13 @@ public class ReservationController {
     }
 
     @Admin
-    @DeleteMapping("/reservations/{id}/")
+    @DeleteMapping("/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> removeReservation(
             @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") final Long reservationId,
-            @NotNull(message = "status는 null일 수 없습니다.") @RequestParam("status") final String status
+            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") final Long reservationId
     ) {
-        reservationService.updateState(memberId, reservationId, status);
+        reservationService.removeReservationById(reservationId, memberId);
 
         return ApiResponse.success();
     }
@@ -97,13 +96,26 @@ public class ReservationController {
         return getResponse(reservationResponse, response);
     }
 
-    @DeleteMapping("/reservations/{id}")
+    @Admin
+    @PostMapping("/reservations/waiting/{id}/approve")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<Void> removeReservation(
+    public ApiResponse<Void> approveWaiting(
             @MemberId final Long memberId,
             @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") final Long reservationId
     ) {
-        reservationService.removeReservationById(reservationId, memberId);
+        reservationService.approveWaiting(reservationId, memberId);
+
+        return ApiResponse.success();
+    }
+
+    @Admin
+    @PostMapping("/reservations/waiting/{id}/deny")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<Void> denyWaiting(
+            @MemberId final Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") final Long reservationId
+    ) {
+        reservationService.denyWaiting(reservationId, memberId);
 
         return ApiResponse.success();
     }

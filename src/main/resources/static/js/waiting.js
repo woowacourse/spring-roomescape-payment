@@ -38,7 +38,7 @@ function approve(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/reservations/${id}/?status=approve`
+    const endpoint = `/reservations/waiting/${id}/approve`
     return fetch(endpoint, {
         method: 'POST'
     }).then(response => {
@@ -51,7 +51,7 @@ function deny(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/reservations/${id}/?status=decline`
+    const endpoint = `/reservations/waiting/${id}/deny`
     return fetch(endpoint, {
         method: 'POST'
     }).then(response => {

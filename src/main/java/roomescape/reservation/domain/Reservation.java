@@ -122,6 +122,10 @@ public class Reservation {
         return member;
     }
 
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
+    }
+
     public boolean isSameDateAndTime(LocalDate date, ReservationTime time) {
         return this.date.equals(date) && time.getStartAt().equals(this.reservationTime.getStartAt());
     }
