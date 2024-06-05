@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
     private void logError(Exception exception) {
         String exceptionMessage = exception.getMessage();
         if (!StringUtils.isBlank(exceptionMessage)) {
-            logger.error("{}\n\t{}", exceptionMessage, exception.getStackTrace()[0]);
+            logger.error("{}\n\t{}", exceptionMessage, exception.getStackTrace());
             return;
         }
         logger.error(exceptionMessage);
