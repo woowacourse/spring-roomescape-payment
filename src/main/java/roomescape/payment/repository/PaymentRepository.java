@@ -6,4 +6,6 @@ import roomescape.payment.domain.Payment;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+
+    boolean existsByReservationId(Long reservationId);
 }

@@ -2,6 +2,7 @@ package roomescape.reservation.integration;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,7 @@ class ReservationIntegrationTest extends IntegrationTest {
     private TossPaymentClient tossPaymentClient;
 
     @Test
-    @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회, 삭제한다.")
+    @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회한다.")
     void adminReservationPageWork() {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
@@ -38,7 +39,33 @@ class ReservationIntegrationTest extends IntegrationTest {
         given(tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto))
                 .willReturn(getValidPaymentConfirmationFromTossDto());
 
-        int id = RestAssured.given().log().all()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie(cookie.toString())
+                .body(reservationRequest)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        RestAssured.given().log().all()
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(6));
+    }
+
+    @Test
+    @DisplayName("이미 결제된 예약을 관리자가 삭제하려 하면 예외가 발생한다.")
+    void cantDeletePaidReservation() {
+        Token token = tokenProvider.getAccessToken(1);
+        ResponseCookie cookie = CookieProvider.setCookieFrom(token);
+        ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
+                "paymentType", "paymentKey", "orderId", 1000);
+        PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
+        given(tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto))
+                .willReturn(getValidPaymentConfirmationFromTossDto());
+
+        Integer id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(cookie.toString())
                 .body(reservationRequest)
@@ -47,22 +74,15 @@ class ReservationIntegrationTest extends IntegrationTest {
                 .statusCode(201)
                 .extract().path("id");
 
-        RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(6));
-
-        RestAssured.given().log().all()
+        String errorMessage = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie(cookie.toString())
                 .when().delete("/reservations/" + id)
                 .then().log().all()
-                .statusCode(204);
-
-        RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(5));
+                .statusCode(400)
+                .extract().asString();
+        Assertions.assertThat(errorMessage)
+                .isEqualTo("이미 결제된 예약은 취소할 수 없습니다.");
     }
 
     @Test

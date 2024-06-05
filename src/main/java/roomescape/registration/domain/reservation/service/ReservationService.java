@@ -134,6 +134,10 @@ public class ReservationService {
 
     @Transactional
     public void removeReservation(long reservationId) {
+        if(paymentRepository.existsByReservationId(reservationId)) {
+            throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_ALREADY_PAID_CAN_NOT_DELETE_EXCEPTION);
+        }
+
         Optional<Waiting> waiting = waitingRepository.findFirstByReservationIdOrderByCreatedAt(reservationId);
 
         if (waiting.isEmpty()) {
