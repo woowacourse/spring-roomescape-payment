@@ -115,7 +115,7 @@ public class ReservationService {
         final List<MyReservationResponse> paidReservations = getPaidReservationResponses(member);
         final List<MyReservationResponse> nonPaidReservations = getNonPaidReservationResponses(member);
 
-        return addAllResponses(List.of(waitings, paidReservations, nonPaidReservations));
+        return addAllResponses(List.of(paidReservations, nonPaidReservations, waitings));
     }
 
     private List<MyReservationResponse> addAllResponses(final List<List<MyReservationResponse>> responses) {
