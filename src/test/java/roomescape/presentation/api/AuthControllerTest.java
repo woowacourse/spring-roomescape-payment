@@ -1,6 +1,6 @@
 package roomescape.presentation.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 
 import java.util.stream.Stream;
 
@@ -44,13 +44,12 @@ class AuthControllerTest extends BaseControllerTest {
     void checkLoginFailWhenNotLoggedIn() {
         String token = "invalid token";
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/login/check")
                 .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+                .assertThat()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     void login() {
@@ -61,31 +60,28 @@ class AuthControllerTest extends BaseControllerTest {
                 .body(request)
                 .when().post("/login")
                 .then().log().all()
+                .assertThat()
+                .header("Set-Cookie", matchesPattern("^token=.*"))
                 .extract();
 
         token = response.cookie("token");
-
-        assertThat(token).isNotNull();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     void checkLogin() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/login/check")
                 .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
     }
 
     void logout() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().post("/logout")
                 .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
     }
 }

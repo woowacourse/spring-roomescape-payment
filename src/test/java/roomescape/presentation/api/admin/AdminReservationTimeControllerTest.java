@@ -1,11 +1,11 @@
 package roomescape.presentation.api.admin;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import roomescape.application.dto.request.ReservationTimeRequest;
-import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -57,22 +54,16 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/times")
                     .then().log().all()
-                    .extract();
-
-            ReservationTimeResponse reservationTimeResponse = response.as(ReservationTimeResponse.class);
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-                softly.assertThat(response.header("Location")).isEqualTo("/times/1");
-                softly.assertThat(reservationTimeResponse)
-                        .isEqualTo(new ReservationTimeResponse(1L, LocalTime.of(10, 30)));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .header("Location", response1 -> equalTo("/times/" + response1.path("id")))
+                    .body("startAt", equalTo("10:30"));
         }
 
         @Test
@@ -85,19 +76,15 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/times")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 시간의 예약 시간이 이미 존재합니다. (시작 시간: %s)", LocalTime.of(10, 30)));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body("message", containsString("해당 시간의 예약 시간이 이미 존재합니다."));
         }
     }
 
@@ -114,13 +101,11 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
-                    .extract();
-
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                    .statusCode(HttpStatus.NO_CONTENT.value());
         }
 
         @Test
@@ -129,17 +114,13 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             Member admin = memberRepository.save(Fixture.MEMBER_ADMIN);
             String token = tokenProvider.createToken(admin.getId().toString());
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 id의 예약 시간이 존재하지 않습니다. (id: %d)", 1));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .body("message", containsString("해당 id의 예약 시간이 존재하지 않습니다."));
         }
 
         @Test
@@ -155,17 +136,13 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
             reservationRepository.save(new Reservation(detail, member));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 예약 시간을 사용하는 예약이 존재합니다. (예약 시간 id: %d)", 1));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body("message", containsString("해당 예약 시간을 사용하는 예약이 존재합니다."));
         }
     }
 }

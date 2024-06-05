@@ -82,14 +82,16 @@ class ReservationControllerTest extends BaseControllerTest {
         Waiting waiting = waitingRepository.save(new Waiting(new ReservationDetail(date, time2, theme1), user1));
 
         String token = tokenProvider.createToken(user1.getId().toString());
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().get("/reservations/mine")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .cookie("token", token)
+                        .when().get("/reservations/mine")
+                        .then().log().all()
+                        .extract();
 
-        List<MyReservationResponse> responses = response.jsonPath()
-                .getList(".", MyReservationResponse.class);
+        List<MyReservationResponse> responses =
+                response.jsonPath()
+                        .getList(".", MyReservationResponse.class);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -176,13 +178,14 @@ class ReservationControllerTest extends BaseControllerTest {
                     "test-paymentType"
             );
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .cookie("token", token)
-                    .contentType(ContentType.JSON)
-                    .body(request)
-                    .when().post("/reservations")
-                    .then().log().all()
-                    .extract();
+            ExtractableResponse<Response> response =
+                    RestAssured.given().log().all()
+                            .cookie("token", token)
+                            .contentType(ContentType.JSON)
+                            .body(request)
+                            .when().post("/reservations")
+                            .then().log().all()
+                            .extract();
 
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

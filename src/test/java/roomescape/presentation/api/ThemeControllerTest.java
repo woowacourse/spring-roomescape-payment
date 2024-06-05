@@ -1,18 +1,16 @@
 package roomescape.presentation.api;
 
-import java.time.LocalDate;
-import java.util.List;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 
-import org.assertj.core.api.SoftAssertions;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -44,20 +42,17 @@ class ThemeControllerTest extends BaseControllerTest {
     void getAllThemes() {
         themeRepository.save(new Theme("테마 이름", "테마 설명", "https://example.com/image.jpg"));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .when().get("/themes")
                 .then().log().all()
-                .extract();
-
-        List<ThemeResponse> themeResponses = response.jsonPath()
-                .getList(".", ThemeResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThat(themeResponses).hasSize(1);
-            softly.assertThat(themeResponses)
-                    .containsExactly(new ThemeResponse(1L, "테마 이름", "테마 설명", "https://example.com/image.jpg"));
-        });
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .and()
+                .body("size()", equalTo(1))
+                .body("id", hasItems(1))
+                .body("name", hasItems("테마 이름"))
+                .body("description", hasItems("테마 설명"))
+                .body("thumbnail", hasItems("https://example.com/image.jpg"));
     }
 
     @Test
@@ -80,25 +75,19 @@ class ThemeControllerTest extends BaseControllerTest {
         reservationRepository.save(new Reservation(new ReservationDetail(excludedDate, time1, theme1), member));
         reservationRepository.save(new Reservation(new ReservationDetail(excludedDate, time2, theme1), member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .param("startDate", "2024-04-06")
                 .param("endDate", "2024-04-07")
                 .param("limit", "2")
                 .when().get("/themes/popular")
                 .then().log().all()
-                .extract();
-
-        List<ThemeResponse> popularThemes = response.jsonPath()
-                .getList(".", ThemeResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(popularThemes).hasSize(2);
-
-            softly.assertThat(popularThemes.get(0).id()).isEqualTo(theme2.getId());
-            softly.assertThat(popularThemes.get(0).name()).isEqualTo(theme2.getName());
-
-            softly.assertThat(popularThemes.get(1).id()).isEqualTo(theme1.getId());
-            softly.assertThat(popularThemes.get(1).name()).isEqualTo(theme1.getName());
-        });
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .and()
+                .body("size()", equalTo(2))
+                .body("id", hasItems(1, 2))
+                .body("name", hasItems("테마1", "테마2"))
+                .body("description", hasItems("테마1 설명", "테마2 설명"))
+                .body("thumbnail", hasItems("https://example1.com", "https://example2.com"));
     }
 }

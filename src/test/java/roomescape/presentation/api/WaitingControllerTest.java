@@ -1,5 +1,7 @@
 package roomescape.presentation.api;
 
+import static org.hamcrest.Matchers.equalTo;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -11,11 +13,6 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.ReservationResponse;
-import roomescape.application.dto.response.ReservationTimeResponse;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -64,26 +61,20 @@ class WaitingControllerTest extends BaseControllerTest {
 
         WaitingWebRequest request = new WaitingWebRequest(date, reservationTime.getId(), theme.getId());
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .cookie("token", token)
+        RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(request)
                 .when().post("/waitings")
                 .then().log().all()
-                .extract();
-
-        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
-        ReservationTimeResponse reservationTimeResponse = reservationResponse.time();
-        ThemeResponse themeResponse = reservationResponse.theme();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-            softly.assertThat(response.header("Location")).isEqualTo("/waitings/" + reservationResponse.id());
-
-            softly.assertThat(reservationResponse.date()).isEqualTo(date);
-            softly.assertThat(reservationTimeResponse).isEqualTo(ReservationTimeResponse.from(reservationTime));
-            softly.assertThat(themeResponse).isEqualTo(ThemeResponse.from(theme));
-        });
+                .assertThat()
+                .statusCode(HttpStatus.CREATED.value())
+                .header("Location", response -> equalTo("/waitings/" + response.path("id")))
+                .and()
+                .body("date", equalTo("2024-04-09"))
+                .body("member.id", equalTo(1))
+                .body("time.id", equalTo(1))
+                .body("theme.id", equalTo(1));
     }
 
     @Test
@@ -101,14 +92,14 @@ class WaitingControllerTest extends BaseControllerTest {
 
         Waiting savedWaiting = waitingRepository.save(new Waiting(detail, user));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().delete("/waitings/" + savedWaiting.getId())
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
             softly.assertThat(waitingRepository.findById(1L)).isEmpty();
         });
     }

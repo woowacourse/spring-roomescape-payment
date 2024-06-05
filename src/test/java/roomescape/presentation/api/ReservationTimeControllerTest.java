@@ -1,24 +1,24 @@
 package roomescape.presentation.api;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+
 import static roomescape.fixture.Fixture.MEMBER_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.AvailableReservationTimeResponse;
-import roomescape.application.dto.response.ReservationTimeResponse;
+import io.restassured.http.ContentType;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -30,6 +30,7 @@ import roomescape.domain.reservation.detail.Theme;
 import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.presentation.BaseControllerTest;
 
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class ReservationTimeControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -49,20 +50,17 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     void getAllReservationTimes() {
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
                 .when().get("/times")
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(200)
+                .and()
+                .body("size()", equalTo(1))
+                .body("id", hasItems(1))
+                .body("startAt", hasItems("10:30"));
 
-        List<ReservationTimeResponse> reservationTimeResponses = response.jsonPath()
-                .getList(".", ReservationTimeResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThat(reservationTimeResponses).hasSize(1);
-            softly.assertThat(reservationTimeResponses)
-                    .containsExactly(new ReservationTimeResponse(1L, LocalTime.of(10, 30)));
-        });
     }
 
     @Test
@@ -73,7 +71,7 @@ class ReservationTimeControllerTest extends BaseControllerTest {
         Theme theme = themeRepository.save(THEME_1);
 
         ReservationTime time1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0)));
-        ReservationTime time2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
+        reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
 
         ReservationDetail detail = new ReservationDetail(date, time1, theme);
 
@@ -81,26 +79,17 @@ class ReservationTimeControllerTest extends BaseControllerTest {
 
         reservationRepository.save(Reservation.create(now, detail, member));
 
-        ExtractableResponse<Response> extractResponse = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .param("date", date.toString())
                 .param("themeId", theme.getId())
                 .when().get("/times/available")
                 .then().log().all()
-                .extract();
-
-        List<AvailableReservationTimeResponse> responses = extractResponse.jsonPath()
-                .getList(".", AvailableReservationTimeResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(responses).hasSize(2);
-
-            softly.assertThat(responses.get(0).timeId()).isEqualTo(time1.getId());
-            softly.assertThat(responses.get(0).startAt()).isEqualTo("09:00");
-            softly.assertThat(responses.get(0).alreadyBooked()).isTrue();
-
-            softly.assertThat(responses.get(1).timeId()).isEqualTo(time2.getId());
-            softly.assertThat(responses.get(1).startAt()).isEqualTo("10:00");
-            softly.assertThat(responses.get(1).alreadyBooked()).isFalse();
-        });
+                .assertThat()
+                .statusCode(200)
+                .and()
+                .body("size()", equalTo(2))
+                .body("timeId", hasItems(1, 2))
+                .body("startAt", hasItems("09:00", "10:00"))
+                .body("alreadyBooked", hasItems(true, false));
     }
 }

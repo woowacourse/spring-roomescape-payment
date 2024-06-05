@@ -1,22 +1,20 @@
 package roomescape.presentation.api.admin;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.ReservationResponse;
-import roomescape.application.dto.response.ReservationTimeResponse;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -61,25 +59,18 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .when().get("/admin/waitings")
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(1))
+                .body("member.name", hasItems("유저"))
+                .body("time.startAt", hasItems("11:00"))
+                .body("theme.name", hasItems("테마 이름"));
 
-        List<ReservationResponse> reservations = response.jsonPath()
-                .getList(".", ReservationResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
-            softly.assertThat(reservations).hasSize(1);
-
-            softly.assertThat(reservations.get(0).date()).isEqualTo(date);
-            softly.assertThat(reservations.get(0).theme()).isEqualTo(ThemeResponse.from(theme));
-            softly.assertThat(reservations.get(0).member()).isEqualTo(MemberResponse.from(member));
-            softly.assertThat(reservations.get(0).time()).isEqualTo(ReservationTimeResponse.from(reservationTime));
-        });
     }
 
     @Test
@@ -95,17 +86,16 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         Waiting savedWaiting = waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ReservationResponse reservationResponse = RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .when().post("/admin/waitings/" + savedWaiting.getId() + "/approve")
+                .pathParam("id", savedWaiting.getId())
+                .when().post("/admin/waitings/{id}/approve")
                 .then().log().all()
-                .extract();
-
-        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(ReservationResponse.class);
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
             softly.assertThat(waitingRepository.findById(savedWaiting.getId())).isEmpty();
             softly.assertThat(reservationRepository.findById(reservationResponse.id())).isPresent();
         });
@@ -124,15 +114,15 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         Waiting savedWaiting = waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .when().delete("/admin/waitings/" + savedWaiting.getId() + "/reject")
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
             softly.assertThat(waitingRepository.findById(savedWaiting.getId())).isEmpty();
         });
     }

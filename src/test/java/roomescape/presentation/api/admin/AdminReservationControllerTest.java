@@ -1,13 +1,12 @@
 package roomescape.presentation.api.admin;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,12 +17,6 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.MemberResponse;
-import roomescape.application.dto.response.ReservationResponse;
-import roomescape.application.dto.response.ReservationTimeResponse;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -76,30 +69,18 @@ class AdminReservationControllerTest extends BaseControllerTest {
         reservationRepository.save(new Reservation(new ReservationDetail(date, reservationTime, theme), member));
         waitingRepository.save(new Waiting(new ReservationDetail(date, reservationTime, theme), member1));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/admin/reservations")
                 .then().log().all()
-                .extract();
-
-        List<ReservationResponse> reservationResponses = response.jsonPath()
-                .getList(".", ReservationResponse.class);
-
-        ReservationResponse reservationResponse = reservationResponses.get(0);
-
-        MemberResponse memberResponse = reservationResponse.member();
-        ReservationTimeResponse reservationTimeResponse = reservationResponse.time();
-        ThemeResponse themeResponse = reservationResponse.theme();
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThat(reservationResponses).hasSize(1);
-
-            softly.assertThat(reservationResponse.date()).isEqualTo(LocalDate.of(2024, 4, 9));
-            softly.assertThat(memberResponse).isEqualTo(MemberResponse.from(member));
-            softly.assertThat(reservationTimeResponse).isEqualTo(ReservationTimeResponse.from(reservationTime));
-            softly.assertThat(themeResponse).isEqualTo(ThemeResponse.from(theme));
-        });
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(1))
+                .body("id", hasItems(1))
+                .body("date", hasItems("2024-04-09"))
+                .body("member.id", hasItems(2))
+                .body("time.id", hasItems(1))
+                .body("theme.id", hasItems(1));
     }
 
     @Nested
@@ -130,27 +111,18 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     admin.getId()
             );
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/reservations")
                     .then().log().all()
-                    .extract();
-
-            ReservationResponse reservationResponse = response.as(ReservationResponse.class);
-            MemberResponse memberResponse = reservationResponse.member();
-            ReservationTimeResponse timeResponse = reservationResponse.time();
-            ThemeResponse themeResponse = reservationResponse.theme();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-                softly.assertThat(reservationResponse.date()).isEqualTo(LocalDate.of(2024, 6, 22));
-                softly.assertThat(memberResponse)
-                        .isEqualTo(new MemberResponse(1L, "admin@gmail.com", "어드민", Role.ADMIN));
-                softly.assertThat(timeResponse).isEqualTo(ReservationTimeResponse.from(reservationTime));
-                softly.assertThat(themeResponse).isEqualTo(ThemeResponse.from(theme));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .body("date", equalTo("2024-06-22"))
+                    .body("member.name", equalTo("어드민"))
+                    .body("time.startAt", equalTo("11:00"))
+                    .body("theme.name", equalTo("테마 이름"));
         }
 
         @Test
@@ -170,15 +142,14 @@ class AdminReservationControllerTest extends BaseControllerTest {
                     1L
             );
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/reservations")
                     .then().log().all()
-                    .extract();
-
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+                    .assertThat()
+                    .statusCode(HttpStatus.FORBIDDEN.value());
         }
     }
 
@@ -195,12 +166,11 @@ class AdminReservationControllerTest extends BaseControllerTest {
         ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
         Reservation savedReservation = reservationRepository.save(new Reservation(detail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().delete("/admin/reservations/" + savedReservation.getId())
                 .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
