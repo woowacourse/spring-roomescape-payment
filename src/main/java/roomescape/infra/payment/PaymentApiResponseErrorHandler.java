@@ -30,7 +30,7 @@ public class PaymentApiResponseErrorHandler implements ResponseErrorHandler {
         throw new PaymentClientException(errorResponse.message());
     }
 
-    private enum ServerErrorCode {
+    enum ServerErrorCode {
         INVALID_REQUEST,
         INVALID_API_KEY,
         NOT_FOUND_TERMINAL_ID,

@@ -2,22 +2,19 @@ package roomescape.infra.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import roomescape.exception.PaymentClientException;
 import roomescape.exception.PaymentServerException;
+import roomescape.infra.payment.PaymentApiResponseErrorHandler.ServerErrorCode;
 
-@TestInstance(Lifecycle.PER_CLASS)
 @SpringBootTest
 class PaymentApiResponseErrorHandlerTest {
 
@@ -27,53 +24,34 @@ class PaymentApiResponseErrorHandlerTest {
     private PaymentApiResponseErrorHandler paymentApiResponseErrorHandler;
 
     @DisplayName("클라이언트 에러를 반환한다")
-    @MethodSource("clientErrorParameter")
+    @ValueSource(strings = {"ALREADY_PROCESSED_PAYMENT", "PROVIDER_ERROR", "INVALID_CARD_NUMBER", "NOT_AVAILABLE_BANK"})
     @ParameterizedTest
-    void paymentClientErrorTest(PaymentErrorResponse errorResponse) throws IOException {
+    void paymentClientErrorTest(String errorCode) throws IOException {
+        // given
+        PaymentErrorResponse errorResponse = new PaymentErrorResponse(errorCode, "클라이언트 에러");
         String body = objectMapper.writeValueAsString(errorResponse);
         MockClientHttpResponse response = new MockClientHttpResponse(body.getBytes(), HttpStatus.BAD_REQUEST);
 
+        // when, then
         Assertions.assertThatThrownBy(() -> paymentApiResponseErrorHandler.handleError(response))
                 .isExactlyInstanceOf(PaymentClientException.class);
     }
 
-    private Stream<Arguments> clientErrorParameter() {
-        return Stream.of(
-                Arguments.of(new PaymentErrorResponse("ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다.")),
-                Arguments.of(new PaymentErrorResponse("PROVIDER_ERROR", "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")),
-                Arguments.of(new PaymentErrorResponse("INVALID_CARD_NUMBER", "카드번호를 다시 확인해주세요.")),
-                Arguments.of(new PaymentErrorResponse("NOT_AVAILABLE_BANK", "은행 서비스 시간이 아닙니다."))
-        );
-    }
-
     @DisplayName("서버 에러를 반환한다")
-    @MethodSource("serverErrorParameter")
+    @EnumSource(value = ServerErrorCode.class, names = {"INVALID_API_KEY", "NOT_FOUND_TERMINAL_ID",
+            "INVALID_AUTHORIZE_AUTH", "INVALID_UNREGISTERED_SUBMALL", "NOT_REGISTERED_BUSINESS", "UNAPPROVED_ORDER_ID",
+            "UNAUTHORIZED_KEY", "REJECT_CARD_COMPANY", "FORBIDDEN_REQUEST", "INCORRECT_BASIC_AUTH_FORMAT",
+            "NOT_FOUND_PAYMENT", "NOT_FOUND_PAYMENT_SESSION", "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
+            "FAILED_INTERNAL_SYSTEM_PROCESSING", "UNKNOWN_PAYMENT_ERROR"})
     @ParameterizedTest
-    void paymentServerErrorTest(PaymentErrorResponse errorResponse) throws IOException {
+    void paymentServerErrorTest(ServerErrorCode errorCode) throws IOException {
+        // given
+        PaymentErrorResponse errorResponse = new PaymentErrorResponse(errorCode.name(), "서버 에러");
         String body = objectMapper.writeValueAsString(errorResponse);
         MockClientHttpResponse response = new MockClientHttpResponse(body.getBytes(), HttpStatus.BAD_REQUEST);
 
+        // when, then
         Assertions.assertThatThrownBy(() -> paymentApiResponseErrorHandler.handleError(response))
                 .isExactlyInstanceOf(PaymentServerException.class);
-    }
-
-    private Stream<Arguments> serverErrorParameter() {
-        return Stream.of(
-                Arguments.of(new PaymentErrorResponse("INVALID_API_KEY", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("NOT_FOUND_TERMINAL_ID", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("INVALID_AUTHORIZE_AUTH", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("INVALID_UNREGISTERED_SUBMALL", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("NOT_REGISTERED_BUSINESS", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("UNAPPROVED_ORDER_ID", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("UNAUTHORIZED_KEY", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("REJECT_CARD_COMPANY", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("FORBIDDEN_REQUEST", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("INCORRECT_BASIC_AUTH_FORMAT", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("NOT_FOUND_PAYMENT", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("NOT_FOUND_PAYMENT_SESSION", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("FAILED_INTERNAL_SYSTEM_PROCESSING", "잘못된 요청입니다.")),
-                Arguments.of(new PaymentErrorResponse("UNKNOWN_PAYMENT_ERROR", "잘못된 요청입니다."))
-        );
     }
 }
