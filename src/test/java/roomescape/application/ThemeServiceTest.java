@@ -24,6 +24,11 @@ import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.RoomEscapeException;
+import roomescape.fixture.MemberFixture;
+import roomescape.fixture.ReservationDetailFixture;
+import roomescape.fixture.ReservationFixture;
+import roomescape.fixture.ThemeFixture;
+import roomescape.fixture.TimeFixture;
 
 class ThemeServiceTest extends BaseServiceTest {
 
@@ -84,7 +89,7 @@ class ThemeServiceTest extends BaseServiceTest {
     @Test
     void when_findPopularThemes_then_return10Themes() {
         // given
-        ReservationTime time = TimeFixture.createReservationTime(LocalTime.now());
+        ReservationTime time = TimeFixture.createTime(LocalTime.now());
         reservationTimeRepository.save(time);
         List<Theme> themes = ThemeFixture.createThemes(10);
         themes.forEach(themeRepository::save);
@@ -93,7 +98,7 @@ class ThemeServiceTest extends BaseServiceTest {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         List<ReservationDetail> details = ReservationDetailFixture.createReservationDetails(themes, yesterday, time);
         details.forEach(reservationDetailRepository::save);
-        List<Reservation> reservations = ReservationFixture.createReservations(details, member);
+        List<Reservation> reservations = ReservationFixture.createReservations(details, member, Status.RESERVED);
         reservations.forEach(reservationRepository::save);
 
         // when
@@ -117,57 +122,5 @@ class ThemeServiceTest extends BaseServiceTest {
         // then
         Assertions.assertThatThrownBy(() -> themeRepository.getById(themeId))
                 .isInstanceOf(RoomEscapeException.class);
-    }
-
-    private static class TimeFixture {
-        public static ReservationTime createReservationTime(LocalTime time) {
-            return new ReservationTime(time);
-        }
-    }
-
-    private static class ThemeFixture {
-        public static List<Theme> createThemes(int count) {
-            return IntStream.range(0, count)
-                    .mapToObj(i -> createTheme("테마" + i))
-                    .toList();
-        }
-
-        public static Theme createTheme(String name) {
-            return new Theme(name, "테마 설명", "https://image.com/im.jpg");
-        }
-    }
-
-    private static class MemberFixture {
-        public static Member createMember(String name) {
-            return new Member(name, "email123@woowa.net", "password");
-        }
-    }
-
-    private static class ReservationDetailFixture {
-        public static List<ReservationDetail> createReservationDetails(
-                List<Theme> themes,
-                LocalDate date,
-                ReservationTime time
-        ) {
-            return themes.stream()
-                    .map(theme -> createReservationDetail(date, time, theme))
-                    .toList();
-        }
-
-        public static ReservationDetail createReservationDetail(LocalDate date, ReservationTime time, Theme theme) {
-            return new ReservationDetail(date, time, theme);
-        }
-    }
-
-    private static class ReservationFixture {
-        public static List<Reservation> createReservations(List<ReservationDetail> details, Member member) {
-            return details.stream()
-                    .map(detail -> createReservation(detail, member))
-                    .toList();
-        }
-
-        public static Reservation createReservation(ReservationDetail detail, Member member) {
-            return new Reservation(member, detail, Status.RESERVED);
-        }
     }
 }

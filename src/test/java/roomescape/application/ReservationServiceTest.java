@@ -1,6 +1,5 @@
 package roomescape.application;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -16,7 +15,6 @@ import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -28,6 +26,10 @@ import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.AuthorizationException;
 import roomescape.fixture.CommonFixture;
+import roomescape.fixture.MemberFixture;
+import roomescape.fixture.ReservationDetailFixture;
+import roomescape.fixture.ThemeFixture;
+import roomescape.fixture.TimeFixture;
 import roomescape.support.FakePaymentClient;
 
 class ReservationServiceTest extends BaseServiceTest {
@@ -58,9 +60,9 @@ class ReservationServiceTest extends BaseServiceTest {
         admin = memberRepository.save(MemberFixture.admin());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
-        detail1 = reservationDetailRepository.save(DetailFixture.createReservationDetail(
+        detail1 = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
                 CommonFixture.tomorrow, time, theme));
-        detail2 = reservationDetailRepository.save(DetailFixture.createReservationDetail(
+        detail2 = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
                 CommonFixture.yesterday, time, theme));
     }
 
@@ -276,33 +278,5 @@ class ReservationServiceTest extends BaseServiceTest {
             softly.assertThat(response.get(1).rank()).isEqualTo(0);
             softly.assertThat(response.get(2).rank()).isEqualTo(1);
         });
-    }
-
-    private static class TimeFixture {
-        public static ReservationTime createTime(LocalTime startAt) {
-            return new ReservationTime(startAt);
-        }
-    }
-
-    private static class MemberFixture {
-        public static Member user() {
-            return new Member("mangcho", "mangcho@woowa.net", "password", Role.NORMAL);
-        }
-
-        public static Member admin() {
-            return new Member("admin", "admin@woowa.net", "password", Role.ADMIN);
-        }
-    }
-
-    private static class ThemeFixture {
-        public static Theme createTheme(String name) {
-            return new Theme(name, "테마 설명", "https://image.com/im.jpg");
-        }
-    }
-
-    private static class DetailFixture {
-        public static ReservationDetail createReservationDetail(LocalDate date, ReservationTime time, Theme theme) {
-            return new ReservationDetail(date, time, theme);
-        }
     }
 }

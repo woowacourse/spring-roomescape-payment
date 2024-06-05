@@ -1,6 +1,5 @@
 package roomescape.application;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -24,6 +22,10 @@ import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.fixture.CommonFixture;
+import roomescape.fixture.MemberFixture;
+import roomescape.fixture.ReservationDetailFixture;
+import roomescape.fixture.ThemeFixture;
+import roomescape.fixture.TimeFixture;
 
 class CancelServiceTest extends BaseServiceTest {
 
@@ -55,7 +57,7 @@ class CancelServiceTest extends BaseServiceTest {
         admin = memberRepository.save(MemberFixture.admin());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
-        detail = reservationDetailRepository.save(DetailFixture.createReservationDetail(
+        detail = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
                 CommonFixture.tomorrow, time, theme));
     }
 
@@ -119,33 +121,5 @@ class CancelServiceTest extends BaseServiceTest {
         // then
         Mockito.verify(eventPublisher, Mockito.times(0))
                 .publishPaymentPendingEvent(Mockito.any());
-    }
-
-    private static class TimeFixture {
-        public static ReservationTime createTime(LocalTime startAt) {
-            return new ReservationTime(startAt);
-        }
-    }
-
-    private static class MemberFixture {
-        public static Member user() {
-            return new Member("mangcho", "mangcho@woowa.net", "password", Role.NORMAL);
-        }
-
-        public static Member admin() {
-            return new Member("admin", "admin@woowa.net", "password", Role.ADMIN);
-        }
-    }
-
-    private static class ThemeFixture {
-        public static Theme createTheme(String name) {
-            return new Theme(name, "테마 설명", "https://image.com/im.jpg");
-        }
-    }
-
-    private static class DetailFixture {
-        public static ReservationDetail createReservationDetail(LocalDate date, ReservationTime time, Theme theme) {
-            return new ReservationDetail(date, time, theme);
-        }
     }
 }
