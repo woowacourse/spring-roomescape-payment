@@ -20,7 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {"spring.config.location=classpath:/application.properties"})
+@TestPropertySource(properties = {"spring.config.location=classpath:/application-test.yml"})
 class TimeTest {
 
     private static final int TIMESLOT_COUNT = 4;

@@ -22,14 +22,14 @@ import static roomescape.fixture.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {"spring.config.location=classpath:/application.properties"})
+@TestPropertySource(properties = {"spring.config.location=classpath:/application-test.yml"})
 class ClientReservationTest {
 
 
     @Autowired
     TokenGenerator tokenGenerator;
 
-    private static final String EMAIL = "test2DB@email.com";
+    private static final String EMAIL = "test2@email.com";
     private static final int RESERVATION_COUNT = 3;
     private static final int WAITING_COUNT = 4;
 

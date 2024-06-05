@@ -20,10 +20,10 @@ import static roomescape.fixture.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {"spring.config.location=classpath:/application.properties"})
+@TestPropertySource(properties = {"spring.config.location=classpath:/application-test.yml"})
 class LoginControllerTest {
 
-    private static final String EMAIL = "testDB@email.com";
+    private static final String EMAIL = "test@email.com";
     private static final String PASSWORD = "1234";
 
     @LocalServerPort
@@ -37,7 +37,7 @@ class LoginControllerTest {
     @DisplayName("로그인 작업을 수행한다.")
     @Test
     void given_emailPassword_when_logins_then_statusCodeIsOk() {
-        TokenRequest request = new TokenRequest("testDB@email.com", "1234");
+        TokenRequest request = new TokenRequest("test@email.com", "1234");
         RestAssured.given().log().all()
                 .contentType("application/json")
                 .body(request)

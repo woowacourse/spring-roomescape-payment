@@ -20,13 +20,13 @@ import static roomescape.fixture.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {"spring.config.location=classpath:/application.properties"})
+@TestPropertySource(properties = {"spring.config.location=classpath:/application-test.yml"})
 class WaitingControllerTest {
 
     @Autowired
     TokenGenerator tokenGenerator;
 
-    private static final String EMAIL = "testDB@email.com";
+    private static final String EMAIL = "test@email.com";
 
     @LocalServerPort
     private int port;
