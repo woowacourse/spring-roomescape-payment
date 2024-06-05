@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -34,7 +35,7 @@ class PaymentRepositoryTest {
         final ReservationTime reservationTime = RESERVATION_TIME_SIX();
         final Theme theme = THEME_HORROR();
         final Reservation reservation = new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, ReservationStatus.RESERVED);
-        final Payment payment = new Payment(reservation, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment payment = new Payment(reservation, PAYMENT_KEY, ORDER_ID, AMOUNT, PaymentStatus.PAID);
         testEntityManager.persist(member);
         testEntityManager.persist(reservationTime);
         testEntityManager.persist(theme);

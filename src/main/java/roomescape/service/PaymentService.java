@@ -6,8 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.component.TossPaymentClient;
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
 import roomescape.exception.RoomescapeException;
@@ -16,6 +18,7 @@ import roomescape.exception.TossPaymentsException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
+@Transactional
 @Service
 public class PaymentService {
 
@@ -38,12 +41,43 @@ public class PaymentService {
         paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
-        final Payment payment = paymentDto.toPayment(reservation);
+        final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
         try {
             paymentRepository.save(payment);
         } catch (RuntimeException e) {
             logger.error("Failed to save payment reservationId = {}: {}", reservationId, e.getMessage());
             paymentClient.cancel(paymentDto, DATABASE_SAVE_ERROR.getMessage());
         }
+    }
+
+    // TODO test
+    public void createPayment(final Long reservationId) {
+        final Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
+        final Payment payment = new Payment(reservation, PaymentStatus.PAID);
+        reservation.toReserved();
+        paymentRepository.save(payment);
+    }
+
+    // TODO test
+    public void payForReservation(final PaymentDto paymentDto, final Long reservationId) {
+        paymentClient.confirm(paymentDto);
+        final Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
+        reservation.toReserved();
+
+        final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
+        paymentRepository.save(payment);
+    }
+
+    // TODO test
+    public void cancelPayment(final Long reservationId) {
+        final Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
+
+        final Payment payment = paymentRepository.findByReservationAndStatus(reservation, PaymentStatus.PAID)
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.PAYMENT_NOT_FOUND));
+        payment.toCanceled();
+        // TODO paymentClient.cancel()
     }
 }

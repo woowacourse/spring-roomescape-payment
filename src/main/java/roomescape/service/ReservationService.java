@@ -1,5 +1,7 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.*;
+
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -7,8 +9,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -20,8 +23,6 @@ import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.*;
-
-import static roomescape.exception.RoomescapeExceptionCode.*;
 
 @Transactional
 @Service
@@ -60,7 +61,7 @@ public class ReservationService {
         final Theme theme = themeRepository.findById(reservationDto.themeId())
                 .orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
 
-        final Reservation reservation = reservationDto.toModel(member, time, theme, ReservationStatus.RESERVED);
+        final Reservation reservation = reservationDto.toReservation(member, time, theme, ReservationStatus.RESERVED);
         validateDate(reservation.getDate());
         validateDuplicatedReservation(reservation);
         return ReservationResponse.from(reservationRepository.save(reservation));
@@ -102,12 +103,10 @@ public class ReservationService {
                 .toList();
     }
 
-    public void deleteReservation(final Long id) {
-        final boolean exists = reservationRepository.existsById(id);
-        if (!exists) {
-            throw new RoomescapeException(RESERVATION_NOT_FOUND);
-        }
-        reservationRepository.deleteById(id);
+    public void cancelReservation(final Long id) {
+        final Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
+        reservation.changeStatus(ReservationStatus.CANCELED);
     }
 
     public List<MyReservationWithRankResponse> findMyReservationsAndWaitings(final LoginMember loginMember) {
@@ -119,7 +118,7 @@ public class ReservationService {
 
     private MyReservationWithRankResponse createMyReservationResponse(final Reservation reservation) {
         if (reservation.isReserved()) {
-            final Payment payment = paymentRepository.findByReservation(reservation)
+            final Payment payment = paymentRepository.findByReservationAndStatus(reservation, PaymentStatus.PAID)
                     .orElseThrow(() -> new RoomescapeException(PAYMENT_NOT_FOUND));
             return new MyReservationWithRankResponse(reservation, calculateRank(reservation), payment);
         }

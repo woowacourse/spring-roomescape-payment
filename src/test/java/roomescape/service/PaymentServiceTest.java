@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
 import roomescape.component.TossPaymentClient;
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;

@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import roomescape.controller.auth.AuthenticationPrincipal;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.payment.PaymentDto;
+import roomescape.dto.payment.PaymentSaveRequest;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationFacadeService;
 import roomescape.service.ReservationService;
 
@@ -20,11 +22,14 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
     private final ReservationFacadeService reservationFacadeService;
 
     public ReservationController(final ReservationService reservationService,
+                                 final PaymentService paymentService,
                                  final ReservationFacadeService reservationFacadeService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
         this.reservationFacadeService = reservationFacadeService;
     }
 
@@ -33,7 +38,7 @@ public class ReservationController {
             @AuthenticationPrincipal final LoginMember loginMember,
             @RequestBody final ReservationSaveRequest request) {
         final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
-        final PaymentDto paymentDto = PaymentDto.of(request);
+        final PaymentDto paymentDto = PaymentDto.from(request);
         final ReservationResponse reservationResponse = reservationFacadeService.createReservation(reservationDto, paymentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
     }
@@ -44,8 +49,8 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable final Long id) {
-        reservationService.deleteReservation(id);
+    public ResponseEntity<Void> cancelReservation(@PathVariable final Long id) {
+        reservationFacadeService.cancelReservation(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -53,5 +58,12 @@ public class ReservationController {
     public ResponseEntity<List<MyReservationWithRankResponse>> findMyReservationsAndWaitings(
             @AuthenticationPrincipal final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findMyReservationsAndWaitings(loginMember));
+    }
+
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<Void> payForReservation(@PathVariable final Long id,
+                                                  @RequestBody final PaymentSaveRequest request) {
+        paymentService.payForReservation(PaymentDto.from(request), id);
+        return ResponseEntity.ok().build();
     }
 }

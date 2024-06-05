@@ -1,9 +1,13 @@
-package roomescape.domain;
+package roomescape.domain.payment;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
@@ -14,7 +18,6 @@ public class Payment {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Reservation reservation;
 
     private String paymentKey;
@@ -23,21 +26,33 @@ public class Payment {
 
     private Long amount;
 
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus status;
+
     protected Payment() {
     }
 
     public Payment(final Reservation reservation, final String paymentKey,
-                   final String orderId, final Long amount) {
-        this(null, reservation, paymentKey, orderId, amount);
+                   final String orderId, final Long amount, final PaymentStatus status) {
+        this(null, reservation, paymentKey, orderId, amount, status);
+    }
+
+    public Payment(final Reservation reservation, final PaymentStatus status) {
+        this(null, reservation, null, null, null, status);
     }
 
     public Payment(final Long id, final Reservation reservation, final String paymentKey,
-                   final String orderId, final Long amount) {
+                   final String orderId, final Long amount, final PaymentStatus status) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+        this.status = status;
+    }
+
+    public void toCanceled() {
+        this.status = PaymentStatus.CANCELED;
     }
 
     public Long getId() {
@@ -58,5 +73,9 @@ public class Payment {
 
     public Long getAmount() {
         return amount;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
     }
 }

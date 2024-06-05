@@ -33,7 +33,7 @@ public record ReservationDto(
         );
     }
 
-    public Reservation toModel(
+    public Reservation toReservation(
             final Member member,
             final ReservationTime time,
             final Theme theme,

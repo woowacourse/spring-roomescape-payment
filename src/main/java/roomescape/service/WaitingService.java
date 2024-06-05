@@ -48,7 +48,7 @@ public class WaitingService {
         final Theme theme = themeRepository.findById(reservationDto.themeId())
                 .orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
 
-        final Reservation waiting = reservationDto.toModel(member, time, theme, ReservationStatus.WAITING);
+        final Reservation waiting = reservationDto.toReservation(member, time, theme, ReservationStatus.WAITING);
         validateExistReservation(waiting);
         validateAlreadyReserved(waiting);
         validateDuplicatedWaiting(waiting);
@@ -90,7 +90,7 @@ public class WaitingService {
         final Reservation waiting = reservationRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomescapeException(WAITING_NOT_FOUND));
         validateIsApprovable(waiting);
-        waiting.toReserved();
+        waiting.toPaymentPending();
     }
 
     private void validateIsApprovable(final Reservation waiting) {

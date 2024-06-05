@@ -24,4 +24,17 @@ public class ReservationFacadeService {
         paymentService.confirmPayment(paymentDto, reservationResponse.id());
         return reservationResponse;
     }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public ReservationResponse createAdminReservation(final ReservationDto reservationDto) {
+        final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
+        paymentService.createPayment(reservationResponse.id());
+        return reservationResponse;
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public void cancelReservation(final Long id) {
+        paymentService.cancelPayment(id);
+        reservationService.cancelReservation(id);
+    }
 }

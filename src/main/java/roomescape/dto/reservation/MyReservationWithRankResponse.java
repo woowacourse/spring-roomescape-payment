@@ -1,6 +1,6 @@
 package roomescape.dto.reservation;
 
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 
 import java.time.LocalDate;

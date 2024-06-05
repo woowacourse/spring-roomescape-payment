@@ -56,6 +56,14 @@ public class Reservation {
         this.status = ReservationStatus.RESERVED;
     }
 
+    public void toPaymentPending() {
+        this.status = ReservationStatus.PAYMENT_PENDING;
+    }
+
+    public void changeStatus(final ReservationStatus status) {
+        this.status = status;
+    }
+
     public boolean isReserved() {
         return this.status == ReservationStatus.RESERVED;
     }

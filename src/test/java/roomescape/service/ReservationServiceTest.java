@@ -9,9 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.TestFixture;
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -216,7 +217,7 @@ class ReservationServiceTest {
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
         final Reservation memberWaiting = new Reservation(4L, MEMBER_TENNY(), DATE_MAY_NINTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
-        final Payment reservationPayment = new Payment(memberReservation, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment reservationPayment = new Payment(memberReservation, PAYMENT_KEY, ORDER_ID, AMOUNT, PaymentStatus.PAID);
 
         given(reservationRepository.findByMemberId(loginMember.id())).willReturn(List.of(memberReservation, memberWaiting));
         given(paymentRepository.findByReservation(memberReservation)).willReturn(Optional.of(reservationPayment));
