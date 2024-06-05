@@ -49,4 +49,8 @@ public class PaymentService {
     public Payment findByReservation(Long reservationId) {
         return paymentRepository.findByReservationId(reservationId);
     }
+
+    public void deleteByReservationId(Long reservationId) {
+        paymentRepository.deleteByReservationId(reservationId);
+    }
 }

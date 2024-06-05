@@ -10,4 +10,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @EntityGraph(attributePaths = "reservation")
     Payment findByReservationId(Long reservationId);
+
+    void deleteByReservationId(Long reservationId);
 }

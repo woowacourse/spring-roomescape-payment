@@ -113,6 +113,7 @@ public class ReservationService {
     }
 
     public void delete(Long id) {
+        paymentService.deleteByReservationId(id);
         Reservation reservation = reservationRepository.findById(id).get();
         reservationRepository.deleteById(id);
 
