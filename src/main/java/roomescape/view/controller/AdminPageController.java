@@ -6,6 +6,7 @@ import roomescape.system.auth.annotation.Admin;
 
 @Controller
 public class AdminPageController {
+
     @Admin
     @GetMapping("/admin")
     public String showAdminPage() {

@@ -27,6 +27,7 @@ import roomescape.system.dto.response.ApiResponse;
 
 @RestController
 public class ReservationController {
+
     private final ReservationService reservationService;
     private final TossPaymentClient tossPaymentClient;
 
@@ -44,7 +45,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations-mine")
-    public ApiResponse<WaitingWithRanksResponse> getMemberReservations(@MemberId final Long memberId) {
+    public ApiResponse<WaitingWithRanksResponse> getMemberReservations(@MemberId Long memberId) {
         return ApiResponse.success(reservationService.findWaitingWithRankById(memberId));
     }
 
@@ -63,8 +64,8 @@ public class ReservationController {
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> removeReservation(
-            @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") final Long reservationId
+            @MemberId Long memberId,
+            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
         reservationService.removeReservationById(reservationId, memberId);
 
@@ -74,9 +75,9 @@ public class ReservationController {
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ReservationResponse> saveReservation(
-            @Valid @RequestBody final ReservationRequest reservationRequest,
-            @MemberId final Long memberId,
-            final HttpServletResponse response
+            @Valid @RequestBody ReservationRequest reservationRequest,
+            @MemberId Long memberId,
+            HttpServletResponse response
     ) {
         tossPaymentClient.confirmPayment(
                 new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(),
@@ -88,9 +89,9 @@ public class ReservationController {
     @PostMapping("/reservations/waiting")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ReservationResponse> saveWaiting(
-            @Valid @RequestBody final ReservationRequest reservationRequest,
-            @MemberId final Long memberId,
-            final HttpServletResponse response
+            @Valid @RequestBody ReservationRequest reservationRequest,
+            @MemberId Long memberId,
+            HttpServletResponse response
     ) {
         ReservationResponse reservationResponse = reservationService.addWaiting(reservationRequest, memberId);
         return getResponse(reservationResponse, response);
@@ -100,8 +101,8 @@ public class ReservationController {
     @PostMapping("/reservations/waiting/{id}/approve")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> approveWaiting(
-            @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") final Long reservationId
+            @MemberId Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
         reservationService.approveWaiting(reservationId, memberId);
 
@@ -112,8 +113,8 @@ public class ReservationController {
     @PostMapping("/reservations/waiting/{id}/deny")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> denyWaiting(
-            @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") final Long reservationId
+            @MemberId Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
         reservationService.denyWaiting(reservationId, memberId);
 

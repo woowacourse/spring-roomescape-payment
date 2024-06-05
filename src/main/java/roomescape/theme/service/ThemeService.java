@@ -14,13 +14,14 @@ import roomescape.theme.dto.ThemesResponse;
 
 @Service
 public class ThemeService {
+
     private final ThemeRepository themeRepository;
 
-    public ThemeService(final ThemeRepository themeRepository) {
+    public ThemeService(ThemeRepository themeRepository) {
         this.themeRepository = themeRepository;
     }
 
-    public Theme findThemeById(final Long id) {
+    public Theme findThemeById(Long id) {
         return themeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.THEME_NOT_FOUND,
                         String.format("[themeId: %d]", id), HttpStatus.BAD_REQUEST));
@@ -35,7 +36,7 @@ public class ThemeService {
         return new ThemesResponse(response);
     }
 
-    public ThemesResponse getTop10Themes(final LocalDate today) {
+    public ThemesResponse getTop10Themes(LocalDate today) {
         LocalDate startDate = today.minusDays(7);
         LocalDate endDate = today.minusDays(1);
         int limit = 10;
@@ -49,13 +50,13 @@ public class ThemeService {
         return new ThemesResponse(response);
     }
 
-    public ThemeResponse addTheme(final ThemeRequest request) {
+    public ThemeResponse addTheme(ThemeRequest request) {
         Theme theme = themeRepository.save(new Theme(request.name(), request.description(), request.thumbnail()));
 
         return ThemeResponse.from(theme);
     }
 
-    public void removeThemeById(final Long id) {
+    public void removeThemeById(Long id) {
         themeRepository.deleteById(id);
     }
 }

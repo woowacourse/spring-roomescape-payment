@@ -13,34 +13,35 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Service
 public class AuthService {
+
     private final MemberService memberService;
     private final JwtHandler jwtHandler;
 
-    public AuthService(final MemberService memberService, final JwtHandler jwtHandler) {
+    public AuthService(MemberService memberService, JwtHandler jwtHandler) {
         this.memberService = memberService;
         this.jwtHandler = jwtHandler;
     }
 
-    public TokenDto login(final LoginRequest request) {
-        final Member member = memberService.findMemberByEmailAndPassword(request.email(), request.password());
+    public TokenDto login(LoginRequest request) {
+        Member member = memberService.findMemberByEmailAndPassword(request.email(), request.password());
 
         return jwtHandler.createToken(member.getId());
     }
 
-    public LoginCheckResponse checkLogin(final Long memberId) {
-        final Member member = memberService.findMemberById(memberId);
+    public LoginCheckResponse checkLogin(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
 
         return new LoginCheckResponse(member.getName());
     }
 
-    public TokenDto reissueToken(final String accessToken, final String refreshToken) {
+    public TokenDto reissueToken(String accessToken, String refreshToken) {
         try {
             jwtHandler.validateToken(refreshToken);
-        } catch (final RoomEscapeException e) {
+        } catch (RoomEscapeException e) {
             throw new RoomEscapeException(ErrorType.INVALID_REFRESH_TOKEN, HttpStatus.UNAUTHORIZED);
         }
 
-        final Long memberId = jwtHandler.getMemberIdFromTokenWithNotValidate(accessToken);
+        Long memberId = jwtHandler.getMemberIdFromTokenWithNotValidate(accessToken);
         return jwtHandler.createToken(memberId);
     }
 }

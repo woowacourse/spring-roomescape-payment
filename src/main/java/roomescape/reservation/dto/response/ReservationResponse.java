@@ -14,7 +14,7 @@ public record ReservationResponse(
         @JsonProperty("theme") ThemeResponse theme
 ) {
 
-    public static ReservationResponse from(final Reservation reservation) {
+    public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getDate(),

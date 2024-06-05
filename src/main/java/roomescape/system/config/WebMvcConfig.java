@@ -12,21 +12,22 @@ import roomescape.system.auth.resolver.MemberIdResolver;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
     private final MemberIdResolver memberIdResolver;
     private final AdminInterceptor adminInterceptor;
 
-    public WebMvcConfig(final MemberIdResolver memberIdResolver, final AdminInterceptor adminInterceptor) {
+    public WebMvcConfig(MemberIdResolver memberIdResolver, AdminInterceptor adminInterceptor) {
         this.memberIdResolver = memberIdResolver;
         this.adminInterceptor = adminInterceptor;
     }
 
     @Override
-    public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(memberIdResolver);
     }
 
     @Override
-    public void addInterceptors(final InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor);
     }
 }

@@ -13,6 +13,7 @@ import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 
 public class TossPaymentClient {
+
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final RestClient restClient;
 

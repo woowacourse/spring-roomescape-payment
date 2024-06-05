@@ -11,6 +11,7 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Entity
 public class ReservationTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

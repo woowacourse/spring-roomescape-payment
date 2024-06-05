@@ -3,6 +3,7 @@ package roomescape.member.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import roomescape.member.domain.repository.MemberRepository;
 
 import java.util.Map;
 
+import static io.restassured.RestAssured.port;
 import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,6 +28,11 @@ class MemberControllerTest {
 
     @LocalServerPort
     private int port;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @Test
     @DisplayName("/members 로 GET 요청을 보내면 회원 정보와 200 OK 를 받는다.")

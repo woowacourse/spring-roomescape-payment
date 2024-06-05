@@ -19,6 +19,7 @@ import roomescape.theme.domain.Theme;
 
 @Entity
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,31 +45,31 @@ public class Reservation {
     }
 
     public Reservation(
-            final LocalDate date,
-            final ReservationTime reservationTime,
-            final Theme theme,
-            final Member member
+            LocalDate date,
+            ReservationTime reservationTime,
+            Theme theme,
+            Member member
     ) {
         this(null, date, reservationTime, theme, member, ReservationStatus.WAITING);
     }
 
     public Reservation(
-            final LocalDate date,
-            final ReservationTime reservationTime,
-            final Theme theme,
-            final Member member,
-            final ReservationStatus status
+            LocalDate date,
+            ReservationTime reservationTime,
+            Theme theme,
+            Member member,
+            ReservationStatus status
     ) {
         this(null, date, reservationTime, theme, member, status);
     }
 
     public Reservation(
-            final Long id,
-            final LocalDate date,
-            final ReservationTime reservationTime,
-            final Theme theme,
-            final Member member,
-            final ReservationStatus status
+            Long id,
+            LocalDate date,
+            ReservationTime reservationTime,
+            Theme theme,
+            Member member,
+            ReservationStatus status
     ) {
         this.id = id;
         this.date = date;

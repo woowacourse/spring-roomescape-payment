@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatusCode;
 
 public class RoomEscapeException extends RuntimeException {
+
     private final ErrorType errorType;
     private final String message;
     private final String invalidValue;

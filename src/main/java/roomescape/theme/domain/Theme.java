@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 
 @Entity
 public class Theme {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,19 +21,19 @@ public class Theme {
     public Theme() {
     }
 
-    public Theme(final String name, final String description, final String thumbnail) {
+    public Theme(String name, String description, String thumbnail) {
         this(null, name, description, thumbnail);
     }
 
-    public Theme(final Long id, final Theme theme) {
+    public Theme(Long id, Theme theme) {
         this(id, theme.name, theme.description, theme.thumbnail);
     }
 
     public Theme(
-            final Long id,
-            final String name,
-            final String description,
-            final String thumbnail
+            Long id,
+            String name,
+            String description,
+            String thumbnail
     ) {
         this.id = id;
         this.name = name;

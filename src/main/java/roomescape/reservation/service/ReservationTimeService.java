@@ -18,18 +18,19 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Service
 public class ReservationTimeService {
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeService(
-            final ReservationTimeRepository reservationTimeRepository,
-            final ReservationRepository reservationRepository
+            ReservationTimeRepository reservationTimeRepository,
+            ReservationRepository reservationRepository
     ) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
 
-    public ReservationTime findTimeById(final Long id) {
+    public ReservationTime findTimeById(Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_TIME_NOT_FOUND,
                         String.format("[reservationTimeId: %d]", id), HttpStatus.BAD_REQUEST));
@@ -44,14 +45,14 @@ public class ReservationTimeService {
         return new ReservationTimesResponse(response);
     }
 
-    public ReservationTimeResponse addTime(final ReservationTimeRequest reservationTimeRequest) {
+    public ReservationTimeResponse addTime(ReservationTimeRequest reservationTimeRequest) {
         validateTimeDuplication(reservationTimeRequest);
         ReservationTime reservationTime = reservationTimeRepository.save(reservationTimeRequest.toTime());
 
         return ReservationTimeResponse.from(reservationTime);
     }
 
-    private void validateTimeDuplication(final ReservationTimeRequest reservationTimeRequest) {
+    private void validateTimeDuplication(ReservationTimeRequest reservationTimeRequest) {
         List<ReservationTime> duplicateReservationTimes = reservationTimeRepository.findByStartAt(
                 reservationTimeRequest.startAt());
 
@@ -61,7 +62,7 @@ public class ReservationTimeService {
         }
     }
 
-    public void removeTimeById(final Long id) {
+    public void removeTimeById(Long id) {
         ReservationTime reservationTime = findTimeById(id);
         List<Reservation> usingTimeReservations = reservationRepository.findByReservationTime(reservationTime);
 
@@ -74,11 +75,11 @@ public class ReservationTimeService {
     }
 
 
-    public ReservationTimeInfosResponse findAllAvailableTimesByDateAndTheme(final LocalDate date, final Long themeId) {
-        final List<ReservationTime> allTimes = reservationTimeRepository.findAll();
-        final List<Reservation> reservations = reservationRepository.findByThemeId(themeId);
+    public ReservationTimeInfosResponse findAllAvailableTimesByDateAndTheme(LocalDate date, Long themeId) {
+        List<ReservationTime> allTimes = reservationTimeRepository.findAll();
+        List<Reservation> reservations = reservationRepository.findByThemeId(themeId);
 
-        final List<ReservationTimeInfoResponse> response = allTimes.stream()
+        List<ReservationTimeInfoResponse> response = allTimes.stream()
                 .map(time -> new ReservationTimeInfoResponse(time.getId(), time.getStartAt(),
                         isReservationBooked(reservations, date, time)))
                 .toList();

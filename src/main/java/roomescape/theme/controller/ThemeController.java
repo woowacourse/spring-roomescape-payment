@@ -22,9 +22,10 @@ import roomescape.theme.service.ThemeService;
 
 @RestController
 public class ThemeController {
+
     private final ThemeService themeService;
 
-    public ThemeController(final ThemeService themeService) {
+    public ThemeController(ThemeService themeService) {
         this.themeService = themeService;
     }
 
@@ -37,7 +38,7 @@ public class ThemeController {
     @GetMapping("/themes/top")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<ThemesResponse> getTop10Themes(
-            @NotNull(message = "날짜는 null일 수 없습니다.") final LocalDate today
+            @NotNull(message = "날짜는 null일 수 없습니다.") LocalDate today
     ) {
         return ApiResponse.success(themeService.getTop10Themes(today));
     }
@@ -46,10 +47,10 @@ public class ThemeController {
     @PostMapping("/themes")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ThemeResponse> saveTheme(
-            @Valid @RequestBody final ThemeRequest request,
-            final HttpServletResponse response
+            @Valid @RequestBody ThemeRequest request,
+            HttpServletResponse response
     ) {
-        final ThemeResponse themeResponse = themeService.addTheme(request);
+        ThemeResponse themeResponse = themeService.addTheme(request);
         response.setHeader(HttpHeaders.LOCATION, "/themes/" + themeResponse.id());
 
         return ApiResponse.success(themeResponse);
@@ -59,7 +60,7 @@ public class ThemeController {
     @DeleteMapping("/themes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> removeTheme(
-            @NotNull(message = "themeId는 null일 수 없습니다.") @PathVariable final Long id
+            @NotNull(message = "themeId는 null일 수 없습니다.") @PathVariable Long id
     ) {
         themeService.removeThemeById(id);
 

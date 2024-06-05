@@ -17,27 +17,28 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Component
 public class MemberIdResolver implements HandlerMethodArgumentResolver {
+
     private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 
     private final JwtHandler jwtHandler;
 
-    public MemberIdResolver(final JwtHandler jwtHandler) {
+    public MemberIdResolver(JwtHandler jwtHandler) {
         this.jwtHandler = jwtHandler;
     }
 
     @Override
-    public boolean supportsParameter(final MethodParameter parameter) {
+    public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(MemberId.class);
     }
 
     @Override
     public Object resolveArgument(
-            final MethodParameter parameter,
-            final ModelAndViewContainer mavContainer,
-            final NativeWebRequest webRequest,
-            final WebDataBinderFactory binderFactory
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory
     ) throws Exception {
-        final Cookie[] cookies = webRequest.getNativeRequest(HttpServletRequest.class).getCookies();
+        Cookie[] cookies = webRequest.getNativeRequest(HttpServletRequest.class).getCookies();
         if (cookies == null) {
             throw new RoomEscapeException(ErrorType.NOT_EXIST_COOKIE, HttpStatus.UNAUTHORIZED);
         }

@@ -19,34 +19,35 @@ import roomescape.system.dto.response.ApiResponse;
 
 @RestController
 public class AuthController {
+
     private final AuthService authService;
 
-    public AuthController(final AuthService authService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     @PostMapping("/login")
     public ApiResponse<Void> login(
-            @Valid @RequestBody final LoginRequest loginRequest,
-            final HttpServletResponse response
+            @Valid @RequestBody LoginRequest loginRequest,
+            HttpServletResponse response
     ) {
-        final TokenDto tokenInfo = authService.login(loginRequest);
+        TokenDto tokenInfo = authService.login(loginRequest);
         addCookieToResponse(new Cookie("accessToken", tokenInfo.accessToken()), response);
         addCookieToResponse(new Cookie("refreshToken", tokenInfo.refreshToken()), response);
         return ApiResponse.success();
     }
 
     @GetMapping("/login/check")
-    public ApiResponse<LoginCheckResponse> checkLogin(@MemberId final Long memberId) {
-        final LoginCheckResponse response = authService.checkLogin(memberId);
+    public ApiResponse<LoginCheckResponse> checkLogin(@MemberId Long memberId) {
+        LoginCheckResponse response = authService.checkLogin(memberId);
         return ApiResponse.success(response);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> logout(
-            final HttpServletRequest request,
-            final HttpServletResponse response
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         TokenDto tokenInfo = getTokenFromCookie(request);
         Cookie cookie = new Cookie("accessToken", tokenInfo.accessToken());
@@ -60,22 +61,22 @@ public class AuthController {
 
     @GetMapping("/token-reissue")
     public ApiResponse<Void> reissueToken(
-            final HttpServletRequest request,
-            final HttpServletResponse response
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        final TokenDto requestToken = getTokenFromCookie(request);
+        TokenDto requestToken = getTokenFromCookie(request);
 
-        final TokenDto tokenInfo = authService.reissueToken(requestToken.accessToken(), requestToken.refreshToken());
+        TokenDto tokenInfo = authService.reissueToken(requestToken.accessToken(), requestToken.refreshToken());
         addCookieToResponse(new Cookie("accessToken", tokenInfo.accessToken()), response);
         addCookieToResponse(new Cookie("refreshToken", tokenInfo.refreshToken()), response);
 
         return ApiResponse.success();
     }
 
-    private TokenDto getTokenFromCookie(final HttpServletRequest request) {
+    private TokenDto getTokenFromCookie(HttpServletRequest request) {
         String accessToken = "";
         String refreshToken = "";
-        for (final Cookie cookie : request.getCookies()) {
+        for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("accessToken")) {
                 accessToken = cookie.getValue();
                 cookie.setMaxAge(0);
@@ -88,7 +89,7 @@ public class AuthController {
         return new TokenDto(accessToken, refreshToken);
     }
 
-    private void addCookieToResponse(Cookie cookie, final HttpServletResponse response) {
+    private void addCookieToResponse(Cookie cookie, HttpServletResponse response) {
         cookie.setHttpOnly(true);
 
         response.addCookie(cookie);

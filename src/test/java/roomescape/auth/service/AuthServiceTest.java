@@ -26,19 +26,15 @@ class AuthServiceTest {
     private AuthService authService;
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private JwtHandler jwtHandler;
 
     @Test
     @DisplayName("존재하는 회원의 email, password로 로그인하면 memberId, accessToken을 Response 한다.")
     void loginSuccess() {
         // given
-        final Member member = memberRepository.save(new Member("이름", "test@test.com", "12341234", Role.MEMBER));
+        Member member = memberRepository.save(new Member("이름", "test@test.com", "12341234", Role.MEMBER));
 
         // when
-        final TokenDto response = authService.login(new LoginRequest(member.getEmail(), member.getPassword()));
+        TokenDto response = authService.login(new LoginRequest(member.getEmail(), member.getPassword()));
 
         // then
         assertAll(
@@ -51,8 +47,8 @@ class AuthServiceTest {
     @DisplayName("존재하지 않는 회원 email 또는 password로 로그인하면 예외를 발생한다.")
     void loginFailByNotExistMemberInfo() {
         // given
-        final String notExistEmail = "invalid@test.com";
-        final String notExistPassword = "invalid1234";
+        String notExistEmail = "invalid@test.com";
+        String notExistPassword = "invalid1234";
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.login(new LoginRequest(notExistEmail, notExistPassword)))
@@ -63,7 +59,7 @@ class AuthServiceTest {
     @DisplayName("존재하지 않는 회원의 memberId로 로그인 여부를 체크하면 예외를 발생한다.")
     void checkLoginFailByNotExistMemberInfo() {
         // given
-        final Long notExistMemberId = 1L;
+        Long notExistMemberId = 1L;
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.checkLogin(notExistMemberId))

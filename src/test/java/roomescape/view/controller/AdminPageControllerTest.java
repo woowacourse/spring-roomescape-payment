@@ -146,7 +146,7 @@ class AdminPageControllerTest {
                 .statusCode(403);
     }
 
-    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAdminAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("이름", email, password, Role.ADMIN));
 
         Map<String, String> loginParams = Map.of(
@@ -164,7 +164,7 @@ class AdminPageControllerTest {
         return "accessToken=" + accessToken;
     }
 
-    private String getAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("name", email, password, Role.MEMBER));
         Map<String, String> loginParams = Map.of(
                 "email", email,

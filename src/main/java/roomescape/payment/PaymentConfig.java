@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClient;
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
 public class PaymentConfig {
+
     @Bean
     public TossPaymentClient tossPaymentClient(PaymentProperties paymentProperties) {
         return new TossPaymentClient(restClient(paymentProperties));

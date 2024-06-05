@@ -27,16 +27,17 @@ import roomescape.theme.service.ThemeService;
 
 @Service
 public class ReservationService {
+
     private final ReservationRepository reservationRepository;
     private final ReservationTimeService reservationTimeService;
     private final MemberService memberService;
     private final ThemeService themeService;
 
     public ReservationService(
-            final ReservationRepository reservationRepository,
-            final ReservationTimeService reservationTimeService,
-            final MemberService memberService,
-            final ThemeService themeService
+            ReservationRepository reservationRepository,
+            ReservationTimeService reservationTimeService,
+            MemberService memberService,
+            ThemeService themeService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeService = reservationTimeService;
@@ -45,7 +46,7 @@ public class ReservationService {
     }
 
     public ReservationsResponse findAllReservations() {
-        final List<ReservationResponse> response = reservationRepository.findAll()
+        List<ReservationResponse> response = reservationRepository.findAll()
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -54,19 +55,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public void removeReservationById(final Long reservationId, final Long memberId) {
+    public void removeReservationById(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         reservationRepository.deleteById(reservationId);
     }
 
-    public ReservationResponse addReservation(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse addReservation(ReservationRequest request, Long memberId) {
         validateIsReservationExist(request.themeId(), request.timeId(), request.date());
         Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.CONFIRMED);
         Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.from(saved);
     }
 
-    public ReservationResponse addWaiting(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse addWaiting(ReservationRequest request, Long memberId) {
         validateMemberAlreadyReserve(request.themeId(), request.timeId(), request.date(), memberId);
         Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.WAITING);
         Reservation saved = reservationRepository.save(reservation);
@@ -100,8 +101,8 @@ public class ReservationService {
     }
 
     private void validateDateAndTime(
-            final LocalDate requestDate,
-            final ReservationTime requestReservationTime
+            LocalDate requestDate,
+            ReservationTime requestReservationTime
     ) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime request = LocalDateTime.of(requestDate, requestReservationTime.getStartAt());
@@ -114,19 +115,19 @@ public class ReservationService {
         }
     }
 
-    private Reservation getReservationForSave(final ReservationRequest request, final Long memberId,
-                                              final ReservationStatus status) {
-        final ReservationTime time = reservationTimeService.findTimeById(request.timeId());
-        final Theme theme = themeService.findThemeById(request.themeId());
-        final Member member = memberService.findMemberById(memberId);
+    private Reservation getReservationForSave(ReservationRequest request, Long memberId,
+                                              ReservationStatus status) {
+        ReservationTime time = reservationTimeService.findTimeById(request.timeId());
+        Theme theme = themeService.findThemeById(request.themeId());
+        Member member = memberService.findMemberById(memberId);
 
         validateDateAndTime(request.date(), time);
         return new Reservation(request.date(), time, theme, member, status);
     }
 
-    public ReservationsResponse findFilteredReservations(final ReservationSearchRequest request) {
+    public ReservationsResponse findFilteredReservations(ReservationSearchRequest request) {
         validateDateForSearch(request.dateFrom(), request.dateTo());
-        final Specification<Reservation> spec = new ReservationSearchSpecification()
+        Specification<Reservation> spec = new ReservationSearchSpecification()
                 .sameThemeId(request.themeId())
                 .sameMemberId(request.memberId())
                 .dateStartFrom(request.dateFrom())
@@ -134,7 +135,7 @@ public class ReservationService {
                 .sameStatus(ReservationStatus.CONFIRMED)
                 .build();
 
-        final List<ReservationResponse> response = reservationRepository.findAll(spec)
+        List<ReservationResponse> response = reservationRepository.findAll(spec)
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -142,7 +143,7 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
-    private void validateDateForSearch(final LocalDate startFrom, final LocalDate endAt) {
+    private void validateDateForSearch(LocalDate startFrom, LocalDate endAt) {
         if (startFrom == null || endAt == null) {
             return;
         }
@@ -152,8 +153,8 @@ public class ReservationService {
         }
     }
 
-    public WaitingWithRanksResponse findWaitingWithRankById(final Long memberId) {
-        final List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
+    public WaitingWithRanksResponse findWaitingWithRankById(Long memberId) {
+        List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
                         memberId)
                 .stream()
                 .map(WaitingWithRankResponse::from)
@@ -161,7 +162,7 @@ public class ReservationService {
         return new WaitingWithRanksResponse(waitingWithRanks);
     }
 
-    public void approveWaiting(final Long reservationId, final Long memberId) {
+    public void approveWaiting(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         if (reservationRepository.isExistConfirmedReservation(reservationId)) {
             throw new RoomEscapeException(ErrorType.RESERVATION_DUPLICATED, HttpStatus.CONFLICT);
@@ -169,7 +170,7 @@ public class ReservationService {
         reservationRepository.updateStatusByReservationId(reservationId, ReservationStatus.CONFIRMED);
     }
 
-    public void cancelWaiting(final Long reservationId) {
+    public void cancelWaiting(Long reservationId) {
         Reservation waiting = reservationRepository.findById(reservationId)
                 .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,

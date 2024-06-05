@@ -23,9 +23,6 @@ import static org.hamcrest.Matchers.is;
 class AuthControllerTest {
 
     @Autowired
-    private AuthService authService;
-
-    @Autowired
     private MemberRepository memberRepository;
 
     @LocalServerPort

@@ -12,9 +12,10 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Service
 public class MemberService {
+
     private final MemberRepository memberRepository;
 
-    public MemberService(final MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
@@ -26,13 +27,13 @@ public class MemberService {
         return new MembersResponse(response);
     }
 
-    public Member findMemberById(final Long memberId) {
+    public Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.MEMBER_NOT_FOUND,
                         String.format("[memberId: %d]", memberId), HttpStatus.BAD_REQUEST));
     }
 
-    public Member findMemberByEmailAndPassword(final String email, final String password) {
+    public Member findMemberByEmailAndPassword(String email, String password) {
         return memberRepository.findByEmailAndPassword(email, password)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.MEMBER_NOT_FOUND,
                         String.format("[email: %s, password: %s]", email, password), HttpStatus.BAD_REQUEST));

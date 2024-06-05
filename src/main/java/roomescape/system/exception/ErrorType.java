@@ -46,7 +46,7 @@ public enum ErrorType {
 
     private final String description;
 
-    ErrorType(final String description) {
+    ErrorType(String description) {
         this.description = description;
     }
 

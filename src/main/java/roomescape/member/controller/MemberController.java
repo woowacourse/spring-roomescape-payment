@@ -11,9 +11,10 @@ import roomescape.system.dto.response.ApiResponse;
 
 @RestController
 public class MemberController {
+
     private final MemberService memberService;
 
-    public MemberController(final MemberService memberService) {
+    public MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 

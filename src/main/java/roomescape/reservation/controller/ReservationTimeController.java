@@ -24,9 +24,10 @@ import roomescape.system.dto.response.ApiResponse;
 
 @RestController
 public class ReservationTimeController {
+
     private final ReservationTimeService reservationTimeService;
 
-    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
+    public ReservationTimeController(ReservationTimeService reservationTimeService) {
         this.reservationTimeService = reservationTimeService;
     }
 
@@ -41,10 +42,10 @@ public class ReservationTimeController {
     @PostMapping("/times")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ReservationTimeResponse> saveTime(
-            @Valid @RequestBody final ReservationTimeRequest reservationTimeRequest,
-            final HttpServletResponse response
+            @Valid @RequestBody ReservationTimeRequest reservationTimeRequest,
+            HttpServletResponse response
     ) {
-        final ReservationTimeResponse reservationTimeResponse = reservationTimeService.addTime(reservationTimeRequest);
+        ReservationTimeResponse reservationTimeResponse = reservationTimeService.addTime(reservationTimeRequest);
         response.setHeader(HttpHeaders.LOCATION, "/times/" + reservationTimeResponse.id());
 
         return ApiResponse.success(reservationTimeResponse);
@@ -54,7 +55,7 @@ public class ReservationTimeController {
     @DeleteMapping("/times/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> removeTime(
-            @NotNull(message = "timeId는 null 또는 공백일 수 없습니다.") @PathVariable final Long id
+            @NotNull(message = "timeId는 null 또는 공백일 수 없습니다.") @PathVariable Long id
     ) {
         reservationTimeService.removeTimeById(id);
 
@@ -64,8 +65,8 @@ public class ReservationTimeController {
     @GetMapping("/times/filter")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<ReservationTimeInfosResponse> findAllAvailableReservationTimes(
-            @NotNull(message = "날짜는 null일 수 없습니다.") @RequestParam final LocalDate date,
-            @NotNull(message = "themeId는 null일 수 없습니다.") @RequestParam final Long themeId) {
+            @NotNull(message = "날짜는 null일 수 없습니다.") @RequestParam LocalDate date,
+            @NotNull(message = "themeId는 null일 수 없습니다.") @RequestParam Long themeId) {
         return ApiResponse.success(reservationTimeService.findAllAvailableTimesByDateAndTheme(date, themeId));
     }
 }

@@ -198,7 +198,7 @@ public class ReservationTimeControllerTest {
         );
     }
 
-    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAdminAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("이름", email, password, Role.ADMIN));
 
         Map<String, String> loginParams = Map.of(

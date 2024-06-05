@@ -57,6 +57,7 @@ public class ReservationControllerTest {
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         MockitoAnnotations.openMocks(this);
     }
 

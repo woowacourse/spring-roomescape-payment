@@ -9,6 +9,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
 public record ReservationRequest(
+
         @NotNull(message = "예약 날짜는 null일 수 없습니다.")
         LocalDate date,
         @NotNull(message = "예약 요청의 timeId는 null일 수 없습니다.")
