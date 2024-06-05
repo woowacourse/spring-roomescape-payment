@@ -51,7 +51,7 @@ class TossPaymentClientTest {
     @Test
     void confirmPaymentTest() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withSuccess());
@@ -63,7 +63,7 @@ class TossPaymentClientTest {
     @Test
     void confirmPaymentTest_whenNotConfirmed() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         String errorResponse = """
                 {
@@ -83,7 +83,7 @@ class TossPaymentClientTest {
     @Test
     void confirmPaymentTest_whenUnauthorized() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         String errorResponse = """
                 {

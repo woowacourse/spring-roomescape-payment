@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
-import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.service.ReservationDeleteService;
-import roomescape.reservation.service.ReservationFindMineService;
 import roomescape.reservation.service.ReservationFindService;
 import roomescape.reservation.service.ReservationPayService;
 
@@ -26,15 +25,12 @@ import roomescape.reservation.service.ReservationPayService;
 public class ReservationController {
     private final ReservationPayService reservationPayService;
     private final ReservationFindService findService;
-    private final ReservationFindMineService findMineService;
     private final ReservationDeleteService deleteService;
 
     public ReservationController(ReservationFindService findService,
-                                 ReservationFindMineService findMineService,
                                  ReservationPayService reservationPayService,
                                  ReservationDeleteService deleteService) {
         this.findService = findService;
-        this.findMineService = findMineService;
         this.reservationPayService = reservationPayService;
         this.deleteService = deleteService;
     }
@@ -45,8 +41,8 @@ public class ReservationController {
     }
 
     @GetMapping("/accounts")
-    public List<MyReservationResponse> findMyReservations(LoggedInMember member) {
-        return findMineService.findMyReservations(member.id());
+    public List<MyReservationWithPaymentResponse> findMyReservations(LoggedInMember member) {
+        return reservationPayService.findMyReservationsWithPayment(member.id());
     }
 
     @PostMapping

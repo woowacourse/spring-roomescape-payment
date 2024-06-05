@@ -8,13 +8,14 @@ public record PaymentConfirmRequest(
         String paymentKey,
         String orderId,
         BigDecimal amount,
-        Long reservationId
+        Long reservationId,
+        Long memberId
 ) {
-    public static PaymentConfirmRequest from(UserReservationCreateRequest request, Long reservationId) {
-        return new PaymentConfirmRequest(request.paymentKey(), request.orderId(), request.amount(), reservationId);
+    public static PaymentConfirmRequest from(UserReservationCreateRequest request, Long reservationId, Long memberId) {
+        return new PaymentConfirmRequest(request.paymentKey(), request.orderId(), request.amount(), reservationId, memberId);
     }
 
     public Payment createPayment() {
-        return new Payment(reservationId, paymentKey, amount);
+        return new Payment(reservationId, memberId, paymentKey, amount);
     }
 }

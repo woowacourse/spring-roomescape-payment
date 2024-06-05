@@ -14,17 +14,20 @@ public class Payment {
     private Long id;
     @Column(nullable = false)
     private Long reservationId;
+    @Column(nullable = false)
+    private Long memberId;
     private String paymentKey;
     @Column(nullable = false)
     private BigDecimal amount;
 
-    public Payment(Long reservationId, String paymentKey, BigDecimal amount) {
-        this(null, reservationId, paymentKey, amount);
+    public Payment(Long reservationId, Long memberId, String paymentKey, BigDecimal amount) {
+        this(null, reservationId, memberId, paymentKey, amount);
     }
 
-    public Payment(Long id, Long reservationId, String paymentKey, BigDecimal amount) {
+    public Payment(Long id, Long reservationId, Long memberId, String paymentKey, BigDecimal amount) {
         this.id = id;
         this.reservationId = reservationId;
+        this.memberId = memberId;
         this.paymentKey = paymentKey;
         this.amount = amount;
     }
@@ -46,5 +49,13 @@ public class Payment {
 
     public Long getReservationId() {
         return reservationId;
+    }
+
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
     }
 }
