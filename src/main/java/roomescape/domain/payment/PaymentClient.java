@@ -29,8 +29,8 @@ public class PaymentClient {
     public PaymentClient(PaymentApiResponseErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(3))
-                .withReadTimeout(Duration.ofSeconds(3));
+                .withConnectTimeout(Duration.ofSeconds(2))
+                .withReadTimeout(Duration.ofSeconds(4));
 
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
 
