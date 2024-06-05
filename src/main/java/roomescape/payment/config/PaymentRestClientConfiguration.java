@@ -12,6 +12,7 @@ import roomescape.payment.application.PaymentProperty;
 import roomescape.payment.infra.PaymentWithRestClient;
 
 import java.time.Duration;
+import java.util.Base64;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperty.class)
@@ -34,7 +35,12 @@ public class PaymentRestClientConfiguration {
         return RestClient.builder()
                 .requestFactory(getClientFactory(paymentProperty))
                 .baseUrl(paymentProperty.getUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + paymentProperty.getSecretKey());
+                .defaultHeader(HttpHeaders.AUTHORIZATION, encodeKey(paymentProperty.getSecretKey()));
+    }
+
+    private String encodeKey(String key) {
+        String encoded = Base64.getEncoder().encodeToString(key.getBytes());
+        return "Basic " + encoded;
     }
 
     private ClientHttpRequestFactory getClientFactory(PaymentProperty paymentProperty) {

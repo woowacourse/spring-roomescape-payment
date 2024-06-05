@@ -22,6 +22,6 @@ security:
 payment:
   name: toss
   url: https://api.tosspayments.com/v1/payments
-  secret-key: dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6
+  secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
   connection-timeout: 10
   read-timeout: 30
