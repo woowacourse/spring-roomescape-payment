@@ -37,10 +37,10 @@ public class ReservationSearchService {
 
     public List<ReservationResponse> findReservationsByFilter(ReservationFilter filter) {
         List<Reservation> reservations = reservationRepository.findByMemberOrThemeOrDateRange(
-                filter.getMemberId(),
-                filter.getThemeId(),
-                filter.getStartDate(),
-                filter.getEndDate()
+                filter.member(),
+                filter.theme(),
+                filter.dateFrom(),
+                filter.dateTo()
         );
 
         return reservations.stream()

@@ -131,7 +131,7 @@ class ReservationApiTest extends ApiBaseTest {
         RestAssured
                 .given().log().all()
                 .port(port)
-                .when().get("/reservations?member=2&theme=1")
+                .when().get("/reservations/search?member=2&theme=1")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(8))

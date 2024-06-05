@@ -48,8 +48,7 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
     void 특정_사용자로_필터링_후_예약_조회() {
         // given
         Long filteringUserId = USER_ID;
-        ReservationFilter reservationFilter = new ReservationFilter();
-        reservationFilter.setMemberId(filteringUserId);
+        ReservationFilter reservationFilter = new ReservationFilter(filteringUserId, null, null, null);
 
         // when
         List<ReservationResponse> reservationResponses = reservationSearchService.findReservationsByFilter(
@@ -67,10 +66,7 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
         LocalDate startDate = LocalDate.now().minusDays(3);
         LocalDate endDate = LocalDate.now().minusDays(1);
 
-        ReservationFilter reservationFilter = new ReservationFilter();
-        reservationFilter.setThemeId(filteringThemeId);
-        reservationFilter.setStartDate(startDate);
-        reservationFilter.setEndDate(endDate);
+        ReservationFilter reservationFilter = new ReservationFilter(null, filteringThemeId, startDate, endDate);
 
         // when
         List<ReservationResponse> reservationResponses = reservationSearchService.findReservationsByFilter(
