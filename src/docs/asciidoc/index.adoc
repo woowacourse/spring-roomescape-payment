@@ -33,6 +33,8 @@ operation::member/create/success[snippets='http-request,http-response']
 operation::member/create/fail/duplicated-email[snippets='http-request,http-response']
 ===== 이메일 형식이 잘못되었을 경우
 operation::member/create/fail/invalid-email-format[snippets='http-request,http-response']
+===== 비밀번호가 최소 8자 이상, 하나 이상의 대문자, 소문자, 숫자, 특수 문자를 포함하지 않을 경우
+operation::member/create/fail/invalid-password-format[snippets='http-request,http-response']
 
 == 예약
 === 예약 생성

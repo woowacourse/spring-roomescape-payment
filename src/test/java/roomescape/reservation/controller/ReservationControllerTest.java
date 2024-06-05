@@ -236,7 +236,7 @@ class ReservationControllerTest extends ControllerTest {
         );
 
         //when
-        doReturn(reservationResponse)
+        doNothing()
                 .when(reservationApplicationService)
                 .deleteWaiting(any(), anyLong());
 

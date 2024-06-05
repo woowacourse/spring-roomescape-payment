@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
 
@@ -134,7 +136,7 @@ class AuthControllerTest extends ControllerTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "chocochip2");
         params.put("email", "dev.chocochip2@gmail.com");
-        params.put("password", "12345");
+        params.put("password", "12345Hsad@!sdlsadasdnk");
 
         //when
         doReturn(memberResponse)
@@ -183,7 +185,7 @@ class AuthControllerTest extends ControllerTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "chocochip");
         params.put("email", invalidMail);
-        params.put("password", "12345");
+        params.put("password", "12345Hsad@!sdlsadasdnk");
 
         //when & then
         restDocs
@@ -191,7 +193,37 @@ class AuthControllerTest extends ControllerTest {
                 .body(params)
                 .when().post("/api/v1/signup")
                 .then().log().all()
-                .apply(document("member/create/fail/invalid-email-format"))
+                .apply(document("member/create/fail/invalid-email-format",
+                        responseFields(
+                                fieldWithPath("errorCode").description("에러코드"),
+                                fieldWithPath("message").description("메시지"),
+                                fieldWithPath("validation.email").description("상세 사유")
+                        )))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("비밀번호가 최소 8자 이상, 하나 이상의 대문자, 소문자, 숫자, 특수 문자를 포함하지 아닐 경우, 400을 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "   ", "chocochip", "chocochip@"})
+    void signupInvalidPassword(String invalidPassword) {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "chocochip");
+        params.put("email", "dev.something@gmail.com");
+        params.put("password", invalidPassword);
+
+        //when & then
+        restDocs
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/api/v1/signup")
+                .then().log().all()
+                .apply(document("member/create/fail/invalid-password-format",
+                        responseFields(
+                                fieldWithPath("errorCode").description("에러코드"),
+                                fieldWithPath("message").description("메시지"),
+                                fieldWithPath("validation.password").description("상세 사유")
+                        )))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }
