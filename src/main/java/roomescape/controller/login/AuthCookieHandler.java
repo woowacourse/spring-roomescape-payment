@@ -1,13 +1,14 @@
 package roomescape.controller.login;
 
 import jakarta.servlet.http.Cookie;
-import java.util.Arrays;
 import org.springframework.stereotype.Component;
 import roomescape.exception.login.InvalidTokenException;
 
+import java.util.Arrays;
+
 @Component
-public class CookieExtractor {
-    private final String COOKIE_NAME = "token";
+public class AuthCookieHandler {
+    private static final String COOKIE_NAME = "token";
 
     public Cookie createCookie(String token) {
         Cookie cookie = new Cookie(COOKIE_NAME, token);
