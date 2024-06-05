@@ -26,7 +26,7 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("관리자가 테마 목록을 조회한다.")
+    @DisplayName("테마 목록을 조회한다.")
     void findAllThemesTest() {
         fixture.createTheme(new ThemeRequest("테마명1", "테마 설명1", "url1", 10_000L));
         fixture.createTheme(new ThemeRequest("테마명2", "테마 설명2", "url2", 10_000L));

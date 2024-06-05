@@ -3,6 +3,7 @@ package roomescape.application.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static roomescape.fixture.MemberFixture.MEMBER_ARU;
+import static roomescape.fixture.MemberFixture.MEMBER_PK;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -50,11 +51,19 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("사용자가 존재하지 않는 경우, 예외가 발생한다.")
+    void memberNotFoundTest() {
+        assertThatCode(() -> memberService.login(MEMBER_ARU.loginRequest()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이메일 / 비밀번호를 확인해 주세요.");
+    }
+
+
+    @Test
     @DisplayName("비밀번호가 틀리는 경우, 예외가 발생한다.")
     void passwordMismatchTest() {
         memberRepository.save(MEMBER_ARU.create());
-        MemberLoginRequest request = new MemberLoginRequest(MEMBER_ARU.email(), "abcdefgh");
-        assertThatCode(() -> memberService.login(request))
+        assertThatCode(() -> memberService.login(MEMBER_PK.loginRequest()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이메일 / 비밀번호를 확인해 주세요.");
     }

@@ -33,7 +33,8 @@ public class MemberService {
 
     @Transactional
     public TokenResponse login(MemberLoginRequest request) {
-        Member member = memberRepository.getByEmail(request.email());
+        Member member = memberRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("이메일 / 비밀번호를 확인해 주세요."));
         if (!member.matchPassword(request.password())) {
             throw new IllegalArgumentException("이메일 / 비밀번호를 확인해 주세요.");
         }
