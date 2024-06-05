@@ -25,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 @Transactional
 class ReservationServiceTest extends IntegrationTestSupport {
@@ -51,6 +53,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약을 저장한다.")
     void saveReservation() {
+        doNothing().when(paymentService).savePayment(any(CreateReservationRequest.class), any(Reservation.class));
+
         final long memberId = 3L;
         final long themeId = 4L;
         final long timeId = 1L;
@@ -74,11 +78,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final LocalDate date = LocalDate.now();
 
         final List<ReservationRankResponse> expected = List.of(
-                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1, "test_payment_key",
+                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1, "payment_key5",
                         1000),
-                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1, "test_payment_key",
+                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1, "payment_key6",
                         1000),
-                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2, "test_payment_key",
+                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2, "payment_key8",
                         1000)
         );
 
@@ -99,6 +103,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 대기를 삭제한다.")
     void deleteWaitReservation() {
+
         final long waitReservationId = 8L;
         final long memberId = 3L;
         final List<WaitingReservationResponse> beforeDeleting = reservationService.findAllWaiting();
@@ -131,8 +136,11 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("멤버는 같은 날짜, 테마, 시간에 대해 하나의 예약만 가능하다")
     void duplicateReservationInfo() {
         //given
+        doNothing().when(paymentService).savePayment(any(CreateReservationRequest.class), any(Reservation.class));
+
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
+        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L,
+                "payment_key3", "orderId", 1000L);
 
         //when && then
         reservationService.addUserReservation(request);
@@ -144,9 +152,13 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("다른 멤버가 같은 날짜, 테마, 시간 예약을 할 수 있다.")
     void addReservation() {
         //given
+        doNothing().when(paymentService).savePayment(any(CreateReservationRequest.class), any(Reservation.class));
+
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
-        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, null, null, null);
+        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L, "paymentKey", null,
+                null);
+        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, "paymentKey", null,
+                null);
 
         //when && then
         reservationService.addUserReservation(request1);

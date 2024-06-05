@@ -5,12 +5,16 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.controller.reservation.dto.CreateReservationRequest;
+import roomescape.domain.Reservation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AdminEndToEndTest extends IntegrationTestSupport {
@@ -82,8 +86,10 @@ class AdminEndToEndTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("예약 저장 및 삭제")
+    @DisplayName("어드민이 예약 저장 및 삭제")
     void saveAndDeleteReservation() {
+        doNothing().when(paymentService).savePayment(any(CreateReservationRequest.class), any(Reservation.class));
+
         final Map<String, String> params = Map.of("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE),
                 "timeId", "1", "themeId", "1", "memberId", "1");
 
