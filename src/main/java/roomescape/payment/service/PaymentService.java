@@ -3,7 +3,7 @@ package roomescape.payment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.ErrorType;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.RoomescapeException;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.domain.Payment;
@@ -30,7 +30,7 @@ public class PaymentService {
 
     public void refund(long memberReservationId) {
         Payment payment = paymentRepository.findByMemberReservationId(memberReservationId)
-                .orElseThrow((() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND)));
+                .orElseThrow((() -> new RoomescapeException(ErrorType.MEMBER_RESERVATION_NOT_FOUND)));
 
         paymentClient.cancel(payment.getPaymentKey());
         paymentRepository.delete(payment);

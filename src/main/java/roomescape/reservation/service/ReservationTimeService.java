@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.reservation.domain.AvailableTimes;
@@ -34,7 +34,7 @@ public class ReservationTimeService {
     public ReservationTimeResponse create(ReservationTimeCreate reservationTimeCreate) {
         LocalTime time = reservationTimeCreate.startAt();
         if (reservationTimeRepository.existsByStartAt(time)) {
-            throw new BadRequestException(ErrorType.DUPLICATED_RESERVATION_TIME_ERROR);
+            throw new RoomescapeException(ErrorType.DUPLICATED_RESERVATION_TIME_ERROR);
         }
 
         ReservationTime reservationTime = new ReservationTime(time);
@@ -51,7 +51,7 @@ public class ReservationTimeService {
     @Transactional
     public void delete(long timeId) {
         if (reservationRepository.existsByTimeId(timeId)) {
-            throw new BadRequestException(ErrorType.RESERVATION_NOT_DELETED);
+            throw new RoomescapeException(ErrorType.RESERVATION_NOT_DELETED);
         }
         reservationTimeRepository.deleteById(timeId);
     }

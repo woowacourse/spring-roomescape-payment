@@ -12,8 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import roomescape.exception.BadRequestException;
+
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class Reservation {
@@ -55,7 +56,7 @@ public class Reservation {
 
     private void validate(LocalDate date, ReservationTime time) {
         if (date == null || time == null) {
-            throw new BadRequestException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
+            throw new RoomescapeException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
         }
     }
 

@@ -23,8 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.service.dto.PaymentResponse;
@@ -76,7 +76,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
                         .getId(),
                         reservation.getTheme()
                                 .getId())))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 
@@ -112,7 +112,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.deleteWaiting(AuthInfo.from(memberChoco),
                 reservationResponse.memberReservationId()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -129,7 +129,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
                 new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
                         10000L, date)
         )).isInstanceOf(
-                        BadRequestException.class)
+                        RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 

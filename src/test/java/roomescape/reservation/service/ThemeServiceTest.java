@@ -12,8 +12,8 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -84,7 +84,7 @@ class ThemeServiceTest extends ServiceTest {
         themeService.delete(theme.getId());
 
         //then
-        assertThat(themeRepository.findAll()).hasSize(0);
+        assertThat(themeRepository.findAll()).isEmpty();
     }
 
     @DisplayName("예약이 존재하는 테마 삭제 시, 예외가 발생한다.")
@@ -97,7 +97,7 @@ class ThemeServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> themeService.delete(theme.getId()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.RESERVATION_NOT_DELETED.getMessage());
     }
 
@@ -112,7 +112,7 @@ class ThemeServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> themeService.findPopularThemes(startDate, endDate, limit))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.INVALID_REQUEST_ERROR.getMessage());
     }
 }

@@ -6,8 +6,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalTime;
 import java.util.Objects;
-import roomescape.exception.BadRequestException;
+
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 public class ReservationTime {
@@ -33,7 +34,7 @@ public class ReservationTime {
 
     public void validate(LocalTime startAt) {
         if (startAt == null) {
-            throw new BadRequestException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
+            throw new RoomescapeException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
         }
     }
 

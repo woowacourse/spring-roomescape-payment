@@ -19,8 +19,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.controller.dto.TokenResponse;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.util.ControllerTest;
 
 @DisplayName("회원 API 통합 테스트")
@@ -111,7 +111,7 @@ class AuthControllerTest extends ControllerTest {
         params.put("password", "12345");
 
         //when
-        doThrow(new BadRequestException(ErrorType.DUPLICATED_EMAIL_ERROR))
+        doThrow(new RoomescapeException(ErrorType.DUPLICATED_EMAIL_ERROR))
                 .when(authService)
                 .signUp(any());
 

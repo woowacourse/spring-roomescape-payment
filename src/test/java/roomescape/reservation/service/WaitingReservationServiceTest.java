@@ -16,9 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.exception.AuthorizationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.ReservationResponse;
@@ -126,7 +125,7 @@ class WaitingReservationServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> waitingReservationService.approveWaiting(admin, memberReservation))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -162,7 +161,7 @@ class WaitingReservationServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> waitingReservationService.denyWaiting(admin, memberReservation))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -177,10 +176,10 @@ class WaitingReservationServiceTest extends ServiceTest {
         //when & then
         assertAll(
                 () -> assertThatThrownBy(() -> waitingReservationService.approveWaiting(memberChoco, memberReservation))
-                        .isInstanceOf(AuthorizationException.class)
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage(ErrorType.NOT_ALLOWED_PERMISSION_ERROR.getMessage()),
                 () -> assertThatThrownBy(() -> waitingReservationService.denyWaiting(memberChoco, memberReservation))
-                        .isInstanceOf(AuthorizationException.class)
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage(ErrorType.NOT_ALLOWED_PERMISSION_ERROR.getMessage())
         );
     }

@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 @DisplayName("예약 시간 도메인 테스트")
 class ReservationTimeTest {
@@ -35,7 +35,7 @@ class ReservationTimeTest {
 
         //when & then
         assertThatThrownBy(() -> new ReservationTime(id1, null))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.MISSING_REQUIRED_VALUE_ERROR.getMessage());
     }
 }

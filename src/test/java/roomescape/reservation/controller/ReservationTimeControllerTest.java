@@ -19,8 +19,8 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.util.ControllerTest;
@@ -96,7 +96,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
 
         //when
-        doThrow(new BadRequestException(ErrorType.RESERVATION_NOT_DELETED))
+        doThrow(new RoomescapeException(ErrorType.RESERVATION_NOT_DELETED))
                 .when(reservationTimeService)
                 .delete(isA(Long.class));
 

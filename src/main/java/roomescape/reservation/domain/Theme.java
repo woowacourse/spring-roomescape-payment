@@ -8,8 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
 import java.util.Objects;
-import roomescape.exception.BadRequestException;
+
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.payment.domain.PayAmount;
 
 @Entity
@@ -53,7 +54,7 @@ public class Theme {
 
     private void validateString(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new BadRequestException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
+            throw new RoomescapeException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
         }
     }
 

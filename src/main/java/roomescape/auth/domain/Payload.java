@@ -1,8 +1,9 @@
 package roomescape.auth.domain;
 
 import java.util.function.Supplier;
-import roomescape.exception.AuthenticationException;
+
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 public class Payload<T> {
     private final T body;
@@ -15,8 +16,9 @@ public class Payload<T> {
     }
 
     public T getValue() {
-        if (!validator.get()) {
-            throw new AuthenticationException(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE);
+
+        if (Boolean.FALSE.equals(validator.get())) {
+            throw new RoomescapeException(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE);
         }
         return body;
     }

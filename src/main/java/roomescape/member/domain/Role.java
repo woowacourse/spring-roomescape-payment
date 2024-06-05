@@ -1,7 +1,7 @@
 package roomescape.member.domain;
 
 import roomescape.exception.ErrorType;
-import roomescape.exception.InternalException;
+import roomescape.exception.RoomescapeException;
 
 public enum Role {
     USER,
@@ -14,6 +14,6 @@ public enum Role {
                 return role;
             }
         }
-        throw new InternalException(ErrorType.UNEXPECTED_SERVER_ERROR);
+        throw new RoomescapeException(ErrorType.UNEXPECTED_SERVER_ERROR);
     }
 }

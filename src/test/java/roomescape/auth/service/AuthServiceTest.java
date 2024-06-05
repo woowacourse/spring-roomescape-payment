@@ -14,9 +14,8 @@ import roomescape.auth.controller.dto.LoginRequest;
 import roomescape.auth.controller.dto.TokenResponse;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.auth.service.dto.SignUpCommand;
-import roomescape.exception.AuthenticationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.util.ServiceTest;
@@ -72,7 +71,7 @@ class AuthServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> authService.fetchByToken(invalidToken))
-                .isInstanceOf(AuthenticationException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.SECURITY_EXCEPTION.getMessage());
     }
 
@@ -107,7 +106,7 @@ class AuthServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> authService.signUp(signUpCommand))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_EMAIL_ERROR.getMessage());
     }
 
@@ -120,7 +119,7 @@ class AuthServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> authService.fetchByToken(accessToken))
-                .isInstanceOf(AuthenticationException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE.getMessage());
     }
 }
