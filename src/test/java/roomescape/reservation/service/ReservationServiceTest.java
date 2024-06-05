@@ -17,6 +17,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
@@ -47,6 +49,9 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @AfterEach
     void init() {
@@ -84,6 +89,8 @@ class ReservationServiceTest {
                 new Reservation(member, LocalDate.now(), theme, time, Status.WAITING));
         Reservation reservation2 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
+        Payment payment1 = paymentRepository.save(new Payment("a", 15000, reservation1));
+        Payment payment2 = paymentRepository.save(new Payment("b", 15000, reservation2));
 
         List<MyReservationResponse> memberReservations = reservationService.findAllByMemberId(member.getId());
         assertThat(memberReservations.size()).isEqualTo(2);
@@ -102,7 +109,7 @@ class ReservationServiceTest {
 
         reservationService.delete(reservation2.getId());
         Reservation findReservation = reservationRepository.findById(reservation1.getId()).get();
-        
+
         assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS);
     }
 }

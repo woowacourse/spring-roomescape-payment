@@ -49,13 +49,13 @@ public class ReservationService {
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {
             Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken,
                     Status.WAITING);
-            paymentService.pay(reservationCreateRequest);
+            paymentService.pay(reservationCreateRequest, reservation);
 
             return reservationRepository.save(reservation).getId();
         }
 
         Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken, Status.SUCCESS);
-        paymentService.pay(reservationCreateRequest);
+        paymentService.pay(reservationCreateRequest, reservation);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -107,7 +107,8 @@ public class ReservationService {
 
         return reservationRepository.findAllByMemberId(memberId).stream()
                 .map(reservation -> MyReservationResponse.toResponse(reservation,
-                        waitings.findMemberRank(reservation, memberId)))
+                        waitings.findMemberRank(reservation, memberId),
+                        paymentService.findByReservation(reservation.getId())))
                 .toList();
     }
 
