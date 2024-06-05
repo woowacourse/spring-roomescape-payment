@@ -21,12 +21,12 @@ public class WaitingCancelService {
     }
 
     public void cancelWaitingForUser(Long reservationId) {
-        Waiting waiting = findWaitingByReservationId(reservationId);
+        Waiting waiting = waitingRepository.findByReservationIdOrThrow(reservationId);
         cancelWaiting(waiting.getId());
     }
 
     public void cancelWaiting(Long waitingId) {
-        Waiting waiting = findWaitingById(waitingId);
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
         Reservation reservation = waiting.getReservation();
 
         List<Reservation> waitingReservations = findWaitingReservationBySameConditions(reservation);
@@ -46,26 +46,10 @@ public class WaitingCancelService {
 
     private void adjustWaitingOrder(List<Reservation> reservationsToAdjust, int waitingOrderToDelete) {
         for (Reservation reservation : reservationsToAdjust) {
-            Waiting waiting = findWaitingByReservationId(reservation.getId());
+            Waiting waiting = waitingRepository.findByReservationIdOrThrow(reservation.getId());
             if (waiting.isWaitingOrderGreaterThan(waitingOrderToDelete)) {
                 waiting.decreaseWaitingOrderByOne();
             }
         }
-    }
-
-    private Waiting findWaitingByReservationId(Long reservationId) {
-        return waitingRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
-                        new Throwable("reservation_id : " + reservationId)
-                ));
-    }
-
-    private Waiting findWaitingById(Long waitingId) {
-        return waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 대기 정보가 존재하지 않습니다.",
-                        new Throwable("waiting_id : " + waitingId)
-                ));
     }
 }

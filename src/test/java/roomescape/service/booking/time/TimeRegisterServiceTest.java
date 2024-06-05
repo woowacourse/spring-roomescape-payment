@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservationtime.ReservationTimeRequest;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.booking.time.module.TimeRegisterService;
 
@@ -51,6 +52,6 @@ class TimeRegisterServiceTest {
 
         // when, then
         assertThatThrownBy(() -> timeRegisterService.registerTime(reservationTimeRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

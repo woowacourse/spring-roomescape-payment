@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeName;
 import roomescape.dto.theme.ThemeRequest;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
 
 @Service
@@ -27,9 +29,9 @@ public class ThemeRegisterService {
 
     public void validateNameDuplicate(ThemeName name) {
         if (themeRepository.existsByThemeName(name)) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 동일한 이름의 테마가 존재해 등록할 수 없습니다.",
-                    new Throwable("theme_name : " + name)
+            throw new RoomEscapeException(
+                    ErrorCode.TIME_NOT_REGISTER_BY_DUPLICATE,
+                    "theme_name = " + name.getThemeName()
             );
         }
     }

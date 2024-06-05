@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.service.ServiceBaseTest;
@@ -61,6 +62,6 @@ class ReservationCancelServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> reservationCancelService.deleteReservation(notExistIdToFind))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

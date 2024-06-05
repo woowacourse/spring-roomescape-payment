@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.dto.member.MemberResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
 
 class MemberServiceTest extends ServiceBaseTest {
@@ -31,6 +32,6 @@ class MemberServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> memberService.getMemberById(notExistId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

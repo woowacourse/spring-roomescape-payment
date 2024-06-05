@@ -24,13 +24,8 @@ public class MemberService {
                 .toList();
     }
 
-    public MemberResponse getMemberById(Long id) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 존재하지 않는 사용자 입니다.",
-                        new Throwable("member_id : " + id)
-                ));
-
+    public MemberResponse getMemberById(Long memberId) {
+        Member member = memberRepository.findByIdOrThrow(memberId);
         return MemberResponse.from(member);
     }
 }

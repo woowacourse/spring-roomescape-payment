@@ -8,52 +8,47 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.dto.payment.TossError;
+import roomescape.exception.ErrorCode;
 import roomescape.exception.ExternalApiTimeoutException;
+import roomescape.exception.RoomEscapeException;
 import roomescape.exception.TossClientException;
 import roomescape.exception.TossServerException;
 
 @ControllerAdvice
 class GlobalExceptionHandler {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
-
-    @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    private ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        String logMessage = """
+    private static final String LOG_MESSAGE = """
                 [%s]
-                messgage : %s
-                """.formatted(e.getClass().getName(), e.getMessage());
-        logger.log(Level.SEVERE, logMessage);
+                message : %s
+            """;
 
-        String errorMessage = "요청 본문을 읽을 수 없습니다. 요청 형식을 확인해 주세요.";
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errorMessage);
-    }
+    private static final String LOG_MESSAGE_WITH_DETAIL = """
+                [%s]
+                message : %s
+                detail : %s
+            """;
 
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    private ProblemDetail handleIllegalArgumentException(IllegalArgumentException e) {
-        Throwable cause = e.getCause();
+    private static final String LOG_MESSAGE_WITH_CODE = """
+                [%s]
+                code : %s
+                message : %s
+            """;
 
-        if (cause != null) {
-            String logMessage = """
-                    [%s]
-                    message : %s
-                    detail : %s
-                    """.formatted(e.getClass().getName(), e.getMessage(), cause.getMessage());
-            logger.log(Level.SEVERE, logMessage);
-        }
+    private final Logger logger;
 
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    private GlobalExceptionHandler() {
+        logger = Logger.getLogger(getClass().getName());
     }
 
     @ExceptionHandler(value = TossClientException.class)
     private ProblemDetail handleTossClientException(TossClientException e) {
         TossError tossError = e.getTossError();
 
-        String logMessage = """
-                [%s]
-                code : %s
-                message : %s
-                """.formatted(e.getClass().getName(), tossError.code(), tossError.message());
+        String logMessage = LOG_MESSAGE_WITH_CODE.formatted(
+                e.getClass().getName(),
+                tossError.code(),
+                tossError.message()
+        );
         logger.log(Level.SEVERE, logMessage);
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, tossError.message());
@@ -63,35 +58,63 @@ class GlobalExceptionHandler {
     private ProblemDetail handleTossServerException(TossServerException e) {
         TossError tossError = e.getTossError();
 
-        String logMessage = """
-                [%s]
-                code : %s
-                message : %s
-                """.formatted(e.getClass().getName(), tossError.code(), tossError.message());
+        String logMessage = LOG_MESSAGE_WITH_CODE.formatted(
+                e.getClass().getName(),
+                tossError.code(),
+                tossError.message()
+        );
         logger.log(Level.SEVERE, logMessage);
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, tossError.message());
     }
 
+    @ExceptionHandler(value = RoomEscapeException.class)
+    private ProblemDetail handleRoomEscapeException(RoomEscapeException e) {
+        ErrorCode errorCode = e.getErrorCode();
+
+        String logMessage = LOG_MESSAGE_WITH_DETAIL.formatted(
+                e.getClass().getName(),
+                errorCode.getMessage(),
+                e.getDetail()
+        );
+        logger.log(Level.SEVERE, logMessage);
+
+        return ProblemDetail.forStatusAndDetail(errorCode.getHttpStatus(), errorCode.getMessage());
+    }
+
     @ExceptionHandler(value = ExternalApiTimeoutException.class)
     private ProblemDetail handleExternalApiTimeoutException(ExternalApiTimeoutException e) {
-        String logMessage = """
-                [%s]
-                message : %s
-                """.formatted(e.getClass().getName(), e.getMessage());
+        String logMessage = LOG_MESSAGE.formatted(e.getClass().getName(), e.getMessage());
         logger.log(Level.SEVERE, logMessage);
-        String errorMessage = "결제 요청이 지연되고 있습니다. 잠시후 다시 시도해주세요.";
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+
+        ErrorCode errorCode = ErrorCode.EXTERNAL_API_TIMEOUT;
+        return ProblemDetail.forStatusAndDetail(errorCode.getHttpStatus(), errorCode.getMessage());
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    private ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        String logMessage = LOG_MESSAGE.formatted(e.getClass().getName(), e.getMessage());
+        logger.log(Level.SEVERE, logMessage);
+
+        ErrorCode errorCode = ErrorCode.HTTP_BODY_NOT_READABLE;
+        return ProblemDetail.forStatusAndDetail(errorCode.getHttpStatus(), errorCode.getMessage());
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    private ProblemDetail handleIllegalArgumentException(IllegalArgumentException e) {
+        String logMessage = LOG_MESSAGE.formatted(e.getClass().getName(), e.getMessage());
+        logger.log(Level.SEVERE, logMessage);
+
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        return ProblemDetail.forStatusAndDetail(errorCode.getHttpStatus(), errorCode.getMessage());
     }
 
     @ExceptionHandler(value = Exception.class)
     private ProblemDetail handleGeneralException(Exception e) {
-        String logMessage = """
-                [%s]
-                message : %s
-                """.formatted(e.getClass().getName(), e.getMessage());
+        String logMessage = LOG_MESSAGE.formatted(e.getClass().getName(), e.getMessage());
         logger.log(Level.SEVERE, logMessage);
-        String errorMessage = "시스템에서 오류가 발생했습니다. 관리자에게 문의해주세요.";
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        return ProblemDetail.forStatusAndDetail(errorCode.getHttpStatus(), errorCode.getMessage());
     }
 }

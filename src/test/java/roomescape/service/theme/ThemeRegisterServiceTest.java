@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeRequest;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.theme.module.ThemeRegisterService;
 
@@ -51,6 +52,6 @@ class ThemeRegisterServiceTest {
 
         //when, then
         assertThatThrownBy(() -> themeRegisterService.registerTheme(themeRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

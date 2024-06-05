@@ -9,6 +9,8 @@ import roomescape.dto.login.LoginMember;
 import roomescape.dto.login.LoginRequest;
 import roomescape.dto.member.MemberPayload;
 import roomescape.dto.token.TokenDto;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.RoomEscapeException;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.infrastructure.auth.PasswordEncoder;
 import roomescape.repository.MemberRepository;
@@ -38,27 +40,19 @@ public class AuthService {
         return token != null && jwtProvider.isValidateToken(token);
     }
 
-    public LoginMember extractLoginMemberByToken(TokenDto tokenDto) throws Exception {
+    public LoginMember extractLoginMemberByToken(TokenDto tokenDto) {
         String token = tokenDto.accessToken();
         return createLoginMemberByToken(token);
     }
 
     private Member authenticateUser(LoginRequest request) {
         Email email = new Email(request.email());
-        Member member = getMemberByEmail(email);
+        Member member = memberRepository.findByEmailOrThrow(email);
         validatePassword(request, member);
         return member;
     }
 
-    private Member getMemberByEmail(Email email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 등록된 아이디가 아닙니다.",
-                        new Throwable("id(email) : " + email.getEmail())
-                ));
-    }
-
-    private LoginMember createLoginMemberByToken(String token) throws Exception {
+    private LoginMember createLoginMemberByToken(String token) {
         try {
             Claims claims = jwtProvider.getClaims(token);
             Long userId = Long.parseLong(jwtProvider.getSubject(token));
@@ -67,13 +61,16 @@ public class AuthService {
             Role userRole = Role.valueOf(claims.get("role", String.class));
             return new LoginMember(userId, userName, userEmail, userRole);
         } catch (Exception e) {
-            throw new Exception("검증되지 않은 토큰입니다. 먼저 토큰 검증을 해주세요.");
+            throw new RoomEscapeException(
+                    ErrorCode.NOT_VALIDATE_ACCESS_TOKEN,
+                    "검증되지 않은 토큰입니다. 먼저 토큰 검증을 해주세요."
+            );
         }
     }
 
     private void validatePassword(LoginRequest request, Member memberToLogin) {
         if (!passwordEncoder.matches(request.password(), memberToLogin.getPassword())) {
-            throw new IllegalArgumentException("[ERROR] 잘못된 비밀번호 입니다.");
+            throw new RoomEscapeException(ErrorCode.USER_NOT_MATCH_PASSWORD);
         }
     }
 }

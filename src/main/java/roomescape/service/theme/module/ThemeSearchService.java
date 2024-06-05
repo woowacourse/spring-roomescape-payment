@@ -22,7 +22,7 @@ public class ThemeSearchService {
     }
 
     public ThemeResponse findTheme(Long themeId) {
-        Theme theme = findThemeById(themeId);
+        Theme theme = themeRepository.findByIdOrThrow(themeId);
         return ThemeResponse.from(theme);
     }
 
@@ -41,13 +41,5 @@ public class ThemeSearchService {
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();
-    }
-
-    private Theme findThemeById(Long themeId) {
-        return themeRepository.findById(themeId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 테마 정보 입니다.",
-                        new Throwable("theme_id : " + themeId)
-                ));
     }
 }

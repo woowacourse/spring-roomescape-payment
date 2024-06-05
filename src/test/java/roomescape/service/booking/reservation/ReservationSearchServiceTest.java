@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
 import roomescape.service.booking.reservation.module.ReservationSearchService;
 
@@ -91,6 +92,6 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> reservationSearchService.findReservation(notExistIdToFind))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

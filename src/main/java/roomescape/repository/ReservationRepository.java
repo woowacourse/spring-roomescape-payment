@@ -8,8 +8,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.RoomEscapeException;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+    default Reservation findByIdOrThrow(Long id) {
+        return findById(id).orElseThrow(() -> new RoomEscapeException(
+                ErrorCode.RESERVATION_NOT_FOUND_BY_ID,
+                "reservation_id = " + id
+        ));
+    }
 
     @EntityGraph(attributePaths = {"member", "theme", "time"})
     Optional<Reservation> findById(Long id);

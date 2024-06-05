@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.dto.login.LoginMember;
 import roomescape.dto.login.LoginRequest;
 import roomescape.dto.token.TokenDto;
+import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
 
 class AuthServiceTest extends ServiceBaseTest {
@@ -37,7 +38,7 @@ class AuthServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -47,7 +48,7 @@ class AuthServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -57,6 +58,6 @@ class AuthServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> authService.extractLoginMemberByToken(tokenDto))
-                .isInstanceOf(Exception.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

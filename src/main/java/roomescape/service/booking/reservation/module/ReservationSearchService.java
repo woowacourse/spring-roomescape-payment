@@ -24,7 +24,7 @@ public class ReservationSearchService {
     }
 
     public ReservationResponse findReservation(Long reservationId) {
-        Reservation reservation = findReservationById(reservationId);
+        Reservation reservation = reservationRepository.findByIdOrThrow(reservationId);
         return ReservationResponse.from(reservation);
     }
 
@@ -60,23 +60,7 @@ public class ReservationSearchService {
             return UserReservationResponse.create(reservation);
         }
 
-        Waiting waiting = findWaitingByReservationId(reservation.getId());
+        Waiting waiting = waitingRepository.findByReservationIdOrThrow(reservation.getId());
         return UserReservationResponse.createByWaiting(waiting);
-    }
-
-    private Reservation findReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 잘못된 예약 정보 입니다.",
-                        new Throwable("reservation_id : " + reservationId)
-                ));
-    }
-
-    private Waiting findWaitingByReservationId(Long reservationId) {
-        return waitingRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "[ERROR] 예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
-                        new Throwable("reservation_id : " + reservationId)
-                ));
     }
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ServiceBaseTest;
 import roomescape.service.theme.module.ThemeDeleteService;
@@ -41,6 +42,6 @@ class ThemeDeleteServiceTest extends ServiceBaseTest {
     void 예약_되어있는_테마를_삭제할_경우_예외_발생() {
         // then
         assertThatThrownBy(() -> themeDeleteService.deleteTheme(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

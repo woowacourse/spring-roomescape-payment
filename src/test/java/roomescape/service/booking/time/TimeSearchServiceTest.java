@@ -17,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservationtime.ReservationTimeResponse;
 import roomescape.dto.reservationtime.TimeWithAvailableResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.booking.time.module.TimeSearchService;
 
@@ -80,6 +81,6 @@ class TimeSearchServiceTest {
 
         // when, then
         assertThatThrownBy(() -> timeSearchService.findTime(notExistIdToFind))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

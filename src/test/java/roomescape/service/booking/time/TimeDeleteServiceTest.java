@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.ServiceBaseTest;
 import roomescape.service.booking.time.module.TimeDeleteService;
@@ -42,6 +43,6 @@ class TimeDeleteServiceTest extends ServiceBaseTest {
     void 예약이_존재하는_시간대를_삭제할_경우_예외_발생() {
         // then
         assertThatThrownBy(() -> timeDeleteService.deleteTime(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.theme.ThemeResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
 import roomescape.service.theme.module.ThemeSearchService;
 
@@ -74,6 +75,6 @@ class ThemeSearchServiceTest extends ServiceBaseTest {
 
         // when, then
         assertThatThrownBy(() -> themeSearchService.findTheme(notExistIdToFind))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }
