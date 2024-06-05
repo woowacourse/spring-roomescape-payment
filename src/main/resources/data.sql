@@ -74,5 +74,36 @@ VALUES (1, current_date, 1, 1, 'SUCCESS', '2024-05-06 12:00:00'),
        (1, dateadd('day', 4, current_date), 2, 7, 'SUCCESS', '2024-05-06 12:07:00'),
        (2, dateadd('day', 4, current_date), 3, 1, 'SUCCESS', '2024-05-06 12:08:00'),
        (1, dateadd('day', 5, current_date), 4, 1, 'SUCCESS', '2024-05-06 12:09:00');
+
 ALTER TABLE RESERVATION
     ALTER COLUMN ID RESTART WITH 25;
+
+INSERT INTO PAYMENT (PAYMENT_KEY, AMOUNT, RESERVATION_ID)
+VALUES ('ABC', 15000, 1),
+       ('AAA', 15000, 2),
+       ('BBB', 15000, 3),
+       ('CCC', 15000, 4),
+       ('DDD', 15000, 5),
+       ('EEE', 15000, 6),
+       ('FFF', 15000, 7),
+       ('JJJ', 15000, 8),
+       ('GGG', 15000, 9),
+       ('HHH', 15000, 10),
+       ('III', 15000, 11),
+       ('KKK', 15000, 12),
+       ('LLL', 15000, 13),
+       ('MMM', 15000, 14),
+       ('NNN', 15000, 15),
+       ('OOO', 15000, 16),
+       ('PPP', 15000, 17),
+       ('QQQ', 15000, 18),
+       ('RRR', 15000, 19),
+       ('SSS', 15000, 20),
+       ('TTT', 15000, 21),
+       ('UUU', 15000, 22),
+       ('VVV', 15000, 23),
+       ('ZZZ', 15000, 24);
+
+ALTER TABLE PAYMENT
+    ALTER COLUMN ID RESTART WITH 25;
+
