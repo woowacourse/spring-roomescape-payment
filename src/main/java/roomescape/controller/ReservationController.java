@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.config.LoginMemberConverter;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.LoginMember;
+import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.service.ReservationService;
 
@@ -61,5 +63,19 @@ public class ReservationController {
             @LoginMemberConverter LoginMember loginMember) {
         List<MyReservationResponse> responses = reservationService.findMyReservations(loginMember.id());
         return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping("/reservation/approve")
+    public ResponseEntity<ReservationResponse> approvePaymentWaiting(
+            @RequestBody @Valid ReservationInformRequest reservationRequest
+    ) {
+        return ResponseEntity.created(URI.create("/reservation/approve/" + reservationRequest.id()))
+                .body(reservationService.approvePaymentWaiting(reservationRequest.id(), reservationRequest));
+    }
+
+    @GetMapping("/reservation/information/{id}")
+    public ResponseEntity<ReservationInformResponse> getReservationInformation(@PathVariable long id) {
+        ReservationInformResponse reservationInformResponse = reservationService.findById(id);
+        return ResponseEntity.ok(reservationInformResponse);
     }
 }

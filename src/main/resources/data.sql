@@ -11,12 +11,12 @@ values ('12:00'),
        ('15:00');
 
 insert into theme (name, description, thumbnail, price)
-values ('테마1', '테마1 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000),
-       ('테마2', '테마2 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000),
-       ('테마3', '테마3 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000),
-       ('테마4', '테마4 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000),
-       ('테마5', '테마5 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000),
-       ('테마6', '테마6 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 1000);
+values ('테마1', '테마1 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 10000),
+       ('테마2', '테마2 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 20000),
+       ('테마3', '테마3 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 30000),
+       ('테마4', '테마4 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 40000),
+       ('테마5', '테마5 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 50000),
+       ('테마6', '테마6 설명', 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/440px-SpongeBob_SquarePants_character.svg.png', 60000);
 
 insert into reservation (member_id, date, time_id, theme_id, status)
 values (1, DATEADD(DAY, 1, CURRENT_DATE), 1, 2, 'RESERVATION'),
@@ -32,6 +32,10 @@ values (1, DATEADD(DAY, 1, CURRENT_DATE), 1, 2, 'RESERVATION'),
        (1, DATEADD(DAY, 1, CURRENT_DATE), 3, 4, 'RESERVATION'),
        (2, DATEADD(DAY, 1, CURRENT_DATE), 4, 4, 'RESERVATION'),
        (2, DATEADD(DAY, 1, CURRENT_DATE), 4, 5, 'RESERVATION'),
+       (4, DATEADD(DAY, 1, CURRENT_DATE), 1, 2, 'WAITING'),
+       (4, DATEADD(DAY, 1, CURRENT_DATE), 1, 4, 'WAITING'),
+       (4, DATEADD(DAY, 1, CURRENT_DATE), 1, 3, 'PAYMENT_WAITING'),
+       (4, DATEADD(DAY, 1, CURRENT_DATE), 2, 6, 'PAYMENT_WAITING'),
        (2, DATEADD(DAY, 1, CURRENT_DATE), 4, 1, 'RESERVATION');
 
 insert into reservation (member_id, date, time_id, theme_id, status)

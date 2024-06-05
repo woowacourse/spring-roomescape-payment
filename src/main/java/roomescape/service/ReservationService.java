@@ -12,9 +12,11 @@ import roomescape.dto.LoginMember;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
+import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
@@ -116,5 +118,22 @@ public class ReservationService {
                 reservation.getId(), reservation.getDate(),
                 reservation.getTime().getId(), reservation.getTheme().getId()
         );
+    }
+
+    @Transactional
+    public ReservationResponse approvePaymentWaiting(long id, ReservationInformRequest reservationRequest) {
+        Reservation reservation = reservationRepository.findById(id).orElseThrow();
+        reservation.setStatus(Status.RESERVATION);
+        PaymentRequest paymentRequest = new PaymentRequest(
+                reservationRequest.orderId(),
+                reservationRequest.amount(),
+                reservationRequest.paymentKey()
+        );
+        paymentService.pay(paymentRequest);
+        return ReservationResponse.from(reservation);
+    }
+
+    public ReservationInformResponse findById(long id) {
+        return ReservationInformResponse.from(reservationRepository.findById(id).orElseThrow());
     }
 }
