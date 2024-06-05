@@ -1,5 +1,6 @@
 package roomescape.service.response;
 
+import roomescape.domain.Payment;
 import roomescape.domain.ReservationPayment;
 
 public record PaymentDto(Long id, String paymentKey, String orderId, Long totalAmount) {
@@ -13,5 +14,12 @@ public record PaymentDto(Long id, String paymentKey, String orderId, Long totalA
                 reservationPayment.getPaymentKey(),
                 reservationPayment.getOrderId(),
                 reservationPayment.getTotalAmount());
+    }
+
+    public PaymentDto(Payment payment) {
+        this(payment.getId(),
+                payment.getPaymentKey(),
+                payment.getOrderId(),
+                payment.getTotalAmount());
     }
 }
