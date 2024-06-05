@@ -2,7 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.request.PaymentApiRequest;
+import roomescape.application.dto.request.PaymentConfirmApiRequest;
 import roomescape.domain.reservation.Payment;
 import roomescape.domain.reservation.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
@@ -20,7 +20,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void confirmPayment(Reservation reservation, PaymentApiRequest request) {
+    public void confirmPayment(Reservation reservation, PaymentConfirmApiRequest request) {
         Payment payment = new Payment(
                 request.paymentKey(),
                 request.orderId(),

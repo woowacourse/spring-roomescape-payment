@@ -1,9 +1,9 @@
 package roomescape.application;
 
-import roomescape.application.dto.request.PaymentApiRequest;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.request.PaymentConfirmApiRequest;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 
 public interface PaymentClient {
 
-    PaymentApiResponse confirmPayment(PaymentApiRequest paymentApiRequest);
+    PaymentConfirmApiResponse confirmPayment(PaymentConfirmApiRequest paymentConfirmApiRequest);
 }

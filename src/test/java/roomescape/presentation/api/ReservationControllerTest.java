@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import roomescape.application.PaymentClient;
 import roomescape.application.dto.response.MemberResponse;
 import roomescape.application.dto.response.MyReservationResponse;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationStatus;
 import roomescape.application.dto.response.ReservationTimeResponse;
@@ -115,7 +115,7 @@ class ReservationControllerTest extends BaseControllerTest {
             String token = tokenProvider.createToken(user.getId().toString());
 
             // given
-            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             ReservationTime time = reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);

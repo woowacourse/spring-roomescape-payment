@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.MemberResponse;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.application.dto.response.ThemeResponse;
@@ -83,7 +83,7 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("성공한다.")
         void success() {
-            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);

@@ -24,7 +24,8 @@ public class ReservationWaitingService {
     }
 
     public List<MyReservationResponse> getMyReservationAndWaitingWithRanks(long memberId) {
-        List<ReservationWithPaymentDto> reservationWithPayments = reservationRepository.findWithPaymentByMemberId(memberId);
+        List<ReservationWithPaymentDto> reservationWithPayments = reservationRepository.findWithPaymentByMemberId(
+                memberId);
         List<WaitingWithRankDto> waitingsWithRank = waitingRepository.findWaitingsWithRankByMemberId(memberId);
 
         return Stream.concat(

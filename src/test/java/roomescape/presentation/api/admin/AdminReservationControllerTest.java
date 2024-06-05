@@ -20,7 +20,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import roomescape.application.PaymentClient;
 import roomescape.application.dto.response.MemberResponse;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.application.dto.response.ThemeResponse;
@@ -111,7 +111,7 @@ class AdminReservationControllerTest extends BaseControllerTest {
             String token = tokenProvider.createToken(admin.getId().toString());
 
             // given
-            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
             ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(11, 0)));

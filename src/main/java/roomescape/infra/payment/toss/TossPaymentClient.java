@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.application.PaymentClient;
-import roomescape.application.dto.request.PaymentApiRequest;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.request.PaymentConfirmApiRequest;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -29,15 +29,16 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient.mutate().baseUrl(paymentBaseUrl).build();
     }
 
-    public PaymentApiResponse confirmPayment(PaymentApiRequest paymentApiRequest) {
+    @Override
+    public PaymentConfirmApiResponse confirmPayment(PaymentConfirmApiRequest request) {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
-                .body(paymentApiRequest)
+                .body(request)
                 .retrieve()
                 .onStatus(errorHandler)
-                .body(PaymentApiResponse.class);
+                .body(PaymentConfirmApiResponse.class);
     }
 
     private String encodeSecretKey(String secretKey) {
