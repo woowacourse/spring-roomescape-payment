@@ -30,7 +30,7 @@ public class Payment {
     public Payment(Long id, Reservation reservation, String paymentKey, String orderId, Long totalAmount) {
         validatePaymentKey(paymentKey);
         validateOrderId(orderId);
-        validateAmount(totalAmount);
+        validateAmount(totalAmount, reservation);
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
@@ -50,9 +50,13 @@ public class Payment {
         }
     }
 
-    private void validateAmount(Long amount) {
+    private void validateAmount(Long amount, Reservation reservation) {
         if (amount == null) {
             throw new IllegalArgumentException("amount가 비어 있습니다. 값을 입력해 주세요.");
+        }
+        Long expectedAmount = reservation.getTheme().getPrice();
+        if (!expectedAmount.equals(amount)) {
+            throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다");
         }
     }
 

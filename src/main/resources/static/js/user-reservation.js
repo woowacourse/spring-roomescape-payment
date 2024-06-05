@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
+    const paymentAmount = -1;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
     paymentWidget.renderPaymentMethods(
@@ -46,7 +46,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
 
     function onReservationButtonClickWithPaymentWidget(event) {
-        onReservationButtonClick(event, paymentWidget);
+        const selectedDate = document.getElementById("datepicker").value;
+        const selectedThemeId = document.querySelector(
+            '.theme-slot.active')?.getAttribute('data-theme-id');
+        const selectedTimeId = document.querySelector(
+            '.time-slot.active')?.getAttribute('data-time-id');
+
+        if (selectedDate && selectedThemeId && selectedTimeId) {
+            fetch('/themes/' + selectedThemeId, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                if (response.status === 200) return response.json();
+                throw new Error('Read failed');
+            }).then((theme) => {
+                paymentWidget.renderPaymentMethods(
+                    "#payment-method",
+                    {value: theme.price},
+                    {variantKey: "DEFAULT"}
+                );
+                onReservationButtonClick(event, paymentWidget, theme.price);
+            })
+        } else {
+            alert("Please select a date, theme, and time before making a reservation.");
+        }
     }
 });
 
@@ -155,7 +180,7 @@ function checkDateAndThemeAndTime() {
     }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+function onReservationButtonClick(event, paymentWidget, price) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector(
         '.theme-slot.active')?.getAttribute('data-theme-id');
@@ -183,14 +208,14 @@ function onReservationButtonClick(event, paymentWidget) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+            amount: price,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-            alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+            alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
         });
     } else {
         alert("Please select a date, theme, and time before making a reservation.");
