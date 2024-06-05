@@ -87,6 +87,9 @@ public class PaymentClient {
         }
     }
 
+    /**
+     * @see <a href="https://docs.tosspayments.com/reference/error-codes#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8"> 결제 승인 API 에러 코드 문서</a>
+     */
     private PaymentConfirmErrorCode getPaymentConfirmErrorCode(final ClientHttpResponse response) throws IOException {
         PaymentConfirmFailOutput confirmFailResponse = objectMapper.readValue(
                 response.getBody(), PaymentConfirmFailOutput.class);
