@@ -25,18 +25,22 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
 
+    @Column(nullable = false)
+    private Long price;
+
     public Theme() {
     }
 
-    public Theme(long id, Name name, String description, String thumbnail) {
+    public Theme(long id, Name name, String description, String thumbnail, Long price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
-    public Theme(Name name, String description, String thumbnail) {
-        this(NULL_ID, name, description, thumbnail);
+    public Theme(Name name, String description, String thumbnail, Long price) {
+        this(NULL_ID, name, description, thumbnail, price);
     }
 
     public long getId() {
@@ -53,5 +57,9 @@ public class Theme {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    public Long getPrice() {
+        return price;
     }
 }

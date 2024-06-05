@@ -1,18 +1,6 @@
 package roomescape.registration.domain.waiting.controller;
 
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,6 +17,19 @@ import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.vo.Name;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(WaitingController.class)
 class WaitingControllerTest extends ControllerTest {
 
@@ -36,7 +37,7 @@ class WaitingControllerTest extends ControllerTest {
             1L,
             LocalDate.now().plusDays(1),
             new ReservationTime(1L, LocalTime.parse("14:00")),
-            new Theme(1L, new Name("레모네 테마"), "레모네가 숨겨둔 보물을 찾으세요!", "썸네일 링크"),
+            new Theme(1L, new Name("레모네 테마"), "레모네가 숨겨둔 보물을 찾으세요!", "썸네일 링크", 15000L),
             new Member(1L, new Name("폴라"), "polla@wooteco.com", "polla1234", MemberRole.MEMBER)
     );
     private final Waiting waiting = new Waiting(

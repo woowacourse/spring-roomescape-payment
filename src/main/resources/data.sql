@@ -10,10 +10,10 @@ VALUES ('폴라(어드민)', 'polla@gmail.com', 'pollari99', 'ADMIN'),
        ('제이(일반)', 'jay@wooteco.com', 'jay', 'MEMBER'),
        ('웨지(일반)', 'wedge@wooteco.com', 'wedge', 'MEMBER');
 
-INSERT INTO theme (name, description, thumbnail)
-VALUES ('테마 - polla', '폴라 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
-       ('테마 - dobby', '도비 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
-       ('테마 - pobi', '포비 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme (name, description, thumbnail, price)
+VALUES ('테마 - polla', '폴라 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 10000),
+       ('테마 - dobby', '도비 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 15000),
+       ('테마 - pobi', '포비 방탈출', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 20000);
 
 INSERT INTO reservation (date, reservation_time_id, theme_id, member_id)
 VALUES ('2024-04-30', 1, 1, 1),

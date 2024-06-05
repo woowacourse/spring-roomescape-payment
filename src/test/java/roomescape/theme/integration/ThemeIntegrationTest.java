@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import roomescape.model.IntegrationTest;
 import roomescape.theme.dto.ThemeRequest;
 
-public class ThemeIntegrationTest extends IntegrationTest {
+class ThemeIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("요청한 테마를 정상적으로 등록, 확인, 삭제한다.")
     void themePageWork() {
-        ThemeRequest themeRequest = new ThemeRequest("포레스트", "공포 테마", "thumbnail");
+        ThemeRequest themeRequest = new ThemeRequest("포레스트", "공포 테마", "thumbnail", 15000L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

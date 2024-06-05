@@ -52,7 +52,7 @@ class ReservationServiceTest {
             1L,
             LocalDate.now().plusDays(2),
             new ReservationTime(1L, TIME),
-            new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail"),
+            new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail",15000L),
             new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER)
     );
     private final Waiting waiting = new Waiting(

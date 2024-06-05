@@ -41,7 +41,7 @@ class ReservationControllerTest extends ControllerTest {
             1L,
             TOMORROW,
             new ReservationTime(1L, LocalTime.of(10, 0)),
-            new Theme(1L, new Name("polla"), "폴라 방탈출", "이미지~"),
+            new Theme(1L, new Name("polla"), "폴라 방탈출", "이미지~", 10000L),
             new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER)
     );
 

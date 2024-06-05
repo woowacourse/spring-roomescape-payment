@@ -1,17 +1,6 @@
 package roomescape.theme.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +16,24 @@ import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 import roomescape.vo.Name;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(ThemeController.class)
 public class ThemeControllerTest extends ControllerTest {
 
     public static final LocalDate TODAY = LocalDate.now();
     private final Theme theme = new Theme(1L, new Name("포레스트"), "공포 테마",
-            "https://zerogangnam.com/storage/AVISPw8N2JfMThKvnk3VJzeY9qywIaYd8pTy46Xx.jpg");
+            "https://zerogangnam.com/storage/AVISPw8N2JfMThKvnk3VJzeY9qywIaYd8pTy46Xx.jpg",15000L);
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +48,7 @@ public class ThemeControllerTest extends ControllerTest {
                 .thenReturn(ThemeResponse.fromTheme(theme));
 
         String content = new ObjectMapper()
-                .writeValueAsString(new ThemeRequest(theme.getName(), theme.getDescription(), theme.getThumbnail()));
+                .writeValueAsString(new ThemeRequest(theme.getName(), theme.getDescription(), theme.getThumbnail(), theme.getPrice()));
 
         mockMvc.perform(post("/themes")
                         .content(content)
