@@ -389,4 +389,23 @@ class MemberReservationControllerTest {
         // then
         assertThat(detailMessage).isEqualTo("본인의 예약 대기만 삭제할 수 있습니다.");
     }
+
+    @DisplayName("사용자 예약 컨트롤러는 결제 대기 상태의 예약의 결제가 성공하면 200을 응답한다.")
+    @Test
+    void confirmPendingReservation() {
+        // given
+        long id = 15L;
+        Mockito.when(restClient.post("/confirm", Fixtures.paymentRequestFixture))
+                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+
+        // when & then
+        RestAssured.given().log().all()
+                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
+                .when()
+                .contentType(ContentType.JSON)
+                .body(Fixtures.paymentRequestFixture)
+                .post("/reservations/" + id + "/payments/confirm")
+                .then()
+                .statusCode(200);
+    }
 }

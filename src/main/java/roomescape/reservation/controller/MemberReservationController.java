@@ -34,7 +34,7 @@ public class MemberReservationController {
         return reservationFacadeService.createReservation(request, member);
     }
 
-    @Operation(summary = "사용자 예약 결제")
+    @Operation(summary = "결제 대기 상태 사용자 예약 결제")
     @PostMapping("/{id}/payments/confirm")
     public ResponseEntity<Void> confirmPendingReservation(@Parameter(description = "MemberReservation id")
                                                           @PathVariable

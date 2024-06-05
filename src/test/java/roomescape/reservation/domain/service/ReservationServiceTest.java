@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.dto.LoginMember;
+import roomescape.exception.BadRequestException;
 import roomescape.exception.ForbiddenException;
 import roomescape.reservation.domain.entity.MemberReservation;
 import roomescape.reservation.domain.entity.ReservationStatus;
@@ -27,14 +28,11 @@ class ReservationServiceTest {
     private final ReservationService reservationService;
     private final MemberReservationRepository memberReservationRepository;
 
-    private final Long id;
-
     @Autowired
     public ReservationServiceTest(ReservationService reservationService,
                                   MemberReservationRepository memberReservationRepository) {
         this.reservationService = reservationService;
         this.memberReservationRepository = memberReservationRepository;
-        this.id = 1L;
     }
 
     @DisplayName("예약 서비스는 예약 확정 상태인 예약들을 조회한다.")
@@ -44,7 +42,7 @@ class ReservationServiceTest {
         List<MemberReservation> reservations = reservationService.readReservations();
 
         // then
-        assertThat(reservations.size()).isEqualTo(11);
+        assertThat(reservations.size()).isEqualTo(12);
     }
 
     @DisplayName("예약 서비스는 id에 맞는 예약을 조회한다.")
@@ -99,5 +97,32 @@ class ReservationServiceTest {
 
         // then
         assertThat(firstWaiting.getStatus()).isEqualTo(ReservationStatus.PENDING);
+    }
+
+    @DisplayName("예약 서비스는 결제 대기 상태의 예약을 예약 상태로 변경한다.")
+    @Test
+    void confirmPendingReservation() {
+        // given
+        long id = 15L;
+        MemberReservation pendingReservation = memberReservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 예약입니다."));
+
+        // when
+        reservationService.confirmPendingReservation(id);
+
+        // then
+        assertThat(pendingReservation.getStatus()).isEqualTo(ReservationStatus.CONFIRMATION);
+    }
+
+    @DisplayName("예약 서비스는 결제 대기 상태가 아닌 예약을 예약 상태로 변경하려고 할 경우 예외가 발생한다.")
+    @Test
+    void confirmNotPendingReservation() {
+        // given
+        long id = 13L;
+
+        // when & then
+        assertThatThrownBy(() -> reservationService.confirmPendingReservation(id))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("해당 예약은 결제 대기 상태가 아닙니다.");
     }
 }
