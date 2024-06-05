@@ -24,7 +24,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.admin.AdminHandlerInterceptor;
 import roomescape.login.LoginMemberArgumentResolver;
 import roomescape.login.dto.Accessor;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.fixture.MemberReservationResponseFixture;
 import roomescape.reservation.service.ReservationService;
 
@@ -49,7 +49,7 @@ class ReservationControllerTest {
     @DisplayName("로그인한 특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_handle_read_my_reservations_request_when_requested() throws Exception {
-        List<MemberReservationResponse> responses = List.of(
+        List<MyReservationResponse> responses = List.of(
                 MemberReservationResponseFixture.RESERVATION_1_WAITING_1,
                 MemberReservationResponseFixture.RESERVATION_2_WAITING_1
         );
@@ -62,7 +62,7 @@ class ReservationControllerTest {
                 any(WebDataBinderFactory.class)
         )).thenReturn(new Accessor(1L));
 
-        when(reservationService.findMemberReservationWithWaitingStatus(any(Long.class))).thenReturn(responses);
+        when(reservationService.findMyReservations(any(Long.class))).thenReturn(responses);
 
         mockMvc.perform(get("/reservations/my")
                         .cookie(new Cookie("mockCookie", "mockValue")))

@@ -18,6 +18,7 @@ import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATIO
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -31,10 +32,10 @@ import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.MyReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationWithWaiting;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.service.ThemeService;
 import roomescape.time.service.ReservationTimeService;
@@ -73,11 +74,14 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findByMemberIdWithWaitingStatus(1L))
-                .thenReturn(List.of(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        when(reservationRepository.findMyReservations(1L))
+                .thenReturn(List.of(new MyReservation(MEMBER_ID_1_RESERVATION, 0L, "paymentKey", "orderId",
+                        BigDecimal.valueOf(1000L))));
 
-        assertThat(reservationService.findMemberReservationWithWaitingStatus(1L))
-                .containsExactly(new MemberReservationResponse(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        assertThat(reservationService.findMyReservations(1L))
+                .containsExactly(new MyReservationResponse(
+                        new MyReservation(MEMBER_ID_1_RESERVATION, 0L, "paymentKey", "orderId",
+                                BigDecimal.valueOf(1000L))));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")

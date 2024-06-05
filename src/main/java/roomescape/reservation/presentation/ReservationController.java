@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
 import roomescape.login.dto.Accessor;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
@@ -27,9 +27,9 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/my")
-    public ResponseEntity<List<MemberReservationResponse>> findMemberReservation(
+    public ResponseEntity<List<MyReservationResponse>> findMemberReservation(
             @Authenticated Accessor accessor) {
-        return ResponseEntity.ok(reservationService.findMemberReservationWithWaitingStatus(accessor.id()));
+        return ResponseEntity.ok(reservationService.findMyReservations(accessor.id()));
     }
 
     @PostMapping("/reservations")

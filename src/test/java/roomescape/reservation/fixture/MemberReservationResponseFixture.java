@@ -1,21 +1,28 @@
 package roomescape.reservation.fixture;
 
-import roomescape.reservation.domain.ReservationWithWaiting;
-import roomescape.reservation.dto.MemberReservationResponse;
+import java.math.BigDecimal;
+import roomescape.reservation.domain.MyReservation;
+import roomescape.reservation.dto.MyReservationResponse;
 
 public class MemberReservationResponseFixture {
 
-    public static final MemberReservationResponse RESERVATION_1_WAITING_1 = new MemberReservationResponse(
-            new ReservationWithWaiting(
+    public static final MyReservationResponse RESERVATION_1_WAITING_1 = new MyReservationResponse(
+            new MyReservation(
                     ReservationFixture.SAVED_RESERVATION_1,
-                    1
+                    1L,
+                    "paymentKey",
+                    "orderId",
+                    BigDecimal.valueOf(1000L)
             )
     );
 
-    public static final MemberReservationResponse RESERVATION_2_WAITING_1 = new MemberReservationResponse(
-            new ReservationWithWaiting(
+    public static final MyReservationResponse RESERVATION_2_WAITING_1 = new MyReservationResponse(
+            new MyReservation(
                     ReservationFixture.SAVED_RESERVATION_2,
-                    1
+                    1L,
+                    "paymentKey",
+                    "orderId",
+                    BigDecimal.valueOf(1000L)
             )
     );
 }

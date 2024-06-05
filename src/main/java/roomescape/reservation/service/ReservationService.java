@@ -12,7 +12,7 @@ import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
@@ -54,9 +54,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberReservationResponse> findMemberReservationWithWaitingStatus(Long memberId) {
-        return reservationRepository.findByMemberIdWithWaitingStatus(memberId).stream()
-                .map(MemberReservationResponse::new)
+    public List<MyReservationResponse> findMyReservations(Long memberId) {
+        return reservationRepository.findMyReservations(memberId).stream()
+                .map(MyReservationResponse::new)
                 .toList();
     }
 

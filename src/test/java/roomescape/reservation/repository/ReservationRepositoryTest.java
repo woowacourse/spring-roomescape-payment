@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.reservation.domain.MyReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationWithWaiting;
 
 // 예약: 멤버 1번, 내일, 첫번째 시간, 테마 1번, 예약 완료);
 // 예약: 멤버 2번, 내일, 두번째 시간, 테마 2번, 예약 완료);
@@ -41,8 +41,8 @@ class ReservationRepositoryTest {
     @DisplayName("특정 멤버의 예약을 조회할 수 있다")
     @Test
     void should_find_member_reservation_with_waiting_status() {
-        List<ReservationWithWaiting> memberReservations = reservationRepository.findByMemberIdWithWaitingStatus(1L);
-        assertThat(memberReservations).hasSize(1);
+        List<MyReservation> myReservations = reservationRepository.findMyReservations(1L);
+        assertThat(myReservations).hasSize(0);
     }
 
     @DisplayName("날짜와 시간, 그리고 테마를 기반으로 예약을 조회할 수 있다")

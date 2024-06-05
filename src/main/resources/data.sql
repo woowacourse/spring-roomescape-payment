@@ -24,4 +24,15 @@ VALUES (1, TIMESTAMPADD(DAY, -1, NOW()), '1', '1'),
        (2, TIMESTAMPADD(DAY, -1, NOW()), '2', '1'),
        (2, TIMESTAMPADD(DAY, -2, NOW()), '2', '2');
 
+INSERT INTO payment(payment_key, order_id, amount, reservation_id)
+VALUES ('dummyPaymentKey', 'dummyId', 20000, '1'),
+       ('dummyPaymentKey', 'dummyId', 20000, '2'),
+       ('dummyPaymentKey', 'dummyId', 20000, '3'),
+       ('dummyPaymentKey', 'dummyId', 20000, '4'),
+       ('dummyPaymentKey', 'dummyId', 20000, '5'),
+       ('dummyPaymentKey', 'dummyId', 20000, '6'),
+       ('dummyPaymentKey', 'dummyId', 20000, '7');
+
+
+
 
