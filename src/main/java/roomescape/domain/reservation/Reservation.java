@@ -54,7 +54,7 @@ public class Reservation {
     }
 
     public Reservation(Long id, Member member, Theme theme, LocalDate date, ReservationTime time,
-                       LocalDateTime createdAt, BookStatus status) {
+                       LocalDateTime createdAt, BookStatus status, String orderId) {
         validateCreatedAtAfterReserveTime(date, time.getStartAt(), createdAt);
         this.id = id;
         this.member = member;
@@ -63,7 +63,12 @@ public class Reservation {
         this.time = time;
         this.createdAt = createdAt;
         this.status = status;
-        this.orderId = UUID.randomUUID().toString();
+        this.orderId = orderId;
+    }
+
+    public Reservation(Long id, Member member, Theme theme, LocalDate date, ReservationTime time,
+                       LocalDateTime createdAt, BookStatus status) {
+        this(id, member, theme, date, time, createdAt, status, UUID.randomUUID().toString());
     }
 
     public Reservation(Member member, Theme theme, LocalDate date, ReservationTime time,
@@ -100,6 +105,10 @@ public class Reservation {
 
     public void cancelBooking() {
         status = status.cancelBooking();
+    }
+
+    public Reservation withOrderId(String orderId) {
+        return new Reservation(id, member, theme, date, time, createdAt, status, orderId);
     }
 
     @Override
