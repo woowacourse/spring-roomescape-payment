@@ -11,19 +11,16 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
-import roomescape.exception.payment.PaymentIOException;
-import roomescape.exception.payment.PaymentTimeoutException;
+import roomescape.service.payment.config.PaymentExceptionInterceptor;
 import roomescape.service.payment.config.PaymentLoggingInterceptor;
 import roomescape.service.payment.dto.PaymentConfirmFailOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -44,6 +41,7 @@ public class PaymentClient {
         this.restClient = RestClient.builder()
                 .requestFactory(createPaymentRequestFactory())
                 .baseUrl(paymentProperties.getUrl())
+                .requestInterceptor(new PaymentExceptionInterceptor())
                 .requestInterceptor(new PaymentLoggingInterceptor())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createPaymentAuthHeader(paymentProperties))
                 .build();
@@ -63,28 +61,15 @@ public class PaymentClient {
     }
 
     public PaymentConfirmOutput confirmPayment(PaymentConfirmInput confirmRequest) {
-        try {
-            return restClient.method(HttpMethod.POST)
-                    .uri("/confirm")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(confirmRequest)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                        throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
-                    })
-                    .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                        throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
-                    })
-                    .body(PaymentConfirmOutput.class);
-
-        } catch (ResourceAccessException e) {
-            if (e.getCause() instanceof SocketTimeoutException) {
-                throw new PaymentTimeoutException(e);
-            }
-            throw new PaymentIOException(e);
-        } catch (Exception e) {
-            throw new PaymentConfirmException(e);
-        }
+        return restClient.method(HttpMethod.POST)
+                .uri("/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(confirmRequest)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
+                    throw new PaymentConfirmException(getPaymentConfirmErrorCode(response));
+                })
+                .body(PaymentConfirmOutput.class);
     }
 
     /**
