@@ -3,8 +3,6 @@
 JAR_DIRECTORY=build/libs
 PROJECT_NAME=spring-roomescape-payment
 
-cd $PROJECT_NAME
-
 echo "> Git Pull"
 git pull origin step2
 
