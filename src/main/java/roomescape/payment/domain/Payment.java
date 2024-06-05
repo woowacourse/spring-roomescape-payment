@@ -30,8 +30,9 @@ public class Payment extends AuditedEntity {
     @Column(nullable = false, unique = true)
     private String orderId;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private PaymentStatus status;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
@@ -43,7 +44,7 @@ public class Payment extends AuditedEntity {
     protected Payment() {
     }
 
-    public Payment(Reservation reservation, String paymentKey, String orderId, String status, PaymentMethod method, int totalAmount) {
+    public Payment(Reservation reservation, String paymentKey, String orderId, PaymentStatus status, PaymentMethod method, int totalAmount) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
@@ -52,7 +53,7 @@ public class Payment extends AuditedEntity {
         this.totalAmount = totalAmount;
     }
 
-    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, String status, PaymentMethod method, int totalAmount) {
+    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, PaymentStatus status, PaymentMethod method, int totalAmount) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
@@ -78,7 +79,7 @@ public class Payment extends AuditedEntity {
         return orderId;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 

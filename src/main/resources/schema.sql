@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS payment (
     reservation_id BIGINT NOT NULL,
     payment_key VARCHAR(255) NOT NULL UNIQUE,
     order_id    VARCHAR(255) NOT NULL UNIQUE,
-    status VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL CHECK (status IN ('DONE', 'CANCEL')),
     method   VARCHAR(255) NOT NULL CHECK (method IN ('CARD', 'EASY_PAY')),
     created_at TIMESTAMP NOT NULL default CURRENT_TIMESTAMP,
     total_amount INT NOT NULL,
