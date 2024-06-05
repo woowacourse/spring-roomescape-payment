@@ -95,7 +95,7 @@ public class Reservation {
         return this.status == Status.RESERVED;
     }
 
-    public boolean isPaymentPending() {
+    public boolean isPending() {
         return this.status == Status.PAYMENT_PENDING;
     }
 

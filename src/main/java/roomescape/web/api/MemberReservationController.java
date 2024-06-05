@@ -30,7 +30,7 @@ public class MemberReservationController {
             @RequestBody @Valid UserReservationRequest request,
             MemberInfo memberInfo
     ) {
-        ReservationResponse response = reservationService.saveReservation(request, memberInfo.id());
+        ReservationResponse response = reservationService.reserve(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
@@ -40,7 +40,7 @@ public class MemberReservationController {
             @RequestBody ReservationPaymentRequest request,
             MemberInfo memberInfo
     ) {
-        ReservationResponse response = reservationService.paymentForPending(request, memberInfo.id());
+        ReservationResponse response = reservationService.payForPending(request, memberInfo.id());
         return ResponseEntity.ok().body(response);
     }
 

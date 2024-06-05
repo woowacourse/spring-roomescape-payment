@@ -78,7 +78,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.saveReservation(request, user.getId());
+        ReservationResponse response = reservationService.reserve(request, user.getId());
 
         // then
         Reservation reservation = reservationRepository.getReservation(response.id());
@@ -104,7 +104,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
         // when
         try {
-            reservationService.saveReservation(request, user.getId());
+            reservationService.reserve(request, user.getId());
         } catch (Exception ignored) {
         }
 
@@ -126,7 +126,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey,
                 CommonFixture.paymentType);
 
-        reservationService.saveReservation(adminRequest, admin.getId());
+        reservationService.reserve(adminRequest, admin.getId());
 
         UserReservationRequest memberRequest = new UserReservationRequest(
                 CommonFixture.tomorrow,
@@ -138,7 +138,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.saveReservation(memberRequest, user.getId());
+        ReservationResponse response = reservationService.reserve(memberRequest, user.getId());
 
         // then
         Reservation reservation = reservationRepository.getReservation(response.id());
@@ -150,7 +150,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
     @DisplayName("결제 대기 상태의 예약을 결제 시, 예약 상태로 전환된다")
     @Test
-    void when_paymentForPending_then_changeToReservedStatus() {
+    void when_payForPending_then_changeToReservedStatus() {
         // given
         Reservation pendingReservation = reservationRepository.save(
                 new Reservation(admin, detail1, Status.PAYMENT_PENDING));
@@ -162,7 +162,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        ReservationResponse response = reservationService.paymentForPending(request, admin.getId());
+        ReservationResponse response = reservationService.payForPending(request, admin.getId());
 
         // then
         Reservation reservation = reservationRepository.getReservation(response.id());
@@ -174,7 +174,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
     @DisplayName("다른 사람의 예약을 결제 시, 권한이 없는 예외가 발생한다")
     @Test
-    void when_paymentForPending_then_throwAuthorizationFailureException() {
+    void when_payForPending_then_throwAuthorizationFailureException() {
         // given
         Reservation pendingReservation = reservationRepository.save(
                 new Reservation(admin, detail1, Status.PAYMENT_PENDING));
@@ -187,7 +187,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        Assertions.assertThatThrownBy(() -> reservationService.paymentForPending(request, userId))
+        Assertions.assertThatThrownBy(() -> reservationService.payForPending(request, userId))
                 .isInstanceOf(AuthorizationException.class);
     }
 

@@ -40,9 +40,9 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
+    public ReservationResponse reserve(UserReservationRequest request, Long memberId) {
         Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
-        if (reservation.isPaymentPending()) {
+        if (reservation.isPending()) {
             Payment payment = savePayment(request.toPaymentRequest());
             reservation.completePayment(payment);
         }
@@ -50,22 +50,13 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationByAdmin(ReservationRequest request) {
+    public ReservationResponse reserveWithoutPayment(ReservationRequest request) {
         Reservation reservation = saveReservation(
                 request.memberId(),
                 request.date(),
                 request.timeId(),
                 request.themeId());
         reservation.toReserved();
-        return ReservationResponse.from(reservation);
-    }
-
-    @Transactional
-    public ReservationResponse paymentForPending(ReservationPaymentRequest request, Long memberId) {
-        Reservation reservation = reservationRepository.getReservation(request.reservationId());
-        rejectIfNotOwner(reservation, memberId);
-        Payment payment = savePayment(request.toPaymentRequest());
-        reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
     }
 
@@ -79,6 +70,15 @@ public class ReservationService {
     private Payment savePayment(PaymentRequest paymentRequest) {
         PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
         return paymentRepository.save(paymentResponse.toPayment());
+    }
+
+    @Transactional
+    public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
+        Reservation reservation = reservationRepository.getReservation(request.reservationId());
+        rejectIfNotOwner(reservation, memberId);
+        Payment payment = savePayment(request.toPaymentRequest());
+        reservation.completePayment(payment);
+        return ReservationResponse.from(reservation);
     }
 
     private void rejectIfNotOwner(Reservation reservation, Long memberId) {

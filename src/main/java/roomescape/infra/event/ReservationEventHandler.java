@@ -31,7 +31,7 @@ public class ReservationEventHandler {
 
     private void checkPaymentStatusAndProcess(PaymentPendingEvent event) {
         reservationRepository.findReservation(event.getReservationId())
-                .filter(Reservation::isPaymentPending)
+                .filter(Reservation::isPending)
                 .ifPresent(this::handlePaymentFailure);
     }
 
