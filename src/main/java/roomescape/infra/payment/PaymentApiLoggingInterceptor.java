@@ -18,17 +18,12 @@ public class PaymentApiLoggingInterceptor implements ClientHttpRequestIntercepto
     }
 
     private String getLoggingData(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
-        return String.format("""
-                        [Request]
-                        %s %s
-                        Header %s
-                        Body %s
-
-                        [Response]
-                        %s
-                        Header %s
-                        """,
-                request.getMethod(), request.getURI(), request.getHeaders(), new String(body),
-                response.getStatusCode(), response.getHeaders());
+        return String.format("[Request] %s %s Header %s Body %s [Response] %s Header %s ",
+                request.getMethod(),
+                request.getURI(),
+                request.getHeaders(),
+                new String(body),
+                response.getStatusCode(),
+                response.getHeaders());
     }
 }
