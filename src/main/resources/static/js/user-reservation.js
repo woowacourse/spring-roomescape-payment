@@ -191,12 +191,12 @@ function renderPrice(price) {
     const summarySection = document.getElementById("price");
 
     summarySection.innerHTML = '';
-    const a = document.createElement('a');
-    a.className = 'price' + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
-    a.id = 'price-amount';
-    a.setAttribute('priceAmount', price);
-    a.textContent = price;
-    summarySection.appendChild(a);
+    const priceSpan = document.createElement('span');
+    priceSpan.className = 'price' + '-slot cursor-pointer';
+    priceSpan.id = 'price-amount';
+    priceSpan.setAttribute('priceAmount', price);
+    priceSpan.textContent = price;
+    summarySection.appendChild(priceSpan);
 }
 
 function checkDateAndThemeAndTime() {
@@ -216,8 +216,6 @@ function checkDateAndThemeAndTime() {
             waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
 
             // 여기서 하면 됨
-            // 예약 하기 버튼 클릭 -> 결제 모달이 띄워짐 -> 결제 모달은 가격을 가짐
-
             const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
             const selectedTimeId = selectedTimeElement.getAttribute('data-time-id');
             fetchPrice(selectedDate, selectedThemeId, selectedTimeId);
