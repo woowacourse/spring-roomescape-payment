@@ -6,11 +6,13 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.PaymentException;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Objects;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -31,20 +33,23 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void sendPaymentConfirm(PaymentConfirmToTossDto paymentConfirmToTossDto) throws JSONException {
+    public PaymentConfirmationFromTossDto sendPaymentConfirm(PaymentConfirmationToTossDto paymentConfirmationToTossDto) throws JSONException {
         Base64.Encoder encoder = Base64.getEncoder();
         String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
         String authorizations = "Basic " + encodedBytes;
 
-        restClient.post()
+        var result = restClient.post()
                 .uri(baseUrl + confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
-                .body(paymentConfirmToTossDto)
+                .body(paymentConfirmationToTossDto)
                 .exchange((request, response) -> {
                     handlePaymentConfirmationException(response);
-                    return new PaymentConfirmFromTossDto("200", "결제가 성공하였습니다.");
+                    return Objects.requireNonNull(response.bodyTo(PaymentConfirmationFromTossDto.class));
                 });
+
+        System.out.println("무야호" + result);
+        return result;
     }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {

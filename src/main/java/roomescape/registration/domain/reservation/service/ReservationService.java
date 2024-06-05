@@ -6,7 +6,8 @@ import roomescape.admin.domain.FilterInfo;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
 import roomescape.client.payment.TossPaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
 import roomescape.exception.model.ReservationExceptionCode;
@@ -14,6 +15,8 @@ import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
@@ -39,17 +42,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
     private final TossPaymentClient tossPaymentClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
                               MemberRepository memberRepository, WaitingRepository waitingRepository,
-                              TossPaymentClient tossPaymentClient) {
+                              TossPaymentClient tossPaymentClient, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
         this.tossPaymentClient = tossPaymentClient;
     }
 
@@ -66,8 +71,11 @@ public class ReservationService {
         Reservation saveReservation = new Reservation(reservationRequest.date(), time, theme, member);
         Reservation reservation = reservationRepository.save(saveReservation);
 
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        tossPaymentClient.sendPaymentConfirm(paymentConfirmToTossDto);
+        PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
+        PaymentConfirmationFromTossDto paymentConfirmationFromTossDto = tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto);
+        Payment payment = paymentConfirmationFromTossDto.toPayment(member, reservation);
+        paymentRepository.save(payment);
+
         return ReservationResponse.from(reservation);
     }
 

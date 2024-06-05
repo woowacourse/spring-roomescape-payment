@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.TossPaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.member.domain.Member;
@@ -92,8 +92,8 @@ class ReservationServiceTest {
         ReservationRequest reservationRequest = new ReservationRequest(reservation.getDate(),
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
                 "paymentType", "paymentKey", "orderId", 1000);
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
+        PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
+        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmationToTossDto);
 
         ReservationResponse reservationResponse = reservationService
                 .addReservation(reservationRequest, 1L);

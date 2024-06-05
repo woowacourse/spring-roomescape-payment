@@ -1,8 +1,9 @@
 package roomescape.client.payment;
 
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 
 public interface PaymentClient {
 
-    void sendPaymentConfirm(PaymentConfirmToTossDto paymentConfirmToTossDto);
+    PaymentConfirmationFromTossDto sendPaymentConfirm(PaymentConfirmationToTossDto paymentConfirmationToTossDto);
 }

@@ -21,7 +21,7 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false)
-    private String externalPaymentId;
+    private String externalPaymentKey;
 
     @Column(nullable = false)
     private String externalOrderId;
@@ -40,7 +40,7 @@ public class Payment {
     public Payment(String externalPaymentId, String externalOrderId,
                    LocalDateTime createdAt, Member member, Reservation reservation) {
         this.id = null;
-        this.externalPaymentId = externalPaymentId;
+        this.externalPaymentKey = externalPaymentId;
         this.externalOrderId = externalOrderId;
         this.createdAt = createdAt;
         this.member = member;
@@ -51,8 +51,8 @@ public class Payment {
         return id;
     }
 
-    public String getExternalPaymentId() {
-        return externalPaymentId;
+    public String getExternalPaymentKey() {
+        return externalPaymentKey;
     }
 
     public String getExternalOrderId() {
