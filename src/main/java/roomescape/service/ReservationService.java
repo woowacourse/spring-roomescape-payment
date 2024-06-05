@@ -8,15 +8,11 @@ import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.controller.time.dto.IsMineRequest;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
-import roomescape.payment.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.payment.PaymentService;
 import roomescape.repository.MemberRepository;
-import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -40,23 +36,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentRepository paymentRepository;
-    private final PaymentClient paymentClient;
-
+    private final PaymentService paymentService;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
-                              final PaymentRepository paymentRepository,
-                              final PaymentClient paymentClient
-    ) {
+                              final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentRepository = paymentRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -105,12 +96,11 @@ public class ReservationService {
         final LocalDate date = request.date();
         validateReservation(member, theme, time, date);
         validateBeforeDay(date.atTime(time.getStartAt()));
-        final TossPaymentConfirmResponse tossPaymentConfirmResponse = paymentClient.postPayment(
-                new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
         final Reservation reservation = new Reservation(null, member, date, time, theme);
         final Reservation savedReservation = reservationRepository.save(reservation);
-        final PaymentInfo payment = tossPaymentConfirmResponse.toPayment(savedReservation);
-        paymentRepository.save(payment);
+
+        paymentService.savePayment(request, savedReservation);
+
         return savedReservation;
     }
 
@@ -125,6 +115,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(final long id) {
         final Reservation fetchReservation = reservationRepository.fetchById(id);
+        paymentService.deletePayment(id);
         reservationRepository.deleteById(fetchReservation.getId());
     }
 
@@ -140,6 +131,8 @@ public class ReservationService {
         if (!isWaitReservation) {
             throw new UserDeleteReservationException("유저는 예약 대기만 삭제 가능합니다.");
         }
+
+        paymentService.deletePayment(reservationId);
         reservationRepository.deleteById(reservation.getId());
     }
 

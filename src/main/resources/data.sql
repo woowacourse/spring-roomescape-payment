@@ -27,11 +27,11 @@ VALUES (1, CURRENT_DATE - 3, 1, 1),
        (3, CURRENT_DATE + 4, 4, 3);
 
 INSERT INTO PAYMENT(ORDER_ID, PAYMENT_KEY, ORDER_NAME, TOTAL_AMOUNT, RESERVATION_ID)
-VALUES ('order_id1', 'peyment_key1', '방탈출1', 1000, 1),
-       ('order_id2', 'peyment_key2', '방탈출2', 1000, 2),
-       ('order_id3', 'peyment_key3', '방탈출2', 1000, 3),
-       ('order_id4', 'peyment_key4', '방탈출2', 1000, 4),
-       ('order_id5', 'peyment_key5', '방탈출3', 1000, 5),
-       ('order_id6', 'peyment_key6', '방탈출3', 1000, 6),
-       ('order_id7', 'peyment_key7', '방탈출3', 1000, 7),
-       ('order_id8', 'peyment_key8', '방탈출3', 1000, 8);
+VALUES ('order_id1', 'payment_key1', '방탈출1', 1000, 1),
+       ('order_id2', 'payment_key2', '방탈출2', 1000, 2),
+       ('order_id3', 'payment_key3', '방탈출2', 1000, 3),
+       ('order_id4', 'payment_key4', '방탈출2', 1000, 4),
+       ('order_id5', 'payment_key5', '방탈출3', 1000, 5),
+       ('order_id6', 'payment_key6', '방탈출3', 1000, 6),
+       ('order_id7', 'payment_key7', '방탈출3', 1000, 7),
+       ('order_id8', 'payment_key8', '방탈출3', 1000, 8);

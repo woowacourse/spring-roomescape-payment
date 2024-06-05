@@ -35,7 +35,8 @@ public class Reservation {
         this.theme = null;
     }
 
-    public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
+    public Reservation(final Long id, final Member member, final LocalDate date,
+                       final ReservationTime time, final Theme theme) {
         this.id = id;
         this.member = member;
         this.date = date;
@@ -92,11 +93,11 @@ public class Reservation {
     @Override
     public String toString() {
         return "Reservation{" +
-                "id=" + id +
-                ", member=" + member +
-                ", date=" + date +
-                ", time=" + time +
-                ", theme=" + theme +
-                '}';
+               "id=" + id +
+               ", member=" + member +
+               ", date=" + date +
+               ", time=" + time +
+               ", theme=" + theme +
+               '}';
     }
 }
