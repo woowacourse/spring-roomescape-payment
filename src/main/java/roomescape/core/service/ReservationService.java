@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Payment;
-import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
@@ -67,8 +66,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(final ReservationRequest request) {
-        final Reservation reservation
-                = createReservation(request, PaymentStatus.PENDING);
+        final Reservation reservation = createReservation(request);
         final Reservation savedReservation = reservationRepository.save(reservation);
         return new ReservationResponse(savedReservation);
     }
@@ -76,8 +74,7 @@ public class ReservationService {
     @Transactional
     public WebPaidReservationResponse createAndPay(final ReservationRequest reservationRequest,
                                                    final PaymentConfirmRequest paymentRequest) {
-        final Reservation reservation
-                = createReservation(reservationRequest, PaymentStatus.WEB_PAID);
+        final Reservation reservation = createReservation(reservationRequest);
         final PaymentConfirmResponse paymentResponse
                 = paymentApprover.confirmPayment(paymentRequest);
         final Payment savedPayment = paymentRepository.save(paymentResponse.toPayment());
@@ -85,15 +82,13 @@ public class ReservationService {
         return new WebPaidReservationResponse(savedReservation);
     }
 
-    private Reservation createReservation(final ReservationRequest request,
-                                          final PaymentStatus paymentStatus) {
+    private Reservation createReservation(final ReservationRequest request) {
         final Member member = getMemberById(request.getMemberId());
         final String date = request.getDate();
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
 
-        final Reservation reservation
-                = new Reservation(member, date, reservationTime, theme, paymentStatus);
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme);
         reservation.validateDateAndTime();
         validateDuplicatedReservation(reservation, reservationTime);
         return reservation;
@@ -208,7 +203,7 @@ public class ReservationService {
             final String dateString = date.format(DateTimeFormatter.ISO_DATE);
 
             final Reservation nextReservation
-                    = new Reservation(member, dateString, time, theme, PaymentStatus.PENDING);
+                    = new Reservation(member, dateString, time, theme);
 
             waitingRepository.delete(waiting);
             reservationRepository.save(nextReservation);

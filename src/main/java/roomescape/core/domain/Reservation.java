@@ -61,14 +61,6 @@ public class Reservation {
         this(member, parseDate(date), time, theme, PaymentStatus.PENDING, null);
     }
 
-    public Reservation(final Member member,
-                       final String date,
-                       final ReservationTime time,
-                       final Theme theme,
-                       final PaymentStatus paymentStatus) {
-        this(member, parseDate(date), time, theme, paymentStatus, null);
-    }
-
     private Reservation(final Member member,
                         final LocalDate date,
                         final ReservationTime time,
@@ -93,7 +85,7 @@ public class Reservation {
     }
 
     public Reservation withPayment(final Payment payment) {
-        return new Reservation(member, date, time, theme, paymentStatus, payment);
+        return new Reservation(member, date, time, theme, PaymentStatus.WEB_PAID, payment);
     }
 
     public void validateDateAndTime() {
