@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:roomescape_test
+    username: sa
+    driverClassName: org.h2.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+  sql:
+    init:
+      data-locations: classpath:data-test.sql

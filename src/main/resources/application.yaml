@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:roomescape
+    username: sa
+    driverClassName: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+security:
+  jwt:
+    token:
+      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
+      expire-length: 3600000   # JWT token expiry time is 3600000 milliseconds (60 minutes or 1 hour)
+  password:
+    salt: 4o0coJC44Iflk5+r9xDsvQ==
+
+payments:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    password: ":"
