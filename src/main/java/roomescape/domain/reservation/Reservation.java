@@ -66,6 +66,13 @@ public class Reservation {
         this.status = Status.PAYMENT_PENDING;
     }
 
+    public void toReserved() {
+        if (this.isCanceled()) {
+            throw new RoomEscapeException("이미 취소된 예약입니다.");
+        }
+        this.status = Status.RESERVED;
+    }
+
     public void cancel(Long memberId) {
         if (this.isNotOwner(memberId)) {
             throw new RoomEscapeException("다른 회원의 예약을 취소할 수 없습니다.");

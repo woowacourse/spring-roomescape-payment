@@ -1,5 +1,6 @@
 package roomescape.application;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,16 +41,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservation(UserReservationRequest request, Long memberId) {
-        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
-        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
-                request.date(), request.timeId(), request.themeId());
-        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
-        reservationRepository.save(reservation);
-
+        Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
         if (reservation.isPaymentPending()) {
-            PaymentRequest paymentRequest = request.toPaymentRequest();
-            PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
-            Payment payment = paymentRepository.save(paymentResponse.toPayment());
+            Payment payment = savePayment(request.toPaymentRequest());
             reservation.completePayment(payment);
         }
         return ReservationResponse.from(reservation);
@@ -57,12 +51,12 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservationByAdmin(ReservationRequest request) {
-        Member member = memberRepository.findMember(request.memberId())
-                .orElseThrow(AuthenticationException::new);
-        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(
-                request.date(), request.timeId(), request.themeId());
-        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
-        reservationRepository.save(reservation);
+        Reservation reservation = saveReservation(
+                request.memberId(),
+                request.date(),
+                request.timeId(),
+                request.themeId());
+        reservation.toReserved();
         return ReservationResponse.from(reservation);
     }
 
@@ -70,11 +64,21 @@ public class ReservationService {
     public ReservationResponse paymentForPending(ReservationPaymentRequest request, Long memberId) {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
         rejectIfNotOwner(reservation, memberId);
-        PaymentRequest paymentRequest = request.toPaymentRequest();
-        PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
-        Payment payment = paymentRepository.save(paymentResponse.toPayment());
+        Payment payment = savePayment(request.toPaymentRequest());
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
+    }
+
+    private Reservation saveReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
+        ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(date, timeId, themeId);
+        Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
+        return reservationRepository.save(reservation);
+    }
+
+    private Payment savePayment(PaymentRequest paymentRequest) {
+        PaymentResponse paymentResponse = paymentRestClient.confirmPayment(paymentRequest);
+        return paymentRepository.save(paymentResponse.toPayment());
     }
 
     private void rejectIfNotOwner(Reservation reservation, Long memberId) {
