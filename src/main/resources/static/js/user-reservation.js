@@ -160,6 +160,7 @@ function checkDateAndThemeAndTime() {
 
 function onReservationButtonClick(event, paymentWidget, renderedPaymentWidget) {
   const selectedDate = document.getElementById("datepicker").value;
+  const themeName = document.querySelector('.theme-slot.active')?.textContent;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
   const price = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-price');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
@@ -184,7 +185,7 @@ function onReservationButtonClick(event, paymentWidget, renderedPaymentWidget) {
     const orderIdPrefix = "WTEST";
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
-      orderName: "테스트 방탈출 예약 결제 1건",
+      orderName: themeName,
       amount: price
     }).then(function (data) {
       console.debug(data);
