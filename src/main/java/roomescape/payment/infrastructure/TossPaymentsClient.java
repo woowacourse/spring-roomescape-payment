@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.NewPayment;
+import roomescape.payment.domain.PaymentCancelInfo;
 import roomescape.payment.domain.PaymentClient;
 
 @Component
@@ -26,5 +27,16 @@ public class TossPaymentsClient implements PaymentClient {
                 .retrieve()
                 .onStatus(errorHandler)
                 .body(ConfirmedPayment.class);
+    }
+
+    @Override
+    public void cancel(PaymentCancelInfo paymentCancelInfo) {
+        String uri = String.format("/%s/cancel", paymentCancelInfo.paymentKey());
+        restClient.post()
+                .uri(uri)
+                .body(paymentCancelInfo)
+                .retrieve()
+                .onStatus(errorHandler)
+                .toBodilessEntity();
     }
 }

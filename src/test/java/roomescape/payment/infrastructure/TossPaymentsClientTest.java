@@ -12,11 +12,13 @@ import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.NewPayment;
+import roomescape.payment.domain.PaymentCancelInfo;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.exception.PaymentServerException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class TossPaymentsClientTest {
     public static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     public static final String CONFIRM_URL = BASE_URL + "/confirm";
+    public static final String CANCEL_URL = BASE_URL + "/paymentKey/cancel";
 
     private final RestClient.Builder testRestClientBuilder = RestClient.builder()
             .baseUrl(BASE_URL);
@@ -101,5 +104,18 @@ class TossPaymentsClientTest {
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.confirm(newPayment))
                 .isInstanceOf(PaymentServerException.class);
+    }
+
+    @Test
+    @DisplayName("토스 결제 취소 API에서 성공 응답을 받는다.")
+    void cancel() {
+        // given
+        PaymentCancelInfo paymentCancelInfo = new PaymentCancelInfo("paymentKey", "취소 사유");
+        mockRestServiceServer.expect(requestTo(CANCEL_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess());
+
+        // when & then
+        assertDoesNotThrow(() -> tossPaymentClient.cancel(paymentCancelInfo));
     }
 }
