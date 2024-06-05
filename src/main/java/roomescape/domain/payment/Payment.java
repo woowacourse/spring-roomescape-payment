@@ -34,14 +34,16 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Reservation reservation, final String paymentKey,
-            final String orderId, final Long amount
-    ) {
+    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final Long amount) {
         this(null, reservation, paymentKey, orderId, amount);
     }
 
-    public Payment(final Long id, final Reservation reservation, final String paymentKey,
-            final String orderId, final Long amount
+    public Payment(
+            final Long id,
+            final Reservation reservation,
+            final String paymentKey,
+            final String orderId,
+            final Long amount
     ) {
         this.id = id;
         this.reservation = reservation;

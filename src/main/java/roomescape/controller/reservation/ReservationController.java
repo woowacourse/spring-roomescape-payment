@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.controller.auth.AuthenticationPrincipal;
 import roomescape.dto.auth.LoginMember;
-import roomescape.dto.payment.PaymentDto;
+import roomescape.dto.payment.PaymentConfirmRequest;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
@@ -33,8 +33,8 @@ public class ReservationController {
             @RequestBody final ReservationSaveRequest request) {
         final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
         final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
-        final PaymentDto paymentDto = PaymentDto.of(request);
-        paymentService.confirmPayment(paymentDto, reservationResponse.id());
+        final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(request);
+        paymentService.confirm(paymentConfirmRequest, reservationResponse.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
     }
 

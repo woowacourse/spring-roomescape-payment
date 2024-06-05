@@ -3,7 +3,7 @@ package roomescape.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-public enum RoomescapeExceptionCode {
+public enum RoomescapeExceptionCode implements RoomescapeErrorCode {
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
@@ -22,7 +22,6 @@ public enum RoomescapeExceptionCode {
     INVALID_NAME_FORMAT(HttpStatus.BAD_REQUEST, "예약자 이름은 숫자로만 구성될 수 없습니다."),
     INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 시간입니다."),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 날짜입니다."),
-    TOSS_PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "Toss payments 에러입니다.")
     ;
 
     private final HttpStatusCode httpStatusCode;
@@ -33,11 +32,13 @@ public enum RoomescapeExceptionCode {
         this.message = message;
     }
 
-    public HttpStatusCode getHttpStatusCode() {
+    @Override
+    public HttpStatusCode httpStatusCode() {
         return httpStatusCode;
     }
 
-    public String getMessage() {
+    @Override
+    public String message() {
         return message;
     }
 }

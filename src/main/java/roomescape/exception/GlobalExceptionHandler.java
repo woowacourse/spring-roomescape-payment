@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import roomescape.dto.ErrorResponseBody;
+import roomescape.dto.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -15,16 +15,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(RoomescapeException.class)
-    public ResponseEntity<ErrorResponseBody> handleRoomescapeException(RoomescapeException e) {
+    public ResponseEntity<ErrorResponse> handleRoomescapeException(RoomescapeException e) {
         logger.error(e.getMessage(), e);
         return ResponseEntity.status(e.getHttpStatusCode())
-                .body(new ErrorResponseBody(e.getMessage()));
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseBody> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         logger.error(e.getMessage(), e);
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponseBody("[Server Error] " + e.getMessage()));
+                .body(new ErrorResponse("[Server Error] " + e.getMessage()));
     }
 }
