@@ -38,6 +38,6 @@ class PaymentServiceTest {
         String actual = paymentService.getPlainPaymentKey(payment);
 
         // then
-        assertThat(actual).isEqualTo("testKey");
+        assertThat(actual).isEqualTo("paymentKey");
     }
 }

@@ -21,6 +21,6 @@ class PaymentTest {
         String actual = payment.getPaymentKey(paymentKeyEncodingService);
 
         // then
-        assertThat(actual).isEqualTo("testKey");
+        assertThat(actual).isEqualTo("paymentKey");
     }
 }
