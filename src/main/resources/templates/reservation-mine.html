@@ -5,11 +5,20 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>방탈출 어드민</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/toss-style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
     <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
+<script>
+    const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm' // 테스트용 클라이언트 키
+    const customerKey = 'UM-UdDPNvpoqVOJRkOx9L' // 내 상점에서 고객을 구분하기 위해 발급한 고객의 고유 ID
 
+    // 2. 결제위젯 SDK 초기화
+    const paymentWidget = PaymentWidget(clientKey, customerKey) // 회원 결제
+    // const paymentWidget1 = PaymentWidget(clientKey, PaymentWidget.ANONYMOUS) // 비회원 결제
+</script>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/">
         <img alt="LOGO" src="https://avatars.githubusercontent.com/u/141792611?s=200&v=4" style="height: 40px;">
@@ -53,6 +62,9 @@
             <th>날짜</th>
             <th>시간</th>
             <th>상태</th>
+            <th>paymentKey</th>
+            <th>결제금액</th>
+            <th>대기 관리</th>
             <th></th>
         </tr>
         </thead>
@@ -60,7 +72,17 @@
         </tbody>
     </table>
 </div>
-
+<!-- 결제창 ui -->
+<div class="wrapper w-100">
+    <div class="max-w-540 w-100">
+        <div id="payment-method" class="w-100"></div>
+        <div id="agreement" class="w-100"></div>
+        <div class="btn-wrapper w-100">
+            <button id="reserve-button" class="btn primary w-100">예약하기</button>
+        </div>
+    </div>
+</div>
+<script src="/js/flatpickr.js"></script>
 <script src="/js/user-scripts.js"></script>
 <script src="/js/reservation-mine.js"></script>
 </body>
