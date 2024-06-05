@@ -12,6 +12,7 @@ import roomescape.infrastructure.payment.response.PaymentErrorResponse;
 import roomescape.infrastructure.payment.response.PaymentServerErrorCode;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentCancelDto;
 import roomescape.service.response.PaymentDto;
 
 import java.io.IOException;
@@ -36,6 +37,16 @@ public class PaymentManager {
     private static String createAuthorizations(String secretKey) {
         byte[] encodedBytes = ENCODER.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
+    }
+
+    public void cancel(String paymentKey, PaymentCancelDto paymentCancelDto) {
+        restClient.post()
+                .uri("https://api.tosspayments.com/v1/payments/{paymentKey}/cancel", paymentKey)
+                .header("Authorization", authorizationHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(paymentCancelDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handlePaymentError);
     }
 
     public PaymentDto approve(PaymentApproveDto paymentApproveDto) {
