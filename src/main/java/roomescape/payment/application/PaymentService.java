@@ -1,6 +1,7 @@
 package roomescape.payment.application;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -36,6 +37,7 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
+    @Async
     @TransactionalEventListener(value = ReservationFailedEvent.class, phase = TransactionPhase.AFTER_ROLLBACK)
     public void cancelCasedByRollBack(ReservationFailedEvent event) {
         ConfirmedPayment confirmedPayment = event.confirmedPayment();

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
@@ -80,10 +79,11 @@ class BookingWithPaymentServiceTest {
             assertThat(payments).hasSize(1);
         }
     }
+
     @Nested
     @RecordApplicationEvents
     class BookingFailTest extends ReservationServiceTest {
-        @MockBean
+        @SpyBean
         private PaymentService paymentService;
 
         @SpyBean
