@@ -44,6 +44,7 @@ class PaymentScenarioTest extends IntegrationTest {
         willDoNothing()
                 .given(tossPaymentClient)
                 .sendPaymentConfirm(paymentConfirmToTossDto);
+        long beforeAdd = reservationRepository.count();
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -52,6 +53,8 @@ class PaymentScenarioTest extends IntegrationTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201);
+        long afterAdd = reservationRepository.count();
+        assertThat(beforeAdd + 1).isEqualTo(afterAdd);
     }
 
     @Test
