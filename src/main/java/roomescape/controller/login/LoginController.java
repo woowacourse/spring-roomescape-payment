@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.config.auth.LoginMember;
 import roomescape.config.auth.RoleAllowed;
-import roomescape.controller.auth.LoginMember;
 import roomescape.domain.member.Member;
 import roomescape.service.login.LoginService;
 import roomescape.service.login.dto.LoginCheckResponse;
@@ -22,17 +22,17 @@ import java.net.URI;
 @RestController
 public class LoginController {
     private final LoginService loginService;
-    private final CookieExtractor cookieExtractor;
+    private final AuthCookieHandler authCookieHandler;
 
-    public LoginController(LoginService loginService, CookieExtractor cookieExtractor) {
+    public LoginController(LoginService loginService, AuthCookieHandler authCookieHandler) {
         this.loginService = loginService;
-        this.cookieExtractor = cookieExtractor;
+        this.authCookieHandler = authCookieHandler;
     }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request, HttpServletResponse response) {
         String token = loginService.login(request);
-        Cookie cookie = cookieExtractor.createCookie(token);
+        Cookie cookie = authCookieHandler.createCookie(token);
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
@@ -47,7 +47,7 @@ public class LoginController {
     @RoleAllowed
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        Cookie cookie = cookieExtractor.deleteCookie();
+        Cookie cookie = authCookieHandler.deleteCookie();
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }

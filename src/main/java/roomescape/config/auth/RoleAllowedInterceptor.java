@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.controller.login.CookieExtractor;
+import roomescape.controller.login.AuthCookieHandler;
 import roomescape.domain.member.MemberRole;
 import roomescape.exception.login.AccessDeniedException;
 import roomescape.service.login.LoginService;
@@ -13,11 +13,11 @@ import java.lang.reflect.Method;
 
 public class RoleAllowedInterceptor implements HandlerInterceptor {
     private final LoginService loginService;
-    private final CookieExtractor cookieExtractor;
+    private final AuthCookieHandler authCookieHandler;
 
-    public RoleAllowedInterceptor(LoginService loginService, CookieExtractor cookieExtractor) {
+    public RoleAllowedInterceptor(LoginService loginService, AuthCookieHandler authCookieHandler) {
         this.loginService = loginService;
-        this.cookieExtractor = cookieExtractor;
+        this.authCookieHandler = authCookieHandler;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class RoleAllowedInterceptor implements HandlerInterceptor {
         RoleAllowed annotation = method.getAnnotation(RoleAllowed.class);
         MemberRole roleAllowed = annotation.value();
 
-        String token = cookieExtractor.getToken(request.getCookies());
+        String token = authCookieHandler.getToken(request.getCookies());
         MemberRole currentRole = loginService.findMemberRoleByToken(token);
 
         if (currentRole.isLowerThan(roleAllowed)) {
