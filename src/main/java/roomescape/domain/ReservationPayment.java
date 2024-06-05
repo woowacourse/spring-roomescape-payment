@@ -8,6 +8,10 @@ public class ReservationPayment {
     private final String orderId;
     private final Long totalAmount;
 
+    public ReservationPayment(Payment payment) {
+        this(payment.getReservation(), payment.getId(), payment.getPaymentKey(), payment.getOrderId(), payment.getTotalAmount());
+    }
+
     public ReservationPayment(Reservation reservation, Long paymentId, String paymentKey, String orderId, Long totalAmount) {
         this.reservation = reservation;
         this.paymentId = paymentId;

@@ -43,6 +43,7 @@ public class ReservationService {
 
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
         Reservation savedReservation = validateAndSave(reservationSaveDto);
+
         return new ReservationDto(savedReservation);
     }
 
@@ -50,7 +51,8 @@ public class ReservationService {
     public ReservationPaymentDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         Reservation reservation = validateAndSave(reservationSaveDto);
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        ReservationPayment reservationPayment = saveReservationPayment(reservation, paymentDto);
+        Payment payment = saveReservationPayment(reservation, paymentDto);
+        ReservationPayment reservationPayment = new ReservationPayment(payment);
 
         return new ReservationPaymentDto(reservationPayment);
     }
@@ -67,13 +69,9 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    private ReservationPayment saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
+    private Payment saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
-        Payment savedPayment = paymentRepository.save(payment);
-
-        return new ReservationPayment(reservation,
-                savedPayment.getId(), savedPayment.getPaymentKey(),
-                savedPayment.getOrderId(), savedPayment.getTotalAmount());
+        return paymentRepository.save(payment);
     }
 
     private ReservationTime findTime(Long timeId) {
