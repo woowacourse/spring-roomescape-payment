@@ -7,6 +7,38 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .modal{
+            position:absolute;
+            display:none;
+
+            justify-content: center;
+            top:0;
+            left:0;
+
+            width:100%;
+            height:100%;
+
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal_body{
+            position:absolute;
+            top:50%;
+            width: 700px;
+
+            text-align: center;
+
+            background-color: rgb(255,255,255);
+            border-radius:10px;
+            box-shadow:0 2px 3px 0 rgba(34,36,38,0.15);
+            padding-bottom: 1rem;
+
+            transform:translateY(-50%);
+        }
+        .btn-wrapper {
+            margin: 0.1rem 2rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -53,18 +85,35 @@
             <th>날짜</th>
             <th>시간</th>
             <th>상태</th>
-            <th>대기 취소</th>
             <th>paymentKey</th>
             <th>결제금액</th>
+            <th></th>
             <th></th>
         </tr>
         </thead>
         <tbody id="table-body">
         </tbody>
     </table>
+    <div class="modal">
+        <div class="modal_body">
+            <div class="wrapper w-100">
+                <div class="max-w-540 w-100">
+                    <div id="payment-method" class="w-100"></div>
+                    <div id="agreement" class="w-100"></div>
+                    <div class="btn-wrapper w-80">
+                        <button id="payment-button" class="btn btn-primary primary w-100">결제하기</button>
+                    </div>
+                    <div class="btn-wrapper w-80">
+                        <button type="button" class="btn btn-secondary primary w-100 close_btn">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/js/user-scripts.js"></script>
 <script src="/js/reservation-mine.js"></script>
+<script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </body>
 </html>
