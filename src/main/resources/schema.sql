@@ -36,3 +36,11 @@ CREATE TABLE  IF NOT EXISTS waiting (
   waiting_order INTEGER,
 FOREIGN KEY (reservation_id) REFERENCES reservation(id)
 );
+
+CREATE TABLE  IF NOT EXISTS payment (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  payment_key VARCHAR(255),
+  reservation_id BIGINT,
+  amount NUMERIC,
+FOREIGN KEY (reservation_id) REFERENCES reservation(id)
+);

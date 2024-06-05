@@ -75,3 +75,23 @@ INSERT INTO waiting (reservation_id, waiting_order) VALUES
     (19, 2),
     (20, 3),
     (22, 1);
+
+INSERT INTO payment (payment_key, reservation_id, amount)
+VALUES ('paymentKey1', 1, 1000),
+       ('paymentKey2', 2, 1000),
+       ('paymentKey3', 3, 1000),
+       ('paymentKey4', 4, 1000),
+       ('paymentKey5', 5, 1000),
+       ('paymentKey6', 6, 1000),
+       ('paymentKey7', 7, 1000),
+       ('paymentKey8', 8, 1000),
+       ('paymentKey9', 9, 1000),
+       ('paymentKey10', 10, 1000),
+       ('paymentKey11', 11, 1000),
+       ('paymentKey12', 12, 1000),
+       ('paymentKey13', 13, 1000),
+       ('paymentKey14', 14, 1000),
+       ('paymentKey15', 15, 1000),
+       ('paymentKey16', 16, 1000),
+       ('paymentKey17', 17, 1000),
+       ('paymentKey21', 21, 1000);
