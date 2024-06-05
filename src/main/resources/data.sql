@@ -28,7 +28,7 @@ INSERT INTO reservation_time(start_at)
 VALUES ('20:00');
 
 
--- 예약 추가
+-- 예약 슬롯 추가
 INSERT INTO reservation_slot(date, reservation_time_id, theme_id)
 VALUES (DATEADD('DAY', -2, CURRENT_DATE()), 1, 1);
 INSERT INTO reservation_slot(date, reservation_time_id, theme_id)
@@ -60,7 +60,11 @@ INSERT INTO member(name, email, password, role)
 VALUES ('타칸', 'dev.tacan@gmail.com', '$2a$10$xFQbps5IJ6r9h69yhgYFe.hrbU59NA6snxaCVtllkcheE.nqq..UG', 'USER');
 
 
--- 예약 목록 추가
+-- 결제 추가
+-- INSERT INTO payment(order_id, total_amount, method, request_at, approved_at)
+-- VALUES ()
+
+-- 예약 추가
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (1, 1, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)

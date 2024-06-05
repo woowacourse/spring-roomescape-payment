@@ -36,14 +36,27 @@ CREATE TABLE IF NOT EXISTS reservation_slot
     FOREIGN KEY (theme_id) REFERENCES theme (id) -- 외래키 추가
     );
 
+CREATE TABLE IF NOT EXISTS payment
+(
+    id              BIGINT  NOT NULL AUTO_INCREMENT,
+    order_id        VARCHAR(255)    NOT NULL,
+    total_amount    BIGINT  NOT NULL,
+    payment_method          VARCHAR(255)    NOT NULL,
+    requested_at    DATE    NOT NULL,
+    approved_at     DATE    NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS reservation
 (
     id             BIGINT NOT NULL AUTO_INCREMENT,
     member_id      BIGINT NOT NULL,
     reservation_slot_id BIGINT NOT NULL,
+    payment_id     BIGINT,
     created_at DATETIME NOT NULL,
     status VARCHAR(255),
     FOREIGN KEY (member_id) REFERENCES member (id),
     FOREIGN KEY (reservation_slot_id) REFERENCES reservation_slot (id),
+    FOREIGN KEY (payment_id) REFERENCES payment (id),
     PRIMARY KEY (id)
-    );
+);

@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.Payment;
 
 @Entity
 public class Reservation {
@@ -19,6 +20,9 @@ public class Reservation {
 
     @ManyToOne
     private Member member;
+
+    @OneToOne
+    private Payment payment;
 
     @ManyToOne
     private ReservationSlot reservationSlot;
@@ -79,6 +83,10 @@ public class Reservation {
 
     public Long getAmount() {
         return AMOUNT;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override
