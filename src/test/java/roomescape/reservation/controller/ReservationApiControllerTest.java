@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.TODAY;
@@ -89,7 +90,7 @@ class ReservationApiControllerTest extends IntegrationTest {
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
 
-        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), anyLong());
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -113,7 +114,7 @@ class ReservationApiControllerTest extends IntegrationTest {
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
 
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), anyLong());
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

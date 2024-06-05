@@ -73,8 +73,8 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        paymentService.pay(PaymentRequest.from(reservationSaveRequest));
         ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
+        paymentService.pay(PaymentRequest.from(reservationSaveRequest), reservationResponse.id());
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

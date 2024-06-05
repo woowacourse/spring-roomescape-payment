@@ -18,8 +18,9 @@ public class PaymentService {
         this.tossPayRestClient = tossPayRestClient;
     }
 
-    public PaymentResponse pay(PaymentRequest paymentRequest) {
+    public PaymentResponse pay(PaymentRequest paymentRequest, Long reservationId) {
         Payment payment = tossPayRestClient.pay(paymentRequest);
+        payment.bindToReservation(reservationId);
         Payment savedPayment = paymentRepository.save(payment);
 
         return PaymentResponse.toResponse(savedPayment);

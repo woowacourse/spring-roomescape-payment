@@ -82,3 +82,29 @@ VALUES
 (1, DATEADD('DAY', 5, CURRENT_DATE), 4, 1, 'SUCCESS', CURRENT_TIMESTAMP),
 (2, DATEADD('DAY', 5, CURRENT_DATE), 4, 1, 'WAIT', CURRENT_TIMESTAMP + INTERVAL '1' MINUTE);
 ALTER TABLE reservation ALTER COLUMN id RESTART WITH 31;
+
+INSERT INTO payment (payment_key, order_id, total_amount, reservation_id)
+VALUES
+    ('payment_key1','order_id1',1000,1),
+    ('payment_key2','order_id2',1000,2),
+    ('payment_key3','order_id3',1000,3),
+    ('payment_key4','order_id4',1000,4),
+    ('payment_key5','order_id5',1000,5),
+    ('payment_key6','order_id6',1000,6),
+    ('payment_key7','order_id7',1000,7),
+    ('payment_key8','order_id8',1000,8),
+    ('payment_key12','order_id12',1000,12),
+    ('payment_key13','order_id13',1000,13),
+    ('payment_key14','order_id14',1000,14),
+    ('payment_key17','order_id17',1000,17),
+    ('payment_key18','order_id18',1000,18),
+    ('payment_key19','order_id19',1000,19),
+    ('payment_key20','order_id20',1000,20),
+    ('payment_key21','order_id21',1000,21),
+    ('payment_key22','order_id22',1000,22),
+    ('payment_key23','order_id23',1000,23),
+    ('payment_key24','order_id24',1000,24),
+    ('payment_key25','order_id25',1000,25),
+    ('payment_key28','order_id28',1000,28),
+    ('payment_key29','order_id29',1000,29),
+    ('payment_key31','order_id31',1000,31);

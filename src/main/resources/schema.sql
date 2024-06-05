@@ -38,5 +38,6 @@ CREATE TABLE IF NOT EXISTS payment
     payment_key  VARCHAR(255) NOT NULL UNIQUE,
     order_id     VARCHAR(255) NOT NULL UNIQUE,
     total_amount NUMERIC       NOT NULL,
+    reservation_id BIGINT NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );

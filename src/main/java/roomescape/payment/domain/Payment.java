@@ -23,7 +23,14 @@ public class Payment {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
+    @Column(name = "reservation_id", nullable = false, unique = true)
+    private Long reservationId;
+
     protected Payment() {
+    }
+
+    public void bindToReservation(Long reservationId) {
+        this.reservationId = reservationId;
     }
 
     public Long getId() {
