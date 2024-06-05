@@ -25,7 +25,8 @@ public class ReservationService {
     }
 
     private MemberReservation findMemberReservationById(Long id) {
-        return memberReservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
+        return memberReservationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }
 
     public List<MemberReservation> readReservations() {

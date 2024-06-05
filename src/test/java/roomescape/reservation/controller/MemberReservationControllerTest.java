@@ -408,4 +408,28 @@ class MemberReservationControllerTest {
                 .then()
                 .statusCode(200);
     }
+
+    @DisplayName("사용자 예약 컨트롤러는 결제 대기 상태가 아닌 예약의 결제가 발생할 경우 400을 응답한다.")
+    @Test
+    void confirmNotPendingReservation() {
+        // given
+        long id = 13L;
+        Mockito.when(restClient.post("/confirm", Fixtures.paymentRequestFixture))
+                .thenReturn(Optional.of(Fixtures.paymentResponseFixture));
+
+        // when
+        String detailMessage = RestAssured.given().log().all()
+                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, accessToken)
+                .when()
+                .contentType(ContentType.JSON)
+                .body(Fixtures.paymentRequestFixture)
+                .post("/reservations/" + id + "/payments/confirm")
+                .then()
+                .statusCode(400)
+                .extract()
+                .jsonPath().get("detail");
+
+        // then
+        assertThat(detailMessage).isEqualTo("해당 예약은 결제 대기 상태가 아닙니다.");
+    }
 }
