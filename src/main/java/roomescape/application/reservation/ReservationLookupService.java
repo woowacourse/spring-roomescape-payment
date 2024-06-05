@@ -7,17 +7,23 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.reservation.dto.request.ReservationFilterRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationStatusResponse;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.Theme;
 import roomescape.infrastructure.reservation.ReservationSpec;
 
 @Service
 @Transactional(readOnly = true)
 public class ReservationLookupService {
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationLookupService(ReservationRepository reservationRepository) {
+    public ReservationLookupService(ReservationRepository reservationRepository,
+                                    PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponse> findByFilter(ReservationFilterRequest request) {
@@ -51,9 +57,25 @@ public class ReservationLookupService {
     public List<ReservationStatusResponse> getReservationStatusesByMemberId(long memberId) {
         return reservationRepository.findActiveReservationByMemberId(memberId)
                 .stream()
-                .map(reservation -> ReservationStatusResponse.of(
-                        reservation,
-                        reservationRepository.getWaitingCount(reservation))
-                ).toList();
+                .map(this::extractResponse)
+                .toList();
+    }
+
+    private ReservationStatusResponse extractResponse(Reservation reservation) {
+        Theme theme = reservation.getTheme();
+        ReservationTime time = reservation.getTime();
+        long waitingCount = reservationRepository.getWaitingCount(reservation);
+
+        ReservationStatusResponse response = new ReservationStatusResponse(
+                reservation.getId(),
+                theme.getName(),
+                reservation.getDate(),
+                time.getStartAt(),
+                waitingCount
+        );
+
+        return paymentRepository.findByOrderId(reservation.getOrderId())
+                .map(response::withPayment)
+                .orElse(response);
     }
 }
