@@ -13,6 +13,7 @@ import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.event.ReservationFailedEvent;
 import roomescape.reservation.event.ReservationSavedEvent;
 
@@ -90,6 +91,9 @@ class BookingWithPaymentServiceTest {
         private BookingManageService bookingManageService;
 
         @Autowired
+        private ReservationRepository reservationRepository;
+
+        @Autowired
         private ApplicationEvents events;
 
         @Test
@@ -124,12 +128,34 @@ class BookingWithPaymentServiceTest {
             ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
             // when & then
-            assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
-                    .isInstanceOf(RuntimeException.class);
+            assertSoftly(softly -> {
+                softly.assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
+                        .isInstanceOf(RuntimeException.class);
 
-            long count = events.stream(ReservationFailedEvent.class).count();
-            assertThat(count).isEqualTo(1);
+                long count = events.stream(ReservationFailedEvent.class).count();
+                softly.assertThat(count).isEqualTo(1);
+            });
+
             verify(paymentService, times(1)).cancelCasedByRollBack(any());
+        }
+
+        @Test
+        @DisplayName("결제 내역 생성에 실패하면 예약 생성도 롤백된다.")
+        void rollBackCreatedReservationWhenPaymentCreateFailed() {
+            // given
+            BDDMockito.willThrow(RuntimeException.class)
+                    .given(paymentService)
+                    .create(any());
+
+            Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
+            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
+
+            // when & then
+            assertSoftly(softly -> {
+                softly.assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
+                        .isInstanceOf(RuntimeException.class);
+                softly.assertThat(reservationRepository.findAll()).hasSize(0);
+            });
         }
     }
 }
