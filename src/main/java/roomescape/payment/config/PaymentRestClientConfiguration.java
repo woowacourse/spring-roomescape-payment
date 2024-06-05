@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient.Builder;
 import roomescape.payment.domain.PaymentProperties;
 import roomescape.payment.domain.RestClientBuilders;
-import roomescape.payment.service.PaymentService;
-import roomescape.payment.service.TossPaymentService;
+import roomescape.payment.service.PaymentClient;
+import roomescape.payment.service.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -24,8 +24,8 @@ public class PaymentRestClientConfiguration {
     }
 
     @Bean
-    public PaymentService tossPaymentService(RestClientBuilders builders) {
+    public PaymentClient tossPaymentService(RestClientBuilders builders) {
         Builder builder = builders.getBuilder("toss");
-        return new TossPaymentService(builder.build());
+        return new TossPaymentClient(builder.build());
     }
 }

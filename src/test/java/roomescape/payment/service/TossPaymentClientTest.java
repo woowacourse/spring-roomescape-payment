@@ -22,9 +22,9 @@ import roomescape.payment.domain.RestClientBuilders;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 
-class TossPaymentServiceTest {
+class TossPaymentClientTest {
     private MockRestServiceServer mockRestServiceServer;
-    private TossPaymentService tossPaymentService;
+    private TossPaymentClient tossPaymentService;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +39,7 @@ class TossPaymentServiceTest {
         RestClientBuilders builders = new RestClientBuilders(properties);
         Builder builder = builders.getBuilder("toss");
         mockRestServiceServer = MockRestServiceServer.bindTo(builder).build();
-        tossPaymentService = new TossPaymentService(builder.build());
+        tossPaymentService = new TossPaymentClient(builder.build());
     }
 
     @AfterEach
