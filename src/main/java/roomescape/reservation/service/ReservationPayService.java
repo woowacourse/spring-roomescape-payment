@@ -3,7 +3,7 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
-import roomescape.payment.service.PaymentClient;
+import roomescape.payment.service.PaymentCreateService;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 
@@ -11,21 +11,21 @@ import roomescape.reservation.dto.UserReservationCreateRequest;
 public class ReservationPayService {
     private final ReservationCreateService reservationCreateService;
     private final ReservationDeleteService reservationDeleteService;
-    private final PaymentClient paymentClient;
+    private final PaymentCreateService paymentCreateService;
 
     public ReservationPayService(ReservationCreateService reservationCreateService,
                                  ReservationDeleteService reservationDeleteService,
-                                 PaymentClient paymentClient) {
+                                 PaymentCreateService paymentCreateService) {
         this.reservationCreateService = reservationCreateService;
         this.reservationDeleteService = reservationDeleteService;
-        this.paymentClient = paymentClient;
+        this.paymentCreateService = paymentCreateService;
     }
 
     public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
         ReservationResponse reservation = reservationCreateService.createReservation(request, memberId);
-
+        PaymentConfirmRequest paymentConfirmRequest = PaymentConfirmRequest.from(request, reservation.id());
         try {
-            paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
+            paymentCreateService.confirmPayment(paymentConfirmRequest);
         } catch (PaymentException exception) {
             reservationDeleteService.deleteReservation(reservation.id());
             throw exception;
