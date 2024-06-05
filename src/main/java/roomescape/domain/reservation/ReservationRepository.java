@@ -7,10 +7,22 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 import roomescape.domain.exception.DomainNotFoundException;
 import roomescape.domain.reservation.detail.ReservationDetail;
+import roomescape.domain.reservation.dto.ReservationWithPaymentDto;
 
 public interface ReservationRepository extends ListCrudRepository<Reservation, Long> {
 
-    List<Reservation> findByMemberId(long memberId);
+    @Query("""
+                SELECT
+                    new roomescape.domain.reservation.dto.ReservationWithPaymentDto(r, p)
+                FROM Reservation r
+                JOIN FETCH r.detail.time
+                JOIN FETCH r.detail.theme
+                JOIN FETCH r.member
+                LEFT JOIN FETCH Payment p
+                ON r.id = p.reservation.id
+                WHERE r.member.id = :memberId
+            """)
+    List<ReservationWithPaymentDto> findWithPaymentByMemberId(long memberId);
 
     boolean existsByDetail_TimeId(long timeId);
 
@@ -21,12 +33,12 @@ public interface ReservationRepository extends ListCrudRepository<Reservation, L
     boolean existsByDetailAndMemberId(ReservationDetail detail, long memberId);
 
     @Query("""
-                SELECT r
+                SELECT
+                    r
                 FROM Reservation r
                 JOIN FETCH r.detail.time
                 JOIN FETCH r.detail.theme
                 JOIN FETCH r.member
-                LEFT JOIN FETCH Payment p ON r.payment.id = p.id
                 WHERE (:memberId IS NULL OR r.member.id = :memberId)
                 AND (:themeId IS NULL OR r.detail.theme.id = :themeId)
                 AND (:dateFrom IS NULL OR r.detail.date >= :dateFrom)

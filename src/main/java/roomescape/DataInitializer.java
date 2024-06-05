@@ -113,31 +113,26 @@ public class DataInitializer implements ApplicationRunner {
                 new Reservation(new ReservationDetail(LocalDate.now().minusDays(1), time3, theme2), user));
         Reservation reservation8 = reservationRepository.save(
                 new Reservation(new ReservationDetail(LocalDate.now().plusDays(2), time1, theme1), user));
+        Reservation reservation9 = reservationRepository.save(
+                new Reservation(new ReservationDetail(LocalDate.now().plusDays(2), time2, theme2), admin));
+
 
         Payment payment1 = paymentRepository.save(
-                new Payment("tgen_20240604162216v123ba", "WTESTMC4xwNjE1MzMwOTI0Njc", BigDecimal.valueOf(1000)));
-        reservation1.assignPayment(payment1);
+                new Payment("tgen_20240604162216v123ba", "WTESTMC4xwNjE1MzMwOTI0Njc", BigDecimal.valueOf(1000), reservation1));
         Payment payment2 = paymentRepository.save(
-                new Payment("tgen_20240604162216asdf12", "WTESTMC4xOTjE1MzI0NjcwNMw", BigDecimal.valueOf(1000)));
-        reservation2.assignPayment(payment2);
+                new Payment("tgen_20240604162216asdf12", "WTESTMC4xOTjE1MzI0NjcwNMw", BigDecimal.valueOf(1000), reservation2));
         Payment payment3 = paymentRepository.save(
-                new Payment("tgen_20240604162216bd1234", "WTESTMC4xNOTI0NjcwjE1MzMw", BigDecimal.valueOf(1000)));
-        reservation3.assignPayment(payment3);
+                new Payment("tgen_20240604162216bd1234", "WTESTMC4xNOTI0NjcwjE1MzMw", BigDecimal.valueOf(1000), reservation3));
         Payment payment4 = paymentRepository.save(
-                new Payment("tgen_20240604162216zxc12", "WTESTMCxOTI0NjcwN4jE1MzMw", BigDecimal.valueOf(1000)));
-        reservation4.assignPayment(payment4);
+                new Payment("tgen_20240604162216zxc12", "WTESTMCxOTI0NjcwN4jE1MzMw", BigDecimal.valueOf(1000), reservation4));
         Payment payment5 = paymentRepository.save(
-                new Payment("tgen_20240604162216brl12", "WTESTMC4xOTI0N1MzMjcwNjEw", BigDecimal.valueOf(1000)));
-        reservation5.assignPayment(payment5);
+                new Payment("tgen_20240604162216brl12", "WTESTMC4xOTI0N1MzMjcwNjEw", BigDecimal.valueOf(1000), reservation5));
         Payment payment6 = paymentRepository.save(
-                new Payment("tgen_20240604162216mkl24", "WTESTMCxOTI0NjcwNjE14MzMw", BigDecimal.valueOf(1000)));
-        reservation6.assignPayment(payment6);
+                new Payment("tgen_20240604162216mkl24", "WTESTMCxOTI0NjcwNjE14MzMw", BigDecimal.valueOf(1000), reservation6));
         Payment payment7 = paymentRepository.save(
-                new Payment("tgen_20240604162216mlk56", "WTESTMC4xcwNjE1OTI0NjMzMw", BigDecimal.valueOf(1000)));
-        reservation7.assignPayment(payment7);
+                new Payment("tgen_20240604162216mlk56", "WTESTMC4xcwNjE1OTI0NjMzMw", BigDecimal.valueOf(1000), reservation7));
         Payment payment8 = paymentRepository.save(
-                new Payment("tgen_20240604162216opt43", "WTESTOTI0NjMC4xcwNjE1MzMw", BigDecimal.valueOf(1000)));
-        reservation8.assignPayment(payment8);
+                new Payment("tgen_20240604162216qwe78", "WTESTMC4xOTI0NjcwNjE1MzNw", BigDecimal.valueOf(1000), reservation8));
 
         // Waiting
         Waiting waiting1 = waitingRepository.save(

@@ -29,9 +29,6 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Payment payment;
-
     protected Reservation() {
     }
 
@@ -72,10 +69,6 @@ public class Reservation {
         }
     }
 
-    public void assignPayment(Payment payment) {
-        this.payment = payment;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -103,9 +96,5 @@ public class Reservation {
 
     public Member getMember() {
         return member;
-    }
-
-    public Payment getPayment() {
-        return payment;
     }
 }

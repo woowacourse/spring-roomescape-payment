@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.dto.response.MyReservationResponse;
-import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.WaitingRepository;
+import roomescape.domain.reservation.dto.ReservationWithPaymentDto;
 import roomescape.domain.reservation.dto.WaitingWithRankDto;
 
 @Service
@@ -24,11 +24,11 @@ public class ReservationWaitingService {
     }
 
     public List<MyReservationResponse> getMyReservationAndWaitingWithRanks(long memberId) {
-        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+        List<ReservationWithPaymentDto> reservationWithPayments = reservationRepository.findWithPaymentByMemberId(memberId);
         List<WaitingWithRankDto> waitingsWithRank = waitingRepository.findWaitingsWithRankByMemberId(memberId);
 
         return Stream.concat(
-                        reservations.stream().map(MyReservationResponse::from),
+                        reservationWithPayments.stream().map(MyReservationResponse::from),
                         waitingsWithRank.stream().map(MyReservationResponse::from))
                 .sorted(Comparator.comparing(MyReservationResponse::date).thenComparing(MyReservationResponse::time))
                 .toList();

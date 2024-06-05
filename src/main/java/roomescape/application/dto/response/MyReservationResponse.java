@@ -3,8 +3,10 @@ package roomescape.application.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.domain.reservation.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Waiting;
+import roomescape.domain.reservation.dto.ReservationWithPaymentDto;
 import roomescape.domain.reservation.dto.WaitingWithRankDto;
 
 public record MyReservationResponse(
@@ -16,7 +18,10 @@ public record MyReservationResponse(
         Long rank,
         PaymentResponse payment
 ) {
-    public static MyReservationResponse from(Reservation reservation) {
+    public static MyReservationResponse from(ReservationWithPaymentDto reservationWithPayments) {
+        Reservation reservation = reservationWithPayments.reservation();
+        Payment payment = reservationWithPayments.payment();
+
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getDetail().getDate(),
@@ -24,7 +29,7 @@ public record MyReservationResponse(
                 reservation.getDetail().getTheme().getName(),
                 ReservationStatus.RESERVED,
                 0L,
-                PaymentResponse.from(reservation.getPayment())
+                PaymentResponse.from(payment)
         );
     }
 
