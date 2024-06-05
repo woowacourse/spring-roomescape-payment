@@ -1,8 +1,6 @@
 package roomescape.controller;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
