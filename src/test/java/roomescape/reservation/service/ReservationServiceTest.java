@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import roomescape.client.PaymentClient;
 import roomescape.client.PaymentException;
@@ -65,7 +65,7 @@ class ReservationServiceTest {
     @DisplayName("예약이 생성한다.")
     void saveReservationWhenAccountIsCompleted() {
         Mockito.when(paymentClient.confirm(anyString(), any(PaymentRequest.class)))
-                .thenReturn(HttpStatus.class);
+                .thenReturn(HttpStatusCode.valueOf(200));
 
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
@@ -85,7 +85,7 @@ class ReservationServiceTest {
     @DisplayName(" 지난 날짜에 대한 예약 시 예외를 발생 시킨다.")
     void saveShouldThrowExceptionWhenReservationDateIsExpire() {
         Mockito.when(paymentClient.confirm(anyString(), any(PaymentRequest.class)))
-                .thenReturn(HttpStatus.class);
+                .thenReturn(HttpStatusCode.valueOf(400));
 
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
@@ -105,7 +105,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")
     void notExistReservationTimeIdExceptionTest() {
         Mockito.when(paymentClient.confirm(anyString(), any(PaymentRequest.class)))
-                .thenReturn(HttpStatus.class);
+                .thenReturn(HttpStatusCode.valueOf(400));
 
         Theme theme = new Theme("공포", "호러 방탈출", "http://asdf.jpg");
         Long themeId = themeRepository.save(theme).getId();
