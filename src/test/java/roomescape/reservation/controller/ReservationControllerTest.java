@@ -30,6 +30,7 @@ import roomescape.payment.PaymentRequest;
 import roomescape.payment.PaymentResponse;
 import roomescape.payment.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -92,6 +93,58 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("대기중인 예약을 취소한다.")
+    void cancelWaiting() {
+        // given
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        String accessTokenCookie = getAccessTokenCookieByLogin("email@email.com", "password");
+
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member1 = memberRepository.save(new Member("name1", "email1r@email.com", "password", Role.MEMBER));
+
+        // when
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member1, ReservationStatus.CONFIRMED));
+        Reservation waiting = reservationRepository.save(
+                new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member,
+                        ReservationStatus.WAITING));
+
+        // then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessTokenCookie)
+                .when().delete("/reservations/waiting/{id}", waiting.getId())
+                .then().log().all()
+                .statusCode(204);
+    }
+
+    @Test
+    @DisplayName("회원은 자신이 아닌 다른 회원의 예약을 취소할 수 없다.")
+    void cantCancelOtherMembersWaiting() {
+        // given
+        Member confirmedMember = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        String accessTokenCookie = getAccessTokenCookieByLogin("email@email.com", "password");
+
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member waitingMember = memberRepository.save(new Member("name1", "email1r@email.com", "password", Role.MEMBER));
+
+        // when
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, confirmedMember, ReservationStatus.CONFIRMED));
+        Reservation waiting = reservationRepository.save(
+                new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, waitingMember,
+                        ReservationStatus.WAITING));
+
+        // then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessTokenCookie)
+                .when().delete("/reservations/waiting/{id}", waiting.getId())
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
     @DisplayName("관리자 권한이 있으면 전체 예약정보를 조회할 수 있다.")
     void readEmptyReservations() {
         // given
@@ -117,7 +170,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("본인의 예약 정보를 삭제할 수 있다.")
+    @DisplayName("예약 취소는 관리자만 할 수 있다.")
     void canRemoveMyReservation() {
         // given
         Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
@@ -133,6 +186,31 @@ public class ReservationControllerTest {
                 .port(port)
                 .header("Cookie", accessTokenCookie)
                 .when().delete("/reservations/" + reservation.getId())
+                .then().log().all()
+                .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("관리자가 대기중인 예약을 거절한다.")
+    void denyWaiting() {
+        // given
+        String adminTokenCookie = getAdminAccessTokenCookieByLogin("admin@email.com", "password");
+
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member confirmedMember = memberRepository.save(new Member("name1", "email@email.com", "password", Role.MEMBER));
+        Member waitingMember = memberRepository.save(new Member("name1", "email1@email.com", "password", Role.MEMBER));
+
+        reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, confirmedMember, ReservationStatus.CONFIRMED));
+        Reservation waiting = reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, waitingMember, ReservationStatus.WAITING));
+
+        // when & then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", adminTokenCookie)
+                .when().post("/reservations/waiting/{id}/deny", waiting.getId())
                 .then().log().all()
                 .statusCode(204);
     }

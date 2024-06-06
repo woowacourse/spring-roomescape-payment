@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
@@ -16,11 +17,14 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
+import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
@@ -80,9 +84,9 @@ class ReservationServiceTest {
 
         // then
         assertThatThrownBy(() -> reservationService.addWaiting(
-                        new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                                "amount", "paymentType"), member.getId()))
-                .isInstanceOf(RoomEscapeException. class);
+                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId()))
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -108,7 +112,7 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.addWaiting(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
                         "amount", "paymentType"), member1.getId()))
-                .isInstanceOf(RoomEscapeException. class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -171,5 +175,50 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.findFilteredReservations(request))
                 .isInstanceOf(RoomEscapeException.class);
+    }
+
+    @Test
+    @DisplayName("대기중인 예약을 승인할 때, 기존에 예약이 존재하면 예외가 발생한다.")
+    void confirmWaitingWhenReservationExist() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member admin = memberRepository.save(new Member("admin", "admin@email.com", "password", Role.ADMIN));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        Member member1 = memberRepository.save(new Member("name1", "email1@email.com", "password", Role.MEMBER));
+
+        reservationService.addReservation(
+                new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
+                        "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId());
+        ReservationResponse waiting = reservationService.addWaiting(
+                new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
+                        "paymentKey", "orderId",
+                        "amount", "paymentType"), member1.getId());
+
+        // when & then
+        assertThatThrownBy(() -> reservationService.approveWaiting(waiting.id(), admin.getId()))
+                .isInstanceOf(RoomEscapeException.class);
+    }
+
+    @Test
+    @DisplayName("대기중인 예약을 확정한다.")
+    void approveWaiting() {
+        // given
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member admin = memberRepository.save(new Member("admin", "admin@email.com", "password", Role.ADMIN));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+
+        // when
+        ReservationResponse waiting = reservationService.addWaiting(
+                new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
+                        "paymentKey", "orderId",
+                        "amount", "paymentType"), member.getId());
+        reservationService.approveWaiting(waiting.id(), admin.getId());
+
+        // then
+        Reservation confirmed = reservationRepository.findById(waiting.id()).get();
+        assertThat(confirmed.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED);
     }
 }
