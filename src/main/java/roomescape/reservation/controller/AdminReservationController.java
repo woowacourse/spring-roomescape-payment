@@ -1,6 +1,8 @@
 package roomescape.reservation.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/reservations")
+@Tag(name = "Admin Reservation API", description = "어드민 예약 관련 API입니다.")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
@@ -29,6 +32,7 @@ public class AdminReservationController {
     }
 
     @PostMapping()
+    @Operation(summary = "예약을 생성한다.", description = "결제 요구 없이 예약을 생성한다.")
     public ResponseEntity<ReservationResponse> create(
             @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
         ReservationResponse reservationResponse = reservationService
@@ -39,11 +43,13 @@ public class AdminReservationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "예약을 삭제한다.")
     public void delete(@PathVariable("id") @Min(1) long reservationId) {
         reservationService.delete(reservationId);
     }
 
     @GetMapping("/waiting")
+    @Operation(summary = "대기중인 예약을 조회한다.")
     public List<ReservationResponse> waiting() {
         return waitingReservationService.findAllByWaitingReservation();
     }

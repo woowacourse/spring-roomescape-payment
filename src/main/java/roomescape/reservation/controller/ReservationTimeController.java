@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/times")
+@Tag(name = "Time API", description = "예약 시간 관련 API")
 public class ReservationTimeController {
     private final ReservationTimeService reservationTimeService;
 
@@ -25,6 +28,7 @@ public class ReservationTimeController {
     }
 
     @PostMapping
+    @Operation(summary = "예약 시간을 생성한다.")
     public ResponseEntity<ReservationTimeResponse> create(
             @RequestBody @Valid ReservationTimeRequest reservationTimeRequest) {
         ReservationTimeResponse response = reservationTimeService.create(reservationTimeRequest);
@@ -32,17 +36,20 @@ public class ReservationTimeController {
     }
 
     @GetMapping
+    @Operation(summary = "예약 시간들을 모두 조회한다.")
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeService.findAll();
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "예약 시간을 조회한다.")
     public void delete(@PathVariable("id") @Min(1) long timeId) {
         reservationTimeService.delete(timeId);
     }
 
     @GetMapping("/available")
+    @Operation(summary = "예약 가능한 시간들을 조회한다.")
     public List<AvailableTimeResponse> getAvailable(
             @RequestParam("date") @Future LocalDate date,
             @RequestParam("themeId") @Min(1) long themeId) {

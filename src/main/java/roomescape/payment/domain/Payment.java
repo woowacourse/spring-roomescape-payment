@@ -19,7 +19,7 @@ public class Payment {
     private Long totalAmount;
 
     @Column(name = "payment_method")
-    private String method; // TODO Enum
+    private String method;
 
     private LocalDateTime requestedAt;
 
