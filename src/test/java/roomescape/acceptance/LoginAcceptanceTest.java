@@ -7,12 +7,28 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
 
 class LoginAcceptanceTest extends BasicAcceptanceTest {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC')");
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('운영자', 'admin@wooteco.com', 'wootecoCrew6!', 'ADMIN')");
+    }
+
     @TestFactory
     @DisplayName("회원가입하지 않은 이메일과 비밀번호로 로그인 할 시 예외를 발생시킨다")
     Stream<DynamicTest> moveNotReservationAndAdminPage() {
@@ -24,11 +40,11 @@ class LoginAcceptanceTest extends BasicAcceptanceTest {
     }
 
     @TestFactory
-    @DisplayName("role이 USER인 Member는 Admin 페이지에 접속하지 못 한다")
+    @DisplayName("role이 BASIC인 Member는 Admin 페이지에 접속하지 못 한다")
     Stream<DynamicTest> moveNotAdminPageTest() {
         AtomicReference<String> userToken = new AtomicReference<>();
         return Stream.of(
-                dynamicTest("role이 USER인 계정으로 로그인을 한다", () -> userToken.set(
+                dynamicTest("role이 BASIC인 계정으로 로그인을 한다", () -> userToken.set(
                         LoginTokenProvider.login("member@wooteco.com", "wootecoCrew6!", 200))),
                 dynamicTest("로그인한 계정의 이름을 확인한다", () -> loginCheck(userToken.get(), 200, "회원")),
                 dynamicTest("admin 페이지에 접속한다", () -> moveToAdminPage(userToken.get(), 403)),

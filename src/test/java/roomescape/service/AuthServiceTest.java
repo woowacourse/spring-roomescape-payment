@@ -3,9 +3,11 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.request.member.TokenRequest;
 import roomescape.exception.RoomescapeException;
@@ -18,6 +20,17 @@ class AuthServiceTest extends BasicAcceptanceTest {
 
     @Autowired
     private JwtTokenProperties jwtTokenProperties;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC')");
+    }
 
     @DisplayName("존재하지 않는 email을 입력 시 예외를 발생시킨다.")
     @Test
@@ -32,7 +45,7 @@ class AuthServiceTest extends BasicAcceptanceTest {
     @DisplayName("email에 해당하지 않는 password를 입력 시 예외를 발생시킨다.")
     @Test
     void invalidNotEqualsPassword() {
-        TokenRequest tokenRequest = new TokenRequest("gomding@wooteco.com", "dffd@efg32");
+        TokenRequest tokenRequest = new TokenRequest("member@wooteco.com", "dffd@efg32");
 
         assertThatThrownBy(() -> authService.createToken(tokenRequest))
                 .isInstanceOf(RoomescapeException.class)

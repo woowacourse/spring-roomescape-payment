@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
@@ -23,6 +25,18 @@ class PaymentServiceTest extends BasicAcceptanceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void SetUp() {
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC')");
+        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES ('10:00')");
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail, price) VALUES ('name1', 'description1', 'thumbnail1', 1000)");
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '1' DAY , 1, 1, 1, 'RESERVATION')");
+    }
 
     @DisplayName("결제 승인 후 응답 내역을 저장한다.")
     @Test

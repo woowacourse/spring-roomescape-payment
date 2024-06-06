@@ -13,7 +13,7 @@ import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql("/reset.sql")
+@Sql(value = {"classpath:clean_data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public abstract class BasicAcceptanceTest {
     @LocalServerPort
     private int port;
@@ -22,7 +22,7 @@ public abstract class BasicAcceptanceTest {
     protected PaymentClient paymentClient;
 
     @BeforeEach
-    protected void setUp() {
+    public void setUp() {
         RestAssured.port = port;
         PaymentRequest paymentRequest = new PaymentRequest("orderId", BigDecimal.valueOf(1000), "paymentKey");
         BDDMockito.given(paymentClient.requestPayment(paymentRequest))
