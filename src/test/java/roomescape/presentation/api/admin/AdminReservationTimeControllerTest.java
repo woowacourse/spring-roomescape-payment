@@ -2,18 +2,35 @@ package roomescape.presentation.api.admin;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
+import static roomescape.support.docs.DescriptorUtil.ERROR_MESSAGE_DESCRIPTOR;
+import static roomescape.support.docs.DescriptorUtil.RESERVATION_TIME_DESCRIPTOR;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import roomescape.application.dto.request.ReservationTimeRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -28,6 +45,7 @@ import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
 import roomescape.presentation.BaseControllerTest;
 
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class AdminReservationTimeControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -41,11 +59,18 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+    private RequestSpecification spec;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
+    }
 
     @Nested
     @DisplayName("예약 시간을 생성하는 경우")
     class AddReservationTime extends BaseControllerTest {
-
         @Test
         @DisplayName("성공할 경우 201을 반환한다.")
         void success() {
@@ -54,7 +79,13 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .accept("application/json")
+                    .filters(document("reservation-time/cookies",
+                                    requestCookies(cookieWithName("token").description("세션에 저장된 쿠기 값입니다.")))
+                            , document("reservation-time/create-time",
+                                    requestFields(fieldWithPath("startAt").description("예약할 시간입니다.")),
+                                    responseFields(RESERVATION_TIME_DESCRIPTOR)))
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
@@ -66,6 +97,7 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
                     .body("startAt", equalTo("10:30"));
         }
 
+
         @Test
         @DisplayName("이미 예약 시간이 존재하면 400을 반환한다.")
         void addReservationTimeFailWhenDuplicatedTime() {
@@ -76,7 +108,12 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .accept("application/json")
+                    .filters(document("reservation-time/create-time/exist-exception",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키입니다.")),
+                            requestFields(fieldWithPath("startAt").description("예약할 시간입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
@@ -101,9 +138,11 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다."))))
                     .cookie("token", token)
-                    .when().delete("/admin/times/1")
+                    .when().delete("/admin/times/{id}", 1)
                     .then().log().all()
                     .statusCode(HttpStatus.NO_CONTENT.value());
         }
@@ -114,7 +153,10 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             Member admin = memberRepository.save(Fixture.MEMBER_ADMIN);
             String token = tokenProvider.createToken(admin.getId().toString());
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time/exception/not-exist",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
@@ -136,7 +178,10 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
             reservationRepository.save(new Reservation(detail, member));
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time/exception/already-exist",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
