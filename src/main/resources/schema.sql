@@ -18,6 +18,14 @@ CREATE TABLE IF NOT EXISTS reservation_time (
     start_at TIME(6) NOT NULL
 );
 
+
+CREATE TABLE  IF NOT EXISTS payment (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(255),
+    payment_key VARCHAR(255),
+    amount NUMERIC
+);
+
 CREATE TABLE IF NOT EXISTS reservation (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     date DATE NOT NULL,
@@ -25,22 +33,16 @@ CREATE TABLE IF NOT EXISTS reservation (
     theme_id BIGINT,
     member_id BIGINT,
     status VARCHAR(255) NOT NULL CHECK (status IN ('RESERVED', 'WAITING')),
+    payment_id BIGINT,
     FOREIGN KEY (time_id) REFERENCES reservation_time(id),
     FOREIGN KEY (theme_id) REFERENCES theme(id),
-    FOREIGN KEY (member_id) REFERENCES member(id)
+    FOREIGN KEY (member_id) REFERENCES member(id),
+    FOREIGN KEY (payment_id) REFERENCES payment(id)
 );
 
 CREATE TABLE  IF NOT EXISTS waiting (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   reservation_id BIGINT,
   waiting_order INTEGER,
-FOREIGN KEY (reservation_id) REFERENCES reservation(id)
-);
-
-CREATE TABLE  IF NOT EXISTS payment (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  payment_key VARCHAR(255),
-  reservation_id BIGINT,
-  amount NUMERIC,
 FOREIGN KEY (reservation_id) REFERENCES reservation(id)
 );
