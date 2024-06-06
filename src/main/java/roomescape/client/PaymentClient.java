@@ -1,5 +1,6 @@
 package roomescape.client;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ public class PaymentClient {
                 .build();
     }
 
-    public Object payForReservation(String authorization, PaymentRequest paymentRequest) {
+    public HttpStatusCode confirm(String authorization, PaymentRequest paymentRequest) {
         return client.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -37,7 +38,7 @@ public class PaymentClient {
                 .exchange(invokeErrorCheck());
     }
 
-    private ExchangeFunction<Object> invokeErrorCheck() {
+    private ExchangeFunction<HttpStatusCode> invokeErrorCheck() {
         return (request, response) -> {
             if (response.getStatusCode().isError()) {
                 throw new PaymentException(mapper.readValue(response.getBody(), TossErrorResponse.class));

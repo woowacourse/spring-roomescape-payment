@@ -53,7 +53,7 @@ public class ReservationService {
     }
 
     public Long save(ReservationCreateRequest reservationCreateRequest, LoginMemberInToken loginMemberInToken) {
-        paymentClient.payForReservation(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest));
+        paymentClient.confirm(getAuthorizations(), PaymentRequest.toRequest(reservationCreateRequest));
 
         if (reservationRepository.existsByDateAndReservationTimeIdAndThemeId(reservationCreateRequest.date(),
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {
