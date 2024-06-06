@@ -25,15 +25,15 @@ import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.resonse.PaymentConfirmResponse;
 import roomescape.payment.dto.resonse.PaymentErrorResponse;
 
-@RestClientTest(PaymentService.class)
+@RestClientTest(TossPaymentClient.class)
 @Import(PaymentConfig.class)
-class PaymentServiceTest {
+class TossPaymentClientTest {
 
     @Autowired
     private MockRestServiceServer mockServer;
 
     @Autowired
-    private PaymentService paymentService;
+    private TossPaymentClient tossPaymentClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -45,7 +45,7 @@ class PaymentServiceTest {
 
     @DisplayName("결제 승인 요청 성공 시 올바른 응답을 반환받는다.")
     @Test
-    void confirmPayment() throws JsonProcessingException {
+    void confirm() throws JsonProcessingException {
         PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
         PaymentConfirmResponse expectedResponse = new PaymentConfirmResponse(
                 "paymentKey",
@@ -61,14 +61,14 @@ class PaymentServiceTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(request)))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> paymentService.confirmPayment(request))
+        assertThatCode(() -> tossPaymentClient.confirmPayment(request))
                 .doesNotThrowAnyException();
         mockServer.verify();
     }
 
     @DisplayName("결제 승인 요청 실패 시 예외가 발생한다.")
     @Test
-    void confirmPaymentWithInvalidRequest() throws JsonProcessingException {
+    void confirmWithInvalidRequest() throws JsonProcessingException {
         PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
         PaymentErrorResponse expectedResponse = new PaymentErrorResponse(
                 "ALREADY_PROCESSED_PAYMENT",
@@ -80,7 +80,7 @@ class PaymentServiceTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(request)))
                 .andRespond(withBadRequest().body(objectMapper.writeValueAsString(expectedResponse)));
 
-        assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class);
         mockServer.verify();
     }

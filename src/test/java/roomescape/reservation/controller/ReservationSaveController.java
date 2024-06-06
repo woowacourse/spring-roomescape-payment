@@ -1,10 +1,11 @@
 package roomescape.reservation.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static roomescape.Fixture.savedReservation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.common.config.ControllerTest;
 import roomescape.common.util.CookieUtils;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
@@ -45,7 +47,8 @@ class ReservationSaveController extends ControllerTest {
                 LocalDate.now(), 1L, 1L, "paymentKey", "orderId", 1000L
         );
 
-        doNothing().when(paymentService).confirmPayment(any());
+        when(paymentService.confirm(any(), any())).thenReturn(
+                new Payment(1L, "paymentKey", "orderId", 1000L, savedReservation));
 
         mockMvc.perform(post("/reservations")
                         .cookie(new Cookie(CookieUtils.TOKEN_KEY, getMemberToken()))

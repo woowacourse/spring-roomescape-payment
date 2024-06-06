@@ -2,11 +2,12 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static roomescape.Fixture.HORROR_THEME;
 import static roomescape.Fixture.MEMBER_JOJO;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
+import static roomescape.Fixture.savedReservation;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.common.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -63,7 +65,8 @@ class ReservationSaveServiceTest {
                 jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
         );
 
-        doNothing().when(paymentService).confirmPayment(any());
+        when(paymentService.confirm(any(), any())).thenReturn(
+                new Payment(1L, "paymentKey", "orderId", 1000L, savedReservation));
 
         reservationService.save(saveRequest);
 

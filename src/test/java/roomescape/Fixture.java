@@ -8,7 +8,9 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 import roomescape.payment.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
 
@@ -52,6 +54,15 @@ public class Fixture {
             "DONE",
             "2024-02-13T12:17:57+09:00",
             "2024-02-13T12:18:14+09:00"
+    );
+
+    public static final Reservation savedReservation = new Reservation(
+            1L,
+            MEMBER_JOJO,
+            TODAY,
+            HORROR_THEME,
+            RESERVATION_TIME_10_00,
+            Status.SUCCESS
     );
 
     private Fixture() {

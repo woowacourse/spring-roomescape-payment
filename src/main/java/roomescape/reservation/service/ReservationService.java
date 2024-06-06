@@ -40,7 +40,7 @@ public class ReservationService {
     public ReservationResponse save(ReservationPaymentRequest request) {
         ReservationSaveRequest reservationSaveRequest = ReservationSaveRequest.from(request);
         Reservation savedReservation = createReservation(reservationSaveRequest);
-        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
+        paymentService.confirm(PaymentConfirmRequest.from(request), savedReservation);
 
         return ReservationResponse.toResponse(savedReservation);
     }
