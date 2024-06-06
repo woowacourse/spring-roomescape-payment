@@ -60,6 +60,10 @@ asciidoctor {
     dependsOn test
 }
 
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
 tasks.register('copyRestDocs', Copy) {
     dependsOn asciidoctor
     from file('build/docs/asciidoc')
