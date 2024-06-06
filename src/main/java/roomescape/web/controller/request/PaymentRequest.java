@@ -2,7 +2,7 @@ package roomescape.web.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentSaveDto;
 
 public record PaymentRequest(
         @NotNull Long reservationId,
@@ -10,7 +10,7 @@ public record PaymentRequest(
         @NotBlank String orderId,
         @NotNull Long amount) {
 
-    public PaymentApproveDto toPaymentApproveDto() {
-        return new PaymentApproveDto(paymentKey, orderId, amount);
+    public PaymentSaveDto toPaymentSaveDto(Long memberId) {
+        return new PaymentSaveDto(memberId, reservationId, paymentKey, orderId, amount);
     }
 }

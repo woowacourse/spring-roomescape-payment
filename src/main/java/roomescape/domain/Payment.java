@@ -56,7 +56,7 @@ public class Payment {
         }
         Long expectedAmount = reservation.getTheme().getPrice();
         if (!expectedAmount.equals(amount)) {
-            throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다");
+            throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
         }
     }
 

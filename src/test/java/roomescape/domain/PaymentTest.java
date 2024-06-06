@@ -16,6 +16,6 @@ class PaymentTest {
 
         assertThatThrownBy(() -> new Payment(reservation, "paymentKey", "orderId", invalidAmount))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("테마 가격과 결제 금액이 일치하지 않습니다");
+                .hasMessage("테마 가격과 결제 금액이 일치하지 않습니다.");
     }
 }
