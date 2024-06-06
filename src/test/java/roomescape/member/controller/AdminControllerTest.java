@@ -190,7 +190,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .put(String.format("/api/v1/admin/reservations/%d/waiting/approve",
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/approve",
                         waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("approve/change/success"))
@@ -210,7 +210,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .put(String.format("/api/v1/admin/reservations/%d/waiting/approve", 1))
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/approve", 1))
                 .then().log().all()
                 .apply(document("approve/change/fail/not-waiting"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
@@ -239,7 +239,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .put(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("deny/change/success"))
                 .statusCode(HttpStatus.OK.value());
@@ -258,7 +258,7 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .put(String.format("/api/v1/admin/reservations/%d/waiting/deny", 1))
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny", 1))
                 .then().log().all()
                 .apply(document("deny/change/fail/not-waiting"))
                 .statusCode(HttpStatus.BAD_REQUEST.value());
