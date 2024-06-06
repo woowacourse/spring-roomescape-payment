@@ -43,6 +43,7 @@ public class ReservationWaitingService {
         this.reservationWaitingRepository = reservationWaitingRepository;
     }
 
+    @Transactional
     public ReservationWaitingAppResponse save(ReservationWaitingSaveAppRequest request) {
         ReservationWaiting waiting = createWaiting(request);
         validateWaiting(waiting);
@@ -107,6 +108,7 @@ public class ReservationWaitingService {
                 .toList();
     }
 
+    @Transactional
     public void deleteMemberWaiting(Long memberId, Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_WAITING,
@@ -115,7 +117,7 @@ public class ReservationWaitingService {
             throw new RoomescapeException(RoomescapeErrorCode.FORBIDDEN,
                     String.format("예약 대기 삭제 권한이 없는 사용자입니다. (id: %d)", memberId));
         }
-        reservationWaitingRepository.deleteById(waitingId);
+        reservationWaitingRepository.delete(waiting);
     }
 
     public List<ReservationWaitingAppResponse> findAllAllowed() {
@@ -125,6 +127,7 @@ public class ReservationWaitingService {
                 .toList();
     }
 
+    @Transactional
     public ReservationWaitingAppResponse denyWaiting(Long waitingId) {
         ReservationWaiting waiting = reservationWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeErrorCode.NOT_FOUND_WAITING,

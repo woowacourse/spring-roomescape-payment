@@ -48,10 +48,21 @@ VALUES (TIMESTAMPADD(DAY, -1, CURRENT_DATE), 1, 1, 1),
        (TIMESTAMPADD(DAY, -2, CURRENT_DATE), 1, 2, 1),
        (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 1),
        (TIMESTAMPADD(DAY, 1, CURRENT_DATE), 1, 1, 3),
-       (TIMESTAMPADD(DAY, 3, CURRENT_DATE), 1, 1, 1);
+       (TIMESTAMPADD(DAY, 3, CURRENT_DATE), 1, 1, 2),
+       (TIMESTAMPADD(DAY, 4, CURRENT_DATE), 1, 1, 2),
+       (TIMESTAMPADD(DAY, 5, CURRENT_DATE), 1, 1, 2),
+       (TIMESTAMPADD(DAY, 6, CURRENT_DATE), 1, 1, 2)
+;
 
 INSERT INTO reservation_waiting(date, time_id, theme_id, member_id, denied_at)
 VALUES (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 3, NULL),
        (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 1, NULL),
        (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 4, NULL),
-       (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 2, NULL);
+       (TIMESTAMPADD(DAY, 2, CURRENT_DATE), 1, 1, 2, NULL)
+;
+
+INSERT INTO payment(reservation_id, payment_key, order_id, amount)
+VALUES (20, 'test_key1', 'test_order_id1', 10000),
+       (21, 'test_key2', 'test_order_id2', 20000),
+       (22, 'test_key3', 'test_order_id3', 30000)
+;

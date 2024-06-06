@@ -7,7 +7,8 @@ public record ReservationMineResponse(
         Long reservationId,
         ThemeResponse theme,
         LocalDate date,
-        ReservationTimeResponse time
+        ReservationTimeResponse time,
+        PaymentResponse payment
 ) {
 
     public static ReservationMineResponse from(ReservationAppResponse reservationAppResponse) {
@@ -15,7 +16,8 @@ public record ReservationMineResponse(
                 reservationAppResponse.id(),
                 ThemeResponse.from(reservationAppResponse.themeAppResponse()),
                 reservationAppResponse.date().getDate(),
-                ReservationTimeResponse.from(reservationAppResponse.reservationTimeAppResponse())
+                ReservationTimeResponse.from(reservationAppResponse.reservationTimeAppResponse()),
+                PaymentResponse.from(reservationAppResponse.paymentAppResponse())
         );
     }
 }

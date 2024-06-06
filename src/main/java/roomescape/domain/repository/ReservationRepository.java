@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
+import roomescape.domain.ReservationWithPayment;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
@@ -22,4 +24,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     List<Reservation> findAllByMemberId(Long id);
 
     Optional<Reservation> findByDateAndTimeIdAndThemeId(ReservationDate date, Long timeId, Long themeId);
+
+    @Query("""
+            SELECT new roomescape.domain.ReservationWithPayment(r, p)
+            FROM Reservation r
+            LEFT JOIN Payment p ON r.id = p.reservation.id
+            WHERE r.member.id = :id
+            """)
+    List<ReservationWithPayment> findAllByMemberIdWithPayment(Long id);
 }

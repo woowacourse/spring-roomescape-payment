@@ -69,5 +69,4 @@ public class MemberReservationController {
 
         return ResponseEntity.ok(responses);
     }
-
 }

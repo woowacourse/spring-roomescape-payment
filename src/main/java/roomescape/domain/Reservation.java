@@ -37,17 +37,24 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(Member member, ReservationDate date, ReservationTime time, Theme theme) {
+    public Reservation(Member member,
+                       ReservationDate date,
+                       ReservationTime time,
+                       Theme theme) {
         this(null, member, date, time, theme);
     }
 
-    public Reservation(Long id, Member member, ReservationDate date, ReservationTime time, Theme theme) {
+    public Reservation(Long id,
+                       Member member,
+                       ReservationDate date,
+                       ReservationTime time,
+                       Theme theme) {
         validateMember(member);
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
-        this.member = member;
         this.id = id;
+        this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;

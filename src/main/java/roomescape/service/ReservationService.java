@@ -5,11 +5,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.PaymentRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
@@ -29,17 +31,19 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
+                              MemberRepository memberRepository, PaymentRepository paymentRepository,
                               PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
 
@@ -47,13 +51,14 @@ public class ReservationService {
     public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest) {
         Reservation reservation = createReservation(reservationSaveAppRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
-
         PaymentApproveAppRequest paymentApproveAppRequest = reservationSaveAppRequest.paymentApproveAppRequest();
-        if (paymentApproveAppRequest != null) {
-            paymentClient.approve(paymentApproveAppRequest);
+        if (paymentApproveAppRequest == null) {
+            return ReservationAppResponse.from(savedReservation);
         }
-
-        return ReservationAppResponse.from(savedReservation);
+        Payment payment = paymentApproveAppRequest.toPaymentWith(savedReservation);
+        Payment savedPayment = paymentRepository.save(payment);
+        paymentClient.approve(paymentApproveAppRequest);
+        return ReservationAppResponse.of(savedReservation, savedPayment);
     }
 
     private Reservation createReservation(ReservationSaveAppRequest reservationSaveAppRequest) {
@@ -117,8 +122,7 @@ public class ReservationService {
     }
 
     public List<ReservationAppResponse> findByMemberId(Long id) {
-
-        return reservationRepository.findAllByMemberId(id).stream()
+        return reservationRepository.findAllByMemberIdWithPayment(id).stream()
                 .map(ReservationAppResponse::from)
                 .toList();
     }

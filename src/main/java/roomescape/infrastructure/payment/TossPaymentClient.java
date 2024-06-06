@@ -22,7 +22,8 @@ public class TossPaymentClient implements PaymentClient {
     private final PaymentAuthorizationGenerator paymentAuthorizationGenerator;
     private final RestClient restClient;
 
-    public TossPaymentClient(ObjectMapper objectMapper, PaymentAuthorizationGenerator paymentAuthorizationGenerator,
+    public TossPaymentClient(ObjectMapper objectMapper,
+                             PaymentAuthorizationGenerator paymentAuthorizationGenerator,
                              RestClient.Builder restClient,
                              @Value("${payment.base-url}") String baseUrl) {
         this.objectMapper = objectMapper;

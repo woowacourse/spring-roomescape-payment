@@ -35,7 +35,7 @@ import roomescape.service.request.ReservationWaitingSaveAppRequest;
 import roomescape.service.response.ReservationWaitingAppResponse;
 import roomescape.service.response.ReservationWaitingWithRankAppResponse;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Transactional
 class ReservationWaitingServiceTest {

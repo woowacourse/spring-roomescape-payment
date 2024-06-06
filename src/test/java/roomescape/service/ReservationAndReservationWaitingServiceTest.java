@@ -30,7 +30,7 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
 import roomescape.domain.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Transactional
 class ReservationAndReservationWaitingServiceTest {
