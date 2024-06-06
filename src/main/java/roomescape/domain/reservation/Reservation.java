@@ -9,10 +9,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.RoomescapeException;
 
@@ -31,6 +33,8 @@ public class Reservation {
     private Theme theme;
     @Enumerated(value = EnumType.STRING)
     private Status status;
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
 
     protected Reservation() {
     }
@@ -73,6 +77,13 @@ public class Reservation {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Payment getPayment() {
+        if (payment == null || status.isPaymentWaiting()) {
+            return new Payment(this, null, null);
+        }
+        return payment;
     }
 
     @Override

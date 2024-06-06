@@ -14,4 +14,8 @@ public enum Status {
     public String getValue() {
         return value;
     }
+
+    public boolean isPaymentWaiting() {
+        return this == PAYMENT_WAITING;
+    }
 }

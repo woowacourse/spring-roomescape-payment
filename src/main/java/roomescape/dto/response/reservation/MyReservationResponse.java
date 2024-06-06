@@ -1,14 +1,10 @@
 package roomescape.dto.response.reservation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 
@@ -18,7 +14,9 @@ public record MyReservationResponse(
         LocalDate date,
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        BigDecimal amount
 ) {
     public static MyReservationResponse from(Reservation reservation) {
         return new MyReservationResponse(
@@ -26,7 +24,9 @@ public record MyReservationResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                reservation.getStatus().getValue()
+                reservation.getStatus().getValue(),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getTotalAmount()
         );
     }
 
@@ -37,7 +37,9 @@ public record MyReservationResponse(
                 reservationWaiting.getTheme().getName(),
                 reservationWaiting.getDate(),
                 reservationWaiting.getTime().getStartAt(),
-                reservationWaitingWithRank.getRank() + 1 + "번째 예약 대기"
+                reservationWaitingWithRank.getRank() + 1 + "번째 예약 대기",
+                null,
+                null
         );
     }
 }
