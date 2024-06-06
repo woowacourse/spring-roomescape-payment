@@ -97,6 +97,16 @@ public class ReservationController {
         return getResponse(reservationResponse, response);
     }
 
+    @DeleteMapping("/reservations/waiting/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<ReservationResponse> saveWaiting(
+            @MemberId Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") Long reservationId
+    ) {
+        reservationService.cancelWaiting(reservationId, memberId);
+        return ApiResponse.success();
+    }
+
     @Admin
     @PostMapping("/reservations/waiting/{id}/approve")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -3,6 +3,7 @@ package roomescape.reservation.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -173,9 +174,10 @@ public class ReservationService {
         reservationRepository.updateStatusByReservationId(reservationId, ReservationStatus.CONFIRMED);
     }
 
-    public void cancelWaiting(Long reservationId) {
+    public void cancelWaiting(Long reservationId, Long memberId) {
         Reservation waiting = reservationRepository.findById(reservationId)
                 .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
+                .filter(r -> Objects.equals(r.getMemberId(), memberId))
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
                         String.format("[reservationId: %d]", reservationId), HttpStatus.BAD_REQUEST));
         reservationRepository.delete(waiting);
@@ -183,7 +185,11 @@ public class ReservationService {
 
     public void denyWaiting(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
-        cancelWaiting(reservationId);
+        Reservation waiting = reservationRepository.findById(reservationId)
+                .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
+                        String.format("[reservationId: %d]", reservationId), HttpStatus.BAD_REQUEST));
+        reservationRepository.delete(waiting);
     }
 
     private void validateIsMemberAdmin(Long memberId) {
