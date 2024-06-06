@@ -1,0 +1,63 @@
+= *사용자 예약 페이지 API*
+:toc: left
+
+=== *1. 예약 생성*
+- Request
+include::{snippets}/reservations/user-create/http-request.adoc[source,json]
+|===
+|파라미터 |타입 |필수 여부 |설명
+
+|token
+|String
+|true
+|사용자 인증 토큰
+|===
+- Response
+include::{snippets}/reservations/user-create/http-response.adoc[]
+
+=== *2. 예약 대기 생성*
+- Request
+include::{snippets}/waitings/create/http-request.adoc[]
+
+|===
+|파라미터 |타입 |필수 여부 |설명
+
+|token
+|String
+|true
+|사용자 인증 토큰
+|===
+
+- Response
+include::{snippets}/waitings/create/http-response.adoc[]
+
+
+=== *3. 테마 조회*
+- Request
+include::{snippets}/themes/retrieve/http-request.adoc[]
+
+- Response
+include::{snippets}/themes/retrieve/http-response.adoc[]
+
+
+=== *4. 예약 시간 및 예약 가능 여부 조회*
+- Request
+include::{snippets}/times/retrieve-available-times/http-request.adoc[]
+
+|===
+|파라미터 |타입 |필수여부 |설명
+
+|date
+|LocalDate
+|true
+|예약 날짜
+
+|themeId
+|Long
+|true
+|예약 테마 고유 id
+|===
+
+
+- Response
+include::{snippets}/times/retrieve-available-times/http-response.adoc[]
