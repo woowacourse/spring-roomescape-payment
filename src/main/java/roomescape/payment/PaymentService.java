@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.payment.dto.CreatePaymentRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.repository.PaymentRepository;
 import roomescape.service.exception.PaymentInfoNotFoundException;
 
@@ -24,9 +24,9 @@ public class PaymentService {
     @Transactional
     public void savePayment(final CreateReservationRequest request, final Reservation savedReservation) {
         //TODO 파라미터 애매함
-        final TossPaymentConfirmResponse tossPaymentConfirmResponse = paymentClient.postPayment(
-                new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
-        final PaymentInfo payment = tossPaymentConfirmResponse.toPayment(savedReservation);
+        final PaymentConfirmResponse paymentConfirmResponse = paymentClient.postPayment(
+                new CreatePaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        final PaymentInfo payment = paymentConfirmResponse.toPayment(savedReservation);
         paymentRepository.save(payment);
     }
 

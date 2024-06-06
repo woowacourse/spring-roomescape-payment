@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.payment.dto.CreatePaymentRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 
 import java.util.Base64;
 
@@ -41,16 +41,16 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public TossPaymentConfirmResponse postPayment(final PaymentRequest paymentRequest) {
+    public PaymentConfirmResponse postPayment(final CreatePaymentRequest paymentRequest) {
         final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
-        final TossPaymentConfirmResponse confirmResponse = restClient.post()
+        final PaymentConfirmResponse confirmResponse = restClient.post()
                 .uri(paymentApi)
                 .header(HttpHeaders.AUTHORIZATION, secret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(errorHandler)
-                .body(TossPaymentConfirmResponse.class);
+                .body(PaymentConfirmResponse.class);
         log.info("토스 결제 응답 = {}", confirmResponse);
         return confirmResponse;
     }

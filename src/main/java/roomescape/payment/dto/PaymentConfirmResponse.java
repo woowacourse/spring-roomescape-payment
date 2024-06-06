@@ -5,7 +5,7 @@ import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record TossPaymentConfirmResponse(
+public record PaymentConfirmResponse(
         String paymentKey,
         String orderId,
         String orderName,
