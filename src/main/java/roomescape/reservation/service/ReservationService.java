@@ -9,6 +9,7 @@ import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
@@ -79,8 +80,29 @@ public class ReservationService {
             throw new BadRequestException("이미 예약된 상태입니다. 예약 대기를 진행하거나 다른 예약을 선택해주세요.");
         }
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        paymentService.purchase(paymentRequest, reservationPaymentRequest.amount());
-        return createReservation(reservationRequest, memberId, ReservationStatus.BOOKED);
+        Payment payment = paymentService.purchase(paymentRequest, reservationPaymentRequest.amount());
+        return createReservationWithPayment(reservationRequest, memberId, ReservationStatus.BOOKED, payment);
+    }
+
+    @Transactional
+    public ReservationResponse createReservationWithPayment(
+            ReservationRequest reservationRequest, Long memberId, ReservationStatus reservationStatus, Payment payment
+    ) {
+        LocalDate date = LocalDate.parse(reservationRequest.date());
+        ReservationTime reservationTime = reservationTimeRepository.findById(reservationRequest.timeId())
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
+        Theme theme = themeRepository.findById(reservationRequest.themeId())
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 테마가 없습니다."));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
+        ReservationSlot reservationSlot = reservationSlotRepository.findByDateAndTimeAndTheme(date, reservationTime, theme)
+                .orElseGet(() -> reservationSlotRepository.save(new ReservationSlot(date, reservationTime, theme)));
+
+        validateReservation(reservationSlot, member);
+
+        Reservation reservation = reservationRepository.save(
+                new Reservation(member, reservationSlot, reservationStatus, payment));
+        return ReservationResponse.from(reservation.getId(), reservationSlot, member);
     }
 
     @Transactional

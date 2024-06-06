@@ -57,6 +57,16 @@ public class Reservation {
         this.status = ReservationStatus.BOOKED;
     }
 
+    public Reservation(Member member,
+                       ReservationSlot reservationSlot,
+                       ReservationStatus reservationStatus,
+                       Payment payment) {
+        this.member = member;
+        this.reservationSlot = reservationSlot;
+        this.status = reservationStatus;
+        this.payment = payment;
+    }
+
     public boolean isBookedBy(Member member) {
         return this.member.equals(member);
     }

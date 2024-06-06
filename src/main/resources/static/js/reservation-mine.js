@@ -46,7 +46,7 @@ function render(data) {
             */
             row.insertCell(4).textContent = '';
             row.insertCell(5).textContent = item.paymentKey;
-            row.insertCell(6).textContent = item.amount;
+            row.insertCell(6).textContent = item.totalAmount;
         }
     });
 }

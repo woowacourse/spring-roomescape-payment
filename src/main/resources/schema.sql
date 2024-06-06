@@ -40,10 +40,11 @@ CREATE TABLE IF NOT EXISTS payment
 (
     id              BIGINT  NOT NULL AUTO_INCREMENT,
     order_id        VARCHAR(255)    NOT NULL,
+    payment_key     VARCHAR(255)    NOT NULL,
     total_amount    BIGINT  NOT NULL,
     payment_method          VARCHAR(255)    NOT NULL,
-    requested_at    DATE    NOT NULL,
-    approved_at     DATE    NOT NULL,
+    requested_at    DATETIME    NOT NULL,
+    approved_at     DATETIME    NOT NULL,
     PRIMARY KEY (id)
 );
 
