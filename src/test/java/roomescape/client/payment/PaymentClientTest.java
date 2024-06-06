@@ -24,7 +24,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.config.ClientConfig;
+import roomescape.exception.ExceptionResponse;
 import roomescape.exception.PaymentConfirmException;
+import roomescape.exception.global.GlobalExceptionCode;
 
 @ContextConfiguration(classes = ClientConfig.class)
 @RestClientTest(PaymentClient.class)
@@ -69,17 +71,18 @@ class PaymentClientTest {
 
     @Test
     @DisplayName("토스 결제 실패: 4xx 에러시 결제에 실패한다.")
-    void invalidRequestNotConfirm() {
+    void invalidRequestNotConfirm() throws JsonProcessingException {
+        String errorObject = objectMapper.writeValueAsString(new ExceptionResponse("ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다."));
+
         mockServer.expect(requestTo(TOSS_PAYMENT_CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "Basic " + paymentClient.getEncodedSecretKey()))
                 .andExpect(content().json(jsonRequest))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST).body("{}")
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST).body(errorObject)
                         .contentType(MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> paymentClient.sendPaymentConfirmToToss(request))
                 .isExactlyInstanceOf(PaymentConfirmException.class)
-                .hasMessageContaining("내부 서버에서 에러가 발생했습니다.");
+                .hasMessageContaining(GlobalExceptionCode.INTERNAL_SERVER_ERROR.getMessage());
     }
-
 }

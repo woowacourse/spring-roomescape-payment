@@ -3,6 +3,7 @@ package roomescape.client.payment;
 import static roomescape.exception.model.PaymentConfirmExceptionCode.FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
@@ -30,6 +31,7 @@ public class PaymentClient {
         this.encodedSecretKey = Base64.getEncoder().encodeToString((widgetSecretKey + ":").getBytes());
         this.restClient = restClient;
         this.objectMapper = objectMapper;
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public void sendPaymentConfirmToToss(PaymentConfirmToTossDto paymentConfirmToTossDto) {
@@ -50,12 +52,11 @@ public class PaymentClient {
                     })
                     .toBodilessEntity();
         } catch (RestClientResponseException e) {
-            log.error("토스 결제 응답 에러 message: {}, body: {}, cause: {}", e.getMessage(), e.getResponseBodyAsString(),
+            log.error("토스 결제 응답 에러 message: {}, body: {}", e.getMessage(), e.getResponseBodyAsString(),
                     e.getCause());
             throw new PaymentConfirmException(GlobalExceptionCode.HTTP_RESPONSE_DATA_INVALID);
         } catch (Exception e) {
-            log.error("토스 결제 에러 message: {}, body: {}, cause: {}", e.getMessage(), e.getCause(),
-                    e.getCause());
+            log.error("토스 결제 에러 message: {}", e.getMessage(), e.getCause());
             throw new PaymentConfirmException(GlobalExceptionCode.INTERNAL_SERVER_ERROR);
         }
     }
