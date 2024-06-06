@@ -1,15 +1,17 @@
 package roomescape.domain.member;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.exception.RoomescapeException;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+import roomescape.exception.RoomescapeException;
 
 class NameTest {
     

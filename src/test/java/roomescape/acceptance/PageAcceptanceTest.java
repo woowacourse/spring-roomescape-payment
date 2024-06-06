@@ -1,12 +1,13 @@
 package roomescape.acceptance;
 
+import static org.hamcrest.Matchers.containsString;
+
+import static roomescape.fixture.TestFixture.ADMIN_EMAIL;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.hamcrest.Matchers.containsString;
-import static roomescape.fixture.TestFixture.ADMIN_EMAIL;
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
 
 class PageAcceptanceTest extends AcceptanceTest {
 

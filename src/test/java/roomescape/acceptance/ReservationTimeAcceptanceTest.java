@@ -2,16 +2,18 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
 import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.fixture.TestFixture.START_AT_SIX;
 
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import roomescape.dto.reservation.ReservationTimeResponse;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
 

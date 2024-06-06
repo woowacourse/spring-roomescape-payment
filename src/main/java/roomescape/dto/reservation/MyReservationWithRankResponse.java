@@ -1,9 +1,9 @@
 package roomescape.dto.reservation;
 
-import roomescape.domain.reservation.Reservation;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import roomescape.domain.reservation.Reservation;
 
 public class MyReservationWithRankResponse {
 

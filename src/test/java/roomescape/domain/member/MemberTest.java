@@ -1,12 +1,13 @@
 package roomescape.domain.member;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import roomescape.fixture.TestFixture;
-import roomescape.exception.RoomescapeException;
-
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import roomescape.exception.RoomescapeException;
+import roomescape.fixture.TestFixture;
 
 class MemberTest {
 

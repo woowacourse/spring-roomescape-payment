@@ -1,14 +1,29 @@
 package roomescape.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
+import static org.mockito.ArgumentMatchers.any;
+
+import static roomescape.fixture.TestFixture.ADMIN_EMAIL;
+import static roomescape.fixture.TestFixture.AMOUNT;
+import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.fixture.TestFixture.MEMBER_PASSWORD;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+import static roomescape.fixture.TestFixture.ORDER_ID;
+import static roomescape.fixture.TestFixture.PAYMENT_KEY;
+import static roomescape.fixture.TestFixture.START_AT_SIX;
+import static roomescape.fixture.TestFixture.THEME_HORROR_DESCRIPTION;
+import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
+import static roomescape.fixture.TestFixture.THEME_HORROR_THUMBNAIL;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import roomescape.component.TossPaymentClient;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
@@ -16,9 +31,6 @@ import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
 import roomescape.dto.reservation.ReservationWaitingSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
-
-import static org.mockito.ArgumentMatchers.any;
-import static roomescape.fixture.TestFixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)

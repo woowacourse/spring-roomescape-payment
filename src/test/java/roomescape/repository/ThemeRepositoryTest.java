@@ -1,23 +1,32 @@
 package roomescape.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static roomescape.fixture.TestFixture.MEMBER_TENNY;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SEVEN;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SIX;
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE;
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE_DESCRIPTION;
+import static roomescape.fixture.TestFixture.THEME_HORROR;
+import static roomescape.fixture.TestFixture.THEME_HORROR_DESCRIPTION;
+import static roomescape.fixture.TestFixture.THEME_HORROR_THUMBNAIL;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemePopularFilter;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.fixture.TestFixture.*;
 
 
 @DataJpaTest

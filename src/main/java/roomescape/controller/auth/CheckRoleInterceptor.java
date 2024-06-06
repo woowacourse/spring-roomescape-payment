@@ -2,10 +2,12 @@ package roomescape.controller.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import roomescape.auth.CookieProvider;
 import roomescape.domain.member.Role;
 import roomescape.dto.member.MemberResponse;

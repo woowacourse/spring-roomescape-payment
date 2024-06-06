@@ -3,11 +3,15 @@ package roomescape.domain.reservation;
 import static roomescape.exception.RoomescapeExceptionCode.EMPTY_TIME;
 import static roomescape.exception.RoomescapeExceptionCode.INVALID_TIME_FORMAT;
 
-import jakarta.persistence.*;
-
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import roomescape.exception.RoomescapeException;
 

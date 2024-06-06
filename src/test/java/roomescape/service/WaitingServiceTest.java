@@ -1,12 +1,30 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
+import static roomescape.fixture.TestFixture.AMOUNT;
+import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY;
+import static roomescape.fixture.TestFixture.ORDER_ID;
+import static roomescape.fixture.TestFixture.PAYMENT_KEY;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SIX;
+import static roomescape.fixture.TestFixture.THEME_HORROR;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.fixture.TestFixture;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -16,19 +34,11 @@ import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.exception.RoomescapeException;
+import roomescape.fixture.TestFixture;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static roomescape.fixture.TestFixture.*;
 
 @ExtendWith(MockitoExtension.class)
 class WaitingServiceTest {

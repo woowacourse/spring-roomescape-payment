@@ -1,5 +1,35 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
+
+import static roomescape.fixture.TestFixture.ADMIN;
+import static roomescape.fixture.TestFixture.ADMIN_NAME;
+import static roomescape.fixture.TestFixture.AMOUNT;
+import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.fixture.TestFixture.DATE_MAY_NINTH;
+import static roomescape.fixture.TestFixture.MEMBER_MIA;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+import static roomescape.fixture.TestFixture.ORDER_ID;
+import static roomescape.fixture.TestFixture.PAYMENT_KEY;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SEVEN;
+import static roomescape.fixture.TestFixture.RESERVATION_TIME_SIX;
+import static roomescape.fixture.TestFixture.START_AT_SEVEN;
+import static roomescape.fixture.TestFixture.START_AT_SIX;
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE;
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE_NAME;
+import static roomescape.fixture.TestFixture.THEME_HORROR;
+import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +38,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.fixture.TestFixture;
+
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -16,20 +46,19 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.auth.LoginMember;
-import roomescape.dto.reservation.*;
+import roomescape.dto.reservation.MyReservationWithRankResponse;
+import roomescape.dto.reservation.ReservationDto;
+import roomescape.dto.reservation.ReservationFilterParam;
+import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationTimeResponse;
 import roomescape.dto.theme.ReservedThemeResponse;
 import roomescape.exception.RoomescapeException;
-import roomescape.repository.*;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-
-import static roomescape.fixture.TestFixture.*;
+import roomescape.fixture.TestFixture;
+import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {

@@ -2,12 +2,23 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.fixture.TestFixture.*;
+
+import static roomescape.fixture.TestFixture.ADMIN_EMAIL;
+import static roomescape.fixture.TestFixture.ADMIN_NAME;
+import static roomescape.fixture.TestFixture.AMOUNT;
+import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+import static roomescape.fixture.TestFixture.ORDER_ID;
+import static roomescape.fixture.TestFixture.PAYMENT_KEY;
+import static roomescape.fixture.TestFixture.START_AT_SIX;
+import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.reservation.AdminReservationSaveRequest;
 import roomescape.dto.reservation.ReservationResponse;

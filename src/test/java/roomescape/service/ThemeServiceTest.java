@@ -1,26 +1,30 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+
+import static roomescape.fixture.TestFixture.THEME_DETECTIVE;
+import static roomescape.fixture.TestFixture.THEME_HORROR;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.ThemeRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static roomescape.fixture.TestFixture.THEME_DETECTIVE;
-import static roomescape.fixture.TestFixture.THEME_HORROR;
 
 @ExtendWith(MockitoExtension.class)
 class ThemeServiceTest {

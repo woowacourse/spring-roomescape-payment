@@ -3,11 +3,11 @@ package roomescape.domain.member;
 import static roomescape.exception.RoomescapeExceptionCode.EMPTY_NAME;
 import static roomescape.exception.RoomescapeExceptionCode.INVALID_NAME_FORMAT;
 
-import jakarta.persistence.Embeddable;
-
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import jakarta.persistence.Embeddable;
 
 import roomescape.exception.RoomescapeException;
 

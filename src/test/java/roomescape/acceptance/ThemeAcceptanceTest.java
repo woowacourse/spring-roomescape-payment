@@ -2,11 +2,15 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.fixture.TestFixture.*;
 
-import io.restassured.path.json.JsonPath;
+import static roomescape.fixture.TestFixture.THEME_HORROR_DESCRIPTION;
+import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
+import static roomescape.fixture.TestFixture.THEME_HORROR_THUMBNAIL;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import io.restassured.path.json.JsonPath;
 import roomescape.dto.theme.ThemeResponse;
 import roomescape.dto.theme.ThemeSaveRequest;
 

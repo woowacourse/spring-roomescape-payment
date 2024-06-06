@@ -1,13 +1,15 @@
 package roomescape.auth;
 
-import jakarta.servlet.http.Cookie;
-import org.springframework.stereotype.Component;
-import roomescape.exception.RoomescapeException;
+import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
+import jakarta.servlet.http.Cookie;
+
+import org.springframework.stereotype.Component;
+
+import roomescape.exception.RoomescapeException;
 
 @Component
 public class CookieProvider {

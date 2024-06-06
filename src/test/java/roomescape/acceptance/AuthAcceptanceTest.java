@@ -1,14 +1,16 @@
 package roomescape.acceptance;
 
-import io.restassured.RestAssured;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
+import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import roomescape.dto.member.MemberResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+import io.restassured.RestAssured;
+import roomescape.dto.member.MemberResponse;
 
 public class AuthAcceptanceTest extends AcceptanceTest {
 
