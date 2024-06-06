@@ -1,4 +1,4 @@
-package roomescape.controller.admin;
+package roomescape.integrationtest.admin;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
