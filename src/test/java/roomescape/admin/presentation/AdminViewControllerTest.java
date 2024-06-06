@@ -1,42 +1,22 @@
 package roomescape.admin.presentation;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import roomescape.admin.AdminHandlerInterceptor;
-import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.util.ControllerTest;
 
 @WebMvcTest(AdminViewController.class)
-class AdminViewControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private LoginMemberArgumentResolver loginMemberArgumentResolver;
-
-    @MockBean
-    private AdminHandlerInterceptor adminHandlerInterceptor;
+class AdminViewControllerTest extends ControllerTest {
 
     @DisplayName("어드민 메인 페이지 요청을 처리할 수 있다")
     @Test
     void should_handle_admin_main_page_request_when_requested() throws Exception {
-        when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
-                any(Object.class)))
-                .thenReturn(true);
-
-        mockMvc.perform(get("/admin"))
+        mockMvc.perform(get("/admin")
+                        .cookie(ADMIN_COOKIE))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/index"));
     }
@@ -44,11 +24,8 @@ class AdminViewControllerTest {
     @DisplayName("어드민 예약 페이지 요청을 처리할 수 있다")
     @Test
     void should_handle_admin_reservation_page_request_when_requested() throws Exception {
-        when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
-                any(Object.class)))
-                .thenReturn(true);
-
-        mockMvc.perform(get("/admin/reservation"))
+        mockMvc.perform(get("/admin/reservation")
+                        .cookie(ADMIN_COOKIE))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/reservation-new"));
     }
@@ -56,11 +33,8 @@ class AdminViewControllerTest {
     @DisplayName("어드민 시간 관리 페이지 요청을 처리할 수 있다")
     @Test
     void should_handle_admin_time_page_request_when_requested() throws Exception {
-        when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
-                any(Object.class)))
-                .thenReturn(true);
-
-        mockMvc.perform(get("/admin/time"))
+        mockMvc.perform(get("/admin/time")
+                        .cookie(ADMIN_COOKIE))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/time"));
     }
@@ -68,11 +42,8 @@ class AdminViewControllerTest {
     @DisplayName("어드민 테마 관리 페이지 요청을 처리할 수 있다")
     @Test
     void should_handle_admin_theme_page_request_when_requested() throws Exception {
-        when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
-                any(Object.class)))
-                .thenReturn(true);
-
-        mockMvc.perform(get("/admin/theme"))
+        mockMvc.perform(get("/admin/theme")
+                        .cookie(ADMIN_COOKIE))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/theme"));
     }
@@ -80,11 +51,8 @@ class AdminViewControllerTest {
     @DisplayName("어드민 예약 대기 관리 페이지 요청을 처리할 수 있다")
     @Test
     void should_handle_admin_reservation_waiting_page_when_requested() throws Exception {
-        when(adminHandlerInterceptor.preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class),
-                any(Object.class)))
-                .thenReturn(true);
-
-        mockMvc.perform(get("/admin/waiting"))
+        mockMvc.perform(get("/admin/waiting")
+                        .cookie(ADMIN_COOKIE))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/waiting"));
     }

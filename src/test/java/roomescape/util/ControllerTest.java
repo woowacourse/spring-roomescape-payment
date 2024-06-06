@@ -27,7 +27,7 @@ import roomescape.util.restdocs.RestDocsConfiguration;
 @Import(RestDocsConfiguration.class)
 public abstract class ControllerTest {
 
-    private static final String ADMIN_TOKEN = "admin token";
+    private static final String ADMIN_TOKEN = "admin-token";
     protected static final Cookie ADMIN_COOKIE = new Cookie("token", ADMIN_TOKEN);
 
     @Autowired
