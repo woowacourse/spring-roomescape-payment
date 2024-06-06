@@ -1,8 +1,18 @@
 package roomescape.payment.pg;
 
-public record TossPaymentsPayment() {
+import java.math.BigDecimal;
 
+public record TossPaymentsPayment(
+        String paymentKey,
+        String orderId,
+        String status,
+        BigDecimal totalAmount
+) {
     public boolean verify(TossPaymentsConfirmRequest request) {
-        return false;
+        boolean amountEqual = totalAmount.equals(request.getAmount());
+        boolean orderIdEqual = orderId.equals(request.getOrderId());
+        boolean paymentKeyEqual = paymentKey.equals(request.getPaymentKey());
+
+        return amountEqual && orderIdEqual && paymentKeyEqual;
     }
 }
