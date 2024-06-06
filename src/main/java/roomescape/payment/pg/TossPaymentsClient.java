@@ -16,14 +16,31 @@ import java.io.IOException;
 public class TossPaymentsClient {
     private final RestClient restClient;
     private final String confirmApiPath;
+    private final String findApiPath;
     private final ObjectMapper objectMapper;
 
     public TossPaymentsClient(ObjectMapper objectMapper,
                               @Qualifier(value = "tossRestClientBuilder") RestClient.Builder restClientBuilder,
-                              @Value("${pg.toss.confirm-api-path}") String confirmApiPath) {
+                              @Value("${pg.toss.confirm-api-path}") String confirmApiPath,
+                              @Value("${pg.toss.find-api-path}") String findApiPath) {
         this.restClient = restClientBuilder.build();
-        this.objectMapper = objectMapper;
         this.confirmApiPath = confirmApiPath;
+        this.findApiPath = findApiPath;
+        this.objectMapper = objectMapper;
+    }
+
+    public TossPaymentsPayment findBy(String paymentKey) {
+        return restClient.get()
+                .uri(findApiPath + "/{paymentKey}", paymentKey)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new ViolationException(extractErrorMessage(res));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new PaymentServerException(extractErrorMessage(res));
+                })
+                .toEntity(TossPaymentsPayment.class)
+                .getBody();
     }
 
     public void confirm(TossPaymentsConfirmRequest request) {

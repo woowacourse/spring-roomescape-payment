@@ -28,7 +28,7 @@ class TossPaymentsClientTest {
 
     public TossPaymentsClientTest(@Qualifier(value = "tossRestClientBuilder") RestClient.Builder builder) {
         this.mockServer = MockRestServiceServer.bindTo(builder).build();
-        this.paymentsClient = new TossPaymentsClient(objectMapper, builder, "test");
+        this.paymentsClient = new TossPaymentsClient(objectMapper, builder, "test", "test");
     }
 
     @Test
