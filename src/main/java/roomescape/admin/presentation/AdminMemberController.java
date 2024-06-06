@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.AdminOnly;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.service.MemberService;
 
@@ -20,7 +19,6 @@ public class AdminMemberController {
     }
 
     @GetMapping("/members")
-    @AdminOnly
     public ResponseEntity<List<MemberResponse>> readAll() {
         return ResponseEntity.ok(memberService.findAll());
     }

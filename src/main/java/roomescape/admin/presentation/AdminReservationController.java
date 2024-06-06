@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.AdminOnly;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
@@ -30,13 +29,11 @@ public class AdminReservationController {
     }
 
     @GetMapping("/reservations")
-    @AdminOnly
     public ResponseEntity<List<ReservationResponse>> getReservationList() {
         return ResponseEntity.ok(reservationService.findAllReservation());
     }
 
     @GetMapping(path = "/reservations", params = {"memberId", "themeId", "dateFrom", "dateTo"})
-    @AdminOnly
     public ResponseEntity<List<ReservationResponse>> findAllByMemberAndThemeAndPeriod(
             @RequestParam(name = "memberId") Long memberId,
             @RequestParam(name = "themeId") Long themeId,
@@ -48,7 +45,6 @@ public class AdminReservationController {
     }
 
     @PostMapping("/reservations")
-    @AdminOnly
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody ReservationRequest reservationRequest) {
         ReservationResponse saveResponse = reservationService.saveAdminReservation(reservationRequest);
@@ -57,13 +53,11 @@ public class AdminReservationController {
     }
 
     @GetMapping("/reservations/waitings")
-    @AdminOnly
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
         return ResponseEntity.ok(reservationService.findReservationsOnWaiting());
     }
 
     @DeleteMapping("/reservations/{id}")
-    @AdminOnly
     public ResponseEntity<Void> removeWaiting(@PathVariable("id") Long id) {
         reservationService.removeReservation(id);
         return ResponseEntity.noContent().build();
