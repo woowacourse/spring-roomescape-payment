@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import roomescape.controller.doc.DocumentFilter;
 import roomescape.domain.*;
 import roomescape.domain.repository.*;
 import roomescape.infrastructure.auth.JwtProvider;
@@ -52,9 +53,11 @@ public class PaymentControllerTest extends ControllerTest {
         when(paymentManager.approve(new PaymentApproveDto("paymentKey", "orderId", theme.getPrice())))
                 .thenReturn(new PaymentDto("paymentKey", "orderId", theme.getPrice()));
 
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
+        RestAssured.given(spec)
+                .filter(DocumentFilter.SAVE_PAYMENT.getValue())
                 .cookie("token", token)
+                .log().all()
+                .contentType(ContentType.JSON)
                 .body(paymentRequest)
                 .when().post("/payments")
                 .then().log().all()

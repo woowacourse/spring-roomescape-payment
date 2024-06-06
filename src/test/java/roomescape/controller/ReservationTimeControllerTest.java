@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test;
 import roomescape.web.controller.request.ReservationTimeRequest;
 
 import static org.hamcrest.Matchers.is;
+import static roomescape.controller.doc.DocumentFilter.GET_TIMES;
 
-class ReservationTimeController extends ControllerTest {
+class ReservationTimeControllerTest extends ControllerTest {
 
 
     @BeforeEach
@@ -45,7 +46,8 @@ class ReservationTimeController extends ControllerTest {
     @DisplayName("예약 시간을 조회한다. -> 200")
     @Test
     void getReservationTimes() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(GET_TIMES.getValue())
                 .contentType(ContentType.JSON)
                 .when().get("/times")
                 .then().log().all()

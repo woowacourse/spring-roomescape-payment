@@ -10,6 +10,7 @@ import roomescape.web.controller.request.ThemeRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static roomescape.controller.doc.DocumentFilter.GET_THEMES;
 
 
 class ThemeControllerTest extends ControllerTest {
@@ -52,7 +53,8 @@ class ThemeControllerTest extends ControllerTest {
     @DisplayName("테마를 조회한다 -> 200")
     @Test
     void findAll() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(GET_THEMES.getValue())
                 .contentType(ContentType.JSON)
                 .when().get("/themes")
                 .then().log().all()

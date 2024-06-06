@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.controller.steps.ReservationAdminSteps;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.Fixture.*;
+import static roomescape.controller.doc.DocumentFilter.SAVE_RESERVATION;
 
 class ReservationControllerTest extends ControllerTest {
 
@@ -41,7 +44,14 @@ class ReservationControllerTest extends ControllerTest {
         PaymentDto paymentDto = new PaymentDto("paymentKey", "orderId", 1000L);
         when(paymentManager.approve(any())).thenReturn(paymentDto);
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId", 1000L);
-        ReservationSteps.createReservation(request, getUserToken())
+
+        RestAssured.given(spec).log().all()
+                .filter(SAVE_RESERVATION.getValue())
+                .contentType(ContentType.JSON)
+                .cookie(COOKIE_NAME, getUserToken())
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
                 .statusCode(201)
                 .body("name", is(VALID_USER_NAME.getName()))
                 .body("payment.paymentKey", is(paymentDto.paymentKey()));
@@ -111,6 +121,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_PastTime() {
         MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 100L, 1L, "paymentKey", "orderId", 1000L);
+
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }

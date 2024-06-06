@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static roomescape.Fixture.VALID_RESERVATION_TIME;
 import static roomescape.Fixture.VALID_THEME;
+import static roomescape.controller.doc.DocumentFilter.SAVE_RESERVATION_WAITING;
 
 public class ReservationWaitingControllerTest extends ControllerTest {
 
@@ -70,7 +71,8 @@ public class ReservationWaitingControllerTest extends ControllerTest {
 
         ReservationWaitingRequest request = new ReservationWaitingRequest(date, time.getId(), theme.getId());
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(SAVE_RESERVATION_WAITING.getValue())
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(request)
