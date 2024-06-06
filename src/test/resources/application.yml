@@ -15,3 +15,9 @@ security:
     token:
       secret-key: pumExiFixehC65FymaHwN/FDue8U48AO
       expire-length: 3600000
+
+payment:
+  toss:
+    secret: test
+    base-uri: /confirm
+    confirm-uri: doesnotmatter

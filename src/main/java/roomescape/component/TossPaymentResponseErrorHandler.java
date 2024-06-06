@@ -30,7 +30,6 @@ public class TossPaymentResponseErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(final ClientHttpResponse response) throws IOException {
         var errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
-        String code = errorResponse.code();
-        throw new RoomescapeException(TossPaymentErrorCode.from(code));
+        throw new RoomescapeException(TossPaymentErrorCode.from(errorResponse));
     }
 }

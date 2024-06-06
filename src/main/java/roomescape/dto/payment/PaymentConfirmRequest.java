@@ -7,10 +7,11 @@ import roomescape.dto.reservation.ReservationSaveRequest;
 public record PaymentConfirmRequest(
         String paymentKey,
         String orderId,
-        Long amount
+        long amount,
+        long reservationId
 ) {
-    public PaymentConfirmRequest(ReservationSaveRequest request) {
-        this(request.paymentKey(), request.orderId(), request.amount());
+    public PaymentConfirmRequest(ReservationSaveRequest request, long reservationId) {
+        this(request.paymentKey(), request.orderId(), request.amount(), reservationId);
     }
 
     public Payment toPayment(final Reservation reservation) {

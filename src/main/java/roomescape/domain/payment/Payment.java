@@ -52,18 +52,6 @@ public class Payment {
         this.amount = amount;
     }
 
-    public boolean samePaymentKey(final String paymentKey) {
-        return this.paymentKey.equals(paymentKey);
-    }
-
-    public boolean sameOrderId(final String orderId) {
-        return this.orderId.equals(orderId);
-    }
-
-    public boolean sameAmount(final Long amount) {
-        return this.amount.equals(amount);
-    }
-
     public Long getId() {
         return id;
     }
@@ -100,5 +88,16 @@ public class Payment {
     @Override
     public int hashCode() {
         return Objects.hash(id, reservation, paymentKey, orderId, amount);
+    }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "id=" + id +
+                ", reservation=" + reservation +
+                ", paymentKey='" + paymentKey + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }

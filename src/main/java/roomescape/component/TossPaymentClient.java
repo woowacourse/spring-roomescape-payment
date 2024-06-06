@@ -6,29 +6,27 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
 import roomescape.dto.payment.PaymentConfirmRequest;
-import roomescape.dto.payment.PaymentConfirmResponse;
 
 @Component
 public class TossPaymentClient {
 
-    private final RestClient restClient;
+    private final RestClient.Builder restClient;
     private final ResponseErrorHandler errorHandler;
 
-    @Value("${payment.toss.confirm-url}")
+    @Value("${payment.toss.confirm-uri}")
     private String confirmUri;
 
-    public TossPaymentClient(final RestClient restClient, final ResponseErrorHandler errorHandler) {
+    public TossPaymentClient(RestClient.Builder restClient, ResponseErrorHandler errorHandler) {
         this.restClient = restClient;
         this.errorHandler = errorHandler;
     }
 
-    public PaymentConfirmResponse confirm(final PaymentConfirmRequest paymentConfirmRequest) {
-        return restClient.post()
+    public void confirm(final PaymentConfirmRequest paymentConfirmRequest) {
+        restClient.build()
+                .post()
                 .uri(confirmUri)
                 .body(paymentConfirmRequest)
                 .retrieve()
-                .onStatus(errorHandler)
-                .toEntity(PaymentConfirmResponse.class)
-                .getBody();
+                .onStatus(errorHandler);
     }
 }

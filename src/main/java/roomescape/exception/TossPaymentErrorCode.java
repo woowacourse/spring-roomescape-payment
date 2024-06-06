@@ -2,11 +2,16 @@ package roomescape.exception;
 
 import static java.util.stream.Collectors.toMap;
 
+import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
+
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import roomescape.dto.payment.TossPaymentErrorResponse;
 
 public enum TossPaymentErrorCode implements RoomescapeErrorCode {
 
@@ -69,8 +74,23 @@ public enum TossPaymentErrorCode implements RoomescapeErrorCode {
         this.message = message;
     }
 
-    public static TossPaymentErrorCode from(String code) {
-        return CACHE.get(code);
+    public static TossPaymentErrorCode from(TossPaymentErrorResponse response) {
+        requireKnownError(response);
+        return CACHE.get(response.code());
+    }
+
+    private static void requireKnownError(TossPaymentErrorResponse response) {
+        if (!isKnown(response)) {
+            throw new RoomescapeException(INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private static boolean isKnown(TossPaymentErrorResponse response) {
+        if (CACHE.containsKey(response.code())) {
+            var errorCode = CACHE.get(response.code());
+            return Objects.equals(errorCode.message, response.message());
+        }
+        return false;
     }
 
     @Override

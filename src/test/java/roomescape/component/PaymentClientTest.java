@@ -1,45 +1,87 @@
 package roomescape.component;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
+
+import java.io.IOException;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.RoomescapeException;
-import roomescape.exception.TossPaymentErrorCode;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.TestFixture.*;
-
-@ExtendWith(MockitoExtension.class)
 class PaymentClientTest {
 
-    @InjectMocks
-    private ResponseErrorHandler tossPaymentResponseErrorHandler;
+    private ResponseErrorHandler errorHandler;
+    private RestClient.Builder restClient;
+    private TossPaymentClient paymentClient;
 
-    @ParameterizedTest
-    @EnumSource(value = TossPaymentErrorCode.class)
-    @DisplayName("결제 승인 오류 시 예외가 발생한다.")
-    void throwExceptionWhen4xxError(final TossPaymentErrorCode tossError) {
-        final TossPaymentClient paymentClient = new TossPaymentClient(restClient(tossError), tossPaymentResponseErrorHandler);
-        final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(PAYMENT_KEY, ORDER_ID, AMOUNT);
+    private ObjectMapper objectMapper;
 
-        assertThatThrownBy(() -> paymentClient.confirm(paymentConfirmRequest))
-                .isInstanceOf(RoomescapeException.class)
-                .hasMessage(tossError.message());
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setUp() {
+        errorHandler = mock(ResponseErrorHandler.class);
+        restClient = RestClient.builder().baseUrl("/confirm");
+        paymentClient = new TossPaymentClient(restClient, errorHandler);
+        objectMapper = new ObjectMapper();
+        mockServer = MockRestServiceServer.bindTo(restClient).build();
     }
 
-    private RestClient restClient(final TossPaymentErrorCode tossError) {
-        return RestClient.builder()
-                .defaultHeader("Authorization", "Basic dGVzdF9za196WExrS0V5cE5BcldtbzUwblgzbG1lYXhZRzVSOg==")
-                .defaultHeader("Content-Type", "application/json")
-                .defaultHeader("TossPayments-Test-Code", tossError.name())
-                .baseUrl("https://api.tosspayments.com/v1/payments/key-in")
-                .build();
+    @Test
+    @DisplayName("결제 승인에 성공한다.")
+    void confirm() throws JsonProcessingException {
+        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L, 1L);
+        var response = new PaymentConfirmResponse("paymentKey", "orderId", 1000L);
+        var responseString = objectMapper.writeValueAsString(response);
+
+        mockServer.expect(requestTo("/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(responseString, MediaType.APPLICATION_JSON));
+
+        assertDoesNotThrow(() -> paymentClient.confirm(request));
+
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("결제 승인 오류 시 예외가 발생한다.")
+    void confirmException() throws IOException {
+        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L, 1L);
+
+        mockServer.expect(requestTo("/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withServerError());
+
+        when(errorHandler.hasError(any())).thenReturn(true);
+        doThrow(new RoomescapeException(INTERNAL_SERVER_ERROR)).when(errorHandler).handleError(any());
+
+        assertThatThrownBy(() -> paymentClient.confirm(request))
+                .isInstanceOf(RoomescapeException.class)
+                .hasMessage(INTERNAL_SERVER_ERROR.message());
+
+        mockServer.verify();
     }
 }

@@ -6,13 +6,12 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.ClientHttpRequestFactories;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -28,19 +27,18 @@ public class PaymentConfig {
     private String secret;
 
     @Bean
-    public RestClient tossPaymentRestClient() {
+    public RestClient.Builder restClient() {
         return RestClient.builder()
                 .baseUrl(tossPaymentsBaseUri)
                 .defaultHeaders(httpHeaders -> httpHeaders.addAll(headers()))
-                .requestFactory(clientHttpRequestFactory())
-                .build();
+                .requestFactory(clientHttpRequestFactory());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(CONNECT_TIMEOUT)
-                .withReadTimeout(READ_TIMEOUT);
-        return ClientHttpRequestFactories.get(settings);
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(CONNECT_TIMEOUT);
+        factory.setReadTimeout(READ_TIMEOUT);
+        return factory;
     }
 
     private HttpHeaders headers() {
@@ -51,8 +49,8 @@ public class PaymentConfig {
     }
 
     private String authorization() {
-        final String secretKeyWithoutPassword = secret + ":";
-        final Encoder encoder = Base64.getEncoder();
+        String secretKeyWithoutPassword = secret + ":";
+        Encoder encoder = Base64.getEncoder();
         return encoder.encodeToString(secretKeyWithoutPassword.getBytes(StandardCharsets.UTF_8));
     }
 }
