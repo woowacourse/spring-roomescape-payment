@@ -1,10 +1,13 @@
 package roomescape.payment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
+import roomescape.payment.dto.CancelPaymentRequest;
 import roomescape.payment.dto.CreatePaymentRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.repository.PaymentRepository;
@@ -13,6 +16,7 @@ import roomescape.service.exception.PaymentInfoNotFoundException;
 @Service
 public class PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
@@ -31,11 +35,13 @@ public class PaymentService {
     }
 
     @Transactional
-    public void deletePayment(final long id) {
+    public void deletePayment(final long reservationId) {
         try {
-            final PaymentInfo paymentInfo = paymentRepository.fetchByReservationId(id);
+            final PaymentInfo paymentInfo = paymentRepository.fetchByReservationId(reservationId);
+            paymentClient.cancelPayment(new CancelPaymentRequest(paymentInfo.getPaymentKey(), "단순변심"));
             paymentRepository.delete(paymentInfo);
         } catch (final PaymentInfoNotFoundException ignore) {
+            log.warn("결제 정보가 존제하지 않습니다.");
         }
     }
 }

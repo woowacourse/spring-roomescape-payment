@@ -20,9 +20,10 @@ public class PaymentClientConfig {
                                            @Value("${payments.toss.secret-key}") final String secretKey,
                                            @Value("${payments.toss.password}") final String password,
                                            @Value("${payments.toss.host-name}") final String hostName,
-                                           @Value("${payments.toss.payment-api}") final String paymentApi
+                                           @Value("${payments.toss.create-payment-api}") final String createApi,
+                                           @Value("${payments.toss.cancel-payment-api}") final String cancelApi
     ) {
-        return new TossPaymentClient(factory(), errorHandler, secretKey, password, hostName, paymentApi);
+        return new TossPaymentClient(factory(), errorHandler, secretKey, password, hostName, createApi, cancelApi);
     }
 
     @Bean
