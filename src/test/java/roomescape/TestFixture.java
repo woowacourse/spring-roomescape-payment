@@ -3,11 +3,13 @@ package roomescape;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
+import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -37,6 +39,9 @@ public class TestFixture {
 
     public static final String TEST_ERROR_MESSAGE = "ERROR MESSAGE";
     public static final String TEST_PASSWORD = "test password";
+
+    public static final PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST =
+            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
 
     public static Member USER_MIA() {
         return new Member(MIA_NAME, MIA_EMAIL, TEST_PASSWORD, USER);

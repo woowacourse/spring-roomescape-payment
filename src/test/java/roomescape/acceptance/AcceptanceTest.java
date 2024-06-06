@@ -21,7 +21,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
 import roomescape.member.dto.request.MemberJoinRequest;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
@@ -31,13 +30,13 @@ import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.ADMIN_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
+import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
 import static roomescape.TestFixture.TEST_PASSWORD;
 import static roomescape.TestFixture.THEME_THUMBNAIL;
 import static roomescape.TestFixture.WOOTECO_THEME_DESCRIPTION;
@@ -49,9 +48,6 @@ import static roomescape.member.domain.Role.USER;
 @Import(TestClientConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
-    public static final PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST =
-            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
-
     @LocalServerPort
     private int port;
 

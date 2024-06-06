@@ -8,7 +8,7 @@ import roomescape.payment.pg.TossPaymentsPayment;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static roomescape.acceptance.AcceptanceTest.PAYMENT_CONFIRM_REQUEST;
+import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
 
 @TestConfiguration
 public class TestClientConfiguration {

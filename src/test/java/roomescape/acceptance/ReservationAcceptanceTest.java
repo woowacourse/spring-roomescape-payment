@@ -28,6 +28,7 @@ import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.MIA_EMAIL;
 import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
+import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
 import static roomescape.TestFixture.TOMMY_EMAIL;
 import static roomescape.TestFixture.TOMMY_NAME;
 import static roomescape.TestFixture.TOMMY_RESERVATION_DATE;
