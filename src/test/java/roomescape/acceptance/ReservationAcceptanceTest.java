@@ -35,7 +35,6 @@ import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
-
     @Test
     @DisplayName("예약을 추가한다.")
     void createOneReservation() {

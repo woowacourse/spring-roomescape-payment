@@ -11,7 +11,6 @@ import static roomescape.TestFixture.MIA_EMAIL;
 import static roomescape.TestFixture.MIA_NAME;
 
 class ViewTest extends AcceptanceTest {
-
     @Test
     @DisplayName("어드민 메인 페이지를 조회한다.")
     void getAdminMainPage() {

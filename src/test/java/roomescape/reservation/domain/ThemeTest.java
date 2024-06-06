@@ -11,7 +11,6 @@ import static roomescape.TestFixture.THEME_THUMBNAIL;
 import static roomescape.TestFixture.WOOTECO_THEME_DESCRIPTION;
 
 class ThemeTest {
-
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = " ")

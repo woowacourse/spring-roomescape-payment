@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationTimeTest {
-
     @Test
     @DisplayName("예약 시간은 10분 단위이다.")
     void validateTimeUnit() {

@@ -13,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TossPaymentsConfirmRequestTest {
-
     @Test
     @DisplayName("paymentKey의 길이는 최대 200자이다.")
     void validatePaymentKeySize() {

@@ -11,7 +11,6 @@ import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class WaitingReservationTest {
-
     @Test
     @DisplayName("예약 대기 순서를 계산한다.")
     void calculateOrder() {

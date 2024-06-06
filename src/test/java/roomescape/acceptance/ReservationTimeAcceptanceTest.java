@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 
 class ReservationTimeAcceptanceTest extends AcceptanceTest {
-
     @Test
     @DisplayName("예약 시간을 추가한다.")
     void createReservationTime() {

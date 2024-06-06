@@ -8,6 +8,7 @@ public record TossPaymentsPayment(
         String status,
         BigDecimal totalAmount
 ) {
+
     public boolean verify(TossPaymentsConfirmRequest request) {
         boolean amountEqual = totalAmount.equals(request.getAmount());
         boolean orderIdEqual = orderId.equals(request.getOrderId());

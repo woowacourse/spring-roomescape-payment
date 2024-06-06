@@ -14,7 +14,6 @@ import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.member.domain.Role.USER;
 
 class MemberTest {
-
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = " ")

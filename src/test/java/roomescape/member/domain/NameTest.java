@@ -10,7 +10,6 @@ import roomescape.global.exception.ViolationException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NameTest {
-
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"miaIsLovely"})

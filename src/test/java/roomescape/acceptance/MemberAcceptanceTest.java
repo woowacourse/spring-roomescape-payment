@@ -22,7 +22,6 @@ import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.TestFixture.TEST_PASSWORD;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
-
     @Test
     @DisplayName("관리자 권한으로 사용자 목록을 조회한다.")
     void findAllMembers() {

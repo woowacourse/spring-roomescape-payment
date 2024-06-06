@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TossPaymentsPaymentTest {
-
     @Test
     @DisplayName("confirmRequest 와 값이 일치하는지 확인할 수 있다.")
     void verify() {

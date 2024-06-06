@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 
 @TestConfiguration
 public class TestClientConfiguration {
-
     @Bean
     public TossPaymentsClient tossPaymentsClient() {
         return mock(TossPaymentsClient.class);

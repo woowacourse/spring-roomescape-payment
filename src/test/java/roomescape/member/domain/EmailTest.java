@@ -10,7 +10,6 @@ import roomescape.global.exception.ViolationException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EmailTest {
-
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"aaa", "aa@aa", "aa.aa@aa"})
