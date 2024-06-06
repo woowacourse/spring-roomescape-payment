@@ -2,6 +2,7 @@ package roomescape.client.payment;
 
 import org.json.JSONException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
@@ -12,9 +13,13 @@ import roomescape.exception.PaymentException;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Objects;
+import java.util.Set;
 
 public class TossPaymentClient implements PaymentClient {
+
+    private static final Set<String> ERROR_RESPONSE_CODES_FOR_FILTER = Set.of(
+            "INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT",
+            "NOT_REGISTERED_BUSINESS", "INVALID_UNREGISTERED_SUBMALL");
 
     private final String widgetSecretKey;
     private final String baseUrl;
@@ -45,23 +50,32 @@ public class TossPaymentClient implements PaymentClient {
                 .body(paymentConfirmationToTossDto)
                 .exchange((request, response) -> {
                     handlePaymentConfirmationException(response);
-                    return Objects.requireNonNull(response.bodyTo(PaymentConfirmationFromTossDto.class)); //todo: null 이 응답되면 어떻게 되는지 테스트 코드로 실험
+                    return convertResponse(response);
                 });
     }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
             ErrorResponseFromTossDto errorResponseBody = response.bodyTo(ErrorResponseFromTossDto.class);
+            filterErrorResponse(errorResponseBody);
 
-            throw new PaymentException(response.getStatusCode(), getMessage(errorResponseBody));
+            throw new PaymentException(response.getStatusCode(), errorResponseBody.message());
         }
     }
 
-    private String getMessage(ErrorResponseFromTossDto errorResponseFromTossDto) {
-        if(errorResponseFromTossDto == null) {
-            return "응답을 받아오지 못했습니다.";
+    private void filterErrorResponse(ErrorResponseFromTossDto errorResponseBody) {
+        if (errorResponseBody == null || ERROR_RESPONSE_CODES_FOR_FILTER.contains(errorResponseBody.code())) {
+            throw new PaymentException(HttpStatus.BAD_REQUEST, "결제 승인에 실패했습니다.");
+        }
+    }
+
+    private PaymentConfirmationFromTossDto convertResponse(ConvertibleClientHttpResponse response) {
+        PaymentConfirmationFromTossDto responseDto = response.bodyTo(PaymentConfirmationFromTossDto.class);
+        if(responseDto == null) {
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "결제 승인 자체는 성공했는데, 응답을 지정한 형식으로 받아오는데에 실패했습니다. 큰일 났습니다!");
         }
 
-        return errorResponseFromTossDto.message();
+        return responseDto;
     }
 }
