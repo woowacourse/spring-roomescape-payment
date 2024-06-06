@@ -1,87 +1,129 @@
 package roomescape.payment.service;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
+import static roomescape.Fixture.HORROR_THEME;
+import static roomescape.Fixture.MEMBER_JOJO;
+import static roomescape.Fixture.RESERVATION_TIME_10_00;
+import static roomescape.Fixture.TOMORROW;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.common.exception.PaymentException;
-import roomescape.payment.config.PaymentConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import roomescape.common.config.DatabaseCleaner;
+import roomescape.member.domain.Member;
+import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
-import roomescape.payment.service.dto.resonse.PaymentErrorResponse;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Status;
+import roomescape.reservation.domain.Theme;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.repository.ThemeRepository;
 
-@RestClientTest(TossPaymentClient.class)
-@Import(PaymentConfig.class)
-class TossPaymentClientTest {
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@ActiveProfiles("test")
+class PaymentServiceTest {
 
     @Autowired
-    private MockRestServiceServer mockServer;
+    private DatabaseCleaner databaseCleaner;
 
     @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @MockBean
     private TossPaymentClient tossPaymentClient;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private PaymentRepository paymentRepository;
 
-    @BeforeEach
-    void setUp() {
-        mockServer.reset();
+    @AfterEach
+    void init() {
+        databaseCleaner.cleanUp();
     }
 
-    @DisplayName("결제 승인 요청 성공 시 올바른 응답을 반환받는다.")
+    @DisplayName("결제 후 결제 내역을 저장한다.")
     @Test
-    void confirm() throws JsonProcessingException {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
-        PaymentConfirmResponse expectedResponse = new PaymentConfirmResponse(
-                "paymentKey",
-                "orderId",
-                1000,
-                "orderName",
-                "DONE",
-                "2024-02-13T12:17:57+09:00",
-                "2024-02-13T12:18:14+09:00"
-        );
-        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().json(objectMapper.writeValueAsString(request)))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
+    void confirmPayment() {
+        Member jojo = memberRepository.save(MEMBER_JOJO);
+        ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
+        Theme theme = themeRepository.save(HORROR_THEME);
+        Reservation reservation = reservationRepository.save(
+                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
 
-        assertThatCode(() -> tossPaymentClient.confirmPayment(request))
-                .doesNotThrowAnyException();
-        mockServer.verify();
+        PaymentConfirmRequest confirmRequest = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
+
+        when(tossPaymentClient.confirmPayment(confirmRequest)).thenReturn(
+                new PaymentConfirmResponse(
+                        confirmRequest.paymentKey(),
+                        confirmRequest.orderId(),
+                        confirmRequest.amount(),
+                        "orderName",
+                        "DONE",
+                        "2024-02-13T12:17:57+09:00",
+                        "2024-02-13T12:18:14+09:00"
+                )
+        );
+
+        Payment payment = paymentService.confirm(confirmRequest, reservation);
+
+        assertAll(
+                () -> assertThat(payment.getPaymentKey()).isEqualTo("paymentKey"),
+                () -> assertThat(payment.getOrderId()).isEqualTo("orderId"),
+                () -> assertThat(payment.getAmount()).isEqualTo(1000),
+                () -> assertThat(payment.getReservation().getId()).isEqualTo(reservation.getId())
+        );
     }
 
-    @DisplayName("결제 승인 요청 실패 시 예외가 발생한다.")
+    @DisplayName("예약 id로 결제 내역을 삭제한다.")
     @Test
-    void confirmWithInvalidRequest() throws JsonProcessingException {
-        PaymentConfirmRequest request = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
-        PaymentErrorResponse expectedResponse = new PaymentErrorResponse(
-                "ALREADY_PROCESSED_PAYMENT",
-                "이미 처리된 결제 입니다."
-        );
+    void deleteByReservationId() {
+        Member jojo = memberRepository.save(MEMBER_JOJO);
+        ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
+        Theme theme = themeRepository.save(HORROR_THEME);
+        Reservation reservation = reservationRepository.save(
+                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
+        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderId", 10000L, reservation));
 
-        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().json(objectMapper.writeValueAsString(request)))
-                .andRespond(withBadRequest().body(objectMapper.writeValueAsString(expectedResponse)));
+        paymentService.deleteByReservationId(reservation.getId());
 
-        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentException.class);
-        mockServer.verify();
+        Optional<Payment> savedPayment = paymentRepository.findById(payment.getId());
+        assertThat(savedPayment).isEmpty();
+    }
+
+    @DisplayName("결제 목록을 조회한다.")
+    @Test
+    void findAllPayment() {
+        Member jojo = memberRepository.save(MEMBER_JOJO);
+        ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
+        Theme theme = themeRepository.save(HORROR_THEME);
+        Reservation reservation = reservationRepository.save(
+                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
+        paymentRepository.save(new Payment("paymentKey", "orderId", 10000L, reservation));
+
+        assertThat(paymentService.findAll()).hasSize(1);
     }
 }
