@@ -65,6 +65,7 @@ public class ReservationApiController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> cancel(@PathVariable("id") Long id) {
+        paymentService.cancel(reservationService.findById(id));
         reservationService.cancelById(id);
 
         return ResponseEntity.ok().build();

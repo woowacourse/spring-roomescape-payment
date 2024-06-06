@@ -2,6 +2,8 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,6 +24,10 @@ public class Payment {
 
     @Column(nullable = false)
     private BigDecimal totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus status;
 
     @Column(name = "reservation_id", nullable = false, unique = true)
     private Long reservationId;
@@ -47,5 +53,13 @@ public class Payment {
 
     public BigDecimal getTotalAmount() {
         return totalAmount;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void cancel(){
+        this.status = PaymentStatus.CANCELED;
     }
 }

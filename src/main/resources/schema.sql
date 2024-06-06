@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS payment
     payment_key  VARCHAR(255) NOT NULL UNIQUE,
     order_id     VARCHAR(255) NOT NULL UNIQUE,
     total_amount NUMERIC       NOT NULL,
+    status VARCHAR(255) NOT NULL CHECK (status IN ('DONE','CANCELED')),
     reservation_id BIGINT NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );

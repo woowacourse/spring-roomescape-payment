@@ -1,11 +1,14 @@
 package roomescape.payment.service;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.payment.client.TossPayRestClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.CancelRequest;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.dto.ReservationResponse;
 
 @Service
 public class PaymentService {
@@ -24,5 +27,16 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
 
         return PaymentResponse.toResponse(savedPayment);
+    }
+
+    public void cancel(ReservationResponse canceledReservation) {
+        Optional<Payment> paymentById = paymentRepository.findByReservationId(canceledReservation.id());
+        paymentById.ifPresent(
+                payment -> {
+                        tossPayRestClient.cancel(new CancelRequest(payment.getPaymentKey()));
+                        payment.cancel();
+                        paymentRepository.save(payment);
+                }
+        );
     }
 }
