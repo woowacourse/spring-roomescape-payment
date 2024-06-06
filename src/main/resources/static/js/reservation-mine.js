@@ -26,13 +26,13 @@ function render(data) {
         row.insertCell(1).textContent = date;
         row.insertCell(2).textContent = time;
 
-        if (status === '예약') {
-            row.insertCell(3).textContent = status;
-        } else {
+        if (status === '대기') {
             row.insertCell(3).textContent = `${item.rank}번째 예약대기`;
+        } else {
+            row.insertCell(3).textContent = status;
         }
 
-        if (status !== '예약') {
+        if (status === '대기') {
             row.insertCell(4).textContent = item.paymentKey;
             row.insertCell(5).textContent = item.amount;
 
@@ -44,7 +44,7 @@ function render(data) {
                 requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
-        } else { // 예약 완료 상태일 때
+        } else if (status === '예약') { // 예약 완료 상태일 때
             /*
             TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
             예약 완료 상태일 때 결제 정보를 함께 보여주기
@@ -61,6 +61,21 @@ function render(data) {
                 requestDelete(item.reservationId).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+        } else if (status === '결제대기') {
+            row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = '';
+
+            const confirmPayment = row.insertCell(6);
+            const confirmPaymentButton = document.createElement('button');
+            confirmPaymentButton.textContent = '결제하기';
+            confirmPaymentButton.className = 'btn btn-primary';
+            confirmPaymentButton.onclick = function () {
+                // requestDelete(item.reservationId).then(() => window.location.reload());
+            };
+            confirmPayment.appendChild(cancelButton);
+        } else {
+            row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = '';
         }
     });
 }
@@ -83,8 +98,15 @@ function requestDeleteWaiting(id) {
 
 function requestDelete(id) {
     const endpoint = `${RESERVATION_API_ENDPOINT}/${id}`;
+
+    const data = {
+        cancelReason: "단순 변심"
+    };
+
     return fetch(endpoint, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
     }).then(response => {
         if (!response.ok) {
             return response.text().then(errorResponse => {

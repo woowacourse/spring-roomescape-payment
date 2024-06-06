@@ -54,7 +54,8 @@ public class AdminReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Reservation reservation = adminReservationSaveRequest.toEntity(member, theme, reservationTime, ReservationStatus.SUCCESS);
-        if (reservationRepository.existsByDateAndTimeStartAtAndStatus(
+        if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                reservation.getTheme(),
                 reservation.getDate(),
                 reservation.getStartAt(),
                 reservation.getStatus()

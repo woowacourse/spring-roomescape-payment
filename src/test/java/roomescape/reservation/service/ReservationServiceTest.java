@@ -9,6 +9,7 @@ import static roomescape.util.Fixture.JOJO;
 import static roomescape.util.Fixture.KAKI;
 import static roomescape.util.Fixture.LOGIN_MEMBER_JOJO;
 import static roomescape.util.Fixture.LOGIN_MEMBER_KAKI;
+import static roomescape.util.Fixture.RESERVATION_CANCEL_REASON;
 import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 import static roomescape.util.Fixture.TOMORROW;
@@ -199,11 +200,11 @@ class ReservationServiceTest {
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
         ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
-        assertThatThrownBy(() -> reservationService.cancelById(reservationResponse.id()))
+        assertThatThrownBy(() -> reservationService.cancelById(reservationResponse.id(), RESERVATION_CANCEL_REASON))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("확정된 예약을 취소하면 예약 상태가 CANCEL로 변경되고, 예약 대기자가 있다면 첫 번째 대기자가 예약 확정된다.")
+    @DisplayName("확정된 예약을 취소하면 예약 상태가 CANCEL로 변경되고, 예약 대기자가 있다면 첫 번째 대기자가 결제 대기 상태가 된다.")
     @Test
     void cancelById() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
@@ -219,9 +220,9 @@ class ReservationServiceTest {
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
 
-        reservationService.cancelById(kaki.getId());
+        reservationService.cancelById(kaki.getId(), RESERVATION_CANCEL_REASON);
         Reservation jojoReservation = reservationRepository.findById(jojo.getId()).get();
 
-        assertThat(jojoReservation.getStatus()).isEqualTo(ReservationStatus.SUCCESS);
+        assertThat(jojoReservation.getStatus()).isEqualTo(ReservationStatus.PAYMENT_PENDING);
     }
 }

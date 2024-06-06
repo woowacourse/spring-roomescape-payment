@@ -145,13 +145,15 @@ public class ReservationRepositoryTest {
                 new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS)
         );
 
-        boolean success = reservationRepository.existsByDateAndTimeStartAtAndStatus(
+        boolean success = reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                horrorTheme,
                 savedReservation.getDate(),
                 savedReservation.getStartAt(),
                 ReservationStatus.SUCCESS
         );
 
-        boolean waiting = reservationRepository.existsByDateAndTimeStartAtAndStatus(
+        boolean waiting = reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                horrorTheme,
                 savedReservation.getDate(),
                 savedReservation.getStartAt(),
                 ReservationStatus.WAIT

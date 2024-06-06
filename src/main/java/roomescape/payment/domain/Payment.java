@@ -63,6 +63,10 @@ public class Payment extends AuditedEntity {
         this.totalAmount = totalAmount;
     }
 
+    public void cancel() {
+        this.status = PaymentStatus.CANCEL;
+    }
+
     public Long getId() {
         return id;
     }

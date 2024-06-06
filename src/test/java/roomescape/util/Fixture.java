@@ -10,6 +10,7 @@ import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
+import roomescape.reservation.dto.ReservationCancelReason;
 
 public class Fixture {
 
@@ -46,6 +47,10 @@ public class Fixture {
 
     public static final LocalDate TODAY = LocalDate.now();
     public static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
+
+    public static final String PAYMENT_KEY = "test_payment_key";
+    public static final String ORDER_ID = "test_order_id";
+    public static final ReservationCancelReason RESERVATION_CANCEL_REASON = new ReservationCancelReason("단순 변심");
 
     private Fixture() {
     }

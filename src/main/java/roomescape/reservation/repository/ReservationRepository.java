@@ -59,7 +59,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByStatusFromDate(ReservationStatus status, LocalDate date);
 
     @EntityGraph(attributePaths = {"time"})
-    boolean existsByDateAndTimeStartAtAndStatus(LocalDate date, LocalTime startAt, ReservationStatus status);
+    boolean existsByThemeAndDateAndTimeStartAtAndStatus(Theme theme, LocalDate date, LocalTime startAt, ReservationStatus status);
 
     @Query("""
            select r.status from Reservation r

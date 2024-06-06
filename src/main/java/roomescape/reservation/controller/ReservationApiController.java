@@ -16,6 +16,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.ReservationCancelReason;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.service.ReservationService;
@@ -68,8 +69,8 @@ public class ReservationApiController {
     }
 
     @PatchMapping("/reservations/{id}")
-    public ResponseEntity<Void> cancel(@PathVariable("id") Long id) {
-        reservationService.cancelById(id);
+    public ResponseEntity<Void> cancel(@PathVariable("id") Long id, @RequestBody ReservationCancelReason reservationCancelReason) {
+        reservationService.cancelById(id, reservationCancelReason);
 
         return ResponseEntity.ok().build();
     }

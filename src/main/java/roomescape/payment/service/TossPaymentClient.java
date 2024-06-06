@@ -8,11 +8,13 @@ import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentErrorHandler;
+import roomescape.reservation.dto.ReservationCancelReason;
 
 @Component
 public class TossPaymentClient {
@@ -41,6 +43,16 @@ public class TossPaymentClient {
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
                 .body(TossPaymentResponse.class);
+    }
+
+    public ResponseEntity<Void> requestPaymentCancel(String paymentKey, ReservationCancelReason cancelReason) {
+        return restClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cancelReason)
+                .retrieve()
+                .onStatus(new PaymentErrorHandler())
+                .toBodilessEntity();
     }
 
     private String createAuthorizations() {

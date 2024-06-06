@@ -16,6 +16,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.ReservationCancelReason;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.repository.ReservationRepository;
@@ -77,7 +78,8 @@ public class ReservationService {
     }
 
     private void validateDuplicatedReservationSuccess(Reservation reservation) {
-        if (reservationRepository.existsByDateAndTimeStartAtAndStatus(
+        if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                reservation.getTheme(),
                 reservation.getDate(),
                 reservation.getStartAt(),
                 reservation.getStatus()
@@ -130,9 +132,10 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelById(Long id) {
+    public void cancelById(Long id, ReservationCancelReason reservationCancelReason) {
         Reservation canceledReservation = getCanceledReservation(id);
         updateFirstWaitingReservation(canceledReservation);
+        paymentService.cancel(id, reservationCancelReason);
     }
 
     private Reservation getCanceledReservation(Long id) {
@@ -152,6 +155,6 @@ public class ReservationService {
                 canceledReservation.getDate(),
                 canceledReservation.getTime().getId(),
                 canceledReservation.getTheme().getId()
-        ).ifPresent(reservation -> reservation.updateStatus(ReservationStatus.SUCCESS));
+        ).ifPresent(reservation -> reservation.updateStatus(ReservationStatus.PAYMENT_PENDING));
     }
 }

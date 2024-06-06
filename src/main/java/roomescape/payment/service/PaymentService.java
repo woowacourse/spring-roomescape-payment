@@ -9,6 +9,7 @@ import roomescape.payment.dto.PaymentSaveResponse;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.ReservationCancelReason;
 
 @Service
 @Transactional
@@ -23,9 +24,22 @@ public class PaymentService {
     }
 
     public PaymentSaveResponse payForReservation(@Valid PaymentRequest paymentRequest, Reservation reservation) {
+        paymentRepository.findByPaymentKey(paymentRequest.paymentKey())
+                .ifPresent(payment -> {
+                    throw new IllegalArgumentException("결제 완료된 예약 입니다.");
+                });
+
         TossPaymentResponse tossPaymentResponse = tossPaymentClient.requestPayment(paymentRequest);
         Payment savedPayment = paymentRepository.save(tossPaymentResponse.from(reservation));
 
         return PaymentSaveResponse.toResponse(savedPayment);
+    }
+
+    public void cancel(Long reservationId, ReservationCancelReason cancelReason) {
+        Payment payment = paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약의 결제 정보가 없습니다."));
+
+        tossPaymentClient.requestPaymentCancel(payment.getPaymentKey(), cancelReason);
+        payment.cancel();
     }
 }
