@@ -45,7 +45,7 @@ class ReservationTimeServiceTest {
     @DisplayName("아이디에 해당하는 예약 시간을 반환한다.")
     @Test
     void should_get_reservation_time() {
-        ReservationTime reservationTime = reservationTimeService.findReservationTime(2);
+        ReservationTime reservationTime = reservationTimeService.getReservationTime(2);
 
         assertThat(reservationTime.getStartAt()).isEqualTo(LocalTime.of(11, 0));
     }

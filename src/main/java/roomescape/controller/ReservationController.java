@@ -46,7 +46,7 @@ public class ReservationController {
 
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<MemberReservationResponse>> getMemberReservations(HttpServletRequest request) {
-        Long memberId = authService.findMemberIdByCookie(request.getCookies());
+        Long memberId = authService.getMemberIdByCookie(request.getCookies());
         List<MemberReservationResponse> responses = reservationWaitingService.getAllMemberReservationsAndWaiting(memberId);
         return ResponseEntity.ok(responses);
     }

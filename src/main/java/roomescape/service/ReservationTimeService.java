@@ -50,8 +50,8 @@ public class ReservationTimeService {
         }
     }
 
-    public ReservationTime findReservationTime(long id) {
-        return findById(id);
+    public ReservationTime getReservationTime(long id) {
+        return getById(id);
     }
 
     public List<IsReservedTimeResponse> getIsReservedTime(LocalDate date, long themeId) {
@@ -74,7 +74,7 @@ public class ReservationTimeService {
     }
 
     private void validateReservedTime(long id) {
-        ReservationTime time = findById(id);
+        ReservationTime time = getById(id);
 
         boolean exists = reservationRepository.existsByTime(time);
         if (exists) {
@@ -83,7 +83,7 @@ public class ReservationTimeService {
     }
 
     private void validateNotExistReservationTime(long id) {
-        findById(id);
+        getById(id);
     }
 
     private List<ReservationTime> filterNotBookedTimes(List<ReservationTime> times, List<ReservationTime> bookedTimes) {
@@ -103,7 +103,7 @@ public class ReservationTimeService {
         return Stream.concat(notBookedTimes.stream(), bookedTimes.stream()).toList();
     }
 
-    private ReservationTime findById(Long id) {
+    private ReservationTime getById(Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
     }

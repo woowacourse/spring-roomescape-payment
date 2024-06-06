@@ -31,7 +31,7 @@ class MemberServiceTest {
     void should_find_member_when_member_exist() {
         MemberLoginRequest request = new MemberLoginRequest("1111", "otter@email.com");
 
-        Member findMember = memberService.findMemberByEmailAndPassword(request);
+        Member findMember = memberService.getMemberByEmailAndPassword(request);
 
         assertThat(findMember.getName()).isEqualTo("수달");
     }
@@ -41,14 +41,14 @@ class MemberServiceTest {
     void should_throw_exception_when_member_not_exist() {
         MemberLoginRequest request = new MemberLoginRequest("3333", "movin@email.com");
 
-        assertThatThrownBy(() -> memberService.findMemberByEmailAndPassword(request))
+        assertThatThrownBy(() -> memberService.getMemberByEmailAndPassword(request))
                 .isInstanceOf(AuthenticationException.class);
     }
 
     @DisplayName("아이디를 통해 사용자 이름을 조회한다.")
     @Test
     void should_find_member_when_give_id() {
-        Member memberById = memberService.findMemberById(1L);
+        Member memberById = memberService.getMemberById(1L);
 
         assertThat(memberById.getId()).isEqualTo(1);
     }
@@ -56,7 +56,7 @@ class MemberServiceTest {
     @DisplayName("주어진 아이디에 해당하는 사용자가 없으면 예외가 발생한다.")
     @Test
     void should_not_find_member_and_throw_exception_when_member_id_not_exist() {
-        assertThatThrownBy(() -> memberService.findMemberById(99L))
+        assertThatThrownBy(() -> memberService.getMemberById(99L))
                 .isInstanceOf(NotFoundException.class);
     }
 

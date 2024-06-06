@@ -147,7 +147,7 @@ class WaitingServiceTest {
         ReservationTime time = reservationTimeRepository.findById(1L).get();
         LocalDate date = LocalDate.now().plusDays(1);
 
-        Waiting waiting = waitingService.findFirstWaitingByCondition(theme, date, time);
+        Waiting waiting = waitingService.getFirstWaitingByCondition(theme, date, time);
 
         assertThat(waiting).isNotNull();
     }
@@ -159,7 +159,7 @@ class WaitingServiceTest {
         ReservationTime time = reservationTimeRepository.findById(1L).get();
         LocalDate date = LocalDate.now().plusDays(3);
 
-        assertThatThrownBy(() -> waitingService.findFirstWaitingByCondition(theme, date, time))
+        assertThatThrownBy(() -> waitingService.getFirstWaitingByCondition(theme, date, time))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 테마:[name1], 날짜:[" + date + "], 시간:[10:00] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.");
     }

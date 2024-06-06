@@ -87,7 +87,7 @@ public class WaitingService {
         return waitingRepository.findAll();
     }
 
-    public Waiting findFirstWaitingByCondition(Theme theme, LocalDate date, ReservationTime time) {
+    public Waiting getFirstWaitingByCondition(Theme theme, LocalDate date, ReservationTime time) {
         return waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time)
                 .orElseThrow(() ->
                         new NotFoundException("해당 테마:[%s], 날짜:[%s], 시간:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(theme.getName(), date, time.getStartAt())));

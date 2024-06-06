@@ -22,13 +22,13 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    public Member findMemberByEmailAndPassword(MemberLoginRequest request) {
+    public Member getMemberByEmailAndPassword(MemberLoginRequest request) {
         return memberRepository.findByEmailAndPassword(request.email(), request.password())
                 .orElseThrow(() -> new AuthenticationException(
                         "사용자(email: %s, password: %s)가 존재하지 않습니다.".formatted(request.email(), request.password())));
     }
 
-    public Member findMemberById(Long id) {
+    public Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("id가 %s인 사용자가 존재하지 않습니다."));
     }

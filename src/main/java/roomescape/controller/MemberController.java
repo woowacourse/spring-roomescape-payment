@@ -33,7 +33,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse response) {
-        Member member = memberService.findMemberByEmailAndPassword(request);
+        Member member = memberService.getMemberByEmailAndPassword(request);
         Cookie cookie = authService.createCookieByMember(member);
         response.addCookie(cookie);
         return ResponseEntity.ok().build();

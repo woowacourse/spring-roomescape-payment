@@ -52,9 +52,9 @@ public class ReservationService {
 
     @Transactional
     public Reservation addReservation(ReservationRequest request, Member member) {
-        ReservationTime reservationTime = findReservationTime(request.date(), request.timeId(),
+        ReservationTime reservationTime = getReservationTime(request.date(), request.timeId(),
                 request.themeId());
-        Theme theme = findTheme(request.themeId());
+        Theme theme = getTheme(request.themeId());
 
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
@@ -62,24 +62,24 @@ public class ReservationService {
 
     @Transactional
     public Reservation addReservation(AdminReservationRequest request) {
-        ReservationTime reservationTime = findReservationTime(request.date(), request.timeId(), request.themeId());
+        ReservationTime reservationTime = getReservationTime(request.date(), request.timeId(), request.themeId());
 
-        Theme theme = findTheme(request.themeId());
-        Member member = findMember(request.memberId());
+        Theme theme = getTheme(request.themeId());
+        Member member = getMember(request.memberId());
 
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 
-    private ReservationTime findReservationTime(LocalDate date, long timeId, long themeId) {
-        ReservationTime reservationTime = findReservationTime(timeId);
+    private ReservationTime getReservationTime(LocalDate date, long timeId, long themeId) {
+        ReservationTime reservationTime = getReservationTime(timeId);
         validateDuplicatedReservation(date, themeId, timeId);
         return reservationTime;
     }
 
     private void validateDuplicatedReservation(LocalDate date, Long themeId, Long timeId) {
-        ReservationTime reservationTime = findReservationTime(timeId);
-        Theme theme = findTheme(themeId);
+        ReservationTime reservationTime = getReservationTime(timeId);
+        Theme theme = getTheme(themeId);
 
         boolean exists = reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
         if (exists) {
@@ -94,34 +94,34 @@ public class ReservationService {
     }
 
     private void validateExistReservation(long id) {
-        findById(reservationRepository, id);
+        getById(reservationRepository, id);
     }
 
     public List<Reservation> findMemberReservations(Long memberId) {
-        Member member = findById(memberRepository, memberId);
+        Member member = getById(memberRepository, memberId);
         return reservationRepository.findAllByMember(member);
     }
 
-    public Reservation findById(Long id) {
-        return findById(reservationRepository, id);
+    public Reservation getReservationById(Long id) {
+        return getById(reservationRepository, id);
     }
 
-    private <T> T findById(CrudRepository<T, Long> repository, Long id) {
+    private <T> T getById(CrudRepository<T, Long> repository, Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
     }
 
-    private Theme findTheme(Long id) {
+    private Theme getTheme(Long id) {
         return themeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(id)));
     }
 
-    private Member findMember(Long id) {
+    private Member getMember(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 사용자가 존재하지 않습니다.".formatted(id)));
     }
 
-    private ReservationTime findReservationTime(Long id) {
+    private ReservationTime getReservationTime(Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
     }

@@ -164,7 +164,7 @@ class ReservationServiceTest {
     @DisplayName("주어진 아이디에 맞는 예약을 반환한다.")
     @Test
     void should_return_reservation_when_given_id() {
-        Reservation reservation = reservationService.findById(1L);
+        Reservation reservation = reservationService.getReservationById(1L);
 
         assertThat(reservation.getId()).isEqualTo(1);
     }
