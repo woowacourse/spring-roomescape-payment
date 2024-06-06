@@ -79,4 +79,8 @@ public class Payment {
     public @NotNull(message = "결제 상태는 비어있을 수 없습니다.") PaymentStatus getStatus() {
         return status;
     }
+
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
+    }
 }
