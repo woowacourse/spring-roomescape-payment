@@ -1,5 +1,6 @@
 package roomescape.core.service;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
@@ -49,5 +50,10 @@ public class PaymentService {
                     paymentRepository.delete(payment);
                 }
         );
+    }
+
+    public PaymentResponse findByReservation(Reservation reservation) {
+        return new PaymentResponse(paymentRepository.findByReservation(reservation)
+                .orElseThrow(IllegalArgumentException::new));
     }
 }

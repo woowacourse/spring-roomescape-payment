@@ -12,6 +12,7 @@ import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.AdminReservationRequest;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
@@ -129,15 +130,17 @@ public class ReservationService {
     }
 
     private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
+        PaymentResponse paymentResponse = paymentService.findByReservation(reservation);
         if (reservation.getStatus().equals(Status.BOOKED)) {
             return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
                     reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                    reservation.getStatus().getValue());
+                    reservation.getStatus().getValue(), paymentResponse.getPaymentKey(), paymentResponse.getAmount());
         }
         return MyReservationResponse.ofReservationWaiting(reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                reservation.getStatus().getValue(), findRankByCreateAt(reservation));
+                reservation.getStatus().getValue(), paymentResponse.getPaymentKey(),
+                paymentResponse.getAmount(), findRankByCreateAt(reservation));
     }
 
     private Integer findRankByCreateAt(final Reservation reservation) {
