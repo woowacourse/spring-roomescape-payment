@@ -311,7 +311,7 @@
           "name": "lini",
           "email": "lini@email.com"
         },
-        "status": "예약"
+        "status": "예약 대기"
     }
     ```
   - 추가 실패 : 이미 예약 혹은 예약 대기가 존재 오류
@@ -375,7 +375,7 @@
     HTTP/1.1 400
 
     {
-    "message": "예약은 삭제할 수 없습니다\. 관리자에게 문의해주세요."
+    "message": "예약은 삭제할 수 없습니다. 관리자에게 문의해주세요."
     }
     ```
   - 삭제 실패: 일반 사용자가 본인 예약 대기 외의 것을 삭제 시도
@@ -796,7 +796,7 @@
     }
   ]
   ```
-  - 사용자는 권한 없음
+  - 어드민 외에는 권한 없음
     ```
       HTTP/1.1 403
 
@@ -807,7 +807,7 @@
 
 ### 사용자 예약 조회
 - http method: GET
-- uri: /reservations-mine
+- uri: /members/reservations
 - request
 ```
 GET /members/reservations HTTP/1.1
@@ -817,7 +817,7 @@ host: localhost:8080
 
 - response
 ```
-HTTP/1.1 200
+HTTP/1.1 200 OK
 Content-Type: application/json
 
 [
@@ -826,21 +826,42 @@ Content-Type: application/json
     "theme": "테마1",
     "date": "2024-03-01",
     "time": "10:00",
-    "status": "예약"
+    "reservationStatus": {
+      "status": "예약",
+      "rank": 1
+    },
+    "payment": {
+      "paymentKey": "tgon_234567890"
+      "amount": 1000
+    }
   },
   {
     "reservationId": 2,
     "theme": "테마2",
     "date": "2024-03-01",
     "time": "12:00",
-    "status": "예약"
+    "reservationStatus": {
+      "status": "예약",
+      "rank": 2
+    },
+    "payment": {
+      "paymentKey": "tgon_9876598760"
+      "amount": 1000
+    }
   },
   {
     "reservationId": 3,
     "theme": "테마3",
     "date": "2024-03-01",
     "time": "14:00",
-    "status": "예약"
+    "reservationStatus": {
+      "status": "예약",
+      "rank": 3
+    },
+    "payment": {
+      "paymentKey": "tgon_0986465789"
+      "amount": 1000
+    }
   }
 ]
 ```
