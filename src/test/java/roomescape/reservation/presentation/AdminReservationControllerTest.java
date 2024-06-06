@@ -27,6 +27,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -94,7 +95,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.memberName").value(MIA_NAME))
                 .andExpect(jsonPath("$.time.id").value(1L))
                 .andExpect(jsonPath("$.time.startAt").value(MIA_RESERVATION_TIME.toString()))
-                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/create/success"));
     }
 
     @Test
@@ -115,7 +117,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].time.id").value(1L))
                 .andExpect(jsonPath("$[0].time.startAt").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].theme.name").value(WOOTECO_THEME_NAME))
-                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/find-all/success"));
     }
 
     @Test
@@ -141,7 +144,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].time.id").value(1L))
                 .andExpect(jsonPath("$[0].time.startAt").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].theme.name").value(WOOTECO_THEME_NAME))
-                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/search/success"));
     }
 
     @Test
@@ -155,7 +159,8 @@ class AdminReservationControllerTest extends ControllerTest {
                         .param("toDate", MIA_RESERVATION_DATE.toString()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("admin-reservations/search/fail/null-parameter"));
     }
 
     @Test
@@ -170,6 +175,7 @@ class AdminReservationControllerTest extends ControllerTest {
         mockMvc.perform(delete("/admin/reservations/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("admin-reservations/delete/success"));
     }
 }

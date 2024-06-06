@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -58,7 +59,8 @@ class MemberControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(MIA_NAME))
-                .andExpect(jsonPath("$.email").value(MIA_EMAIL));
+                .andExpect(jsonPath("$.email").value(MIA_EMAIL))
+                .andDo(document("members/join/success"));
     }
 
     @ParameterizedTest
@@ -74,7 +76,8 @@ class MemberControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("members/join/fail/null-field"));
     }
 
     private static Stream<MemberJoinRequest> invalidRequests() {
@@ -98,6 +101,7 @@ class MemberControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value(MIA_NAME))
-                .andExpect(jsonPath("$[1].name").value(TOMMY_NAME));
+                .andExpect(jsonPath("$[1].name").value(TOMMY_NAME))
+                .andDo(document("members/find-all/success"));
     }
 }

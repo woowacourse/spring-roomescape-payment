@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,7 +64,8 @@ class ThemeControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.name").value(WOOTECO_THEME_NAME))
                 .andExpect(jsonPath("$.description").value(WOOTECO_THEME_DESCRIPTION))
                 .andExpect(jsonPath("$.thumbnail").value(THEME_THUMBNAIL))
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andDo(document("themes/create/success"));
     }
 
     @ParameterizedTest
@@ -80,7 +82,8 @@ class ThemeControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("themes/create/fail/invalid-name"));
     }
 
     @Test
@@ -98,7 +101,8 @@ class ThemeControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].name").value(WOOTECO_THEME_NAME))
                 .andExpect(jsonPath("$[0].description").value(WOOTECO_THEME_DESCRIPTION))
                 .andExpect(jsonPath("$[0].thumbnail").value(THEME_THUMBNAIL))
-                .andExpect(jsonPath("$[0].id").value(1L));
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andDo(document("themes/find-all/success"));
     }
 
     @Test
@@ -112,7 +116,8 @@ class ThemeControllerTest extends ControllerTest {
         // when & then
         mockMvc.perform(delete("/themes/{id}", anyLong()))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("themes/delete/success"));
     }
 
     @Test
@@ -134,6 +139,7 @@ class ThemeControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[1].name").value(HORROR_THEME_NAME))
                 .andExpect(jsonPath("$[1].description").value(HORROR_THEME_DESCRIPTION))
                 .andExpect(jsonPath("$[1].thumbnail").value(THEME_THUMBNAIL))
-                .andExpect(jsonPath("$[1].id").value(2L));
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andDo(document("themes/find-all-popular/success"));
     }
 }

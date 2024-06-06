@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,7 +62,8 @@ class ReservationTimeControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.startAt").value(MIA_RESERVATION_TIME.toString()));
+                .andExpect(jsonPath("$.startAt").value(MIA_RESERVATION_TIME.toString()))
+                .andDo(document("times/create/success"));
     }
 
     @Test
@@ -76,7 +78,8 @@ class ReservationTimeControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("times/create/fail/time-unit"));
     }
 
     @Test
@@ -91,7 +94,8 @@ class ReservationTimeControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("times/create/fail/null-field"));
     }
 
     @Test
@@ -110,7 +114,8 @@ class ReservationTimeControllerTest extends ControllerTest {
                         .content(invalidFormatRequest))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("times/create/fail/time-format"));
     }
 
     @Test
@@ -124,7 +129,8 @@ class ReservationTimeControllerTest extends ControllerTest {
         mockMvc.perform(get("/times").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].startAt").value(MIA_RESERVATION_TIME.toString()));
+                .andExpect(jsonPath("$[0].startAt").value(MIA_RESERVATION_TIME.toString()))
+                .andDo(document("times/find-all/success"));
     }
 
     @Test
@@ -139,7 +145,8 @@ class ReservationTimeControllerTest extends ControllerTest {
         mockMvc.perform(delete("/times/{id}", anyLong())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("times/delete/success"));
     }
 
     @Test
@@ -158,7 +165,8 @@ class ReservationTimeControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].startAt").value(MIA_RESERVATION_TIME.toString()))
-                .andExpect(jsonPath("$[0].isReserved").value(true));
+                .andExpect(jsonPath("$[0].isReserved").value(true))
+                .andDo(document("times/find-all-available/success"));
     }
 
     @Test
@@ -175,6 +183,7 @@ class ReservationTimeControllerTest extends ControllerTest {
                         .param("themeId", Long.toString(themeId)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("times/find-all-available/fail/parameter-format"));
     }
 }

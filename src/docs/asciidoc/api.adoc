@@ -1,0 +1,126 @@
+= 방탈출 예약 프로그램 API 명세
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:sectnums:
+:docinfo: shared-head
+
+= 테마 기능
+== 생성
+=== 성공
+operation::themes/create/success[snippets='http-request,http-response']
+=== 실패
+==== 테마 이름이 비어 있는 경우
+operation::themes/create/fail/invalid-name[snippets='http-request,http-response']
+== 목록 조회
+=== 성공
+operation::themes/find-all/success[snippets='http-request,http-response']
+== 삭제
+=== 성공
+operation::themes/delete/success[snippets='http-request,http-response']
+== 인기 테마 목록 조회
+operation::themes/find-all-popular/success[snippets='http-request,http-response']
+
+= 예약 시간 기능
+== 생성
+=== 성공
+operation::times/create/success[snippets='http-request,http-response']
+=== 실패
+==== 시간 단위가 10분이 아닐 경우
+operation::times/create/fail/time-unit[snippets='http-request,http-response']
+==== 필드가 하나라도 존재하지 않는 경우
+operation::times/create/fail/null-field[snippets='http-request,http-response']
+==== 시간 형식이 올바르지 않은 경우
+operation::times/create/fail/time-format[snippets='http-request,http-response']
+== 목록 조회
+=== 성공
+operation::times/find-all/success[snippets='http-request,http-response']
+== 삭제
+=== 성공
+operation::times/delete/success[snippets='http-request,http-response']
+== 특정 날짜, 테마의 예약 가능 시간 조회
+=== 성공
+operation::times/find-all-available/success[snippets='http-request,http-response']
+=== 실패
+==== 쿼리스트링의 날짜 형식이 올바르지 않은 경우
+operation::times/find-all-available/fail/parameter-format[snippets='http-request,http-response']
+
+= 사용자 기능
+== 회원가입
+=== 성공
+operation::members/join/success[snippets='http-request,http-response']
+=== 실패
+==== 필드가 하나라도 존재하지 않는 경우
+operation::members/join/fail/null-field[snippets='http-request,http-response']
+== 목록 조회
+operation::members/find-all/success[snippets='http-request,http-response']
+
+= 사용자 예약 기능
+== 생성
+=== 성공
+operation::reservations/create/success[snippets='http-request,http-response']
+=== 실패
+==== 필드가 하나라도 존재하지 않는 경우
+operation::reservations/create/fail/null-field[snippets='http-request,http-response']
+==== 예약 날짜 형식이 올바르지 않은 경우
+operation::reservations/create/fail/date-format[snippets='http-request,http-response']
+==== 동일한 사용자가 중복 예약할 경우
+operation::reservations/create/fail/duplicated-reservation[snippets='http-request,http-response']
+==== 존재하지 않는 시간/테마로 예약할 경우
+operation::reservations/create/fail/time-not-found[snippets='http-request,http-response']
+== 사용자 예약 목록 조회
+=== 성공
+operation::reservations/find-mine/success[snippets='http-request,http-response']
+== 예약 대기 삭제
+=== 성공
+operation::reservations/delete/success[snippets='http-request,http-response']
+=== 실패
+==== 예약자가 아닌 사용자가 삭제할 경우
+operation::reservations/delete/fail/permission[snippets='http-request,http-response']
+
+= 관리자 예약 기능
+== 생성
+=== 성공
+operation::admin-reservations/create/success[snippets='http-request,http-response']
+== 예약 목록 조회
+=== 성공
+operation::admin-reservations/find-all/success[snippets='http-request,http-response']
+== 사용자, 테마, 예약 날짜로 검색
+=== 성공
+operation::admin-reservations/search/success[snippets='http-request,http-response']
+=== 실패
+==== 쿼리스트링이 하나라도 존재하지 않는 경우
+operation::admin-reservations/search/fail/null-parameter[snippets='http-request,http-response']
+== 예약 삭제
+=== 성공
+operation::admin-reservations/delete/success[snippets='http-request,http-response']
+== 대기 예약 목록 조회
+=== 성공
+operation::admin-waiting-reservations/find-all/success[snippets='http-request,http-response']
+== 대기 예약 삭제
+=== 성공
+operation::admin-waiting-reservations/delete/success[snippets='http-request,http-response']
+== 대기 예약 승인
+=== 성공
+operation::admin-waiting-reservations/approve/success[snippets='http-request,http-response']
+
+= 인증
+== 로그인
+=== 성공
+operation::auth/login/success[snippets='http-request,http-response']
+=== 실패
+=== 필드가 하나라도 없는 경우
+operation::auth/login/fail/null-field[snippets='http-request,http-response']
+=== 존재하지 않는 이메일 혹은 틀린 비밀번호인 경우
+operation::auth/login/fail/not-existing-info[snippets='http-request,http-response']
+== 정보 조회
+=== 성공
+operation::auth/find/success[snippets='http-request,http-response']
+=== 실패
+==== 유효하지 않은 토큰인 경우
+operation::auth/find/fail/invalid-token[snippets='http-request,http-response']
+==== 토큰이 없는 경우
+operation::auth/find/fail/without-token[snippets='http-request,http-response']
