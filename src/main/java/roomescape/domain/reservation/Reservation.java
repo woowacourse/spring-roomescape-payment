@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -111,8 +110,11 @@ public class Reservation {
         return this.status == Status.CANCELED;
     }
 
-    public Optional<Payment> findPayment() {
-        return Optional.ofNullable(payment);
+    public Payment getPayment() {
+        if (this.payment == null) {
+            throw new RoomEscapeException("결제 정보가 없습니다.");
+        }
+        return payment;
     }
 
     public void completePayment(Payment payment) {

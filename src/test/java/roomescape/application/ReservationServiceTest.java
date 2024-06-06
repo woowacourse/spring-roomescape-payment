@@ -25,6 +25,7 @@ import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.AuthorizationException;
+import roomescape.exception.RoomEscapeException;
 import roomescape.fixture.CommonFixture;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationDetailFixture;
@@ -86,7 +87,8 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
-            softly.assertThat(reservation.findPayment()).isNotEmpty();
+            softly.assertThatCode(reservation::getPayment)
+                    .doesNotThrowAnyException();
         });
     }
 
@@ -146,7 +148,9 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.WAITING);
-            softly.assertThat(reservation.findPayment()).isEmpty();
+            softly.assertThatThrownBy(reservation::getPayment)
+                    .isInstanceOf(RoomEscapeException.class)
+                    .hasMessage("결제 정보가 없습니다.");
         });
     }
 
@@ -170,7 +174,8 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.getReservation(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
-            softly.assertThat(reservation.findPayment()).isNotEmpty();
+            softly.assertThatCode(reservation::getPayment)
+                    .doesNotThrowAnyException();
         });
     }
 
