@@ -7,7 +7,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
+import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
 import roomescape.core.domain.Theme;
@@ -32,6 +35,7 @@ public class ReservationService {
     protected static final String RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약입니다.";
     protected static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약만 취소할 수 있습니다.";
     protected static final String NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE = "관리자만 예약을 취소할 수 있습니다.";
+    public static final String PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE = "해당 예약의 결제 이력이 존재하지 않습니다.";
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -69,7 +73,7 @@ public class ReservationService {
         final ReservationTime reservationTime = getReservationTimeById(request.getTimeId());
         final Theme theme = getThemeById(request.getThemeId());
 
-        final Reservation reservation = new Reservation(member, date, reservationTime, theme);
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme, ReservationStatus.BOOKED);
 
         validateDuplicatedReservation(reservation, reservationTime);
 
@@ -92,8 +96,8 @@ public class ReservationService {
     }
 
     private void validateDuplicatedReservation(final Reservation reservation, final ReservationTime reservationTime) {
-        final Integer reservationCount = reservationRepository.countByDateAndTimeAndTheme(
-                reservation.getDate(), reservationTime, reservation.getTheme());
+        final Integer reservationCount = reservationRepository.countByDateAndTimeAndThemeAndStatus(
+                reservation.getDate(), reservationTime, reservation.getTheme(), ReservationStatus.BOOKED);
         if (reservationCount > 0) {
             throw new IllegalArgumentException(ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE);
         }
@@ -103,6 +107,7 @@ public class ReservationService {
     public List<ReservationResponse> findAll() {
         return reservationRepository.findAll()
                 .stream()
+                .filter(reservation -> reservation.getStatus().equals(ReservationStatus.BOOKED))
                 .map(ReservationResponse::new)
                 .toList();
     }
@@ -135,9 +140,20 @@ public class ReservationService {
         return reservationRepository.findAllByMember(member)
                 .stream()
                 .filter(paymentRepository::existsByReservation)
-                .map(reservation -> MyReservationResponse.from(reservation,
-                        paymentRepository.findByReservation(reservation)))
+                .filter(reservation -> getPaymentByReservation(reservation)
+                        .getStatus()
+                        .equals(PaymentStatus.CONFIRMED))
+                .map(this::getMyReservationResponse)
                 .toList();
+    }
+
+    private Payment getPaymentByReservation(final Reservation reservation) {
+        return paymentRepository.findByReservation(reservation)
+                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE));
+    }
+
+    private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
+        return MyReservationResponse.from(reservation, getPaymentByReservation(reservation));
     }
 
     private List<MyReservationResponse> getNonPaidReservationResponses(final Member member) {
@@ -173,7 +189,7 @@ public class ReservationService {
             throw new IllegalArgumentException(RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE);
         }
 
-        reservationRepository.delete(reservation);
+        reservation.cancel();
         changeFirstWaitingToReservation(reservation);
     }
 
@@ -187,7 +203,8 @@ public class ReservationService {
             final Member member = waiting.getMember();
             final String dateString = date.format(DateTimeFormatter.ISO_DATE);
 
-            final Reservation nextReservation = new Reservation(member, dateString, time, theme);
+            final Reservation nextReservation = new Reservation(member, dateString, time, theme,
+                    ReservationStatus.BOOKED);
 
             waitingRepository.delete(waiting);
             reservationRepository.save(nextReservation);
@@ -205,7 +222,7 @@ public class ReservationService {
             throw new IllegalArgumentException(NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE);
         }
 
-        reservationRepository.delete(reservation);
+        reservation.cancel();
         changeFirstWaitingToReservation(reservation);
     }
 }
