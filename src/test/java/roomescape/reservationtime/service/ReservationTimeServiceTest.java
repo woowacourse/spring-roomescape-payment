@@ -35,8 +35,6 @@ import roomescape.vo.Name;
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceTest {
 
-    private static final LocalTime CURRENT_TIME = LocalTime.now();
-
     private final ReservationTime time = new ReservationTime(1L, LocalTime.of(17, 3));
 
     @InjectMocks
@@ -77,7 +75,7 @@ class ReservationTimeServiceTest {
         when(reservationTimeRepository.findByStartAt(any()))
                 .thenReturn(Optional.of(time));
 
-        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(CURRENT_TIME);
+        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.of(13,12));
         assertThatThrownBy(() -> reservationTimeService.addReservationTime(reservationTimeRequest))
                 .isExactlyInstanceOf(RoomEscapeException.class)
                 .hasMessageContaining("이미 존재하는 예약 시간입니다.");
@@ -98,7 +96,7 @@ class ReservationTimeServiceTest {
     void validateReservationExistence_ShouldThrowException_WhenReservationExistAtTime() {
         List<Reservation> reservations = List.of(new Reservation(
                 LocalDate.now().plusDays(1),
-                new ReservationTime(1L, LocalTime.now()),
+                new ReservationTime(1L, LocalTime.of(13,10)),
                 new Theme(1L, new Name("테스트 테마"), "테마 설명", "썸네일"),
                 new Member(1L, new Name("레모네"), "lemone@gmail.com", "lemon12", MemberRole.MEMBER))
         );
