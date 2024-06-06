@@ -49,7 +49,7 @@ import static roomescape.member.domain.Role.USER;
 @Import(TestClientConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
-    protected static final PaymentConfirmRequest paymentConfirmRequest =
+    public static final PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST =
             new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
 
     @LocalServerPort
@@ -111,7 +111,7 @@ public abstract class AcceptanceTest {
     }
 
     protected Long createTestBooking(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
-        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)

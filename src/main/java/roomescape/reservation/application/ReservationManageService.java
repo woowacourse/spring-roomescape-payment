@@ -4,8 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentConfirmRequest;
-import roomescape.payment.pg.TossPaymentsClient;
-import roomescape.payment.pg.TossPaymentsConfirmRequest;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
@@ -17,11 +17,11 @@ public abstract class ReservationManageService {
     protected static final int MAX_RESERVATION_NUMBER_IN_TIME_SLOT = 1;
 
     protected final ReservationRepository reservationRepository;
-    private final TossPaymentsClient paymentsClient;
+    private final PaymentService paymentService;
 
-    public ReservationManageService(ReservationRepository reservationRepository, TossPaymentsClient paymentsClient) {
+    public ReservationManageService(ReservationRepository reservationRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
-        this.paymentsClient = paymentsClient;
+        this.paymentService = paymentService;
     }
 
     abstract protected void correctReservationStatus(int bookingCount, Reservation reservation);
@@ -35,8 +35,7 @@ public abstract class ReservationManageService {
     @Transactional
     public Reservation create(Reservation reservation, PaymentConfirmRequest paymentConfirmRequest) {
         Reservation createdReservation = create(reservation);
-        TossPaymentsConfirmRequest tossPaymentsConfirmRequest = new TossPaymentsConfirmRequest(paymentConfirmRequest);
-        paymentsClient.confirm(tossPaymentsConfirmRequest);
+        paymentService.confirm(paymentConfirmRequest, new PaymentProduct(createdReservation.getId()));
         return createdReservation;
     }
 

@@ -45,7 +45,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -111,7 +111,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         createTestReservation(MIA_RESERVATION_DATE, timeId, themeId, token, BOOKING);
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -141,7 +141,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
 
         // when
         for (int i = 0; i < threadCount; i++) {
@@ -284,7 +284,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(null, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -314,7 +314,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
