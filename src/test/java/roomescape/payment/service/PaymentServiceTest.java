@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,8 +63,8 @@ class PaymentServiceTest {
     void cancelPayment() {
         doNothing().when(paymentRestClient).cancelPayment("paymentKey");
         when(paymentRepository.findByReservation_Id(1L))
-                .thenReturn(new Payment(RESERVATION, "paymentKey", BigDecimal.valueOf(1000), "orderId",
-                        LocalDateTime.now()));
+                .thenReturn(Optional.of(new Payment(RESERVATION, "paymentKey", BigDecimal.valueOf(1000), "orderId",
+                        LocalDateTime.now())));
 
         assertThatCode(() -> paymentService.cancelPayment(1L))
                 .doesNotThrowAnyException();

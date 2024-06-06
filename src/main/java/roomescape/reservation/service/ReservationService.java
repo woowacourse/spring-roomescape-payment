@@ -62,8 +62,14 @@ public class ReservationService {
     public List<MyReservationWaitingResponse> findMyReservations(Long memberId) {
         return reservationRepository.findByMember_id(memberId)
                 .stream()
-                .map(MyReservationWaitingResponse::from)
+                .map(this::toMyReservationWaitingResponse)
                 .toList();
+    }
+
+    private MyReservationWaitingResponse toMyReservationWaitingResponse(Reservation reservation) {
+        return paymentService.findPaymentByReservation(reservation)
+                .map(payment -> MyReservationWaitingResponse.from(reservation, payment))
+                .orElseGet(() -> MyReservationWaitingResponse.from(reservation));
     }
 
     public ReservationResponse createAdminReservation(AdminReservationCreateRequest request) {

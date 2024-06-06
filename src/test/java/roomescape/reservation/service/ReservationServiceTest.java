@@ -69,12 +69,14 @@ class ReservationServiceTest {
                         1L, new MemberResponse(1L, "브라운"),
                         LocalDate.of(2024, 8, 15),
                         new TimeResponse(1L, LocalTime.of(19, 0)),
-                        new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")),
+                        new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                        ReservationStatus.RESERVED.getName()),
                 new ReservationResponse(
                         2L, new MemberResponse(2L, "브리"),
                         LocalDate.of(2024, 8, 20),
                         new TimeResponse(1L, LocalTime.of(19, 0)),
-                        new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg")));
+                        new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                        ReservationStatus.RESERVED.getName()));
 
         List<ReservationResponse> actual = reservationService.findReservations();
 
@@ -131,7 +133,8 @@ class ReservationServiceTest {
         ReservationResponse expected = new ReservationResponse(
                 1L, new MemberResponse(1L, "브라운"), LocalDate.of(2024, 8, 15),
                 new TimeResponse(1L, LocalTime.of(19, 0)),
-                new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"));
+                new ThemeResponse(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"),
+                ReservationStatus.RESERVED.getName());
 
         ReservationResponse actual = reservationService.createAdminReservation(request);
 

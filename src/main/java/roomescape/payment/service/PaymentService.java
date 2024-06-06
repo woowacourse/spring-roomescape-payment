@@ -1,12 +1,16 @@
 package roomescape.payment.service;
 
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRestClient;
 import roomescape.payment.dto.PaymentCreateRequest;
 import roomescape.payment.dto.RestClientPaymentApproveResponse;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.Reservation;
 
 @Service
 public class PaymentService {
@@ -27,8 +31,14 @@ public class PaymentService {
     }
 
     public void cancelPayment(Long reservationId) {
-        Payment payment = paymentRepository.findByReservation_Id(reservationId);
+        Payment payment = paymentRepository.findByReservation_Id(reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "결제되지 않은 예약이라 취소가 불가능합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
         restClient.cancelPayment(payment.getPaymentKey());
         paymentRepository.deleteByReservation_Id(payment.getReservationId());
+    }
+
+    public Optional<Payment> findPaymentByReservation(Reservation reservation) {
+        return paymentRepository.findByReservation_Id(reservation.getId());
     }
 }
