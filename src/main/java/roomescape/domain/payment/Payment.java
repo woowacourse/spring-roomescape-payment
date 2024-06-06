@@ -52,6 +52,18 @@ public class Payment {
         this.amount = amount;
     }
 
+    public boolean samePaymentKey(final String paymentKey) {
+        return this.paymentKey.equals(paymentKey);
+    }
+
+    public boolean sameOrderId(final String orderId) {
+        return this.orderId.equals(orderId);
+    }
+
+    public boolean sameAmount(final Long amount) {
+        return this.amount.equals(amount);
+    }
+
     public Long getId() {
         return id;
     }

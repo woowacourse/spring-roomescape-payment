@@ -6,6 +6,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.payment.PaymentConfirmResponse;
 
 @Component
 public class TossPaymentClient {
@@ -21,11 +22,13 @@ public class TossPaymentClient {
         this.errorHandler = errorHandler;
     }
 
-    public void confirm(final PaymentConfirmRequest paymentConfirmRequest) {
-        restClient.post()
+    public PaymentConfirmResponse confirm(final PaymentConfirmRequest paymentConfirmRequest) {
+        return restClient.post()
                 .uri(confirmUri)
                 .body(paymentConfirmRequest)
                 .retrieve()
-                .onStatus(errorHandler);
+                .onStatus(errorHandler)
+                .toEntity(PaymentConfirmResponse.class)
+                .getBody();
     }
 }
