@@ -33,7 +33,7 @@ class PageAcceptanceTest extends AcceptanceTest {
     @ValueSource(strings = {"/", "/reservation", "/login", "/reservation-mine"})
     @DisplayName("사용자가 사용자 페이지에 접근하면 200을 응답한다.")
     void respondOkWhenMemberAccessMemberPage(String path) {
-        assertGetResponse(path, 200)
+        assertGetResponse(path, 200, "page/access-member-page")
                 .body(containsString("<!DOCTYPE html>"));
     }
 }

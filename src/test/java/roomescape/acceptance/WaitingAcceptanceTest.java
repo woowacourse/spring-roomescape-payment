@@ -23,7 +23,8 @@ public class WaitingAcceptanceTest extends AcceptanceTest {
         final ReservationSaveRequest request
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
-        final ReservationResponse response = assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/waitings", 201)
+        final ReservationResponse response = assertPostResponseWithToken(
+                request, MEMBER_TENNY_EMAIL, "/waitings", 201, "waitings/create")
                 .extract().as(ReservationResponse.class);
 
         assertAll(() -> {

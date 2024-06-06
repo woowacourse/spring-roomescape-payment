@@ -1,15 +1,24 @@
 package roomescape.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.component.TossPaymentClient;
+import roomescape.config.RestDocsConfiguration;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
@@ -18,22 +27,40 @@ import roomescape.dto.reservation.ReservationWaitingSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static roomescape.TestFixture.*;
+import static roomescape.config.ApiDocumentUtils.getDocumentRequest;
+import static roomescape.config.ApiDocumentUtils.getDocumentResponse;
 
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import(RestDocsConfiguration.class)
+@AutoConfigureRestDocs
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 abstract class AcceptanceTest {
 
+    public static final String BASE_URL = "http://localhost";
+
+    protected RequestSpecification specification;
+
+    @MockBean
+    private TossPaymentClient paymentClient;
+
     @LocalServerPort
     private int port;
 
-    @MockBean
-    TossPaymentClient paymentClient;
 
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
         paymentClient.confirm(any());
+
+        this.specification = new RequestSpecBuilder()
+                .setPort(port)
+                .setBaseUri(BASE_URL)
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     protected Long saveReservationTime() {
@@ -140,9 +167,10 @@ abstract class AcceptanceTest {
     }
 
     protected ValidatableResponse assertPostResponseWithToken(final Object request, final String email,
-                                                              final String path, final int statusCode) {
+                                                              final String path, final int statusCode, final String documentId) {
         final String accessToken = getAccessToken(email);
-        return RestAssured.given().log().all()
+        return RestAssured.given(this.specification).log().all()
+                .filter(document(documentId, getDocumentRequest(), getDocumentResponse()))
                 .cookie("token", accessToken)
                 .contentType(ContentType.JSON)
                 .body(request)
@@ -152,7 +180,7 @@ abstract class AcceptanceTest {
     }
 
     protected ValidatableResponse assertPostResponse(final Object request, final String path, final int statusCode) {
-        return RestAssured.given().log().all()
+        return RestAssured.given(this.specification).log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post(path)
@@ -160,15 +188,16 @@ abstract class AcceptanceTest {
                 .statusCode(statusCode);
     }
 
-    protected ValidatableResponse assertGetResponse(final String path, final int statusCode) {
-        return RestAssured.given().log().all()
+    protected ValidatableResponse assertGetResponse(final String path, final int statusCode, final String documentId) {
+        return RestAssured.given(this.specification).log().all()
+                .filter(document(documentId, getDocumentRequest(), getDocumentResponse()))
                 .when().get(path)
                 .then().log().all()
                 .statusCode(statusCode);
     }
 
     protected ValidatableResponse assertGetResponseWithToken(final String token, final String path, final int statusCode) {
-        return RestAssured.given().log().all()
+        return RestAssured.given(this.specification).log().all()
                 .cookie("token", token)
                 .when().get(path)
                 .then().log().all()
@@ -176,7 +205,7 @@ abstract class AcceptanceTest {
     }
 
     protected void assertDeleteResponse(final String path, final Long id, final int statusCode) {
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .when().delete(path + id)
                 .then().log().all()
                 .statusCode(statusCode);
