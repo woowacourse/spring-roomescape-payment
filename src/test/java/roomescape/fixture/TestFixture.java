@@ -3,8 +3,11 @@ package roomescape.fixture;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Name;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.payment.PaymentConfirmRequest;
 
 import java.time.LocalDate;
 
@@ -38,6 +41,9 @@ public class TestFixture {
     public static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
     public static final String ORDER_ID = "MC4wNDYzMzA0OTc2MDgy";
     public static final Long AMOUNT = 1000L;
+
+    private TestFixture() {
+    }
 
     public static Member ADMIN() {
         return new Member(new Name(ADMIN_NAME), ADMIN_EMAIL, ADMIN_PASSWORD, Role.ADMIN);
@@ -95,6 +101,11 @@ public class TestFixture {
         return new Theme(id, THEME_DETECTIVE_NAME, THEME_DETECTIVE_DESCRIPTION, THEME_DETECTIVE_THUMBNAIL);
     }
 
-    private TestFixture() {
+    public static Reservation RESERVATION_ONE() {
+        return new Reservation(1L, ADMIN(1L), LocalDate.now(), RESERVATION_TIME_SIX(1L), THEME_HORROR(1L), ReservationStatus.RESERVED);
+    }
+
+    public static PaymentConfirmRequest paymentConfirmRequest() {
+        return new PaymentConfirmRequest("paymentKey", "orderId", 1000L);
     }
 }
