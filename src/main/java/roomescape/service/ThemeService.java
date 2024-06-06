@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Theme;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
@@ -13,6 +14,7 @@ import roomescape.service.request.ThemeSaveAppRequest;
 import roomescape.service.response.ThemeAppResponse;
 
 @Service
+@Transactional(readOnly = true)
 public class ThemeService {
 
     private static final int MAX_POPULAR_THEME_COUNT = 10;
@@ -40,6 +42,7 @@ public class ThemeService {
         }
     }
 
+    @Transactional
     public void delete(Long id) {
         if (reservationRepository.existsByThemeId(id)) {
             throw new RoomescapeException(RoomescapeErrorCode.ALREADY_RESERVED);
