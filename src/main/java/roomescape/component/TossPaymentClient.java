@@ -24,7 +24,7 @@ public class TossPaymentClient {
     @Value("${toss.payments.secret}")
     private String secret;
 
-    public TossPaymentClient(RestClient restClient, ResponseErrorHandler errorHandler) {
+    public TossPaymentClient(final RestClient restClient, final ResponseErrorHandler errorHandler) {
         this.restClient = restClient;
         this.errorHandler = errorHandler;
     }
