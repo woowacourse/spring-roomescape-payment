@@ -83,7 +83,10 @@ public class ReservationTimeService {
     }
 
     private void validateNotExistReservationTime(long id) {
-        getById(id);
+        boolean exists = reservationTimeRepository.existsById(id);
+        if (!exists) {
+            throw new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id));
+        }
     }
 
     private List<ReservationTime> filterNotBookedTimes(List<ReservationTime> times, List<ReservationTime> bookedTimes) {
