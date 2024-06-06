@@ -1,6 +1,7 @@
 # 방탈출 기능 요구 사항
 
-- [API 요청 폴더 바로가기](api-test)
+### API 문서화
+- [x] Swagger API를 사용해 문서화한다.
 
 ### 📌 reservation (예약)
 - [전체 회원 예약 API 요청 파일 바로가기](api-test/reservation-api.http)

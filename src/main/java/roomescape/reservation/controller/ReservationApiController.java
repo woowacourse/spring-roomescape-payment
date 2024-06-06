@@ -1,5 +1,9 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -21,6 +25,7 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "회원 예약 API", description = "방탈출 일반 유저과 관리자의 예약 API 입니다.")
 @RestController
 public class ReservationApiController {
 
@@ -30,6 +35,8 @@ public class ReservationApiController {
         this.reservationService = reservationService;
     }
 
+    @Operation(summary = "전체 예약 조회 API", description = "전체 예약을 상태별로 조회 합니다.")
+    @Parameter(name = "status", description = "예약 상태")
     @GetMapping("/reservations")
     public ResponseEntity<MultipleResponses<ReservationResponse>> findAll(
             @RequestParam(name = "status", defaultValue = "SUCCESS") ReservationStatus reservationStatus
@@ -39,6 +46,7 @@ public class ReservationApiController {
         return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
     }
 
+    @Operation(summary = "회원 별 예약 조회 API", description = "회원 별 예약을 조회 합니다.")
     @GetMapping("/reservations/mine")
     public ResponseEntity<MultipleResponses<MemberReservationResponse>> findMemberReservations(LoginMember loginMember) {
         List<MemberReservationResponse> memberReservationResponses = reservationService.findMemberReservations(loginMember);
@@ -46,6 +54,7 @@ public class ReservationApiController {
         return ResponseEntity.ok(new MultipleResponses<>(memberReservationResponses));
     }
 
+    @Operation(summary = "일반 유저 예약 추가 API", description = "일반 유저의 예약을 추가 합니다.")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
@@ -57,6 +66,7 @@ public class ReservationApiController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "예약 대기 추가 API", description = "예약 대기를 추가 합니다.")
     @PostMapping("/reservations/waiting")
     public ResponseEntity<ReservationResponse> saveReservationWaiting(
             @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
@@ -68,6 +78,8 @@ public class ReservationApiController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "예약 취소 API", description = "예약을 상태를 취소로 변경합니다.")
+    @Parameter(name = "id", description = "취소할 예약의 id", schema = @Schema(type = "integer", example = "1"))
     @PatchMapping("/reservations/{id}")
     public ResponseEntity<Void> cancel(@PathVariable("id") Long id, @RequestBody ReservationCancelReason reservationCancelReason) {
         reservationService.cancelById(id, reservationCancelReason);
@@ -75,6 +87,8 @@ public class ReservationApiController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "예약 삭제 API", description = "예약 데이터를 삭제 합니다.")
+    @Parameter(name = "id", description = "삭제할 예약의 id", schema = @Schema(type = "integer", example = "1"))
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         reservationService.delete(id);
