@@ -30,4 +30,9 @@ public class AdminPageController {
     public String adminThemePage() {
         return "admin/theme";
     }
+
+    @GetMapping("/admin/payment")
+    public String adminPaymentPage() {
+        return "admin/payment";
+    }
 }
