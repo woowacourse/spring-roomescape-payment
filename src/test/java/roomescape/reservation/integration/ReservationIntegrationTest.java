@@ -17,8 +17,6 @@ import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
-import java.time.LocalDateTime;
-
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 
@@ -114,8 +112,7 @@ class ReservationIntegrationTest extends IntegrationTest {
 
     private PaymentConfirmationFromTossDto getValidPaymentConfirmationFromTossDto() {
         return new PaymentConfirmationFromTossDto(
-                "test-payment-key", "test-order-id", 10000L, "DONE",
-                LocalDateTime.now().plusDays(7L)
+                "test-payment-key", "test-order-id", 10000L, "DONE"
         );
     }
 }

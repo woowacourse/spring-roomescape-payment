@@ -20,7 +20,6 @@ import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -118,8 +117,7 @@ class PaymentScenarioTest extends IntegrationTest {
 
     private PaymentConfirmationFromTossDto getValidPaymentConfirmationFromTossDto() {
         return new PaymentConfirmationFromTossDto(
-                "test-payment-key", "test-order-id", 10000L, "DONE",
-                LocalDateTime.now().plusDays(7L)
+                "test-payment-key", "test-order-id", 10000L, "DONE"
         );
     }
 }

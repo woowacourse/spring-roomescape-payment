@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import org.hibernate.annotations.CreationTimestamp;
 import roomescape.member.domain.Member;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
@@ -26,6 +27,7 @@ public class Payment {
     @Column(nullable = false)
     private String externalOrderId;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -38,11 +40,11 @@ public class Payment {
     protected Payment() {}
 
     public Payment(String externalPaymentId, String externalOrderId,
-                   LocalDateTime createdAt, Member member, Reservation reservation) {
+                   Member member, Reservation reservation) {
         this.id = null;
+        this.createdAt = null;
         this.externalPaymentKey = externalPaymentId;
         this.externalOrderId = externalOrderId;
-        this.createdAt = createdAt;
         this.member = member;
         this.reservation = reservation;
     }

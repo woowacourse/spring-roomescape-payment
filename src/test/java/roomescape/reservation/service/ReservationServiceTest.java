@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.TossPaymentClient;
+import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationExceptionCode;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.given;
 
 @Sql(scripts = "/init.sql")
 @Transactional
@@ -93,7 +94,8 @@ class ReservationServiceTest {
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
                 "paymentType", "paymentKey", "orderId", 1000);
         PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
-        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmationToTossDto);
+        given(tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto))
+                .willReturn(getValidPaymentConfirmationFromTossDto());
 
         ReservationResponse reservationResponse = reservationService
                 .addReservation(reservationRequest, 1L);
@@ -159,5 +161,11 @@ class ReservationServiceTest {
 
         assertEquals(ReservationExceptionCode.RESERVATION_DATE_IS_PAST_EXCEPTION.getMessage(),
                 pastDateReservation.getMessage());
+    }
+
+    private PaymentConfirmationFromTossDto getValidPaymentConfirmationFromTossDto() {
+        return new PaymentConfirmationFromTossDto(
+                "test-payment-key", "test-order-id", 10000L, "DONE"
+        );
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
-import roomescape.client.payment.dto.PaymentConfirmFromTossDto;
+import roomescape.client.payment.dto.ErrorResponseFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.PaymentException;
@@ -38,33 +38,30 @@ public class TossPaymentClient implements PaymentClient {
         String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
         String authorizations = "Basic " + encodedBytes;
 
-        var result = restClient.post()
+        return restClient.post()
                 .uri(baseUrl + confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, authorizations)
                 .body(paymentConfirmationToTossDto)
                 .exchange((request, response) -> {
                     handlePaymentConfirmationException(response);
-                    return Objects.requireNonNull(response.bodyTo(PaymentConfirmationFromTossDto.class));
+                    return Objects.requireNonNull(response.bodyTo(PaymentConfirmationFromTossDto.class)); //todo: null 이 응답되면 어떻게 되는지 테스트 코드로 실험
                 });
-
-        System.out.println("무야호" + result);
-        return result;
     }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-            PaymentConfirmFromTossDto paymentConfirmFromTossDto = response.bodyTo(PaymentConfirmFromTossDto.class);
+            ErrorResponseFromTossDto errorResponseBody = response.bodyTo(ErrorResponseFromTossDto.class);
 
-            throw new PaymentException(response.getStatusCode(), getMessage(paymentConfirmFromTossDto));
+            throw new PaymentException(response.getStatusCode(), getMessage(errorResponseBody));
         }
     }
 
-    private String getMessage(PaymentConfirmFromTossDto paymentConfirmFromTossDto) {
-        if(paymentConfirmFromTossDto == null) {
+    private String getMessage(ErrorResponseFromTossDto errorResponseFromTossDto) {
+        if(errorResponseFromTossDto == null) {
             return "응답을 받아오지 못했습니다.";
         }
 
-        return paymentConfirmFromTossDto.message();
+        return errorResponseFromTossDto.message();
     }
 }
