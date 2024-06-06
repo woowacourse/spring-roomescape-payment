@@ -32,7 +32,8 @@ public class PaymentClient {
     private ExchangeFunction<HttpStatusCode> invokeErrorCheck() {
         return (request, response) -> {
             if (response.getStatusCode().isError()) {
-                throw new PaymentException(mapper.readValue(response.getBody(), TossErrorResponse.class));
+                throw new PaymentException(mapper.readValue(response.getBody(), TossErrorResponse.class),
+                        response.getStatusCode());
             }
             return response.getStatusCode();
         };
