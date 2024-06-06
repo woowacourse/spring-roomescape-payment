@@ -41,7 +41,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withBadRequest().body(expectedBody));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest(
+        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
                 "paymentKey",
                 "orderId",
                 BigDecimal.valueOf(1000L),
@@ -49,6 +49,7 @@ class TossPaymentsClientTest {
         );
 
         // when & then
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(paymentConfirmRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(ViolationException.class)
                 .hasMessage("잘못된 요청");
@@ -64,7 +65,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withServerError().body(expectedBody));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest(
+        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
                 "paymentKey",
                 "orderId",
                 BigDecimal.valueOf(1000L),
@@ -72,6 +73,7 @@ class TossPaymentsClientTest {
         );
 
         // when & then
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(paymentConfirmRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(PaymentServerException.class)
                 .hasMessage("내부 서버 오류");

@@ -8,7 +8,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.payment.application.PaymentServerException;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class TossPaymentsClient {
         this.confirmApiPath = confirmApiPath;
     }
 
-    public void confirm(PaymentConfirmRequest request) {
+    public void confirm(TossPaymentsConfirmRequest request) {
         restClient.post()
                 .uri(confirmApiPath)
                 .body(request)

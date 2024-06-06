@@ -52,4 +52,16 @@ public class TossPaymentsConfirmRequest {
             throw new ViolationException("orderId는 영문 대소문자, 숫자, 특수문자 -, _로 이루어져야 합니다.");
         }
     }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
 }

@@ -5,6 +5,7 @@ import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.payment.pg.TossPaymentsClient;
+import roomescape.payment.pg.TossPaymentsConfirmRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
@@ -34,7 +35,8 @@ public abstract class ReservationManageService {
     @Transactional
     public Reservation create(Reservation reservation, PaymentConfirmRequest paymentConfirmRequest) {
         Reservation createdReservation = create(reservation);
-        paymentsClient.confirm(paymentConfirmRequest);
+        TossPaymentsConfirmRequest tossPaymentsConfirmRequest = new TossPaymentsConfirmRequest(paymentConfirmRequest);
+        paymentsClient.confirm(tossPaymentsConfirmRequest);
         return createdReservation;
     }
 
