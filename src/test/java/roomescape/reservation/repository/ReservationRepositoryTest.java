@@ -33,7 +33,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationWithRank;
+import roomescape.reservation.domain.ReservationWithRankAndPayment;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
@@ -112,12 +112,12 @@ class ReservationRepositoryTest {
         reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, Status.WAIT));
         reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, Status.WAIT));
 
-        List<ReservationWithRank> reservationWithRanks = reservationRepository.findReservationWithRanksByMemberId(
+        List<ReservationWithRankAndPayment> reservationWithRankAndPayments = reservationRepository.findReservationWithRanksByMemberId(
                 jojo.getId());
 
         assertAll(
-                () -> assertThat(reservationWithRanks).hasSize(2),
-                () -> assertThat(reservationWithRanks.get(1)
+                () -> assertThat(reservationWithRankAndPayments).hasSize(2),
+                () -> assertThat(reservationWithRankAndPayments.get(1)
                         .getRank())
                         .isEqualTo(2L)
         );

@@ -24,10 +24,12 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.common.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.response.MemberReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationWithRank;
+import roomescape.reservation.domain.ReservationWithRankAndPayment;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -55,6 +57,9 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @AfterEach
     void init() {
@@ -93,14 +98,16 @@ class ReservationServiceTest {
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
         Reservation success = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS));
+        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, success));
+
         reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT));
         Reservation secondWait = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, WAIT));
 
         MemberReservationResponse expectedSuccess = MemberReservationResponse.toResponse(
-                new ReservationWithRank(success, 0)
+                new ReservationWithRankAndPayment(success, 0, payment)
         );
         MemberReservationResponse expectedWait = MemberReservationResponse.toResponse(
-                new ReservationWithRank(secondWait, 2)
+                new ReservationWithRankAndPayment(secondWait, 2, null)
         );
 
         // when

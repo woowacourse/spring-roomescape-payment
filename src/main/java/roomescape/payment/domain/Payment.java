@@ -44,4 +44,12 @@ public class Payment {
         this.amount = amount;
         this.reservation = reservation;
     }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
 }

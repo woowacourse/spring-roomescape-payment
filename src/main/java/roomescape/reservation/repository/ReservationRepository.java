@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationWithRank;
+import roomescape.reservation.domain.ReservationWithRankAndPayment;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 
@@ -23,17 +23,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findTimeIdsByDateAndThemeId(LocalDate date, Long themeId);
 
     @Query("""
-            select new roomescape.reservation.domain.ReservationWithRank(
+            select new roomescape.reservation.domain.ReservationWithRankAndPayment(
             r, (select count(*)
                 from Reservation r2
                 where r2.theme = r.theme
                 and r2.date = r.date
                 and r2.reservationTime = r.reservationTime
-                and r2.id < r.id))
+                and r2.id < r.id), p)
             from Reservation r
+            left join Payment p
+            on r.id = p.reservation.id
             where r.member.id = :memberId
             """)
-    List<ReservationWithRank> findReservationWithRanksByMemberId(Long memberId);
+    List<ReservationWithRankAndPayment> findReservationWithRanksByMemberId(Long memberId);
 
     List<Reservation> findAllByMemberId(Long memberId);
 
