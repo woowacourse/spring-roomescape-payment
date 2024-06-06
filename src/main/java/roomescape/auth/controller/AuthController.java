@@ -16,7 +16,7 @@ import roomescape.auth.dto.response.LoginResponse;
 import roomescape.auth.service.AuthService;
 
 @RestController
-public class AuthController {
+public class AuthController implements AuthControllerApi {
 
     private final AuthorizationManager authorizationManager;
     private final AuthService authService;
