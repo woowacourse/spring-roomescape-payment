@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static roomescape.TestFixture.ADMIN;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.TestFixture.DATE_MAY_NINTH;
+import static roomescape.TestFixture.PAYMENT;
 import static roomescape.TestFixture.RESERVATION_TIME_SIX;
 import static roomescape.TestFixture.START_AT_SEVEN;
 import static roomescape.TestFixture.START_AT_SIX;
@@ -33,7 +34,7 @@ class ReservationTest {
     @Test
     @DisplayName("예약이 생성된다.")
     void createReservation() {
-        assertThatCode(() -> new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC(), "결제완", 1000))
+        assertThatCode(() -> new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC(), PAYMENT()))
                 .doesNotThrowAnyException();
     }
 
@@ -42,7 +43,7 @@ class ReservationTest {
     @DisplayName("예약이 동일한 예약 시간을 갖는지 확인한다.")
     void hasSameDateTime(final LocalDate date, final String time, final boolean expectedResult) {
         // given
-        final Reservation reservation = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC(), "결제완", 1000);
+        final Reservation reservation = new Reservation(TestFixture.MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), TestFixture.THEME_COMIC(), PAYMENT());
 
         // when
         final boolean actual = reservation.hasSameDateTime(date, new ReservationTime(time));
@@ -55,7 +56,7 @@ class ReservationTest {
     @DisplayName("예약이 가능한 날짜와 시간이라면 참이다.")
     void isAvailable_True() {
         // given
-        Reservation reservation = new Reservation(ADMIN(), LocalDate.now(), new ReservationTime(0L, LocalTime.now().plusHours(1)), THEME_COMIC(), "결제완", 1000);
+        Reservation reservation = new Reservation(ADMIN(), LocalDate.now(), new ReservationTime(0L, LocalTime.now().plusHours(1)), THEME_COMIC(), PAYMENT());
 
         // when
         boolean available = reservation.isAvailable();
@@ -68,7 +69,7 @@ class ReservationTest {
     @DisplayName("예약이 불가능한 날짜와 시간이라면 거짓이다.")
     void isAvailableDate_False() {
         // given
-        Reservation reservation = new Reservation(ADMIN(), LocalDate.now(), new ReservationTime(0L, LocalTime.now().minusHours(1)), THEME_COMIC(), "결제완", 1000);
+        Reservation reservation = new Reservation(ADMIN(), LocalDate.now(), new ReservationTime(0L, LocalTime.now().minusHours(1)), THEME_COMIC(), PAYMENT());
 
         // when
         boolean available = reservation.isAvailable();

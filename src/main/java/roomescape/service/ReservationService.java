@@ -2,6 +2,7 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.payment.PaymentResponse;
@@ -74,8 +75,10 @@ public class ReservationService {
     @Transactional
     public MyReservationResponse updatePayment(Long id, PaymentResponse paymentResponse) {
         final Reservation reservation = findReservation(id);
-        reservation.updatePayment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
-        return MyReservationResponse.from(reservation);
+        Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
+        Reservation paidReservation = reservation.withPayment(payment);
+        Reservation saved = reservationRepository.save(paidReservation);
+        return MyReservationResponse.from(saved);
     }
 
     public void checkMyReservation(Long id, LoginMember loginMember) {

@@ -3,6 +3,7 @@ package roomescape;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Name;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Waiting;
@@ -38,6 +39,8 @@ public class TestFixture {
     public static final String THEME_ANIME_NAME = "포켓몬";
     public static final String THEME_ANIME_DESCRIPTION = "매우 귀엽습니다.";
     public static final String THEME_ANIME_THUMBNAIL = "https://i.pinimg.com/474x/b3/aa/d7/b3aad752a5fbda932dd37015bca3047f.jpg";
+    public static final String PAYMENT_KEY = "dummy";
+    public static final int AMOUNT = 1000;
 
     public static Member ADMIN() {
         return new Member(new Name(ADMIN_NAME), ADMIN_EMAIL, ADMIN_PASSWORD, Role.ADMIN);
@@ -99,8 +102,12 @@ public class TestFixture {
         return new Theme(id, THEME_ANIME_NAME, THEME_ANIME_DESCRIPTION, THEME_ANIME_THUMBNAIL);
     }
 
+    public static Payment PAYMENT() {
+        return new Payment(PAYMENT_KEY, AMOUNT);
+    }
+
     public static Reservation RESERVATION() {
-        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완", 1000);
+        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), PAYMENT());
     }
 
     public static Waiting WAITING() {
@@ -108,7 +115,7 @@ public class TestFixture {
     }
 
     public static PaymentResponse DUMMY_PAYMENT_RESPONSE() {
-        return new PaymentResponse("dummy", 0);
+        return new PaymentResponse(PAYMENT_KEY, AMOUNT);
     }
 
 }
