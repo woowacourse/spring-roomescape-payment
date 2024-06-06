@@ -35,8 +35,21 @@ public class Payment {
     protected Payment() {
     }
 
+    public Payment(String paymentKey, String orderId, BigDecimal totalAmount, PaymentStatus status,
+                   Long reservationId) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.reservationId = reservationId;
+    }
+
     public void bindToReservation(Long reservationId) {
         this.reservationId = reservationId;
+    }
+
+    public void cancel(){
+        this.status = PaymentStatus.CANCELED;
     }
 
     public Long getId() {
@@ -59,7 +72,7 @@ public class Payment {
         return status;
     }
 
-    public void cancel(){
-        this.status = PaymentStatus.CANCELED;
+    public Long getReservationId() {
+        return reservationId;
     }
 }

@@ -1,11 +1,14 @@
 package roomescape.util;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.auth.domain.Role;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -46,6 +49,12 @@ public class Fixture {
 
     public static final LocalDate TODAY = LocalDate.now();
     public static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
+
+    public static final String PAYMENT_KEY_1 = "testPaymentKey1";
+    public static final String ORDER_ID_1 = "testOrderId1";
+    public static final BigDecimal AMOUNT = new BigDecimal("1000");
+
+    public static final Payment APPROVED_PAYMENT = new Payment(PAYMENT_KEY_1, ORDER_ID_1, AMOUNT, PaymentStatus.DONE, 1L);
 
     private Fixture() {
     }
