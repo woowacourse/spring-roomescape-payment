@@ -9,6 +9,7 @@ import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.service.PaymentCreateService;
 import roomescape.payment.service.PaymentFindService;
+import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.ReservationResponse;
@@ -22,6 +23,7 @@ public class ReservationPayService {
     private final ReservationCreateService reservationCreateService;
     private final ReservationFindMineService reservationFindMineService;
     private final ReservationDeleteService reservationDeleteService;
+    private final ReservationUpdateService reservationUpdateService;
     private final PaymentCreateService paymentCreateService;
     private final PaymentFindService paymentFindService;
 
@@ -29,10 +31,12 @@ public class ReservationPayService {
                                  ReservationFindMineService reservationFindMineService,
                                  ReservationDeleteService reservationDeleteService,
                                  PaymentCreateService paymentCreateService,
-                                 PaymentFindService paymentFindService) {
+                                 PaymentFindService paymentFindService,
+                                 ReservationUpdateService reservationUpdateService) {
         this.reservationCreateService = reservationCreateService;
         this.reservationFindMineService = reservationFindMineService;
         this.reservationDeleteService = reservationDeleteService;
+        this.reservationUpdateService = reservationUpdateService;
         this.paymentCreateService = paymentCreateService;
         this.paymentFindService = paymentFindService;
     }
@@ -42,6 +46,7 @@ public class ReservationPayService {
         PaymentConfirmRequest paymentConfirmRequest = PaymentConfirmRequest.from(request, reservation.id(), memberId);
         try {
             paymentCreateService.confirmPayment(paymentConfirmRequest);
+            reservationUpdateService.updateReservationPaymentStatus(reservation.id(), PaymentStatus.COMPLETED);
         } catch (PaymentException exception) {
             reservationDeleteService.deleteReservation(reservation.id());
             throw exception;
