@@ -16,7 +16,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
-import roomescape.exception.ExceptionResponse;
+import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
