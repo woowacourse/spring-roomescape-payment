@@ -29,7 +29,8 @@ public class BookingQueryService {
     }
 
     public List<Reservation> findAll() {
-        return reservationRepository.findAllByStatusWithDetails(ReservationStatus.BOOKING);
+        List<ReservationStatus> statusConditions = List.of(ReservationStatus.BOOKING);
+        return reservationRepository.findAllByStatusWithDetails(statusConditions);
     }
 
     public List<Reservation> findAllByMemberIdAndThemeIdAndDateBetween(Long memberId, Long themeId,

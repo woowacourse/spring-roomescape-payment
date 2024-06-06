@@ -45,6 +45,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationPayment> findReservationsByMemberAndStatusWithDetailsAndPayment(@Param(value = "member") Member member,
                                                                                     @Param(value = "status") ReservationStatus status);
 
+    @Query("""
+           SELECT r FROM Reservation r
+           JOIN FETCH r.time
+           JOIN FETCH r.theme
+           WHERE r.member = :member AND r.status = :status
+           """)
+    List<Reservation> findAllByMemberAndStatus(@Param(value = "member") Member member,
+                                               @Param(value = "status") ReservationStatus status);
+
     int countByTime(ReservationTime time);
 
     @Query("""
@@ -68,9 +77,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH r.member
             JOIN FETCH r.theme
             JOIN FETCH r.time
-            WHERE r.status = :status
+            WHERE r.status IN :status
             """)
-    List<Reservation> findAllByStatusWithDetails(@Param(value = "status") ReservationStatus status);
+    List<Reservation> findAllByStatusWithDetails(@Param(value = "status") List<ReservationStatus> statusConditions);
 
     Optional<Reservation> findFirstByDateAndTimeAndThemeAndStatusOrderById(LocalDate date, ReservationTime time,
                                                                            Theme theme, ReservationStatus status);

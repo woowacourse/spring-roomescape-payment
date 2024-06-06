@@ -13,6 +13,16 @@ public class WaitingManageService extends ReservationManageService {
         super(reservationRepository);
     }
 
+    public void approve(Long reservationId, Member agent) {
+        if (!agent.isAdmin()) {
+            throw new ViolationException("예약 승인 권한이 없습니다.");
+        }
+        reservationRepository.findById(reservationId).ifPresent(reservation -> {
+            reservation.changeToBooking();
+            reservationRepository.save(reservation);
+        });
+    }
+
     @Override
     protected void correctReservationStatus(int bookingCount, Reservation reservation) {
         if (bookingCount < MAX_RESERVATION_NUMBER_IN_TIME_SLOT) {
@@ -27,7 +37,7 @@ public class WaitingManageService extends ReservationManageService {
 
     @Override
     protected void validateReservationStatus(Reservation reservation) {
-        if (!reservation.isWaiting()) {
+        if (reservation.isBooking()) {
             throw new ViolationException("대기 중인 예약이 아닙니다.");
         }
     }

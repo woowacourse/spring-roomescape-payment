@@ -21,7 +21,12 @@ public class WaitingQueryService {
         return reservationRepository.findWaitingReservationsByMemberWithDetails(member);
     }
 
+    public List<Reservation> findAllUnpaidByMember(Member member) {
+        return reservationRepository.findAllByMemberAndStatus(member, ReservationStatus.PENDING_PAYMENT);
+    }
+
     public List<Reservation> findAll() {
-        return reservationRepository.findAllByStatusWithDetails(ReservationStatus.WAITING);
+        List<ReservationStatus> statusConditions = List.of(ReservationStatus.WAITING, ReservationStatus.PENDING_PAYMENT);
+        return reservationRepository.findAllByStatusWithDetails(statusConditions);
     }
 }

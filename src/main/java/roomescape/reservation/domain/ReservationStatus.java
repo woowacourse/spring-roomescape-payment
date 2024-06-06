@@ -7,7 +7,7 @@ import java.util.Arrays;
 public enum ReservationStatus {
     BOOKING("BOOKING"),
     WAITING("WAITING"),
-    UNPAID("UNPAID");
+    PENDING_PAYMENT("PENDING PAYMENT");
 
     private final String identifier;
 

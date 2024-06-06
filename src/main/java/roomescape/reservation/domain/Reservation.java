@@ -79,11 +79,11 @@ public class Reservation {
         return ownerId.equals(memberId) || member.isAdmin();
     }
 
-    public void approveWaiting() {
-        if (status.isBooking()) {
+    public void changeToUnpaid() {
+        if (isBooking()) {
             throw new ViolationException("이미 확정된 예약은 결제 대기 상태가 될 수 없습니다.");
         }
-        this.status = ReservationStatus.UNPAID;
+        this.status = ReservationStatus.PENDING_PAYMENT;
     }
 
     public void changeToBooking() {

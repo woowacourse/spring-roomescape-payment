@@ -32,6 +32,18 @@ public record MyReservationResponse(
         );
     }
 
+    public static MyReservationResponse from(Reservation unpaidReservation) {
+        return new MyReservationResponse(
+                unpaidReservation.getId(),
+                unpaidReservation.getTheme().getName(),
+                unpaidReservation.getDate(),
+                unpaidReservation.getTime().getStartAt(),
+                "결제 대기",
+                null,
+                null
+        );
+    }
+
     public static MyReservationResponse from(WaitingReservation waitingReservation) {
         return new MyReservationResponse(
                 waitingReservation.getReservation().getId(),

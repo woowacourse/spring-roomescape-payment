@@ -13,6 +13,7 @@ import roomescape.global.dto.ErrorResponse;
 import roomescape.member.domain.Member;
 import roomescape.reservation.dto.request.AdminReservationSaveRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.WaitingReservationResponse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -169,7 +170,10 @@ public class AdminReservationAcceptanceTest extends AcceptanceTest {
     Stream<DynamicTest> deleteWaitingReservationAndFindAll() {
         return Stream.of(
                 dynamicTest("예약 대기를 취소시킨다.", this::deleteWaitingReservation),
-                dynamicTest("예약 대기 목록을 조회한다.", this::findWaitingReservations)
+                dynamicTest("예약 대기 목록을 조회한다.", () -> {
+                    List<WaitingReservationResponse> waitingReservationResponses = findWaitingReservationsWithSize();
+                    assertThat(waitingReservationResponses).hasSize(0);
+                })
         );
     }
 
@@ -201,26 +205,8 @@ public class AdminReservationAcceptanceTest extends AcceptanceTest {
         checkHttpStatusNoContent(response);
     }
 
-    private void findWaitingReservations() {
-        // given
-        String token = createTestToken(ADMIN_EMAIL);
-        Cookie cookie = new Cookie.Builder("token", token).build();
-
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .cookie(cookie)
-                .when().get("/admin/reservations/waiting")
-                .then().log().all()
-                .extract();
-        List<ReservationResponse> reservationResponses = Arrays.stream(response.as(ReservationResponse[].class))
-                .toList();
-
-        // then
-        assertThat(reservationResponses).hasSize(0);
-    }
-
     @TestFactory
-    @DisplayName("예약을 취소하면 첫 번째 대기 예약이 승인된다.")
+    @DisplayName("예약을 취소하면 첫 번째 대기 예약이 결제 대기 상태가 된다.")
     Stream<DynamicTest> deleteAndApproveFirstWaitingReservation() {
         return Stream.of(
                 dynamicTest("예약과 예약 대기를 생성한다.", () -> {
@@ -236,7 +222,25 @@ public class AdminReservationAcceptanceTest extends AcceptanceTest {
                     createTestReservation(TOMMY_RESERVATION_DATE, timeId, themeId, miaToken, WAITING);
                 }),
                 dynamicTest("예약을 삭제한다.", this::deleteOneReservation),
-                dynamicTest("예약 목록을 조회한다.", () -> findReservationsWithSize(1))
+                dynamicTest("예약 목록을 조회한다.", () -> {
+                    List<WaitingReservationResponse> waitingReservationResponses = findWaitingReservationsWithSize();
+                    assertThat(waitingReservationResponses).hasSize(1)
+                            .extracting(WaitingReservationResponse::status)
+                            .contains("결제 대기");
+                })
         );
+    }
+
+    private List<WaitingReservationResponse> findWaitingReservationsWithSize() {
+        String token = createTestToken(ADMIN_EMAIL);
+        Cookie cookie = new Cookie.Builder("token", token).build();
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .cookie(cookie)
+                .when().get("/admin/reservations/waiting")
+                .then().log().all()
+                .extract();
+        return Arrays.stream(response.as(WaitingReservationResponse[].class))
+                .toList();
     }
 }

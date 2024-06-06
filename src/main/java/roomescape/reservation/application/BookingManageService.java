@@ -53,7 +53,7 @@ public class BookingManageService extends ReservationManageService {
         Optional<Reservation> firstWaitingReservation = reservationRepository.findFirstByDateAndTimeAndThemeAndStatusOrderById(
                 deletedReservation.getDate(), deletedReservation.getTime(),
                 deletedReservation.getTheme(), ReservationStatus.WAITING);
-        firstWaitingReservation.ifPresent(Reservation::changeToBooking);
+        firstWaitingReservation.ifPresent(Reservation::changeToUnpaid);
     }
 
     @Override

@@ -5,9 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationPayment;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -21,12 +18,6 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 class BookingManageServiceTest extends ReservationServiceTest {
     @Autowired
     private BookingManageService bookingManageService;
-
-    @Autowired
-    private WaitingManageService waitingManageService;
-
-    @Autowired
-    private BookingQueryService bookingQueryService;
 
     @Test
     @DisplayName("예약을 생성한다.")
@@ -70,24 +61,6 @@ class BookingManageServiceTest extends ReservationServiceTest {
         // when & then
         assertThatCode(() -> bookingManageService.delete(reservation.getId(), admin))
                 .doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("예약을 삭제하면 첫 번째 대기 예약 상태가 예약 중으로 바뀐다.")
-    void deleteAndChangeToBooking() {
-        // given
-        Reservation reservationInBooking = bookingManageService.create(MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING));
-        Reservation reservationInWaiting = waitingManageService.create(new Reservation(admin, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING));
-
-        // when
-        bookingManageService.delete(reservationInBooking.getId(), admin);
-
-        // then
-        List<ReservationPayment> changedBookings = bookingQueryService.findAllByMember(admin);
-        assertThat(changedBookings).hasSize(1)
-                .extracting(ReservationPayment::reservation)
-                .extracting(Reservation::getId)
-                .contains(reservationInWaiting.getId());
     }
 
     @Test

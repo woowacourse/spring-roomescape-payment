@@ -3,6 +3,7 @@ package roomescape.reservation.presentation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,7 +11,7 @@ import roomescape.member.domain.Member;
 import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.WaitingReservationResponse;
 
 import java.util.List;
 
@@ -27,10 +28,10 @@ public class AdminReservationWaitingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> findWaitingReservations() {
+    public ResponseEntity<List<WaitingReservationResponse>> findWaitingReservations() {
         List<Reservation> waitingReservations = waitingQueryService.findAll();
         return ResponseEntity.ok(waitingReservations.stream()
-                .map(ReservationResponse::from)
+                .map(WaitingReservationResponse::from)
                 .toList());
     }
 
@@ -38,5 +39,11 @@ public class AdminReservationWaitingController {
     public ResponseEntity<Void> deleteWaitingReservation(@PathVariable Long id, Member loginAdminMember) {
         waitingManageService.delete(id, loginAdminMember);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/approval")
+    public ResponseEntity<Void> approve(@PathVariable Long id, Member loginAdminMember) {
+        waitingManageService.approve(id, loginAdminMember);
+        return ResponseEntity.ok().build();
     }
 }

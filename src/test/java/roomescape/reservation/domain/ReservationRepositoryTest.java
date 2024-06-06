@@ -79,7 +79,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
 
         // when
-        List<Reservation> reservations = reservationRepository.findAllByStatusWithDetails(BOOKING);
+        List<Reservation> reservations = reservationRepository.findAllByStatusWithDetails(List.of(BOOKING));
 
         // then
         assertSoftly(softly -> {
