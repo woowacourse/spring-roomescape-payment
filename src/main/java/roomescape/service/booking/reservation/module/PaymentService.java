@@ -19,7 +19,7 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public PaymentResponse payByToss(PaymentRequest paymentRequest) { // TODO: 얘도 트랜잭션 적용되나?
+    public PaymentResponse payByToss(PaymentRequest paymentRequest) {
         return tossPaymentClient.confirm(paymentRequest);
     }
 

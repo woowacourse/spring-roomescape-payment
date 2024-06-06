@@ -21,7 +21,6 @@ import roomescape.repository.ThemeRepository;
 import roomescape.util.DateUtil;
 
 @Service
-//@Transactional
 public class ReservationRegisterService {
 
     private final PaymentService paymentService;
