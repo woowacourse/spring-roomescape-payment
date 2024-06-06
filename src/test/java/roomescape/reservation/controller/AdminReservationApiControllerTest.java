@@ -99,9 +99,26 @@ class AdminReservationApiControllerTest  extends IntegrationTest {
                 .header("Location", "/reservations/1");
     }
 
-    @DisplayName("예약을 성공적으로 제거하면 204 응답을 받는다.")
+    @DisplayName("예약을 성공적으로 취소하면 204 응답을 받는다.")
     @Test
-    void delete() {
+    void cancelReservation() {
+        saveAdminMemberAsDuck();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateTomorrow();
+
+        RestAssured.given().log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
+                .accept(ContentType.JSON)
+                .when()
+                .patch("admin/reservations/{id}", 1L)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("예약 대기를 성공적으로 제거하면 204 응답을 받는다.")
+    @Test
+    void deleteWaiting() {
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
                 .accept(ContentType.JSON)
