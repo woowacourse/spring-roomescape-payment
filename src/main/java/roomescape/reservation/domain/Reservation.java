@@ -63,6 +63,10 @@ public class Reservation {
     protected Reservation() {
     }
 
+    public void completePayment() {
+        this.reservationStatus = ReservationStatus.RESERVED;
+    }
+
     public boolean isBefore(LocalDateTime currentDateTime) {
         LocalDate currentDate = currentDateTime.toLocalDate();
         if (date.isBefore(currentDate)) {
@@ -72,6 +76,10 @@ public class Reservation {
             return false;
         }
         return time.isBefore(currentDateTime.toLocalTime());
+    }
+
+    public boolean isNotPaidReservation() {
+        return reservationStatus.equals(ReservationStatus.PAYMENT_PENDING);
     }
 
     public boolean isEqualsDate(LocalDate date) {
@@ -114,10 +122,6 @@ public class Reservation {
         return reservationStatus;
     }
 
-    public boolean isNotPaidReservation() {
-        return reservationStatus.equals(ReservationStatus.PAYMENT_PENDING);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -140,12 +144,12 @@ public class Reservation {
     @Override
     public String toString() {
         return "Reservation{" +
-                "id=" + id +
-                ", member=" + member +
-                ", date=" + date +
-                ", time=" + time +
-                ", theme=" + theme +
-                ", reservationStatus=" + reservationStatus +
-                '}';
+               "id=" + id +
+               ", member=" + member +
+               ", date=" + date +
+               ", time=" + time +
+               ", theme=" + theme +
+               ", reservationStatus=" + reservationStatus +
+               '}';
     }
 }

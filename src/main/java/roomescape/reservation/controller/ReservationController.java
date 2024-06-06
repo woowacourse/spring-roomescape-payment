@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
@@ -41,6 +42,12 @@ public class ReservationController {
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location)
                 .body(response);
+    }
+
+    @PostMapping("/payment")
+    public ResponseEntity<Void> paymentReservation(@RequestBody ReservationPaymentRequest request) {
+        reservationService.payReservation(request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

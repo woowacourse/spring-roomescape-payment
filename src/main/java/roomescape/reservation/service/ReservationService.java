@@ -14,6 +14,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
@@ -94,6 +95,19 @@ public class ReservationService {
         paymentService.approvePayment(request.createPaymentRequest(reservation));
 
         return reservationResponse;
+    }
+
+    @Transactional
+    public void payReservation(ReservationPaymentRequest request) {
+        Reservation reservation = reservationRepository.findById(request.reservationId())
+                .orElseThrow(() ->
+                        new RoomEscapeException("해당 예약은 존재하지 않습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        if (!reservation.isNotPaidReservation()) {
+            throw new RoomEscapeException("이미 결제된 예약에 대해 결제할 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST);
+        }
+
+        paymentService.approvePayment(request.createPaymentRequest(reservation));
+        reservation.completePayment();
     }
 
     private void validateCreate(Reservation reservation) {
