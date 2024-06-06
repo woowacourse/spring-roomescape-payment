@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Status;
@@ -99,22 +100,26 @@ public class ReservationService {
     public List<MyReservationResponse> findAllByMember(final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.getId())
                 .orElseThrow(IllegalArgumentException::new);
-        return reservationRepository.findAllByMember(member)
-                .stream()
-                .map(this::getMyReservationResponse)
+        List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        return reservations.stream()
+                .map(reservation -> {
+                    Payment payment = paymentRepository.findByReservationId(reservation.getId());
+                    return getMyReservationResponse(reservation, payment);
+                })
                 .toList();
     }
 
-    private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
+    private MyReservationResponse getMyReservationResponse(final Reservation reservation, final Payment payment) {
         if (reservation.getStatus().equals(Status.BOOKED)) {
             return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
                     reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                    reservation.getStatus().getValue());
+                    reservation.getStatus().getValue(), payment.getPaymentKey(), payment.getAmount());
         }
         return MyReservationResponse.ofReservationWaiting(reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                reservation.getStatus().getValue(), findRankByCreateAt(reservation));
+                reservation.getStatus().getValue(), findRankByCreateAt(reservation), payment.getPaymentKey(),
+                payment.getAmount());
     }
 
     private Integer findRankByCreateAt(final Reservation reservation) {
