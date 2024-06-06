@@ -1,12 +1,16 @@
 package roomescape.presentation.api;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.ArgumentMatchers.any;
+
+import static roomescape.application.dto.response.ReservationStatus.RESERVED;
+import static roomescape.application.dto.response.ReservationStatus.WAITING;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,14 +21,6 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.MemberResponse;
-import roomescape.application.dto.response.MyReservationResponse;
-import roomescape.application.dto.response.ReservationResponse;
-import roomescape.application.dto.response.ReservationStatus;
-import roomescape.application.dto.response.ReservationTimeResponse;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -82,29 +78,18 @@ class ReservationControllerTest extends BaseControllerTest {
         Waiting waiting = waitingRepository.save(new Waiting(new ReservationDetail(date, time2, theme1), user1));
 
         String token = tokenProvider.createToken(user1.getId().toString());
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .cookie("token", token)
-                        .when().get("/reservations/mine")
-                        .then().log().all()
-                        .extract();
 
-        List<MyReservationResponse> responses =
-                response.jsonPath()
-                        .getList(".", MyReservationResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThat(responses).hasSize(2);
-
-            softly.assertThat(responses.get(0).id()).isEqualTo(reservation.getId());
-            softly.assertThat(responses.get(0).rank()).isEqualTo(0);
-            softly.assertThat(responses.get(0).status()).isEqualTo(ReservationStatus.RESERVED);
-
-            softly.assertThat(responses.get(1).id()).isEqualTo(waiting.getId());
-            softly.assertThat(responses.get(1).rank()).isEqualTo(1);
-            softly.assertThat(responses.get(1).status()).isEqualTo(ReservationStatus.WAITING);
-        });
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .and()
+                .body("size()", equalTo(2))
+                .body("id", hasItems(reservation.getId().intValue(), waiting.getId().intValue()))
+                .body("rank", hasItems(0, 1))
+                .body("status", hasItems(RESERVED.name(), WAITING.name()));
     }
 
     @Nested
@@ -121,8 +106,8 @@ class ReservationControllerTest extends BaseControllerTest {
             BDDMockito.doReturn(new PaymentResponse("DONE", "123"))
                     .when(paymentClient).confirmPayment(any());
 
-            ReservationTime time = reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);
-            Theme theme = themeRepository.save(Fixture.THEME_1);
+            reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);
+            themeRepository.save(Fixture.THEME_1);
 
             ReservationWebRequest request = new ReservationWebRequest(
                     LocalDate.of(2024, 4, 9),
@@ -134,28 +119,20 @@ class ReservationControllerTest extends BaseControllerTest {
                     "test-paymentType"
             );
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given().log().all()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/reservations")
                     .then().log().all()
-                    .extract();
-
-            ReservationResponse reservationResponse = response.as(ReservationResponse.class);
-            MemberResponse memberResponse = reservationResponse.member();
-            ReservationTimeResponse reservationTimeResponse = reservationResponse.time();
-            ThemeResponse themeResponse = reservationResponse.theme();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-                softly.assertThat(response.header("Location")).isEqualTo("/reservations/1");
-
-                softly.assertThat(reservationResponse.date()).isEqualTo(LocalDate.of(2024, 4, 9));
-                softly.assertThat(memberResponse).isEqualTo(MemberResponse.from(user));
-                softly.assertThat(reservationTimeResponse).isEqualTo(ReservationTimeResponse.from(time));
-                softly.assertThat(themeResponse).isEqualTo(ThemeResponse.from(theme));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .header("Location", response -> equalTo("/reservations/" + response.path("id")))
+                    .and()
+                    .body("date", equalTo("2024-04-09"))
+                    .body("member.id", equalTo(1))
+                    .body("time.id", equalTo(1))
+                    .body("theme.id", equalTo(1));
         }
 
         @Test
@@ -178,19 +155,15 @@ class ReservationControllerTest extends BaseControllerTest {
                     "test-paymentType"
             );
 
-            ExtractableResponse<Response> response =
-                    RestAssured.given().log().all()
-                            .cookie("token", token)
-                            .contentType(ContentType.JSON)
-                            .body(request)
-                            .when().post("/reservations")
-                            .then().log().all()
-                            .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                softly.assertThat(response.body().asString()).contains("지나간 날짜/시간에 대한 예약은 불가능합니다.");
-            });
+            RestAssured.given().log().all()
+                    .cookie("token", token)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/reservations")
+                    .then().log().all()
+                    .assertThat()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body("message", containsString("지나간 날짜/시간에 대한 예약은 불가능합니다."));
         }
     }
 }
