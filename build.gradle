@@ -49,7 +49,23 @@ test {
 }
 
 asciidoctor {
-    inputs.dir snippetsDir
     configurations 'asciidoctorExt'
+
+    sources {
+        include("**/index.adoc")
+    }
+    baseDirFollowsSourceFile()
+
+    inputs.dir snippetsDir
     dependsOn test
+}
+
+tasks.register('copyRestDocs', Copy) {
+    dependsOn asciidoctor
+    from file('build/docs/asciidoc')
+    into file('src/main/resources/static/docs')
+}
+
+build {
+    dependsOn copyRestDocs
 }
