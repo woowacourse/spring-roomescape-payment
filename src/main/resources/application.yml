@@ -22,7 +22,7 @@ roomescape:
   payment:
     toss:
       connection-timeout-duration-of-second: 5
-      read-timeout-duration-of-second: 3
+      read-timeout-duration-of-second: 30
       confirm-endpoint-v1: "/v1/payments/confirm"
       confirm-widget-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
       confirm-password: ""
