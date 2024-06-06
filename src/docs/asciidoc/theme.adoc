@@ -1,0 +1,11 @@
+==== 테마 생성
+
+operation::theme-create[snippets="http-request,request-cookies,request-fields,http-response"]
+
+==== 전체 테마 조회
+
+operation::theme-find-all[snippets="http-request,http-response,response-fields"]
+
+==== 테마 삭제
+
+operation::theme-delete[snippets="http-request,request-cookies,path-parameters"]

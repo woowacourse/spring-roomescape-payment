@@ -1,0 +1,32 @@
+= 방탈출 예약 관리 시스템 Rest API Docs
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectnums: 2
+
+
+== 회원
+
+include::member.adoc[]
+
+== 인증
+
+include::auth.adoc[]
+
+== 예약 시간
+
+include::reservation-time.adoc[]
+
+== 방탈출 테마
+
+include::theme.adoc[]
+
+== 방탈출 예약
+
+include::reservation.adoc[]
+
+== 방탈출 예약 대기
+
+include::reservation-waiting.adoc[]

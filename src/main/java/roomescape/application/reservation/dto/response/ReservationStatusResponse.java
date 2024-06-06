@@ -9,7 +9,7 @@ public record ReservationStatusResponse(
         long id,
         String theme,
         LocalDate date,
-        LocalTime time,
+        LocalTime startAt,
         long waitingCount,
         PaymentResponse payment
 ) {
@@ -22,7 +22,7 @@ public record ReservationStatusResponse(
                 id,
                 theme,
                 date,
-                time,
+                startAt,
                 waitingCount,
                 new PaymentResponse(payment.getPaymentKey(), payment.getAmount())
         );

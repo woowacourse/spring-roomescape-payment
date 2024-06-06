@@ -1,6 +1,7 @@
 package roomescape.fixture;
 
 import java.time.LocalTime;
+import roomescape.application.reservation.dto.request.ReservationTimeRequest;
 import roomescape.domain.reservation.ReservationTime;
 
 public enum TimeFixture {
@@ -22,5 +23,9 @@ public enum TimeFixture {
     public ReservationTime create() {
         LocalTime time = LocalTime.of(hour, minute);
         return new ReservationTime(time);
+    }
+
+    public ReservationTimeRequest request() {
+        return new ReservationTimeRequest(LocalTime.of(hour, minute));
     }
 }

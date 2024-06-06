@@ -1,0 +1,11 @@
+==== 예약 생성
+
+operation::reservation-create[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+
+==== 자신의 예약 조회
+
+operation::reservation-find-my[snippets="http-request,request-cookies,http-response,response-fields"]
+
+==== 자신의 예약 취소
+
+operation::reservation-delete[snippets="http-request,request-cookies,path-parameters,http-response"]
