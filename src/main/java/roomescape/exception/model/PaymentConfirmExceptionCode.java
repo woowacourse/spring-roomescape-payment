@@ -17,11 +17,11 @@ public enum PaymentConfirmExceptionCode implements ExceptionCode {
 
     @Override
     public HttpStatus getHttpStatus() {
-        return null;
+        return httpStatus;
     }
 
     @Override
     public String getMessage() {
-        return null;
+        return message;
     }
 }
