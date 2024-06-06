@@ -15,6 +15,8 @@ public class MemberReservationResponse {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime time;
     private String status;
+    private String paymentkey;
+    private Long amount;
 
     public MemberReservationResponse(Reservation reservation) {
         this.id = reservation.getId();
@@ -22,6 +24,8 @@ public class MemberReservationResponse {
         this.date = reservation.getDate();
         this.time = reservation.getTime().getStartAt();
         this.status = "예약";
+        this.paymentkey = reservation.getPayment().getPaymentKey();
+        this.amount = reservation.getPayment().getTotalAmount();
     }
 
     public MemberReservationResponse(WaitingWithRank waitingWithRank) {
@@ -30,6 +34,8 @@ public class MemberReservationResponse {
         this.date = waitingWithRank.getWaiting().getDate();
         this.time = waitingWithRank.getWaiting().getTime().getStartAt();
         this.status = "%d번째 예약대기".formatted(waitingWithRank.getRank());
+        this.paymentkey = "";
+        this.amount = 0L;
     }
 
     public Long getId() {
@@ -50,5 +56,13 @@ public class MemberReservationResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentkey;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }

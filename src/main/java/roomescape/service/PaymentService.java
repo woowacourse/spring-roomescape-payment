@@ -1,14 +1,11 @@
 package roomescape.service;
 
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.PaymentException;
+import roomescape.model.Payment;
 import roomescape.service.httpclient.TossPaymentClient;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Service
 public class PaymentService {
@@ -21,9 +18,9 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public void confirmReservationPayments(ReservationRequest request) {
+    public Payment confirmReservationPayments(ReservationRequest request) {
         validatePayments(request.amount());
-        tossPaymentClient.confirm(new PaymentRequest(request.paymentKey(),request.orderId(),request.amount()));
+        return tossPaymentClient.confirm(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
     }
 
     private void validatePayments(long amount) {

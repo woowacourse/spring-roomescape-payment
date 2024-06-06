@@ -3,6 +3,7 @@ package roomescape.service.httpclient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import roomescape.controller.request.PaymentRequest;
+import roomescape.model.Payment;
 
 @Component
 public class TossPaymentRestTemplate extends TossPaymentClient {
@@ -14,7 +15,7 @@ public class TossPaymentRestTemplate extends TossPaymentClient {
     }
 
     @Override
-    protected void request(final PaymentRequest paymentRequest) {
-        restTemplate.postForLocation(CONFIRM_URI, paymentRequest);
+    protected Payment request(final PaymentRequest paymentRequest) {
+        return restTemplate.postForObject(CONFIRM_URI, paymentRequest, Payment.class);
     }
 }

@@ -16,6 +16,7 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.service.fixture.AdminReservationRequestBuilder;
 import roomescape.service.fixture.MemberBuilder;
+import roomescape.service.fixture.PaymentFixture;
 import roomescape.service.fixture.ReservationRequestBuilder;
 
 import java.time.LocalDate;
@@ -63,7 +64,7 @@ class ReservationServiceTest {
         Member member = memberRepository.findById(2L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().build();
 
-        reservationService.addReservation(request, member);
+        reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment());
 
         List<Reservation> allReservations = reservationRepository.findAll();
         assertThat(allReservations).hasSize(3);
@@ -123,7 +124,7 @@ class ReservationServiceTest {
                 .build();
         Member member = MemberBuilder.builder().build();
 
-        assertThatThrownBy(() -> reservationService.addReservation(request, member))
+        assertThatThrownBy(() -> reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약할 수 없습니다.");
     }
@@ -136,7 +137,7 @@ class ReservationServiceTest {
         Member member = memberRepository.findById(1L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().date(date).build();
 
-        assertThatThrownBy(() -> reservationService.addReservation(request, member))
+        assertThatThrownBy(() -> reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment()))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
     }

@@ -6,15 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import roomescape.exception.PaymentException;
+import roomescape.model.Payment;
+import roomescape.service.fixture.JsonResponseFixture;
 import roomescape.service.fixture.ReservationRequestBuilder;
+import roomescape.service.httpclient.TossPaymentRestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -24,6 +30,8 @@ class PaymentServiceTest {
     private PaymentService paymentService;
     private RestTemplate restTemplate;
     private MockRestServiceServer mockServer;
+    @Autowired
+    private TossPaymentRestTemplate tossPaymentRestTemplate;
 
     @Autowired
     public PaymentServiceTest(final PaymentService paymentService, final RestTemplate restTemplate) {
@@ -65,5 +73,14 @@ class PaymentServiceTest {
         assertThatThrownBy(() -> paymentService.confirmReservationPayments(ReservationRequestBuilder.builder().build()))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("[ERROR] 결제 서버에 오류가 발생했습니다.");
+    }
+
+    @Test
+    public void should_create_payment_when_postForObject() throws Exception {
+        String jsonResponse = JsonResponseFixture.TOSS_API_CONFIRM_RESPONSE;
+        mockServer.expect(anything())
+                .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
+        final Payment payment = paymentService.confirmReservationPayments(ReservationRequestBuilder.builder().build());
+        assertEquals("tgen_20240604202416eHBf1", payment.getPaymentKey());
     }
 }

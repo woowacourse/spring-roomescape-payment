@@ -1,6 +1,14 @@
 package roomescape.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import roomescape.exception.BadRequestException;
 
 import java.time.LocalDate;
@@ -9,7 +17,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"date", "time_id", "theme_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time_id", "theme_id"})})
 public class Reservation {
 
     @Id
@@ -22,21 +30,28 @@ public class Reservation {
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+    @Embedded
+    private Payment payment;
 
     protected Reservation() {
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment) {
         validatePast(date, time);
         this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
+        this.payment = payment;
+    }
+
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment) {
+        this(null, date, time, theme, member, payment);
     }
 
     public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
+        this(null, date, time, theme, member, new Payment());
     }
 
     private void validatePast(LocalDate date, ReservationTime time) {
@@ -65,6 +80,10 @@ public class Reservation {
         return member;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -82,16 +101,5 @@ public class Reservation {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getDate(), getTime(), getTheme(), getMember());
-    }
-
-    @Override
-    public String toString() {
-        return "Reservation{" +
-                "id=" + id +
-                ", date=" + date +
-                ", time=" + time +
-                ", theme=" + theme +
-                ", member=" + member +
-                '}';
     }
 }
