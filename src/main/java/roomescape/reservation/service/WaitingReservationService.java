@@ -7,28 +7,33 @@ import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.reservation.controller.dto.ReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.ReservationViewResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatus;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class WaitingReservationService {
 
+    private final ReservationService reservationService;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
 
-    public WaitingReservationService(ReservationRepository reservationRepository,
+    public WaitingReservationService(ReservationService reservationService, ReservationRepository reservationRepository,
                                      MemberRepository memberRepository) {
+        this.reservationService = reservationService;
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
     }
 
-    public List<ReservationViewResponse> convertReservationsWithStatusToViewResponses(List<ReservationWithStatus> reservationWithStatuses) {
+    public List<ReservationViewResponse> convertReservationsWithStatusToViewResponses(
+            List<ReservationWithStatus> reservationWithStatuses
+    ) {
         return reservationWithStatuses
                 .stream()
                 .map(this::generateReservationViewResponse)
@@ -65,5 +70,10 @@ public class WaitingReservationService {
         reservationRepository.deleteById(reservationId);
         reservationRepository.findFirstByReservationSlotOrderByCreatedAt(reservation.getReservationSlot())
                         .ifPresent(Reservation::bookReservation);
+    }
+
+    @Transactional
+    public ReservationResponse reserveWaiting(ReservationRequest reservationRequest, Long memberId) {
+        return reservationService.createReservation(reservationRequest, memberId, ReservationStatus.WAITING);
     }
 }

@@ -3,7 +3,6 @@ package roomescape.payment.infra;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.handler.TossPaymentErrorHandler;
-import roomescape.payment.application.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 

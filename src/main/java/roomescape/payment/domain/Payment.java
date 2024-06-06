@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.domain;
 
 import jakarta.persistence.*;
 

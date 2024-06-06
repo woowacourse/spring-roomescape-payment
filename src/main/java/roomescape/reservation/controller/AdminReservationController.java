@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.reservation.controller.dto.AdminReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingReservationService;
 
@@ -31,7 +32,7 @@ public class AdminReservationController {
     public ResponseEntity<ReservationResponse> create(
             @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
         ReservationResponse reservationResponse = reservationService
-                .createReservation(adminReservationRequest.toReservationRequest(), adminReservationRequest.memberId());
+                .createReservation(adminReservationRequest.toReservationRequest(), adminReservationRequest.memberId(), ReservationStatus.BOOKED); // TODO 상태도 요청으로 받기
         return ResponseEntity.created(URI.create("/admin/reservations/" + reservationResponse.reservationId()))
                 .body(reservationResponse);
     }

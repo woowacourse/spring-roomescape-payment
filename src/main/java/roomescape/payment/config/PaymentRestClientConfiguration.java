@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.application.PaymentProperty;
 import roomescape.payment.infra.PaymentWithRestClient;
 
@@ -25,7 +26,7 @@ public class PaymentRestClientConfiguration {
     }
 
     @Bean
-    public PaymentWithRestClient paymentWithRestClient() {
+    public PaymentClient paymentWithRestClient() {
         RestClient.Builder builder = createBuilder(paymentProperty);
         RestClient restClient = builder.build();
         return new PaymentWithRestClient(restClient);

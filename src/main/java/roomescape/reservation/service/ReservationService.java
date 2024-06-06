@@ -8,9 +8,8 @@ import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.application.PaymentClient;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -21,7 +20,6 @@ import roomescape.reservation.domain.specification.ReservationSpecification;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ReservationService {
@@ -31,19 +29,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final ReservationSlotRepository reservationSlotRepository;
     private final ReservationRepository reservationRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               ReservationSlotRepository reservationSlotRepository,
-                              ReservationRepository reservationRepository, PaymentClient paymentClient) {
+                              ReservationRepository reservationRepository, PaymentService paymentService) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationSlotRepository = reservationSlotRepository;
         this.reservationRepository = reservationRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +68,25 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(ReservationRequest reservationRequest, Long memberId) {
+    public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
+        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
+
+        if (reservationRepository.existsByDateAndTimeIdAndThemeId(
+                LocalDate.parse(reservationRequest.date()),
+                reservationRequest.themeId(),
+                reservationRequest.timeId())
+        ) {
+            throw new BadRequestException("이미 예약된 상태입니다. 예약 대기를 진행하거나 다른 예약을 선택해주세요.");
+        }
+        PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
+        paymentService.purchase(paymentRequest, reservationPaymentRequest.amount());
+        return createReservation(reservationRequest, memberId, ReservationStatus.BOOKED);
+    }
+
+    @Transactional
+    public ReservationResponse createReservation(
+            ReservationRequest reservationRequest, Long memberId, ReservationStatus reservationStatus
+    ) {
         LocalDate date = LocalDate.parse(reservationRequest.date());
         ReservationTime reservationTime = reservationTimeRepository.findById(reservationRequest.timeId())
                 .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
@@ -80,13 +96,8 @@ public class ReservationService {
                 .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
         ReservationSlot reservationSlot = reservationSlotRepository.findByDateAndTimeAndTheme(date, reservationTime, theme)
                 .orElseGet(() -> reservationSlotRepository.save(new ReservationSlot(date, reservationTime, theme)));
-        ReservationStatus reservationStatus = ReservationStatus.BOOKED;
 
         validateReservation(reservationSlot, member);
-
-        if (reservationRepository.existsByReservationSlot(reservationSlot)) {
-            reservationStatus = ReservationStatus.WAITING;
-        }
 
         Reservation reservation = reservationRepository.save(
                 new Reservation(member, reservationSlot, reservationStatus));
@@ -118,19 +129,5 @@ public class ReservationService {
     public void delete(long reservationId) {
         reservationRepository.deleteByReservationSlot_Id(reservationId);
         reservationSlotRepository.deleteById(reservationId);
-    }
-
-    @Transactional
-    public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
-        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
-        ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
-        PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
-
-        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
-            throw new BadRequestException("결제 금액이 잘못되었습니다.");
-        }
-
-        return reservationResponse;
     }
 }

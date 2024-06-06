@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.Payment;
+import roomescape.payment.domain.Payment;
 
 @Entity
 public class Reservation {

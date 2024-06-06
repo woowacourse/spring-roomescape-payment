@@ -11,9 +11,10 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
 import roomescape.member.service.MemberService;
-import roomescape.payment.application.PaymentClient;
+import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -64,14 +66,6 @@ class ReservationControllerTest extends ControllerTest {
                 .when(paymentClient)
                 .confirm(any());
 
-//        given(paymentClient.confirm(any(PaymentRequest.class)))
-//                .willReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
-
-/*
-        Mockito.when(paymentClient.confirm(any()))
-                .thenReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
-*/
-
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeRequest("10:00"));
         ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
@@ -107,7 +101,7 @@ class ReservationControllerTest extends ControllerTest {
                         LocalDate.now().plusDays(10).toString(),
                         reservationTimeResponse.id(),
                         themeResponse.id()),
-                getMemberChoco().getId()
+                getMemberChoco().getId(), ReservationStatus.BOOKED
         );
 
         return Stream.of(
@@ -204,6 +198,55 @@ class ReservationControllerTest extends ControllerTest {
                 .cookie("token", token)
                 .when().get("/reservations/mine")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .body("size()", is(1));
     }
+
+    @DisplayName("예약 추가 시, 내 예약 개수가 늘어난다")
+    @Test
+    void reservationAndGetMyReservation() {
+        //given
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
+
+        //when
+        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+                .when(paymentClient)
+                .confirm(any());
+
+        ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
+                new ReservationTimeRequest("10:00"));
+        ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
+
+        Map<String, Object> reservation = new HashMap<>();
+        reservation.put("date", "2099-08-05");
+        reservation.put("timeId", reservationTimeResponse.id());
+        reservation.put("themeId", themeResponse.id());
+        reservation.put("paymentKey", "test");
+        reservation.put("orderId", "test");
+        reservation.put("amount", 1000L);
+        reservation.put("paymentType", "test");
+
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .contentType(ContentType.JSON)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        //then
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(2));
+    }
+
 }

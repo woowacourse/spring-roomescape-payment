@@ -44,7 +44,7 @@ VALUES (DATEADD('DAY', 4, CURRENT_DATE()), 3, 4);
 INSERT INTO reservation_slot(date, reservation_time_id, theme_id)
 VALUES (DATEADD('MONTH', 1, CURRENT_DATE()), 3, 4);
 INSERT INTO reservation_slot(date, reservation_time_id, theme_id)
-VALUES (DATEADD('DAY', 4, CURRENT_DATE()), 3, 4);
+VALUES (DATEADD('DAY', 5, CURRENT_DATE()), 3, 4);
 
 
 -- 회원 추가
@@ -78,7 +78,7 @@ VALUES (2, 4, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (2, 8, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (3, 3, DATEADD(HOUR, 1, CURRENT_TIME()), 'WAITING');
+VALUES (5, 3, DATEADD(HOUR, 1, CURRENT_TIME()), 'WAITING');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (3, 5, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
@@ -86,4 +86,4 @@ VALUES (3, 6, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (2, 7, DATEADD(HOUR, 1, CURRENT_TIME()), 'WAITING');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (3, 7, DATEADD(HOUR, 2, CURRENT_TIME()), 'WAITING');
+VALUES (5, 7, DATEADD(HOUR, 2, CURRENT_TIME()), 'WAITING');

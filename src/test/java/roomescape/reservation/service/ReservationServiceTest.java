@@ -13,7 +13,7 @@ import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.application.PaymentClient;
+import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
@@ -224,7 +224,7 @@ class ReservationServiceTest extends ServiceTest {
                 theme.getId());
 
         //when & then
-        assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, member.getId()))
+        assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, member.getId(), ReservationStatus.BOOKED))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -270,33 +270,4 @@ class ReservationServiceTest extends ServiceTest {
                 () -> assertThat(myReservations).extracting(ReservationWithStatus::time).containsOnly(time.getStartAt())
         );
     }
-
-    @DisplayName("앞선 예약이 있는 경우 예약을 대기한다")
-    @Test
-    void existSameReservation() {
-        //given
-        ReservationSlot reservationSlot = getNextDayReservationSlot(ReservationTimeFixture.get1PM(), getTheme1());
-        Member choco = getMemberChoco();
-        Member tacan = getMemberTacan();
-
-        reservationSlotRepository.save(reservationSlot);
-        reservationRepository.save(new Reservation(choco, reservationSlot));
-
-        //when
-        reservationService.createReservation(new ReservationRequest(
-                reservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
-                reservationSlot.getTime().getId(),
-                reservationSlot.getTheme().getId(
-                )), tacan.getId());
-        List<Reservation> allByMember = reservationRepository.findAllByMember(tacan);
-        Reservation addedReservation = allByMember
-                .stream()
-                .filter(reservation -> Objects.equals(reservation.getReservationSlot().getId(), reservationSlot.getId()))
-                .findAny()
-                .get();
-
-        //then
-        assertThat(addedReservation.getStatus()).isEqualTo(ReservationStatus.WAITING);
-    }
-
 }
