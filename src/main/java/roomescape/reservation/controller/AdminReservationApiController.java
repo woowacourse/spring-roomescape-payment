@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.MultipleResponses;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -26,9 +28,11 @@ import roomescape.reservation.service.ReservationService;
 public class AdminReservationApiController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public AdminReservationApiController(ReservationService reservationService) {
+    public AdminReservationApiController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -68,9 +72,17 @@ public class AdminReservationApiController {
                 .body(reservationResponse);
     }
 
+    @PatchMapping("/reservations/{id}")
+    public ResponseEntity<Void> cancelReservation(@PathVariable("id") Long id) {
+        paymentService.cancel(reservationService.findById(id));
+        reservationService.cancelReservationById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        reservationService.delete(id);
+    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") Long id) {
+        reservationService.deleteWaitingById(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -164,11 +164,11 @@ public class ReservationService {
                 .toList();
     }
 
-    public void delete(Long id) {
+    public void deleteWaitingById(Long id) {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelById(Long id) {
+    public void cancelReservationById(Long id) {
         Reservation canceledReservation = getCanceledReservation(id);
         updateFirstWaitingReservation(canceledReservation);
     }

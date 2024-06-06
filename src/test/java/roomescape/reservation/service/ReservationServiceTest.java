@@ -200,7 +200,7 @@ class ReservationServiceTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
         ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
 
-        assertThatThrownBy(() -> reservationService.cancelById(reservationResponse.id()))
+        assertThatThrownBy(() -> reservationService.cancelReservationById(reservationResponse.id()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -220,7 +220,7 @@ class ReservationServiceTest {
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
 
-        reservationService.cancelById(kaki.getId());
+        reservationService.cancelReservationById(kaki.getId());
         Reservation jojoReservation = reservationRepository.findById(jojo.getId()).get();
 
         assertThat(jojoReservation.getStatus()).isEqualTo(ReservationStatus.SUCCESS);

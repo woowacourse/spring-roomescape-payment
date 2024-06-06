@@ -64,16 +64,16 @@ public class ReservationApiController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> cancel(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> cancelReservation(@PathVariable("id") Long id) {
         paymentService.cancel(reservationService.findById(id));
-        reservationService.cancelById(id);
+        reservationService.cancelReservationById(id);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        reservationService.delete(id);
+    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") Long id) {
+        reservationService.deleteWaitingById(id);
 
         return ResponseEntity.noContent().build();
     }

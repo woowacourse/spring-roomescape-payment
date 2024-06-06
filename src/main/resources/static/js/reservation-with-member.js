@@ -181,7 +181,10 @@ function deleteRow(event) {
 
   requestDelete(reservationId)
       .then(() => row.remove())
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+      });
 }
 
 function applyFilter(event) {
@@ -235,7 +238,7 @@ function requestCreate(reservation) {
 
 function requestDelete(id) {
   const requestOptions = {
-    method: 'DELETE',
+    method: 'PATCH',
   };
 
   return fetch(`${RESERVATION_API_ENDPOINT}/${id}`, requestOptions)
