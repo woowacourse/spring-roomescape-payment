@@ -12,6 +12,9 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ClientConfiguration {
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(3);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(3);
+
     @Bean
     public RestClient restClient() {
         return RestClient.builder()
@@ -21,8 +24,8 @@ public class ClientConfiguration {
 
     private ClientHttpRequestFactory clientFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(3))
-                .withReadTimeout(Duration.ofSeconds(3));
+                .withConnectTimeout(CONNECT_TIMEOUT)
+                .withReadTimeout(READ_TIMEOUT);
         return ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory::new, settings);
     }
 }
