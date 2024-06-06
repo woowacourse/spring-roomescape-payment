@@ -37,7 +37,7 @@ abstract class ControllerTest {
     protected RequestSpecification spec;
 
     @BeforeEach
-    protected void initest(RestDocumentationContextProvider restDocumentation) {
+    protected void iniTest(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
         Filter documentationConfiguration = documentationConfiguration(restDocumentation)
                 .operationPreprocessors()
