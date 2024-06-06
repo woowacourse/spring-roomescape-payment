@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import roomescape.global.dto.ErrorResponse;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -46,7 +47,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -112,7 +113,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         createTestReservation(MIA_RESERVATION_DATE, timeId, themeId, token, BOOKING);
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -142,11 +143,12 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
 
         // when
         for (int i = 0; i < threadCount; i++) {
             int threadIndex = i;
+            PaymentConfirmRequest paymentConfirmRequest = PAYMENT_CONFIRM_REQUEST("key" + threadIndex, "orderId" + threadIndex);
+            ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
             new Thread(() -> RestAssured.given()
                     .contentType(ContentType.JSON)
                     .cookie(cookies.get(threadIndex))
@@ -285,7 +287,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(null, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -315,7 +317,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when

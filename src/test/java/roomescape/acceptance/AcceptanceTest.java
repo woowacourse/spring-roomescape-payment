@@ -107,7 +107,7 @@ public abstract class AcceptanceTest {
     }
 
     protected Long createTestBooking(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
-        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST);
+        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)

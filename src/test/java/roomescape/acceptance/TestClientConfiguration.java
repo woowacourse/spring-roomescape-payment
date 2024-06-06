@@ -8,18 +8,15 @@ import roomescape.payment.pg.TossPaymentsPayment;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
 
 @TestConfiguration
 public class TestClientConfiguration {
     @Bean
     public TossPaymentsClient tossPaymentsClient() {
         TossPaymentsClient client = mock(TossPaymentsClient.class);
-        TossPaymentsPayment payment = new TossPaymentsPayment(
-                PAYMENT_CONFIRM_REQUEST.paymentKey(),
-                PAYMENT_CONFIRM_REQUEST.orderId(),
-                "IN_PROGRESS",
-                PAYMENT_CONFIRM_REQUEST.amount());
+        TossPaymentsPayment payment = mock(TossPaymentsPayment.class);
+        BDDMockito.when(payment.verify(any()))
+                .thenReturn(true);
         BDDMockito.when(client.findBy(any()))
                 .thenReturn(payment);
 

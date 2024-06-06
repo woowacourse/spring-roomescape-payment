@@ -40,9 +40,6 @@ public class TestFixture {
     public static final String TEST_ERROR_MESSAGE = "ERROR MESSAGE";
     public static final String TEST_PASSWORD = "test password";
 
-    public static final PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST =
-            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
-
     public static Member USER_MIA() {
         return new Member(MIA_NAME, MIA_EMAIL, TEST_PASSWORD, USER);
     }
@@ -94,5 +91,13 @@ public class TestFixture {
 
     public static Theme HORROR_THEME(Long id) {
         return new Theme(id, HORROR_THEME_NAME, HORROR_THEME_DESCRIPTION, THEME_THUMBNAIL);
+    }
+
+    public static PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST() {
+        return new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
+    }
+
+    public static PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST(String key, String orderId) {
+        return new PaymentConfirmRequest(key, orderId, BigDecimal.valueOf(1000L), "none");
     }
 }
