@@ -12,17 +12,17 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.component.TossPaymentClient;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
 
     @Mock

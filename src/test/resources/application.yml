@@ -15,8 +15,3 @@ security:
     token:
       secret-key: pumExiFixehC65FymaHwN/FDue8U48AO
       expire-length: 3600000
-
-
-toss:
-  payments:
-    secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
