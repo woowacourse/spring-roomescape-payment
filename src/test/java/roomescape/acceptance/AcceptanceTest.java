@@ -21,7 +21,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
 import roomescape.member.dto.request.MemberJoinRequest;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;

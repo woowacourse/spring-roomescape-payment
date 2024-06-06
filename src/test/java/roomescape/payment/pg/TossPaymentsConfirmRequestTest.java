@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentConfirmRequest;
-import roomescape.payment.pg.TossPaymentsConfirmRequest;
 
 import java.math.BigDecimal;
 

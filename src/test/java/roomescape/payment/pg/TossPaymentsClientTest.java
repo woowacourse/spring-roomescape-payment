@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.pg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossPaymentsErrorResponse;
-import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.application.PaymentConfirmRequest;
+import roomescape.payment.application.PaymentServerException;
 
 import java.math.BigDecimal;
 

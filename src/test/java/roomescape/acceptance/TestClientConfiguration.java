@@ -2,7 +2,7 @@ package roomescape.acceptance;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.pg.TossPaymentsClient;
 
 import static org.mockito.Mockito.mock;
 

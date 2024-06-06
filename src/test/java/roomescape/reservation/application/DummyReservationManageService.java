@@ -1,7 +1,7 @@
 package roomescape.reservation.application;
 
 import roomescape.member.domain.Member;
-import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.pg.TossPaymentsClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 

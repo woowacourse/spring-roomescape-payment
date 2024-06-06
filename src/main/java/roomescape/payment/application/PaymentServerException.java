@@ -1,4 +1,4 @@
-package roomescape.payment.exception;
+package roomescape.payment.application;
 
 public class PaymentServerException extends RuntimeException {
     private final String message;
