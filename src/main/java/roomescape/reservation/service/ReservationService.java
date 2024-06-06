@@ -7,8 +7,9 @@ import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.model.Payment;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
 import roomescape.reservation.dto.request.CreateReservationRequest;
@@ -41,7 +42,7 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationService(final WaitingService waitingService,
                               final ReservationRepository reservationRepository,
@@ -49,16 +50,18 @@ public class ReservationService {
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository,
-                              final PaymentClient paymentClient) {
+                              final PaymentService paymentService
+    ) {
         this.waitingService = waitingService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
+    @Transactional
     public CreateReservationResponse createMyReservationWithPayment(final AuthInfo authInfo,
                                                                     final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
@@ -66,12 +69,13 @@ public class ReservationService {
         Reservation reservation = createReservation(createReservationRequest);
 
         try {
-            paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
+            Payment payment = paymentService.confirm(ConfirmPaymentRequest.from(createReservationRequest));
+            reservation.assignPayment(payment);
+            return CreateReservationResponse.from(reservation);
         } catch (ClientException e) {
             reservationRepository.delete(reservation);
             throw e;
         }
-        return CreateReservationResponse.from(reservation);
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
