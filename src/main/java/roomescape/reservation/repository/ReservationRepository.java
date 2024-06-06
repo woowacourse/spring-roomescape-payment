@@ -35,11 +35,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             join fetch Member m on m.id = r.member.id
             left join fetch Payment p on p.reservationId = r.id
             where m.id = :memberId
+            and r.status <> 'CANCEL'
             and r.date >= :date
             order by r.date, rt.startAt, r.createdAt
              """)
-    List<ReservationWithPayment> findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(Long memberId,
-                                                                                                   LocalDate date);
+    List<ReservationWithPayment> findAllExceptCancelByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(Long memberId,
+                                                                                                               LocalDate date);
 
     @Query("""
             select r from Reservation r

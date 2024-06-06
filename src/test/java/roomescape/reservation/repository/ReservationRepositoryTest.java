@@ -55,9 +55,9 @@ public class ReservationRepositoryTest {
         assertThat(reservations.size()).isEqualTo(1);
     }
 
-    @DisplayName("회원 id로 예약 목록을 조회한다.")
+    @DisplayName("회원 id로 취소되지 않은 예약 목록을 조회한다.")
     @Test
-    void findAllByMemberId() {
+    void findAllExceptCancelByMemberId() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
 
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
@@ -67,9 +67,10 @@ public class ReservationRepositoryTest {
 
         reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
         reservationRepository.save(new Reservation(jojo, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
+        reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.CANCEL));
 
         List<ReservationWithPayment> reservations =
-                reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(kaki.getId(), TODAY);
+                reservationRepository.findAllExceptCancelByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(kaki.getId(), TODAY);
 
         assertThat(reservations.size()).isEqualTo(1);
     }

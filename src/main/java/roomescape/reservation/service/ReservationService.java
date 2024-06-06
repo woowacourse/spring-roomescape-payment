@@ -136,7 +136,7 @@ public class ReservationService {
 
         Waitings waitings = new Waitings(waitingReservations);
 
-        return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
+        return reservationRepository.findAllExceptCancelByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
                 .map(reservationWithPayment -> MemberReservationResponse.toResponse(
                         reservationWithPayment,
                         waitings.findMemberRank(reservationWithPayment.reservation(), loginMember.id())
