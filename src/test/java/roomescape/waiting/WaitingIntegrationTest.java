@@ -223,7 +223,7 @@ class WaitingIntegrationTest {
                 .then().log().all()
 
                 .statusCode(403)
-                .body("detail", equalTo("회원의 권한이 없어, 식별자 2인 예약 대기를 삭제할 수 없습니다."));
+                .body("detail", equalTo("회원의 권한이 없어, 식별자 1인 예약 대기를 삭제할 수 없습니다."));
     }
 
     @DisplayName("예약 대기 거절 성공")

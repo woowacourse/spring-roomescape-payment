@@ -20,7 +20,7 @@ import roomescape.waiting.service.WaitingService;
 
 @RestController
 @RequestMapping
-public class WaitingController {
+public class WaitingController extends WaitingControllerApi {
 
     private final WaitingService waitingService;
 
