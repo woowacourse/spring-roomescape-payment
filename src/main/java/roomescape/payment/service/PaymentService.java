@@ -29,4 +29,8 @@ public class PaymentService {
 
         return paymentRepository.save(payment);
     }
+
+    public void deleteByReservationId(Long reservationId) {
+        paymentRepository.deleteByReservationId(reservationId);
+    }
 }
