@@ -2,6 +2,7 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentDto;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
@@ -34,7 +35,10 @@ public class ReservationFacadeService {
 
     @Transactional(rollbackFor = {Exception.class})
     public void cancelReservation(final Long id) {
-        paymentService.cancelPayment(id);
-        reservationService.cancelReservation(id);
+        final Reservation reservation = reservationService.findReservationById(id);
+        if (reservation.isReserved()) {
+            paymentService.cancelPayment(reservation);
+        }
+        reservationService.cancelReservation(reservation);
     }
 }

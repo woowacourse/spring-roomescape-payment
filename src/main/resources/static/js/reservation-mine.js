@@ -62,7 +62,6 @@ function render(data) {
             paymentButton.textContent = '결제';
             paymentButton.className = 'btn btn-primary';
             paymentButton.onclick = function (event) {
-                //onReservationButtonClick(item.reservationId).then(() => window.location.reload());
                 onReservationButtonClick(event, paymentWidget, item.reservationId);
             };
             paymentCell.appendChild(paymentButton);

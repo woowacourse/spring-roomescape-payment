@@ -35,7 +35,7 @@ class MemberServiceTest {
         final Member expectedMember = MEMBER_TENNY(1L);
         given(memberRepository.findById(anyLong()))
                 .willReturn(Optional.of(expectedMember));
-
+        
         // when
         final MemberResponse memberResponse = memberService.findById(1L);
 

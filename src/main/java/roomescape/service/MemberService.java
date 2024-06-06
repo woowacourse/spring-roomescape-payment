@@ -19,7 +19,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public MemberService(final MemberRepository memberRepository, final JwtTokenProvider jwtTokenProvider) {
+    public MemberService(final MemberRepository memberRepository,
+                         final JwtTokenProvider jwtTokenProvider) {
         this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }

@@ -9,7 +9,5 @@ import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    Optional<Payment> findByReservation(final Reservation reservation);
-
     Optional<Payment> findByReservationAndStatus(final Reservation reservation, final PaymentStatus status);
 }

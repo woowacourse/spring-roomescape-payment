@@ -68,6 +68,10 @@ public class Reservation {
         return this.status == ReservationStatus.RESERVED;
     }
 
+    public boolean isWaiting() {
+        return this.status == ReservationStatus.WAITING;
+    }
+
     public Long getId() {
         return id;
     }

@@ -50,16 +50,13 @@ public class PaymentService {
         }
     }
 
-    // TODO test
     public void createPayment(final Long reservationId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
         final Payment payment = new Payment(reservation, PaymentStatus.PAID);
-        reservation.toReserved();
         paymentRepository.save(payment);
     }
 
-    // TODO test
     public void payForReservation(final PaymentDto paymentDto, final Long reservationId) {
         paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)
@@ -70,14 +67,11 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
-    // TODO test
-    public void cancelPayment(final Long reservationId) {
-        final Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
-
+    public void cancelPayment(final Reservation reservation) {
         final Payment payment = paymentRepository.findByReservationAndStatus(reservation, PaymentStatus.PAID)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.PAYMENT_NOT_FOUND));
         payment.toCanceled();
-        // TODO paymentClient.cancel()
+        final PaymentDto paymentDto = new PaymentDto(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount());
+        paymentClient.cancel(paymentDto, "고객 변심");
     }
 }

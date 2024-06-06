@@ -28,8 +28,8 @@ class PaymentRepositoryTest {
     private PaymentRepository paymentRepository;
 
     @Test
-    @DisplayName("예약 건에 대한 결제 정보를 조회한다.")
-    void findPaymentByReservation() {
+    @DisplayName("예약, 결제 상태로 결제 정보를 조회한다.")
+    void findByReservationAndStatus() {
         // given
         final Member member = MEMBER_TENNY();
         final ReservationTime reservationTime = RESERVATION_TIME_SIX();
@@ -46,7 +46,7 @@ class PaymentRepositoryTest {
         testEntityManager.flush();
 
         // when
-        final Optional<Payment> actual = paymentRepository.findByReservation(reservation);
+        final Optional<Payment> actual = paymentRepository.findByReservationAndStatus(reservation, PaymentStatus.PAID);
 
         // then
         assertThat(actual).isNotEmpty();

@@ -103,10 +103,17 @@ public class ReservationService {
                 .toList();
     }
 
-    public void cancelReservation(final Long id) {
-        final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
+    public void cancelReservation(final Reservation reservation) {
+        if (reservation.isWaiting()) {
+            reservationRepository.delete(reservation);
+            return;
+        }
         reservation.changeStatus(ReservationStatus.CANCELED);
+    }
+
+    public Reservation findReservationById(final Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
     }
 
     public List<MyReservationWithRankResponse> findMyReservationsAndWaitings(final LoginMember loginMember) {
