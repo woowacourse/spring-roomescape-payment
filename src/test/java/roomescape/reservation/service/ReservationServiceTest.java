@@ -25,6 +25,7 @@ import roomescape.reservation.domain.specification.ReservationSpecification;
 import roomescape.util.ServiceTest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -60,7 +61,16 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("예약 생성에 성공한다.")
     @Test
     void create() {
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        );
+
+        BDDMockito.doReturn(paymentResponse)
                 .when(paymentClient)
                 .confirm(any());
 

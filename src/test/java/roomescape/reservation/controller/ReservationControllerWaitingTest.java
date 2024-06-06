@@ -17,6 +17,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.util.ControllerTest;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +36,15 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @BeforeEach
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        );
+        BDDMockito.doReturn(paymentResponse)
                 .when(paymentClient)
                 .confirm(any());
     }

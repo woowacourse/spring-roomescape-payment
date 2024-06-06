@@ -69,7 +69,7 @@ public class WaitingReservationService {
         }
         reservationRepository.deleteById(reservationId);
         reservationRepository.findFirstByReservationSlotOrderByCreatedAt(reservation.getReservationSlot())
-                        .ifPresent(Reservation::bookReservation);
+                        .ifPresent(Reservation::pendingReservation);
     }
 
     @Transactional

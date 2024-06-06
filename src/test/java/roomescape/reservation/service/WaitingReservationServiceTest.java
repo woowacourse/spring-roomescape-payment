@@ -68,7 +68,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         assertThat(addedReservation.getStatus()).isEqualTo(ReservationStatus.WAITING);
     }
 
-    @DisplayName("예약 대기 변경 성공 : 예약 삭제 시 대기 번호가 빠른 예약이 BOOKED 처리된다.")
+    @DisplayName("예약 대기 변경 성공 : 예약 삭제 시 대기 번호가 빠른 예약이 PENDING 처리된다.")
     @Test
     void waitingReservationConfirm() {
         Reservation bookedReservation = ReservationFixture.getBookedReservation();
@@ -83,6 +83,6 @@ class WaitingReservationServiceTest extends ServiceTest {
                 .findAny()
                 .get();
 
-        assertThat(nextReservationWithStatus.status()).isEqualTo(ReservationStatus.BOOKED);
+        assertThat(nextReservationWithStatus.status()).isEqualTo(ReservationStatus.PENDING);
     }
 }
