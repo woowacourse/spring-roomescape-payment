@@ -51,7 +51,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handlePaymentExceptionError(PaymentFailException e) {
-        log.error("Toss Payment Server Error 발생: {}", e.getMessage(), e);
+        log.error("Toss Payment Error 발생: {}", e.getMessage(), e);
+        if (e.isClientError()) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
         return ResponseEntity.internalServerError().body(new ErrorResponse(TOSS_PAYMENT_SERVER_ERROR_MESSAGE));
     }
 
