@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
@@ -18,6 +18,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -30,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import roomescape.dto.payment.PaymentConfirmRequest;
 import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.TossPaymentErrorCode;
 
 class PaymentClientTest {
 
@@ -66,17 +69,18 @@ class PaymentClientTest {
         mockServer.verify();
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(TossPaymentErrorCode.class)
     @DisplayName("결제 승인 오류 시 예외가 발생한다.")
-    void confirmException() throws IOException {
+    void confirmException(TossPaymentErrorCode tossErrorCode) throws IOException {
         var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L, 1L);
 
         mockServer.expect(requestTo("/confirm"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withServerError());
+                .andRespond(withStatus(tossErrorCode.httpStatusCode()));
 
         when(errorHandler.hasError(any())).thenReturn(true);
-        doThrow(new RoomescapeException(INTERNAL_SERVER_ERROR)).when(errorHandler).handleError(any());
+        doThrow(new RoomescapeException(tossErrorCode)).when(errorHandler).handleError(any());
 
         assertThatThrownBy(() -> paymentClient.confirm(request))
                 .isInstanceOf(RoomescapeException.class)
