@@ -31,6 +31,7 @@ import roomescape.exception.RoomEscapeException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
@@ -39,6 +40,7 @@ public class ReservationService {
     private final PaymentClient paymentRestClient;
     private final PaymentRepository paymentRepository;
 
+    @Transactional
     public ReservationResponse reserve(UserReservationRequest request, Long memberId) {
         Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
         if (reservation.isPending()) {
@@ -74,6 +76,7 @@ public class ReservationService {
         return paymentRepository.save(paymentResponse.toPayment());
     }
 
+    @Transactional
     public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
         Reservation reservation = reservationRepository.getReservation(request.reservationId());
         rejectIfNotOwner(reservation, memberId);
@@ -88,7 +91,6 @@ public class ReservationService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationResponse> findAllReservedReservations() {
         List<Reservation> reservations = reservationRepository.findAll(Status.RESERVED);
         return reservations.stream()
@@ -96,7 +98,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationResponse> findAllReservationByConditions(ReservationSearchCondition condition) {
         List<Reservation> reservations = reservationRepository.findReservation(
                 condition.start(), condition.end(), condition.memberId(), condition.themeId());
@@ -105,7 +106,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<UserReservationResponse> findAllWithRank(Long memberId) {
         List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(memberId);
 
@@ -114,7 +114,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationResponse> findAllWaitings() {
         List<Reservation> reservations = reservationRepository.findAll(Status.WAITING);
         return reservations.stream()
