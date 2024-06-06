@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static roomescape.Fixture.VALID_RESERVATION_TIME;
@@ -120,6 +121,14 @@ public class ReservationWaitingControllerTest extends ControllerTest {
                 .when().delete("/reservation-waitings/" + waiting.getId())
                 .then().log().all()
                 .statusCode(204);
+
+        LocalDateTime deletedAt = jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM reservation_waiting WHERE id = ?",
+                new Object[]{1L},
+                (rs, rowNum) -> rs.getTimestamp("deleted_at").toLocalDateTime()
+        );
+
+        assertThat(deletedAt).isNotNull();
     }
 
     @DisplayName("내 예약 대기 목록을 조회한다. -> 200")

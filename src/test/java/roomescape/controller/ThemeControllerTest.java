@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,9 +45,13 @@ class ThemeControllerTest extends ControllerTest {
                 .then().log().all()
                 .statusCode(204);
 
-        Long count = jdbcTemplate.queryForObject("SELECT COUNT(id) FROM theme", Long.class);
+        LocalDateTime deletedAt = jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM theme WHERE id = ?",
+                new Object[]{1L},
+                (rs, rn) -> rs.getTimestamp("deleted_at").toLocalDateTime()
+        );
 
-        assertThat(count).isEqualTo(1L);
+        assertThat(deletedAt).isNotNull();
     }
 
     @DisplayName("테마를 조회한다 -> 200")

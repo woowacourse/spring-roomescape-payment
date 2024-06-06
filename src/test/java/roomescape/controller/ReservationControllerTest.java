@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static roomescape.Fixture.VALID_ADMIN_EMAIL;
@@ -11,6 +12,7 @@ import static roomescape.Fixture.VALID_USER_NAME;
 import static roomescape.Fixture.VALID_USER_PASSWORD;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +59,14 @@ class ReservationControllerTest extends ControllerTest {
     void deleteBy() {
         ReservationSteps.deleteReservation(1L)
                 .statusCode(204);
+
+        LocalDateTime deletedAt = jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM reservation WHERE id = ?",
+                new Object[]{1L},
+                (rs, rowNum) -> rs.getTimestamp("deleted_at").toLocalDateTime()
+        );
+
+        assertThat(deletedAt).isNotNull();
     }
 
     @DisplayName("예약을 조회한다. -> 200")

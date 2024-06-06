@@ -1,9 +1,11 @@
 package roomescape.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,14 @@ class ReservationTimeController extends ControllerTest {
                 .when().delete("/times/1")
                 .then().log().all()
                 .statusCode(204);
+
+        LocalDateTime deletedAt = jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM reservation_time WHERE id = ?",
+                new Object[]{1L},
+                (rs, rowNum) -> rs.getTimestamp("deleted_at").toLocalDateTime()
+        );
+
+        assertThat(deletedAt).isNotNull();
     }
 
     @DisplayName("예약 시간을 조회한다. -> 200")
