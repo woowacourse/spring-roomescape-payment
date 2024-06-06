@@ -53,7 +53,7 @@ public class PaymentService {
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })
                 .retrieve()
-                .onStatus(this::isFailToPayment, (request, response) -> {
+                .onStatus(r->!r.is2xxSuccessful(), (request, response) -> {
                     String errorMessage = parseErrorMessage(response);
                     throw new PaymentException(
                             "결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value())
@@ -61,10 +61,6 @@ public class PaymentService {
                 })
                 .toEntity(PaymentResponse.class)
                 .getBody();
-    }
-
-    private boolean isFailToPayment(HttpStatusCode status) {
-        return status.is4xxClientError() || status.is5xxServerError();
     }
 
     private String parseErrorMessage(ClientHttpResponse response) throws IOException {
