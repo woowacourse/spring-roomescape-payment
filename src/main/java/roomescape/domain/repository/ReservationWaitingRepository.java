@@ -15,6 +15,8 @@ public interface ReservationWaitingRepository extends JpaRepository<ReservationW
 
     boolean existsByMemberIdAndDateAndTimeIdAndThemeId(Long memberId, ReservationDate date, Long timeId, Long themeId);
 
+    boolean existsByDateAndTimeIdAndThemeId(ReservationDate date, Long timeId, Long themeId);
+
     @Query("""
             SELECT new roomescape.domain.ReservationWaitingWithRank(
                 w,

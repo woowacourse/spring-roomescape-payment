@@ -118,4 +118,14 @@ public class ReservationWaitingService {
         ReservationWaiting updatedWaiting = reservationWaitingRepository.save(waiting);
         return new ReservationWaitingDto(updatedWaiting);
     }
+
+    public boolean existsByReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("존재하지 않는 예약입니다. (id: %d)", reservationId)));
+        ReservationDate date = reservation.getDate();
+        Long timeId = reservation.getTime().getId();
+        Long themeId = reservation.getTheme().getId();
+
+        return reservationWaitingRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId);
+    }
 }
