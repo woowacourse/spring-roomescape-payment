@@ -1,4 +1,4 @@
-package roomescape.payment.dto.resonse;
+package roomescape.payment.service.dto.resonse;
 
 public record PaymentErrorResponse(
         String code,

@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.payment.dto.resonse.PaymentErrorResponse;
+import roomescape.payment.service.dto.resonse.PaymentErrorResponse;
 
 public class PaymentErrorHandler implements ResponseErrorHandler {
 

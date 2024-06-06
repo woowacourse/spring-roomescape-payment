@@ -6,7 +6,7 @@ import roomescape.auth.domain.Role;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
-import roomescape.payment.dto.resonse.PaymentConfirmResponse;
+import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;

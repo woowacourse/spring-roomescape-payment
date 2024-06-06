@@ -21,9 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.common.exception.PaymentException;
 import roomescape.payment.config.PaymentConfig;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.resonse.PaymentConfirmResponse;
-import roomescape.payment.dto.resonse.PaymentErrorResponse;
+import roomescape.payment.service.dto.request.PaymentConfirmRequest;
+import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
+import roomescape.payment.service.dto.resonse.PaymentErrorResponse;
 
 @RestClientTest(TossPaymentClient.class)
 @Import(PaymentConfig.class)

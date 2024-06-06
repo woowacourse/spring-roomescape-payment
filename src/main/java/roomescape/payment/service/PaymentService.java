@@ -1,9 +1,11 @@
 package roomescape.payment.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.payment.controller.dto.response.PaymentResponse;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.resonse.PaymentConfirmResponse;
+import roomescape.payment.service.dto.request.PaymentConfirmRequest;
+import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 
@@ -32,5 +34,12 @@ public class PaymentService {
 
     public void deleteByReservationId(Long reservationId) {
         paymentRepository.deleteByReservationId(reservationId);
+    }
+
+    public List<PaymentResponse> findAll() {
+        return paymentRepository.findAll()
+                .stream()
+                .map(PaymentResponse::toResponse)
+                .toList();
     }
 }

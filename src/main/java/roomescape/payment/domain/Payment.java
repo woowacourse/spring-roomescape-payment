@@ -45,11 +45,23 @@ public class Payment {
         this.reservation = reservation;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getPaymentKey() {
         return paymentKey;
     }
 
+    public String getOrderId() {
+        return orderId;
+    }
+
     public Long getAmount() {
         return amount;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
     }
 }

@@ -1,4 +1,4 @@
-package roomescape.payment.dto.request;
+package roomescape.payment.service.dto.request;
 
 import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 
