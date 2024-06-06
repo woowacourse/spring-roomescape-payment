@@ -25,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.config.ClientConfig;
+import roomescape.exception.ExceptionResponse;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
