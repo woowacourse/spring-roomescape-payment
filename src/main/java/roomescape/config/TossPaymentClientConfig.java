@@ -21,7 +21,7 @@ public class TossPaymentClientConfig {
     @Bean
     public RestTemplate paymentApproveRestTemplate() {
         return new RestTemplateBuilder()
-                .rootUri(tossPaymentsProperties.getBaseUrl())
+                .rootUri(tossPaymentsProperties.baseUrl())
                 .setConnectTimeout(Duration.ofSeconds(5))
                 .setReadTimeout(Duration.ofSeconds(30))
                 .errorHandler(new PaymentApproveErrorHandler())
@@ -31,7 +31,7 @@ public class TossPaymentClientConfig {
     @Bean
     public RestTemplate paymentRefundRestTemplate() {
         return new RestTemplateBuilder()
-                .rootUri(tossPaymentsProperties.getBaseUrl())
+                .rootUri(tossPaymentsProperties.baseUrl())
                 .setConnectTimeout(Duration.ofSeconds(5))
                 .setReadTimeout(Duration.ofSeconds(30))
                 .errorHandler(new PaymentRefundErrorHandler())
