@@ -8,6 +8,7 @@ import roomescape.controller.request.ReservationRequest;
 import roomescape.controller.response.MemberReservationResponse;
 import roomescape.controller.response.ReservationResponse;
 import roomescape.model.Member;
+import roomescape.model.PaymentInfo;
 import roomescape.model.Reservation;
 import roomescape.service.AuthService;
 import roomescape.service.PaymentService;
@@ -56,6 +57,7 @@ public class ReservationController {
                                                                  @AuthenticationPrincipal Member member) {
         paymentService.confirmReservationPayments(request);
         Reservation reservation = reservationService.addReservation(request, member);
+        PaymentInfo paymentInfo = paymentService.addPayment(request, reservation);
         ReservationResponse reservationResponse = new ReservationResponse(reservation);
         return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservationResponse);
     }

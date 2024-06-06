@@ -9,6 +9,9 @@ import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.InvalidPaymentInformationException;
 import roomescape.exception.PaymentException;
 import roomescape.exception.PaymentServerErrorException;
+import roomescape.model.PaymentInfo;
+import roomescape.model.Reservation;
+import roomescape.repository.PaymentInfoRepository;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -17,11 +20,13 @@ public class PaymentService {
 
     private final static long RESERVATION_PRICE = 1999999;
     private final RestClient restClient;
+    private final PaymentInfoRepository paymentInfoRepository;
     @Value("${payment.toss.payment-confirm-url}")
     private String confirmUrl;
 
-    public PaymentService(RestClient restClient) {
+    public PaymentService(RestClient restClient, PaymentInfoRepository paymentInfoRepository) {
         this.restClient = restClient;
+        this.paymentInfoRepository = paymentInfoRepository;
     }
 
     public void confirmReservationPayments(ReservationRequest request) {
@@ -43,5 +48,10 @@ public class PaymentService {
         if (RESERVATION_PRICE != amount) {
             throw new PaymentException("클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [%d]".formatted(amount));
         }
+    }
+
+    public PaymentInfo addPayment(ReservationRequest request, Reservation reservation) {
+        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
+        return paymentInfoRepository.save(paymentInfo);
     }
 }
