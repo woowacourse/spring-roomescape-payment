@@ -2,12 +2,15 @@ package roomescape.core.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -39,20 +42,26 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
+    @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "예약 상태는 비어있을 수 없습니다.")
+    private ReservationStatus status;
+
     public Reservation() {
     }
 
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme) {
-        this(null, member, date, time, theme);
+    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
+                       final ReservationStatus status) {
+        this(null, member, date, time, theme, status);
     }
 
     public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme) {
+                       final Theme theme, final ReservationStatus status) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);
         this.time = time;
         this.theme = theme;
+        this.status = status;
     }
 
     private LocalDate parseDate(final String date) {
@@ -82,6 +91,10 @@ public class Reservation {
         return date.isEqual(LocalDate.now(kst));
     }
 
+    public void cancel() {
+        this.status = ReservationStatus.CANCELED;
+    }
+
     public Long getId() {
         return id;
     }
@@ -104,5 +117,9 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public ReservationStatus getStatus() {
+        return status;
     }
 }
