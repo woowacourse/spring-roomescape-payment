@@ -1,9 +1,10 @@
 package roomescape.service.booking.reservation.module;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.reservation.Reservation;
+import roomescape.domain.payment.Payment;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.repository.PaymentRepository;
 
@@ -11,7 +12,6 @@ import roomescape.repository.PaymentRepository;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-
     private final TossPaymentClient tossPaymentClient;
 
     public PaymentService(final PaymentRepository paymentRepository, TossPaymentClient tossPaymentClient) {
@@ -19,8 +19,24 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public void pay(PaymentRequest paymentRequest, final Reservation reservation) { // TODO: 얘도 트랜잭션 적용되나?
-        PaymentResponse paymentResponse = tossPaymentClient.confirm(paymentRequest);
-        paymentRepository.save(paymentResponse.toEntity(reservation));
+    public PaymentResponse payByToss(PaymentRequest paymentRequest) { // TODO: 얘도 트랜잭션 적용되나?
+        return tossPaymentClient.confirm(paymentRequest);
+    }
+
+    public Payment save(final Payment rawPayment) {
+        return paymentRepository.save(rawPayment);
+    }
+
+    public PaymentResponse findPaymentById(final Long id) {
+        Payment payment = findById(id);
+        return PaymentResponse.from(payment);
+    }
+
+    private Payment findById(final Long id) {
+       return paymentRepository.findById(id)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "일치하는 결제 정보가 존재하지 않습니다.",
+                        "payment_id : " + id
+                ));
     }
 }

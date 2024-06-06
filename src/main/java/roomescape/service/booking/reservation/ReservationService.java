@@ -76,18 +76,20 @@ public class ReservationService {
     }
 
     public List<UserReservationPaymentResponse> findReservationByMemberId(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+        List<UserReservationResponse> reservationResponses = reservationSearchService.findReservationByMemberId(memberId);
         List<UserReservationPaymentResponse> reservationPaymentResponses = new ArrayList<>();
-        for (Reservation reservation : reservations) {
-            if (reservation.isReserved()) {
-                Payment payment = paymentRepository.findByReservation(reservation);
-                reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservation, payment));
+
+        for (UserReservationResponse reservationResponse : reservationResponses) {
+            if (reservationResponse.isReserved()) {
+                PaymentResponse paymentResponse = paymentService.findPaymentById(reservationResponse.paymentId());
+                reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservationResponse, paymentResponse));
             }
-            if (!reservation.isReserved()) {
-                Waiting waiting = findWaitingByReservation(reservation);
-                reservationPaymentResponses.add(UserReservationPaymentResponse.of(waiting));
+            if (!reservationResponse.isReserved()) {
+                WaitingResponse waitingResponse = waitingService.findWaitingByReservationId(reservationResponse.id());
+                reservationPaymentResponses.add(UserReservationPaymentResponse.from(waitingResponse));
             }
         }
+
         return reservationPaymentResponses;
     }
 

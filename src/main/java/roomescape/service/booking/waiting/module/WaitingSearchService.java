@@ -38,4 +38,17 @@ public class WaitingSearchService {
                         "waiting_id : " + waitingId
                 ));
     }
+
+    public WaitingResponse findWaitingByReservationId(final Long reservationId) {
+        Waiting waiting = findByReservationId(reservationId);
+        return WaitingResponse.from(waiting);
+    }
+
+    private Waiting findByReservationId(final Long reservationId) {
+        return waitingRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "잘못된 예약 대기 정보 입니다.",
+                        "reservationId : " + reservationId
+                ));
+    }
 }

@@ -3,9 +3,8 @@ package roomescape.dto.reservation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.payment.Payment;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.waiting.Waiting;
+import roomescape.dto.payment.PaymentResponse;
+import roomescape.dto.waiting.WaitingResponse;
 
 public record UserReservationPaymentResponse(
         Long id,
@@ -20,25 +19,25 @@ public record UserReservationPaymentResponse(
     private static final String RESERVED = "예약";
     private static final String WAITING_ORDER = "%d번째 예약 대기";
 
-    public static UserReservationPaymentResponse of(final Reservation reservation, final Payment payment) {
+    public static UserReservationPaymentResponse of(final UserReservationResponse reservation, final PaymentResponse payment) {
         return new UserReservationPaymentResponse(
-                reservation.getId(),
-                reservation.getTheme().getThemeName(),
-                reservation.getDate(),
-                reservation.getTime().getStartAt(),
+                reservation.id(),
+                reservation.theme(),
+                reservation.date(),
+                reservation.time(),
                 RESERVED,
-                payment.getPaymentKey(),
-                payment.getAmount()
+                payment.paymentKey(),
+                payment.totalAmount()
         );
     }
 
-    public static UserReservationPaymentResponse of(final Waiting waiting) {
-        return new UserReservationPaymentResponse(
-                waiting.getId(),
-                waiting.getReservation().getTheme().getThemeName(),
-                waiting.getReservation().getDate(),
-                waiting.getReservation().getTime().getStartAt(),
-                String.format(WAITING_ORDER, waiting.getWaitingOrderValue()),
+    public static UserReservationPaymentResponse from(final WaitingResponse waiting) {
+                return new UserReservationPaymentResponse(
+                waiting.waitingId(),
+                waiting.theme(),
+                waiting.date(),
+                waiting.startAt(),
+                String.format(WAITING_ORDER, waiting.order()),
                 "",
                 BigDecimal.ZERO
         );

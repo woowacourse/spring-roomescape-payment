@@ -3,6 +3,7 @@ package roomescape.dto.reservation;
 import java.time.LocalDate;
 import java.util.Objects;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.theme.Theme;
@@ -40,13 +41,14 @@ public record ReservationRequest(
         );
     }
 
-    public Reservation toEntity(ReservationTime reservationTime, Theme theme, Member member, Status status) {
+    public Reservation toEntity(ReservationTime reservationTime, Theme theme, Member member, Status status, Payment payment) {
         return new Reservation(
                 date,
                 reservationTime,
                 theme,
                 member,
-                status
+                status,
+                payment
         );
     }
 }

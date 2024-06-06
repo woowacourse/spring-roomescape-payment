@@ -4,9 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
-import roomescape.domain.reservation.Reservation;
 
 @Entity
 public class Payment {
@@ -15,24 +13,27 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String orderId;
+
     private String paymentKey;
 
     private BigDecimal amount;
 
-    @OneToOne
-    private Reservation reservation;
-
     protected Payment() {
     }
 
-    public Payment(final String paymentKey, final BigDecimal amount, final Reservation reservation) {
+    public Payment(final String orderId, final BigDecimal amount, final String paymentKey) {
+        this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
-        this.reservation = reservation;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getOrderId() {
+        return orderId;
     }
 
     public String getPaymentKey() {
@@ -41,9 +42,5 @@ public class Payment {
 
     public BigDecimal getAmount() {
         return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
     }
 }

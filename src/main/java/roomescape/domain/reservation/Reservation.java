@@ -8,8 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.time.ReservationTime;
 
@@ -34,21 +36,20 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @OneToOne
+    private Payment payment;
+
     protected Reservation() {
     }
 
-    public Reservation(LocalDate date, ReservationTime reservationTime, Theme theme, Member member, Status status) {
-        this(null, date, reservationTime, theme, member, status);
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime reservationTime, Theme theme, Member member,
-                       Status status) {
-        this.id = id;
+    public Reservation(final LocalDate date, final ReservationTime time, final Theme theme, final Member member,
+                       final Status status, final Payment payment) {
         this.date = date;
-        this.time = reservationTime;
+        this.time = time;
         this.theme = theme;
         this.member = member;
         this.status = status;
+        this.payment = payment;
     }
 
     public void changeStatusToReserve() {
@@ -81,6 +82,14 @@ public class Reservation {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(final Payment payment) {
+        this.payment = payment;
     }
 
     @Override

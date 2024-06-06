@@ -54,7 +54,7 @@ public class WaitingRegisterService {
         ReservationTime reservationTime = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member member = findMember(request.memberId());
-        return request.toEntity(reservationTime, theme, member, Status.WAITING);
+        return request.toEntity(reservationTime, theme, member, Status.WAITING, null);
     }
 
     private ReservationTime findReservationTime(Long timeId) {

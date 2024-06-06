@@ -45,4 +45,8 @@ public class WaitingService {
     public void cancelWaiting(Long waitingId) {
         waitingCancelService.cancelWaiting(waitingId);
     }
+
+    public WaitingResponse findWaitingByReservationId(final Long reservationId) {
+        return waitingSearchService.findWaitingByReservationId(reservationId);
+    }
 }

@@ -10,7 +10,8 @@ public record UserReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        Long paymentId
 ) {
 
     private static final String RESERVED = "예약";
@@ -22,7 +23,8 @@ public record UserReservationResponse(
                 reservation.getTheme().getThemeName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                RESERVED
+                RESERVED,
+                reservation.getPayment().getId()
         );
     }
 
@@ -33,7 +35,12 @@ public record UserReservationResponse(
                 reservation.getTheme().getThemeName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                String.format(WAITING_ORDER, waiting.getWaitingOrderValue())
+                String.format(WAITING_ORDER, waiting.getWaitingOrderValue()),
+                null
         );
+    }
+
+    public boolean isReserved() {
+        return this.status.equals(RESERVED);
     }
 }
