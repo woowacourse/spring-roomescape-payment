@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.MultipleResponses;
@@ -19,6 +20,7 @@ import roomescape.reservation.dto.TimeSaveRequest;
 import roomescape.reservation.service.ReservationTimeService;
 
 @RestController
+@RequestMapping("/times")
 public class ReservationTimeApiController {
 
     private final ReservationTimeService reservationTimeService;
@@ -27,14 +29,14 @@ public class ReservationTimeApiController {
         this.reservationTimeService = reservationTimeService;
     }
 
-    @GetMapping("/times")
+    @GetMapping
     public ResponseEntity<MultipleResponses<TimeResponse>> findAll() {
         List<TimeResponse> times = reservationTimeService.findAll();
 
         return ResponseEntity.ok(new MultipleResponses<>(times));
     }
 
-    @GetMapping("/times/available")
+    @GetMapping("/available")
     public ResponseEntity<MultipleResponses<AvailableReservationTimeResponse>> findAvailableTimes(
             @RequestParam("date") LocalDate date,
             @RequestParam("theme-id") Long themeId
@@ -44,14 +46,14 @@ public class ReservationTimeApiController {
         return ResponseEntity.ok(new MultipleResponses<>(availableTimes));
     }
 
-    @PostMapping("/times")
+    @PostMapping
     public ResponseEntity<TimeResponse> save(@Valid @RequestBody TimeSaveRequest timeSaveRequest) {
         TimeResponse timeResponse = reservationTimeService.save(timeSaveRequest);
 
         return ResponseEntity.created(URI.create("/times/" + timeResponse.id())).body(timeResponse);
     }
 
-    @DeleteMapping("/times/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         reservationTimeService.delete(id);
 

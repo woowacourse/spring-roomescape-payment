@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
@@ -21,6 +22,7 @@ import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
+@RequestMapping("/reservations")
 public class ReservationApiController {
 
     private final ReservationService reservationService;
@@ -31,14 +33,14 @@ public class ReservationApiController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping("/reservations/mine")
+    @GetMapping("/mine")
     public ResponseEntity<MultipleResponses<MemberReservationResponse>> findMemberReservations(LoginMember loginMember) {
         List<MemberReservationResponse> memberReservationResponses = reservationService.findMemberReservations(loginMember);
 
         return ResponseEntity.ok(new MultipleResponses<>(memberReservationResponses));
     }
 
-    @PostMapping("/reservations")
+    @PostMapping
     public ResponseEntity<ReservationResponse> saveReservationByUser(
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
@@ -50,7 +52,7 @@ public class ReservationApiController {
                 .body(reservationResponse);
     }
 
-    @PostMapping("/reservations/waiting")
+    @PostMapping("/waiting")
     public ResponseEntity<ReservationResponse> saveReservationWaiting(
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
@@ -61,14 +63,14 @@ public class ReservationApiController {
                 .body(reservationResponse);
     }
 
-    @PatchMapping("/reservations/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> cancel(@PathVariable("id") Long id) {
         reservationService.cancelById(id);
 
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/reservations/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         reservationService.delete(id);
 

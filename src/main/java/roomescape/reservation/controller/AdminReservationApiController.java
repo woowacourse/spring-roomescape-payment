@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.MultipleResponses;
@@ -21,6 +22,7 @@ import roomescape.reservation.dto.ReservationWaitingResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
+@RequestMapping("/admin")
 public class AdminReservationApiController {
 
     private final ReservationService reservationService;
@@ -29,7 +31,7 @@ public class AdminReservationApiController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/admin/reservations")
+    @GetMapping("/reservations")
     public ResponseEntity<MultipleResponses<ReservationResponse>> findAll(
             @RequestParam(name = "status", defaultValue = "SUCCESS") ReservationStatus reservationStatus
     ) {
@@ -38,7 +40,7 @@ public class AdminReservationApiController {
         return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
     }
 
-    @GetMapping("/admin/reservations/search")
+    @GetMapping("/reservations/search")
     public ResponseEntity<MultipleResponses<ReservationResponse>> findAllBySearchCond(
             @Valid @ModelAttribute ReservationSearchConditionRequest reservationSearchConditionRequest
     ) {
@@ -48,14 +50,14 @@ public class AdminReservationApiController {
         return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
     }
 
-    @GetMapping("/admin/reservations/waiting")
+    @GetMapping("/reservations/waiting")
     public ResponseEntity<MultipleResponses<ReservationWaitingResponse>> findWaitingReservations() {
         List<ReservationWaitingResponse> waitingReservations = reservationService.findWaitingReservations();
 
         return ResponseEntity.ok(new MultipleResponses<>(waitingReservations));
     }
 
-    @PostMapping("/admin/reservations")
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByAdmin(
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest
     ) {
@@ -66,7 +68,7 @@ public class AdminReservationApiController {
                 .body(reservationResponse);
     }
 
-    @DeleteMapping("/admin/reservations/{id}")
+    @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         reservationService.delete(id);
 
