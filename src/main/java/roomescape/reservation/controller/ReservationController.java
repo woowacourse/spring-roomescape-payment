@@ -24,7 +24,7 @@ import roomescape.reservation.service.ReservationService;
 
 @RestController
 @RequestMapping
-public class ReservationController {
+public class ReservationController extends ReservationControllerApi {
 
     private final ReservationService reservationService;
 
