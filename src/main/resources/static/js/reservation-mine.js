@@ -38,6 +38,8 @@ function render(data) {
       cancelCell.appendChild(cancelButton);
     } else { // 예약 완료 상태일 때
       row.insertCell(4).textContent = '';
+      row.insertCell(5).textContent = item.paymentKey;
+      row.insertCell(6).textContent = item.amount;
     }
   });
 }

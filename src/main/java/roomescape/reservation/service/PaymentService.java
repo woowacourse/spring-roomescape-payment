@@ -23,13 +23,15 @@ import com.google.gson.JsonParser;
 
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
-import roomescape.reservation.dto.PaymentResponse;
 import roomescape.reservation.encoder.BasicAuthEncoder;
+import roomescape.reservation.model.Payment;
+import roomescape.reservation.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
 
     private final RestClient tossRestClient;
+    private final PaymentRepository paymentRepository;
 
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
@@ -38,18 +40,20 @@ public class PaymentService {
 
     public PaymentService(RestTemplateBuilder builder,
                           @Value("${third-party-api.toss-payment.url}") String url,
-                          @Value("${third-party-api.toss-payment.path.payment}") String path) {
+                          @Value("${third-party-api.toss-payment.path.payment}") String path,
+                          PaymentRepository paymentRepository) {
         RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(3000, ChronoUnit.MILLIS))
                 .setReadTimeout(Duration.of(1000, ChronoUnit.MILLIS))
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url + path))
                 .build();
-        tossRestClient = RestClient.create(tossPaymentRestTemplate);
+        this.tossRestClient = RestClient.create(tossPaymentRestTemplate);
+        this.paymentRepository = paymentRepository;
     }
 
-    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
+    public Payment requestTossPayment(PaymentRequest paymentRequest) {
         String authorization = BasicAuthEncoder.encode(tossSecretKey);
 
-        return tossRestClient.post()
+        Payment payment = tossRestClient.post()
                 .uri(confirmPath)
                 .header("Authorization", authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
@@ -59,8 +63,10 @@ public class PaymentService {
                     String errorMessage = parseErrorMessage(response);
                     throw new PaymentException("결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value()));
                 })
-                .toEntity(PaymentResponse.class)
+                .toEntity(Payment.class)
                 .getBody();
+
+        return paymentRepository.save(payment);
     }
 
     private String parseErrorMessage(ClientHttpResponse response) throws IOException {

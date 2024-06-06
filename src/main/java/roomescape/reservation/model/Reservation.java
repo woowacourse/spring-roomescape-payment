@@ -25,6 +25,9 @@ public class Reservation {
     @ManyToOne
     private Member member;
 
+    @OneToOne
+    private Payment payment;
+
     public static Reservation of(
             final LocalDate date,
             final ReservationTime time,
@@ -108,7 +111,15 @@ public class Reservation {
         return member;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }
