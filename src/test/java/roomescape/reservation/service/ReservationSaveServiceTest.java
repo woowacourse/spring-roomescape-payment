@@ -7,7 +7,7 @@ import static roomescape.Fixture.HORROR_THEME;
 import static roomescape.Fixture.MEMBER_JOJO;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
-import static roomescape.Fixture.savedReservation;
+import static roomescape.Fixture.JOJO_RESERVATION;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +31,7 @@ import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class ReservationSaveServiceTest {
+
     @Autowired
     private DatabaseCleaner databaseCleaner;
 
@@ -66,7 +67,7 @@ class ReservationSaveServiceTest {
         );
 
         when(paymentService.confirm(any(), any())).thenReturn(
-                new Payment(1L, "paymentKey", "orderId", 1000L, savedReservation));
+                new Payment(1L, "paymentKey", "orderId", 1000L, JOJO_RESERVATION));
 
         reservationService.save(saveRequest);
 
