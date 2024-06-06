@@ -1,8 +1,10 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.REQUEST_TIMEOUT;
 import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import roomescape.component.TossPaymentClient;
 import roomescape.domain.payment.Payment;
@@ -33,7 +35,11 @@ public class PaymentService {
         final Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
         final Payment payment = request.toPayment(reservation);
-        paymentClient.confirm(request);
+        try {
+            paymentClient.confirm(request);
+        } catch (ResourceAccessException e) {
+            throw new RoomescapeException(REQUEST_TIMEOUT);
+        }
         paymentRepository.save(payment);
     }
 }
