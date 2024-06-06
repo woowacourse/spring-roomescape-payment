@@ -1,14 +1,36 @@
 package roomescape.payment.model;
 
-public class Payment {
-    private String paymentKey;
-    private String orderId;
-    private Long amount;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-    public Payment(final String paymentKey, final String orderId, final Long amount) {
+import java.util.Objects;
+
+@Entity
+public class Payment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String paymentKey;
+
+    private String orderId;
+
+    private Long totalAmount;
+
+    public Payment(final String paymentKey, final String orderId, final Long totalAmount) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
-        this.amount = amount;
+        this.totalAmount = totalAmount;
+    }
+
+    protected Payment() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getPaymentKey() {
@@ -19,7 +41,20 @@ public class Payment {
         return orderId;
     }
 
-    public Long getAmount() {
-        return amount;
+    public Long getTotalAmount() {
+        return totalAmount;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Payment payment = (Payment) object;
+        return Objects.equals(id, payment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
