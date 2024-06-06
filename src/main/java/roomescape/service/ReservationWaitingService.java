@@ -4,8 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.response.MemberReservationResponse;
 import roomescape.exception.NotFoundException;
-import roomescape.model.*;
-import roomescape.repository.MemberRepository;
+import roomescape.model.Member;
+import roomescape.model.Reservation;
+import roomescape.model.ReservationTime;
+import roomescape.model.Theme;
+import roomescape.model.Waiting;
+import roomescape.model.WaitingWithRank;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
@@ -17,21 +21,16 @@ public class ReservationWaitingService {
 
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
-    private final MemberRepository memberRepository;
 
-    public ReservationWaitingService(ReservationRepository reservationRepository, WaitingRepository waitingRepository, MemberRepository memberRepository) {
+    public ReservationWaitingService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
-        this.memberRepository = memberRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
-                new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
-
+    public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Member member) {
         List<Reservation> memberReservations = reservationRepository.findAllByMember(member);
-        List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
+        List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(member.getId());
 
         List<MemberReservationResponse> allMemberReservations =
                 new java.util.ArrayList<>(memberReservations.stream()
