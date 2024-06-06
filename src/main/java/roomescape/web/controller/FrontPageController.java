@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 class FrontPageController {
 
-    @GetMapping("/reservation")
+    @GetMapping("reservation")
     public String reservation(){
-        return "/reservation";
+        return "reservation";
     }
 
-    @GetMapping("/reservation-mine")
+    @GetMapping("reservation-mine")
     public String reservationMine() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 
-    @GetMapping("/login")
+    @GetMapping("login")
     public String login() {
-        return "/login";
+        return "login";
     }
 }
