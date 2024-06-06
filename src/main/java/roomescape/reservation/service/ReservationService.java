@@ -26,6 +26,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeService;
 
 @Service
+@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -45,6 +46,7 @@ public class ReservationService {
         this.themeService = themeService;
     }
 
+    @Transactional(readOnly = true)
     public ReservationsResponse findAllReservations() {
         List<ReservationResponse> response = reservationRepository.findAll()
                 .stream()
@@ -54,7 +56,6 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
-    @Transactional
     public void removeReservationById(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         reservationRepository.deleteById(reservationId);
@@ -125,6 +126,7 @@ public class ReservationService {
         return new Reservation(request.date(), time, theme, member, status);
     }
 
+    @Transactional(readOnly = true)
     public ReservationsResponse findFilteredReservations(ReservationSearchRequest request) {
         validateDateForSearch(request.dateFrom(), request.dateTo());
         Specification<Reservation> spec = new ReservationSearchSpecification()
@@ -153,6 +155,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public WaitingWithRanksResponse findWaitingWithRankById(Long memberId) {
         List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
                         memberId)

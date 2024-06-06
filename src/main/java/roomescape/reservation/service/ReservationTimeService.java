@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -17,6 +18,7 @@ import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 
 @Service
+@Transactional
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -30,12 +32,14 @@ public class ReservationTimeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional(readOnly = true)
     public ReservationTime findTimeById(Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_TIME_NOT_FOUND,
                         String.format("[reservationTimeId: %d]", id), HttpStatus.BAD_REQUEST));
     }
 
+    @Transactional(readOnly = true)
     public ReservationTimesResponse findAllTimes() {
         List<ReservationTimeResponse> response = reservationTimeRepository.findAll()
                 .stream()
@@ -74,7 +78,7 @@ public class ReservationTimeService {
         reservationTimeRepository.deleteById(id);
     }
 
-
+    @Transactional(readOnly = true)
     public ReservationTimeInfosResponse findAllAvailableTimesByDateAndTheme(LocalDate date, Long themeId) {
         List<ReservationTime> allTimes = reservationTimeRepository.findAll();
         List<Reservation> reservations = reservationRepository.findByThemeId(themeId);
