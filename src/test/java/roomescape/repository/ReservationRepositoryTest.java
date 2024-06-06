@@ -234,6 +234,6 @@ class ReservationRepositoryTest {
         Theme theme = themeRepository.findById(themeId).orElseThrow();
         Member member = memberRepository.findById(memberId).orElseThrow();
 
-        return new Reservation(date, reservationTime, theme, member, Status.RESERVED);
+        return new Reservation(date, reservationTime, theme, member, Status.RESERVED, null);
     }
 }
