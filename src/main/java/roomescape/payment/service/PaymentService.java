@@ -2,14 +2,16 @@ package roomescape.payment.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.controller.dto.response.PaymentResponse;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
-import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 
 @Service
+@Transactional(readOnly = true)
 public class PaymentService {
 
     private final TossPaymentClient tossPaymentClient;
@@ -20,6 +22,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public Payment confirm(PaymentConfirmRequest confirmRequest, Reservation reservation) {
         PaymentConfirmResponse confirmResponse = tossPaymentClient.confirmPayment(confirmRequest);
         Payment payment = new Payment(
@@ -32,6 +35,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    @Transactional
     public void deleteByReservationId(Long reservationId) {
         paymentRepository.deleteByReservationId(reservationId);
     }
