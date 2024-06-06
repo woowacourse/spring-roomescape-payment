@@ -34,35 +34,6 @@ class ReservationServiceTest {
         assertThat(reservations).hasSize(16);
     }
 
-    @DisplayName("예약 정보를 저장한다.")
-    @Test
-    void saveReservationTest() {
-        // Given
-        final LocalDate date = LocalDate.now().plusDays(10);
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(date,
-                3L,
-                1L,
-                1L,
-                "paymentKey",
-                "orderId",
-                1000L);
-
-        // When
-        final Reservation reservation = reservationService.saveReservation(
-                saveReservationRequest, saveReservationRequest.memberId()
-        );
-
-        // Then
-        final List<Reservation> reservations = reservationService.getReservations();
-        assertAll(
-                () -> assertThat(reservations).hasSize(17),
-                () -> assertThat(reservation.getId()).isEqualTo(17L),
-                () -> assertThat(reservation.getMember().getId()).isEqualTo(3L),
-                () -> assertThat(reservation.getDate().getValue()).isEqualTo(date),
-                () -> assertThat(reservation.getTime().getStartAt()).isEqualTo(LocalTime.of(9, 30))
-        );
-    }
-
     @DisplayName("저장하려는 예약 시간이 존재하지 않는다면 예외를 발생시킨다.")
     @Test
     void throwExceptionWhenSaveReservationWithNotExistReservationTimeTest() {

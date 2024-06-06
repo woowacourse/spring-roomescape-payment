@@ -58,6 +58,7 @@ public class ReservationService {
         );
     }
 
+    @Transactional
     public Reservation saveReservation(final SaveReservationRequest request, final Long memberId) {
         final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
@@ -70,8 +71,9 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
 
+        Reservation result = reservationRepository.save(reservation);
         paymentService.requestTossPayment(request.toPaymentRequest());
-        return reservationRepository.save(reservation);
+        return result;
     }
 
     private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
