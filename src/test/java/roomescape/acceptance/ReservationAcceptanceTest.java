@@ -2,7 +2,6 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
@@ -11,6 +10,7 @@ import roomescape.exception.ExternalApiException;
 
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static roomescape.TestFixture.ADMIN_EMAIL;
@@ -118,16 +118,13 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         given(paymentClient.pay(any())).willThrow(new ExternalApiException("결제 승인 서버에 문제가 있습니다."));
 
         // when
-        String responseId = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie("token", getAccessToken(MEMBER_CAT_EMAIL))
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/reservations")
                 .then().log().all()
-                .extract()
-                .jsonPath().getObject("id", String.class);
+                .body(containsString("Error"));
 
-        // then
-        Assertions.assertThat(responseId).isNull();
     }
 }
