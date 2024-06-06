@@ -63,13 +63,25 @@ class AdminPageControllerTest extends ControllerTest {
                     .contentType(ContentType.HTML);
         }
 
-        @DisplayName("/theme 을 요청하면 html을 반환한다.")
+        @DisplayName("/theme을 요청하면 html을 반환한다.")
         @Test
         void requestTheme() {
             RestAssured.given().log().all()
                     .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
                     .when()
                     .get("/admin/theme")
+                    .then().log().all()
+                    .statusCode(HttpStatus.OK.value())
+                    .contentType(ContentType.HTML);
+        }
+
+        @DisplayName("/payment을 요청하면 html을 반환한다.")
+        @Test
+        void requestPayment() {
+            RestAssured.given().log().all()
+                    .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
+                    .when()
+                    .get("/admin/payment")
                     .then().log().all()
                     .statusCode(HttpStatus.OK.value())
                     .contentType(ContentType.HTML);
@@ -120,6 +132,17 @@ class AdminPageControllerTest extends ControllerTest {
                     .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                     .when()
                     .get("/admin/theme")
+                    .then().log().all()
+                    .statusCode(HttpStatus.FORBIDDEN.value());
+        }
+
+        @DisplayName("일반 사용자가 /admin/payment를 요청하면 403 응답 코드를 반환한다.")
+        @Test
+        void AdminPaymentPathAccessDenied() {
+            RestAssured.given().log().all()
+                    .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                    .when()
+                    .get("/admin/payment")
                     .then().log().all()
                     .statusCode(HttpStatus.FORBIDDEN.value());
         }
