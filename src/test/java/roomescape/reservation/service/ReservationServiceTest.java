@@ -3,12 +3,15 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.HORROR_THEME;
 import static roomescape.util.Fixture.JOJO;
 import static roomescape.util.Fixture.KAKI;
 import static roomescape.util.Fixture.LOGIN_MEMBER_JOJO;
 import static roomescape.util.Fixture.LOGIN_MEMBER_KAKI;
+import static roomescape.util.Fixture.ORDER_ID;
+import static roomescape.util.Fixture.PAYMENT_KEY;
 import static roomescape.util.Fixture.RESERVATION_CANCEL_REASON;
 import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
@@ -26,7 +29,9 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentSaveResponse;
 import roomescape.payment.exception.PaymentFailException;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
@@ -69,6 +74,27 @@ class ReservationServiceTest {
         databaseCleaner.cleanUp();
     }
 
+    @DisplayName("결제에 성공하면 예약을 성공적으로 저장한다.")
+    @Test
+    void save() {
+        ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
+        Theme horrorTheme = themeRepository.save(HORROR_THEME);
+        Member kaki = memberRepository.save(KAKI);
+
+        LoginMember loginMember = LOGIN_MEMBER_KAKI;
+        UserReservationSaveRequest userReservationSaveRequest =
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, 1000);
+
+        PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
+        PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.DONE, 1000);
+        doReturn(paymentSaveResponse).when(paymentService)
+                .payForReservation(paymentRequest, userReservationSaveRequest.toEntity(kaki, horrorTheme, hour10, ReservationStatus.SUCCESS));
+
+        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+
+        assertThat(reservationResponse.id()).isEqualTo(1L);
+    }
+
     @DisplayName("예약 시 결제에 실패하면 예외가 발생한다.")
     @Test
     void saveExceptionByPaymentFail() {
@@ -103,13 +129,10 @@ class ReservationServiceTest {
     @Test
     void validateDuplicatedReservationSuccess() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-
         UserReservationSaveRequest userReservationSaveRequest =
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
         reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
@@ -122,9 +145,7 @@ class ReservationServiceTest {
     @Test
     void validateDuplicatedReservationWaiting() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
@@ -140,9 +161,7 @@ class ReservationServiceTest {
     @Test
     void validateReservationWaitingAfterReservation() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
@@ -158,9 +177,7 @@ class ReservationServiceTest {
     @Test
     void findMemberReservations() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
         memberRepository.save(KAKI);
         memberRepository.save(JOJO);
 
@@ -190,9 +207,7 @@ class ReservationServiceTest {
     @Test
     void deleteTodayReservation() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
@@ -208,7 +223,6 @@ class ReservationServiceTest {
     @Test
     void cancelById() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
-
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
 
         Member kaki = memberRepository.save(KAKI);
