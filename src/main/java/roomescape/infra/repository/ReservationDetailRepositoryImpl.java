@@ -21,12 +21,6 @@ public class ReservationDetailRepositoryImpl implements ReservationDetailReposit
     }
 
     @Override
-    public ReservationDetail getReservationDetail(LocalDate date, ReservationTime time, Theme theme) {
-        return findReservationDetail(date, time, theme)
-                .orElseGet(() -> save(new ReservationDetail(date, time, theme)));
-    }
-
-    @Override
     public Optional<ReservationDetail> findReservationDetail(LocalDate date, ReservationTime time, Theme theme) {
         return reservationDetailJpaRepository.findByDateAndTimeAndTheme(date, time, theme);
     }

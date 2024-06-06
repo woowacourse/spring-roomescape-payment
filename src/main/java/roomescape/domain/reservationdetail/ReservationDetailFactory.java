@@ -14,6 +14,7 @@ public class ReservationDetailFactory {
     public ReservationDetail createReservationDetail(LocalDate date, Long timeId, Long themeId) {
         ReservationTime time = reservationTimeRepository.getReservationTime(timeId);
         Theme theme = themeRepository.getById(themeId);
-        return reservationDetailRepository.getReservationDetail(date, time, theme);
+        return reservationDetailRepository.findReservationDetail(date, time, theme)
+                .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(date, time, theme)));
     }
 }
