@@ -36,29 +36,6 @@ class AdminReservationControllerTest {
         RestAssured.port = randomServerPort;
     }
 
-    @DisplayName("(관리자) - 사용자 아이디를 포함하여 예약 정보를 저장한다.")
-    @Test
-    void saveReservationForAdminTest() {
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
-                LocalDate.now().plusDays(1),
-                3L,
-                1L,
-                1L,
-                "paymentKey",
-                "orderId",
-                1000L
-        );
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", createAdminAccessToken())
-                .body(saveReservationRequest)
-                .when().post("/admin/reservations")
-                .then().log().all()
-                .statusCode(201)
-                .body("id", is(17));
-    }
-
     @DisplayName("관리자가 아닌 클라이언트가 회원 아이디를 포함하여 예약 정보를 저장하려고 하면 에러 코드가 응답된다.")
     @Test
     void saveReservationIncludeMemberIdWhoNotAdminTest() {

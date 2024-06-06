@@ -50,8 +50,7 @@ public class PaymentService {
         return tossRestClient.post()
                 .uri("/confirm")
                 .header(HttpHeaders.AUTHORIZATION, authorization)
-                .body(paymentRequest, new ParameterizedTypeReference<>() {
-                })
+                .body(paymentRequest)
                 .retrieve()
                 .onStatus(r->!r.is2xxSuccessful(), (request, response) -> {
                     String errorMessage = parseErrorMessage(response);
