@@ -10,7 +10,7 @@ import roomescape.member.service.MemberService;
 
 @RestController
 @RequestMapping("/members")
-public class MemberController {
+public class MemberController implements MemberControllerApi {
 
     private final MemberService memberService;
 
