@@ -7,41 +7,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.time.fixture.DateTimeFixture.DAY_AFTER_TOMORROW;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import roomescape.admin.AdminHandlerInterceptor;
-import roomescape.login.LoginMemberArgumentResolver;
 import roomescape.time.dto.AvailableTimeResponse;
 import roomescape.time.dto.ReservationTimeResponse;
 import roomescape.time.fixture.DateTimeFixture;
 import roomescape.time.fixture.ReservationTimeFixture;
 import roomescape.time.service.ReservationTimeService;
+import roomescape.util.ControllerTest;
 
 @WebMvcTest(ReservationTimeController.class)
-class ReservationTimeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class ReservationTimeControllerTest extends ControllerTest {
 
     @MockBean
     private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private LoginMemberArgumentResolver loginMemberArgumentResolver;
-
-    @MockBean
-    private AdminHandlerInterceptor adminHandlerInterceptor;
 
     @DisplayName("전체 시간을 읽는 요청을 처리할 수 있다")
     @Test

@@ -6,24 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import roomescape.admin.AdminHandlerInterceptor;
-import roomescape.login.LoginMemberArgumentResolver;
+import roomescape.util.ControllerTest;
 
 @WebMvcTest(ClientViewController.class)
-class ClientViewControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private LoginMemberArgumentResolver loginMemberArgumentResolver;
-
-    @MockBean
-    private AdminHandlerInterceptor adminHandlerInterceptor;
+class ClientViewControllerTest extends ControllerTest {
 
     @DisplayName("메인 페이지 요청을 처리할 수 있다")
     @Test

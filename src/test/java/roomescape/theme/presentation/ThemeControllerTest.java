@@ -5,38 +5,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import roomescape.admin.AdminHandlerInterceptor;
-import roomescape.login.LoginMemberArgumentResolver;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.fixture.ThemeFixture;
 import roomescape.theme.service.ThemeService;
+import roomescape.util.ControllerTest;
 
 @WebMvcTest(ThemeController.class)
-class ThemeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class ThemeControllerTest extends ControllerTest {
 
     @MockBean
     private ThemeService themeService;
-
-    @MockBean
-    private LoginMemberArgumentResolver loginMemberArgumentResolver;
-
-    @MockBean
-    private AdminHandlerInterceptor adminHandlerInterceptor;
 
     @DisplayName("전체 테마 목록을 읽는 요청을 처리할 수 있다")
     @Test

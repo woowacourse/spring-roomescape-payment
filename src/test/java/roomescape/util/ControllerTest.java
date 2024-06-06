@@ -28,7 +28,10 @@ import roomescape.util.restdocs.RestDocsConfiguration;
 public abstract class ControllerTest {
 
     private static final String ADMIN_TOKEN = "admin-token";
+    private static final String MEMBER_TOKEN = "member-token";
+
     protected static final Cookie ADMIN_COOKIE = new Cookie("token", ADMIN_TOKEN);
+    protected static final Cookie MEMBER_COOKIE = new Cookie("token", MEMBER_TOKEN);
 
     @Autowired
     protected RestDocumentationResultHandler restDocs;
@@ -39,7 +42,7 @@ public abstract class ControllerTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @MockBean
+    @Autowired
     protected LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @Autowired
@@ -74,6 +77,6 @@ public abstract class ControllerTest {
     }
 
     void setUpMemberAccessor() {
-
+        when(jwtTokenProvider.getAccessorId("123")).thenReturn(101L);
     }
 }
