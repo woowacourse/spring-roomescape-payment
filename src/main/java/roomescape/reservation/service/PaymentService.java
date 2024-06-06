@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import roomescape.config.TossRestClientConfig;
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.PaymentResponse;
@@ -36,12 +38,8 @@ public class PaymentService {
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
 
-    public PaymentService(RestTemplateBuilder builder) {
-        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(5, ChronoUnit.SECONDS))
-                .setReadTimeout(Duration.of(30, ChronoUnit.SECONDS))
-                .uriTemplateHandler(new DefaultUriBuilderFactory("https://api.tosspayments.com/v1/payments"))
-                .build();
-        tossRestClient = RestClient.create(tossPaymentRestTemplate);
+    public PaymentService(RestClient tossRestClient) {
+        this.tossRestClient = tossRestClient;
     }
 
     public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
@@ -52,7 +50,7 @@ public class PaymentService {
                 .header(HttpHeaders.AUTHORIZATION, authorization)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(r->!r.is2xxSuccessful(), (request, response) -> {
+                .onStatus(r -> !r.is2xxSuccessful(), (request, response) -> {
                     String errorMessage = parseErrorMessage(response);
                     throw new PaymentException(
                             "결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value())
