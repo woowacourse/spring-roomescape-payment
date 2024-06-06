@@ -100,4 +100,10 @@ public class ControllerTest {
 
         jdbcTemplate.update(sql);
     }
+
+    protected void savePayment() {
+        String sql = "insert into payment (payment_key, order_id, amount, reservation_id) values ('5EnNZRJG', 'MC4wO', 10000, 1)";
+
+        jdbcTemplate.update(sql);
+    }
 }
