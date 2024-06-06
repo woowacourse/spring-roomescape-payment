@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.core.dto.exception.HttpExceptionResponse;
+import roomescape.core.dto.payment.PaymentCancelRequest;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
-import roomescape.core.dto.reservation.ReservationPaymentRequest;
+import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.exception.PaymentException;
 
 @Component
@@ -21,7 +22,8 @@ public class PaymentClientImpl implements PaymentClient {
         this.restClient = restClient;
     }
 
-    public PaymentConfirmResponse getPaymentConfirmResponse(final ReservationPaymentRequest memberRequest) {
+    @Override
+    public PaymentConfirmResponse getPaymentConfirmResponse(final PaymentRequest memberRequest) {
         final String authorizations = encoder.getEncodedSecretKey();
 
         try {
@@ -35,12 +37,37 @@ public class PaymentClientImpl implements PaymentClient {
         }
     }
 
-    private PaymentConfirmResponse getPaymentRequestResult(final ReservationPaymentRequest memberRequest,
-                                                           final String authorizations) {
+    private PaymentConfirmResponse getPaymentRequestResult(final PaymentRequest request, final String authorizations) {
         return restClient.post()
+                .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", authorizations)
-                .body(new PaymentConfirmRequest(memberRequest))
+                .body(new PaymentConfirmRequest(request))
+                .retrieve()
+                .body(PaymentConfirmResponse.class);
+    }
+
+    @Override
+    public void getPaymentCancelResponse(final String paymentKey) {
+        final String authorizations = encoder.getEncodedSecretKey();
+
+        try {
+            getCancelRequestResult(paymentKey, authorizations);
+        } catch (final HttpClientErrorException exception) {
+            final HttpStatusCode statusCode = exception.getStatusCode();
+            final String statusText = exception.getStatusText();
+            final HttpExceptionResponse responseBody = exception.getResponseBodyAs(HttpExceptionResponse.class);
+
+            throw new PaymentException(statusCode, statusText, responseBody);
+        }
+    }
+
+    private void getCancelRequestResult(final String paymentKey, final String authorizations) {
+        restClient.post()
+                .uri("/{paymentKey}/cancel", paymentKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", authorizations)
+                .body(new PaymentCancelRequest("단순 고객 변심"))
                 .retrieve()
                 .body(PaymentConfirmResponse.class);
     }

@@ -1,8 +1,10 @@
 package roomescape.infrastructure;
 
 import roomescape.core.dto.payment.PaymentConfirmResponse;
-import roomescape.core.dto.reservation.ReservationPaymentRequest;
+import roomescape.core.dto.payment.PaymentRequest;
 
 public interface PaymentClient {
-    PaymentConfirmResponse getPaymentConfirmResponse(final ReservationPaymentRequest memberRequest);
+    PaymentConfirmResponse getPaymentConfirmResponse(final PaymentRequest request);
+
+    void getPaymentCancelResponse(String paymentKey);
 }
