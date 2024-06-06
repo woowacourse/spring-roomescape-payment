@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.mockito.BDDMockito;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.exception.PaymentException;
@@ -89,6 +90,9 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @TestFactory
     @DisplayName("예약을 추가하고 삭제한다")
     Stream<DynamicTest> reservationPostAndDeleteTest() {
+        PaymentRequest paymentRequest = new PaymentRequest("orderId", BigDecimal.valueOf(1000), "paymentKey");
+        BDDMockito.given(paymentClient.requestPayment(paymentRequest))
+                .willReturn(new PaymentResponse("paymentKey", BigDecimal.valueOf(1000)));
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         AtomicLong reservationId = new AtomicLong();
 
@@ -106,7 +110,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @Test
     void reservationPostWhenPaymentFail() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, BigDecimal.valueOf(1000));
+        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, "paymentKey", "orderId", BigDecimal.valueOf(1000));
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
         BDDMockito.given(paymentClient.requestPayment(paymentRequest))

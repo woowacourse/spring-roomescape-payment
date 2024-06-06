@@ -19,11 +19,11 @@ import roomescape.BasicAcceptanceTest;
 import roomescape.TestFixtures;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
-import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
+import roomescape.dto.request.reservation.AdminReservationRequest;
+import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
-import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
@@ -40,7 +40,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     void saveByClient() {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         LoginMember loginMember = new LoginMember(1L, "찰리");
-        ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, BigDecimal.valueOf(1000));
+        ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, "paymentKey", "orderId", BigDecimal.valueOf(1000));
         reservationService.saveReservationByClient(loginMember, reservationRequest);
 
         List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);

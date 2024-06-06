@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,7 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.mockito.BDDMockito;
 import roomescape.BasicAcceptanceTest;
+import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.request.reservation.ReservationTimeRequest;
 
@@ -64,6 +68,9 @@ class ReservationTimeAcceptanceTest extends BasicAcceptanceTest {
     @TestFactory
     @DisplayName("예약이 가능한 시간을 구분하여 반환한다.")
     Stream<DynamicTest> res() {
+        PaymentRequest paymentRequest = new PaymentRequest("orderId", BigDecimal.valueOf(1000), "paymentKey");
+        BDDMockito.given(paymentClient.requestPayment(paymentRequest))
+                .willReturn(new PaymentResponse("paymentKey", BigDecimal.valueOf(1000)));
         AtomicReference<String> token = new AtomicReference<>();
         return Stream.of(
                 dynamicTest("모든 예약된 시간을 조회한다 (총 3개)", () -> getAvailableTimes(200, 3)),

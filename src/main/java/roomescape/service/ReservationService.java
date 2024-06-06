@@ -34,16 +34,16 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        PaymentRequest paymentRequest = new PaymentRequest(reservationRequest.orderId(), reservationRequest.amount(),
-                reservationRequest.paymentKey());
-        paymentService.confirmPayment(paymentRequest);
+        PaymentRequest paymentRequest = reservationRequest.toPaymentRequest();
         Reservation reservation = reservationFactory.createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
                 reservationRequest.themeId()
         );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.confirmPayment(paymentRequest, savedReservation);
+        return ReservationResponse.from(savedReservation);
     }
 
     @Transactional
@@ -73,6 +73,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
                         String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
+        paymentService.deletePayment(reservation.getId());
         reservationRepository.deleteById(reservation.getId());
         updateWaitingToReservation(reservation);
     }
