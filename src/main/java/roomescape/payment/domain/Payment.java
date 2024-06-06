@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import roomescape.reservation.domain.Reservation;
 
@@ -29,7 +30,7 @@ public class Payment {
     @Column(nullable = false, name = "total_amount")
     private Long totalAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "reservation_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Reservation reservation;
 
