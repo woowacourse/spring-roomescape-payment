@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.theme.ThemeRequest;
@@ -97,11 +98,11 @@ class ThemeServiceTest {
     private void createReservations() {
         final ReservationTime reservationTimeAfterOneMinute = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation oneMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeAfterOneMinute, getTheme());
+                reservationTimeAfterOneMinute, getTheme(), ReservationStatus.BOOKED);
 
         final ReservationTime reservationTimeAfterTwoMinute = testFixture.persistReservationTimeAfterMinute(2);
         final Reservation twoMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeAfterTwoMinute, getTheme());
+                reservationTimeAfterTwoMinute, getTheme(), ReservationStatus.BOOKED);
 
         reservationRepository.save(oneMinuteAfterReservation);
         reservationRepository.save(twoMinuteAfterReservation);
@@ -133,7 +134,7 @@ class ThemeServiceTest {
 
         final ReservationTime reservationTime = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation reservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTime, themeRepository.findById(themeId).orElseThrow());
+                reservationTime, themeRepository.findById(themeId).orElseThrow(), ReservationStatus.BOOKED);
         reservationRepository.save(reservation);
 
         assertThatThrownBy(() -> themeService.delete(themeId))

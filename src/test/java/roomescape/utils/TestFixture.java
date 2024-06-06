@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
 import roomescape.core.domain.Theme;
@@ -98,7 +99,7 @@ public class TestFixture {
         final Theme theme = themeRepository.findById(themeId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        reservationRepository.save(new Reservation(member, date, time, theme));
+        reservationRepository.save(new Reservation(member, date, time, theme, ReservationStatus.BOOKED));
     }
 
     public static String getTomorrowDate() {

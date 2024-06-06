@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeResponse;
@@ -102,7 +103,7 @@ class ReservationTimeServiceTest {
     @DisplayName("예약 시간 삭제 시, 예약 내역이 존재하면 예외가 발생한다.")
     void deleteWithReservation() {
         final Reservation reservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeRepository.findById(1L).orElseThrow(), getTheme());
+                reservationTimeRepository.findById(1L).orElseThrow(), getTheme(), ReservationStatus.BOOKED);
         reservationRepository.save(reservation);
 
         assertThatThrownBy(() -> reservationTimeService.delete(1L))
