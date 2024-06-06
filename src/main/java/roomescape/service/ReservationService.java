@@ -1,7 +1,10 @@
 package roomescape.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,10 +12,11 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationFactory;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
+import roomescape.domain.reservationwaiting.ReservationWaiting;
+import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
@@ -23,12 +27,16 @@ import roomescape.exception.RoomescapeException;
 public class ReservationService {
     private final ReservationFactory reservationFactory;
     private final ReservationRepository reservationRepository;
+    private final ReservationWaitingRepository reservationWaitingRepository;
     private final PaymentService paymentService;
 
-    public ReservationService(ReservationFactory reservationFactory, ReservationRepository reservationRepository,
+    public ReservationService(ReservationFactory reservationFactory,
+                              ReservationRepository reservationRepository,
+                              ReservationWaitingRepository reservationWaitingRepository,
                               PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationFactory = reservationFactory;
+        this.reservationWaitingRepository = reservationWaitingRepository;
         this.paymentService = paymentService;
     }
 
@@ -47,17 +55,6 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
-        Reservation reservation = reservationFactory.createWaiting(
-                loginMember.id(),
-                waitingRequest.date(),
-                waitingRequest.timeId(),
-                waitingRequest.themeId()
-        );
-        return ReservationResponse.from(reservationRepository.save(reservation));
-    }
-
-    @Transactional
     public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
         Reservation reservation = reservationFactory.createReservation(
                 adminReservationRequest.memberId(),
@@ -70,36 +67,53 @@ public class ReservationService {
 
     @Transactional
     public void deleteById(long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
-                        String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
+        Reservation reservation = getReservation(id);
+        if (hasReservationWaiting(reservation)) {
+            ReservationWaiting reservationWaiting = getReservationWaiting(reservation);
+            confirmReservationWaiting(reservationWaiting);
+        }
         paymentService.deletePayment(reservation.getId());
         reservationRepository.deleteById(reservation.getId());
-        updateWaitingToReservation(reservation);
     }
 
-    private void updateWaitingToReservation(Reservation reservation) {
-        if (isWaitingUpdatableToReservation(reservation)) {
-            reservationRepository.findFirstByDateAndTimeIdAndThemeIdAndStatus(
-                    reservation.getDate(), reservation.getTime().getId(), reservation.getTheme().getId(), Status.WAITING
-            ).ifPresent(Reservation::changePaymentWaiting);
-        }
+    private Reservation getReservation(long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
+                        String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
     }
 
-    private boolean isWaitingUpdatableToReservation(Reservation reservation) {
-        return reservation.getStatus() == Status.RESERVATION &&
-                reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
-                        reservation.getDate(), reservation.getTime().getId(),
-                        reservation.getTheme().getId(), Status.WAITING
-                );
+    private boolean hasReservationWaiting(Reservation reservation) {
+        return reservationWaitingRepository.existsByDateAndTimeIdAndThemeId(
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId()
+        );
     }
 
-    public List<ReservationResponse> findAllByStatus(Status status) {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(status);
-        return convertToReservationResponses(reservations);
+    private ReservationWaiting getReservationWaiting(Reservation reservation) {
+        return reservationWaitingRepository.findFirstByDateAndThemeIdAndTimeIdOrderById(
+                        reservation.getDate(),
+                        reservation.getTheme().getId(),
+                        reservation.getTime().getId())
+                .orElseThrow(() -> new RoomescapeException(HttpStatus.BAD_REQUEST, "예약 대기가 존재하지 않습니다."));
     }
 
-    private List<ReservationResponse> convertToReservationResponses(List<Reservation> reservations) {
+    private void confirmReservationWaiting(ReservationWaiting reservationWaiting) {
+        reservationRepository.save(
+                new Reservation(
+                        reservationWaiting.getMember(),
+                        reservationWaiting.getDate(),
+                        reservationWaiting.getTime(),
+                        reservationWaiting.getTheme(),
+                        Status.PAYMENT_WAITING
+                )
+        );
+        reservationWaitingRepository.delete(reservationWaiting);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> findAll() {
+        List<Reservation> reservations = reservationRepository.findAll();
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -116,16 +130,16 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<MyReservationResponse> findMyReservations(Long memberId) {
-        return reservationRepository.findAllByMemberIdOrderByDateAsc(memberId).stream()
-                .map(reservation -> MyReservationResponse.of(reservation, getWaitingOrder(reservation)))
+        Stream<MyReservationResponse> reservationResponses =
+                reservationWaitingRepository.findReservationWaitWithRankByMemberId(memberId).stream()
+                .map(MyReservationResponse::from);
+        Stream<MyReservationResponse> reservationWaitingResponses =
+                reservationRepository.findAllByMemberId(memberId).stream()
+                .map(MyReservationResponse::from);
+        return Stream.concat(reservationResponses, reservationWaitingResponses)
+                .sorted(Comparator.comparing(reservation -> LocalDateTime.of(reservation.date(), reservation.time())))
                 .toList();
-    }
-
-    private long getWaitingOrder(Reservation reservation) {
-        return reservationRepository.countByOrder(
-                reservation.getId(), reservation.getDate(),
-                reservation.getTime().getId(), reservation.getTheme().getId()
-        );
     }
 }

@@ -12,29 +12,11 @@ import roomescape.domain.theme.Theme;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     long countByTimeId(long timeId);
 
-    @Query("""
-            SELECT COUNT(r)
-            FROM Reservation r
-            WHERE r.theme.id = :themeId
-            AND r.date = :date
-            AND r.time.id = :timeId
-            AND r.id < :id
-            """)
-    long countByOrder(Long id, LocalDate date, long timeId, long themeId);
-
-    @EntityGraph(attributePaths = {"member", "time", "theme"})
-    List<Reservation> findAllByStatus(Status status);
-
-    Optional<Reservation> findFirstByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, long timeId, long themeId, Status status);
-
     boolean existsByDateAndTimeIdAndThemeId(LocalDate date, long timeId, long themeId);
-
-    boolean existsByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, long timeId, long themeId, Status status);
 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
 
-    @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberIdOrderByDateAsc(Long memberId);
+    List<Reservation> findAllByMemberId(Long memberId);
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,

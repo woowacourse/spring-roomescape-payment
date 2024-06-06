@@ -14,19 +14,23 @@ import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.response.reservation.ReservationResponse;
+import roomescape.service.ReservationWaitingService;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminReservationController {
     private final ReservationService reservationService;
+    private final ReservationWaitingService reservationWaitingService;
 
-    public AdminReservationController(ReservationService reservationService) {
+    public AdminReservationController(ReservationService reservationService,
+                                      ReservationWaitingService reservationWaitingService) {
         this.reservationService = reservationService;
+        this.reservationWaitingService = reservationWaitingService;
     }
 
     @GetMapping("/waitings")
     public ResponseEntity<List<ReservationResponse>> findAllByWaiting() {
-        List<ReservationResponse> responses = reservationService.findAllByStatus(Status.WAITING);
+        List<ReservationResponse> responses = reservationWaitingService.findAll();
         return ResponseEntity.ok(responses);
     }
 
