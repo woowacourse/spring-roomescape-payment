@@ -1,6 +1,5 @@
 package roomescape.client.payment;
 
-import org.json.JSONException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,21 +37,27 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentConfirmationFromTossDto sendPaymentConfirm(PaymentConfirmationToTossDto paymentConfirmationToTossDto) throws JSONException {
-        Base64.Encoder encoder = Base64.getEncoder();
-        String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
-        String authorizations = "Basic " + encodedBytes;
+    public PaymentConfirmationFromTossDto sendPaymentConfirm(PaymentConfirmationToTossDto paymentConfirmationToTossDto) {
+        System.out.println("로그 PaymentConfirmationToTossDto : " + paymentConfirmationToTossDto);
 
         return restClient.post()
                 .uri(baseUrl + confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, authorizations)
+                .headers(this::addHeaders)
                 .body(paymentConfirmationToTossDto)
                 .exchange((request, response) -> {
+                    System.out.println("요청 헤더 ::" + request.getHeaders());
                     handlePaymentConfirmationException(response);
                     return convertResponse(response);
                 });
     }
+
+    public void addHeaders(HttpHeaders headers) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
+
+        headers.setBasicAuth(encodedBytes);
+        }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
@@ -73,7 +78,7 @@ public class TossPaymentClient implements PaymentClient {
         PaymentConfirmationFromTossDto responseDto = response.bodyTo(PaymentConfirmationFromTossDto.class);
         if(responseDto == null) {
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "결제 승인 자체는 성공했는데, 응답을 지정한 형식으로 받아오는데에 실패했습니다. 큰일 났습니다!");
+                    "결제 승인 자체는 성공했는데, 응답을 지정한 형식으로 받아오는데에 실패했습니다. 이거 무를 수도 없고!! 큰일 났습니다!");
         }
 
         return responseDto;
