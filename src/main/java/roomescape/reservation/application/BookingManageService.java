@@ -9,6 +9,7 @@ import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.event.ReservationDeletedEvent;
 import roomescape.reservation.event.ReservationFailedEvent;
 import roomescape.reservation.event.ReservationSavedEvent;
 
@@ -27,9 +28,16 @@ public class BookingManageService extends ReservationManageService {
     public Reservation createWithPayment(Reservation reservation, ConfirmedPayment confirmedPayment) {
         eventPublisher.publishEvent(new ReservationFailedEvent(confirmedPayment));
 
-        Reservation savedReservation = create(reservation);
+        Reservation savedReservation = super.create(reservation);
         eventPublisher.publishEvent(new ReservationSavedEvent(savedReservation, confirmedPayment));
         return savedReservation;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id, Member agent) {
+        super.delete(id, agent);
+        eventPublisher.publishEvent(new ReservationDeletedEvent(id));
     }
 
     @Override

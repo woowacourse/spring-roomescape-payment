@@ -1,6 +1,7 @@
 package roomescape.payment.infrastructure;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.ConfirmedPayment;
@@ -30,6 +31,7 @@ public class TossPaymentsClient implements PaymentClient {
     }
 
     @Override
+    @Async
     public void cancel(PaymentCancelInfo paymentCancelInfo) {
         String uri = String.format("/%s/cancel", paymentCancelInfo.paymentKey());
         restClient.post()

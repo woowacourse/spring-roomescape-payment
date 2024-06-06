@@ -6,7 +6,8 @@ import java.util.Arrays;
 
 public enum ReservationStatus {
     BOOKING("BOOKING"),
-    WAITING("WAITING");
+    WAITING("WAITING"),
+    UNPAID("UNPAID");
 
     private final String identifier;
 

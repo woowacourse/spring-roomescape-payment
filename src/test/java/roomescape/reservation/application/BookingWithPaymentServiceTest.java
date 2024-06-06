@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
+import roomescape.common.TestClientConfiguration;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -18,6 +22,7 @@ import roomescape.reservation.event.ReservationFailedEvent;
 import roomescape.reservation.event.ReservationSavedEvent;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -26,13 +31,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static roomescape.TestFixture.MIA_RESERVATION;
+import static roomescape.TestFixture.USER_ADMIN;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 
 class BookingWithPaymentServiceTest {
+    private static final ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
     @Nested
     @RecordApplicationEvents
-    class BookingSuccessTest extends ReservationServiceTest {
+    class BookingCreateSuccessTest extends ReservationServiceTest {
         @Autowired
         private BookingManageService bookingManageService;
 
@@ -50,7 +57,6 @@ class BookingWithPaymentServiceTest {
         void createBookingWithPayment() {
             // given
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
-            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
             // when
             Reservation createdReservation = bookingManageService.createWithPayment(reservation, confirmedPayment);
@@ -68,8 +74,6 @@ class BookingWithPaymentServiceTest {
         void createPayment() {
             // given
             Reservation reservation = bookingManageService.create(MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING));
-
-            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
             ReservationSavedEvent reservationSavedEvent = new ReservationSavedEvent(reservation, confirmedPayment);
 
             // when
@@ -83,7 +87,8 @@ class BookingWithPaymentServiceTest {
 
     @Nested
     @RecordApplicationEvents
-    class BookingFailTest extends ReservationServiceTest {
+    @Import(TestClientConfiguration.class)
+    class BookingCreateFailTest extends ReservationServiceTest {
         @SpyBean
         private PaymentService paymentService;
 
@@ -105,7 +110,6 @@ class BookingWithPaymentServiceTest {
                     .create(any());
 
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
-            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
             // when & then
             assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
@@ -118,14 +122,13 @@ class BookingWithPaymentServiceTest {
 
         @Test
         @DisplayName("결제 내역 생성에 실패하면 PG 결제 취소 API에 취소 요청을 한다.")
-        void cancelCasedByRollBackWhenPaymentCreateFailed() {
+        void cancelCasedByRollBackWhenPaymentCreateFailed() throws InterruptedException {
             // given
             BDDMockito.willThrow(RuntimeException.class)
                     .given(paymentService)
                     .create(any());
 
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
-            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
             // when & then
             assertSoftly(softly -> {
@@ -135,7 +138,7 @@ class BookingWithPaymentServiceTest {
                 long count = events.stream(ReservationFailedEvent.class).count();
                 softly.assertThat(count).isEqualTo(1);
             });
-
+            Thread.sleep(1000);
             verify(paymentService, times(1)).cancelCasedByRollBack(any());
         }
 
@@ -148,7 +151,6 @@ class BookingWithPaymentServiceTest {
                     .create(any());
 
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
-            ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
             // when & then
             assertSoftly(softly -> {
@@ -156,6 +158,48 @@ class BookingWithPaymentServiceTest {
                         .isInstanceOf(RuntimeException.class);
                 softly.assertThat(reservationRepository.findAll()).hasSize(0);
             });
+        }
+    }
+
+    @Nested
+    class BookingDeleteSuccessTest extends ReservationServiceTest {
+        @MockBean
+        private PaymentClient paymentClient;
+
+        @Autowired
+        private BookingManageService bookingManageService;
+
+        @Autowired
+        private PaymentRepository paymentRepository;
+
+        @Test
+        @DisplayName("예약을 삭제하면 결제 취소 API에 취소 요청을 한다.")
+        void deleteReservationWithPaymentCancel() throws InterruptedException {
+            // given
+            Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
+            bookingManageService.createWithPayment(reservation, confirmedPayment);
+
+            // when
+            bookingManageService.delete(reservation.getId(), USER_ADMIN());
+
+            // then
+            Thread.sleep(1000);
+            verify(paymentClient, times(1)).cancel(any());
+        }
+
+        @Test
+        @DisplayName("예약을 삭제하면 결제 내역이 삭제된다.")
+        void deleteReservationWithPaymentDeleting() {
+            // given
+            Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
+            bookingManageService.createWithPayment(reservation, confirmedPayment);
+
+            // when
+            bookingManageService.delete(reservation.getId(), USER_ADMIN());
+
+            // then
+            Optional<Payment> payment = paymentRepository.findByReservationId(reservation.getId());
+            assertThat(payment).isEmpty();
         }
     }
 }

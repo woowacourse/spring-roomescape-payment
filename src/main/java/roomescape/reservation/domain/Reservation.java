@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.persistence.ReservationStatusPersistConverter;
 
@@ -76,6 +77,13 @@ public class Reservation {
         Long memberId = member.getId();
         Long ownerId = this.member.getId();
         return ownerId.equals(memberId) || member.isAdmin();
+    }
+
+    public void approveWaiting() {
+        if (status.isBooking()) {
+            throw new ViolationException("이미 확정된 예약은 결제 대기 상태가 될 수 없습니다.");
+        }
+        this.status = ReservationStatus.UNPAID;
     }
 
     public void changeToBooking() {
