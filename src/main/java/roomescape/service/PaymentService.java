@@ -11,6 +11,7 @@ import roomescape.component.TossPaymentClient;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.payment.PaymentDto;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.RoomescapeExceptionCode;
@@ -61,7 +62,7 @@ public class PaymentService {
         paymentClient.confirm(paymentDto);
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
-        reservation.toReserved();
+        reservation.changeStatus(ReservationStatus.RESERVED);
 
         final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
         paymentRepository.save(payment);

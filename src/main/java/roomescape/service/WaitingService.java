@@ -90,7 +90,7 @@ public class WaitingService {
         final Reservation waiting = reservationRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomescapeException(WAITING_NOT_FOUND));
         validateIsApprovable(waiting);
-        waiting.toPaymentPending();
+        waiting.changeStatus(ReservationStatus.PAYMENT_PENDING);
     }
 
     private void validateIsApprovable(final Reservation waiting) {
