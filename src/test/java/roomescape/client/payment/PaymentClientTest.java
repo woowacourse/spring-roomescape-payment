@@ -24,8 +24,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.config.ClientConfig;
-import roomescape.exception.ExceptionResponse;
 import roomescape.exception.PaymentConfirmException;
+import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
 
 @ContextConfiguration(classes = ClientConfig.class)
@@ -72,7 +72,7 @@ class PaymentClientTest {
     @Test
     @DisplayName("토스 결제 실패: 4xx 에러시 결제에 실패한다.")
     void invalidRequestNotConfirm() throws JsonProcessingException {
-        String errorObject = objectMapper.writeValueAsString(new ExceptionResponse("ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다."));
+        String errorObject = objectMapper.writeValueAsString(new TossPaymentExceptionResponse("ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다."));
 
         mockServer.expect(requestTo(TOSS_PAYMENT_CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
