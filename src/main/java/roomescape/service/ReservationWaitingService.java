@@ -30,7 +30,7 @@ public class ReservationWaitingService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
 
-        List<Reservation> memberReservations = reservationRepository.findAllByMember(member);
+        List<ReservationWithPaymentInfo> memberReservations = reservationRepository.findAllByMemberWithPaymentInfo(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
 
         List<MemberReservationResponse> allMemberReservations =

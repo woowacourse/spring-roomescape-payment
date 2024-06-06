@@ -2,10 +2,7 @@ package roomescape.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import roomescape.model.Member;
-import roomescape.model.Reservation;
-import roomescape.model.ReservationTime;
-import roomescape.model.Theme;
+import roomescape.model.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,6 +36,16 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
     List<Reservation> findAllByDateAndTheme(LocalDate date, Theme theme);
 
     List<Reservation> findAllByMember(Member member);
+
+    @Query("""
+            SELECT new roomescape.model.ReservationWithPaymentInfo(
+            r, p)
+            FROM Reservation r
+            INNER JOIN PaymentInfo p
+            ON r.id = p.reservation.id
+            WHERE r.member = :member
+            """)
+    List<ReservationWithPaymentInfo> findAllByMemberWithPaymentInfo(Member member);
 
     boolean existsReservationByThemeAndDateAndTimeAndMember(Theme theme, LocalDate date, ReservationTime time, Member member);
 

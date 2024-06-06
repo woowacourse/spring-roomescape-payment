@@ -1,7 +1,7 @@
 package roomescape.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import roomescape.model.Reservation;
+import roomescape.model.ReservationWithPaymentInfo;
 import roomescape.model.WaitingWithRank;
 
 import java.time.LocalDate;
@@ -15,13 +15,17 @@ public class MemberReservationResponse {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime time;
     private String status;
+    private String paymentKey;
+    private Long amount;
 
-    public MemberReservationResponse(Reservation reservation) {
-        this.id = reservation.getId();
-        this.theme = reservation.getTheme().getName();
-        this.date = reservation.getDate();
-        this.time = reservation.getTime().getStartAt();
+    public MemberReservationResponse(ReservationWithPaymentInfo reservation) {
+        this.id = reservation.getReservation().getId();
+        this.theme = reservation.getReservation().getTheme().getName();
+        this.date = reservation.getReservation().getDate();
+        this.time = reservation.getReservation().getTime().getStartAt();
         this.status = "예약";
+        this.paymentKey = reservation.getPaymentInfo().getPaymentKey();
+        this.amount = reservation.getPaymentInfo().getAmount();
     }
 
     public MemberReservationResponse(WaitingWithRank waitingWithRank) {
@@ -30,6 +34,8 @@ public class MemberReservationResponse {
         this.date = waitingWithRank.getWaiting().getDate();
         this.time = waitingWithRank.getWaiting().getTime().getStartAt();
         this.status = "%d번째 예약대기".formatted(waitingWithRank.getRank());
+        this.paymentKey = null;
+        this.amount = null;
     }
 
     public Long getId() {
@@ -50,5 +56,13 @@ public class MemberReservationResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }
