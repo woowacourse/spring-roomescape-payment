@@ -2,21 +2,28 @@ package roomescape.reservation.domain;
 
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "theme")
 public class Theme {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "name", nullable = false)
     private String themeName;
+    @Column(name = "description", nullable = false)
     private String description;
+    @Column(name = "thumbnail", nullable = false)
     private String thumbnail;
 
-    public Theme() {
+    protected Theme() {
     }
 
     public Theme(String themeName, String description, String thumbnail) {

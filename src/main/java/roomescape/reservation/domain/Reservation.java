@@ -3,6 +3,7 @@ package roomescape.reservation.domain;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,27 +11,37 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import roomescape.member.domain.Member;
 
 @Entity
+@Table(name = "reservation")
 public class Reservation {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private Status status;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
     private Member member;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theme_id", referencedColumnName = "id", nullable = false)
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_time", referencedColumnName = "id", nullable = false)
     private ReservationTime reservationTime;
 
-    public Reservation() {
+    protected Reservation() {
     }
 
     public Reservation(Long id, LocalDate date, Status status, Member member, Theme theme,
