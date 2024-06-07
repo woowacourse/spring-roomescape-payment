@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -46,11 +48,13 @@ public interface AuthControllerApi {
             parameters = @Parameter(name = "loginMemberRequest", description = "로그인 정보를 담은 객체", required = true))
     ResponseEntity<Void> login(HttpServletResponse httpServletResponse, LoginRequest loginMemberRequest);
 
+    @SecurityRequirement(name = "쿠키 인증 토큰")
     @Operation(
             summary = "회원 정보 조회",
             description = "회원/어드민 계정으로 로그인한 정보 조회합니다. 현재는 회원의 이름만을 반환합니다",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "정보 조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "정보 조회 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetAuthInfoResponse.class))),
                     @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "존재하지 않는 회원",

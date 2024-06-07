@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +19,13 @@ import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 
 public abstract class ReservationControllerApi {
 
+    @SecurityRequirement(name = "쿠키 인증 토큰")
     @Operation(
             summary = "회원 방탈출 예약 생성",
             description = "회원의 방탈출 예약을 생성합니다.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "회원 예약 생성 성공"),
+                    @ApiResponse(responseCode = "201", description = "회원 예약 생성 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateReservationResponse.class))),
                     @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "이미 존재하는 예약",
@@ -49,7 +53,8 @@ public abstract class ReservationControllerApi {
             summary = "방탈출 예약 단건 조회",
             description = "식별자에 해당하는 예약 목록을 조회합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "방탈출 예약 단건 조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "방탈출 예약 단건 조회 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = FindReservationResponse.class))),
                     @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "존재하지 않는 예약",
@@ -61,7 +66,8 @@ public abstract class ReservationControllerApi {
     @Operation(
             summary = "테마, 날짜에 해당하는 방탈출 예약 가능한 시간 목록 조회",
             description = "해당하는 테마, 날짜에 현재 예약 가능한 시간 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "방탈출 예약 가능한 시간 목록 조회 성공"),
+            responses = @ApiResponse(responseCode = "200", description = "방탈출 예약 가능한 시간 목록 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindAvailableTimesResponse.class))),
             parameters = {
                     @Parameter(name = "date", description = "조회하려는 날짜", required = true),
                     @Parameter(name = "themeId", description = "조회하려는 테마 식별자", required = true)})
@@ -71,7 +77,8 @@ public abstract class ReservationControllerApi {
     @Operation(
             summary = "방탈출 예약 검색 조회",
             description = "조건에 해당하는 예약 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "방탈출 검색 성공"),
+            responses = @ApiResponse(responseCode = "200", description = "방탈출 검색 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindReservationResponse.class))),
             parameters = {
                     @Parameter(name = "themeId", description = "검색하려는 테마 식별자", required = true),
                     @Parameter(name = "memberId", description = "검색하려는 회원 식별자", required = true),
@@ -82,6 +89,7 @@ public abstract class ReservationControllerApi {
                                                                     LocalDate dateFrom,
                                                                     LocalDate dateTo);
 
+    @SecurityRequirement(name = "쿠키 인증 토큰")
     @Operation(
             summary = "방탈출 예약 삭제",
             description = "방탈출 예약을 삭제합니다. 대기가 존재하는 예약일 경우, 가장 먼저 등록된 대기가 자동으로 예약으로 승격됩니다.",
@@ -105,9 +113,11 @@ public abstract class ReservationControllerApi {
             parameters = @Parameter(name = "id", description = "삭제하려는 예약 식별자", required = true, example = "1"))
     abstract ResponseEntity<Void> cancelReservation(AuthInfo authInfo, Long id);
 
+    @SecurityRequirement(name = "쿠키 인증 토큰")
     @Operation(
             summary = "방탈출 예약 목록 조회",
             description = "전체 예약 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "전체 예약 목록 조회 성공"))
+            responses = @ApiResponse(responseCode = "200", description = "전체 예약 목록 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindReservationWithPaymentResponse.class))))
     abstract ResponseEntity<List<FindReservationWithPaymentResponse>> getReservations(AuthInfo authInfo);
 }

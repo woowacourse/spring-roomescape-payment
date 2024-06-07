@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
@@ -19,7 +18,8 @@ public abstract class AdminReservationControllerApi {
             summary = "어드민의 회원 방탈출 예약 생성",
             description = "어드민 권한이 있는 유저가 회원의 방탈출 예약을 생성합니다.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "회원 예약 생성 성공"),
+                    @ApiResponse(responseCode = "201", description = "회원 예약 생성 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateReservationResponse.class))),
                     @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "이미 존재하는 예약",
@@ -41,11 +41,12 @@ public abstract class AdminReservationControllerApi {
                                             value = "detail: 식별자 1에 해당하는 회원이 존재하지 않습니다.")}))},
             parameters = @Parameter(name = "createReservationByAdminRequest", description = "생성하려는 예약의 정보를 담은 객체", required = true))
     abstract ResponseEntity<CreateReservationResponse> createReservationByAdmin(
-            @Valid @RequestBody CreateReservationByAdminRequest createReservationByAdminRequest);
+            CreateReservationByAdminRequest createReservationByAdminRequest);
 
     @Operation(
             summary = "방탈출 전체 예약 조회",
             description = "저장된 모든 방탈출 예약 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "방탈출 전체 예약 조회 성공"))
+            responses = @ApiResponse(responseCode = "200", description = "방탈출 전체 예약 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindAdminReservationResponse.class))))
     abstract ResponseEntity<List<FindAdminReservationResponse>> getReservationsByAdmin();
 }

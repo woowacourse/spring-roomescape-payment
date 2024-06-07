@@ -21,7 +21,8 @@ public abstract class ThemeControllerApi {
             summary = "방탈출 테마 생성",
             description = "새로운 방탈출 테마를 생성합니다.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "내 테마 생성 성공"),
+                    @ApiResponse(responseCode = "201", description = "내 테마 생성 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateThemeResponse.class))),
                     @ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "테마 생성 권한 없음",
@@ -33,14 +34,15 @@ public abstract class ThemeControllerApi {
     @Operation(
             summary = "방탈출 테마 목록 조회",
             description = "전체 테마 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "전체 테마 목록 조회 성공")
-    )
+            responses = @ApiResponse(responseCode = "200", description = "전체 테마 목록 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindThemeResponse.class))))
     abstract ResponseEntity<List<FindThemeResponse>> getThemes();
 
     @Operation(
             summary = "방탈출 인기 테마 조회",
             description = "예약이 많이 등록된 테마를 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "인기 테마 조회 성공"),
+            responses = @ApiResponse(responseCode = "200", description = "인기 테마 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindPopularThemesResponse.class))),
             parameters = @Parameter(
                     in = ParameterIn.QUERY,
                     name = "size",

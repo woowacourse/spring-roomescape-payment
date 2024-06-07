@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,8 @@ public abstract class ReservationTimeControllerApi {
             summary = "방탈출 시간대 생성",
             description = "새로운 방탈출 시간대를 생성합니다.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "내 시간대 생성 성공"),
+                    @ApiResponse(responseCode = "201", description = "내 시간대 생성 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateReservationTimeResponse.class))),
                     @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "이미 존재하는 시간대",
@@ -29,14 +31,16 @@ public abstract class ReservationTimeControllerApi {
     @Operation(
             summary = "방탈출 시간대 목록 조회",
             description = "방탈출 시간대 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "시간대 목록 조회 성공"))
+            responses = @ApiResponse(responseCode = "200", description = "시간대 목록 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindReservationTimeResponse.class))))
     abstract ResponseEntity<List<FindReservationTimeResponse>> getReservationTimes();
 
     @Operation(
             summary = "방탈출 시간대 단건 조회 조회",
             description = "방탈출 시간대 하나를 조회합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "특정 시간대 조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "특정 시간대 조회 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = FindReservationTimeResponse.class))),
                     @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "존재하지 않는 시간대",

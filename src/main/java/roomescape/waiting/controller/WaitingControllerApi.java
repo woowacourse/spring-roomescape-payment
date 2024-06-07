@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
@@ -20,7 +21,8 @@ public abstract class WaitingControllerApi {
             summary = "방탈출 대기 생성",
             description = "방탈출에 내 대기를 등록합니다. 이미 예약이 존재하는 경우에만, 대기를 등록할 수 있습니다.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "내 대기 생성 성공"),
+                    @ApiResponse(responseCode = "201", description = "내 대기 생성 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateWaitingResponse.class))),
                     @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "대기를 생성하려는 방탈출의 예약이 존재하지 않음",
@@ -35,8 +37,7 @@ public abstract class WaitingControllerApi {
                             examples = @ExampleObject(
                                     name = "존재하지 않는 회원",
                                     description = "대기 등록하려는 회원이 서버에 존재하지 않을 경우.",
-                                    value = "detail: 식별자 1에 해당하는 회원이 존재하지 않습니다.")))},
-            parameters = @Parameter(name = "createWaitingRequest", description = "대기 생성 요청 객체", required = true))
+                                    value = "detail: 식별자 1에 해당하는 회원이 존재하지 않습니다.")))})
     abstract ResponseEntity<CreateWaitingResponse> createWaiting(AuthInfo authInfo, CreateWaitingRequest createWaitingRequest);
 
     @Operation(
@@ -61,7 +62,8 @@ public abstract class WaitingControllerApi {
             summary = "내 방탈출 대기 목록 조회",
             description = "내 방탈출 대기 목록을 조회합니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "내 대기 목록 조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "내 대기 목록 조회 성공", content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = FindWaitingWithRankingResponse.class))),
                     @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     name = "존재하지 않는 회원",

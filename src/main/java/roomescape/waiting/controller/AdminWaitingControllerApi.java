@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
@@ -17,7 +18,8 @@ public abstract class AdminWaitingControllerApi {
     @Operation(
             summary = "전체 대기 목록 조회",
             description = "모든 회원의 대기 목록을 조회합니다.",
-            responses = @ApiResponse(responseCode = "200", description = "전체 대기 목록 조회 성공"))
+            responses = @ApiResponse(responseCode = "200", description = "전체 대기 목록 조회 성공", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FindWaitingResponse.class))))
     abstract ResponseEntity<List<FindWaitingResponse>> getWaitings();
 
     @Operation(
