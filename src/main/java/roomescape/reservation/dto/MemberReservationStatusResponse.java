@@ -21,12 +21,12 @@ public record MemberReservationStatusResponse(
         );
     }
 
-    public MemberReservationStatusResponse(ReservationWaiting reservationWaiting) {
+    public MemberReservationStatusResponse(ReservationWaiting reservationWaiting, Long rank) {
         this(reservationWaiting.getId(),
                 reservationWaiting.getTheme().getName(),
                 reservationWaiting.getDate(),
                 reservationWaiting.getTime().getStartAt(),
-                reservationWaiting.getRank() + "번째 " + reservationWaiting.getStatus().getValue()
+                rank + "번째 " + reservationWaiting.getStatus().getValue()
         );
     }
 }
