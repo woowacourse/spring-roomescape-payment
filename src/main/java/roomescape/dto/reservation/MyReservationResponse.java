@@ -13,7 +13,8 @@ public record MyReservationResponse(
         LocalDate date,
         String time,
         String status,
-        String paymentKey
+        String paymentKey,
+        Integer amount
 ) {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -27,7 +28,8 @@ public record MyReservationResponse(
                 reservation.getDate(),
                 reservation.getStartAt().format(FORMATTER),
                 RESERVED,
-                reservation.getPaymentKey()
+                reservation.getPaymentKey(),
+                reservation.getAmount()
         );
     }
 
@@ -39,7 +41,8 @@ public record MyReservationResponse(
                 waiting.getDate(),
                 waiting.getStartAt().format(FORMATTER),
                 String.format(WAITING_WITH_RANK, waitingWithRank.getRank()),
-                null
+                null,
+                waiting.getAmount()
         );
     }
 }

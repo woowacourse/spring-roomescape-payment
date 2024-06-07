@@ -90,6 +90,7 @@ function render(data) {
         const time = item.time;
         const status = item.status;
         const paymentKey = item.paymentKey;
+        const amount = item.amount;
 
         row.insertCell(0).textContent = theme;
         row.insertCell(1).textContent = date;
@@ -119,7 +120,8 @@ function render(data) {
             };
             cancelCell.appendChild(cancelButton);
         }
-
+        row.insertCell(5).textContent = paymentKey;
+        row.insertCell(6).textContent = amount;
     });
 }
 

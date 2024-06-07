@@ -17,7 +17,8 @@ public record ReservationSaveRequest(
         LocalDate date,
         Long timeId,
         Long themeId,
-        String paymentKey
+        String paymentKey,
+        Integer amount
 ) {
 
     public Reservation toReservation(final MemberResponse memberResponse,
@@ -28,7 +29,7 @@ public record ReservationSaveRequest(
         final Member member = new Member(memberResponse.id(), new Name(memberResponse.name()), memberResponse.email());
         final ReservationTime time = new ReservationTime(timeResponse.id(), timeResponse.startAt());
         final Theme theme = new Theme(themeResponse.id(), themeResponse.name(), themeResponse.description(), themeResponse.thumbnail());
-        return new Reservation(member, date, time, theme, paymentResponse.paymentKey());
+        return new Reservation(member, date, time, theme, paymentResponse.paymentKey(), amount);
     }
 
     public Reservation toReservation(final MemberResponse memberResponse,
