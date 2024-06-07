@@ -1,6 +1,7 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
@@ -30,9 +31,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(paymentConfirmRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    PaymentErrorResponse errorResponse = objectMapper.readValue(res.getBody(),
-                            PaymentErrorResponse.class);
-                    log.error("결제 요청 문제 발생: {}", errorResponse.getMessage());
+                    log.error("결제 요청 문제 발생: {}", new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8));
                     throw new IllegalRequestException("결제 요청에 대한 문제가 있습니다.");
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {

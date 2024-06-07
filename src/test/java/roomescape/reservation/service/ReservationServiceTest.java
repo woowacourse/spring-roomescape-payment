@@ -140,7 +140,9 @@ class ReservationServiceTest {
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{ \"error\": \"Bad Request\" }")); // 여기에 원하는 JSON 본문을 추가
+
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
