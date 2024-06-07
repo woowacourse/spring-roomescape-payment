@@ -133,6 +133,7 @@ public class ReservationApplicationService {
         waitingReservationService.denyWaiting(member, memberReservation);
     }
 
+    @Transactional
     public BigDecimal findPrice(LocalDate date, long themeId, long timeId) {
         return reservationCommonService.getReservation(date, timeId, themeId).getPrice();
     }
