@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.infrastructure.payment.TimeoutInterceptor;
 
 import java.time.Duration;
 
@@ -16,10 +17,10 @@ public class ClientConfig {
     private static final int READ_TIMEOUT_SECONDS = 30;
 
     @Bean
-    public RestClient restClient() {
+    public RestClient.Builder restClientBuilder() { // todo
         return RestClient.builder()
                 .requestFactory(getRequestFactory())
-                .build();
+                .requestInterceptor(new TimeoutInterceptor());
     }
 
     private ClientHttpRequestFactory getRequestFactory() {
