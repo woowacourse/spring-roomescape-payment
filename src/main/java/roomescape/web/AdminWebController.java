@@ -8,26 +8,26 @@ public class AdminWebController {
 
     @GetMapping("/admin")
     public String getAdminPage() {
-        return "/admin/index";
+        return "admin/index";
     }
 
     @GetMapping("/admin/reservation")
     public String getReservationPage() {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @GetMapping("/admin/time")
     public String getTimePage() {
-        return "/admin/time";
+        return "admin/time";
     }
 
     @GetMapping("/admin/theme")
     public String getThemePage() {
-        return "/admin/theme";
+        return "admin/theme";
     }
 
     @GetMapping("/admin/waiting")
     public String getWaitingPage() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 }

@@ -8,26 +8,26 @@ public class UserWebController {
 
     @GetMapping("/login")
     public String getLoginPage() {
-        return "/login";
+        return "login";
     }
 
     @GetMapping("/signup")
     public String getSingUpPage() {
-        return "/signup";
+        return "signup";
     }
 
     @GetMapping
     public String getPopularThemePage() {
-        return "/index";
+        return "index";
     }
 
     @GetMapping("/reservation")
     public String getUserReservationPage() {
-        return "/reservation";
+        return "reservation";
     }
 
     @GetMapping("/reservation-mine")
     public String getUserMyReservationPage() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }
