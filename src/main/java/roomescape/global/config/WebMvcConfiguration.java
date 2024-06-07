@@ -58,7 +58,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(3000);
-        factory.setReadTimeout(3000);
+        factory.setReadTimeout(10000);
 
         return factory;
     }
