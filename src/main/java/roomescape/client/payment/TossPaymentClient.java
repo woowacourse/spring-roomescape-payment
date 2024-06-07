@@ -57,7 +57,7 @@ public class TossPaymentClient implements PaymentClient {
         String encodedBytes = encoder.encodeToString((this.widgetSecretKey + ":").getBytes());
 
         headers.setBasicAuth(encodedBytes);
-        }
+    }
 
     private void handlePaymentConfirmationException(ConvertibleClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
