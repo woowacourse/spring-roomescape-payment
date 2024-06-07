@@ -3,23 +3,27 @@ package roomescape.application.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.exception.AuthenticationException;
+import roomescape.web.support.JwtTokenProperties;
 
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
-    private static final String SECRET_KEY = "hellowootecoworldhihowareyouiamfinethankyouandyou";
     private static final String ROLE_CLAIM_KEY = "role";
     private static final String NAME_CLAIM_KEY = "name";
+
+    private final JwtTokenProperties jwtTokenProperties;
 
     public String encode(Member user) {
         return Jwts.builder()
                 .subject(user.getId().toString())
                 .claim(ROLE_CLAIM_KEY, user.getRoleAsString())
                 .claim(NAME_CLAIM_KEY, user.getName())
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                .signWith(Keys.hmacShaKeyFor(jwtTokenProperties.secret().getBytes()))
                 .compact();
     }
 
@@ -40,7 +44,7 @@ public class JwtProvider {
             token = token.replace("token=", "");
 
             return Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                    .verifyWith(Keys.hmacShaKeyFor(jwtTokenProperties.secret().getBytes()))
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();

@@ -19,3 +19,6 @@ payments:
   read-timeout: 3000
   connect-timeout: 3000
 payment-timeout: 60
+jwt:
+  token:
+    secret: hellowootecoworldhihowareyouiamfinethankyouandyou
