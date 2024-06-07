@@ -11,7 +11,7 @@ public record MemberReservationResponse(
         LocalTime time,
         String status,
         String paymentKey,
-        int amount
+        String amount
 ) {
     public MemberReservationResponse(ReservationWithInformation reservation) {
         this(
@@ -20,8 +20,8 @@ public record MemberReservationResponse(
                 reservation.getReservationDate(),
                 reservation.getStartAt(),
                 statusMessage(reservation.getWaitingNumber()),
-                reservation.getPaymentKey(),
-                reservation.getAmount()
+                paymentKey(reservation.getPaymentKey()),
+                amount(reservation.getAmount())
         );
     }
 
@@ -30,5 +30,19 @@ public record MemberReservationResponse(
             return waitingNumber + "번째 예약 대기";
         }
         return "예약";
+    }
+
+    private static String paymentKey(String paymentKey) {
+        if (paymentKey.isBlank()) {
+            return "관리자에게 따로 문의";
+        }
+        return paymentKey;
+    }
+
+    private static String amount(int amount) {
+        if (amount == 0) {
+            return "관리자에게 따로 문의";
+        }
+        return Integer.toString(amount);
     }
 }
