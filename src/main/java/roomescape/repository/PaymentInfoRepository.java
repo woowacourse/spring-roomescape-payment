@@ -1,14 +1,19 @@
 package roomescape.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import roomescape.model.PaymentInfo;
-import roomescape.model.Reservation;
 
 import java.util.Optional;
 
 public interface PaymentInfoRepository extends CrudRepository<PaymentInfo, Long> {
 
-    Optional<PaymentInfo> findByReservation(Reservation reservation);
+    @Query("""
+            SELECT p
+            FROM PaymentInfo p
+            WHERE p.reservation.id = :reservationId
+            """)
+    Optional<PaymentInfo> findByReservationId(Long reservationId);
 
     PaymentInfo save(PaymentInfo paymentInfo);
 

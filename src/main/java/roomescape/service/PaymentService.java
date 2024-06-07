@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import roomescape.controller.request.PaymentCancelRequest;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.InvalidPaymentInformationException;
@@ -23,6 +24,8 @@ public class PaymentService {
     private final PaymentInfoRepository paymentInfoRepository;
     @Value("${payment.toss.payment-confirm-url}")
     private String confirmUrl;
+    @Value("${payment.toss.cancel}")
+    private String cancelUrl;
 
     public PaymentService(RestClient restClient, PaymentInfoRepository paymentInfoRepository) {
         this.restClient = restClient;
@@ -53,5 +56,23 @@ public class PaymentService {
     public PaymentInfo addPayment(ReservationRequest request, Reservation reservation) {
         PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
         return paymentInfoRepository.save(paymentInfo);
+    }
+
+    public void cancelPayment(Long reservationId) {
+        PaymentInfo paymentInfo = paymentInfoRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new PaymentException("id:[%s] 인 예약의 결제 정보가 존재하지 않습니다.".formatted(reservationId)));
+        String paymentKey = paymentInfo.getPaymentKey();
+        restClient.post()
+                .uri("/" + paymentKey + cancelUrl)
+                .contentType(APPLICATION_JSON)
+                .body(new PaymentCancelRequest("고객 요청"))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new InvalidPaymentInformationException();
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new PaymentServerErrorException();
+                }).toBodilessEntity();
+        paymentInfoRepository.deleteById(paymentInfo.getId());
     }
 }
