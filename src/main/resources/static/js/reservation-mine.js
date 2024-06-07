@@ -69,10 +69,9 @@ function render(data, paymentWidget) {
                 // 결제 버튼 가져오기
                 var btn = document.getElementById("payment-button");
 
-                btn.onclick = requestPayment(item.ownerId, paymentWidget).then(function () {
-                    modal.style.display = "none";
-                    window.location.reload();
-                });
+                btn.onclick = function () {
+                    requestPayment(item.ownerId, paymentWidget).then(() => window.location.reload());
+                };
             };
             paymentCell.appendChild(paymentButton);
         } else { // 예약 완료 상태일 때
@@ -110,10 +109,14 @@ function requestPayment(id, paymentWidget) {
     }).then(function (data) {
         console.debug(data);
         fetchReservationPayment(data, reservationData);
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
     }).catch(function (error) {
         // TOSS 에러 처리: 에러 목록을 확인하세요
         // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
         alert(error.message);
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
     });
 }
 
