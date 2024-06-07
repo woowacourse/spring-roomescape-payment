@@ -1,8 +1,8 @@
-# 방탈출 예약 시스템
+# 🏃 방탈출 예약 시스템
 
 우아한 방탈출 카페의 예약 시스템 웹 애플리케이션 입니다.
 
-## 손님
+## 💁 손님
 
 손님은 회원가입 후 원하는 테마, 날짜, 시간 을 선택하여 방탈출을 예약할 수 있습니다.
 
@@ -24,67 +24,74 @@
 
 아직 시작 되지 않는 방탈출 예약에 대해서는 1초 전까지 에약 취소가 가능하며 별도의 위약금이나 수수료는 발생하지 않습니다.
 
-## 관리자
+## 👷🏻 관리자
 
 관리자는 원하는 손님 정보로 예약을 추가할 수 있으며 모든 예약 정보를 관리할 수 있습니다.
 
 관리자는 테마, 시간을 추가할 수 있고, 아무런 예약이 되어 있지 않은 테마나 시간을 삭제할 수도 있습니다.
 
-## API Docs
+## 🧪 Test Account
 
-https://womosoft.com/swagger-ui/index.html
+| 권한  | 이메일                | 비밀번호       |
+|-----|--------------------|------------|
+| 유저  | `clover@gmail.com` | `password` |
+| 어드민 | `admin@gmail.com`  | `password` |
 
-## ERD Diagram
+## 📑 API Docs
+
+https://escape.womosoft.com/swagger-ui/index.html
+
+## 🔀 ERD
 
 ```mermaid
 erDiagram
     MEMBER {
-        BIGINT ID PK "auto_increment"
-        VARCHAR EMAIL
-        VARCHAR NAME
-        VARCHAR PASSWORD
-        VARCHAR ROLE "default 'USER'"
+        bigint id PK
+        varchar email
+        varchar name
+        varchar password
+        varchar role
     }
 
     MEMBER_RESERVATION {
-        TIMESTAMP CREATED_AT
-        BIGINT ID PK "auto_increment"
-        BIGINT MEMBER_ID
-        BIGINT RESERVATION_ID
-        VARCHAR STATUS "default 'CONFIRMED'"
-    }
-
-    PAYMENT {
-        NUMERIC AMOUNT "(38, 2)"
-        TIMESTAMP CREATED_AT
-        BIGINT ID PK "auto_increment"
-        BIGINT MEMBER_RESERVATION_ID "unique"
-        VARCHAR ORDER_ID
-        VARCHAR PAYMENT_KEY
+        timestamp created_at
+        bigint id PK
+        bigint member_id FK
+        bigint reservation_id FK
+        varchar status
     }
 
     RESERVATION {
-        DATE DATE
-        BIGINT ID PK "auto_increment"
-        BIGINT THEME_ID
-        BIGINT TIME_ID
+        date date
+        bigint id PK
+        bigint theme_id FK
+        bigint time_id FK
     }
 
     RESERVATION_TIME {
-        TIME START_AT "(6)"
-        BIGINT ID PK "auto_increment"
+        time start_at
+        bigint id PK
     }
 
     THEME {
-        BIGINT ID PK "auto_increment"
-        VARCHAR DESCRIPTION
-        VARCHAR NAME
-        VARCHAR THUMBNAIL
+        bigint id PK
+        varchar description
+        varchar name
+        varchar thumbnail
     }
 
-    MEMBER ||--o{ MEMBER_RESERVATION: "has"
-    RESERVATION ||--o{ MEMBER_RESERVATION: "is for"
-    RESERVATION_TIME ||--o{ RESERVATION: "occurs at"
-    THEME ||--o{ RESERVATION: "has"
-    MEMBER_RESERVATION ||--o{ PAYMENT: "is paid with"
+    PAYMENT {
+        numeric amount
+        timestamp created_at
+        bigint id PK
+        bigint member_reservation_id FK
+        varchar order_id
+        varchar payment_key
+    }
+
+    MEMBER ||--o{ MEMBER_RESERVATION: "makes"
+    MEMBER_RESERVATION ||--o{ RESERVATION: "is for"
+    RESERVATION ||--o{ THEME: "features"
+    RESERVATION ||--o{ RESERVATION_TIME: "at time"
+    MEMBER_RESERVATION ||--o{ PAYMENT: "is paid by"
 ```
