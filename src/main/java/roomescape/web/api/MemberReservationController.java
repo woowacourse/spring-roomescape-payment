@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.CancelService;
 import roomescape.application.ReservationService;
-import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
+import roomescape.domain.member.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +28,9 @@ public class MemberReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> makeReservation(
             @RequestBody @Valid UserReservationRequest request,
-            MemberInfo memberInfo
+            Member member
     ) {
-        ReservationResponse response = reservationService.reserve(request, memberInfo.id());
+        ReservationResponse response = reservationService.reserve(request, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
@@ -38,33 +38,33 @@ public class MemberReservationController {
     @PostMapping("/reservations/payment")
     public ResponseEntity<ReservationResponse> paymentForPending(
             @RequestBody ReservationPaymentRequest request,
-            MemberInfo memberInfo
+            Member member
     ) {
-        ReservationResponse response = reservationService.payForPending(request, memberInfo.id());
+        ReservationResponse response = reservationService.payForPending(request, member);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(MemberInfo memberInfo) {
-        List<UserReservationResponse> response = reservationService.findAllWithRank(memberInfo.id());
+    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(Member member) {
+        List<UserReservationResponse> response = reservationService.findAllWithRank(member);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/waitings/{idWaiting}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable(value = "idWaiting") Long waitingId,
-            MemberInfo memberInfo
+            Member member
     ) {
-        cancelService.cancelReservation(waitingId, memberInfo);
+        cancelService.cancelReservation(waitingId, member);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/reservations/{idReservation}")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable(value = "idReservation") Long reservationId,
-            MemberInfo memberInfo
+            Member member
     ) {
-        cancelService.cancelReservation(reservationId, memberInfo);
+        cancelService.cancelReservation(reservationId, member);
         return ResponseEntity.noContent().build();
     }
 }

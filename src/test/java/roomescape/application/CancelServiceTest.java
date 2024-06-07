@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.domain.event.CancelEventPublisher;
@@ -74,10 +73,9 @@ class CancelServiceTest extends BaseServiceTest {
     void when_cancelReservation_then_changedToCancelStatus() {
         // given
         Reservation reservation = reservationRepository.save(new Reservation(user, detail, Status.RESERVED));
-        MemberInfo memberInfo = new MemberInfo(user.getId());
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), user);
 
         // then
         Reservation canceledReservation = reservationRepository.getById(reservation.getId());
@@ -88,7 +86,6 @@ class CancelServiceTest extends BaseServiceTest {
     @Test
     void when_cancelReservation_then_paymentCanceled() {
         // given
-        MemberInfo memberInfo = new MemberInfo(user.getId());
         UserReservationRequest request = new UserReservationRequest(
                 CommonFixture.tomorrow,
                 time.getId(),
@@ -97,10 +94,10 @@ class CancelServiceTest extends BaseServiceTest {
                 "asdsds",
                 "asddsdsa",
                 "dsadsdsa");
-        ReservationResponse reserve = reservationService.reserve(request, user.getId());
+        ReservationResponse reserve = reservationService.reserve(request, user);
 
         // when
-        cancelService.cancelReservation(reserve.id(), memberInfo);
+        cancelService.cancelReservation(reserve.id(), user);
 
         // then
         Mockito.verify(paymentClient, Mockito.times(1))
@@ -111,12 +108,11 @@ class CancelServiceTest extends BaseServiceTest {
     @Test
     void when_cancelReservation_then_nextWaitingReservationChangedToWaitingStatus() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
         Reservation nextReservation = reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), admin);
 
         // then
         Reservation waitingReservation = reservationRepository.getById(nextReservation.getId());
@@ -127,12 +123,11 @@ class CancelServiceTest extends BaseServiceTest {
     @Test
     void when_cancelReservation_then_eventPublished() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
         reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), admin);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(1))
@@ -143,11 +138,10 @@ class CancelServiceTest extends BaseServiceTest {
     @Test
     void when_cancelReservation_then_nothingHappened() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), admin);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(0))

@@ -41,8 +41,8 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public ReservationResponse reserve(UserReservationRequest request, Long memberId) {
-        Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
+    public ReservationResponse reserve(UserReservationRequest request, Member member) {
+        Reservation reservation = saveReservation(member.getId(), request.date(), request.timeId(), request.themeId());
         if (reservation.isPending()) {
             Payment payment = savePayment(request.toPaymentRequest(), reservation);
             reservation.completePayment(payment);
@@ -77,16 +77,16 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
+    public ReservationResponse payForPending(ReservationPaymentRequest request, Member member) {
         Reservation reservation = reservationRepository.getById(request.reservationId());
-        rejectIfNotOwner(reservation, memberId);
+        rejectIfNotOwner(reservation, member);
         Payment payment = savePayment(request.toPaymentRequest(), reservation);
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
     }
 
-    private void rejectIfNotOwner(Reservation reservation, Long memberId) {
-        if (reservation.isNotOwner(memberId)) {
+    private void rejectIfNotOwner(Reservation reservation, Member member) {
+        if (reservation.isNotOwner(member.getId())) {
             throw new AuthorizationException();
         }
     }
@@ -106,9 +106,8 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<UserReservationResponse> findAllWithRank(Long memberId) {
-        List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(memberId);
-
+    public List<UserReservationResponse> findAllWithRank(Member member) {
+        List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(member.getId());
         return reservationWithRanks.stream()
                 .map(UserReservationResponse::from)
                 .toList();

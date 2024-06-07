@@ -81,7 +81,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.reserve(request, user.getId());
+        ReservationResponse response = reservationService.reserve(request, user);
 
         // then
         Reservation reservation = reservationRepository.getById(response.id());
@@ -108,7 +108,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
         // when
         try {
-            reservationService.reserve(request, user.getId());
+            reservationService.reserve(request, user);
         } catch (Exception ignored) {
         }
 
@@ -130,7 +130,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey,
                 CommonFixture.paymentType);
 
-        reservationService.reserve(adminRequest, admin.getId());
+        reservationService.reserve(adminRequest, admin);
 
         UserReservationRequest memberRequest = new UserReservationRequest(
                 CommonFixture.tomorrow,
@@ -142,7 +142,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.reserve(memberRequest, user.getId());
+        ReservationResponse response = reservationService.reserve(memberRequest, user);
 
         // then
         Reservation reservation = reservationRepository.getById(response.id());
@@ -168,7 +168,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        ReservationResponse response = reservationService.payForPending(request, admin.getId());
+        ReservationResponse response = reservationService.payForPending(request, admin);
 
         // then
         Reservation reservation = reservationRepository.getById(response.id());
@@ -185,7 +185,6 @@ class ReservationServiceTest extends BaseServiceTest {
         // given
         Reservation pendingReservation = reservationRepository.save(
                 new Reservation(admin, detail1, Status.PAYMENT_PENDING));
-        Long userId = user.getId();
 
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 pendingReservation.getId(),
@@ -194,7 +193,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        Assertions.assertThatThrownBy(() -> reservationService.payForPending(request, userId))
+        Assertions.assertThatThrownBy(() -> reservationService.payForPending(request, user))
                 .isInstanceOf(AuthorizationException.class);
     }
 
@@ -274,7 +273,7 @@ class ReservationServiceTest extends BaseServiceTest {
         reservationRepository.save(new Reservation(user, detail2, Status.RESERVED));
 
         // when
-        List<UserReservationResponse> response = reservationService.findAllWithRank(user.getId());
+        List<UserReservationResponse> response = reservationService.findAllWithRank(user);
 
         // then
         SoftAssertions.assertSoftly(softly -> {

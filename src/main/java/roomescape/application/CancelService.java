@@ -3,8 +3,8 @@ package roomescape.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.event.CancelEventPublisher;
+import roomescape.domain.member.Member;
 import roomescape.domain.payment.CancelReason;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
@@ -21,16 +21,16 @@ public class CancelService {
     private final PaymentClient paymentClient;
 
     @Transactional
-    public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
+    public void cancelReservation(Long reservationId, Member member) {
         Reservation reservation = reservationRepository.getById(reservationId);
-        rejectIfNotOwnerOrAdmin(reservation, memberInfo);
+        rejectIfNotOwnerOrAdmin(reservation, member);
         reservation.toCancel();
         updateFirstWaitingToPending(reservation);
         cancelPayment(reservation);
     }
 
-    private void rejectIfNotOwnerOrAdmin(Reservation reservation, MemberInfo memberInfo) {
-        if (reservation.isNotOwner(memberInfo.id())) {// && !memberInfo.isAdmin()) {
+    private void rejectIfNotOwnerOrAdmin(Reservation reservation, Member member) {
+        if (reservation.isNotOwner(member.getId())) {// && !memberInfo.isAdmin()) {
             throw new AuthorizationException();
         }
     }
