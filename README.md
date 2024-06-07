@@ -11,12 +11,12 @@
 
 ## 2단계 - 내 예약 페이지 변경
 
-- [ ] 내 예약 조회 API Response에 결제 정보 추가
-    - paymentKey, 결제 금액
+- [ ] 내 예약 조회 API Response에 결제 정보(필수: paymentKey, 결제 금액) 추가
+    - paymentKey, currency, totalAmount, status
 - [ ] 결제 정보 테이블 추가
-    - paymentKey, 결제 금액, 결제 종류
+    - paymentKey, type, orderId, orderName, currency, method, totalAmount, status
 - [ ] 예약 추가 시 결제 정보를 DB에 저장
-    - 관리자 예약 추가의 결제 종류는 계좌 이체
+    - 관리자 예약 추가의 method는 '가게 계좌이체'
 
 ## 3단계 - 배포하기
 
@@ -31,7 +31,7 @@
 ## 5단계 - 리팩토링
 
 - [ ] 대기 테이블과 예약 테이블 간 연관관계 제거
-- [ ] 예약, 대기, 결제 플로우에 soft delete 적용
+- [ ] 예약, 대기, 결제 플로우에 soft delete 적용 (삭제 -> 취소)
 - [ ] CI/CD 스크립트 작성
 
 ### 결제 플로우
