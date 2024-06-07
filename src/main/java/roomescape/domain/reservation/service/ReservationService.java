@@ -4,8 +4,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.model.Member;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.model.PaymentHistory;
+import roomescape.domain.payment.repository.PaymentHistoryRepository;
 import roomescape.domain.payment.service.PaymentService;
 import roomescape.domain.reservation.dto.ReservationDto;
+import roomescape.domain.reservation.dto.ReservationWithPaymentHistoryDto;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.dto.SearchReservationsParams;
 import roomescape.domain.reservation.dto.SearchReservationsRequest;
@@ -34,6 +37,7 @@ public class ReservationService {
     private final CustomReservationRepository customReservationRepository;
     private final MemberRepository memberRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentService paymentService;
 
     public ReservationService(
@@ -43,6 +47,7 @@ public class ReservationService {
             final ReservationWaitingRepository reservationWaitingRepository,
             final MemberRepository memberRepository,
             final ThemeRepository themeRepository,
+            final PaymentHistoryRepository paymentHistoryRepository,
             final PaymentService paymentService
     ) {
         this.customReservationRepository = customReservationRepository;
@@ -51,6 +56,7 @@ public class ReservationService {
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
+        this.paymentHistoryRepository = paymentHistoryRepository;
         this.paymentService = paymentService;
     }
 
@@ -135,5 +141,18 @@ public class ReservationService {
                 .stream()
                 .map(ReservationDto::from)
                 .toList();
+    }
+
+    public List<ReservationWithPaymentHistoryDto> getMyReservationsWithPaymentHistory(final Long memberId) {
+        return reservationRepository.findAllByMember_Id(memberId).stream()
+                .map(this::convertReservationToReservationWithPaymentHistory)
+                .toList();
+    }
+
+    private ReservationWithPaymentHistoryDto convertReservationToReservationWithPaymentHistory(final Reservation reservation) {
+        final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
+                .orElseThrow(() -> new NoSuchElementException("해당 예약의 결제 정보가 존재하지 않습니다."));
+
+        return ReservationWithPaymentHistoryDto.from(reservation, paymentHistory.getPaymentKey(), paymentHistory.getTotalAmount());
     }
 }

@@ -8,15 +8,19 @@ public record MyReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
-    public static MyReservationResponse from(final ReservationDto reservation) {
+    public static MyReservationResponse from(final ReservationWithPaymentHistoryDto reservationWithPaymentHistoryDto) {
         return new MyReservationResponse(
-                reservation.id(),
-                reservation.theme().name().getValue(),
-                reservation.date().getValue(),
-                reservation.time().startAt(),
-                reservation.status().getDescription()
+                reservationWithPaymentHistoryDto.id(),
+                reservationWithPaymentHistoryDto.theme().name().getValue(),
+                reservationWithPaymentHistoryDto.date().getValue(),
+                reservationWithPaymentHistoryDto.time().startAt(),
+                reservationWithPaymentHistoryDto.status().getDescription(),
+                reservationWithPaymentHistoryDto.paymentKey(),
+                reservationWithPaymentHistoryDto.totalAmount()
         );
     }
 }

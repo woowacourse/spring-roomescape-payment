@@ -27,7 +27,7 @@ public class ReservationController {
 
     @GetMapping("/reservations-mine")
     public List<MyReservationResponse> getMyReservations(@Authenticated final AuthenticatedMember authenticatedMember) {
-        return reservationService.getMyReservations(authenticatedMember.id())
+        return reservationService.getMyReservationsWithPaymentHistory(authenticatedMember.id())
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();
