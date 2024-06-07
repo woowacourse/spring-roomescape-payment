@@ -30,7 +30,6 @@ import static roomescape.TestFixture.USER_ADMIN;
 import static roomescape.TestFixture.USER_MIA;
 
 class MemberApiDocumentTest extends DocumentTest {
-
     private final MemberService memberService = Mockito.mock(MemberService.class);
 
     @Test
