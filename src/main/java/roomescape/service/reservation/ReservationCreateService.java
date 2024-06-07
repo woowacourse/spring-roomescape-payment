@@ -49,19 +49,25 @@ public class ReservationCreateService {
     }
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
-        return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-                adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
+        Reservation reservation = saveReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
+                adminReservationRequest.memberId(), adminReservationRequest.date(), ReservationStatus.RESERVED);
+        return new ReservationResponse(reservation);
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
-        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
-        Payment payment = paymentService.approvePayment(request);
+        Reservation reservation = saveReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
+                reservationRequest.date(), ReservationStatus.PENDING_PAYMENT);
 
-        return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-                reservationRequest.date(), payment);
+        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
+        if (reservation.isPendingPayment()) {
+            Payment payment = paymentService.approvePayment(request);
+            reservation.paid(payment);
+        }
+
+        return new ReservationResponse(reservation);
     }
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date, Payment payment) {
+    private Reservation saveReservation(long timeId, long themeId, long memberId, LocalDate date, ReservationStatus status) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Theme theme = findThemeById(themeId);
@@ -69,8 +75,7 @@ public class ReservationCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         validateDuplication(reservationDetail);
 
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment));
-        return new ReservationResponse(reservation);
+        return reservationRepository.save(new Reservation(member, reservationDetail, status));
     }
 
     private ReservationTime findTimeById(long timeId) {

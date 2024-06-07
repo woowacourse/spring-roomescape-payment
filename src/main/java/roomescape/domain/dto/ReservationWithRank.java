@@ -1,15 +1,18 @@
 package roomescape.domain.dto;
 
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 
 public class ReservationWithRank {
 
-    private Reservation reservation;
-    private long rank;
+    private final Reservation reservation;
+    private final long rank;
+    private final Payment payment;
 
-    public ReservationWithRank(Reservation reservation, long rank) {
+    public ReservationWithRank(Reservation reservation, long rank, Payment payment) {
         this.reservation = reservation;
         this.rank = rank;
+        this.payment = payment;
     }
 
     public Reservation getReservation() {
@@ -18,5 +21,9 @@ public class ReservationWithRank {
 
     public long getRank() {
         return rank;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }

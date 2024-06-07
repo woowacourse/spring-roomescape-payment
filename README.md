@@ -828,7 +828,7 @@ Content-Type: application/json
     "time": "10:00",
     "reservationStatus": {
       "status": "예약",
-      "rank": 1
+      "rank": 0
     },
     "payment": {
       "paymentKey": "tgon_234567890"
@@ -841,11 +841,11 @@ Content-Type: application/json
     "date": "2024-03-01",
     "time": "12:00",
     "reservationStatus": {
-      "status": "예약",
+      "status": "예약대기",
       "rank": 2
     },
     "payment": {
-      "paymentKey": "tgon_9876598760"
+      "paymentKey": ""
       "amount": 1000
     }
   },
@@ -855,11 +855,11 @@ Content-Type: application/json
     "date": "2024-03-01",
     "time": "14:00",
     "reservationStatus": {
-      "status": "예약",
+      "status": "예약대기",
       "rank": 3
     },
     "payment": {
-      "paymentKey": "tgon_0986465789"
+      "paymentKey": ""
       "amount": 1000
     }
   }

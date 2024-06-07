@@ -5,49 +5,38 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.time.LocalDateTime;
-
 @Entity
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String paymentKey;
-
     private Long amount;
-
-    private Boolean deleted;
-
-    private LocalDateTime requestedAt;
-
-    private LocalDateTime approvedAt;
+    private String orderId;
+    private String requestedAt;
+    private String approvedAt;
 
     public Payment() {
     }
 
-    public Payment(String paymentKey, Long amount, Boolean deleted, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(String paymentKey, Long amount, String orderId, String requestedAt, String approvedAt) {
         this.paymentKey = paymentKey;
         this.amount = amount;
-        this.deleted = deleted;
+        this.orderId = orderId;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
     }
 
-    public static Payment createEmpty() {
-        return new Payment(null, 0L, null, null, null);
+    public Long getId() {
+        return id;
+    }
+
+    public long getAmount() {
+        return amount;
     }
 
     public String getPaymentKey() {
         return paymentKey;
-    }
-
-    public Long getAmount() {
-        return amount;
-    }
-
-    public Long getId() {
-        return id;
     }
 }
