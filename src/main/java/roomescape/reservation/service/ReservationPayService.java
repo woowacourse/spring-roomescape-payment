@@ -12,6 +12,7 @@ import roomescape.payment.service.PaymentFindService;
 import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.MyReservationWithPaymentResponse;
+import roomescape.reservation.dto.PendingReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 
@@ -22,6 +23,7 @@ public class ReservationPayService {
 
     private final ReservationCreateService reservationCreateService;
     private final ReservationFindMineService reservationFindMineService;
+    private final ReservationFindService reservationFindService;
     private final ReservationDeleteService reservationDeleteService;
     private final ReservationUpdateService reservationUpdateService;
     private final PaymentCreateService paymentCreateService;
@@ -29,12 +31,14 @@ public class ReservationPayService {
 
     public ReservationPayService(ReservationCreateService reservationCreateService,
                                  ReservationFindMineService reservationFindMineService,
+                                 ReservationFindService reservationFindService,
                                  ReservationDeleteService reservationDeleteService,
                                  PaymentCreateService paymentCreateService,
                                  PaymentFindService paymentFindService,
                                  ReservationUpdateService reservationUpdateService) {
         this.reservationCreateService = reservationCreateService;
         this.reservationFindMineService = reservationFindMineService;
+        this.reservationFindService = reservationFindService;
         this.reservationDeleteService = reservationDeleteService;
         this.reservationUpdateService = reservationUpdateService;
         this.paymentCreateService = paymentCreateService;
@@ -67,6 +71,14 @@ public class ReservationPayService {
                 .toList();
 
         return makeMyReservations(reservationResponses, waitingResponses);
+    }
+
+    public MyReservationResponse updateReservationPayment(PendingReservationPaymentRequest request, Long reservationId, Long memberId) {
+        ReservationResponse reservation = reservationFindService.findReservation(reservationId);
+        PaymentConfirmRequest paymentConfirmRequest = PaymentConfirmRequest.from(request, reservation.id(), memberId);
+
+        paymentCreateService.confirmPayment(paymentConfirmRequest);
+        return reservationUpdateService.updateReservationPaymentStatus(reservation.id(), PaymentStatus.COMPLETED);
     }
 
     private MyReservationWithPaymentResponse getMyReservationWithPaymentResponse(MyReservationResponse reservation, List<PaymentResponse> payments) {

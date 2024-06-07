@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.payment.dto.PaymentResponse;
+import roomescape.reservation.domain.PaymentStatus;
 
 public record MyReservationWithPaymentResponse(Long id,
                                                String themeName,
@@ -12,6 +13,7 @@ public record MyReservationWithPaymentResponse(Long id,
                                                @JsonFormat(pattern = "HH:mm") LocalTime startAt,
                                                String status,
                                                Long waitingId,
+                                               PaymentStatus paymentStatus,
                                                String paymentKey,
                                                BigDecimal amount) {
     public static MyReservationWithPaymentResponse from(MyReservationResponse reservationResponse, PaymentResponse paymentResponse) {
@@ -22,6 +24,7 @@ public record MyReservationWithPaymentResponse(Long id,
                 reservationResponse.startAt(),
                 reservationResponse.status(),
                 reservationResponse.waitingId(),
+                reservationResponse.paymentStatus(),
                 paymentResponse.paymentKey(),
                 paymentResponse.amount());
     }
@@ -34,6 +37,7 @@ public record MyReservationWithPaymentResponse(Long id,
                 reservationResponse.startAt(),
                 reservationResponse.status(),
                 reservationResponse.waitingId(),
+                reservationResponse.paymentStatus(),
                 null,
                 null);
     }

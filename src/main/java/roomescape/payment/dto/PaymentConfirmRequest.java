@@ -2,6 +2,7 @@ package roomescape.payment.dto;
 
 import java.math.BigDecimal;
 import roomescape.payment.domain.Payment;
+import roomescape.reservation.dto.PendingReservationPaymentRequest;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 
 public record PaymentConfirmRequest(
@@ -12,6 +13,10 @@ public record PaymentConfirmRequest(
         Long memberId
 ) {
     public static PaymentConfirmRequest from(UserReservationCreateRequest request, Long reservationId, Long memberId) {
+        return new PaymentConfirmRequest(request.paymentKey(), request.orderId(), request.amount(), reservationId, memberId);
+    }
+
+    public static PaymentConfirmRequest from(PendingReservationPaymentRequest request, Long reservationId, Long memberId) {
         return new PaymentConfirmRequest(request.paymentKey(), request.orderId(), request.amount(), reservationId, memberId);
     }
 
