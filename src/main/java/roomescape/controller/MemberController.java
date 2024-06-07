@@ -1,5 +1,8 @@
 package roomescape.controller;
 
+import static roomescape.exception.ExceptionType.INVALID_TOKEN;
+import static roomescape.exception.ExceptionType.LOGIN_FAIL;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
+import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.LoginRequest;
 import roomescape.dto.MemberInfo;
 import roomescape.service.MemberService;
@@ -31,6 +35,7 @@ public class MemberController {
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 할 때 사용하는 API")
+    @ErrorApiResponse(LOGIN_FAIL)
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         long memberId = memberService.login(loginRequest);
         LocalDateTime now = LocalDateTime.now();
@@ -47,6 +52,7 @@ public class MemberController {
 
     @GetMapping("/login/check")
     @Operation(summary = "로그인 여부 확인", description = "로그인 여부를 확인할 때 사용하는 API")
+    @ErrorApiResponse(INVALID_TOKEN)
     public MemberInfo myInfo(@Auth long memberId) {
         return memberService.findByMemberId(memberId);
     }

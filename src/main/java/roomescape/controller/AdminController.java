@@ -1,5 +1,11 @@
 package roomescape.controller;
 
+import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
+import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
@@ -39,6 +46,8 @@ public class AdminController {
 
     @PostMapping("/reservations")
     @Operation(summary = "관리자 예약 추가", description = "관리자가 예약을 추가 할 때 사용하는 API")
+    @ErrorApiResponse({NOT_FOUND_RESERVATION_TIME, NOT_FOUND_THEME, NOT_FOUND_MEMBER, DUPLICATE_RESERVATION,
+            PAST_TIME_RESERVATION})
     public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest reservationRequest) {
         ReservationResponse saved = reservationService.save(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + saved.id()))

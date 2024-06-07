@@ -1,5 +1,13 @@
 package roomescape.controller;
 
+import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
+import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION;
+import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
+import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
+import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.ExceptionType.PERMISSION_DENIED;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
@@ -13,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
+import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
@@ -33,6 +42,8 @@ public class ReservationController {
 
     @PostMapping
     @Operation(summary = "예약 생성", description = "회원이 자신의 예약을 생성할 때 사용하는 API")
+    @ErrorApiResponse({NOT_FOUND_RESERVATION_TIME, NOT_FOUND_THEME, NOT_FOUND_MEMBER, DUPLICATE_RESERVATION,
+            PAST_TIME_RESERVATION})
     public ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
@@ -55,7 +66,8 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "예약 취소", description = "예약을 취련할 때 사용하는 API")
+    @Operation(summary = "예약 취소", description = "예약을 취소할 때 사용하는 API")
+    @ErrorApiResponse({PERMISSION_DENIED, NOT_FOUND_RESERVATION, NOT_FOUND_MEMBER})
     public ResponseEntity<Void> delete(@Auth long memberId, @PathVariable("id") long reservationId) {
         reservationService.cancel(memberId, reservationId);
         return ResponseEntity.noContent().build();

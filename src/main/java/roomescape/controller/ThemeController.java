@@ -1,5 +1,12 @@
 package roomescape.controller;
 
+import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
+import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
+import static roomescape.exception.ExceptionType.EMPTY_DESCRIPTION;
+import static roomescape.exception.ExceptionType.EMPTY_NAME;
+import static roomescape.exception.ExceptionType.EMPTY_THUMBNAIL;
+import static roomescape.exception.ExceptionType.NOT_URL_BASE_THUMBNAIL;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.ThemeRequest;
 import roomescape.dto.ThemeResponse;
 import roomescape.service.ThemeService;
@@ -42,6 +50,7 @@ public class ThemeController {
 
     @PostMapping("/admin/themes")
     @Operation(summary = "관리자 테마 생성", description = "관리자가 테마를 생성할 때 사용하는 API")
+    @ErrorApiResponse({DUPLICATE_THEME, EMPTY_NAME, EMPTY_DESCRIPTION, EMPTY_THUMBNAIL, NOT_URL_BASE_THUMBNAIL})
     public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
         ThemeResponse saved = themeService.save(themeRequest);
         return ResponseEntity.created(URI.create("/themes/" + saved.id()))
@@ -49,7 +58,8 @@ public class ThemeController {
     }
 
     @DeleteMapping("/admin/themes/{id}")
-    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭기할 때 사용하는 API")
+    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭제할 때 사용하는 API")
+    @ErrorApiResponse(DELETE_USED_THEME)
     public ResponseEntity<Void> delete(@PathVariable long id) {
         themeService.delete(id);
         return ResponseEntity.noContent().build();
