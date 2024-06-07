@@ -103,6 +103,10 @@ public class Reservation {
         return this.status == Status.CANCELED;
     }
 
+    public boolean isPaid() {
+        return this.payment != null;
+    }
+
     public Payment getPayment() {
         if (this.payment == null) {
             throw new RoomEscapeException("결제 정보가 없습니다.");

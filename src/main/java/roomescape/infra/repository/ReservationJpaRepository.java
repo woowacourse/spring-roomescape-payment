@@ -43,6 +43,7 @@ public interface ReservationJpaRepository extends ReservationRepository, Reposit
                 and r.detail = mine.detail
                 and r.status = 'WAITING'))
             from Reservation mine
+            left join mine.payment
             where mine.member.id = :memberId
             and (mine.detail.date > current_date or (mine.detail.date = current_date
                 and mine.detail.time.startAt > current_time))
