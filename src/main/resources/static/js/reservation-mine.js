@@ -85,7 +85,6 @@ function render(data) {
             const paymentButton = document.createElement('button');
             paymentButton.textContent = '결제하기';
             paymentButton.className = 'btn btn-danger';
-            //TODO
             paymentButton.onclick = function () {
                 reservationId = item.id;
                 const modal = document.getElementById('myModal');
