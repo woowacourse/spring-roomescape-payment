@@ -60,8 +60,6 @@ public class MemberReservationService {
         PaymentInfo paymentInfo = paymentRepository.findByMemberReservationId(memberReservation.getId())
                 .map(PaymentInfo::from)
                 .orElse(PaymentInfo.NOT_PAYMENT);
-        System.out.println(memberReservation);
-        System.out.println(paymentInfo);
         return new MyReservationInfo(
                 memberReservation.getId(),
                 ReservationInfo.from(memberReservation.getReservation()),

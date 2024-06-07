@@ -16,12 +16,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<ExceptionResponse> handle(RoomescapeException ex) {
-        log.warn("Roomescape exception [status={},errorCode={},message={}]", ex.getStatusCode(),ex.getErrorCode(),ex.getMessage());
-        return ResponseEntity.status(ex.getStatusCode()).body(new ExceptionResponse(ex.getErrorCode(),ex.getMessage()));
+        log.warn("Roomescape exception [status={},errorCode={},message={}]", ex.getStatusCode(), ex.getErrorCode(), ex.getMessage(), ex);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(new ExceptionResponse(ex.getErrorCode(), ex.getMessage()));
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
@@ -29,14 +30,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse> handleHandlerMethodValidationException(
             HandlerMethodValidationException e) {
-        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        log.error(e.getMessage());
+        log.error("Server Exception [message={}]",e.getMessage(),e);
         return ResponseEntity.internalServerError()
                 .body(ExceptionResponse.of(ErrorType.UNEXPECTED_SERVER_ERROR));
     }

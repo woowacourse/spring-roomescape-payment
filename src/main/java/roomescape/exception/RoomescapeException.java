@@ -7,14 +7,14 @@ public class RoomescapeException extends RuntimeException {
     private final ErrorType errorType;
 
     public RoomescapeException(final ErrorType errorType) {
-        this.errorType = errorType;
+        this(errorType, null);
     }
 
     public RoomescapeException(final ErrorType errorType, final Throwable cause) {
         super(errorType.name(), cause);
         this.errorType = errorType;
     }
-    
+
     public HttpStatusCode getStatusCode() {
         return HttpStatus.valueOf(errorType.getStatusCode());
     }
