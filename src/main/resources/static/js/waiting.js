@@ -17,15 +17,11 @@ function render(data) {
   data.forEach(item => {
     const row = tableBody.insertRow();
 
-    /*
-    TODO: [4단계] 예약 대기 관리 기능
-          예약 대기 목록 조회 response 명세에 맞춰 값 설정
-     */
     const id = item.id;
-    const name = item.member.name;
-    const theme = item.theme.name;
+    const name = item.member;
+    const theme = item.theme;
     const date = item.date;
-    const startAt = item.time.startAt;
+    const startAt = item.startAt;
 
     row.insertCell(0).textContent = id;            // 예약 대기 id
     row.insertCell(1).textContent = name;          // 예약자명
@@ -35,10 +31,6 @@ function render(data) {
 
     const actionCell = row.insertCell(row.cells.length);
 
-    /*
-    TODO: [4단계] 예약 대기 관리 기능
-          예약 대기 승인/거절 버튼이 필요한 경우 활성화하여 사용
-     */
     // actionCell.appendChild(createActionButton('승인', 'btn-primary', approve));
     actionCell.appendChild(createActionButton('삭제', 'btn-danger', deny));
   });
@@ -66,10 +58,6 @@ function deny(event) {
   const row = event.target.closest('tr');
   const id = row.cells[0].textContent;
 
-  /*
-  TODO: [4단계] 예약 대기 목록 관리 기능
-        예약 대기 거절 API 호출
-   */
   const endpoint = '/reservations/queue/' + id;
   return fetch(endpoint, {
     method: 'DELETE'
