@@ -3,6 +3,7 @@ package roomescape.infra;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -14,11 +15,12 @@ import roomescape.exception.PaymentErrorHandler;
 @Component
 public class PaymentRestClient {
 
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
     private static final Encoder ENCODER = Base64.getEncoder();
     private static final String BASE64_DELIMITER = ":";
 
+    @Value("${secret.key.widget}")
+    private String widgetSecretKey;
     private final RestClient restClient;
     private final PaymentErrorHandler paymentErrorHandler;
 
@@ -38,7 +40,7 @@ public class PaymentRestClient {
     }
 
     private String getAuthorizationHeader() {
-        byte[] encodedBytes = ENCODER.encode((WIDGET_SECRET_KEY + BASE64_DELIMITER)
+        byte[] encodedBytes = ENCODER.encode((widgetSecretKey + BASE64_DELIMITER)
                 .getBytes(StandardCharsets.UTF_8));
 
         return AUTHORIZATION_HEADER_PREFIX + new String(encodedBytes);
