@@ -12,9 +12,9 @@ public interface TimeRepository extends ListCrudRepository<ReservationTime, Long
 
     @Query("""
             SELECT t FROM Reservation AS r
-            INNER JOIN r.time AS t
-            WHERE r.date = :date
-            AND r.theme.id = :themeId
+            INNER JOIN r.schedule.time AS t
+            WHERE r.schedule.date = :date
+            AND r.schedule.theme.id = :themeId
             """)
     List<ReservationTime> findByReservationDateAndThemeId(LocalDate date, Long themeId);
 }

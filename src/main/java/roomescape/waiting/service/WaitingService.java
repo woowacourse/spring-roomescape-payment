@@ -52,7 +52,7 @@ public class WaitingService {
     }
 
     private Reservation findReservation(WaitingRequest request) {
-        return reservationRepository.findByDateAndTimeIdAndThemeId(
+        return reservationRepository.findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(
                         request.date(), request.timeId(), request.themeId())
                 .orElseThrow(() -> new BadArgumentRequestException("아직 예약되지 않았습니다."));
     }
@@ -73,7 +73,7 @@ public class WaitingService {
 
     private boolean isAlreadyWaited(Reservation reservation, Member member) {
         return reservation.getMember().equals(member)
-               || waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId());
+                || waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId());
     }
 
     public void deleteWaiting(Long id) {

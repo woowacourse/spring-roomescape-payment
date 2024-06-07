@@ -12,14 +12,15 @@ import roomescape.reservation.domain.Reservation;
 public interface ReservationRepository extends ListCrudRepository<Reservation, Long> {
     List<Reservation> findByMemberId(Long memberId);
 
-    Optional<Reservation> findByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+    Optional<Reservation> findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(LocalDate date, Long timeId,
+                                                                                     Long themeId);
 
     @Query("""
             SELECT r FROM Reservation AS r
-            WHERE (:themeId IS NULL OR r.theme.id = :themeId)
+            WHERE (:themeId IS NULL OR r.schedule.theme.id = :themeId)
             AND (:memberId IS NULL OR r.member.id = :memberId)
-            AND (:startDate IS NULL OR r.date >= :startDate)
-            AND (:endDate IS NULL OR r.date <= :endDate)
+            AND (:startDate IS NULL OR r.schedule.date >= :startDate)
+            AND (:endDate IS NULL OR r.schedule.date <= :endDate)
             """)
     List<Reservation> findByCondition(Long memberId, Long themeId, LocalDate startDate, LocalDate endDate);
 }
