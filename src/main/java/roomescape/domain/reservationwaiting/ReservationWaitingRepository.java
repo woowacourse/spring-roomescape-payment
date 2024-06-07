@@ -11,8 +11,7 @@ public interface ReservationWaitingRepository extends JpaRepository<ReservationW
     boolean existsByReservationAndMember(Reservation reservation, Member member);
 
     @Query("""
-            SELECT new roomescape.domain.reservationwaiting.ReservationWaitingWithRank(
-                w, COUNT(*))
+            SELECT new roomescape.domain.reservationwaiting.ReservationWaitingWithRank(w, COUNT(*))
             FROM ReservationWaiting w
             LEFT JOIN ReservationWaiting w2
                 ON w2.id <= w.id

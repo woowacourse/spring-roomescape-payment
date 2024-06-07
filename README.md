@@ -14,13 +14,14 @@
 - [x] 결제 테이블 추가
     - 결제 정보: paymentKey, type, orderId, orderName, currency, method, totalAmount, status
 - [x] 사용자 예약 추가 시 결제 정보를 DB에 저장
-- [ ] 내 예약 조회 API Response에 결제 정보 추가
+- [x] 내 예약 조회 API Response에 결제 정보 추가
     - 결제 정보: paymentKey, currency, totalAmount, status
 
 ## 3단계 - 배포하기
 
 - [ ] WAS 서버 배포
 - [ ] DB 서버 배포
+- [ ] 배포 스크립트 작성
 
 ## 4단계 - 문서화
 
@@ -30,8 +31,13 @@
 ## 5단계 - 리팩토링
 
 - [ ] 대기 테이블과 예약 테이블 간 연관관계 제거
-- [ ] 예약, 대기, 결제 플로우에 soft delete 적용 (삭제 -> 취소)
-- [ ] CI/CD 스크립트 작성
+    - 예약결제(결제정보, 예약, 회원)
+    - 예약(예약정보, 회원)
+    - 대기(예약정보, 회원)
+- [ ] 예약, 결제 플로우에 soft delete 적용(삭제 -> 취소)
+    - 예약상태에 '예약취소' 값 추가
+    - 하나의 예약에 여러 회원의 결제 정보 존재 가능
+- [ ] LazyLoading과 OSIV 적용 여부 고민
 
 ### 결제 플로우
 
@@ -224,7 +230,7 @@ Content-Type: application/json
 Request
 
 ```
-GET /reservations-mine
+GET /reservations/mine
 cookie: token=hello.example.token
 ```
 

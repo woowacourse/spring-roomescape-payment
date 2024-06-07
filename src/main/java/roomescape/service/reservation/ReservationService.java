@@ -19,6 +19,7 @@ import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationWithPayment;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
@@ -84,13 +85,14 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationMineListResponse findMyReservation(Member member) {
-        List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
-        List<ReservationWaitingWithRank> reservationWaitingWithRanks
+        List<ReservationWithPayment> reservationsWithPayment
+                = reservationRepository.findAllReservationWithPaymentByMemberId(member.getId());
+        List<ReservationWaitingWithRank> reservationWaitingsWithRank
                 = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
 
         List<ReservationMineResponse> myReservations = Stream.concat(
-                        reservations.stream().map(ReservationMineResponse::new),
-                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
+                        reservationsWithPayment.stream().map(ReservationMineResponse::new),
+                        reservationWaitingsWithRank.stream().map(ReservationMineResponse::new)
                 )
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();

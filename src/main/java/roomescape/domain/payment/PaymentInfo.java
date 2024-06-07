@@ -41,6 +41,10 @@ public class PaymentInfo {
         this.status = status;
     }
 
+    public String getTotalAmountWithCurrency() {
+        return totalAmount + currency;
+    }
+
     public String getPaymentKey() {
         return paymentKey;
     }

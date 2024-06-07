@@ -17,9 +17,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
 
     boolean existsByInfoTheme(Theme theme);
 
-    List<Reservation> findByMemberId(Long id);
-
     Optional<Reservation> findByInfo(ReservationInfo info);
+
+    @Query("""
+            SELECT new roomescape.domain.reservation.ReservationWithPayment(r, p)
+            FROM Reservation r
+            LEFT JOIN ReservationPayment p
+                ON p.reservation.id = r.id
+            WHERE r.member.id = :memberId
+            """)
+        // TODO: 쿼리 개선점 있는지 생각 필요
+    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId);
 
     @Query("""
             SELECT r.info.reservationTime.id

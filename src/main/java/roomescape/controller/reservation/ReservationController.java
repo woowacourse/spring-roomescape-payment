@@ -46,7 +46,7 @@ public class ReservationController {
     }
 
     @RoleAllowed
-    @GetMapping("/reservations-mine")
+    @GetMapping("/reservations/mine")
     public ResponseEntity<ReservationMineListResponse> findMyReservation(@LoginMember Member member) {
         ReservationMineListResponse response = reservationService.findMyReservation(member);
         return ResponseEntity.ok().body(response);

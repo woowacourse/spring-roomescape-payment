@@ -101,7 +101,7 @@ class ReservationIntegrationTest extends IntegrationTest {
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())
-                    .when().get("/reservations-mine")
+                    .when().get("/reservations/mine")
                     .then().log().all()
                     .statusCode(200)
                     .body("reservations.size()", is(2));
