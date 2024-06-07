@@ -79,6 +79,7 @@ public class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
+    // TODO: 회원도 결제 대기 상태라면 예약 삭제 가능하도록 변경
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
