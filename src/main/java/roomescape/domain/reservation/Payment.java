@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
-import java.math.BigInteger;
 
 @Entity
 public class Payment {
@@ -25,9 +24,9 @@ public class Payment {
     private String orderId;
 
     @Column(nullable = false)
-    private BigInteger amount;
+    private Integer amount;
 
-    public Payment(Reservation reservation, String paymentKey, String orderId, BigInteger amount) {
+    public Payment(Reservation reservation, String paymentKey, String orderId, Integer amount) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
@@ -35,6 +34,25 @@ public class Payment {
     }
 
     protected Payment() {
+    }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 }

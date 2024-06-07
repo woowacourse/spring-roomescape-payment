@@ -1,5 +1,8 @@
 package roomescape.domain.repository;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
@@ -7,10 +10,6 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     @Query("select r from Reservation r where r.reservationSlot.date = :date and r.reservationSlot.theme = :theme")
@@ -37,19 +36,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("""
             select r
-            from Reservation r 
-            where r.reservationSlot.date = :date 
-             and r.reservationSlot.theme.id =:themeId 
-             and r.reservationSlot.time.id = :timeId""")
+            from Reservation r
+            where r.reservationSlot.date = :date
+             and r.reservationSlot.theme.id =:themeId
+             and r.reservationSlot.time.id = :timeId
+             """)
     Optional<Reservation> findByDateAndThemeIdAndTimeId(LocalDate date, long themeId, long timeId);
 
     @Query("""
-            select r
-            from Reservation r
-            join fetch r.reservationSlot
-            where r.member = :member
-             and r.reservationSlot.date >=:date
-            order by r.reservationSlot.date asc, r.reservationSlot.time.startAt asc""")
+        select r
+        from Reservation r
+        where r.member = :member
+        and r.reservationSlot.date >= :date
+        order by r.reservationSlot.date asc, r.reservationSlot.time.startAt asc
+    """)
     List<Reservation> findByMemberAndDateGreaterThanEqual(Member member, LocalDate date);
 
     boolean existsByReservationSlot(ReservationSlot slot);

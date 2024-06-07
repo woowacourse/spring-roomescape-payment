@@ -1,7 +1,6 @@
 package roomescape.service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.math.BigInteger;
 import roomescape.domain.reservation.Payment;
 import roomescape.domain.reservation.Reservation;
 
@@ -34,6 +33,6 @@ public class PaymentResponse {
     }
 
     public Payment toPayment(Reservation reservation) {
-        return new Payment(reservation, paymentKey, orderId, new BigInteger(totalAmount));
+        return new Payment(reservation, paymentKey, orderId, Integer.valueOf(totalAmount));
     }
 }

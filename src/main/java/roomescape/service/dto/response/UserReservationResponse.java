@@ -1,18 +1,20 @@
 package roomescape.service.dto.response;
 
-import roomescape.domain.reservation.*;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.OptionalLong;
-
 import static roomescape.domain.reservation.ReservationStatus.RESERVED;
 import static roomescape.domain.reservation.ReservationStatus.WAITING;
+
+import java.util.OptionalLong;
+import roomescape.domain.reservation.Payment;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationSlot;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.WaitingWithRank;
 
 public record UserReservationResponse(
         long id,
         ReservationSlot reservationSlot,
         ReservationStatus status,
+        Payment payment,
         OptionalLong rank
 ) {
     public static UserReservationResponse reserved(Reservation reservation) {
@@ -20,6 +22,7 @@ public record UserReservationResponse(
                 reservation.getId(),
                 reservation.getReservationSlot(),
                 RESERVED,
+                reservation.getPayment(),
                 OptionalLong.empty()
         );
     }
@@ -29,6 +32,7 @@ public record UserReservationResponse(
                 waitingWithRank.waiting().getId(),
                 waitingWithRank.waiting().getReservation().getReservationSlot(),
                 WAITING,
+                null, //TODO null 처리 고민
                 OptionalLong.of(waitingWithRank.rank() + 1)
         );
     }

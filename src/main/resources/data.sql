@@ -48,3 +48,6 @@ VALUES (1, '2024-05-04', 1, 1),
 INSERT INTO waiting (created_at, reservation_id, member_id)
 VALUES ('2024-05-04 11.11.11', 1, 2),
        ('2024-05-05 11.11.11', 3, 2);
+
+INSERT INTO payment (reservation_id, payment_key, order_id, amount)
+values (18, 'afjdslfjdfeafefd', 'test', 30000)
