@@ -15,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -80,7 +79,7 @@ class WaitingCommonServiceTest {
     @Test
     void cannotDeleteWaitingByIdIfReserved() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
         Reservation target = reservationRepository.save(reservation);
 
         //when
@@ -93,7 +92,7 @@ class WaitingCommonServiceTest {
     @Test
     void cannotDeleteWaitingByIdIfNotOwner() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.WAITING);
         Reservation target = reservationRepository.save(reservation);
 
         //when

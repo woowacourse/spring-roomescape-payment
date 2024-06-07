@@ -18,6 +18,6 @@ public class FakePaymentClient implements PaymentClient {
         if (request.paymentKey().equals("failPaymentKey")) {
             throw new TossPaymentException(TossPaymentErrorCode.INTERNAL_SERVER_ERROR);
         }
-        return new Payment(request.paymentKey(), request.amount(), false, LocalDateTime.now().minusSeconds(5), LocalDateTime.now());
+        return new Payment(request.paymentKey(), request.amount(), false, LocalDateTime.now().minusSeconds(5), LocalDateTime.now(), null);
     }
 }

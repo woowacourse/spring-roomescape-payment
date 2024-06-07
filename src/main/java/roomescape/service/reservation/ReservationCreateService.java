@@ -49,7 +49,7 @@ public class ReservationCreateService {
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
         return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-            adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
+            adminReservationRequest.memberId(), adminReservationRequest.date());
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
@@ -57,10 +57,10 @@ public class ReservationCreateService {
         Payment payment = paymentService.approvePayment(request);
 
         return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-            reservationRequest.date(), payment);
+            reservationRequest.date());
     }
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date, Payment payment) {
+    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Theme theme = findThemeById(themeId);
@@ -68,7 +68,7 @@ public class ReservationCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         validateDuplication(reservationDetail);
 
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment));
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED));
         return new ReservationResponse(reservation);
     }
 

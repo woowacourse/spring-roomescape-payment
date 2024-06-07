@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.dto.ReservationWithRank;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -27,7 +26,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @DisplayName("모든 예약 내역을 조회한다.")
     @Test
     void findAllReservations() {
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
         //when
         List<ReservationResponse> reservations = reservationCommonService.findAll();
@@ -40,7 +39,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void findByMember() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(), null, null,
             null);
@@ -56,7 +55,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void findByMemberAndTheme() {
         //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
         long notMemberThemeId = theme.getId() + 1;
         ReservationFilterRequest reservationFilterRequest = new ReservationFilterRequest(member.getId(),
@@ -73,7 +72,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void deleteReservationById() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
         Reservation target = reservationRepository.save(reservation);
 
         //when
@@ -87,9 +86,9 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
     @Test
     void deleteThenUpdateReservation() {
         //given
-        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
-        Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
-        Reservation reservation3 = new Reservation(anotherMember, reservationDetail, ReservationStatus.WAITING, Payment.createEmpty());
+        Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
+        Reservation reservation2 = new Reservation(member, reservationDetail, ReservationStatus.WAITING);
+        Reservation reservation3 = new Reservation(anotherMember, reservationDetail, ReservationStatus.WAITING);
         reservationRepository.save(reservation);
         reservationRepository.save(reservation2);
         reservationRepository.save(reservation3);

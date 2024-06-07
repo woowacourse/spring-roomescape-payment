@@ -15,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -69,7 +68,7 @@ class WaitingCreateServiceTest {
         //given
         WaitingRequest waitingRequest = new WaitingRequest(reservationDetail.getDate(),
             reservationDetail.getReservationTime().getId(), theme.getId());
-        reservationRepository.save(new Reservation(anotherMember, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty()));
+        reservationRepository.save(new Reservation(anotherMember, reservationDetail, ReservationStatus.RESERVED));
 
         //when
         ReservationResponse result = waitingCreateService.createWaiting(waitingRequest, member.getId());
@@ -89,7 +88,7 @@ class WaitingCreateServiceTest {
         //given
         WaitingRequest waitingRequest = new WaitingRequest(reservationDetail.getDate(),
             reservationDetail.getReservationTime().getId(), theme.getId());
-        reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty()));
+        reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED));
 
         //when & then
         assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))

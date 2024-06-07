@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import roomescape.domain.member.Member;
 
 @Entity
 public class Payment {
@@ -23,19 +25,19 @@ public class Payment {
 
     private LocalDateTime approvedAt;
 
-    public Payment() {
+    @ManyToOne
+    private Member member;
+
+    protected Payment() {
     }
 
-    public Payment(String paymentKey, Long amount, Boolean deleted, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(String paymentKey, Long amount, Boolean deleted, LocalDateTime requestedAt, LocalDateTime approvedAt, Member member) {
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.deleted = deleted;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
-    }
-
-    public static Payment createEmpty() {
-        return new Payment(null, 0L, null, null, null);
+        this.member = member;
     }
 
     public String getPaymentKey() {
@@ -48,5 +50,9 @@ public class Payment {
 
     public Long getId() {
         return id;
+    }
+
+    public Member getMember() {
+        return member;
     }
 }

@@ -1,6 +1,5 @@
 package roomescape.service.waiting;
 
-import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -51,7 +50,7 @@ public class WaitingCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         validateDuplication(reservationDetail, member);
 
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.WAITING, null));
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.WAITING));
         return new ReservationResponse(reservation);
     }
 

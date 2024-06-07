@@ -8,19 +8,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.domain.member.Member;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.theme.Theme;
@@ -47,18 +43,13 @@ public class Reservation {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @OneToOne
-    @Cascade(CascadeType.PERSIST)
-    private Payment payment;
-
     protected Reservation() {
     }
 
-    public Reservation(Member member, ReservationDetail detail, ReservationStatus status, Payment payment) {
+    public Reservation(Member member, ReservationDetail detail, ReservationStatus status) {
         this.member = member;
         this.detail = detail;
         this.status = status;
-        this.payment = payment;
     }
 
     public boolean isReservationOf(Member member) {
