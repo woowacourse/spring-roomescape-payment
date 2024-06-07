@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.response.member.MemberResponse;
@@ -195,22 +196,22 @@ public class TestFixtures {
             RESERVATION_RESPONSE_14, RESERVATION_RESPONSE_15
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_1 = new MyReservationResponse(
-            1L, "name1", TODAY.minusDays(5), LocalTime.of(10, 0), "예약"
+            1L, "name1", TODAY.minusDays(5), LocalTime.of(10, 0), Status.RESERVATION, null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_2 = new MyReservationResponse(
-            2L, "name1", TODAY.minusDays(5), LocalTime.of(11, 0), "예약"
+            2L, "name1", TODAY.minusDays(5), LocalTime.of(11, 0), Status.RESERVATION, null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_3 = new MyReservationResponse(
-            3L, "name1", TODAY.minusDays(5), LocalTime.of(12, 0), "예약"
+            3L, "name1", TODAY.minusDays(5), LocalTime.of(12, 0), Status.RESERVATION, null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_4 = new MyReservationResponse(
-            4L, "name1", TODAY.minusDays(5), LocalTime.of(13, 0), "예약"
+            4L, "name1", TODAY.minusDays(5), LocalTime.of(13, 0), Status.RESERVATION, null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_5 = new MyReservationResponse(
-            5L, "name2", TODAY.minusDays(5), LocalTime.of(10, 0), "예약"
+            5L, "name2", TODAY.minusDays(5), LocalTime.of(10, 0), Status.RESERVATION, null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_6 = new MyReservationResponse(
-            6L, "name2", TODAY.minusDays(5), LocalTime.of(11, 0), "예약"
+            6L, "name2", TODAY.minusDays(5), LocalTime.of(11, 0), Status.RESERVATION, null, null
     );
     public static final List<MyReservationResponse> MY_RESERVATION_RESPONSES = List.of(
             MY_RESERVATION_RESPONSE_1, MY_RESERVATION_RESPONSE_2, MY_RESERVATION_RESPONSE_3,

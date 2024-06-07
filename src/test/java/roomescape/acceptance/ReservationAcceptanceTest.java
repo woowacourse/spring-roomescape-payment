@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationTime;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.PaymentExceptionResponse;
@@ -108,7 +111,8 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
         ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
-        given(paymentService.pay(paymentRequest))
+        given(paymentService.pay(paymentRequest,
+                new Reservation(null, LocalDate.now().plusDays(1), new ReservationTime(LocalTime.of(10, 0)), null, null)))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new PaymentExceptionResponse("EXCEPTION", "exception")));
 

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.dto.AvailableTimeDto;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.response.reservation.MyReservationResponse;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     long countByTimeId(long timeId);
@@ -33,8 +34,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
 
-    @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberIdOrderByDateAsc(Long memberId);
+//    @EntityGraph(attributePaths = {"time", "theme"})
+    @Query("""
+            select new roomescape.dto.response.reservation.MyReservationResponse(
+            r.id, r.theme.name.name, r.date, r.time.startAt, r.status, p.paymentKey, p.totalAmount
+            )
+            from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            left join fetch Payment p on p.reservationId = r.id
+            where m.id = :memberId
+            """)
+    List<MyReservationResponse> findMyReservation(Long memberId);
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,

@@ -38,7 +38,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse saveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        ReservationResponse reservationResponse = reservationCreateService.saveReservationByClient(
+        Reservation reservation = reservationCreateService.saveReservationByClient(
                 loginMember, reservationRequest
         );
         PaymentRequest paymentRequest = new PaymentRequest(
@@ -46,18 +46,20 @@ public class ReservationService {
                 reservationRequest.amount(),
                 reservationRequest.paymentKey()
         );
-        paymentService.pay(paymentRequest);
-        return reservationResponse;
+        paymentService.pay(paymentRequest, reservation);
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
     public ReservationResponse saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
-        return reservationCreateService.saveWaitingByClient(loginMember, waitingRequest);
+        Reservation reservation = reservationCreateService.saveWaitingByClient(loginMember, waitingRequest);
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
     public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
-        return reservationCreateService.saveReservationByAdmin(adminReservationRequest);
+        Reservation reservation = reservationCreateService.saveReservationByAdmin(adminReservationRequest);
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
@@ -108,9 +110,8 @@ public class ReservationService {
     }
 
     public List<MyReservationResponse> findMyReservations(Long memberId) {
-        return reservationRepository.findAllByMemberIdOrderByDateAsc(memberId).stream()
-                .map(reservation -> MyReservationResponse.of(reservation, getWaitingOrder(reservation)))
-                .toList();
+        List<MyReservationResponse> myReservation = reservationRepository.findMyReservation(memberId);
+        return myReservation;
     }
 
     private long getWaitingOrder(Reservation reservation) {
@@ -129,7 +130,7 @@ public class ReservationService {
                 reservationRequest.amount(),
                 reservationRequest.paymentKey()
         );
-        paymentService.pay(paymentRequest);
+        paymentService.pay(paymentRequest, reservation);
         return ReservationResponse.from(reservation);
     }
 

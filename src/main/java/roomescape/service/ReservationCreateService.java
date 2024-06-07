@@ -18,7 +18,6 @@ import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
 @Service
@@ -41,36 +40,36 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+    public Reservation saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
         Reservation reservation = createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
                 reservationRequest.themeId()
         );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationRepository.save(reservation);
     }
 
     @Transactional
-    public ReservationResponse saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
+    public Reservation saveWaitingByClient(LoginMember loginMember, WaitingRequest waitingRequest) {
         Reservation reservation = createWaiting(
                 loginMember.id(),
                 waitingRequest.date(),
                 waitingRequest.timeId(),
                 waitingRequest.themeId()
         );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationRepository.save(reservation);
     }
 
     @Transactional
-    public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
+    public Reservation saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
         Reservation reservation = createReservation(
                 adminReservationRequest.memberId(),
                 adminReservationRequest.date(),
                 adminReservationRequest.timeId(),
                 adminReservationRequest.themeId()
         );
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationRepository.save(reservation);
     }
 
     private Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
