@@ -2,6 +2,8 @@ package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,16 +12,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.payment.PaymentConfirmErrorCode;
+import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.InvalidReservationMemberException;
 import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.service.payment.PaymentClient;
+import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -29,6 +40,9 @@ import roomescape.service.reservation.dto.ReservationSaveInput;
 class ReservationServiceTest extends ServiceTest {
     @Autowired
     private ReservationService reservationService;
+
+    @MockBean
+    PaymentClient paymentClient;
 
     @Nested
     @DisplayName("예약 목록 조회")
@@ -120,8 +134,8 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Nested
-    @DisplayName("예약 추가")
-    class SaveReservation {
+    @DisplayName("결제 없이 예약 추가")
+    class SaveReservationWithoutPayment {
         ReservationTime time;
         Theme theme;
         Member member;
@@ -134,7 +148,7 @@ class ReservationServiceTest extends ServiceTest {
         }
 
         @Test
-        void 예약을_추가할_수_있다() {
+        void 결제_없이_예약을_추가할_수_있다() {
             ReservationSaveInput request = new ReservationSaveInput(
                     LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
             ReservationResponse response = reservationService.saveReservationWithoutPayment(request, member);
@@ -159,6 +173,56 @@ class ReservationServiceTest extends ServiceTest {
 
             assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(InvalidDateTimeReservationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("결제와 함께 예약 추가")
+    class SaveReservationWithPayment {
+        ReservationTime time;
+        Theme theme;
+        Member member;
+        ReservationSaveInput reservationSaveInput;
+        PaymentConfirmInput paymentConfirmInput;
+
+        @BeforeEach
+        void setUp() {
+            time = timeFixture.createFutureTime();
+            theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservationSaveInput = new ReservationSaveInput(
+                    LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
+            paymentConfirmInput = new PaymentConfirmInput(
+                    "orderId", 1000L, "paymentKey");
+        }
+
+        @Test
+        void 결제와_함께_예약을_추가할_수_있다() {
+            PaymentConfirmOutput paymentConfirmOutput = new PaymentConfirmOutput(
+                    "paymentKey", PaymentType.NORMAL, "orderId", "orderName",
+                    "KRW", "간편결제", 1000L, PaymentStatus.DONE);
+            given(paymentClient.confirmPayment(any()))
+                    .willReturn(paymentConfirmOutput);
+
+            reservationService.saveReservationWithPayment(reservationSaveInput, paymentConfirmInput, member);
+
+            List<Payment> payments = paymentFixture.findAllPayment();
+            assertThat(payments.get(0).getInfo().getPaymentKey())
+                    .isEqualTo(paymentConfirmOutput.paymentKey());
+        }
+
+        @Test
+        void 예약_중_결제_실패시_예외가_발생하고_결제와_예약이_모두_추가되지_않는다() {
+            given(paymentClient.confirmPayment(any()))
+                    .willThrow(new PaymentConfirmException(PaymentConfirmErrorCode.UNKNOWN_PAYMENT_ERROR));
+
+            assertThatThrownBy(() -> reservationService.saveReservationWithPayment(
+                    reservationSaveInput, paymentConfirmInput, member))
+                    .isInstanceOf(PaymentConfirmException.class);
+            assertThat(paymentFixture.findAllPayment())
+                    .isEmpty();
+            assertThat(reservationFixture.findAllReservation())
+                    .isEmpty();
         }
     }
 

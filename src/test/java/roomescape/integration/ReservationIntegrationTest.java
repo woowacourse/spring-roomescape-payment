@@ -14,12 +14,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.service.payment.PaymentClient;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 class ReservationIntegrationTest extends IntegrationTest {
     @MockBean
@@ -128,7 +131,11 @@ class ReservationIntegrationTest extends IntegrationTest {
         @Test
         void 결제_성공_시_예약을_추가할_수_있다() {
             params.put("date", "2000-04-07");
-            paymentClient.confirmPayment(any());
+            PaymentConfirmOutput paymentConfirmOutput = new PaymentConfirmOutput(
+                    "paymentKey", PaymentType.NORMAL, "orderId", "orderName",
+                    "KRW", "간편결제", 1000L, PaymentStatus.DONE);
+            given(paymentClient.confirmPayment(any()))
+                    .willReturn(paymentConfirmOutput);
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())

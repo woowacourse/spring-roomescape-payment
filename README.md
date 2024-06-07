@@ -13,8 +13,7 @@
 
 - [x] 결제 테이블 추가
     - 결제 정보: paymentKey, type, orderId, orderName, currency, method, totalAmount, status
-- [ ] 예약 추가 시 결제 정보를 DB에 저장
-    - 관리자 예약 추가의 method는 OTHER
+- [x] 사용자 예약 추가 시 결제 정보를 DB에 저장
 - [ ] 내 예약 조회 API Response에 결제 정보 추가
     - 결제 정보: paymentKey, currency, totalAmount, status
 

@@ -1,5 +1,6 @@
 package roomescape.helper.domain;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import roomescape.domain.payment.Payment;
@@ -28,5 +29,9 @@ public class PaymentFixture {
         );
         Payment payment = new Payment(info, reservation);
         return paymentRepository.save(payment);
+    }
+
+    public List<Payment> findAllPayment() {
+        return paymentRepository.findAll();
     }
 }

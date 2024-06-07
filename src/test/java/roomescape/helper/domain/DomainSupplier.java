@@ -19,4 +19,7 @@ public abstract class DomainSupplier {
 
     @Autowired
     protected WaitingFixture waitingFixture;
+
+    @Autowired
+    protected PaymentFixture paymentFixture;
 }

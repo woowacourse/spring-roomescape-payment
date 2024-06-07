@@ -41,6 +41,38 @@ public class PaymentInfo {
         this.status = status;
     }
 
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public PaymentType getType() {
+        return type;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public String getOrderName() {
+        return orderName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public PaymentMethod getMethod() {
+        return method;
+    }
+
+    public Long getTotalAmount() {
+        return totalAmount;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

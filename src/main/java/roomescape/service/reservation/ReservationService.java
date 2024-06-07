@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -32,6 +34,7 @@ import roomescape.exception.reservationtime.NotFoundReservationTimeException;
 import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.service.payment.PaymentClient;
 import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationMineResponse;
@@ -45,6 +48,7 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
     private final Clock clock;
 
@@ -52,12 +56,14 @@ public class ReservationService {
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
+                              PaymentRepository paymentRepository,
                               PaymentClient paymentClient,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
         this.clock = clock;
     }
@@ -91,15 +97,15 @@ public class ReservationService {
         return new ReservationMineListResponse(myReservations);
     }
 
-    public ReservationResponse saveReservationWithPayment(
-            ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
+    public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
-        paymentClient.confirmPayment(paymentConfirmInput);
         return new ReservationResponse(savedReservation);
     }
 
-    public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {
+    public ReservationResponse saveReservationWithPayment(
+            ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
+        confirmAndSavePayment(paymentConfirmInput, savedReservation);
         return new ReservationResponse(savedReservation);
     }
 
@@ -109,8 +115,13 @@ public class ReservationService {
         Reservation reservation = input.toReservation(time, theme, member);
         validateDuplicateReservation(reservation);
         validateDateTimeReservation(reservation);
-
         return reservationRepository.save(reservation);
+    }
+
+    private void confirmAndSavePayment(PaymentConfirmInput input, Reservation reservation) {
+        PaymentConfirmOutput output = paymentClient.confirmPayment(input);
+        Payment payment = output.toPayment(reservation);
+        paymentRepository.save(payment);
     }
 
     private ReservationTime findReservationTimeById(long id) {
