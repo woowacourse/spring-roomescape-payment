@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function render(data) {
   const tableBody = document.getElementById('table-body');
   tableBody.innerHTML = '';
-  data.data.waitingWithRankResponses.forEach(item => {
+  data.data.myReservationResponses.forEach(item => {
     const row = tableBody.insertRow();
 
-    const theme = item.reservation.theme.name;
-    const date = item.reservation.date;
-    const time = item.reservation.time.startAt;
+    const theme = item.themeName;
+    const date = item.date;
+    const time = item.time;
     const status = (item.rank === 0 ? "예약" :  item.rank + "번째 예약대기");
 
     row.insertCell(0).textContent = theme;

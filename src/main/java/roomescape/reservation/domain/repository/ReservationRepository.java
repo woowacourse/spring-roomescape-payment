@@ -10,24 +10,13 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.WaitingWithRank;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
     List<Reservation> findByReservationTime(ReservationTime reservationTime);
 
     List<Reservation> findByThemeId(Long themeId);
-
-    @Query("SELECT new roomescape.reservation.domain.WaitingWithRank(" +
-            "    w, " +
-            "    (SELECT COUNT(w2) " +
-            "     FROM Reservation w2 " +
-            "     WHERE w2.theme = w.theme " +
-            "       AND w2.date = w.date " +
-            "       AND w2.reservationTime = w.reservationTime " +
-            "       AND w2.id < w.id)) " +
-            "FROM Reservation w " +
-            "WHERE w.member.id = :memberId")
-    List<WaitingWithRank> findWaitingsWithRankByMemberId(Long memberId);
 
     @Modifying
     @Query("""
@@ -50,4 +39,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             WHERE r2.id = :id AND r2.reservationStatus = 'WAITING'
             """)
     boolean isExistConfirmedReservation(@Param("id") Long reservationId);
+
+    @Query("""
+                    SELECT new roomescape.reservation.dto.response.MyReservationResponse(
+                        t.name,
+                        r.date,
+                        r.reservationTime.startAt,
+                        (SELECT COUNT (r2) FROM Reservation r2 WHERE r2.theme = r.theme AND r2.date = r.date AND r2.reservationTime = r.reservationTime AND r2.id < r.id),
+                        p.paymentKey,
+                        p.totalAmount
+                    )
+                    FROM Reservation r
+                    JOIN r.theme t
+                    JOIN Payment p
+                    ON r.id = p.reservation.id
+                    WHERE r.member.id = :memberId
+            """)
+    List<MyReservationResponse> findMyReservations(Long memberId);
 }
