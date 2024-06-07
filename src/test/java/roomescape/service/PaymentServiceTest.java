@@ -88,7 +88,7 @@ class PaymentServiceTest {
         given(paymentRestClient.requestPaymentApproval(any(PaymentRequest.class)))
                 .willReturn(new PaymentApprovalResult("paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L)));
 
-        paymentService.savePaymentAndUpdateReservationStatus(request);
+        paymentService.savePayment(request);
         Reservation foundReservation = reservationRepository.findById(reservation.getId()).get();
 
         // when & then

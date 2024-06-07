@@ -31,7 +31,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse savePaymentAndUpdateReservationStatus(PaymentRequest request) {
+    public PaymentResponse savePayment(PaymentRequest request) {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
