@@ -95,3 +95,68 @@ erDiagram
     RESERVATION ||--o{ RESERVATION_TIME: "at time"
     MEMBER_RESERVATION ||--o{ PAYMENT: "is paid by"
 ```
+
+## 🔧 Setting files
+
+### /etc/systemd/system/roomescape.service
+
+- `sudo systemctl stop roomescape`
+- `sudo systemctl start roomescape`
+
+```ini
+[Unit]
+Description=Roomescape
+After=network.target
+
+[Service]
+User=ubuntu
+Group=nogroup
+ExecStart=/usr/bin/java -jar /home/ubuntu/spring-roomescape-payment/run.jar
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### /etc/nginx/sites-available/escape
+
+- `sudo systemctl stop nginx`
+- `sudo systemctl start nginx`
+
+```
+server {
+        listen 80;
+        server_name escape.womosoft.com;
+        return 301 https://$server_name$request_uri;
+}
+
+server {
+        listen 443;
+        server_name escape.womosoft.com;
+
+        ssl_certificate /etc/letsencrypt/live/womosoft.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/womosoft.com/privkey.pem;
+        ssl_trusted_certificate /etc/letsencrypt/live/womosoft.com/chain.pem;
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+        ssl_session_timeout 10m;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256;
+        ssl_ecdh_curve secp384r1;
+
+        add_header Strict-Transport-Security max-age=31536000;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+
+        ssl_stapling on;
+        ssl_stapling_verify on;
+
+        location / {
+                proxy_pass http://127.0.0.1:8080;
+        }
+}
+```
