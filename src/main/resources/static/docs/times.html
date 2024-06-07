@@ -451,7 +451,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times HTTP/1.1
 Accept: application/json
-Host: localhost:61021</code></pre>
+Host: localhost:53844</code></pre>
 </div>
 </div>
 </div>
@@ -462,17 +462,17 @@ Host: localhost:61021</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:29 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 86
 
 [ {
   "id" : 1,
-  "startAt" : "17:07"
+  "startAt" : "15:52"
 }, {
   "id" : 2,
-  "startAt" : "17:08"
+  "startAt" : "15:53"
 } ]</code></pre>
 </div>
 </div>
@@ -518,9 +518,9 @@ Content-Length: 86
 <h4 id="_예약_시간을_날짜와_테마에_따른_예약_여부와_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times?date=2024-06-06&amp;theme=1 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times?date=2024-06-08&amp;theme=1 HTTP/1.1
 Accept: application/json
-Host: localhost:61021</code></pre>
+Host: localhost:53844</code></pre>
 </div>
 </div>
 </div>
@@ -531,18 +531,18 @@ Host: localhost:61021</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:29 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 142
 
 [ {
   "id" : 1,
-  "startAt" : "17:07",
+  "startAt" : "15:52",
   "alreadyBooked" : false
 }, {
   "id" : 2,
-  "startAt" : "17:08",
+  "startAt" : "15:53",
   "alreadyBooked" : false
 } ]</code></pre>
 </div>

@@ -452,13 +452,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /admin/reservations HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:61021
+Host: localhost:53844
 Content-Length: 83
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MywiZXhwIjoxNzE3NzQ2NjYzfQ.YBV02K1j_yaBJZsQD8yXQQ2uzW8cZNL2IJt39H4LxEU
 
 {
   "memberId" : 1,
-  "date" : "2024-06-06",
+  "date" : "2024-06-08",
   "timeId" : 1,
   "themeId" : 1
 }</code></pre>
@@ -533,21 +533,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /reservations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:26 GMT
+Date: Fri, 07 Jun 2024 06:51:02 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 298
 
 {
   "id" : 2,
-  "date" : "2024-06-06",
+  "date" : "2024-06-08",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "17:07"
+    "startAt" : "15:52"
   },
   "theme" : {
     "id" : 1,
@@ -612,8 +612,8 @@ Content-Length: 298
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admin/reservations/1 HTTP/1.1
 Accept: application/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MSwiZXhwIjoxNzE3NzQ2NjYxfQ.9aidCcgo6M2qd-3pwaUZmxo20IEcQPV1YSN5ar1nO8o</code></pre>
 </div>
 </div>
 </div>
@@ -665,7 +665,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 05 Jun 2024 08:06:25 GMT
+Date: Fri, 07 Jun 2024 06:51:01 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -681,9 +681,9 @@ Connection: keep-alive</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /admin/themes HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:61021
+Host: localhost:53844
 Content-Length: 161
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MywiZXhwIjoxNzE3NzQ2NjYzfQ.YBV02K1j_yaBJZsQD8yXQQ2uzW8cZNL2IJt39H4LxEU
 
 {
   "name" : "theme name",
@@ -756,7 +756,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /themes/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:26 GMT
+Date: Fri, 07 Jun 2024 06:51:02 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 174
@@ -818,8 +818,8 @@ Content-Length: 174
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admin/themes/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MiwiZXhwIjoxNzE3NzQ2NjYyfQ.Kc5wUKtAEacMHKTDJhj49-hrjYDwWtzo8CuGtB0o9Uw</code></pre>
 </div>
 </div>
 </div>
@@ -871,7 +871,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 05 Jun 2024 08:06:25 GMT
+Date: Fri, 07 Jun 2024 06:51:01 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -887,9 +887,9 @@ Connection: keep-alive</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /admin/themes HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:61021
+Host: localhost:53844
 Content-Length: 161
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MywiZXhwIjoxNzE3NzQ2NjYzfQ.YBV02K1j_yaBJZsQD8yXQQ2uzW8cZNL2IJt39H4LxEU
 
 {
   "name" : "theme name",
@@ -962,7 +962,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /themes/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:26 GMT
+Date: Fri, 07 Jun 2024 06:51:02 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 174
@@ -1024,8 +1024,8 @@ Content-Length: 174
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admin/themes/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NSwiZXhwIjoxNzE3NTc4Mzg1fQ.7FXohpgkwi2nVIF6oOw2dBEzFw7Wrym5DeF4aby64W4</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MiwiZXhwIjoxNzE3NzQ2NjYyfQ.Kc5wUKtAEacMHKTDJhj49-hrjYDwWtzo8CuGtB0o9Uw</code></pre>
 </div>
 </div>
 </div>
@@ -1077,7 +1077,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 05 Jun 2024 08:06:25 GMT
+Date: Fri, 07 Jun 2024 06:51:01 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -1092,8 +1092,8 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admin/waitings/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4NiwiZXhwIjoxNzE3NTc4Mzg2fQ.DUYI2iLAyl32RhYadJsWsN_hwVDYLx76_5SF0otDb-M</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MiwiZXhwIjoxNzE3NzQ2NjYyfQ.Kc5wUKtAEacMHKTDJhj49-hrjYDwWtzo8CuGtB0o9Uw</code></pre>
 </div>
 </div>
 </div>
@@ -1145,7 +1145,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 05 Jun 2024 08:06:26 GMT
+Date: Fri, 07 Jun 2024 06:51:02 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>

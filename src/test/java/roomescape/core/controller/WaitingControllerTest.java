@@ -97,7 +97,7 @@ class WaitingControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("/waitings/get/",
+                .filter(document("waitings/get/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(

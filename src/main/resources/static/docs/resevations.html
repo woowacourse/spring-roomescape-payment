@@ -452,12 +452,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /reservations HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:61021
+Host: localhost:53844
 Content-Length: 124
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc
 
 {
-  "date" : "2024-06-06",
+  "date" : "2024-06-08",
   "timeId" : 1,
   "themeId" : 1,
   "paymentKey" : "1",
@@ -545,7 +545,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /reservations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:28 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 480
@@ -553,14 +553,14 @@ Content-Length: 480
 {
   "reservationResponse" : {
     "id" : 2,
-    "date" : "2024-06-06",
+    "date" : "2024-06-08",
     "member" : {
       "id" : 1,
       "name" : "리건"
     },
     "time" : {
       "id" : 1,
-      "startAt" : "17:07"
+      "startAt" : "15:52"
     },
     "theme" : {
       "id" : 1,
@@ -617,8 +617,8 @@ Content-Length: 480
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations/mine HTTP/1.1
 Accept: application/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OSwiZXhwIjoxNzE3NTc4Mzg5fQ.FIBtp0JepL6_BWCKoHYFc3XKTB9lb8BXS_wwXTcswj8</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc</code></pre>
 </div>
 </div>
 </div>
@@ -650,7 +650,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:28 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 329
@@ -658,16 +658,16 @@ Content-Length: 329
 [ {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-05",
-  "time" : "17:07",
+  "date" : "2024-06-07",
+  "time" : "15:52",
   "status" : "예약",
   "paymentKey" : null,
   "amount" : null
 }, {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-06",
-  "time" : "17:07",
+  "date" : "2024-06-08",
+  "time" : "15:52",
   "status" : "1번째 예약 대기",
   "paymentKey" : null,
   "amount" : null
@@ -743,8 +743,8 @@ Content-Length: 329
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations HTTP/1.1
 Accept: application/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
 </div>
 </div>
 </div>
@@ -755,21 +755,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:28 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 1,
-  "date" : "2024-06-05",
+  "date" : "2024-06-07",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "17:07"
+    "startAt" : "15:52"
   },
   "theme" : {
     "id" : 1,
@@ -837,10 +837,10 @@ Content-Length: 302
 <h4 id="_특정_조건을_만족하는_모든_예약_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations?dateTo=2024-06-06&amp;themeId=1&amp;dateFrom=2024-06-06&amp;memberId=1 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations?dateTo=2024-06-08&amp;themeId=1&amp;dateFrom=2024-06-08&amp;memberId=1 HTTP/1.1
 Accept: application/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
 </div>
 </div>
 </div>
@@ -884,21 +884,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Wed, 05 Jun 2024 08:06:28 GMT
+Date: Fri, 07 Jun 2024 06:51:04 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 2,
-  "date" : "2024-06-06",
+  "date" : "2024-06-08",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "17:07"
+    "startAt" : "15:52"
   },
   "theme" : {
     "id" : 1,
@@ -968,8 +968,8 @@ Content-Length: 302
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /reservations/1 HTTP/1.1
 Accept: application/json
-Host: localhost:61021
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzU3NDc4OCwiZXhwIjoxNzE3NTc4Mzg4fQ.o0i_9cb-Q80FM1TZzUN_6sptcyC19YeiG4nRLcy8_xU</code></pre>
+Host: localhost:53844
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
 </div>
 </div>
 </div>
@@ -1021,7 +1021,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 05 Jun 2024 08:06:28 GMT
+Date: Fri, 07 Jun 2024 06:51:05 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
