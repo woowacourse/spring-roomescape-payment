@@ -1,7 +1,45 @@
 spring:
-  h2:
-    console:
-      enabled: true
+  profiles:
+    default: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.123:3306/roomescape?serverTimezone=Asia/Seoul
+    username: root
+    password: 1q2w3e4r!
+  jpa:
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        ddl-auto: validate
+        format_sql: true
+
+security:
+  jwt:
+    token:
+      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
+      expire-length: 3600000
+
+payment:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
   datasource:
     url: jdbc:h2:mem:database
   jpa:
