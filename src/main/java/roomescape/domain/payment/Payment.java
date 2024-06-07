@@ -50,10 +50,6 @@ public class Payment {
         return Objects.hash(orderId);
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public String getOrderId() {
         return orderId;
     }
