@@ -37,24 +37,24 @@ public class ReservationCreateService {
         this.themeRepository = themeRepository;
     }
 
-    private Member findMemberById(Long memberId) {
+    private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다."));
     }
 
-    private ReservationTime findReservationTimeById(Long id) {
+    private ReservationTime getReservationTimeById(Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약 시간입니다."));
     }
 
-    private Theme findThemeById(Long id) {
+    private Theme getThemeById(Long id) {
         return themeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 테마입니다."));
     }
 
     public MemberReservation createReservation(ReservationCreateRequest request) {
-        Member member = findMemberById(request.memberId());
-        Reservation reservation = findReservationOrSave(request);
+        Member member = getMemberById(request.memberId());
+        Reservation reservation = getReservationOrSave(request);
 
         MemberReservation memberReservation = request.toMemberReservation(member, reservation);
         reservation.validateIsBeforeNow();
@@ -63,7 +63,7 @@ public class ReservationCreateService {
         return memberReservationRepository.save(memberReservation);
     }
 
-    private Reservation findReservationOrSave(ReservationCreateRequest request) {
+    private Reservation getReservationOrSave(ReservationCreateRequest request) {
         Long timeId = request.timeId();
         Long themeId = request.themeId();
         LocalDate date = request.date();
@@ -73,8 +73,8 @@ public class ReservationCreateService {
     }
 
     private Reservation createReservation(Long timeId, Long themeId, LocalDate date) {
-        ReservationTime time = findReservationTimeById(timeId);
-        Theme theme = findThemeById(themeId);
+        ReservationTime time = getReservationTimeById(timeId);
+        Theme theme = getThemeById(themeId);
 
         Reservation reservation = new Reservation(date, time, theme);
         return reservationRepository.save(reservation);

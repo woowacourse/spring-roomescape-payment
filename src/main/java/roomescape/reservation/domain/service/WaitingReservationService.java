@@ -24,7 +24,7 @@ public class WaitingReservationService {
     }
 
     public void confirmWaitingReservation(Long id) {
-        MemberReservation memberReservation = findMemberReservationById(id);
+        MemberReservation memberReservation = getMemberReservationById(id);
         memberReservation.validateWaitingStatus();
 
         Reservation reservation = memberReservation.getReservation();
@@ -34,7 +34,7 @@ public class WaitingReservationService {
         memberReservation.setStatus(ReservationStatus.CONFIRMATION);
     }
 
-    private MemberReservation findMemberReservationById(Long id) {
+    private MemberReservation getMemberReservationById(Long id) {
         return memberReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }

@@ -24,7 +24,7 @@ public class ReservationService {
         this.memberReservationRepository = memberReservationRepository;
     }
 
-    private MemberReservation findMemberReservationById(Long id) {
+    private MemberReservation getMemberReservationById(Long id) {
         return memberReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }
@@ -55,7 +55,7 @@ public class ReservationService {
     }
 
     public MemberReservation readReservation(Long id) {
-        return findMemberReservationById(id);
+        return getMemberReservationById(id);
     }
 
     public void deleteReservation(MemberReservation memberReservation, LoginMember loginMember) {
@@ -76,7 +76,7 @@ public class ReservationService {
     }
 
     public void confirmPendingReservation(Long id) {
-        MemberReservation memberReservation = findMemberReservationById(id);
+        MemberReservation memberReservation = getMemberReservationById(id);
         memberReservation.validatePendingStatus();
         memberReservation.setStatus(ReservationStatus.CONFIRMATION);
     }
