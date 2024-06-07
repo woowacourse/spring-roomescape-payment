@@ -78,7 +78,7 @@ class ReservationTimeServiceTest extends IntegrationTestSupport {
     @Test
     void findBookedTimes() {
         // given
-        var reservationTimeBookedRequest = new ReservationTimeBookedRequest(LocalDate.parse("2024-05-04"), 1L);
+        var reservationTimeBookedRequest = new ReservationTimeBookedRequest(LocalDate.parse("2024-06-04"), 1L);
 
         // when
         List<ReservationTimeBookedResponse> timesWithBooked = reservationTimeService.getTimesWithBooked(

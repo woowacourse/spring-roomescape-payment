@@ -1,3 +1,9 @@
+SET referential_integrity FALSE;
+TRUNCATE TABLE reservation RESTART IDENTITY;
+TRUNCATE TABLE waiting RESTART IDENTITY;
+TRUNCATE TABLE theme RESTART IDENTITY;
+TRUNCATE TABLE reservation_time RESTART IDENTITY;
+
 INSERT INTO theme (name, description, thumbnail)
 VALUES ('이름1', '설명1', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('이름2', '설명2', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
@@ -22,12 +28,6 @@ VALUES ('09:00'),
        ('14:00'),
        ('15:00')
 ;
-INSERT INTO member (name, email, password, role)
-VALUES ('어드민', 'admin@admin.com', '1234', 'ADMIN'),
-       ('유저1', 'user1@user.com', '1234', 'USER'),
-       ('유저2', 'user2@user.com', '1234', 'USER'),
-       ('유저3', 'user3@user.com', '1234', 'USER')
-;
 INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key, order_id, amount, is_deleted)
 VALUES (1, '2024-06-04', 1, 1, 'paymentKey1', 'orderId1', 1000, false),
        (1, '2024-06-04', 2, 1, 'paymentKey2', 'orderId2', 1000, false),
@@ -50,7 +50,6 @@ VALUES (1, '2024-06-04', 1, 1, 'paymentKey1', 'orderId1', 1000, false),
 ;
 INSERT INTO waiting (member_id, reservation_id, is_deleted)
 VALUES (3, 15, false),
-       (2, 15, false),
        (1, 15, false),
        (1, 16, false)
 ;

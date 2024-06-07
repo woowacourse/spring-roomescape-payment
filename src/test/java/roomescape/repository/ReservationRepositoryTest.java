@@ -12,8 +12,8 @@ import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.PaymentInfo;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.WaitingRepository;
 import roomescape.domain.reservation.dto.ReservationReadOnly;
 import roomescape.domain.reservation.slot.*;
 import roomescape.service.dto.ReservationConditionRequest;
@@ -53,10 +53,10 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
         Member member = Member.createUser("생강", "email@email.com", "1234");
         Member savedMember = memberRepository.save(member);
 
-        ReservationSlot slot = new ReservationSlot(LocalDate.parse("2025-01-01"), savedReservationTime,
-                savedTheme);
+        ReservationSlot slot = new ReservationSlot(LocalDate.parse("2025-01-01"), savedReservationTime, savedTheme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(savedMember, slot);
+        Reservation reservation = new Reservation(savedMember, slot, paymentInfo);
         Reservation savedReservation = reservationRepository.save(reservation);
         assertAll(() -> assertThat(savedReservation.getMember().getName()).isEqualTo("생강"),
                 () -> assertThat(savedReservation.getSlot().getDate()).isEqualTo("2025-01-01"),
@@ -75,7 +75,7 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
     void findTimesByDateAndTheme() {
         // given
         Theme theme = themeRepository.findById(2L).get();
-        LocalDate date = LocalDate.parse("2024-05-30");
+        LocalDate date = LocalDate.parse("2024-06-30");
 
         // when
         List<ReservationTime> times = reservationRepository.findTimesByDateAndTheme(date, theme);
@@ -94,8 +94,8 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
     @Test
     void findPopularThemes() {
         // given
-        LocalDate startDate = LocalDate.parse("2024-05-04");
-        LocalDate endDate = LocalDate.parse("2024-05-30");
+        LocalDate startDate = LocalDate.parse("2024-06-04");
+        LocalDate endDate = LocalDate.parse("2024-06-30");
         Limit limit = Limit.of(2);
 
         // when
@@ -137,10 +137,10 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
                         4
                 ),
                 Arguments.of(
-                        new ReservationConditionRequest(null, null, LocalDate.parse("2024-05-09"), null),
+                        new ReservationConditionRequest(null, null, LocalDate.parse("2024-06-09"), null),
                         9
                 ),Arguments.of(
-                        new ReservationConditionRequest(null, null, null, LocalDate.parse("2024-05-09")),
+                        new ReservationConditionRequest(null, null, null, LocalDate.parse("2024-06-09")),
                         11
                 ),
                 Arguments.of(
@@ -148,11 +148,11 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
                         4
                 ),
                 Arguments.of(
-                        new ReservationConditionRequest(2L, null, LocalDate.parse("2024-05-09"), null),
+                        new ReservationConditionRequest(2L, null, LocalDate.parse("2024-06-09"), null),
                         6
                 ),
                 Arguments.of(
-                        new ReservationConditionRequest(1L, 1L, LocalDate.parse("2024-05-09"), LocalDate.parse("2024-05-30")),
+                        new ReservationConditionRequest(1L, 1L, LocalDate.parse("2024-06-09"), LocalDate.parse("2024-06-30")),
                         1
                 )
         );

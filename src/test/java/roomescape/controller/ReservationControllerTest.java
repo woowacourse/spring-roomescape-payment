@@ -6,9 +6,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import roomescape.IntegrationTestSupport;
+import roomescape.domain.payment.PaymentResponse;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.service.dto.PaymentConfirmRequest;
 import roomescape.service.dto.ReservationStatus;
 import roomescape.service.dto.UserReservationResponse;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Map;
@@ -18,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-
+import static org.mockito.Mockito.doReturn;
 
 class ReservationControllerTest extends IntegrationTestSupport {
 
@@ -142,6 +146,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
     @DisplayName("유저의 예약 생성")
     @TestFactory
     Stream<DynamicTest> dynamicUserTestsFromCollection() {
+        mockPaymentConfirm(1000, "orderId", "paymentKey");
         return Stream.of(
                 dynamicTest("내 예약 목록을 조회한다.", () -> {
                     userReservationSize = RestAssured.given().log().all()
@@ -235,6 +240,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
     @DisplayName("예약 대기 생성")
     @TestFactory
     Stream<DynamicTest> dynamicWaitTestsFromCollection() {
+        mockPaymentConfirm(1000, "orderId111", "paymentKey111");
         return Stream.of(
                 dynamicTest("내 예약 목록을 조회한다.", () -> {
                     userReservationSize = RestAssured.given().log().all()
@@ -251,8 +257,8 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             "timeId", 1L,
                             "themeId", 1L,
                             "amount", 1000,
-                            "orderId", "orderId",
-                            "paymentKey", "paymentKey");
+                            "orderId", "orderId111",
+                            "paymentKey", "paymentKey111");
 
                     userReservationId = RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
@@ -342,5 +348,21 @@ class ReservationControllerTest extends IntegrationTestSupport {
                             .statusCode(204);
                 })
         );
+    }
+
+    private void mockPaymentConfirm(int amount, String orderId, String paymentKey) {
+        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(amount, orderId, paymentKey);
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "mId",
+                paymentKey,
+                orderId,
+                PaymentStatus.DONE,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                amount);
+        doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirmPayment(paymentRequest);
     }
 }

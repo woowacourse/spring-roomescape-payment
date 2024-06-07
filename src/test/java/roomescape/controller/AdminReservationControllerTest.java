@@ -16,8 +16,8 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
     void findReservationByFilter() {
         Map<String, String> params = Map.of("themeId", "1",
                 "memberId", "1",
-                "dateFrom", "2024-05-04",
-                "dateTo", "2024-05-04"
+                "dateFrom", "2000-01-01",
+                "dateTo", "9999-09-09"
         );
 
         RestAssured.given().log().all()
@@ -26,7 +26,7 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
                 .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(2));
+                .body("size()", is(4));
     }
 
     @DisplayName("예약 대기 목록을 조회한다.")

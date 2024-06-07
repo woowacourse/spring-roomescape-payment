@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.PaymentResponse;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.slot.*;
 import roomescape.exception.PaymentException;
@@ -14,11 +16,13 @@ import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
 
 @Transactional
@@ -42,14 +46,32 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("예약 저장")
     @Test
     void saveReservation() {
+        // given
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("01:00")));
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
         Member member = memberRepository.save(Member.createUser("고구마", "email@email.com", "1234"));
 
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+
+        // when
+        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(1000, "orderId", "paymentKey");
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "mId",
+                "paymentKey",
+                "orderId",
+                PaymentStatus.DONE,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                1000);
+        doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirmPayment(paymentRequest);
+
         ReservationResponse reservationResponse = reservationService.saveReservation(reservationPaymentRequest);
 
+        // then
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
                 () -> assertThat(reservationResponse.date()).isEqualTo(LocalDate.parse("2025-11-11")),
@@ -65,6 +87,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @DisplayName("결제 오류시 예약이 저장되지 않는다.")
     @Test
     void saveReservationPaymentError() {
+        // given
         LocalDate date = LocalDate.parse("2025-11-11");
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.parse("01:00")));
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
@@ -73,12 +96,13 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(member.getId(),
                 date, time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
 
+        // when
         PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
-
         doThrow(PaymentException.class)
                 .when(paymentClient)
                 .confirmPayment(paymentConfirmRequest);
 
+        // then
         assertAll(
                 () -> assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
                         .isInstanceOf(PaymentException.class),
@@ -99,6 +123,20 @@ class ReservationServiceTest extends IntegrationTestSupport {
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationPaymentRequest reservationPaymentRequest2 = new ReservationPaymentRequest(member2.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+
+        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(1000, "orderId", "paymentKey");
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "mId",
+                "paymentKey",
+                "orderId",
+                PaymentStatus.DONE,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                1000);
+        doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirmPayment(paymentRequest);
 
         ReservationResponse reservationResponse1 = reservationService.saveReservation(reservationPaymentRequest1);
 
@@ -161,7 +199,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Test
     void saveDuplicatedReservation() {
         ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
-                1L, LocalDate.parse("2024-05-04"), 1L, 1L,
+                1L, LocalDate.parse("2024-06-04"), 1L, 1L,
                 1000, "orderId", "paymentKey");
 
         assertThatThrownBy(() -> reservationService.saveReservation(reservationPaymentRequest))
@@ -172,7 +210,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     @Test
     void findAllMyReservations() {
         // given // when
-        List<UserReservationResponse> allUserReservation = reservationService.findMyAllReservationAndWaiting(1L, LocalDate.parse("2024-05-30"));
+        List<UserReservationResponse> allUserReservation = reservationService.findMyAllReservationAndWaiting(1L, LocalDate.parse("2024-06-30"));
 
         // then
         assertThat(allUserReservation).hasSize(3)
@@ -194,9 +232,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         assertThat(allWaiting).hasSize(3)
                 .extracting("name", "theme", "date", "startAt")
                 .containsExactlyInAnyOrder(
-                        tuple("유저2", "이름2", LocalDate.parse("2024-05-30"), LocalTime.parse("10:00")),
-                        tuple("어드민", "이름2", LocalDate.parse("2024-05-30"), LocalTime.parse("10:00")),
-                        tuple("어드민", "이름2", LocalDate.parse("2024-05-30"), LocalTime.parse("11:00"))
+                        tuple("유저2", "이름2", LocalDate.parse("2024-06-30"), LocalTime.parse("10:00")),
+                        tuple("어드민", "이름2", LocalDate.parse("2024-06-30"), LocalTime.parse("10:00")),
+                        tuple("어드민", "이름2", LocalDate.parse("2024-06-30"), LocalTime.parse("11:00"))
                 );
     }
 
@@ -216,6 +254,20 @@ class ReservationServiceTest extends IntegrationTestSupport {
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
         ReservationPaymentRequest reservationPaymentRequest3 = new ReservationPaymentRequest(member3.getId(),
                 LocalDate.parse("2025-11-11"), time.getId(), theme.getId(), 1000, "orderId", "paymentKey");
+
+        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(1000, "orderId", "paymentKey");
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "mId",
+                "paymentKey",
+                "orderId",
+                PaymentStatus.DONE,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                1000);
+        doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirmPayment(paymentRequest);
 
         Long reservationId = reservationService.saveReservation(reservationPaymentRequest1).id();
         reservationService.saveReservation(reservationPaymentRequest2);
