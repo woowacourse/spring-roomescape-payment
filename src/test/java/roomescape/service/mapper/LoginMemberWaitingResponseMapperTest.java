@@ -23,7 +23,7 @@ class LoginMemberWaitingResponseMapperTest {
                         DEFAULT_THEME.getName(),
                         DEFAULT_RESERVATION.getDate(),
                         DEFAULT_RESERVATION.getTime(),
-                        "1번째 예약 대기"
+                        1
                 ));
     }
 }

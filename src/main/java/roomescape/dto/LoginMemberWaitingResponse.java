@@ -7,5 +7,5 @@ public record LoginMemberWaitingResponse(long reservationId,
                                          String theme,
                                          LocalDate date,
                                          LocalTime time,
-                                         String status) {
+                                         long priority) {
 }

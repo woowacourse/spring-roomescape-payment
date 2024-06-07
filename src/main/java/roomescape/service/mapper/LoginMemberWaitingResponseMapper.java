@@ -10,7 +10,7 @@ public class LoginMemberWaitingResponseMapper {
                 waitingResponse.themeName(),
                 waitingResponse.date(),
                 waitingResponse.startAt(),
-                "%d번째 예약 대기".formatted(waitingResponse.priority())
+                waitingResponse.priority()
         );
     }
 }

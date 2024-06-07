@@ -84,12 +84,12 @@ function renderMyWaiting(data) {
     const theme = item.theme;
     const date = item.date;
     const time = item.time;
-    const status = item.status;
+    const priority = item.priority;
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
-    row.insertCell(3).textContent = status;
+    row.insertCell(3).textContent = `${priority}번째 예약 대기`;
 
     const cancelCell = row.insertCell(4);
     const cancelButton = document.createElement('button');
