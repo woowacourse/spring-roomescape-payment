@@ -16,10 +16,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import roomescape.auth.dto.request.LoginRequest;
+import roomescape.common.exception.ClientException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ReservationTimeFixture;
@@ -27,7 +29,8 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.FakePaymentClient;
+import roomescape.payment.client.PaymentClient;
+import roomescape.payment.model.PaymentInfoFromClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
@@ -45,7 +48,6 @@ import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @IntegrationTest
-@Import(FakePaymentClient.class)
 class ReservationIntegrationTest {
 
     private final MemberRepository memberRepository;
@@ -54,6 +56,9 @@ class ReservationIntegrationTest {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentRepository paymentRepository;
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     @Autowired
     ReservationIntegrationTest(final MemberRepository memberRepository,
@@ -76,6 +81,8 @@ class ReservationIntegrationTest {
     @BeforeEach
     void init() {
         RestAssured.port = this.port;
+        Mockito.when(paymentClient.confirm(Mockito.any()))
+                .thenReturn(new PaymentInfoFromClient("paymentKey", "orderId", 100L));
     }
 
     private String getTokenByLogin(final Member member) {
@@ -119,6 +126,10 @@ class ReservationIntegrationTest {
 
         CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2099-11-30"), 1L, 1L,
                 "failPayment", "orderId", 100L);
+
+        // stub
+        Mockito.when(paymentClient.confirm(Mockito.any()))
+                .thenThrow(new ClientException("결제 오류입니다. 같은 문제가 반복된다면 문의해주세요."));
 
         // when
         RestAssured.given().log().all()
