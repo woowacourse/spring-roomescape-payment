@@ -33,6 +33,7 @@ CREATE TABLE reservation (
     theme_id BIGINT NOT NULL,
     reservation_member_id BIGINT NOT NULL,
     create_at TIMESTAMP NOT NULL,
+    deleted BOOLEAN DEFAULT FALSE NOT NULL,
     FOREIGN KEY (time_id) REFERENCES reservation_time(id),
     FOREIGN KEY (theme_id) REFERENCES theme(id),
     FOREIGN KEY (reservation_member_id) REFERENCES member(id)
@@ -52,5 +53,6 @@ CREATE TABLE payment (
     amount BIGINT NOT NULL,
     reservation_id BIGINT,
     create_at TIMESTAMP NOT NULL,
+    deleted BOOLEAN DEFAULT FALSE NOT NULL,
     FOREIGN KEY (reservation_id) REFERENCES reservation(id)
 );

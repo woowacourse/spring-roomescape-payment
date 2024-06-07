@@ -6,11 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.domain.BaseEntity;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 
 @Entity
+@SQLDelete(sql = "UPDATE payment SET deleted = TRUE WHERE payment.id = ?")
+@SQLRestriction("deleted = FALSE ")
 public class Payment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

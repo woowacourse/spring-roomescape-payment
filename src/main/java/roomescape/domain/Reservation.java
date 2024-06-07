@@ -16,9 +16,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.exception.RoomescapeException;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation SET deleted = TRUE WHERE reservation.id = ?")
+@SQLRestriction("deleted = FALSE ")
 public class Reservation extends BaseEntity implements Comparable<Reservation> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
