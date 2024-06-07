@@ -54,11 +54,7 @@ function renderTheme(themes) {
     themes.themeResponses.forEach(theme => {
         const name = theme.name;
         const themeId = theme.id;
-        /*
-        TODO: [3단계] 사용자 예약 - 테마 목록 조회 API 호출 후 렌더링
-              response 명세에 맞춰 createSlot 함수 호출 시 값 설정
-              createSlot('theme', theme name, theme id) 형태로 호출
-        */
+
         themeSlots.appendChild(createSlot('theme', name, themeId));
     });
 }
@@ -100,10 +96,6 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-    /*
-    TODO: [3단계] 사용자 예약 - 예약 가능 시간 조회 API 호출
-          요청 포맷에 맞게 설정
-    */
     fetch(`/times/booked?date=${date}&themeId=${themeId}`, { // 예약 가능 시간 조회 API endpoint
         method: 'GET',
         headers: {
@@ -129,10 +121,7 @@ function renderAvailableTimes(times) {
         return;
     }
     times.reservationTimeBookedResponses.forEach(time => {
-        /*
-        TODO: [3단계] 사용자 예약 - 예약 가능 시간 조회 API 호출 후 렌더링
-              response 명세에 맞춰 createSlot 함수 호출 시 값 설정
-        */
+
         const startAt = time.startAt;
         const timeId = time.id;
         const alreadyBooked = time.alreadyBooked;
@@ -174,42 +163,15 @@ function onReservationButtonClick(event, paymentWidget)  {
 
     if (selectedDate && selectedThemeId && selectedTimeId) {
 
-        /*
-        TODO: [3단계] 사용자 예약 - 예약 요청 API 호출
-              [5단계] 예약 생성 기능 변경 - 사용자
-              request 명세에 맞게 설정
-        */
         const reservationData = {
             date: selectedDate,
             themeId: selectedThemeId,
             timeId: selectedTimeId
         };
 
-        // fetch('/reservations', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(reservationData)
-        // })
-        //     .then(response => {
-        //         if (!response.ok) throw new Error('Reservation failed');
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         alert("Reservation successful!");
-        //         location.reload();
-        //     })
-        //     .catch(error => {
-        //         alert("An error occurred while making the reservation.");
-        //         console.error(error);
-        //     });
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
-        /*
-        TODO: [1단계]
-              - orderIdPrefix 를 자신만의 prefix로 변경
-        */
+
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
         const orderIdPrefix = "WTEST";
@@ -231,12 +193,6 @@ function onReservationButtonClick(event, paymentWidget)  {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    /*
-    TODO: [1단계]
-        - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-        - 내 서버 URL에 맞게 reservationURL 변경
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
@@ -283,9 +239,6 @@ function onWaitButtonClick() {
             timeId: selectedTimeId
         };
 
-        /*
-        TODO: [3단계] 예약 대기 생성 요청 API 호출
-         */
         fetch('/waitings', {
             method: 'POST',
             headers: {
