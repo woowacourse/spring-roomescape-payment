@@ -21,16 +21,17 @@ public class Payment {
     private String orderId;
     @Column(nullable = false)
     private BigDecimal totalAmount;
-    private long reservationId;
+    @OneToOne(optional = false)
+    private Reservation reservation;
 
     protected Payment() {
     }
 
-    public Payment(String paymentKey, String orderId, BigDecimal totalAmount, Long reservationId) {
+    public Payment(String paymentKey, String orderId, BigDecimal totalAmount, Reservation reservation) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
-        this.reservationId = reservationId;
+        this.reservation = reservation;
     }
 
     public Long getId() {
@@ -49,8 +50,8 @@ public class Payment {
         return totalAmount;
     }
 
-    public Long getReservation() {
-        return reservationId;
+    public Reservation getReservation() {
+        return reservation;
     }
 
     @Override
