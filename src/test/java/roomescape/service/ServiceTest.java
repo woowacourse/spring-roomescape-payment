@@ -13,35 +13,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.helper.CookieProvider;
 import roomescape.helper.DatabaseCleaner;
-import roomescape.helper.domain.MemberFixture;
-import roomescape.helper.domain.ReservationFixture;
-import roomescape.helper.domain.ReservationTimeFixture;
-import roomescape.helper.domain.ThemeFixture;
-import roomescape.helper.domain.WaitingFixture;
+import roomescape.helper.domain.DomainSupplier;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-abstract class ServiceTest {
+abstract class ServiceTest extends DomainSupplier {
     @Autowired
     protected DatabaseCleaner databaseCleaner;
 
     @Autowired
     protected CookieProvider cookieProvider;
-
-    @Autowired
-    protected MemberFixture memberFixture;
-
-    @Autowired
-    protected ReservationFixture reservationFixture;
-
-    @Autowired
-    protected ReservationTimeFixture timeFixture;
-
-    @Autowired
-    protected ThemeFixture themeFixture;
-
-    @Autowired
-    protected WaitingFixture waitingFixture;
 
     @MockBean
     protected Clock clock;
