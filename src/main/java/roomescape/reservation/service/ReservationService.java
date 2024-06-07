@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
@@ -26,15 +28,18 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
     public ReservationService(MemberService memberService, ReservationTimeService reservationTimeService,
                               ThemeService themeService, ReservationRepository reservationRepository,
+                              PaymentRepository paymentRepository,
                               PaymentClient paymentClient) {
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
 
@@ -77,7 +82,16 @@ public class ReservationService {
                 request.timeId(),
                 request.themeId()
         );
-        return saveReservation(reservationRequest);
+        ReservationResponse reservationResponse = saveReservation(reservationRequest);
+        savePayment(reservationResponse, request);
+        return reservationResponse;
+    }
+
+    @Transactional
+    public void savePayment(ReservationResponse reservationResponse, MemberReservationAddRequest request) {
+        Reservation reservation = reservationRepository.findById(reservationResponse.id())
+                .orElseThrow(() -> new IllegalRequestException("예약 번호가 존재하지 않습니다: " + reservationResponse.id()));
+        paymentRepository.save(new Payment(reservation, request.paymentKey(), request.amount()));
     }
 
     @Transactional

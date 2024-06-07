@@ -14,6 +14,7 @@ import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERV
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
+import static roomescape.reservation.fixture.ReservationFixture.SAVED_PAYMENT_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_2;
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
@@ -21,6 +22,7 @@ import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,8 @@ import roomescape.global.exception.InternalServerException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 import roomescape.payment.config.PaymentConfig;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.service.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -67,6 +71,9 @@ class ReservationServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
 
+    @Mock
+    private PaymentRepository paymentRepository;
+
     @Autowired
     private TossPaymentClient paymentClient;
 
@@ -76,7 +83,7 @@ class ReservationServiceTest {
     @BeforeEach
     void setData() {
         this.reservationService = new ReservationService(memberService, reservationTimeService,
-                themeService, reservationRepository, paymentClient);
+                themeService, reservationRepository, paymentRepository, paymentClient);
     }
 
     @DisplayName("전체 예약을 조회하고 응답 형태로 반환할 수 있다")
@@ -168,6 +175,7 @@ class ReservationServiceTest {
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withStatus(HttpStatus.OK));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.of(SAVED_RESERVATION_1));
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
 

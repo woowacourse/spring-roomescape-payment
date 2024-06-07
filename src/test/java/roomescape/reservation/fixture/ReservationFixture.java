@@ -8,6 +8,7 @@ import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_11_00_ID_2;
 
 import roomescape.member.fixture.MemberFixture;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.ReservationRequest;
@@ -104,4 +105,10 @@ public class ReservationFixture {
             TOMORROW,
             RESERVATION_TIME_10_00_ID_1,
             THEME_1);
+
+    public static final Payment SAVED_PAYMENT_1 = new Payment(
+            1L,
+            SAVED_RESERVATION_1,
+            "paymentKey",
+            1000);
 }
