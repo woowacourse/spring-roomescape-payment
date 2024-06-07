@@ -16,7 +16,7 @@ import roomescape.registration.domain.waiting.service.WaitingService;
 import java.util.List;
 
 @RestController
-public class WaitingController {
+public class WaitingController implements WaitingControllerSwagger {
 
     private final WaitingService waitingService;
 
@@ -24,6 +24,7 @@ public class WaitingController {
         this.waitingService = waitingService;
     }
 
+    @Override
     @PostMapping("/waitings")
     public ResponseEntity<WaitingResponse> waitingSave(@RequestBody WaitingRequest waitingRequest,
                                                        @LoginMemberId long memberId) {
@@ -32,6 +33,7 @@ public class WaitingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(waiting);
     }
 
+    @Override
     @GetMapping("/waitings")
     public ResponseEntity<List<WaitingResponse>> waitingList() {
         List<WaitingResponse> waitings = waitingService.findWaitings();
@@ -39,6 +41,7 @@ public class WaitingController {
         return ResponseEntity.ok(waitings);
     }
 
+    @Override
     @DeleteMapping("/waitings/{waitingId}")
     public ResponseEntity<WaitingResponse> waitingRemove(@PathVariable long waitingId) {
         waitingService.removeWaiting(waitingId);
