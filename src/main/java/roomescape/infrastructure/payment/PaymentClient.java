@@ -3,8 +3,8 @@ package roomescape.infrastructure.payment;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
-import roomescape.dto.payment.PaymentRequest;
-import roomescape.dto.payment.PaymentResponse;
+import roomescape.dto.request.payment.PaymentRequest;
+import roomescape.dto.response.payment.PaymentResponse;
 
 @HttpExchange
 public interface PaymentClient {

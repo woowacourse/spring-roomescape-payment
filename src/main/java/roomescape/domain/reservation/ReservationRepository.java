@@ -34,10 +34,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
 
-//    @EntityGraph(attributePaths = {"time", "theme"})
     @Query("""
             select new roomescape.dto.response.reservation.MyReservationResponse(
-            r.id, r.theme.name.name, r.date, r.time.startAt, r.status, p.paymentKey, p.totalAmount
+            r, p.paymentKey, p.totalAmount
             )
             from Reservation r
             join fetch ReservationTime rt on rt.id = r.time.id

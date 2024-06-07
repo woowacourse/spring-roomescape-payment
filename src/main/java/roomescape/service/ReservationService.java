@@ -9,13 +9,13 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.LoginMember;
-import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.request.payment.PaymentRequest;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.response.reservation.MyReservationWebResponse;
 import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
@@ -109,9 +109,13 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<MyReservationResponse> findMyReservations(Long memberId) {
-        List<MyReservationResponse> myReservation = reservationRepository.findMyReservation(memberId);
-        return myReservation;
+    @Transactional(readOnly = true)
+    public List<MyReservationWebResponse> findMyReservations(Long memberId) {
+        return reservationRepository.findMyReservation(memberId).stream()
+                .map(myReservationResponse -> MyReservationWebResponse.of(
+                        myReservationResponse.reservation(), myReservationResponse.paymentKey(),
+                        myReservationResponse.totalAmount(), getWaitingOrder(myReservationResponse.reservation())))
+                .toList();
     }
 
     private long getWaitingOrder(Reservation reservation) {

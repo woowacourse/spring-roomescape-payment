@@ -1,4 +1,4 @@
-package roomescape.dto.payment;
+package roomescape.dto.response.payment;
 
 import java.math.BigDecimal;
 import roomescape.domain.payment.Payment;

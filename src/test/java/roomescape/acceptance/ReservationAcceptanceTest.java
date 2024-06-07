@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -17,11 +18,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
+import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationTime;
-import roomescape.dto.payment.PaymentRequest;
+import roomescape.domain.theme.Theme;
+import roomescape.dto.request.payment.PaymentRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.PaymentExceptionResponse;
 import roomescape.exception.PaymentException;
@@ -29,6 +34,8 @@ import roomescape.exception.PaymentException;
 class ReservationAcceptanceTest extends BasicAcceptanceTest {
     private String clientToken;
     private String adminToken;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @BeforeEach
     void SetUp() {
@@ -107,17 +114,16 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @DisplayName("결제가 실패하면 예약이 생성되지 않는다.")
     @Test
     void reservationPostWhenPaymentFail() {
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        ReservationRequest request = new ReservationRequest(reservation.getDate(), 3L, 1L, null, null, 1000);
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
-        given(paymentService.pay(paymentRequest,
-                new Reservation(null, LocalDate.now().plusDays(1), new ReservationTime(LocalTime.of(10, 0)), null, null)))
+        given(paymentService.pay(paymentRequest, reservation))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new PaymentExceptionResponse("EXCEPTION", "exception")));
 
         ReservationTestStep.postClientReservation(
-                clientToken, tomorrow.toString(), 1L, 1L, 400);
+                clientToken, reservation.getDate().toString(), 1L, 1L, 400);
         ReservationTestStep.getReservations(200, 3);
     }
 

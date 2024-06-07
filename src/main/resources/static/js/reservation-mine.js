@@ -38,7 +38,7 @@ function render(data) {
         /*
         TODO: [3단계] 예약 대기 기능 - 예약 대기 취소 기능 구현 후 활성화
          */
-        if (status === 'RESERVATION') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+        if (status === '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             /*
             TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
                 예약 완료 상태일 때 결제 정보를 함께 보여주기
@@ -47,8 +47,10 @@ function render(data) {
             row.insertCell(4).textContent = '';
             row.insertCell(5).textContent = item.paymentKey;
             row.insertCell(6).textContent = item.totalAmount;
-        } else if(status === 'PAYMENT_WAITING') {
+        } else if(status === '결제대기') {
             const payCell = row.insertCell(4);
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
             const paymentButton = document.createElement('input');
             paymentButton.type = 'radio';
             paymentButton.name = 'payment';
@@ -63,6 +65,8 @@ function render(data) {
             payCell.appendChild(payLabel);
         } else { // 예약 완료 상태일 때
             const cancelCell = row.insertCell(4);
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';

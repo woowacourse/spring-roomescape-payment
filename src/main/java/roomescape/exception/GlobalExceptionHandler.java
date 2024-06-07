@@ -24,17 +24,10 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<PaymentExceptionResponse> exceptionHandler(PaymentException exception) {
+    public ResponseEntity<PaymentExceptionResponse> paymentExceptionHandler(PaymentException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
                 .body(exception.getTossExceptionResponse());
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> exceptionHandler(RuntimeException exception) {
-        logError(exception);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("서버 내부에서 에러가 발생했습니다.");
     }
 
     @ExceptionHandler(Exception.class)

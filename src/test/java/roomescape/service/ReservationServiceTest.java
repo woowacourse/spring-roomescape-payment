@@ -22,7 +22,7 @@ import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.response.reservation.MyReservationWebResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 
@@ -89,9 +89,9 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     @DisplayName("해당 멤버의 예약 목록을 반환한다.")
     @Test
     void findMyReservations() {
-        List<MyReservationResponse> myReservationResponses = reservationService.findMyReservations(1L);
+        List<MyReservationWebResponse> myReservationWebRespons = reservationService.findMyReservations(1L);
 
-        assertThat(myReservationResponses).isEqualTo(TestFixtures.MY_RESERVATION_RESPONSES);
+        assertThat(myReservationWebRespons).isEqualTo(TestFixtures.MY_RESERVATION_RESPONSES);
     }
 
     @TestFactory
