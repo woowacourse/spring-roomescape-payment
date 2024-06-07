@@ -7,6 +7,7 @@ import io.restassured.specification.RequestSpecification;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -26,6 +27,7 @@ import static roomescape.TestFixture.USER_PASSWORD;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(RestDocumentationExtension.class)
+@AutoConfigureRestDocs(uriHost = "redddy.com", uriPort = 80)
 @ActiveProfiles("test")
 public abstract class IntegrationTestSupport {
 

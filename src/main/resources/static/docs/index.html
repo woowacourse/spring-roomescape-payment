@@ -511,16 +511,16 @@ Content-Length: 64
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTQ1LCJpYXQiOjE3MTc3NTUzNDV9.YB9oOuxUXvD2w2dnm-50I3Ap_lob6FT0vIZU6UvXJQI; Max-Age=3600000; Expires=Fri, 19 Jul 2024 02:15:45 GMT; Path=/; HttpOnly
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwODk4LCJpYXQiOjE3MTc3NTcyOTh9.PiIFPVfYAhrtd_pHLIvG4uAarmwkHi8WJLW7Vab0274; Max-Age=3600000; Expires=Fri, 19 Jul 2024 02:48:18 GMT; Path=/; HttpOnly
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 10:15:45 GMT
+Date: Fri, 07 Jun 2024 10:48:17 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 191
 
 {
-  "assessToken" : "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTQ1LCJpYXQiOjE3MTc3NTUzNDV9.YB9oOuxUXvD2w2dnm-50I3Ap_lob6FT0vIZU6UvXJQI"
+  "assessToken" : "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwODk4LCJpYXQiOjE3MTc3NTcyOTh9.PiIFPVfYAhrtd_pHLIvG4uAarmwkHi8WJLW7Vab0274"
 }</code></pre>
 </div>
 </div>
@@ -601,7 +601,7 @@ Content-Length: 191
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8081/logout' -i -X POST \
     -H 'Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1' \
-    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTQ2LCJpYXQiOjE3MTc3NTUzNDZ9.PMtO0VMRIze7cDYIHuR5_764ZCIhmpO0YIF5MJDBkXM'</code></pre>
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwODk4LCJpYXQiOjE3MTc3NTcyOTh9.PiIFPVfYAhrtd_pHLIvG4uAarmwkHi8WJLW7Vab0274'</code></pre>
 </div>
 </div>
 </div>
@@ -612,7 +612,7 @@ Content-Length: 191
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /logout HTTP/1.1
 Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTQ2LCJpYXQiOjE3MTc3NTUzNDZ9.PMtO0VMRIze7cDYIHuR5_764ZCIhmpO0YIF5MJDBkXM</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwODk4LCJpYXQiOjE3MTc3NTcyOTh9.PiIFPVfYAhrtd_pHLIvG4uAarmwkHi8WJLW7Vab0274</code></pre>
 </div>
 </div>
 </div>
@@ -646,7 +646,7 @@ Set-Cookie: token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 10:15:46 GMT
+Date: Fri, 07 Jun 2024 10:48:17 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2276
@@ -724,7 +724,7 @@ Content-Length: 2276
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8081/reservations' -i -X POST \
     -H 'Content-Type: application/json' \
-    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTU5LCJpYXQiOjE3MTc3NTUzNTl9.-tBT0o8E30qPAnXNvuZpFK1iI0gtykiKPD2VvMeRgrY' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwOTEwLCJpYXQiOjE3MTc3NTczMTB9.kKCugc_nubW-8Hl-MCzW48bixmV2M1YE_x3YP13SJLE' \
     -d '{
   "memberId" : 2,
   "themeId" : 2,
@@ -745,7 +745,7 @@ Content-Length: 2276
 Content-Type: application/json
 Host: localhost:8081
 Content-Length: 191
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzU4OTU5LCJpYXQiOjE3MTc3NTUzNTl9.-tBT0o8E30qPAnXNvuZpFK1iI0gtykiKPD2VvMeRgrY
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3NzYwOTEwLCJpYXQiOjE3MTc3NTczMTB9.kKCugc_nubW-8Hl-MCzW48bixmV2M1YE_x3YP13SJLE
 
 {
   "memberId" : 2,
@@ -788,7 +788,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiO
 Location: /reservations/9
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 10:15:59 GMT
+Date: Fri, 07 Jun 2024 10:48:29 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 214
@@ -916,7 +916,7 @@ Content-Length: 214
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8081/times' -i -X GET \
-    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk3MCwiaWF0IjoxNzE3NzU1MzcwfQ.-U5qRC6jdlRE3PktgiydbjIJC1_gQvGheEac9OxlLRw'</code></pre>
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I'</code></pre>
 </div>
 </div>
 </div>
@@ -926,7 +926,7 @@ Content-Length: 214
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk3MCwiaWF0IjoxNzE3NzU1MzcwfQ.-U5qRC6jdlRE3PktgiydbjIJC1_gQvGheEac9OxlLRw</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I</code></pre>
 </div>
 </div>
 </div>
@@ -937,7 +937,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 10:16:09 GMT
+Date: Fri, 07 Jun 2024 10:48:38 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 212
@@ -966,7 +966,7 @@ Content-Length: 212
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://localhost:8081/times' \
-    'Cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk3MCwiaWF0IjoxNzE3NzU1MzcwfQ.-U5qRC6jdlRE3PktgiydbjIJC1_gQvGheEac9OxlLRw'</code></pre>
+    'Cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I'</code></pre>
 </div>
 </div>
 </div>
@@ -1035,7 +1035,7 @@ Content-Length: 212
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8081/themes' -i -X GET \
-    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk2OCwiaWF0IjoxNzE3NzU1MzY4fQ.DBtsCvxStQGwGmrY89h3MIcr-6esFvu1LoH83Z-qGmI'</code></pre>
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I'</code></pre>
 </div>
 </div>
 </div>
@@ -1045,7 +1045,7 @@ Content-Length: 212
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /themes HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk2OCwiaWF0IjoxNzE3NzU1MzY4fQ.DBtsCvxStQGwGmrY89h3MIcr-6esFvu1LoH83Z-qGmI</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I</code></pre>
 </div>
 </div>
 </div>
@@ -1056,7 +1056,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 10:16:08 GMT
+Date: Fri, 07 Jun 2024 10:48:37 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 647
@@ -1090,7 +1090,7 @@ Content-Length: 647
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://localhost:8081/themes' \
-    'Cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc1ODk2OCwiaWF0IjoxNzE3NzU1MzY4fQ.DBtsCvxStQGwGmrY89h3MIcr-6esFvu1LoH83Z-qGmI'</code></pre>
+    'Cookie:token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzc2MDkxOCwiaWF0IjoxNzE3NzU3MzE4fQ.IcvFZ0MFwLdQVLr2f7fb4n8tVE5x9yiQUEbXsYgqM3I'</code></pre>
 </div>
 </div>
 </div>
