@@ -27,6 +27,7 @@ public enum ErrorType {
     RESERVATION_NOT_FOUND("예약(Reservation) 정보가 존재하지 않습니다."),
     RESERVATION_TIME_NOT_FOUND("예약 시간(ReservationTime) 정보가 존재하지 않습니다."),
     THEME_NOT_FOUND("테마(Theme) 정보가 존재하지 않습니다."),
+    PAYMENT_NOT_POUND("결제(Payment) 정보가 존재하지 않습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED("지원하지 않는 HTTP Method 입니다."),
@@ -41,7 +42,7 @@ public enum ErrorType {
     INTERNAL_SERVER_ERROR("서버 내부에서 에러가 발생하였습니다."),
 
     // Payment Error
-    PAYMENT_ERROR("결제에 실패했습니다. 결제 정보를 확인해주세요."),
+    PAYMENT_ERROR("결제(취소)에 실패했습니다. 결제(취소) 정보를 확인해주세요."),
     PAYMENT_SERVER_ERROR("결제 서버에서 에러가 발생하였습니다. 잠시 후 다시 시도해주세요.");
 
     private final String description;
