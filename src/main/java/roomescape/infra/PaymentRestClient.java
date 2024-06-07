@@ -7,9 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
-import roomescape.dto.service.TossPaymentResponse;
+import roomescape.dto.service.PaymentApprovalResult;
 import roomescape.exception.PaymentErrorHandler;
 
 @Component
@@ -28,16 +27,14 @@ public class PaymentRestClient {
         this.paymentErrorHandler = paymentErrorHandler;
     }
 
-    public Payment requestPaymentApproval(PaymentRequest request) {
-        TossPaymentResponse response = restClient.post()
+    public PaymentApprovalResult requestPaymentApproval(PaymentRequest request) {
+        return restClient.post()
                 .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
                 .onStatus(paymentErrorHandler)
-                .body(TossPaymentResponse.class);
-
-        return response.toPayment();
+                .body(PaymentApprovalResult.class);
     }
 
     private String getAuthorizationHeader() {

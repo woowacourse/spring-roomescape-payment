@@ -6,6 +6,7 @@ import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.PaymentResponse;
+import roomescape.dto.service.PaymentApprovalResult;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 import roomescape.infra.PaymentRestClient;
@@ -34,10 +35,11 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(request.reservationId())
                 .orElseThrow(() -> new RoomescapeException(ExceptionType.NOT_FOUND_RESERVATION));
 
-        Payment payment = paymentRestClient.requestPaymentApproval(request);
-        Payment saved = paymentRepository.save(payment);
-        reservation.updateAsPaid(payment);
+        reservation.updateAsPaid();
 
-        return new PaymentResponse(saved.getId(), saved.getPaymentKey(), saved.getOrderId(), saved.getAmount());
+        PaymentApprovalResult result = paymentRestClient.requestPaymentApproval(request);
+        Payment payment = paymentRepository.save(result.toPayment(reservation));
+
+        return PaymentResponse.from(payment);
     }
 }

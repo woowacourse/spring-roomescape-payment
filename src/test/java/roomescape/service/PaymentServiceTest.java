@@ -1,8 +1,6 @@
 package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -17,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.Member;
-import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.service.PaymentApprovalResult;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
@@ -60,15 +58,15 @@ class PaymentServiceTest {
 
     @AfterEach
     void cleanUp() {
+        paymentRepository.deleteAll();
         reservationRepository.deleteAll();
         reservationTimeRepository.deleteAll();
         themeRepository.deleteAll();
         memberRepository.deleteAll();
-        paymentRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("결제가 정상 처리되면, 결제 정보를 저장한다.")
+    @DisplayName("결제가 정상 처리되면, 결제 상태를 갱신한다.")
     void savePayment() {
         // given
         Member member = memberRepository.save(MemberFixture.DEFAULT_MEMBER);
@@ -88,15 +86,17 @@ class PaymentServiceTest {
         PaymentRequest request = new PaymentRequest(
                 reservation.getId(), "paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L));
         given(paymentRestClient.requestPaymentApproval(any(PaymentRequest.class)))
-                .willReturn(new Payment(null, "paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L)));
+                .willReturn(new PaymentApprovalResult("paymentKey", "WTESTzzzzz", BigDecimal.valueOf(1000L)));
+
+        paymentService.savePaymentAndUpdateReservationStatus(request);
+        Reservation foundReservation = reservationRepository.findById(reservation.getId()).get();
 
         // when & then
-        assertThatCode(() -> paymentService.savePaymentAndUpdateReservationStatus(request))
-                .doesNotThrowAnyException();
+        assertThat(foundReservation.getStatus()).isEqualTo(ReservationStatus.RESERVED_PAID);
     }
 
     @Test
-    @DisplayName("결제가 실패하면, 예약의 결제 정보를 갱신하지 않는다.")
+    @DisplayName("결제가 실패하면, 예약의 결제 상태를 갱신하지 않는다.")
     void failPaymentThenReservationPaymentInfoNotUpdated() {
         // given
         Member member = memberRepository.save(MemberFixture.DEFAULT_MEMBER);
@@ -120,9 +120,6 @@ class PaymentServiceTest {
         Reservation foundReservation = reservationRepository.findById(reservation.getId()).get();
 
         // then
-        assertAll(
-                () -> assertThat(foundReservation.getStatus()).isEqualTo(ReservationStatus.RESERVED_UNPAID),
-                () -> assertThat(foundReservation.getPayment()).isNull()
-        );
+        assertThat(foundReservation.getStatus()).isEqualTo(ReservationStatus.RESERVED_UNPAID);
     }
 }
