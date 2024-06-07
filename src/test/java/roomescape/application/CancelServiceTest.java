@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.application.dto.request.member.MemberInfo;
+import roomescape.application.dto.request.reservation.UserReservationRequest;
+import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -32,6 +36,8 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private CancelService cancelService;
     @Autowired
+    private ReservationService reservationService;
+    @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -42,6 +48,8 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @SpyBean
+    private PaymentClient paymentClient;
     @MockBean
     private CancelEventPublisher eventPublisher;
 
@@ -74,6 +82,29 @@ class CancelServiceTest extends BaseServiceTest {
         // then
         Reservation canceledReservation = reservationRepository.getById(reservation.getId());
         Assertions.assertThat(canceledReservation.getStatus()).isEqualTo(Status.CANCELED);
+    }
+
+    @DisplayName("예약 취소 시, 결제도 취소된다")
+    @Test
+    void when_cancelReservation_then_paymentCanceled() {
+        // given
+        MemberInfo memberInfo = new MemberInfo(user.getId());
+        UserReservationRequest request = new UserReservationRequest(
+                CommonFixture.tomorrow,
+                time.getId(),
+                theme.getId(),
+                1000L,
+                "asdsds",
+                "asddsdsa",
+                "dsadsdsa");
+        ReservationResponse reserve = reservationService.reserve(request, user.getId());
+
+        // when
+        cancelService.cancelReservation(reserve.id(), memberInfo);
+
+        // then
+        Mockito.verify(paymentClient, Mockito.times(1))
+                .cancel(Mockito.any(), Mockito.any());
     }
 
     @DisplayName("예약 취소 시, 다음 예약 대기가 결제 대기 상태로 전환된다")
