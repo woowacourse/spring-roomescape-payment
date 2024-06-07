@@ -37,7 +37,7 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(paymentApproveRequest.reservationId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
         ApproveApiResponse approve = paymentClient.approve(paymentApproveRequest);
-        Payment payment = new Payment(approve.orderId(), approve.paymentKey(), approve.totalAmount(), reservation);
+        Payment payment = new Payment(approve.paymentKey(), approve.totalAmount(), reservation);
         paymentRepository.save(payment);
     }
 }

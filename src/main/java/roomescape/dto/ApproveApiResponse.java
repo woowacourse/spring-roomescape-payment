@@ -1,4 +1,4 @@
 package roomescape.dto;
 
-public record ApproveApiResponse(String orderId, String paymentKey, long totalAmount) {
+public record ApproveApiResponse(String paymentKey, long totalAmount) {
 }

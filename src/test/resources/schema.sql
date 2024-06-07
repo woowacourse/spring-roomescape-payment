@@ -48,7 +48,6 @@ create table reservation_waiting (
 );
 CREATE TABLE payment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    order_id VARCHAR(255),
     payment_key VARCHAR(255),
     amount BIGINT NOT NULL,
     reservation_id BIGINT,
