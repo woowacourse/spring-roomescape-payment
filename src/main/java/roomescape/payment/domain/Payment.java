@@ -29,13 +29,13 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(
-            Long id,
-            String paymentKey,
-            String orderId,
-            BigDecimal amount,
-            LocalDateTime createdAt,
-            MemberReservation memberReservation) {
+    public Payment(Long id,
+                   String paymentKey,
+                   String orderId,
+                   BigDecimal amount,
+                   LocalDateTime createdAt,
+                   MemberReservation memberReservation
+    ) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;

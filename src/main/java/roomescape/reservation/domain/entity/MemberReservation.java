@@ -52,13 +52,17 @@ public class MemberReservation {
 
     public void validateDuplicated(MemberReservation other) {
         if (reservation.equals(other.reservation)) {
-            if (member.equals(other.member)) {
-                throw new BadRequestException("이미 예약한 테마입니다.");
-            }
+            validateDuplicatedType(other);
+        }
+    }
 
-            if (status.isNotWaiting()) {
-                throw new BadRequestException("다른 사용자가 이미 예약한 테마입니다.");
-            }
+    private void validateDuplicatedType(MemberReservation other) {
+        if (member.equals(other.member)) {
+            throw new BadRequestException("이미 예약한 테마입니다.");
+        }
+
+        if (status.isNotWaiting()) {
+            throw new BadRequestException("다른 사용자가 이미 예약한 테마입니다.");
         }
     }
 

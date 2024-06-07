@@ -9,12 +9,11 @@ import roomescape.reservation.domain.entity.ReservationStatus;
 
 import java.time.LocalDate;
 
-public record ReservationCreateRequest(
-        @NotNull(message = "사용자는 비어있을 수 없습니다.") Long memberId,
-        @NotNull(message = "예약 날짜는 비어있을 수 없습니다.") LocalDate date,
-        @NotNull(message = "예약 시간은 비어있을 수 없습니다.") Long timeId,
-        @NotNull(message = "테마는 비어있을 수 없습니다.") Long themeId,
-        @NotNull(message = "예약 상태는 비어있을 수 없습니다.") ReservationStatus status
+public record ReservationCreateRequest(@NotNull(message = "사용자는 비어있을 수 없습니다.") Long memberId,
+                                       @NotNull(message = "예약 날짜는 비어있을 수 없습니다.") LocalDate date,
+                                       @NotNull(message = "예약 시간은 비어있을 수 없습니다.") Long timeId,
+                                       @NotNull(message = "테마는 비어있을 수 없습니다.") Long themeId,
+                                       @NotNull(message = "예약 상태는 비어있을 수 없습니다.") ReservationStatus status
 ) {
 
     public ReservationCreateRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {

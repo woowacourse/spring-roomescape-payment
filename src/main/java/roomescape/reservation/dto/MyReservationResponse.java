@@ -10,14 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record MyReservationResponse(
-        Long reservationId,
-        String theme,
-        LocalDate date,
-        LocalTime time,
-        String status,
-        String paymentKey,
-        String amount
+public record MyReservationResponse(Long reservationId,
+                                    String theme,
+                                    LocalDate date,
+                                    LocalTime time,
+                                    String status,
+                                    String paymentKey,
+                                    String amount
 ) {
 
     public static MyReservationResponse from(MemberReservation memberReservation) {
@@ -34,7 +33,10 @@ public record MyReservationResponse(
         );
     }
 
-    public static MyReservationResponse of(MemberReservation memberReservation, String plainPaymentKey, BigDecimal amount) {
+    public static MyReservationResponse of(MemberReservation memberReservation,
+                                           String plainPaymentKey,
+                                           BigDecimal amount
+    ) {
         Reservation reservation = memberReservation.getReservation();
 
         return new MyReservationResponse(

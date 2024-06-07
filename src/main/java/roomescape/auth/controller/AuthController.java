@@ -22,12 +22,15 @@ public class AuthController {
 
     private final AuthService authService;
     private final TokenCookieService tokenCookieService;
-    @Value("${jwt.expired-period}")
-    private long expiredPeriod;
+    private final long expiredPeriod;
 
-    public AuthController(AuthService authService, TokenCookieService tokenCookieService) {
+    public AuthController(AuthService authService,
+                          TokenCookieService tokenCookieService,
+                          @Value("${jwt.expired-period}") long expiredPeriod
+    ) {
         this.authService = authService;
         this.tokenCookieService = tokenCookieService;
+        this.expiredPeriod = expiredPeriod;
     }
 
     @GetMapping("/login")

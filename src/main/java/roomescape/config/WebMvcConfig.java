@@ -16,9 +16,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final HandlerMethodArgumentResolver loginMemberArgumentResolver;
     private final HandlerInterceptor roleCheckHandlerInterceptor;
 
-    public WebMvcConfig(
-            HandlerMethodArgumentResolver loginMemberArgumentResolver,
-            HandlerInterceptor roleCheckHandlerInterceptor
+    public WebMvcConfig(HandlerMethodArgumentResolver loginMemberArgumentResolver,
+                        HandlerInterceptor roleCheckHandlerInterceptor
     ) {
         this.loginMemberArgumentResolver = loginMemberArgumentResolver;
         this.roleCheckHandlerInterceptor = roleCheckHandlerInterceptor;

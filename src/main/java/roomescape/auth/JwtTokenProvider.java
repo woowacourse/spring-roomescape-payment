@@ -20,16 +20,19 @@ public class JwtTokenProvider {
     public static final String CLAIM_ID_KEY = "id";
     public static final String CLAIM_ROLE_KEY = "role";
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-    @Value("${jwt.expired-period}")
-    private long expiredPeriod;
+    private final String jwtSecret;
+    private final long expiredPeriod;
+
+    public JwtTokenProvider(@Value("${jwt.secret}") String jwtSecret, @Value("${jwt.expired-period}") long expiredPeriod) {
+        this.jwtSecret = jwtSecret;
+        this.expiredPeriod = expiredPeriod;
+    }
 
     public String generate(Member member) {
         long now = new Date().getTime();
 
         return Jwts.builder()
-                .claim(CLAIM_ID_KEY, member.getId().toString()) // TODO: double로 자동 형변환 되는 현상 알아보기
+                .claim(CLAIM_ID_KEY, member.getId().toString())
                 .claim(CLAIM_EMAIL_KEY, member.getEmail())
                 .claim(CLAIM_ROLE_KEY, member.getRole().name())
                 .setExpiration(new Date(now + expiredPeriod))

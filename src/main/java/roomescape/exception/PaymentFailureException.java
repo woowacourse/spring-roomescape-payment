@@ -5,9 +5,10 @@ import java.util.List;
 public class PaymentFailureException extends RuntimeException {
 
     private static final List<String> SERVER_FAULT_CODE = List.of(
-            "INVALID_API_KEY", "INVALID_AUTHORIZE_AUTH", "UNAUTHORIZED_KEY"
+            "INVALID_API_KEY",
+            "INVALID_AUTHORIZE_AUTH",
+            "UNAUTHORIZED_KEY"
     );
-
 
     public PaymentFailureException(String message) {
         super(message);

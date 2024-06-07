@@ -16,21 +16,23 @@ import java.util.Optional;
 @Service
 public class PaymentService {
 
-    private final TossPaymentRestClient restClient;
+    private final TossPaymentRestClient tossPaymentRestClient;
     private final PaymentRepository paymentRepository;
     private final PaymentKeyEncodingService paymentKeyEncodingService;
-    @Value("${toss.url.confirm-payment}")
-    private String confirmUrl;
-    @Value("${toss.url.cancel-payment}")
-    private String cancelUrl;
+    private final String confirmUrl;
+    private final String cancelUrl;
 
     public PaymentService(PaymentRepository paymentRepository,
-                          TossPaymentRestClient restClient,
-                          PaymentKeyEncodingService paymentKeyEncodingService
+                          TossPaymentRestClient tossPaymentRestClient,
+                          PaymentKeyEncodingService paymentKeyEncodingService,
+                          @Value("${toss.url.confirm-payment}") String confirmUrl,
+                          @Value("${toss.url.cancel-payment}") String cancelUrl
     ) {
         this.paymentRepository = paymentRepository;
-        this.restClient = restClient;
+        this.tossPaymentRestClient = tossPaymentRestClient;
         this.paymentKeyEncodingService = paymentKeyEncodingService;
+        this.confirmUrl = confirmUrl;
+        this.cancelUrl = cancelUrl;
     }
 
     public Optional<Payment> findByMemberReservation(MemberReservation memberReservation) {
@@ -38,7 +40,7 @@ public class PaymentService {
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
-        PaymentResponse response = restClient.post(confirmUrl, request)
+        PaymentResponse response = tossPaymentRestClient.post(confirmUrl, request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
         Payment payment = Payment.of(response, memberReservation, paymentKeyEncodingService);
@@ -57,7 +59,7 @@ public class PaymentService {
         String plainPaymentKey = getPlainPaymentKey(payment);
         String uri = String.format(cancelUrl, plainPaymentKey);
         Map<String, String> body = Map.of("cancelReason", "고객 변심");
-        restClient.post(uri, body);
+        tossPaymentRestClient.post(uri, body);
     }
 
     public String getPlainPaymentKey(Payment payment) {

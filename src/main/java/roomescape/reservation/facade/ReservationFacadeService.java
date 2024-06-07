@@ -27,7 +27,8 @@ public class ReservationFacadeService {
     public ReservationFacadeService(ReservationService reservationService,
                                     ReservationCreateService reservationCreateService,
                                     WaitingReservationService waitingReservationService,
-                                    PaymentService paymentService) {
+                                    PaymentService paymentService
+    ) {
         this.reservationService = reservationService;
         this.reservationCreateService = reservationCreateService;
         this.waitingReservationService = waitingReservationService;
@@ -61,8 +62,10 @@ public class ReservationFacadeService {
 
     @Transactional(readOnly = true)
     public List<MyReservationResponse> readMyReservations(LoginMember loginMember) {
-        List<MemberReservation> confirmationReservations = reservationService.readConfirmationMemberReservation(loginMember);
-        List<WaitingReservationRanking> waitingReservations = reservationService.readWaitingMemberReservation(loginMember);
+        List<MemberReservation> confirmationReservations =
+                reservationService.readConfirmationMemberReservation(loginMember);
+        List<WaitingReservationRanking> waitingReservations =
+                reservationService.readWaitingMemberReservation(loginMember);
 
         return Stream.concat(
                         confirmationReservations.stream()
