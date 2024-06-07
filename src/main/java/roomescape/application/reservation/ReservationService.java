@@ -86,7 +86,7 @@ public class ReservationService {
         reservation.cancelBooking();
         reservationRepository.findFirstWaiting(
                 reservation.getTheme(), reservation.getDate(), reservation.getTime()
-        ).ifPresent(Reservation::book);
+        ).ifPresent(Reservation::pendingPayment);
     }
 
 

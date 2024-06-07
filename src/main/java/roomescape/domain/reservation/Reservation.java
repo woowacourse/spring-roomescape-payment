@@ -85,8 +85,8 @@ public class Reservation {
         return status == BookStatus.BOOKED;
     }
 
-    public void book() {
-        status = status.book();
+    public void pendingPayment() {
+        status = status.pendingPayment();
     }
 
     public void cancelWaiting() {
