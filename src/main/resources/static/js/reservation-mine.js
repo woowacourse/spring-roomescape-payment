@@ -96,7 +96,7 @@ function render(data) {
         row.insertCell(1).textContent = date;
         row.insertCell(2).textContent = time;
         row.insertCell(3).textContent = status;
-        if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+        if (status !== '예약' && status !== '예약(결제대기중)') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             const cancelCell = row.insertCell(4);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
@@ -109,7 +109,7 @@ function render(data) {
             row.insertCell(4).textContent = '';
         }
 
-        if (paymentKey === null && status === '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+        if (paymentKey === null && status === '예약(결제대기중)') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             const cancelCell = row.insertCell(4);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '결제';
