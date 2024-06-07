@@ -19,7 +19,8 @@ values (1, '12:00'),
 
 insert into reservation (id, member_id, date, theme_id, time_id, created_at, status, order_id)
 values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED', 'order12'),
-       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED', 'order11');
+       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED', 'order11'),
+       (3, 1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01T09:00', 'WAITING', 'order13');
 
 insert into payment (id, order_id, payment_key, amount)
 values (1, 'order12', 'paymentkey123', 10000),
