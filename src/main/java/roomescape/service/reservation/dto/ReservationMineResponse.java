@@ -9,6 +9,7 @@ import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 public class ReservationMineResponse {
     private static final String BOOKED_MESSAGE = "예약";
@@ -40,14 +41,25 @@ public class ReservationMineResponse {
         this.amount = amount;
     }
 
-    public ReservationMineResponse(Payment payment) {
-        this(payment.getReservation().getId(),
-                payment.getReservation().getTheme().getName().getName(),
-                payment.getReservation().getDate(),
-                payment.getReservation().getTime().getStartAt(),
-                createStatusMessage(payment.getReservation()),
-                payment.getPaymentKey(),
-                payment.getAmount()
+    public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
+        if (reservationPayment.isPresent()) {
+            Payment payment = reservationPayment.get();
+            return new ReservationMineResponse(reservation.getId(),
+                    reservation.getTheme().getName().getName(),
+                    reservation.getDate(),
+                    reservation.getTime().getStartAt(),
+                    PAYMENT_WAITING_MESSAGE,
+                    payment.getPaymentKey(),
+                    payment.getAmount()
+            );
+        }
+        return new ReservationMineResponse(reservation.getId(),
+                reservation.getTheme().getName().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                PAYMENT_WAITING_MESSAGE,
+                "",
+                0
         );
     }
 

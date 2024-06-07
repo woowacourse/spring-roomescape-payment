@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -87,7 +88,12 @@ public class ReservationService {
                 = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
 
         List<ReservationMineResponse> myReservations = Stream.concat(
-                        payments.stream().map(ReservationMineResponse::new),
+                        reservations.stream().map(reservation -> {
+                            Optional<Payment> payment = payments.stream()
+                                    .filter(p -> p.getReservation().equals(reservation))
+                                    .findAny();
+                            return ReservationMineResponse.ofReservationPayment(reservation, payment);
+                        }),
                         reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
                 )
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
