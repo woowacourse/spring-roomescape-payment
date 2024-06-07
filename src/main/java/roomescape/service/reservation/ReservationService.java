@@ -15,7 +15,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.InvalidReservationMemberException;
-import roomescape.service.payment.PaymentClient;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -43,20 +43,20 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
     private final Clock clock;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              PaymentClient paymentClient,
+                              PaymentService paymentService,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
         this.clock = clock;
     }
 
@@ -92,7 +92,7 @@ public class ReservationService {
     public ReservationResponse saveReservationWithPayment(
             ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
-        paymentClient.confirmPayment(paymentConfirmInput);
+        paymentService.confirmPayment(paymentConfirmInput, savedReservation);
 
         return new ReservationResponse(savedReservation);
     }

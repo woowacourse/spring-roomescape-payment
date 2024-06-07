@@ -13,6 +13,7 @@ public class DatabaseCleaner {
 
     public void execute() {
         clearReservationWaiting();
+        clearPayment();
         clearReservation();
         clearMember();
         clearTime();
@@ -22,6 +23,11 @@ public class DatabaseCleaner {
     private void clearReservationWaiting() {
         entityManager.createNativeQuery("DELETE FROM reservation_waiting").executeUpdate();
         entityManager.createNativeQuery("ALTER TABLE reservation_waiting ALTER COLUMN id RESTART").executeUpdate();
+    }
+
+    private void clearPayment() {
+        entityManager.createNativeQuery("DELETE FROM payment").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE payment ALTER COLUMN id RESTART").executeUpdate();
     }
 
     private void clearReservation() {

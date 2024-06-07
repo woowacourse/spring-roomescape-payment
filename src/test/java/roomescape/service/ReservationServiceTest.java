@@ -203,7 +203,7 @@ class ReservationServiceTest extends ServiceTest {
         }
 
         @Test
-        void 예약_대기가_존재하는_예약_삭제_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_예약자로_승격되면서_예약_대기가_삭제된다() {
+        void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_예약자로_승격되면서_예약_대기가_삭제된다() {
             Member otherMember = memberFixture.createAdminMember();
             waitingFixture.createWaiting(reservation, otherMember);
 

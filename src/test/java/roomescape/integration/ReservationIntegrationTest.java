@@ -12,6 +12,8 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+import roomescape.service.payment.PaymentStatus;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,7 +126,9 @@ class ReservationIntegrationTest extends IntegrationTest {
         @Test
         void 결제_성공_시_예약을_추가할_수_있다() {
             params.put("date", "2000-04-07");
-            paymentClient.confirmPayment(any());
+            given(paymentClient.confirmPayment(any())).willReturn(
+                    new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
+                            1000, "provider", "paymentMethod", PaymentStatus.DONE));
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())
