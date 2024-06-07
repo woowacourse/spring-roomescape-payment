@@ -1,6 +1,7 @@
 package roomescape.domain.reservation;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
         return findById(id)
                 .orElseThrow(NotFoundReservationException::new);
     }
+
+    @EntityGraph(attributePaths = {"member"})
+    List<Reservation> findAll();
 
     boolean existsByInfo(ReservationInfo info);
 
