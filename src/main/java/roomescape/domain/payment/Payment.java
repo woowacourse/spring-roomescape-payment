@@ -1,6 +1,8 @@
 package roomescape.domain.payment;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,7 @@ public class Payment {
     private String orderId;
     private int amount;
     String orderName;
+    @Enumerated(EnumType.STRING)
     PaymentStatus status;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")

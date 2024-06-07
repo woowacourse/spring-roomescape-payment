@@ -61,6 +61,10 @@ public class Reservation {
         return this.status == ReservationStatus.PAYMENT_WAITING;
     }
 
+    public boolean isBooked() {
+        return this.status == ReservationStatus.BOOKED;
+    }
+
     public boolean isPast(LocalDateTime now) {
         return info.isPast(now);
     }
@@ -69,8 +73,8 @@ public class Reservation {
         return member.equals(otherMember);
     }
 
-    public boolean isNotOwnedBy(long otherMemberId) {
-        return member.isDifferentId(otherMemberId);
+    public boolean isNotOwnedBy(Member otherMember) {
+        return member.isDifferent(otherMember);
     }
 
     public Long getId() {

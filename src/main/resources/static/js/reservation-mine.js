@@ -38,14 +38,21 @@ function render(data) {
                 // TODO: Toss 결제창 열리게 만들기
             }
             paymentCell.appendChild(paymentButton);
-        } else if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+        }
+        if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             const cancelCell = row.insertCell(index++);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
-            cancelButton.onclick = function () {
-                requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
-            };
+            if (status === '결제 대기') {
+                cancelButton.onclick = function () {
+                    requestDeleteReservation(item.reservationId).then(() => window.location.reload());
+                };
+            } else {
+                cancelButton.onclick = function () {
+                    requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
+                };
+            }
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(index++).textContent = '';
@@ -55,6 +62,16 @@ function render(data) {
 
 function requestDeleteWaiting(id) {
     const endpoint = `/reservations/${id}/waitings`;
+    return fetch(endpoint, {
+        method: 'DELETE'
+    }).then(response => {
+        if (response.status === 204) return;
+        throw new Error('Delete failed');
+    });
+}
+
+function requestDeleteReservation(id) {
+    const endpoint = `/reservations/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {

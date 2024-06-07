@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import java.util.Objects;
 
 @Entity
@@ -42,8 +43,16 @@ public class Member {
         this(null, name, email, password, role);
     }
 
+    public boolean isAdmin() {
+        return this.role == MemberRole.ADMIN;
+    }
+
     public boolean isDifferentPassword(MemberPassword otherPassword) {
         return !password.equals(otherPassword);
+    }
+
+    public boolean isDifferent(Member otherMember) {
+        return !this.equals(otherMember);
     }
 
     public boolean isDifferentId(long otherId) {
@@ -86,4 +95,5 @@ public class Member {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

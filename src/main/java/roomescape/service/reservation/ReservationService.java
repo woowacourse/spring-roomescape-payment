@@ -14,9 +14,10 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.exception.payment.NotFoundPaymentException;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
-import roomescape.exception.reservation.InvalidReservationMemberException;
+import roomescape.exception.reservation.ReservationAuthorityNotExistException;
 import roomescape.service.payment.PaymentService;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
@@ -136,9 +137,14 @@ public class ReservationService {
         }
     }
 
-    public void deleteReservation(long reservationId, long memberId) {
+    // TODO: 토스 환불 기능 연동
+    public void deleteReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
-        validateReservationMember(reservation, memberId);
+        validateReservationMember(reservation, member);
+
+        Payment payment = paymentRepository.findByReservation(reservation)
+                .orElseThrow(NotFoundPaymentException::new);
+        paymentRepository.delete(payment);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
                 waiting -> upgradeWaitingToReservationAndDeleteWaiting(reservation, waiting),
@@ -146,9 +152,12 @@ public class ReservationService {
         );
     }
 
-    private void validateReservationMember(Reservation reservation, long memberId) {
-        if (reservation.isNotOwnedBy(memberId)) {
-            throw new InvalidReservationMemberException();
+    private void validateReservationMember(Reservation reservation, Member member) {
+        if (member.isAdmin()) {
+            return;
+        }
+        if (reservation.isNotOwnedBy(member)) {
+            throw new ReservationAuthorityNotExistException();
         }
     }
 

@@ -79,13 +79,13 @@ public class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
-    // TODO: 회원도 결제 대기 상태라면 예약 삭제 가능하도록 변경
-    @RoleAllowed(MemberRole.ADMIN)
+    // TODO: 예약정보, 결제정보 Soft Delete 로 변경
+    @RoleAllowed
     @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
-            @RequestParam @NotNull(message = "memberId 값이 null일 수 없습니다.") Long memberId) {
-        reservationService.deleteReservation(reservationId, memberId);
+            @LoginMember Member member) {
+        reservationService.deleteReservation(reservationId, member);
         return ResponseEntity.noContent().build();
     }
 }

@@ -12,8 +12,8 @@ import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
-import roomescape.exception.reservation.InvalidReservationMemberException;
 import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.exception.reservation.ReservationAuthorityNotExistException;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -175,11 +175,12 @@ class ReservationServiceTest extends ServiceTest {
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
             reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
         }
 
         @Test
         void 예약_id와_예약자_id로_예약_대기가_존재하지_않는_예약을_삭제할_수_있다() {
-            reservationService.deleteReservation(reservation.getId(), member.getId());
+            reservationService.deleteReservation(reservation.getId(), member);
 
             List<Reservation> reservations = reservationFixture.findAllReservation();
             assertThat(reservations)
@@ -190,24 +191,23 @@ class ReservationServiceTest extends ServiceTest {
         void 존재하지_않는_예약_id로_예약_삭제_시_예외가_발생한다() {
             long wrongReservationId = 10L;
 
-            assertThatThrownBy(() -> reservationService.deleteReservation(wrongReservationId, member.getId()))
+            assertThatThrownBy(() -> reservationService.deleteReservation(wrongReservationId, member))
                     .isInstanceOf(NotFoundReservationException.class);
         }
 
         @Test
         void 예약자가_아닌_사용자_id로_예약_삭제_시_예외가_발생한다() {
-            long wrongMemberId = 10L;
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
-            assertThatThrownBy(() -> reservationService.deleteReservation(reservation.getId(), wrongMemberId))
-                    .isInstanceOf(InvalidReservationMemberException.class);
+            assertThatThrownBy(() -> reservationService.deleteReservation(reservation.getId(), anotherMember))
+                    .isInstanceOf(ReservationAuthorityNotExistException.class);
         }
 
         @Test
         void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
-            Member otherMember = memberFixture.createAdminMember();
-            waitingFixture.createWaiting(reservation, otherMember);
-
-            reservationService.deleteReservation(reservation.getId(), member.getId());
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
+            waitingFixture.createWaiting(reservation, anotherMember);
+            reservationService.deleteReservation(reservation.getId(), member);
 
             List<Reservation> reservations = reservationFixture.findAllReservation();
             List<ReservationWaiting> waitings = waitingFixture.findAllWaiting();
@@ -216,7 +216,7 @@ class ReservationServiceTest extends ServiceTest {
                     .first()
                     .satisfies(reservation -> {
                         assertThat(reservation).isEqualTo(this.reservation);
-                        assertThat(reservation.getMember()).isEqualTo(otherMember);
+                        assertThat(reservation.getMember()).isEqualTo(anotherMember);
                         assertThat(reservation.isPaymentWaitingStatus()).isTrue();
                     });
             assertThat(waitings)

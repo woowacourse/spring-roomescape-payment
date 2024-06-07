@@ -24,6 +24,16 @@ public class MemberFixture {
         return memberRepository.save(user);
     }
 
+    public Member createUserMember(String email) {
+        Member user = new Member(
+                new MemberName("사용자"),
+                new MemberEmail(email),
+                new MemberPassword("1234567890"),
+                MemberRole.USER
+        );
+        return memberRepository.save(user);
+    }
+
     public Member createAdminMember() {
         Member admin = new Member(
                 new MemberName("관리자"),

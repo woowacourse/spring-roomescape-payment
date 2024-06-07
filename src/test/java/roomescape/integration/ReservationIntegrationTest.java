@@ -265,14 +265,15 @@ class ReservationIntegrationTest extends IntegrationTest {
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
             reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
             memberFixture.createAdminMember();
         }
 
         @Test
-        void 예약_id와_예약자_id로_예약을_삭제할_수_있다() {
+        void 예약_id로_예약을_삭제할_수_있다() {
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + reservation.getId() + "?memberId=" + member.getId())
+                    .when().delete("/reservations/" + reservation.getId())
                     .then().log().all()
                     .statusCode(204);
         }
@@ -283,20 +284,20 @@ class ReservationIntegrationTest extends IntegrationTest {
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + wrongReservationId + "?memberId=" + member.getId())
+                    .when().delete("/reservations/" + wrongReservationId)
                     .then().log().all()
                     .statusCode(404);
         }
 
         @Test
-        void 예약자가_아닌_사용자_id로_예약을_삭제할_수_없다() {
-            long wrongMemberId = 10L;
+        void 예약자가_아닌_사용자는_예약을_삭제할_수_없다() {
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
             RestAssured.given().log().all()
-                    .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + reservation.getId() + "?memberId=" + wrongMemberId)
+                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().getAddress()))
+                    .when().delete("/reservations/" + reservation.getId())
                     .then().log().all()
-                    .statusCode(400);
+                    .statusCode(403);
         }
     }
 }
