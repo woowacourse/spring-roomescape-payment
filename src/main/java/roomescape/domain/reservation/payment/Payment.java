@@ -1,5 +1,7 @@
 package roomescape.domain.reservation.payment;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +16,7 @@ public class Payment {
     @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "orderId", nullable = false)
+    @Column(name = "orderId", unique = true, nullable = false)
     String orderId;
 
     @Column(name = "amount", nullable = false)
@@ -51,5 +53,25 @@ public class Payment {
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Payment payment = (Payment) o;
+
+        if (id == null || ((Payment) o).id == null) {
+            return Objects.equals(orderId, payment.orderId);
+        }
+        return Objects.equals(id, payment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return Objects.hash(orderId);
+        }
+        return Objects.hash(id);
     }
 }

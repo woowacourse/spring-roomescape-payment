@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.service.client.FakeTossPaymentClient;
@@ -39,9 +40,9 @@ class PaymentServiceTest {
         @DisplayName("성공: 결제 요청 성공")
         void pay() {
             PaymentRequest request = new PaymentRequest("paymentKey", 1000, "orderId");
-            assertThatCode(
-                    () -> paymentService.pay(request))
-                    .doesNotThrowAnyException();
+
+            Payment actual = paymentService.pay(request);
+            assertThat(actual).isEqualTo(new Payment(1L, "paymentKey", 1000, "orderId"));
         }
 
         @Test
