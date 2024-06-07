@@ -22,21 +22,22 @@ public class PaymentRestClientBuilder {
         PaymentProperties.PaymentProperty paymentProperty = properties.getProperty(clientName);
 
         return RestClient.builder()
+                .baseUrl(paymentProperty.getBaseUrl())
                 .requestFactory(getClientHttpRequestFactory(paymentProperty))
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createAuthorizationHeader(paymentProperty));
     }
 
     private ClientHttpRequestFactory getClientHttpRequestFactory(PaymentProperties.PaymentProperty paymentProperty) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(paymentProperty.connectionTimeoutSeconds()))
-                .withReadTimeout(Duration.ofSeconds(paymentProperty.readTimeoutSeconds()));
+                .withConnectTimeout(Duration.ofSeconds(paymentProperty.getConnectionTimeoutSeconds()))
+                .withReadTimeout(Duration.ofSeconds(paymentProperty.getReadTimeoutSeconds()));
 
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 
     private String createAuthorizationHeader(PaymentProperties.PaymentProperty paymentProperty) {
         return AUTHORIZATION_HEADER + Base64.getEncoder()
-                .encodeToString((paymentProperty.secretKey() + paymentProperty.password()).getBytes());
+                .encodeToString((paymentProperty.getSecretKey() + paymentProperty.getPassword()).getBytes());
     }
 
     public PaymentProperties getProperties() {

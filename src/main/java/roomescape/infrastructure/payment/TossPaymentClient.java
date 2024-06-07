@@ -1,5 +1,7 @@
 package roomescape.infrastructure.payment;
 
+import static roomescape.infrastructure.payment.toss.TossPaymentErrorCode.SERVER_ERROR;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +23,7 @@ public class TossPaymentClient implements PaymentClient {
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
         try {
             return restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
+                    .uri("/v1/payments/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
@@ -30,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
         } catch (PaymentFailException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new PaymentFailException("결제에 실패했습니다", exception, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PaymentFailException(SERVER_ERROR.getMessage(), exception, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -38,7 +40,7 @@ public class TossPaymentClient implements PaymentClient {
     public void cancel(Payment payment, CancelReason reason) {
         try {
             restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
+                    .uri("/v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(reason)
                     .retrieve()
@@ -47,7 +49,7 @@ public class TossPaymentClient implements PaymentClient {
         } catch (PaymentFailException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new PaymentFailException("결제에 실패했습니다", exception, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PaymentFailException(SERVER_ERROR.getMessage(), exception, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

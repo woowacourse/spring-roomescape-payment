@@ -16,25 +16,34 @@ public class PaymentProperties {
     }
 
     public static class PaymentProperty {
+        private String baseUrl;
         private String secretKey;
         private String password;
         private int connectionTimeoutSeconds;
         private int readTimeoutSeconds;
 
-        public String secretKey() {
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+
+        public String getSecretKey() {
             return secretKey;
         }
 
-        public String password() {
+        public String getPassword() {
             return password;
         }
 
-        public int connectionTimeoutSeconds() {
+        public int getConnectionTimeoutSeconds() {
             return connectionTimeoutSeconds;
         }
 
-        public int readTimeoutSeconds() {
+        public int getReadTimeoutSeconds() {
             return readTimeoutSeconds;
+        }
+
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
         }
 
         public void setSecretKey(String secretKey) {

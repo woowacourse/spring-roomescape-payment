@@ -54,7 +54,7 @@ class TossPaymentClientTest {
                 }
                 """;
 
-        mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        mockRestServiceServer.expect(requestTo("/v1/payments/confirm"))
                 .andRespond(withServerError()
                         .body(errorResponse)
                         .contentType(MediaType.APPLICATION_JSON));
@@ -75,7 +75,7 @@ class TossPaymentClientTest {
                 }
                 """;
 
-        mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        mockRestServiceServer.expect(requestTo("/v1/payments/confirm"))
                 .andRespond(withBadRequest()
                         .body(errorResponse)
                         .contentType(MediaType.APPLICATION_JSON));
