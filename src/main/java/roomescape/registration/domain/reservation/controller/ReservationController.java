@@ -21,7 +21,7 @@ import java.util.List;
 
 @RequestMapping("/reservations")
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationControllerSwagger {
 
     private final ReservationService reservationService;
 
@@ -29,6 +29,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
                                                                @LoginMemberId long id) {
@@ -39,17 +40,20 @@ public class ReservationController {
                 .body(reservationResponse);
     }
 
+    @Override
     @GetMapping
-    public List<ReservationResponse> reservaionList() {
+    public List<ReservationResponse> reservationList() {
         return reservationService.findReservations();
     }
 
+    @Override
     @GetMapping("/{themeId}")
     public List<ReservationTimeAvailabilityResponse> reservationTimeList(@PathVariable long themeId,
                                                                          @RequestParam LocalDate date) {
         return reservationService.findTimeAvailability(themeId, date);
     }
 
+    @Override
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> reservationRemove(@PathVariable long reservationId) {
         reservationService.removeReservation(reservationId);
