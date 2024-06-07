@@ -54,8 +54,6 @@ class ReservationApplicationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     private final LoginMember loginMember = MemberFixture.DEFAULT_LOGIN_MEMBER;
-    private ReservationPaymentRequest request;
-    private ReservationPaymentResponse response;
 
     @BeforeEach
     void initData() {
@@ -67,14 +65,14 @@ class ReservationApplicationServiceTest {
     @DisplayName("결제에 성공할 경우 예약에 성공한다.")
     @Test
     void reservationPayment() {
-        request = new ReservationPaymentRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 LocalDate.now().plusDays(1),
                 DEFAULT_THEME.getId(),
                 DEFAULT_RESERVATION_TIME.getId(),
                 PAYMENT_REQUEST.paymentKey(),
                 PAYMENT_REQUEST.orderId(),
                 PAYMENT_REQUEST.amount());
-        response = new ReservationPaymentResponse(
+        ReservationPaymentResponse response = new ReservationPaymentResponse(
                 new ReservationResponse(
                         1L,
                         LocalDate.now().plusDays(1),
@@ -92,7 +90,7 @@ class ReservationApplicationServiceTest {
     @Test
     void failReservationPayment() {
         PaymentRequest invalidPaymentRequest = new PaymentRequest("invalidPaymentKey", "invalidOrderId", 1000);
-        request = new ReservationPaymentRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 LocalDate.now().plusDays(1),
                 DEFAULT_THEME.getId(),
                 DEFAULT_RESERVATION_TIME.getId(),
