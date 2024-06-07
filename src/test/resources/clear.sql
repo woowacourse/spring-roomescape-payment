@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS RESERVATION;
+DROP TABLE IF EXISTS PAYMENT;
 DROP TABLE IF EXISTS RESERVATION_TIME;
 DROP TABLE IF EXISTS THEME;
 DROP TABLE IF EXISTS MEMBER;
@@ -29,6 +30,15 @@ CREATE TABLE IF NOT EXISTS member
     PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS payment
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    payment_key VARCHAR(255) NOT NULL,
+    order_id VARCHAR(255) NOT NULL,
+    amount BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS reservation
 (
     id        BIGINT NOT NULL AUTO_INCREMENT,
@@ -37,8 +47,10 @@ CREATE TABLE IF NOT EXISTS reservation
     theme_id  BIGINT NOT NULL,
     member_id BIGINT NOT NULL,
     created_at DATETIME NOT NULL,
+    payment_id BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (member_id) REFERENCES member (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
-    FOREIGN KEY (theme_id) REFERENCES theme (id)
+    FOREIGN KEY (theme_id) REFERENCES theme (id),
+    FOREIGN KEY (payment_id) REFERENCES payment (id)
 );

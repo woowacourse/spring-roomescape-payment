@@ -1,20 +1,19 @@
 package roomescape.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.exception.ExceptionType.EMPTY_DATE;
-import static roomescape.exception.ExceptionType.EMPTY_MEMBER;
-import static roomescape.exception.ExceptionType.EMPTY_THEME;
-import static roomescape.exception.ExceptionType.EMPTY_TIME;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.Fixture;
 import roomescape.exception.RoomescapeException;
+import roomescape.service.FakePayment;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.exception.ExceptionType.*;
 
 class ReservationTest {
 
@@ -52,9 +51,9 @@ class ReservationTest {
     @DisplayName("날짜를 기준으로 비교를 잘 하는지 확인.")
     void compareTo() {
         Reservation first = new Reservation(1L, LocalDate.of(1999, 12, 1), new ReservationTime(
-                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember);
+                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, FakePayment.CORRECT_REQ);
         Reservation second = new Reservation(2L, LocalDate.of(1998, 1, 8), new ReservationTime(
-                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember);
+                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, FakePayment.CORRECT_REQ);
         int compareTo = first.compareTo(second);
         Assertions.assertThat(compareTo)
                 .isGreaterThan(0);
@@ -67,8 +66,8 @@ class ReservationTest {
         Theme theme = new Theme(1L, "name", "description", "thumbnail");
         ReservationTime time = new ReservationTime(1L, LocalTime.now());
 
-        Reservation savedReservation = new Reservation(1L, date, time, theme, Fixture.defaultMember);
-        Reservation nonSavedReservation = new Reservation(date, time, theme, Fixture.defaultMember);
+        Reservation savedReservation = new Reservation(1L, date, time, theme, Fixture.defaultMember, FakePayment.CORRECT_REQ);
+        Reservation nonSavedReservation = new Reservation(date, time, theme, Fixture.defaultMember, FakePayment.CORRECT_REQ);
 
         assertThat(savedReservation.isSameReservation(nonSavedReservation))
                 .isTrue();

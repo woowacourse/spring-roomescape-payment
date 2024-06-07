@@ -1,10 +1,8 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.*;
 import roomescape.dto.*;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
@@ -27,48 +25,75 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationResponse saveByUser(LoginMemberRequest loginMemberRequest,
                                           ReservationWithPaymentRequest reservationWithPaymentRequest) {
-        ReservationTime requestedTime = reservationTimeRepository.findById(reservationWithPaymentRequest.timeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
-        Theme requestedTheme = themeRepository.findById(reservationWithPaymentRequest.themeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
-        Member requestedMember = memberRepository.findById(loginMemberRequest.id())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
 
-        return save(reservationWithPaymentRequest.toReservation(
-                requestedMember, requestedTime, requestedTheme));
+        Reservation requestedReservation = makeReservationByRequest(
+                reservationWithPaymentRequest.date(),
+                reservationWithPaymentRequest.timeId(),
+                reservationWithPaymentRequest.themeId(),
+                loginMemberRequest.id()
+        );
+
+        Payment payment = paymentService.pay(reservationWithPaymentRequest.toPayment());
+
+        Reservation reservation = new Reservation(
+                requestedReservation.getDate(),
+                requestedReservation.getReservationTime(),
+                requestedReservation.getTheme(),
+                requestedReservation.getMember(),
+                payment
+        );
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(savedReservation);
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
-        ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
-        Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
-        Member requestedMember = memberRepository.findById(reservationRequest.memberId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+        Reservation requestedReservation = makeReservationByRequest(
+                reservationRequest.date(),
+                reservationRequest.timeId(),
+                reservationRequest.themeId(),
+                reservationRequest.memberId()
+        );
+        Reservation savedReservation = reservationRepository.save(requestedReservation);
 
-        return save(new Reservation(
-                reservationRequest.date(), requestedTime, requestedTheme, requestedMember,null, 0L));
+        return ReservationResponse.from(
+                savedReservation
+        );
     }
 
-    private ReservationResponse save(Reservation beforeSaveReservation) {
+    private Reservation makeReservationByRequest(LocalDate date, long timeId, long themeId, long memberId) {
+        ReservationTime requestedTime = reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
+        Theme requestedTheme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
+        Member requestedMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+
+        Reservation beforeSaveReservation = new Reservation(
+                date,
+                requestedTime,
+                requestedTheme,
+                requestedMember);
         if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
-        Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
-        return ReservationResponse.from(savedReservation);
+        return beforeSaveReservation;
     }
 
     public List<ReservationResponse> findAll() {

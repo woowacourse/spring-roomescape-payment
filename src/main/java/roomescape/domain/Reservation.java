@@ -25,10 +25,9 @@ public class Reservation implements Comparable<Reservation> {
     private Member member;
     @Column(nullable = false)
     private LocalDateTime createdAt;
-    @Column(nullable = true)//TODO
-    private String paymentKey;
-    @Column(nullable = true)//TODO
-    private Long amount;
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
     protected Reservation() {
 
@@ -40,17 +39,15 @@ public class Reservation implements Comparable<Reservation> {
                 reservationBeforeSave.time,
                 reservationBeforeSave.theme,
                 reservationBeforeSave.member,
-                reservationBeforeSave.paymentKey,
-                reservationBeforeSave.amount);
+                reservationBeforeSave.payment);
     }
 
     public Reservation(LocalDate date,
                        ReservationTime time,
                        Theme theme,
                        Member member,
-                       String paymentKey,
-                       long amount) {
-        this(null, date, time, theme, member, paymentKey, amount);
+                       Payment payment){
+        this(null, date, time, theme, member, payment);
     }
 
     public Reservation(Long id,
@@ -58,9 +55,12 @@ public class Reservation implements Comparable<Reservation> {
                        ReservationTime time,
                        Theme theme,
                        Member member,
-                       String paymentKey,
-                       long amount) {
-        this(id, date, time, theme, member, LocalDateTime.now(), paymentKey, amount);
+                       Payment payment){
+        this(id, date, time, theme, member, LocalDateTime.now(), payment);
+    }
+
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
+        this(null, date, time, theme, member, LocalDateTime.now(), null);
     }
 
     public Reservation(Long id,
@@ -69,8 +69,7 @@ public class Reservation implements Comparable<Reservation> {
                        Theme theme,
                        Member member,
                        LocalDateTime createdAt,
-                       String paymentKey,
-                       long amount) {
+                       Payment payment) {
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
@@ -81,8 +80,7 @@ public class Reservation implements Comparable<Reservation> {
         this.theme = theme;
         this.member = member;
         this.createdAt = createdAt;
-        this.paymentKey = paymentKey;
-        this.amount = amount;
+        this.payment = payment;
     }
 
     private void validateTheme(Theme theme) {
@@ -181,12 +179,8 @@ public class Reservation implements Comparable<Reservation> {
         return createdAt;
     }
 
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public long getAmount() {
-        return amount;
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

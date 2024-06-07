@@ -15,20 +15,6 @@ public record ReservationDetailResponse(
         String paymentKey,
         long amount
 ) {
-    public static ReservationDetailResponse from(Reservation reservation, ReservationStatus status) {
-        return new ReservationDetailResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getReservationTime().getStartAt(),
-                getStatusName(status)
-
-                , reservation.getPaymentKey(), reservation.getAmount()
-
-
-//                , "paymentKeySample",400
-        );
-    }
 
     public static ReservationDetailResponse from(Reservation reservation, long index) {
         return new ReservationDetailResponse(
@@ -36,11 +22,9 @@ public record ReservationDetailResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
-                getStatusNameByIndex(index)
-
-
-                , reservation.getPaymentKey(), reservation.getAmount()
-//                , "paymentKeySample",400
+                getStatusNameByIndex(index),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
