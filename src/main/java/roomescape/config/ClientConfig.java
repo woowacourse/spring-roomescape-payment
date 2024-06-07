@@ -3,7 +3,7 @@ package roomescape.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.client.payment.TossPaymentClient;
 
@@ -22,9 +22,8 @@ public class ClientConfig {
         return new TossPaymentClient(widgetSecretKey, baseUrl, confirmUrl, restClient);
     }
 
-    private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
-        SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        clientHttpRequestFactory.setConnectTimeout(3000);
+    private JdkClientHttpRequestFactory getClientHttpRequestFactory() {
+        JdkClientHttpRequestFactory clientHttpRequestFactory = new JdkClientHttpRequestFactory();
         clientHttpRequestFactory.setReadTimeout(3000);
 
         return clientHttpRequestFactory;
