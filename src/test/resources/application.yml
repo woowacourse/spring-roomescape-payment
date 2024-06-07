@@ -36,3 +36,4 @@ security:
 
 toss:
   secret-key: jerry-prin-secret-key
+  uri: https://api.tosspayments.com/v1/payments/confirm
