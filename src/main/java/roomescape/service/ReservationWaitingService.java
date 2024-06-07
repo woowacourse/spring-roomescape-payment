@@ -30,18 +30,27 @@ public class ReservationWaitingService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
 
-        List<ReservationWithPaymentInfo> memberReservations = reservationRepository.findAllByMemberWithPaymentInfo(member);
+        List<ReservationWithPaymentInfo> memberReservationsWithPaymentInfo = reservationRepository.findAllByMemberWithPaymentInfo(member);
+        List<Reservation> memberReservationsWithoutPaymentInfo = reservationRepository.findAllByMemberWithoutPaymentInfo(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
 
         List<MemberReservationResponse> allMemberReservations =
-                new java.util.ArrayList<>(memberReservations.stream()
+                new java.util.ArrayList<>(memberReservationsWithPaymentInfo.stream()
                         .map(MemberReservationResponse::new)
                         .toList());
+        System.out.println(allMemberReservations);
+        List<MemberReservationResponse> allMemberReservationsWithoutPaymentInfo = memberReservationsWithoutPaymentInfo.stream()
+                .map(MemberReservationResponse::new)
+                .toList();
+        System.out.println(allMemberReservationsWithoutPaymentInfo);
         List<MemberReservationResponse> waiting = waitingWithRanks.stream()
                 .map(MemberReservationResponse::new)
                 .toList();
+        System.out.println(waiting);
 
         allMemberReservations.addAll(waiting);
+        allMemberReservations.addAll(allMemberReservationsWithoutPaymentInfo);
+        System.out.println(allMemberReservations);
         return allMemberReservations;
     }
 

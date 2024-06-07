@@ -47,6 +47,16 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
             """)
     List<ReservationWithPaymentInfo> findAllByMemberWithPaymentInfo(Member member);
 
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            LEFT OUTER JOIN PaymentInfo p
+            ON r.id = p.reservation.id
+            WHERE r.member = :member
+            AND p.id IS NULL
+            """)
+    List<Reservation> findAllByMemberWithoutPaymentInfo(Member member);
+
     boolean existsReservationByThemeAndDateAndTimeAndMember(Theme theme, LocalDate date, ReservationTime time, Member member);
 
 }
