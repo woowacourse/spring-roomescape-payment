@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
@@ -45,14 +46,15 @@ class TossPaymentClientTest {
     private PaymentClientResponseErrorHandler responseErrorHandler;
     @Autowired
     private ObjectMapper objectMapper;
+    @Value("${security.toss.payment.url}")
+    private String url;
 
     @DisplayName("적합한 인자를 통한 결제 요청 시 성공한다.")
     @Test
     void payment() throws JsonProcessingException {
-        String uri = "https://api.tosspayments.com/v1/payments/confirm";
-
+        String endPoint = "/v1/payments/confirm";
         mockServer
-                .expect(requestTo(uri))
+                .expect(requestTo(url + endPoint))
                 .andExpect(content().json(objectMapper.writeValueAsString(PAYMENT_REQUEST)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(PAYMENT_RESPONSE), MediaType.APPLICATION_JSON));
@@ -65,12 +67,12 @@ class TossPaymentClientTest {
     @DisplayName("적합하지 못한 인자를 통한 결제 요청 시 실패한다.")
     @Test
     void failPayment() throws IOException {
-        String uri = "https://api.tosspayments.com/v1/payments/confirm";
+        String endPoint = "/v1/payments/confirm";
         String errorMessage = "적합하지 않은 paymentKey입니다.";
         PaymentRequest invalidPaymentRequest = new PaymentRequest("invalid", "invalidOrderId", 1000);
 
         mockServer
-                .expect(requestTo(uri))
+                .expect(requestTo(url + endPoint))
                 .andExpect(content().json(objectMapper.writeValueAsString(invalidPaymentRequest)))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).body(errorMessage));
