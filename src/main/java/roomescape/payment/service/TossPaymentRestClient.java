@@ -1,6 +1,8 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +28,7 @@ public class TossPaymentRestClient {
 
     private final RestClient restClient;
     private final PaymentProperties properties;
+    private final Logger logger = LoggerFactory.getLogger(TossPaymentRestClient.class);
 
     public TossPaymentRestClient(ObjectMapper objectMapper, PaymentProperties properties) {
         String authorizationToken = Base64.getEncoder()
@@ -45,16 +48,28 @@ public class TossPaymentRestClient {
                 .build();
     }
 
-    private static RestClient.ResponseSpec.ErrorHandler get4xxErrorHandler(ObjectMapper objectMapper) {
+    private RestClient.ResponseSpec.ErrorHandler get4xxErrorHandler(ObjectMapper objectMapper) {
         return (request, response) -> {
             PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            logger.warn("Request: {} {} / Response: {} {} {}",
+                    request.getMethod(),
+                    request.getURI(),
+                    response.getStatusCode(),
+                    response.getStatusText(),
+                    paymentFailure);
             throw new BadRequestException(paymentFailure.message());
         };
     }
 
-    private static RestClient.ResponseSpec.ErrorHandler getDefaultErrorHandler(ObjectMapper objectMapper) {
+    private RestClient.ResponseSpec.ErrorHandler getDefaultErrorHandler(ObjectMapper objectMapper) {
         return (request, response) -> {
             PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            logger.warn("Request: {} {} / Response: {} {} {}",
+                    request.getMethod(),
+                    request.getURI(),
+                    response.getStatusCode(),
+                    response.getStatusText(),
+                    paymentFailure);
             throw new PaymentFailureException(paymentFailure.message());
         };
     }
