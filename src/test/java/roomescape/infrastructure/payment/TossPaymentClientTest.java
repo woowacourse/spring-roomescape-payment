@@ -20,24 +20,21 @@ import roomescape.infrastructure.payment.toss.TossResponseErrorHandler;
 
 class TossPaymentClientTest {
 
-    PaymentProperty property;
-    PaymentProperties properties;
-    PaymentRestClientBuilder builder;
-    MockRestServiceServer mockRestServiceServer;
-    PaymentClient tossPaymentClient;
+    private MockRestServiceServer mockRestServiceServer;
+    private PaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
-        property = new PaymentProperty();
+        PaymentProperty property = new PaymentProperty();
         property.setSecretKey("secretKey");
         property.setPassword("password");
         property.setConnectionTimeoutSeconds(3);
         property.setReadTimeoutSeconds(5);
 
-        properties = new PaymentProperties(Map.of("toss", property));
+        PaymentProperties properties = new PaymentProperties(Map.of("toss", property));
 
-        builder = new PaymentRestClientBuilder(properties);
-        RestClient.Builder builder = this.builder.generate("toss");
+        PaymentRestClientBuilder paymentRestClientBuilder = new PaymentRestClientBuilder(properties);
+        RestClient.Builder builder = paymentRestClientBuilder.generate("toss");
 
         mockRestServiceServer = MockRestServiceServer.bindTo(builder).build();
         tossPaymentClient = new TossPaymentClient(builder.build(), new TossResponseErrorHandler());
