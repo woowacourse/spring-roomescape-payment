@@ -1,9 +1,11 @@
 package roomescape.config;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.Filter;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +43,13 @@ public abstract class IntegrationTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
-        this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation))
+
+        Filter RestAssuredConfig = documentationConfiguration(restDocumentation)
+                .operationPreprocessors()
+                .withRequestDefaults(prettyPrint())
+                .withResponseDefaults(prettyPrint());
+
+        this.spec = new RequestSpecBuilder().addFilter(RestAssuredConfig)
                 .build();
     }
 
