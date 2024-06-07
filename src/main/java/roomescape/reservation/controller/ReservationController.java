@@ -2,18 +2,12 @@ package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import java.net.URI;
+
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
 import roomescape.reservation.controller.dto.MyReservationResponse;
@@ -22,13 +16,14 @@ import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.WaitingRequest;
+import roomescape.reservation.domain.specification.ReservationSpecification;
 import roomescape.reservation.service.ReservationApplicationService;
 import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.reservation.service.dto.WaitingCreate;
 
 @RestController
 @RequestMapping("/reservations")
-public class ReservationController {
+public class ReservationController implements ReservationSpecification {
 
     private final ReservationApplicationService reservationApplicationService;
 
@@ -37,26 +32,26 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> reservations(
+    public List<ReservationResponse> reservations(
             @RequestParam(value = "themeId", required = false) Long themeId,
             @RequestParam(value = "memberId", required = false) Long memberId,
             @RequestParam(value = "dateFrom", required = false) LocalDate startDate,
             @RequestParam(value = "dateTo", required = false) LocalDate endDate
     ) {
-        return ResponseEntity.ok(reservationApplicationService.findMemberReservations(
-                new ReservationQueryRequest(themeId, memberId, startDate, endDate)));
+        return reservationApplicationService.findMemberReservations(
+                new ReservationQueryRequest(themeId, memberId, startDate, endDate));
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<ReservationResponse> pay(@LoginUser AuthInfo authInfo,
-                                                   @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationResponse response = reservationApplicationService.publish(authInfo, reservationPaymentRequest);
-        return ResponseEntity.ok().body(response);
+    public ReservationResponse pay(@LoginUser AuthInfo authInfo,
+                                   @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
+        return reservationApplicationService.publish(authInfo, reservationPaymentRequest);
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
-                                                      @RequestBody @Valid ReservationRequest reservationRequest) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationResponse create(@LoginUser AuthInfo authInfo,
+                                      @RequestBody @Valid ReservationRequest reservationRequest) {
         MemberReservationCreate memberReservationCreate = new MemberReservationCreate(
                 authInfo.getId(),
                 reservationRequest.themeId(),
@@ -66,49 +61,46 @@ public class ReservationController {
                 reservationRequest.amount(),
                 reservationRequest.date()
         );
-        ReservationResponse response = reservationApplicationService.createMemberReservation(memberReservationCreate);
-        return ResponseEntity.created(URI.create("/reservations/" + response.memberReservationId())).body(response);
+        return reservationApplicationService.createMemberReservation(memberReservationCreate);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@LoginUser AuthInfo authInfo,
-                                       @PathVariable("id") @Min(1) long reservationMemberId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@LoginUser AuthInfo authInfo,
+                       @PathVariable("id") @Min(1) long reservationMemberId) {
         reservationApplicationService.deleteMemberReservation(authInfo, reservationMemberId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@LoginUser AuthInfo authInfo) {
-        List<MyReservationResponse> responses = reservationApplicationService.findMyReservations(authInfo)
+    public List<MyReservationResponse> getMyReservations(@LoginUser AuthInfo authInfo) {
+        return reservationApplicationService.findMyReservations(authInfo)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();
-        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/waiting")
-    public ResponseEntity<List<ReservationResponse>> getWaiting() {
-        return ResponseEntity.ok().body(reservationApplicationService.getWaiting());
+    public List<ReservationResponse> getWaiting() {
+        return reservationApplicationService.getWaiting();
     }
 
     @PostMapping("/waiting")
-    public ResponseEntity<ReservationResponse> addWaiting(@LoginUser AuthInfo authInfo,
-                                                          @RequestBody @Valid WaitingRequest waitingRequest) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationResponse addWaiting(@LoginUser AuthInfo authInfo,
+                                          @RequestBody @Valid WaitingRequest waitingRequest) {
         WaitingCreate waitingCreate = new WaitingCreate(
                 authInfo.getId(),
                 waitingRequest.date(),
                 waitingRequest.timeId(),
                 waitingRequest.themeId()
         );
-        ReservationResponse reservationResponse = reservationApplicationService.addWaiting(waitingCreate);
-        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.memberReservationId()))
-                .body(reservationResponse);
+        return reservationApplicationService.addWaiting(waitingCreate);
     }
 
     @DeleteMapping("/{id}/waiting")
-    public ResponseEntity<Void> deleteWaiting(@LoginUser AuthInfo authInfo,
-                                              @PathVariable("id") @Min(1) long reservationMemberId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteWaiting(@LoginUser AuthInfo authInfo,
+                              @PathVariable("id") @Min(1) long reservationMemberId) {
         reservationApplicationService.deleteWaiting(authInfo, reservationMemberId);
-        return ResponseEntity.noContent().build();
     }
 }
