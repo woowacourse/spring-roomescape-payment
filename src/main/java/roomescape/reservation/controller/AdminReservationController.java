@@ -50,13 +50,13 @@ public class AdminReservationController {
 
     @Operation(summary = "예약 대기 승인")
     @PutMapping("/waiting/{id}")
-    public void confirmWaitingReservation(@Parameter(description = "MemberReservation id") @PathVariable Long id) {
+    public void confirmWaitingReservation(@Parameter(description = "예약 pk") @PathVariable Long id) {
         reservationFacadeService.confirmWaitingReservation(id);
     }
 
     @Operation(summary = "예약 대기 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@Parameter(description = "MemberReservation id") @PathVariable Long id) {
+    public ResponseEntity<Void> deleteReservation(@Parameter(description = "예약 pk") @PathVariable Long id) {
         reservationFacadeService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
