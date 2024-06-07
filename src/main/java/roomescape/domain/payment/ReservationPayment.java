@@ -10,7 +10,7 @@ import java.util.Objects;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
-public class Payment {
+public class ReservationPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,16 +21,16 @@ public class Payment {
     @ManyToOne(optional = false)
     private Reservation reservation;
 
-    protected Payment() {
+    protected ReservationPayment() {
     }
 
-    public Payment(Long id, PaymentInfo info, Reservation reservation) {
+    public ReservationPayment(Long id, PaymentInfo info, Reservation reservation) {
         this.id = id;
         this.info = info;
         this.reservation = reservation;
     }
 
-    public Payment(PaymentInfo info, Reservation reservation) {
+    public ReservationPayment(PaymentInfo info, Reservation reservation) {
         this(null, info, reservation);
     }
 
@@ -54,8 +54,8 @@ public class Payment {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment payment = (Payment) o;
-        return Objects.equals(id, payment.id);
+        ReservationPayment reservationPayment = (ReservationPayment) o;
+        return Objects.equals(id, reservationPayment.id);
     }
 
     @Override

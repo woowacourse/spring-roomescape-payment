@@ -3,20 +3,20 @@ package roomescape.helper.domain;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentInfo;
 import roomescape.domain.payment.PaymentMethod;
-import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.payment.PaymentType;
+import roomescape.domain.payment.ReservationPayment;
+import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 
 @Component
-public class PaymentFixture {
+public class ReservationPaymentFixture {
     @Autowired
-    private PaymentRepository paymentRepository;
+    private ReservationPaymentRepository reservationPaymentRepository;
 
-    public Payment createPayment(Reservation reservation) {
+    public ReservationPayment createReservationPayment(Reservation reservation) {
         PaymentInfo info = new PaymentInfo(
                 "paymentKey",
                 PaymentType.NORMAL,
@@ -27,11 +27,11 @@ public class PaymentFixture {
                 1000L,
                 PaymentStatus.DONE
         );
-        Payment payment = new Payment(info, reservation);
-        return paymentRepository.save(payment);
+        ReservationPayment reservationPayment = new ReservationPayment(info, reservation);
+        return reservationPaymentRepository.save(reservationPayment);
     }
 
-    public List<Payment> findAllPayment() {
-        return paymentRepository.findAll();
+    public List<ReservationPayment> findAllReservationPayment() {
+        return reservationPaymentRepository.findAll();
     }
 }

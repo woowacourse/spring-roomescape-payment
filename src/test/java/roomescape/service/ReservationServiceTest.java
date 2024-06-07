@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.member.Member;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.payment.PaymentType;
+import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -206,8 +206,8 @@ class ReservationServiceTest extends ServiceTest {
 
             reservationService.saveReservationWithPayment(reservationSaveInput, paymentConfirmInput, member);
 
-            List<Payment> payments = paymentFixture.findAllPayment();
-            assertThat(payments.get(0).getInfo().getPaymentKey())
+            List<ReservationPayment> reservationPayments = reservationPaymentFixture.findAllReservationPayment();
+            assertThat(reservationPayments.get(0).getInfo().getPaymentKey())
                     .isEqualTo(paymentConfirmOutput.paymentKey());
         }
 
@@ -219,7 +219,7 @@ class ReservationServiceTest extends ServiceTest {
             assertThatThrownBy(() -> reservationService.saveReservationWithPayment(
                     reservationSaveInput, paymentConfirmInput, member))
                     .isInstanceOf(PaymentConfirmException.class);
-            assertThat(paymentFixture.findAllPayment())
+            assertThat(reservationPaymentFixture.findAllReservationPayment())
                     .isEmpty();
             assertThat(reservationFixture.findAllReservation())
                     .isEmpty();

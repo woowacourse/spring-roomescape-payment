@@ -21,5 +21,5 @@ public abstract class DomainSupplier {
     protected WaitingFixture waitingFixture;
 
     @Autowired
-    protected PaymentFixture paymentFixture;
+    protected ReservationPaymentFixture reservationPaymentFixture;
 }

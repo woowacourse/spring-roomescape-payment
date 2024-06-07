@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentRepository;
+import roomescape.domain.payment.ReservationPayment;
+import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -48,7 +48,7 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentRepository paymentRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
     private final PaymentClient paymentClient;
     private final Clock clock;
 
@@ -56,14 +56,14 @@ public class ReservationService {
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              PaymentRepository paymentRepository,
+                              ReservationPaymentRepository reservationPaymentRepository,
                               PaymentClient paymentClient,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.paymentRepository = paymentRepository;
+        this.reservationPaymentRepository = reservationPaymentRepository;
         this.paymentClient = paymentClient;
         this.clock = clock;
     }
@@ -120,8 +120,8 @@ public class ReservationService {
 
     private void confirmAndSavePayment(PaymentConfirmInput input, Reservation reservation) {
         PaymentConfirmOutput output = paymentClient.confirmPayment(input);
-        Payment payment = output.toPayment(reservation);
-        paymentRepository.save(payment);
+        ReservationPayment reservationPayment = output.toReservationPayment(reservation);
+        reservationPaymentRepository.save(reservationPayment);
     }
 
     private ReservationTime findReservationTimeById(long id) {
