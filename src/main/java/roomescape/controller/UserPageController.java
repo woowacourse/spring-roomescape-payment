@@ -15,6 +15,11 @@ public class UserPageController {
         return "index";
     }
 
+    @GetMapping("/api-docs")
+    public String showApiDocsPage() {
+        return "docs/index";
+    }
+
     @GetMapping("/reservation")
     public String showUserPage() {
         return "reservation";
