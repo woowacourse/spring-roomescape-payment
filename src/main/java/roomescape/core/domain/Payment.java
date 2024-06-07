@@ -23,6 +23,10 @@ public class Payment {
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
     @NotNull(message = "paymentKey는 비어있을 수 없습니다.")
     private String paymentKey;
 
@@ -41,15 +45,16 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final Integer amount,
-                   final PaymentStatus status) {
-        this(null, reservation, paymentKey, orderId, amount, status);
+    public Payment(final Reservation reservation, final Member member, final String paymentKey, final String orderId,
+                   final Integer amount, final PaymentStatus status) {
+        this(null, reservation, member, paymentKey, orderId, amount, status);
     }
 
-    public Payment(final Long id, final Reservation reservation, final String paymentKey, final String orderId,
-                   final Integer amount, final PaymentStatus status) {
+    public Payment(final Long id, final Reservation reservation, final Member member, final String paymentKey,
+                   final String orderId, final Integer amount, final PaymentStatus status) {
         this.id = id;
         this.reservation = reservation;
+        this.member = member;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
@@ -62,6 +67,10 @@ public class Payment {
 
     public Reservation getReservation() {
         return reservation;
+    }
+
+    public Member member() {
+        return member;
     }
 
     public @NotNull(message = "paymentKey는 비어있을 수 없습니다.") String getPaymentKey() {

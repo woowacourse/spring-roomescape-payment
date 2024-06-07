@@ -116,51 +116,47 @@ public class ReservationService {
     public List<MyReservationResponse> findAllByMember(final LoginMember loginMember) {
         final Member member = getMemberById(loginMember.getId());
 
-        final List<MyReservationResponse> waitings = getWaitingReservationResponses(member);
-        final List<MyReservationResponse> paidReservations = getPaidReservationResponses(member);
-        final List<MyReservationResponse> nonPaidReservations = getNonPaidReservationResponses(member);
+        final List<MyReservationResponse> waitings = getWaitingResponses(member);
+        final List<MyReservationResponse> reservations = getReservationResponses(member);
 
-        return addAllResponses(List.of(paidReservations, nonPaidReservations, waitings));
+        return addAllResponses(List.of(reservations, waitings));
     }
 
-    private List<MyReservationResponse> addAllResponses(final List<List<MyReservationResponse>> responses) {
-        return responses.stream()
-                .flatMap(Collection::stream)
-                .toList();
-    }
-
-    private List<MyReservationResponse> getWaitingReservationResponses(final Member member) {
+    private List<MyReservationResponse> getWaitingResponses(final Member member) {
         return waitingRepository.findAllWithRankByMember(member)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();
     }
 
-    private List<MyReservationResponse> getPaidReservationResponses(final Member member) {
-        return reservationRepository.findAllByMember(member)
-                .stream()
-                .filter(paymentRepository::existsByReservation)
-                .filter(reservation -> getPaymentByReservation(reservation)
-                        .getStatus()
-                        .equals(PaymentStatus.CONFIRMED))
-                .map(this::getMyReservationResponse)
+    private List<MyReservationResponse> getReservationResponses(final Member member) {
+        final List<Reservation> myReservations = reservationRepository.findAllByMemberAndStatus(member,
+                ReservationStatus.BOOKED);
+        final List<Payment> myPayments = paymentRepository.findAllByMemberAndStatus(member, PaymentStatus.CONFIRMED);
+
+        final List<MyReservationResponse> paidResponses = getPaidReservations(myPayments);
+        final List<MyReservationResponse> nonPaidResponses = getNonPaidReservations(myReservations, myPayments);
+        return addAllResponses(List.of(paidResponses, nonPaidResponses));
+    }
+
+    private List<MyReservationResponse> getPaidReservations(final List<Payment> myPayments) {
+        return myPayments.stream()
+                .map(payment -> MyReservationResponse.from(payment.getReservation(), payment))
                 .toList();
     }
 
-    private Payment getPaymentByReservation(final Reservation reservation) {
-        return paymentRepository.findByReservation(reservation)
-                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE));
-    }
-
-    private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
-        return MyReservationResponse.from(reservation, getPaymentByReservation(reservation));
-    }
-
-    private List<MyReservationResponse> getNonPaidReservationResponses(final Member member) {
-        return reservationRepository.findAllByMember(member)
-                .stream()
-                .filter(reservation -> !paymentRepository.existsByReservation(reservation))
+    private List<MyReservationResponse> getNonPaidReservations(final List<Reservation> reservations,
+                                                               final List<Payment> payments) {
+        return reservations.stream()
+                .filter(reservation -> payments.stream()
+                        .noneMatch(payment -> payment.getReservation().equals(reservation)))
                 .map(MyReservationResponse::from)
+                .toList();
+    }
+
+    private List<MyReservationResponse> addAllResponses(final List<List<MyReservationResponse>> responses) {
+        return responses.stream()
+                .flatMap(Collection::stream)
                 .toList();
     }
 

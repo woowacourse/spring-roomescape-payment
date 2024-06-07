@@ -2,13 +2,16 @@ package roomescape.core.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import roomescape.core.domain.Member;
 import roomescape.core.domain.Payment;
 import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
+import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.PaymentRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.infrastructure.PaymentClient;
@@ -20,29 +23,36 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
     private final PaymentClient paymentClient;
 
     public PaymentService(final PaymentRepository paymentRepository, final ReservationRepository reservationRepository,
-                          final PaymentClient paymentClient) {
+                          final MemberRepository memberRepository, final PaymentClient paymentClient) {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
+        this.memberRepository = memberRepository;
         this.paymentClient = paymentClient;
     }
 
     @Transactional
     public PaymentConfirmResponse confirmPayment(final ReservationResponse reservationResponse,
-                                                 final ReservationPaymentRequest request) {
+                                                 final ReservationPaymentRequest request,
+                                                 final LoginMember loginMember) {
         final Reservation reservation = getReservation(reservationResponse.getId());
+        final Member member = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         final PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), request);
-        return getPaymentConfirmResponse(paymentRequest, reservation);
+        return getPaymentConfirmResponse(paymentRequest, reservation, member);
     }
 
     @Transactional
-    public PaymentConfirmResponse confirmPayment(final PaymentRequest request) {
+    public PaymentConfirmResponse confirmPayment(final PaymentRequest request, final LoginMember loginMember) {
         final Reservation reservation = getReservation(request.getReservationId());
+        final Member member = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
-        return getPaymentConfirmResponse(request, reservation);
+        return getPaymentConfirmResponse(request, reservation, member);
     }
 
     private Reservation getReservation(final Long reservationId) {
@@ -51,9 +61,9 @@ public class PaymentService {
     }
 
     private PaymentConfirmResponse getPaymentConfirmResponse(final PaymentRequest paymentRequest,
-                                                             final Reservation reservation) {
+                                                             final Reservation reservation, final Member member) {
         final PaymentConfirmResponse response = paymentClient.getPaymentConfirmResponse(paymentRequest);
-        final Payment payment = new Payment(reservation, response.getPaymentKey(), response.getOrderId(),
+        final Payment payment = new Payment(reservation, member, response.getPaymentKey(), response.getOrderId(),
                 response.getTotalAmount(), PaymentStatus.CONFIRMED);
 
         paymentRepository.save(payment);

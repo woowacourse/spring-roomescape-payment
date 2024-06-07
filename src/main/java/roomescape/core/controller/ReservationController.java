@@ -35,7 +35,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
                                                       final LoginMember member) {
         final ReservationResponse response = getCreatedReservation(request, member);
-        paymentService.confirmPayment(response, request);
+        paymentService.confirmPayment(response, request, member);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);

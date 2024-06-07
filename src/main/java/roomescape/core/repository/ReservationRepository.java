@@ -19,6 +19,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByMember(final Member member);
 
+    List<Reservation> findAllByMemberAndStatus(final Member member, final ReservationStatus status);
+
     Integer countByTime(final ReservationTime reservationTime);
 
     Integer countByTheme(final Theme theme);
