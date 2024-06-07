@@ -1,19 +1,21 @@
 package roomescape.member.integration;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
 import roomescape.model.IntegrationTest;
+import roomescape.registration.dto.PaymentResponse;
 import roomescape.registration.dto.RegistrationInfoDto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 class MemberIntegrationTest extends IntegrationTest {
 
@@ -56,7 +58,8 @@ class MemberIntegrationTest extends IntegrationTest {
                 "polla",
                 LocalDate.parse("2024-04-30"),
                 LocalTime.parse("15:40"),
-                "예약"
+                "예약",
+                PaymentResponse.getPaymentResponseForNotPaidReservation()
         );
     }
 }
