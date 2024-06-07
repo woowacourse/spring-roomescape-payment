@@ -54,6 +54,14 @@ asciidoctor {
     dependsOn test
 }
 
+asciidoctor.doLast {
+    def filePath = "src/main/resources/static/docs/reservation.html"
+    def file = file(filePath)
+    def docs = file.text
+    def updatedDocs = docs.replaceAll(/localhost:\d{4,5}/, 'localhost:8080')
+    file.text = updatedDocs
+}
+
 bootJar {
     dependsOn asciidoctor
     copy {
