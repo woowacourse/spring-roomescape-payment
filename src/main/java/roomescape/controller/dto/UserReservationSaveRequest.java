@@ -7,7 +7,7 @@ import roomescape.service.dto.request.ReservationSaveRequest;
 
 import java.time.LocalDate;
 
-public record MemberReservationSaveRequest(
+public record UserReservationSaveRequest(
         @NotNull(message = "날짜를 입력해주세요")
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
         LocalDate date,

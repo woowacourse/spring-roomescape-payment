@@ -5,7 +5,7 @@ public record PaymentRequest(
         String orderId,
         String amount) {
 
-    public static PaymentRequest from(MemberReservationSaveRequest request) {
+    public static PaymentRequest from(UserReservationSaveRequest request) {
         return new PaymentRequest(
                 request.paymentKey(),
                 request.orderId(),

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.dto.MemberReservationSaveRequest;
+import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.controller.dto.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.MemberRepository;
@@ -55,11 +55,11 @@ public class ReservationService {
         this.timeRepository = timeRepository;
     }
 
-    public ReservationResponse saveMemberReservation(LoginMember member, MemberReservationSaveRequest memberReservationSaveRequest){
-        ReservationSaveRequest reservationSaveRequest = memberReservationSaveRequest.toReservationSaveRequest(member.id());
+    public ReservationResponse saveMemberReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
+        ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
         Reservation reservation = saveReservation(reservationSaveRequest);
 
-        PaymentRequest paymentRequest = PaymentRequest.from(memberReservationSaveRequest);
+        PaymentRequest paymentRequest = PaymentRequest.from(userReservationSaveRequest);
         paymentService.pay(reservation, paymentRequest);
         return new ReservationResponse(reservation);
     }

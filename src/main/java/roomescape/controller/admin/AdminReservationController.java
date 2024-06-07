@@ -1,5 +1,6 @@
 package roomescape.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,6 @@ import roomescape.service.dto.response.ReservationResponses;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
@@ -21,7 +21,8 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping
+    @Operation(summary = "어드민 예약 추가 API", description = "어드민이 예약을 추가한다.")
+    @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @RequestBody @Valid ReservationSaveRequest reservationSaveRequest
     ) {
@@ -30,7 +31,8 @@ public class AdminReservationController {
                 .body(reservationResponse);
     }
 
-    @GetMapping
+    @Operation(summary = "어드민 예약 조회 API", description = "어드민이 예약을 조회한다.")
+    @GetMapping("/admin/reservations")
     public ResponseEntity<ReservationResponses> getReservations(
             @ModelAttribute @Valid ReservationConditionRequest reservationConditionRequest) {
         ReservationResponses reservationResponses = reservationService.findReservationsByCondition(reservationConditionRequest);
@@ -39,7 +41,8 @@ public class AdminReservationController {
                 .body(reservationResponses);
     }
 
-    @DeleteMapping("/{id}")
+    @Operation(summary = "어드민 예약 삭제 API", description = "어드민이 예약을 삭제한다.")
+    @DeleteMapping("/admin/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();

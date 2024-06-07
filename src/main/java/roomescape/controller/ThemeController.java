@@ -1,17 +1,16 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ThemeService;
 import roomescape.service.dto.request.PopularThemeRequest;
 import roomescape.service.dto.response.ThemeResponses;
 
 @RestController
-@RequestMapping("/themes")
 public class ThemeController {
 
     private final ThemeService themeService;
@@ -20,13 +19,15 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
-    @GetMapping
+    @Operation(summary = "테마 조회 API", description = "테마를 조회한다.")
+    @GetMapping("/themes")
     public ResponseEntity<ThemeResponses> getThemes() {
         ThemeResponses themeResponses = themeService.getThemes();
         return ResponseEntity.ok(themeResponses);
     }
 
-    @GetMapping("/popular")
+    @Operation(summary = "인기테마 조회 API", description = "인기 테마를 조회한다.")
+    @GetMapping("/themes/popular")
     public ResponseEntity<ThemeResponses> getPopularThemes(
             @ModelAttribute @Valid PopularThemeRequest popularThemeRequest
     ) {

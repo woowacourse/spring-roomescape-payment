@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,6 @@ import roomescape.service.dto.request.WaitingRequest;
 import roomescape.service.dto.response.WaitingResponse;
 
 @RestController
-@RequestMapping("/waitings")
 public class WaitingController {
     private final WaitingService waitingService;
 
@@ -18,7 +18,8 @@ public class WaitingController {
         this.waitingService = waitingService;
     }
 
-    @PostMapping
+    @Operation(summary = "예약대기 API", description = "예약 대기를 생성한다.")
+    @PostMapping("/waitings")
     public ResponseEntity<WaitingResponse> saveWaiting(
             @Login LoginMember member,
             @RequestBody @Valid WaitingRequest waitingRequest
@@ -27,7 +28,8 @@ public class WaitingController {
         return ResponseEntity.ok(waitingResponse);
     }
 
-    @DeleteMapping
+    @Operation(summary = "예약대기 삭제 API", description = "예약 대기를 삭제한다.")
+    @DeleteMapping("/waitings")
     public ResponseEntity<Void> deleteWaiting(
             @Login LoginMember member,
             @RequestParam(name = "id") long id) {
