@@ -49,7 +49,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         Long timeId = 2L;
         Long themeId = 1L;
 
-        Optional<Reservation> actual = reservationRepository.findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(
+        Optional<Reservation> actual = reservationRepository.findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
                 date, timeId, themeId);
 
         assertThat(actual).isNotEmpty();
@@ -62,7 +62,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         Long timeId = 2L;
         Long themeId = 2L;
 
-        Optional<Reservation> actual = reservationRepository.findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(
+        Optional<Reservation> actual = reservationRepository.findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
                 date, timeId, themeId);
 
         assertThat(actual).isEmpty();

@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,7 +23,7 @@ public class Reservation {
     @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member member;
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 

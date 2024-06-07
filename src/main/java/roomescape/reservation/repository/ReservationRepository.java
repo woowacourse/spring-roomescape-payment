@@ -12,8 +12,8 @@ import roomescape.reservation.domain.Reservation;
 public interface ReservationRepository extends ListCrudRepository<Reservation, Long> {
     List<Reservation> findByMemberId(Long memberId);
 
-    Optional<Reservation> findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(LocalDate date, Long timeId,
-                                                                                     Long themeId);
+    Optional<Reservation> findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
+            LocalDate date, Long timeId, Long themeId);
 
     @Query("""
             SELECT r FROM Reservation AS r

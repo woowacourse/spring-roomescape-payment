@@ -52,7 +52,7 @@ public class WaitingService {
     }
 
     private Reservation findReservation(WaitingRequest request) {
-        return reservationRepository.findBySchedule_DateAndSchedule_Time_IdAndSchedule_Theme_Id(
+        return reservationRepository.findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
                         request.date(), request.timeId(), request.themeId())
                 .orElseThrow(() -> new BadArgumentRequestException("아직 예약되지 않았습니다."));
     }
