@@ -230,7 +230,7 @@ class ReservationControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("reservation/create-reservation",
+                    .filter(document("reservation/create-reservation/exception",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
                             requestFields(RESERVATION_REQUEST_DESCRIPTOR),
                             responseFields(ERROR_MESSAGE_DESCRIPTOR)))
