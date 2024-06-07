@@ -1,12 +1,13 @@
 package roomescape.domain.member;
 
 import jakarta.persistence.Embeddable;
-import java.util.Objects;
 import roomescape.exception.member.InvalidMemberPasswordLengthException;
+
+import java.util.Objects;
 
 @Embeddable
 public class MemberPassword {
-    private static final int MIN_LENGTH = 10;
+    private static final int MIN_LENGTH = 8;
     private static final int MAX_LENGTH = 16;
 
     private String password;
