@@ -21,16 +21,10 @@ values ('세렌디피티: 뜻밖의 행운',
 insert into reservation_time (start_at)
 values ('10:00'),
        ('11:00'),
-       ('12:00'),
-       ('13:00'),
-       ('14:00'),
        ('15:00'),
        ('16:00'),
        ('17:00'),
-       ('18:00'),
-       ('19:00'),
-       ('20:00'),
-       ('21:00');
+       ('18:00');
 
 insert into reservation_detail (date, time_id, theme_id)
 values ('2024-06-07', 1, 1),
