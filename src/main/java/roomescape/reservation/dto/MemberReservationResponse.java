@@ -4,14 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
 
-public record MemberReservationStatusResponse(
+public record MemberReservationResponse(
         Long reservationId,
         String theme,
         LocalDate date,
         LocalTime time,
         String status) {
 
-    public MemberReservationStatusResponse(Reservation reservation) {
+    public MemberReservationResponse(Reservation reservation) {
         this(reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
@@ -20,12 +20,12 @@ public record MemberReservationStatusResponse(
         );
     }
 
-    public MemberReservationStatusResponse(Long reservationId,
-                                           String theme,
-                                           LocalDate date,
-                                           LocalTime time,
-                                           String status,
-                                           Long rank) {
+    public MemberReservationResponse(Long reservationId,
+                                     String theme,
+                                     LocalDate date,
+                                     LocalTime time,
+                                     String status,
+                                     Long rank) {
         this(reservationId,
                 theme,
                 date,

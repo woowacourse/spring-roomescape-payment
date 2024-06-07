@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
 import roomescape.auth.dto.Accessor;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -35,7 +35,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/{id}")
-    public ResponseEntity<MemberReservationStatusResponse> getReservationById(@PathVariable("id") Long id) {
+    public ResponseEntity<MemberReservationResponse> getReservationById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(reservationService.findById(id));
     }
 
@@ -51,7 +51,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/my")
-    public ResponseEntity<List<MemberReservationStatusResponse>> findMemberReservationStatus(
+    public ResponseEntity<List<MemberReservationResponse>> findMemberReservationStatus(
             @Authenticated Accessor accessor) {
         return ResponseEntity.ok(reservationService.findAllByMemberId(accessor.id()));
     }

@@ -20,7 +20,7 @@ import roomescape.reservation.domain.ReservationWaiting;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.WaitingRankCalculator;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.Theme;
@@ -55,10 +55,10 @@ public class ReservationService {
                 .toList();
     }
 
-    public MemberReservationStatusResponse findById(Long id) {
+    public MemberReservationResponse findById(Long id) {
         Reservation foundReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
-        return new MemberReservationStatusResponse(foundReservation);
+        return new MemberReservationResponse(foundReservation);
     }
 
     public List<ReservationResponse> findAllWaitingReservation(Status status) {
@@ -75,23 +75,23 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<MemberReservationStatusResponse> findAllByMemberId(Long memberId) {
-        List<MemberReservationStatusResponse> memberReservationStatusResponses = new ArrayList<>();
+    public List<MemberReservationResponse> findAllByMemberId(Long memberId) {
+        List<MemberReservationResponse> memberReservationRespons = new ArrayList<>();
 
-        findAllMembersReservedReservation(memberReservationStatusResponses, memberId);
-        findAllMembersWaitingReservation(memberReservationStatusResponses, memberId);
+        findAllMembersReservedReservation(memberReservationRespons, memberId);
+        findAllMembersWaitingReservation(memberReservationRespons, memberId);
 
-        return memberReservationStatusResponses;
+        return memberReservationRespons;
     }
 
-    private void findAllMembersReservedReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
+    private void findAllMembersReservedReservation(List<MemberReservationResponse> responses, Long memberId) {
         reservationRepository.findAllReservedByMemberId(memberId)
                 .stream()
-                .map(MemberReservationStatusResponse::new)
+                .map(MemberReservationResponse::new)
                 .forEach(responses::add);
     }
 
-    private void findAllMembersWaitingReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
+    private void findAllMembersWaitingReservation(List<MemberReservationResponse> responses, Long memberId) {
         List<ReservationWaiting> reservationWaitings
                 = reservationRepository.findAllReservationWaitingByMemberId(memberId);
 
@@ -105,7 +105,7 @@ public class ReservationService {
             );
 
             responses.add(
-                    new MemberReservationStatusResponse(
+                    new MemberReservationResponse(
                             reservationWaiting.getId(),
                             reservationWaiting.getTheme().getName(),
                             reservationWaiting.getDate(),
