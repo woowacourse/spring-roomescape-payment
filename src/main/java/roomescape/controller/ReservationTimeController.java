@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import roomescape.service.AvailableTimeService;
 import roomescape.service.ReservationTimeService;
 
 @RestController
+@Tag(name = "예약 시간", description = "예약 시간 API")
 public class ReservationTimeController {
     private final ReservationTimeService reservationTimeService;
     private final AvailableTimeService availableTimeService;

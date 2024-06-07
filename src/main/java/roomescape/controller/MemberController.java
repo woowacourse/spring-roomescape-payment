@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import roomescape.service.MemberService;
 import roomescape.service.TokenService;
 
 @RestController
+@Tag(name = "회원", description = "회원 관리 API")
 public class MemberController {
     private final MemberService memberService;
     private final TokenService tokenService;

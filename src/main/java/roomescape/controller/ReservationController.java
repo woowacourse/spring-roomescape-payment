@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import roomescape.service.ReservationService;
 
 @RestController
 @RequestMapping("/reservations")
+@Tag(name = "예약", description = "회원용 예약 API")
 public class ReservationController {
     private final ReservationService reservationService;
     private final MyReservationService myReservationService;
@@ -53,7 +55,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "예약 취소", description = "예약을 취소할 때 사용하는 API")
+    @Operation(summary = "예약 취소", description = "예약을 취련할 때 사용하는 API")
     public ResponseEntity<Void> delete(@Auth long memberId, @PathVariable("id") long reservationId) {
         reservationService.cancel(memberId, reservationId);
         return ResponseEntity.noContent().build();

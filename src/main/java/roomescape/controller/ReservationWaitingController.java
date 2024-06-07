@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import roomescape.service.MyReservationService;
 import roomescape.service.ReservationWaitingService;
 
 @RestController
+@Tag(name = "예약 대기", description = "예약 대기 API")
 public class ReservationWaitingController {
     private final ReservationWaitingService waitingService;
     private final MyReservationService myReservationService;
@@ -49,7 +51,7 @@ public class ReservationWaitingController {
     }
 
     @GetMapping("/admin/reservations/waiting")
-    @Operation(summary = "예약 대기 목록 조회", description = "관리자가 예약 대기목록을 조회할 때 사용하는 API")
+    @Operation(summary = "예약 대기 목록 조회", description = "관리자가 예약 대기목록 조회할 때 사용하는 API")
     public List<ReservationWaitingResponse> findAll() {
         return waitingService.findAll();
     }

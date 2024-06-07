@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,7 @@ import roomescape.service.ReservationService;
 
 @Controller
 @RequestMapping("/admin")
+@Tag(name = "관리자 예약", description = "관리자용 예약 API")
 public class AdminController {
     private final ReservationService reservationService;
 

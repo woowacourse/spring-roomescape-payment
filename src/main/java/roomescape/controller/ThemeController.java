@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ import roomescape.dto.ThemeResponse;
 import roomescape.service.ThemeService;
 
 @RestController
+@Tag(name = "테마", description = "테마 API")
 public class ThemeController {
     private final ThemeService themeService;
 
@@ -47,7 +49,7 @@ public class ThemeController {
     }
 
     @DeleteMapping("/admin/themes/{id}")
-    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭제할 때 사용하는 API")
+    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭기할 때 사용하는 API")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         themeService.delete(id);
         return ResponseEntity.noContent().build();
