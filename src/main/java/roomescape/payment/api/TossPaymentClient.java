@@ -1,6 +1,7 @@
 package roomescape.payment.api;
 
 import java.util.Base64;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +38,17 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentResponse payment(PaymentRequest paymentRequest) {
-        log.info("URI: {}, RequestBody:{} ", APPROVE_PAYMENT_URI, paymentRequest);
+        String requestId = UUID.randomUUID().toString();
+        log.info("RequestID: {}, URI: {}, RequestBody:{} ", requestId, APPROVE_PAYMENT_URI, paymentRequest);
         PaymentResponse paymentResponse = restClient.post()
                 .uri(APPROVE_PAYMENT_URI)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
+                .header("Request-ID", requestId)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(paymentClientResponseErrorHandler)
                 .body(PaymentResponse.class);
-        log.info("URI: {}, Method: {}, ResponseBody:{} ", APPROVE_PAYMENT_URI, "POST", paymentResponse);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentResponse);
         return paymentResponse;
     }
 }
