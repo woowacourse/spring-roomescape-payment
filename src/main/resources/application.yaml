@@ -13,10 +13,6 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-
 security:
   jwt:
     token:
