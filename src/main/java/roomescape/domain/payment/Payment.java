@@ -16,11 +16,13 @@ import java.math.BigDecimal;
 @Entity
 public class Payment {
 
+    private static final int MAX_PAYMENT_KEY_LENGTH = 200;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = MAX_PAYMENT_KEY_LENGTH)
     private String paymentKey;
 
     @Embedded
