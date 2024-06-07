@@ -1,50 +1,50 @@
-package roomescape.domain.reservationwaiting;
+package roomescape.domain.payment;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.util.Objects;
-import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
-public class ReservationWaiting {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Embedded
+    private PaymentInfo info;
+
     @ManyToOne(optional = false)
     private Reservation reservation;
 
-    @ManyToOne(optional = false)
-    private Member member;
-
-    protected ReservationWaiting() {
+    protected Payment() {
     }
 
-    public ReservationWaiting(Long id, Reservation reservation, Member member) {
+    public Payment(Long id, PaymentInfo info, Reservation reservation) {
         this.id = id;
+        this.info = info;
         this.reservation = reservation;
-        this.member = member;
     }
 
-    public ReservationWaiting(Reservation reservation, Member member) {
+    public Payment(PaymentInfo info, Reservation reservation) {
+        this.info = info;
         this.reservation = reservation;
-        this.member = member;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public PaymentInfo getInfo() {
+        return info;
     }
 
-    public Member getMember() {
-        return member;
+    public Reservation getReservation() {
+        return reservation;
     }
 
     @Override
@@ -55,8 +55,8 @@ public class ReservationWaiting {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ReservationWaiting that = (ReservationWaiting) o;
-        return Objects.equals(id, that.id);
+        Payment payment = (Payment) o;
+        return Objects.equals(id, payment.id);
     }
 
     @Override

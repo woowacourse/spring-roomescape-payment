@@ -11,10 +11,10 @@ public class ReservationRequest {
     private final Long themeId;
     private final String paymentKey;
     private final String orderId;
-    private final Integer amount;
+    private final Long amount;
 
     public ReservationRequest(
-            String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
+            String date, String timeId, String themeId, String paymentKey, String orderId, Long amount) {
         validate(date, timeId, themeId, paymentKey, orderId, amount);
         this.date = LocalDate.parse(date);
         this.timeId = Long.parseLong(timeId);
@@ -25,7 +25,7 @@ public class ReservationRequest {
     }
 
     public void validate(
-            String date, String timeId, String themeId, String paymentKey, String orderId, Integer amount) {
+            String date, String timeId, String themeId, String paymentKey, String orderId, Long amount) {
         if (date == null || date.isBlank() ||
                 timeId == null || timeId.isBlank() ||
                 themeId == null || themeId.isBlank() ||

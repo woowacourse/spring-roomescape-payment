@@ -36,7 +36,7 @@ public class PaymentClientTest {
         mockServer.expect(requestTo(BASE_URL + CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess());
-        PaymentConfirmInput input = new PaymentConfirmInput("orderId", 1000, "mock_secret_key");
+        PaymentConfirmInput input = new PaymentConfirmInput("orderId", 1000L, "mock_secret_key");
 
         assertThatCode(() -> paymentClient.confirmPayment(input))
                 .doesNotThrowAnyException();
@@ -56,7 +56,7 @@ public class PaymentClientTest {
                         .body(expectedBody)
                         .contentType(MediaType.APPLICATION_JSON)
                 );
-        PaymentConfirmInput input = new PaymentConfirmInput("orderId", 1000, "mock_secret_key");
+        PaymentConfirmInput input = new PaymentConfirmInput("orderId", 1000L, "mock_secret_key");
 
         assertThatCode(() -> paymentClient.confirmPayment(input))
                 .isInstanceOf(PaymentConfirmException.class)
