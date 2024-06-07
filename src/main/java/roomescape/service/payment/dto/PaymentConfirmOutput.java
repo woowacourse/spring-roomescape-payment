@@ -4,6 +4,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.service.payment.PaymentStatus;
 
+// TODO: requestedAt, approvedAt 저장하기
 public record PaymentConfirmOutput(
         String paymentKey,
         String orderId,

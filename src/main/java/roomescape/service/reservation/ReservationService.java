@@ -14,7 +14,6 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.exception.payment.NotFoundPaymentException;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.ReservationAuthorityNotExistException;
@@ -141,10 +140,7 @@ public class ReservationService {
     public void deleteReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, member);
-
-        Payment payment = paymentRepository.findByReservation(reservation)
-                .orElseThrow(NotFoundPaymentException::new);
-        paymentRepository.delete(payment);
+        paymentService.cancelPayment(reservation);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
                 waiting -> upgradeWaitingToReservationAndDeleteWaiting(reservation, waiting),

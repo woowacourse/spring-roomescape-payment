@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
+import roomescape.exception.payment.NotFoundPaymentException;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
@@ -24,5 +25,14 @@ public class PaymentService {
         PaymentConfirmOutput paymentConfirmOutput = paymentClient.confirmPayment(paymentConfirmInput);
         Payment payment = paymentConfirmOutput.toPayment(reservation);
         return paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public void cancelPayment(Reservation reservation) {
+        Payment payment = paymentRepository.findByReservation(reservation)
+                .orElseThrow(NotFoundPaymentException::new);
+        paymentRepository.delete(payment);
+
+        paymentClient.cancelPayment(payment);
     }
 }
