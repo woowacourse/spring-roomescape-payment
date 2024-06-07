@@ -1,3 +1,9 @@
+.img-thumbnail {
+    width: 300px;
+    height: 380px;
+    object-fit: cover; /* 이미지가 비율을 유지하면서 지정된 크기에 맞게 잘림 */
+}
+
 .profile-image {
     height: 30px;
     width: 30px;
