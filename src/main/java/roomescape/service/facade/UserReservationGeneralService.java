@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.CreateUserReservationRequest;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequest;
 
 @Service
 public class UserReservationGeneralService {
@@ -20,7 +22,8 @@ public class UserReservationGeneralService {
     }
 
     public CreateReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
-        paymentService.pay(request);
+        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(), request.paymentKey());
+        Payment payment = paymentService.pay(paymentRequest);
         return userReservationService.reserve(CreateReservationRequest.to(memberId, request));
     }
 }

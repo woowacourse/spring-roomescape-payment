@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
@@ -33,6 +35,7 @@ import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -77,9 +80,10 @@ class UserReservationGeneralServiceTest {
         themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));
         reservationTimeRepository.save(new ReservationTime("08:00"));
 
-        doNothing()
-                .when(paymentService)
-                .pay(any(CreateUserReservationRequest.class));
+        Payment payment = new Payment(orderId, amount, paymentKey);
+
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
     }
 
     @Nested

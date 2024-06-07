@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
@@ -27,11 +28,13 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.repository.MemberRepository;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -87,9 +90,9 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약 저장 -> 201")
     @Test
     void save() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(CreateUserReservationRequest.class));
+        Payment payment = new Payment("1", 1000, "1");
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
@@ -160,9 +163,9 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
     @Test
     void save_TimeIdNotFound() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(CreateUserReservationRequest.class));
+        Payment payment = new Payment("1", 1000, "1");
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, THEME_ID, 2L, "1", "1", 1000, "1");
@@ -180,9 +183,9 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
     @Test
     void save_ThemeIdNotFound() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(CreateUserReservationRequest.class));
+        Payment payment = new Payment("1", 1000, "1");
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
 
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, 2L, TIME_ID, "1", "1", 1000, "1");
@@ -200,9 +203,9 @@ class UserReservationControllerTest {
     @DisplayName("실패: 중복 예약 -> 400")
     @Test
     void save_Duplication() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(CreateUserReservationRequest.class));
+        Payment payment = new Payment("1", 1000, "1");
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
 
         userReservationService.reserve(new CreateReservationRequest(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID));
 
