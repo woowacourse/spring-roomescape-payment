@@ -101,9 +101,9 @@ class AdminWaitingControllerTest extends BaseControllerTest {
                                         subsectionWithPath("member").description("예약한 사용자 정보입니다."),
                                         subsectionWithPath("time").description("예약한 예약 시간 정보입니다."),
                                         subsectionWithPath("theme").description("예약한 예약 테마 정보입니다.")),
-                        responseFields(beneathPath("[].member"), MEMBER_DESCRIPTOR),
-                        responseFields(beneathPath("[].time"), RESERVATION_TIME_DESCRIPTOR),
-                        responseFields(beneathPath("[].theme"), THEME_DESCRIPTOR),
+                        responseFields(beneathPath("[].member").withSubsectionId("member"), MEMBER_DESCRIPTOR),
+                        responseFields(beneathPath("[].time").withSubsectionId("time"), RESERVATION_TIME_DESCRIPTOR),
+                        responseFields(beneathPath("[].theme").withSubsectionId("theme"), THEME_DESCRIPTOR),
                         responseBody(beneathPath("[].member").withSubsectionId("member")),
                         responseBody(beneathPath("[].time").withSubsectionId("time")),
                         responseBody(beneathPath("[].theme").withSubsectionId("theme"))))

@@ -83,7 +83,7 @@ class AdminThemeControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("theme/create-theme",
+                    .filter(document("theme/create-theme/admin",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
                             requestFields(THEME_DESCRIPTOR[1], THEME_DESCRIPTOR[2], THEME_DESCRIPTOR[3]),
                             responseFields(THEME_DESCRIPTOR)))
@@ -113,7 +113,7 @@ class AdminThemeControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("theme/create-theme/exception/already-exist",
+                    .filter(document("theme/create-theme/admin/exception/already-exist",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
                             responseFields(fieldWithPath("message").description("예외 메시지 입니다."))))
                     .cookie("token", token)
@@ -142,7 +142,7 @@ class AdminThemeControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("theme/delete-theme",
+                    .filter(document("theme/delete-theme/admin",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다."))))
                     .cookie("token", token)
                     .when().delete("/admin/themes/{id}", theme.getId())
@@ -160,7 +160,7 @@ class AdminThemeControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("theme/delete-theme/exception/not-exist",
+                    .filter(document("theme/delete-theme/admin/exception/not-exist",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
                             responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
@@ -186,7 +186,7 @@ class AdminThemeControllerTest extends BaseControllerTest {
 
             RestAssured.given(spec).log().all()
                     .accept("application/json")
-                    .filter(document("theme/delete-theme/exception/already-exist",
+                    .filter(document("theme/delete-theme/admin/exception/already-exist",
                             requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
                             responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)

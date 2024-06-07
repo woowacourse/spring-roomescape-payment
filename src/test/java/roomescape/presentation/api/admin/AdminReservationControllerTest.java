@@ -134,9 +134,9 @@ class AdminReservationControllerTest extends BaseControllerTest {
                                         subsectionWithPath("theme").description("예약한 예약 테마 정보입니다."),
                                         fieldWithPath("paymentKey").description("토스에서 제공하는 payment key입니다."),
                                         fieldWithPath("amount").description("예약 결제 금액입니다.")),
-                        responseFields(beneathPath("[].member"), MEMBER_DESCRIPTOR),
-                        responseFields(beneathPath("[].time"), RESERVATION_TIME_DESCRIPTOR),
-                        responseFields(beneathPath("[].theme"), THEME_DESCRIPTOR),
+                        responseFields(beneathPath("[].member").withSubsectionId("member"), MEMBER_DESCRIPTOR),
+                        responseFields(beneathPath("[].time").withSubsectionId("time"), RESERVATION_TIME_DESCRIPTOR),
+                        responseFields(beneathPath("[].theme").withSubsectionId("theme"), THEME_DESCRIPTOR),
                         responseBody(beneathPath("[].member").withSubsectionId("member")),
                         responseBody(beneathPath("[].time").withSubsectionId("time")),
                         responseBody(beneathPath("[].theme").withSubsectionId("theme"))))

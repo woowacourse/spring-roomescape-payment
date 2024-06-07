@@ -91,6 +91,7 @@ class AuthControllerTest extends BaseControllerTest {
                 .accept("application/json")
                 .filter(document("auth/login",
                         requestFields(LOGIN_DESCRIPTOR[0], LOGIN_DESCRIPTOR[1]),
+                        responseFields(MEMBER_DESCRIPTOR),
                         responseCookies(cookieWithName("token").description("로그인 성공 시 받는 쿠키 값입니다."))))
                 .contentType(ContentType.JSON)
                 .body(request)
