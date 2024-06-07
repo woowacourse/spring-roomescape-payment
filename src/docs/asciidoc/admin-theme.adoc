@@ -1,0 +1,8 @@
+== Admin 테마
+
+=== 테마 추가
+operation::admin-theme-controller-test/should_handle_post_theme_request_when_requested[snippets='http-request,http-response']
+
+=== 테마 삭제
+operation::admin-theme-controller-test/should_handle_delete_theme_when_requested[snippets='http-request,http-response']
+

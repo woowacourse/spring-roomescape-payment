@@ -1,0 +1,9 @@
+== 테마
+
+=== 테마 전체 조회
+
+operation::theme-controller-test/should_handle_get_themes_request_when_requested[snippets='http-request,http-response']
+
+=== 인기 테마 조회
+
+operation::theme-controller-test/should_handle_get_popular_themes_request_when_requested[snippets='http-request,http-response']

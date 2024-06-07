@@ -1,0 +1,25 @@
+= 방탈출 API 명세
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:sectnums:
+:docinfo: shared-head
+
+= 사용자 api 명세
+
+include::login.adoc[]
+include::member.adoc[]
+include::reservation.adoc[]
+include::theme.adoc[]
+include::time.adoc[]
+
+= 관리자 api 명세
+
+include::admin-member.adoc[]
+include::admin-reservation.adoc[]
+include::admin-reservationtime.adoc[]
+include::admin-theme.adoc[]
+include::admin-view.adoc[]
