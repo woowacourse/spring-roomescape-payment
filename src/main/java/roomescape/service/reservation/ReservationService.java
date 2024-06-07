@@ -3,6 +3,8 @@ package roomescape.service.reservation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -44,6 +46,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
     public ReservationService(ReservationRepository reservationRepository,
@@ -51,12 +54,14 @@ public class ReservationService {
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               PaymentService paymentService,
+                              PaymentRepository paymentRepository,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
@@ -77,11 +82,12 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationMineListResponse findMyReservation(Member member) {
         List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
+        List<Payment> payments = paymentRepository.findByReservationIn(reservations);
         List<ReservationWaitingWithRank> reservationWaitingWithRanks
                 = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
 
         List<ReservationMineResponse> myReservations = Stream.concat(
-                        reservations.stream().map(ReservationMineResponse::new),
+                        payments.stream().map(ReservationMineResponse::new),
                         reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
                 )
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
