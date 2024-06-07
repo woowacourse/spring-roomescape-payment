@@ -7,6 +7,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.util.Timeout;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -16,9 +17,18 @@ import org.springframework.web.client.RestClient.Builder;
 @Configuration
 public class RestClientConfig {
 
-    private Timeout CONNECTION_TIMEOUT = Timeout.ofSeconds(3);
-    private Timeout SOCKET_TIMEOUT = Timeout.ofSeconds(2);
-    private Timeout READ_TIMEOUT = Timeout.ofSeconds(30);
+    private final Timeout connectionTimeOut;
+    private final Timeout socketTimeOut;
+    private final Timeout readTimeOut;
+
+    public RestClientConfig(
+            @Value("${server.http.connection-timeout}") long connectionTimeOut,
+            @Value("${server.http.socket-timeout}") long socketTimeOut,
+            @Value("${server.http.read-timeout}") long readTimeOut) {
+        this.connectionTimeOut = Timeout.ofSeconds(connectionTimeOut);
+        this.socketTimeOut = Timeout.ofSeconds(socketTimeOut);
+        this.readTimeOut = Timeout.ofSeconds(readTimeOut);
+    }
 
     @Bean
     public Builder restClientBuilder() {
@@ -34,8 +44,8 @@ public class RestClientConfig {
 
     private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
         ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(CONNECTION_TIMEOUT)
-                .setSocketTimeout(SOCKET_TIMEOUT)
+                .setConnectTimeout(connectionTimeOut)
+                .setSocketTimeout(socketTimeOut)
                 .build();
 
         return PoolingHttpClientConnectionManagerBuilder.create()
@@ -45,7 +55,7 @@ public class RestClientConfig {
 
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setResponseTimeout(READ_TIMEOUT)
+                .setResponseTimeout(readTimeOut)
                 .build();
     }
 
