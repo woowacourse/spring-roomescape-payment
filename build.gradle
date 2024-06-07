@@ -41,8 +41,13 @@ dependencies {
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-test {
+task controllerTest(type: Test) {
     include '**/*ControllerTest.*'
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+test {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
@@ -50,7 +55,7 @@ test {
 asciidoctor {
     configurations 'asciidoctorExtensions'
     inputs.dir snippetsDir
-    dependsOn test
+    dependsOn controllerTest
 }
 
 task copyDocument(type: Copy) {
@@ -62,4 +67,11 @@ task copyDocument(type: Copy) {
 
 bootJar {
     dependsOn copyDocument
+    dependsOn controllerTest
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(bootJar)) {
+        test.enabled = false
+    }
 }
