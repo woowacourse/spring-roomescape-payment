@@ -10,10 +10,12 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Schedule;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ScheduleRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.time.domain.ReservationTime;
@@ -22,16 +24,20 @@ import roomescape.time.repository.TimeRepository;
 @Service
 public class ReservationCreateService {
     private final ReservationRepository reservationRepository;
+    private final ScheduleRepository scheduleRepository;
     private final MemberRepository memberRepository;
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final PaymentService paymentService;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
+                                    ScheduleRepository scheduleRepository,
                                     MemberRepository memberRepository,
                                     TimeRepository timeRepository,
-                                    ThemeRepository themeRepository, PaymentService paymentService) {
+                                    ThemeRepository themeRepository,
+                                    PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
+        this.scheduleRepository = scheduleRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
@@ -56,14 +62,21 @@ public class ReservationCreateService {
 
     private Reservation makeReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
         Member member = findMemberByMemberId(memberId);
-        ReservationTime time = findTimeByTimeId(timeId);
-        Theme theme = findThemeByThemeId(themeId);
-        return new Reservation(member, date, time, theme);
+        Schedule schedule = makeSchedule(date, timeId, themeId);
+        return new Reservation(member, schedule);
     }
 
     private Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BadArgumentRequestException("해당 멤버가 존재하지 않습니다."));
+    }
+
+    private Schedule makeSchedule(LocalDate date, Long timeId, Long themeId) {
+        ReservationTime time = findTimeByTimeId(timeId);
+        Theme theme = findThemeByThemeId(themeId);
+
+        return scheduleRepository.findByDateAndTimeAndTheme(date, time, theme)
+                .orElseGet(() -> new Schedule(date, time, theme));
     }
 
     private ReservationTime findTimeByTimeId(Long timeId) {

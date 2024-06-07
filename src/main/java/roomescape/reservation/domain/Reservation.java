@@ -27,6 +27,12 @@ public class Reservation {
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
+    public Reservation(Member member, Schedule schedule) {
+        this.id = null;
+        this.member = member;
+        this.schedule = schedule;
+    }
+
     public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
         this.id = null;
         this.member = Objects.requireNonNull(member);

@@ -37,6 +37,13 @@ public class Schedule {
         this.theme = Objects.requireNonNull(theme);
     }
 
+    public Schedule(Long id, LocalDate date, ReservationTime time, Theme theme) {
+        this.id = Objects.requireNonNull(id);
+        this.date = Objects.requireNonNull(date);
+        this.time = Objects.requireNonNull(time);
+        this.theme = Objects.requireNonNull(theme);
+    }
+
     protected Schedule() {
     }
 
