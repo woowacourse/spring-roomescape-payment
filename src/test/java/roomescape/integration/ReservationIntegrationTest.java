@@ -92,6 +92,7 @@ class ReservationIntegrationTest extends IntegrationTest {
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
             Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
             waitingFixture.createWaiting(reservation, member);
 
             RestAssured.given().log().all()

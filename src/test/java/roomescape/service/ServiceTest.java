@@ -1,10 +1,5 @@
 package roomescape.service;
 
-import static org.mockito.BDDMockito.given;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,10 +9,17 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.helper.CookieProvider;
 import roomescape.helper.DatabaseCleaner;
 import roomescape.helper.domain.MemberFixture;
+import roomescape.helper.domain.PaymentFixture;
 import roomescape.helper.domain.ReservationFixture;
 import roomescape.helper.domain.ReservationTimeFixture;
 import roomescape.helper.domain.ThemeFixture;
 import roomescape.helper.domain.WaitingFixture;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
@@ -42,6 +44,9 @@ abstract class ServiceTest {
 
     @Autowired
     protected WaitingFixture waitingFixture;
+
+    @Autowired
+    protected PaymentFixture paymentFixture;
 
     @MockBean
     protected Clock clock;

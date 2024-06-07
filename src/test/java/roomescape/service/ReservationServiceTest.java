@@ -100,6 +100,7 @@ class ReservationServiceTest extends ServiceTest {
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
             Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
             waitingFixture.createWaiting(reservation, member);
         }
 
