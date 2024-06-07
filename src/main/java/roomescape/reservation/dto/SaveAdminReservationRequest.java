@@ -7,8 +7,9 @@ import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.Theme;
 
-public record SaveReservationRequest(
+public record SaveAdminReservationRequest(
         LocalDate date,
+        Long memberId,
         Long timeId,
         Long themeId,
         String orderId,

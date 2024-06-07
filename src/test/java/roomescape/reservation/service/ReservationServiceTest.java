@@ -21,6 +21,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.fixture.PaymentConfirmFixtures;
+import roomescape.member.model.Member;
+import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
 import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.payment.service.PaymentService;
@@ -40,6 +42,9 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -62,26 +67,28 @@ class ReservationServiceTest {
 
     @DisplayName("예약 정보를 저장한다.")
     @Test
+    @Sql("classpath:test-payment-credential-data.sql")
     void saveReservationTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
-        String orderId = "orderId";
-        long amount = 1000L;
+        final String orderId = "orderId";
+        final long amount = 1000L;
+        final String paymentKey = "paymentKey";
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 date,
-                3L,
                 1L,
                 1L,
                 orderId,
                 amount,
-                "paymentKey"
+                paymentKey
         );
-        paymentService.saveCredential(new SavePaymentCredentialRequest(orderId, amount));
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        paymentService.saveCredential(new SavePaymentCredentialRequest(paymentKey, amount));
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse(paymentKey, amount));
 
         // When
-        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
+        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest, member.getId());
 
         // Then
         final List<ReservationDto> reservations = reservationService.getReservations();
@@ -101,16 +108,17 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now(),
-                3L,
                 9L,
                 1L,
                 "orderId",
                 1000L,
                 "paymentKey"
         );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("해당 id의 예약 시간이 존재하지 않습니다.");
     }
@@ -153,16 +161,17 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().minusDays(3),
-                3L,
                 1L,
                 1L,
                 "orderId",
                 1000L,
                 "paymentKey"
         );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
     }
@@ -173,16 +182,17 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(2),
-                3L,
                 4L,
                 9L,
                 "orderId",
                 1000L,
                 "paymentKey"
         );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 해당 날짜/시간의 테마 예약이 있습니다.");
     }

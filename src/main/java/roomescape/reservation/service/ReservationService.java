@@ -9,6 +9,7 @@ import roomescape.member.model.Member;
 import roomescape.member.service.MemberService;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.SaveAdminReservationRequest;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SearchReservationsParams;
 import roomescape.reservation.dto.SearchReservationsRequest;
@@ -71,7 +72,7 @@ public class ReservationService {
                 .toList();
     }
 
-    public ReservationDto saveReservation(final SaveReservationRequest request) {
+    public ReservationDto saveReservation(final SaveAdminReservationRequest request) {
         final ReservationTime reservationTime = reservationTimeService.getReservationTime(request.timeId());
         final Theme theme = themeService.getTheme(request.themeId());
         final Member member = memberService.getMember(request.memberId());
@@ -80,9 +81,22 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplicated(reservation);
 
-        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), member);
-
         return ReservationDto.from(reservationRepository.save(reservation));
+    }
+
+    public ReservationDto saveReservation(final SaveReservationRequest request,
+                                          final Long memberId) {
+        final ReservationTime reservationTime = reservationTimeService.getReservationTime(request.timeId());
+        final Theme theme = themeService.getTheme(request.themeId());
+        final Member member = memberService.getMember(memberId);
+        final Reservation reservation = request.toReservation(reservationTime, theme, member);
+
+        validateReservationDateAndTime(reservation.getDate(), reservationTime);
+        validateReservationDuplicated(reservation);
+
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), reservation, member);
+        return ReservationDto.from(savedReservation);
     }
 
     private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {

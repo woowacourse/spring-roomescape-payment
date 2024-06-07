@@ -2,6 +2,11 @@
   TEST INITIALIZE
   */
 DELETE
+FROM payment_history;
+ALTER TABLE payment_history
+    ALTER COLUMN id RESTART WITH 1;
+
+DELETE
 FROM reservation;
 ALTER TABLE reservation
     ALTER COLUMN id RESTART WITH 1;
@@ -9,11 +14,6 @@ ALTER TABLE reservation
 DELETE
 FROM reservation_waiting;
 ALTER TABLE reservation_waiting
-    ALTER COLUMN id RESTART WITH 1;
-
-DELETE
-FROM payment_history;
-ALTER TABLE payment_history
     ALTER COLUMN id RESTART WITH 1;
 
 DELETE

@@ -26,6 +26,7 @@ import roomescape.member.model.MemberRole;
 import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationTimeResponse;
+import roomescape.reservation.dto.SaveAdminReservationRequest;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SaveReservationTimeRequest;
 import roomescape.reservation.dto.SaveThemeRequest;
@@ -65,7 +66,7 @@ class AdminReservationControllerTest {
     @Sql("classpath:test-payment-credential-data.sql")
     @Test
     void saveReservationForAdminTest() {
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+        final SaveAdminReservationRequest saveReservationRequest = new SaveAdminReservationRequest(
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
@@ -92,7 +93,6 @@ class AdminReservationControllerTest {
     void saveReservationIncludeMemberIdWhoNotAdminTest() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
-                null,
                 1L,
                 1L,
                 "orderId",

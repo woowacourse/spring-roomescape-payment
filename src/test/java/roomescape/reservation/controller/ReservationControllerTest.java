@@ -47,7 +47,6 @@ class ReservationControllerTest {
     void saveReservationTest() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
-                null,
                 1L,
                 1L,
                 "orderId",
@@ -72,7 +71,6 @@ class ReservationControllerTest {
     void saveReservationWithNoExistReservationTime() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
-                null,
                 80L,
                 1L,
                 "orderId",
@@ -95,7 +93,6 @@ class ReservationControllerTest {
     void saveReservationWithReservationDateAndTimeBeforeNow() {
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().minusDays(1),
-                null,
                 1L,
                 1L,
                 "orderId",

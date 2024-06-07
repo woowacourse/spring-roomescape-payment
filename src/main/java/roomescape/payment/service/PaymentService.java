@@ -11,6 +11,7 @@ import roomescape.payment.model.PaymentCredential;
 import roomescape.payment.model.PaymentHistory;
 import roomescape.payment.repository.PaymentCredentialRepository;
 import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.reservation.model.Reservation;
 
 @Service
 public class PaymentService {
@@ -39,15 +40,14 @@ public class PaymentService {
             final String orderId,
             final Long amount,
             final String paymentKey,
+            final Reservation reservation,
             final Member member
     ) {
         matchPaymentCredential(orderId, amount);
 
         final PaymentConfirmResponse confirmResponse = paymentGateway.confirm(orderId, amount, paymentKey);
-        final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(member);
-
+        final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(reservation, member);
         paymentHistoryRepository.save(paymentHistory);
-
         paymentCredentialRepository.deleteAllByOrderIdAndAmount(orderId, amount);
     }
 

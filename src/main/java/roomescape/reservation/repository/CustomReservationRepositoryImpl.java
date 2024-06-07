@@ -31,7 +31,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                                 r.id AS reservation_id, r.date AS reservation_date, r.status AS reservation_status,
                                 rt.id AS time_id, rt.start_at AS reservation_time,
                                 th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
-                                m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role
+                                m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
                             FROM reservation AS r
                             INNER JOIN reservation_time AS rt on r.time_id = rt.id
                             INNER JOIN theme AS th ON r.theme_id = th.id
@@ -58,8 +58,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                         MemberRole.valueOf(rs.getString("member_role")),
                         rs.getString("member_password"),
                         rs.getString("member_name"),
-                        rs.getString("member_email")
-                )
+                        rs.getString("member_email"))
         ));
     }
 }

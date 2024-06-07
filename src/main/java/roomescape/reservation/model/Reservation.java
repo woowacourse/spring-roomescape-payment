@@ -71,7 +71,7 @@ public class Reservation {
         );
     }
 
-    private Reservation(
+    protected Reservation(
             final Long id,
             final ReservationStatus status,
             final ReservationDate date,

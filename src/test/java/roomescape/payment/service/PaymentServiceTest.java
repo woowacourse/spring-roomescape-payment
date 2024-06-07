@@ -29,6 +29,8 @@ import roomescape.payment.model.PaymentCredential;
 import roomescape.payment.model.PaymentHistory;
 import roomescape.payment.repository.PaymentCredentialRepository;
 import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.reservation.model.Reservation;
+import roomescape.reservation.repository.ReservationRepository;
 
 @SpringBootTest
 @Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -49,6 +51,9 @@ class PaymentServiceTest {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     @DisplayName("결제 신용 정보를 저장한다.")
     @Test
     void saveCredential() {
@@ -62,17 +67,17 @@ class PaymentServiceTest {
 
     @DisplayName("결제를 제출하면 결제 신용은 삭제되고 결제 이력은 추가된다.")
     @Test
+    @Sql("classpath:test-payment-credential-data.sql")
     void submitPayment() {
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
         final Member member = memberRepository.findById(1L).orElseThrow();
-        final SavePaymentCredentialRequest request = new SavePaymentCredentialRequest(orderId, amount);
-        paymentService.saveCredential(request);
+        final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
 
-        paymentService.submitPayment(orderId, amount, primaryKey, member);
+        paymentService.submitPayment(orderId, amount, primaryKey, reservation, member);
         List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAll();
         List<PaymentCredential> paymentCredentials = paymentCredentialRepository.findAll();
 
@@ -85,17 +90,17 @@ class PaymentServiceTest {
 
     @DisplayName("PG 통신에서 예외가 발생하면 해당 예외와 메세지가 던져진다.")
     @Test
+    @Sql("classpath:test-payment-credential-data.sql")
     void submitPaymentWhenGatewayThrowError() {
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
         final Member member = memberRepository.findById(1L).orElseThrow();
-        final SavePaymentCredentialRequest request = new SavePaymentCredentialRequest(orderId, amount);
-        paymentService.saveCredential(request);
+        final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willThrow(new PaymentConfirmFailException("존재하지 않는 결제입니다.", HttpStatus.BAD_REQUEST));
 
-        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, member))
+        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation, member))
                 .isInstanceOf(PaymentConfirmFailException.class)
                 .hasMessage("존재하지 않는 결제입니다.");
     }
@@ -107,8 +112,9 @@ class PaymentServiceTest {
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
         final Member member = memberRepository.findById(1L).orElseThrow();
+        final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
 
-        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, member))
+        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation, member))
                 .isInstanceOf(PaymentCredentialMissMatchException.class);
     }
 }
