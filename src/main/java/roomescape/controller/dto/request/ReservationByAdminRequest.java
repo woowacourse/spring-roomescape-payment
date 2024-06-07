@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import roomescape.service.dto.request.CreateReservationRequest;
 
-public record AdminReservationRequest(
+public record ReservationByAdminRequest(
         @NotNull(message = "날짜는 필수 값입니다.")
         LocalDate date,
 

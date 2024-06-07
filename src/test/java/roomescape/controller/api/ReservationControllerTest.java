@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.controller.BaseControllerTest;
-import roomescape.controller.dto.request.AdminReservationRequest;
+import roomescape.controller.dto.request.ReservationByAdminRequest;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
@@ -126,7 +126,7 @@ class ReservationControllerTest extends BaseControllerTest {
 
     private void addAdminReservation() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        AdminReservationRequest request = new AdminReservationRequest(date, theme.getId(), time.getId(), ADMIN_ID);
+        ReservationByAdminRequest request = new ReservationByAdminRequest(date, theme.getId(), time.getId(), ADMIN_ID);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
