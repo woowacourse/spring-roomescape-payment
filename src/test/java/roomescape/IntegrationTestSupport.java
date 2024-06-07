@@ -15,7 +15,7 @@ import static roomescape.TestFixture.ADMIN_PASSWORD;
 import static roomescape.TestFixture.USER_EMAIL;
 import static roomescape.TestFixture.USER_PASSWORD;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 public abstract class IntegrationTestSupport {
 

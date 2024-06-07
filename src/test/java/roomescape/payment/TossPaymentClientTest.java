@@ -9,7 +9,7 @@ import roomescape.payment.dto.CreatePaymentRequest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Profile("test")
 class TossPaymentClientTest {
 
