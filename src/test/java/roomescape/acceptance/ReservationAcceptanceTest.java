@@ -62,32 +62,4 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
         assertThat(responses).hasSize(1);
     }
-
-    @DisplayName("사용자가 예약과 함께 결제를 한다.")
-    @Disabled
-    @Test
-    void reserveWithPurchase() {
-        MemberResponse memberResponse = fixture.registerMember(
-                new MemberRegisterRequest("name", "email@mail.com", "12341234")
-        ).as(MemberResponse.class);
-        String token = fixture.loginAndGetToken("email@mail.com", "12341234");
-        ReservationTimeResponse timeResponse = fixture.createReservationTime(15, 20);
-        ThemeResponse themeResponse = fixture.createTheme(new ThemeRequest("테마", "디스크립션1", "https://theme", 1000L));
-
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
-                memberResponse.id(),
-                themeResponse.id(),
-                LocalDate.of(2024, 12, 25),
-                timeResponse.id(),
-                "paymentKet",
-                "orderId");
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .contentType(ContentType.JSON)
-                .body(reservationPaymentRequest)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
-    }
 }
