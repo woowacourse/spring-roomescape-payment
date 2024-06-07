@@ -33,10 +33,10 @@ public class ReservationWaitingServiceTest extends ServiceTest {
     class FindAllReservationWaiting {
         @Test
         void 예약_대기_목록을_조회할_수_있다() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
 
             ReservationWaitingListResponse response = reservationWaitingService.findAllReservationWaiting();
@@ -49,7 +49,7 @@ public class ReservationWaitingServiceTest extends ServiceTest {
     @Nested
     @DisplayName("예약 대기 추가")
     class SaveReservationWaiting {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Theme theme;
         Member user;
         Member admin;
@@ -60,12 +60,12 @@ public class ReservationWaitingServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             theme = themeFixture.createFirstTheme();
             admin = memberFixture.createAdminMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, admin);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, admin);
             date = reservation.getDate().toString();
-            timeId = reservation.getTime().getId().toString();
+            timeId = reservation.getReservationTime().getId().toString();
             themeId = reservation.getTheme().getId().toString();
             user = memberFixture.createUserMember();
         }
@@ -109,7 +109,7 @@ public class ReservationWaitingServiceTest extends ServiceTest {
 
         @Test
         void 지난_예약에_대해_예약_대기_추가_시_예외가_발생한다() {
-            Reservation pastReservation = reservationFixture.createPastReservation(time, theme, admin);
+            Reservation pastReservation = reservationFixture.createPastReservation(reservationTime, theme, admin);
             String pastDate = pastReservation.getDate().toString();
             ReservationWaitingRequest request = new ReservationWaitingRequest(pastDate, timeId, themeId);
 
@@ -126,10 +126,10 @@ public class ReservationWaitingServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             user = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, user);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, user);
             waitingFixture.createWaiting(reservation, user);
         }
 
@@ -164,10 +164,10 @@ public class ReservationWaitingServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waiting = waitingFixture.createWaiting(reservation, member);
         }
 

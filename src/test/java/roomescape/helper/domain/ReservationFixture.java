@@ -15,13 +15,13 @@ public class ReservationFixture {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    public Reservation createPastReservation(ReservationTime time, Theme theme, Member member) {
-        Reservation reservation = new Reservation(LocalDate.of(2000, 4, 1), time, theme, member);
+    public Reservation createPastReservation(ReservationTime reservationTime, Theme theme, Member member) {
+        Reservation reservation = new Reservation(LocalDate.of(2000, 4, 1), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 
-    public Reservation createFutureReservation(ReservationTime time, Theme theme, Member member) {
-        Reservation reservation = new Reservation(LocalDate.of(2000, 4, 8), time, theme, member);
+    public Reservation createFutureReservation(ReservationTime reservationTime, Theme theme, Member member) {
+        Reservation reservation = new Reservation(LocalDate.of(2000, 4, 8), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 

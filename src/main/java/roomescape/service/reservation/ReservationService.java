@@ -110,9 +110,9 @@ public class ReservationService {
     }
 
     private Reservation saveReservation(ReservationSaveInput input, Member member) {
-        ReservationTime time = findReservationTimeById(input.timeId());
+        ReservationTime reservationTime = findReservationTimeById(input.timeId());
         Theme theme = findThemeById(input.themeId());
-        Reservation reservation = input.toReservation(time, theme, member);
+        Reservation reservation = input.toReservation(reservationTime, theme, member);
         validateDuplicateReservation(reservation);
         validateDateTimeReservation(reservation);
         return reservationRepository.save(reservation);

@@ -13,7 +13,7 @@ import roomescape.domain.theme.Theme;
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
     boolean existsByInfo(ReservationInfo info);
 
-    boolean existsByInfoTime(ReservationTime time);
+    boolean existsByInfoReservationTime(ReservationTime reservationTime);
 
     boolean existsByInfoTheme(Theme theme);
 
@@ -22,11 +22,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Optional<Reservation> findByInfo(ReservationInfo info);
 
     @Query("""
-            SELECT r.info.time.id
+            SELECT r.info.reservationTime.id
             FROM Reservation r
             WHERE r.info.date = :date AND r.info.theme.id = :themeId
             """)
-    List<Long> findTimeIdByDateAndThemeId(LocalDate date, long themeId);
+    List<Long> findReservationTimeIdByDateAndThemeId(LocalDate date, long themeId);
 
     @Query("""
             SELECT t

@@ -34,8 +34,8 @@ public class ReservationTime {
         this(null, startAt);
     }
 
-    public boolean isAlreadyBooked(List<Long> bookedTimeIds) {
-        return bookedTimeIds.contains(this.id);
+    public boolean isAlreadyBooked(List<Long> bookedIds) {
+        return bookedIds.contains(this.id);
     }
 
     public Long getId() {

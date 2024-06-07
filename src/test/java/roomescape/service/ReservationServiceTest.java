@@ -52,15 +52,15 @@ class ReservationServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             firstTheme = themeFixture.createFirstTheme();
             user = memberFixture.createUserMember();
             Theme secondTheme = themeFixture.createSecondTheme();
             Member admin = memberFixture.createAdminMember();
-            reservationFixture.createPastReservation(time, firstTheme, user);
-            reservationFixture.createFutureReservation(time, firstTheme, admin);
-            reservationFixture.createPastReservation(time, secondTheme, user);
-            reservationFixture.createFutureReservation(time, secondTheme, admin);
+            reservationFixture.createPastReservation(reservationTime, firstTheme, user);
+            reservationFixture.createFutureReservation(reservationTime, firstTheme, admin);
+            reservationFixture.createPastReservation(reservationTime, secondTheme, user);
+            reservationFixture.createFutureReservation(reservationTime, secondTheme, admin);
         }
 
         @Test
@@ -109,10 +109,10 @@ class ReservationServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
         }
 
@@ -136,13 +136,13 @@ class ReservationServiceTest extends ServiceTest {
     @Nested
     @DisplayName("결제 없이 예약 추가")
     class SaveReservationWithoutPayment {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Theme theme;
         Member member;
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
         }
@@ -150,7 +150,7 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 결제_없이_예약을_추가할_수_있다() {
             ReservationSaveInput request = new ReservationSaveInput(
-                    LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
+                    LocalDate.of(2000, 4, 7), reservationTime.getId(), theme.getId());
             ReservationResponse response = reservationService.saveReservationWithoutPayment(request, member);
 
             assertThat(response.getMember().getName())
@@ -159,8 +159,9 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 시간대와_테마가_똑같은_중복된_예약_추가시_예외가_발생한다() {
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
-            ReservationSaveInput input = new ReservationSaveInput(reservation.getDate(), time.getId(), theme.getId());
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
+            ReservationSaveInput input = new ReservationSaveInput(reservation.getDate(), reservationTime.getId(),
+                    theme.getId());
 
             assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(DuplicatedReservationException.class);
@@ -169,7 +170,7 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 지나간_날짜와_시간에_대한_예약_추가시_예외가_발생한다() {
             ReservationSaveInput input = new ReservationSaveInput(
-                    LocalDate.of(2000, 4, 6), time.getId(), theme.getId());
+                    LocalDate.of(2000, 4, 6), reservationTime.getId(), theme.getId());
 
             assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(InvalidDateTimeReservationException.class);
@@ -179,7 +180,7 @@ class ReservationServiceTest extends ServiceTest {
     @Nested
     @DisplayName("결제와 함께 예약 추가")
     class SaveReservationWithPayment {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Theme theme;
         Member member;
         ReservationSaveInput reservationSaveInput;
@@ -187,11 +188,11 @@ class ReservationServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
             reservationSaveInput = new ReservationSaveInput(
-                    LocalDate.of(2000, 4, 7), time.getId(), theme.getId());
+                    LocalDate.of(2000, 4, 7), reservationTime.getId(), theme.getId());
             paymentConfirmInput = new PaymentConfirmInput(
                     "orderId", 1000L, "paymentKey");
         }
@@ -234,10 +235,10 @@ class ReservationServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
         }
 
         @Test

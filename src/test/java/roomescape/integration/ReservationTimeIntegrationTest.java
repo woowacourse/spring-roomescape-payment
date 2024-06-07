@@ -24,7 +24,7 @@ class ReservationTimeIntegrationTest extends IntegrationTest {
         @Test
         void 시간_목록을_조회할_수_있다() {
             memberFixture.createAdminMember();
-            timeFixture.createFutureTime();
+            reservationTimeFixture.createFutureReservationTime();
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
@@ -42,10 +42,10 @@ class ReservationTimeIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
         }
 
         @Test
@@ -133,9 +133,9 @@ class ReservationTimeIntegrationTest extends IntegrationTest {
 
         @Test
         void 중복된_시간은_추가할_수_없다() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Map<String, String> params = new HashMap<>();
-            params.put("startAt", time.getStartAt().toString());
+            params.put("startAt", reservationTime.getStartAt().toString());
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
@@ -150,12 +150,12 @@ class ReservationTimeIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("시간 삭제 API")
     class DeleteReservationTime {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Member member;
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             member = memberFixture.createAdminMember();
         }
 
@@ -180,7 +180,7 @@ class ReservationTimeIntegrationTest extends IntegrationTest {
         @Test
         void 예약이_존재하는_시간은_삭제할_수_없다() {
             Theme theme = themeFixture.createFirstTheme();
-            reservationFixture.createFutureReservation(time, theme, member);
+            reservationFixture.createFutureReservation(reservationTime, theme, member);
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())

@@ -22,10 +22,10 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
     class FindAllReservationWaiting {
         @Test
         void 예약_대기_목록을_조회할_수_있다() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
             memberFixture.createAdminMember();
 
@@ -41,7 +41,7 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("예약 대기 추가 API")
     class SaveReservationWaiting {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Theme theme;
         Member user;
         Member admin;
@@ -50,14 +50,14 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             theme = themeFixture.createFirstTheme();
             admin = memberFixture.createAdminMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, admin);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, admin);
             user = memberFixture.createUserMember();
             params = new HashMap<>();
             params.put("themeId", theme.getId().toString());
-            params.put("timeId", time.getId().toString());
+            params.put("timeId", reservationTime.getId().toString());
         }
 
         @Test
@@ -116,7 +116,7 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
 
         @Test
         void 지난_예약에_대해선_예약_대기를_추가할_수_없다() {
-            Reservation pastReservation = reservationFixture.createPastReservation(time, theme, user);
+            Reservation pastReservation = reservationFixture.createPastReservation(reservationTime, theme, user);
             params.put("date", pastReservation.getDate().toString());
 
             RestAssured.given().log().all()
@@ -136,10 +136,10 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
         }
 
@@ -180,10 +180,10 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waiting = waitingFixture.createWaiting(reservation, member);
             memberFixture.createAdminMember();
         }

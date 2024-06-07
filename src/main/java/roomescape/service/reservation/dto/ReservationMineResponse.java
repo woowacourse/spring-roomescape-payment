@@ -28,7 +28,7 @@ public class ReservationMineResponse {
         this(reservation.getId(),
                 reservation.getTheme().getName().getName(),
                 reservation.getDate(),
-                reservation.getTime().getStartAt(),
+                reservation.getReservationTime().getStartAt(),
                 ReservationStatus.BOOKED.getDescription()
         );
     }
@@ -37,7 +37,7 @@ public class ReservationMineResponse {
         this(waitingWithRank.getWaiting().getReservation().getId(),
                 waitingWithRank.getWaiting().getReservation().getTheme().getName().getName(),
                 waitingWithRank.getWaiting().getReservation().getDate(),
-                waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
+                waitingWithRank.getWaiting().getReservation().getReservationTime().getStartAt(),
                 String.format(ReservationStatus.WAITING.getDescription(), waitingWithRank.getRank())
         );
     }

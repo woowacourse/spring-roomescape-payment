@@ -37,10 +37,10 @@ class ThemeIntegrationTest extends IntegrationTest {
     class FindAllPopularTheme {
         @Test
         void 최근_일주일동안_예약_건수_많은_순서대로_10개_테마를_인기_테마로_조회할_수_있다() {
-            ReservationTime time = timeFixture.createPastTime();
+            ReservationTime reservationTime = reservationTimeFixture.createPastReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            reservationFixture.createPastReservation(time, theme, member);
+            reservationFixture.createPastReservation(reservationTime, theme, member);
 
             RestAssured.given().log().all()
                     .when().get("/themes/popular")
@@ -127,8 +127,8 @@ class ThemeIntegrationTest extends IntegrationTest {
 
         @Test
         void 예약이_존재하는_테마는_삭제할_수_없다() {
-            ReservationTime time = timeFixture.createPastTime();
-            reservationFixture.createFutureReservation(time, theme, member);
+            ReservationTime reservationTime = reservationTimeFixture.createPastReservationTime();
+            reservationFixture.createFutureReservation(reservationTime, theme, member);
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())

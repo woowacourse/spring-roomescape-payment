@@ -29,7 +29,7 @@ public class ReservationWaitingResponse {
                 waiting.getMember().getName().getName(),
                 waiting.getReservation().getTheme().getName().getName(),
                 waiting.getReservation().getDate(),
-                waiting.getReservation().getTime().getStartAt(),
+                waiting.getReservation().getReservationTime().getStartAt(),
                 waiting.getReservation().getId()
         );
     }

@@ -12,7 +12,7 @@ public abstract class DomainSupplier {
     protected ReservationFixture reservationFixture;
 
     @Autowired
-    protected ReservationTimeFixture timeFixture;
+    protected ReservationTimeFixture reservationTimeFixture;
 
     @Autowired
     protected ThemeFixture themeFixture;

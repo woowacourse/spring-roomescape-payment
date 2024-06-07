@@ -28,12 +28,12 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, new ReservationInfo(date, time, theme), member);
+    public Reservation(LocalDate date, ReservationTime reservationTime, Theme theme, Member member) {
+        this(null, new ReservationInfo(date, reservationTime, theme), member);
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, new ReservationInfo(date, time, theme), member);
+    public Reservation(Long id, LocalDate date, ReservationTime reservationTime, Theme theme, Member member) {
+        this(id, new ReservationInfo(date, reservationTime, theme), member);
     }
 
     public Reservation(Long id, ReservationInfo info, Member member) {
@@ -70,8 +70,8 @@ public class Reservation {
         return info.getDate();
     }
 
-    public ReservationTime getTime() {
-        return info.getTime();
+    public ReservationTime getReservationTime() {
+        return info.getReservationTime();
     }
 
     public Theme getTheme() {

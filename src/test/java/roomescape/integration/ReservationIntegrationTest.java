@@ -36,15 +36,15 @@ class ReservationIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             firstTheme = themeFixture.createFirstTheme();
             user = memberFixture.createUserMember();
             Theme secondTheme = themeFixture.createSecondTheme();
             Member admin = memberFixture.createAdminMember();
-            reservationFixture.createPastReservation(time, firstTheme, user);
-            reservationFixture.createFutureReservation(time, firstTheme, admin);
-            reservationFixture.createPastReservation(time, secondTheme, user);
-            reservationFixture.createFutureReservation(time, secondTheme, admin);
+            reservationFixture.createPastReservation(reservationTime, firstTheme, user);
+            reservationFixture.createFutureReservation(reservationTime, firstTheme, admin);
+            reservationFixture.createPastReservation(reservationTime, secondTheme, user);
+            reservationFixture.createFutureReservation(reservationTime, secondTheme, admin);
         }
 
         @Test
@@ -93,10 +93,10 @@ class ReservationIntegrationTest extends IntegrationTest {
     class FindMyReservation {
         @Test
         void 내_예약_목록을_조회할_수_있다() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
 
             RestAssured.given().log().all()
@@ -111,18 +111,18 @@ class ReservationIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("사용자 예약 추가 API")
     class SaveReservation {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Theme theme;
         Member member;
         Map<String, String> params = new HashMap<>();
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
             theme = themeFixture.createFirstTheme();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             member = memberFixture.createUserMember();
-            params.put("themeId", time.getId().toString());
-            params.put("timeId", theme.getId().toString());
+            params.put("themeId", theme.getId().toString());
+            params.put("timeId", reservationTime.getId().toString());
             params.put("paymentKey", "testPaymentKey");
             params.put("orderId", "testOrderId");
             params.put("amount", "1000");
@@ -191,7 +191,7 @@ class ReservationIntegrationTest extends IntegrationTest {
 
         @Test
         void 시간대와_테마가_똑같은_중복된_예약은_추가할_수_없다() {
-            Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             params.put("date", reservation.getDate().toString());
 
             RestAssured.given().log().all()
@@ -224,12 +224,12 @@ class ReservationIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
             memberFixture.createAdminMember();
             params.put("themeId", theme.getId().toString());
-            params.put("timeId", time.getId().toString());
+            params.put("timeId", reservationTime.getId().toString());
             params.put("memberId", member.getId().toString());
             params.put("date", "2000-04-07");
         }
@@ -267,10 +267,10 @@ class ReservationIntegrationTest extends IntegrationTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
             memberFixture.createAdminMember();
         }
 
