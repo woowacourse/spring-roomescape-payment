@@ -6,10 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.CreationTimestamp;
-import roomescape.member.domain.Member;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
 import java.time.LocalDateTime;
@@ -31,21 +29,17 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
-
     @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     protected Payment() {}
 
-    public Payment(String externalPaymentId, String externalOrderId,
-                   Member member, Reservation reservation) {
+    public Payment(String externalPaymentId,
+                   String externalOrderId, Reservation reservation) {
         this.id = null;
         this.createdAt = null;
         this.externalPaymentKey = externalPaymentId;
         this.externalOrderId = externalOrderId;
-        this.member = member;
         this.reservation = reservation;
     }
 
@@ -65,11 +59,11 @@ public class Payment {
         return createdAt;
     }
 
-    public Member getMember() {
-        return member;
-    }
-
     public Reservation getReservation() {
         return reservation;
+    }
+
+    public Long getAmount() {
+        return this.reservation.getTheme().getPrice();
     }
 }

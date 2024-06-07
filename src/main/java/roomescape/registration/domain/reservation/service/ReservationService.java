@@ -12,6 +12,7 @@ import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.registration.domain.reservation.domain.Reservation;
@@ -67,7 +68,7 @@ public class ReservationService {
         Reservation saveReservation = new Reservation(reservationRequest.date(), time, theme, member);
         Reservation reservation = reservationRepository.save(saveReservation);
 
-        paymentService.sendConfirmRequestAndSavePayment(reservationRequest, reservation, member);
+        paymentService.sendConfirmRequestAndSavePayment(reservationRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }
@@ -119,9 +120,15 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<ReservationResponse> findMemberReservations(long id) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
-
         return reservations.stream()
-                .map(ReservationResponse::from)
+                .map(reservation -> {
+                    Optional<Payment> optionalPayment = paymentRepository.findByReservationId(reservation.getId());
+                    if(optionalPayment.isPresent()) {
+                        return ReservationResponse.from(reservation, optionalPayment.get());
+                    }
+
+                    return ReservationResponse.from(reservation);
+                })
                 .toList();
     }
 

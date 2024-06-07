@@ -1,7 +1,6 @@
 package roomescape.client.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
@@ -13,11 +12,10 @@ public record PaymentConfirmationFromTossDto(
         String status
 ) {
 
-    public Payment toPayment(Member member, Reservation reservation) {
+    public Payment toPayment(Reservation reservation) {
         return new Payment(
                 this.paymentKey,
                 this.orderId,
-                member,
                 reservation
         );
     }

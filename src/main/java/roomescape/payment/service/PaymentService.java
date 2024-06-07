@@ -6,7 +6,6 @@ import roomescape.client.payment.TossPaymentClient;
 import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.PaymentException;
-import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
@@ -27,11 +26,11 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public void sendConfirmRequestAndSavePayment(ReservationRequest reservationRequest, Reservation reservation, Member member) {
+    public void sendConfirmRequestAndSavePayment(ReservationRequest reservationRequest, Reservation reservation) {
         PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
         PaymentConfirmationFromTossDto paymentConfirmationFromTossDto = tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto);
         validateConfirmationStatus(paymentConfirmationFromTossDto);
-        Payment payment = paymentConfirmationFromTossDto.toPayment(member, reservation);
+        Payment payment = paymentConfirmationFromTossDto.toPayment(reservation);
 
         paymentRepository.save(payment);
     }
