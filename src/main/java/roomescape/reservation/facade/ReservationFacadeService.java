@@ -61,7 +61,7 @@ public class ReservationFacadeService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> readMyReservations(LoginMember loginMember) {
+    public List<MyReservationResponse> readReservationsByMember(LoginMember loginMember) {
         List<MemberReservation> confirmationReservations =
                 reservationService.readConfirmationMemberReservation(loginMember);
         List<WaitingReservationRanking> waitingReservations =

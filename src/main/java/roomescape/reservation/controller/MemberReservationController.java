@@ -47,7 +47,7 @@ public class MemberReservationController {
     @Operation(summary = "사용자 예약 조회")
     @GetMapping("/my")
     public List<MyReservationResponse> readMyReservations(@Parameter(hidden = true) LoginMember loginMember) {
-        return reservationFacadeService.readMyReservations(loginMember);
+        return reservationFacadeService.readReservationsByMember(loginMember);
     }
 
     @Operation(summary = "사용자 예약 삭제")
