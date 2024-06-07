@@ -164,6 +164,10 @@ public class Reservation extends BaseEntity {
         return theme;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

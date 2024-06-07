@@ -43,6 +43,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             on r.reservationTime.id = rt.id
             join fetch Theme t
             on r.theme.id = t.id
+            join fetch Payment p 
+            on r.payment.id = p.id 
             where m.id = :memberId
             """)
     List<Reservation> findAllByMemberId(Long memberId);

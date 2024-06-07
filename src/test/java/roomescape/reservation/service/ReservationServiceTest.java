@@ -22,12 +22,15 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.model.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
@@ -57,6 +60,7 @@ class ReservationServiceTest {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     ReservationServiceTest(final ReservationService reservationService,
@@ -64,13 +68,14 @@ class ReservationServiceTest {
                            final ReservationTimeRepository reservationTimeRepository,
                            final ThemeRepository themeRepository,
                            final MemberRepository memberRepository,
-                           final WaitingRepository waitingRepository) {
+                           final WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
         this.reservationService = reservationService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Test
@@ -218,16 +223,20 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(ThemeFixture.getOne());
 
         Member member = members.get(0);
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme));
-        Reservation reservationByOtherMember = reservationRepository.save(
-                new Reservation(members.get(1), LocalDate.parse("2025-04-10"), reservationTime, theme));
+        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderID", 1000L));
 
+        Reservation reservation = new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme);
+        reservation.assignPayment(payment);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        Reservation reservationByOtherMember = new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme);
+        reservation.assignPayment(payment);
+        Reservation savedReservationByOtherMember = reservationRepository.save(reservationByOtherMember);
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
         assertThat(reservationService.getReservations(authInfo))
-                .containsExactly(FindReservationResponse.from(reservation));
+                .containsExactly(FindReservationWithPaymentResponse.from(reservation));
     }
 
     @Test
