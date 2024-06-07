@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/themes")
-public class ThemeController {
+public class ThemeController implements ThemeControllerSwagger {
 
     private final ThemeService themeService;
 
@@ -28,6 +28,7 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody ThemeRequest themeRequest) {
         return ResponseEntity
@@ -35,6 +36,7 @@ public class ThemeController {
                 .body(themeService.addTheme(themeRequest));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> themeList() {
         return ResponseEntity
@@ -42,6 +44,7 @@ public class ThemeController {
                 .body(themeService.findThemes());
     }
 
+    @Override
     @GetMapping("/rank")
     public ResponseEntity<List<ThemeRankResponse>> themeRankList(@RequestParam LocalDate date) {
         return ResponseEntity
@@ -49,6 +52,7 @@ public class ThemeController {
                 .body(themeService.findRankedThemes(date));
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") long themeId) {
         themeService.removeTheme(themeId);
