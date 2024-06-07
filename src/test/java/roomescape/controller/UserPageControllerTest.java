@@ -10,13 +10,16 @@ import roomescape.controller.member.dto.MemberLoginRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.USER_NAME;
+import static roomescape.controller.doc.DocumentFilter.LOGIN;
+import static roomescape.controller.doc.DocumentFilter.LOGOUT;
 
 class UserPageControllerTest extends IntegrationTestSupport {
 
     @Test
     @DisplayName("사용자 로그인")
     void showUserPage() {
-        RestAssured.given().log().all()
+        RestAssured.given(specification).log().all()
+                .filter(LOGIN.getValue())
                 .contentType("application/json")
                 .body(new MemberLoginRequest("jinwuo0925@gmail.com", "1111"))
                 .when().post("/login")
@@ -39,8 +42,9 @@ class UserPageControllerTest extends IntegrationTestSupport {
 
     @Test
     @DisplayName("로그인 후 로그아웃")
-    void loginAndlogout() {
-        RestAssured.given().log().all()
+    void loginAndLogout() {
+        RestAssured.given(specification).log().all()
+                .filter(LOGOUT.getValue())
                 .cookie("token", USER_TOKEN)
                 .when().post("/logout")
                 .then().log().all()

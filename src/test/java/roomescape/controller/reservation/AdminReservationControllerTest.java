@@ -11,6 +11,7 @@ import roomescape.controller.reservation.dto.CreateReservationRequest;
 import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.is;
+import static roomescape.controller.doc.DocumentFilter.ADMIN_SAVE_RESERVATION;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AdminReservationControllerTest extends IntegrationTestSupport {
@@ -51,7 +52,8 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
         final CreateReservationRequest request = new CreateReservationRequest(1L,
                 1L, LocalDate.now().plusDays(1), 1L, "tgen_20240529194618t4hG2", "MC4wMzc1NDM4Njg4NTE1", 1000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(specification).log().all()
+                .filter(ADMIN_SAVE_RESERVATION.getValue())
                 .cookie("token", ADMIN_TOKEN)
                 .contentType(ContentType.JSON)
                 .body(request)
