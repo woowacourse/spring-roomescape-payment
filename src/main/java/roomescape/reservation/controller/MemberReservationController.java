@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import roomescape.reservation.facade.ReservationFacadeService;
 
 import java.util.List;
 
+@Tag(name = "멤버 예약", description = "멤버 권한으로 예약 조회, 추가, 삭제")
 @RestController
 @RequestMapping("/reservations")
 public class MemberReservationController {

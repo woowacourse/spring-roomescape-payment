@@ -1,5 +1,6 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import roomescape.theme.service.ThemeService;
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "테마", description = "테마를 추가 및 삭제, 인기 테마 조회")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
