@@ -30,6 +30,7 @@
 - [x] 테마 검색 기능 추가
 
 - [x] 자신의 예약 목록 조회 기능 추가
+  - [ ] 결제 정보 조회 기능 추가
 
 - [x] 예약 대기 생성/조회/삭제 기능 추가
 
@@ -431,21 +432,27 @@ content-type: application/json
     "theme": "테마1",
     "date": "2024-03-01",
     "time": "10:00",
-    "status": "예약"
+    "status": "예약",
+    "paymentKey": "paymentKey1",
+    "amount": 1000
   },
   {
     "reservationId": 2,
     "theme": "테마2",
     "date": "2024-03-01",
     "time": "12:00",
-    "status": "예약"
+    "status": "예약",
+    "paymentKey": "paymentKey2",
+    "amount": 1000
   },
   {
     "reservationId": 3,
     "theme": "테마3",
     "date": "2024-03-01",
     "time": "14:00",
-    "status": "예약"
+    "status": "예약",
+    "paymentKey": "paymentKey3",
+    "amount": 1000
   }
 ]
 ```
