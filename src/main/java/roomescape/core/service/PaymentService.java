@@ -52,8 +52,8 @@ public class PaymentService {
         );
     }
 
-    public PaymentResponse findByReservation(Reservation reservation) {
-        return new PaymentResponse(paymentRepository.findByReservation(reservation)
-                .orElseThrow(IllegalArgumentException::new));
+    public Optional<PaymentResponse> findByReservation(Reservation reservation) {
+        return paymentRepository.findByReservation(reservation)
+                .map(payment -> new PaymentResponse(payment));
     }
 }

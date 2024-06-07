@@ -130,7 +130,13 @@ public class ReservationService {
     }
 
     private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
-        PaymentResponse paymentResponse = paymentService.findByReservation(reservation);
+        return paymentService.findByReservation(reservation)
+                .map(paymentResponse -> getMyReservationResponseWithPayment(reservation, paymentResponse))
+                .orElseGet(() -> getReservationResponseWithoutPayment(reservation));
+    }
+
+    private MyReservationResponse getMyReservationResponseWithPayment(final Reservation reservation,
+                                                                      final PaymentResponse paymentResponse) {
         if (reservation.getStatus().equals(Status.BOOKED)) {
             return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
                     reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
@@ -141,6 +147,18 @@ public class ReservationService {
                 reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
                 reservation.getStatus().getValue(), paymentResponse.getPaymentKey(),
                 paymentResponse.getAmount(), findRankByCreateAt(reservation));
+    }
+
+    private MyReservationResponse getReservationResponseWithoutPayment(Reservation reservation) {
+        if (reservation.getStatus().equals(Status.BOOKED)) {
+            return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
+                    reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
+                    reservation.getStatus().getValue(), "NOT_PAID", 0L);
+        }
+        return MyReservationResponse.ofReservationWaiting(reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
+                reservation.getStatus().getValue(), "NOT_PAID", 0L, findRankByCreateAt(reservation));
     }
 
     private Integer findRankByCreateAt(final Reservation reservation) {
