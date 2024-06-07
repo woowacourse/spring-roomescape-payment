@@ -25,7 +25,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.TestFixture.HORROR_THEME;
@@ -62,7 +61,7 @@ class ThemeApiDocumentTest extends DocumentTest {
         BDDMockito.given(themeService.findAllPopular())
                 .willReturn(List.of(WOOTECO_THEME(1L), HORROR_THEME(2L)));
 
-        mockMvc.perform(get("/themes/popular")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/themes/popular")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
