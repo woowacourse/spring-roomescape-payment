@@ -13,9 +13,7 @@ public record ReservationStatusResponse(
         LocalDate date,
         LocalTime time,
         long waitingCount,
-
         String paymentKey,
-
         long amount
 ) {
     public static ReservationStatusResponse of(Reservation reservation, long waitingCount, ReservationPayment payment) {
