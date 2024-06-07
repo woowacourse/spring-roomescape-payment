@@ -2,6 +2,7 @@ package roomescape.reservation.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,20 +17,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import roomescape.common.config.IntegrationTest;
 import roomescape.common.util.CookieUtils;
 import roomescape.reservation.client.PaymentService;
 import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
 @AutoConfigureMockMvc
-public class ReservationSaveController extends IntegrationTest {
+class ReservationSaveControllerTest extends IntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private PaymentService paymentService;
@@ -52,6 +49,7 @@ public class ReservationSaveController extends IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(reservationPaymentSaveRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string(HttpHeaders.LOCATION, "/reservations/1"));
+                .andExpect(header().string(HttpHeaders.LOCATION, "/reservations/1"))
+                .andDo(document("reservations/save"));
     }
 }

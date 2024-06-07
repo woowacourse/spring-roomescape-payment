@@ -1,5 +1,8 @@
 package roomescape.auth.controller;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -28,17 +31,34 @@ class AuthControllerTest extends IntegrationTest {
                 .statusCode(201);
 
         LoginRequest loginRequest = new LoginRequest(email, password);
-        Response response = RestAssured.given().log().all()
+        Response response = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
+                .filter(document("/auth/login"))
                 .when().post("/login")
                 .thenReturn();
 
         String cookie = String.valueOf(response.getDetailedCookie(CookieUtils.TOKEN_KEY));
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(cookie)
+                .filter(document("/auth/findMemberName"))
                 .when().get("/login/member")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("로그아웃을 하면 해당 사용자의 쿠키를 제거한다.")
+    @Test
+    void logout() {
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, "cookieValue")
+                .filter(document("/auth/logout"))
+                .when()
+                .post("/logout")
+                .then().log().all()
+                .statusCode(200)
+                .header("Set-Cookie", containsString("token=;"))
+                .header("Set-Cookie", containsString("Max-Age=0"))
+                .header("Set-Cookie", containsString("Path=/"));
     }
 }

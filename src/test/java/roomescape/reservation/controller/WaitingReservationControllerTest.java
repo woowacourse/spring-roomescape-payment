@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.Fixture.KAKI_EMAIL;
 import static roomescape.Fixture.KAKI_NAME;
 import static roomescape.Fixture.KAKI_PASSWORD;
@@ -36,9 +37,10 @@ class WaitingReservationControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
         saveWaitReservationAsDateNow();
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("waitings/findAll"))
                 .when()
                 .get("/reservations/wait")
                 .then().log().all()
@@ -59,11 +61,12 @@ class WaitingReservationControllerTest extends IntegrationTest {
         WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
         String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, kakiToken)
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(saveRequest))
                 .accept(ContentType.JSON)
+                .filter(document("waitings/save"))
                 .when()
                 .post("/reservations/wait")
                 .then().log().all()
@@ -79,9 +82,10 @@ class WaitingReservationControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
         saveWaitReservationAsDateNow();
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("waitings/confirm"))
                 .when()
                 .patch("/reservations/wait/{id}", 1L)
                 .then().log().all()

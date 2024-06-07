@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.Fixture.TOMORROW;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,11 +30,12 @@ class AdminReservationControllerTest extends IntegrationTest {
 
         ReservationSaveRequest adminRequest = new ReservationSaveRequest(2L, TOMORROW, 1L, 1L, "paymentKey", 1000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(adminRequest))
                 .accept(ContentType.JSON)
+                .filter(document("/reservations/admin/save"))
                 .when()
                 .post("/admin/reservations")
                 .then().log().all()

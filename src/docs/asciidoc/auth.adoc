@@ -1,0 +1,16 @@
+[[Auth]]
+= 4. 인증 및 인가
+
+== 4.1 인증 API
+
+=== 로그인
+
+operation::auth/login[snippets='http-request,http-response']
+
+=== 로그인된 회원 이름 조회
+
+operation::auth/findMemberName[snippets='http-request,http-response']
+
+=== 로그아웃
+
+operation::auth/logout[snippets='http-request,http-response']

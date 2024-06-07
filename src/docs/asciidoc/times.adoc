@@ -1,0 +1,20 @@
+[[Reservation-Time]]
+= 2. 예약 시간
+
+== 2.1 예약 시간 API
+
+=== 예약 시간 전체 조회
+
+operation::times/findAll[snippets='http-request,http-response']
+
+=== 예약 가능한 시간 조회
+
+operation::times/available[snippets='http-request,http-response']
+
+=== 예약 시간 저장
+
+operation::times/save[snippets='http-request,http-response']
+
+=== 예약 시간 삭제
+
+operation::times/delete[snippets='http-request,http-response']
