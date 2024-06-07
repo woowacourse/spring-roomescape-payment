@@ -26,7 +26,7 @@ import roomescape.payment.client.toss.TossClientErrorResponse;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = Logger.getLogger("Logeer");
+    private static final Logger logger = Logger.getLogger("Logger");
     private static final String EXCEPTION_PREFIX = "[ERROR] ";
 
     @ExceptionHandler
