@@ -59,8 +59,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberReservationResponse> findMemberReservationWithWaitingStatus(Long memberId) {
-        return reservationRepository.findByMemberIdWithWaitingStatus(memberId).stream()
+    public List<MemberReservationResponse> findMemberReservationWithInformation(Long memberId) {
+        return reservationRepository.findByMemberIdWithInformation(memberId).stream()
                 .map(MemberReservationResponse::new)
                 .toList();
     }

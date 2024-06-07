@@ -4,18 +4,22 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 
-public class ReservationWithWaiting {
+public class ReservationWithInformation {
 
     private final Reservation reservation;
     private final int waitingNumber;
+    private final String paymentKey;
+    private final int amount;
 
-    public ReservationWithWaiting(Reservation reservation, int waitingNumber) {
+    public ReservationWithInformation(Reservation reservation, int waitingNumber, String paymentKey, int amount) {
         this.reservation = reservation;
         this.waitingNumber = waitingNumber;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
-    public ReservationWithWaiting(Reservation reservation, Long waitingNumber) {
-        this(reservation, waitingNumber.intValue());
+    public ReservationWithInformation(Reservation reservation, Long waitingNumber, String paymentKey, int amount) {
+        this(reservation, waitingNumber.intValue(), paymentKey, amount);
     }
 
     public Reservation getReservation() {
@@ -42,6 +46,14 @@ public class ReservationWithWaiting {
         return waitingNumber;
     }
 
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -50,12 +62,12 @@ public class ReservationWithWaiting {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ReservationWithWaiting that = (ReservationWithWaiting) o;
+        ReservationWithInformation that = (ReservationWithInformation) o;
         return waitingNumber == that.waitingNumber && Objects.equals(reservation, that.reservation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(reservation, waitingNumber);
+        return Objects.hash(reservation, waitingNumber, paymentKey, amount);
     }
 }

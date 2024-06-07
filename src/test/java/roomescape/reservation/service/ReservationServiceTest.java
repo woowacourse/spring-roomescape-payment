@@ -14,7 +14,6 @@ import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERV
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
-import static roomescape.reservation.fixture.ReservationFixture.SAVED_PAYMENT_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_2;
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
@@ -41,12 +40,11 @@ import roomescape.global.exception.InternalServerException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
 import roomescape.payment.config.PaymentConfig;
-import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.service.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationWithWaiting;
+import roomescape.reservation.domain.ReservationWithInformation;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.service.ThemeService;
@@ -99,11 +97,11 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findByMemberIdWithWaitingStatus(1L))
-                .thenReturn(List.of(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        when(reservationRepository.findByMemberIdWithInformation(1L))
+                .thenReturn(List.of(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", 1000)));
 
-        assertThat(reservationService.findMemberReservationWithWaitingStatus(1L))
-                .containsExactly(new MemberReservationResponse(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        assertThat(reservationService.findMemberReservationWithInformation(1L))
+                .containsExactly(new MemberReservationResponse(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", 1000)));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")

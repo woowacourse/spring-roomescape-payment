@@ -25,13 +25,13 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private int totalAmount;
+    private int amount;
 
-    public Payment(Long id, Reservation reservation, String paymentKey, int totalAmount) {
+    public Payment(Long id, Reservation reservation, String paymentKey, int amount) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
-        this.totalAmount = totalAmount;
+        this.amount = amount;
     }
 
     public Payment(Reservation reservation, String paymentKey, int totalAmount) {
@@ -53,8 +53,8 @@ public class Payment {
         return paymentKey;
     }
 
-    public int getTotalAmount() {
-        return totalAmount;
+    public int getAmount() {
+        return amount;
     }
 
     @Override
@@ -71,6 +71,6 @@ public class Payment {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reservation, paymentKey, totalAmount);
+        return Objects.hash(id, reservation, paymentKey, amount);
     }
 }

@@ -2,22 +2,26 @@ package roomescape.reservation.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.reservation.domain.ReservationWithWaiting;
+import roomescape.reservation.domain.ReservationWithInformation;
 
 public record MemberReservationResponse(
         Long id,
         String themeName,
         LocalDate date,
         LocalTime time,
-        String status) {
-
-    public MemberReservationResponse(ReservationWithWaiting reservation) {
+        String status,
+        String paymentKey,
+        int amount
+) {
+    public MemberReservationResponse(ReservationWithInformation reservation) {
         this(
                 reservation.getReservationId(),
                 reservation.getThemeName(),
                 reservation.getReservationDate(),
                 reservation.getStartAt(),
-                statusMessage(reservation.getWaitingNumber())
+                statusMessage(reservation.getWaitingNumber()),
+                reservation.getPaymentKey(),
+                reservation.getAmount()
         );
     }
 

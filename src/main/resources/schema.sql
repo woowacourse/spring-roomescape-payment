@@ -41,7 +41,7 @@ CREATE TABLE payment
     id       BIGINT       NOT NULL AUTO_INCREMENT,
     reservation_id BIGINT NOT NULL,
     payment_key    VARCHAR(255) NOT NULL,
-    total_amount INT NOT NULL,
+    amount INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (reservation_id) REFERENCES reservation (id)
 );
