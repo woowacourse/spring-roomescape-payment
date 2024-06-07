@@ -24,13 +24,6 @@ public class ReservationMineResponse {
     private final String paymentKey;
     private final Integer amount;
 
-    private static String createStatusMessage(Reservation reservation) {
-        if (reservation.isPaymentWaitingStatus()) {
-            return PAYMENT_WAITING_MESSAGE;
-        }
-        return BOOKED_MESSAGE;
-    }
-
     public ReservationMineResponse(Long reservationId, String theme, LocalDate date, LocalTime time, String status, String paymentKey, Integer amount) {
         this.reservationId = reservationId;
         this.theme = theme;
@@ -48,7 +41,7 @@ public class ReservationMineResponse {
                     reservation.getTheme().getName().getName(),
                     reservation.getDate(),
                     reservation.getTime().getStartAt(),
-                    PAYMENT_WAITING_MESSAGE,
+                    BOOKED_MESSAGE,
                     payment.getPaymentKey(),
                     payment.getAmount()
             );

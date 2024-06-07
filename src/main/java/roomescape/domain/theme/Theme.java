@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import java.util.Objects;
 
+// TODO: 테마 가격 추가해서 가격만큼 payment amount에 적용시키기
 @Entity
 public class Theme {
     @Id

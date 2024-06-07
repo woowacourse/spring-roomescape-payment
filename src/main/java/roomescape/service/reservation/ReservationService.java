@@ -136,7 +136,6 @@ public class ReservationService {
         }
     }
 
-    // TODO: 토스 환불 기능 연동
     public void deleteReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, member);
