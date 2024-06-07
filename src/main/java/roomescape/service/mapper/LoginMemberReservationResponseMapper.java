@@ -1,5 +1,8 @@
 package roomescape.service.mapper;
 
+import static roomescape.dto.ReservationStatus.SUCCESS;
+import static roomescape.dto.ReservationStatus.WAITING_PAYMENT;
+
 import roomescape.domain.Reservation;
 import roomescape.domain.payment.Payment;
 import roomescape.dto.LoginMemberReservationResponse;
@@ -18,7 +21,7 @@ public class LoginMemberReservationResponseMapper {
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getTime(),
-                "결제 대기",
+                WAITING_PAYMENT,
                 null,
                 null);
     }
@@ -29,7 +32,7 @@ public class LoginMemberReservationResponseMapper {
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getTime(),
-                "예약",
+                SUCCESS,
                 payment.getPaymentKey(),
                 payment.getAmount());
     }

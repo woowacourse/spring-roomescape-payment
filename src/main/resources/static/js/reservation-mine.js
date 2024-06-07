@@ -26,11 +26,12 @@ function renderMyReservation(data) {
     const date = item.date;
     const time = item.time;
     const status = item.status;
+    const statusString = status === "SUCCESS" ? "예약" : "결제 대기";
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
-    row.insertCell(3).textContent = status;
+    row.insertCell(3).textContent = statusString;
     const cancelCell = row.insertCell(4);
     const cancelButton = document.createElement('button');
     cancelButton.textContent = '취소';
