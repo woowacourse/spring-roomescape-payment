@@ -7,8 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import roomescape.domain.member.model.Member;
+import jakarta.persistence.OneToOne;
+import roomescape.domain.reservation.model.Reservation;
 
 import java.time.LocalDateTime;
 
@@ -18,14 +18,14 @@ public class PaymentHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(length = 100, nullable = false, unique = true)
     private String orderId;
 
-    @Column(nullable = false)
+    @Column(length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @Column(nullable = false)
+    @Column(length = 100, nullable = false)
     private String orderName;
 
     @Column(nullable = false)
@@ -34,11 +34,14 @@ public class PaymentHistory {
     @Column(nullable = false)
     private LocalDateTime approvedAt;
 
-    @Column(nullable = false)
+    @Column(length = 100, nullable = false)
+    private String paymentKey;
+
+    @Column(length = 100, nullable = false)
     private String paymentProvider;
 
-    @ManyToOne
-    private Member member;
+    @OneToOne
+    private Reservation reservation;
 
     protected PaymentHistory() {
     }
@@ -49,16 +52,18 @@ public class PaymentHistory {
             final String orderName,
             final Long totalAmount,
             final LocalDateTime approvedAt,
+            final String paymentKey,
             final String paymentProvider,
-            final Member member
+            final Reservation reservation
     ) {
         this.orderId = orderId;
         this.paymentStatus = paymentStatus;
         this.orderName = orderName;
         this.totalAmount = totalAmount;
         this.approvedAt = approvedAt;
+        this.paymentKey = paymentKey;
         this.paymentProvider = paymentProvider;
-        this.member = member;
+        this.reservation = reservation;
     }
 
     public Long getId() {
@@ -85,11 +90,15 @@ public class PaymentHistory {
         return approvedAt;
     }
 
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
     public String getPaymentProvider() {
         return paymentProvider;
     }
 
-    public Member getMember() {
-        return member;
+    public Reservation getReservation() {
+        return reservation;
     }
 }

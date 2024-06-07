@@ -1,8 +1,8 @@
 package roomescape.domain.payment.dto;
 
-import roomescape.domain.member.model.Member;
 import roomescape.domain.payment.model.PaymentHistory;
 import roomescape.domain.payment.model.PaymentStatus;
+import roomescape.domain.reservation.model.Reservation;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -14,6 +14,7 @@ public class PaymentConfirmResponse {
     private final String orderName;
     private final Long totalAmount;
     private final LocalDateTime approvedAt;
+    private final String paymentKey;
     private final String paymentProvider;
 
     public PaymentConfirmResponse(
@@ -22,6 +23,7 @@ public class PaymentConfirmResponse {
             final String orderName,
             final Long totalAmount,
             final String approvedAt,
+            final String paymentKey,
             final Map<String, String> easyPay
     ) {
         this.orderId = orderId;
@@ -29,6 +31,7 @@ public class PaymentConfirmResponse {
         this.orderName = orderName;
         this.totalAmount = totalAmount;
         this.approvedAt = convertLocalDateTime(approvedAt);
+        this.paymentKey = paymentKey;
         this.paymentProvider = easyPay.get("provider");
     }
 
@@ -37,15 +40,16 @@ public class PaymentConfirmResponse {
         return offsetDateTime.toLocalDateTime();
     }
 
-    public PaymentHistory toPaymentHistory(final Member member) {
+    public PaymentHistory toPaymentHistory(final Reservation reservation) {
         return new PaymentHistory(
                 orderId,
                 PaymentStatus.valueOf(status),
                 orderName,
                 totalAmount,
                 approvedAt,
+                paymentKey,
                 paymentProvider,
-                member
+                reservation
         );
     }
 
@@ -63,6 +67,10 @@ public class PaymentConfirmResponse {
 
     public LocalDateTime getApprovedAt() {
         return approvedAt;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 
     public String getPaymentProvider() {

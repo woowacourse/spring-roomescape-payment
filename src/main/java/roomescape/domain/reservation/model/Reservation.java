@@ -1,5 +1,6 @@
 package roomescape.domain.reservation.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,6 +31,7 @@ public class Reservation {
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
     private ReservationStatus status;
 
     @Embedded
