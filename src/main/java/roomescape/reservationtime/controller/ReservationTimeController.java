@@ -17,13 +17,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/times")
-public class ReservationTimeController {
+public class ReservationTimeController implements ReservationTimeControllerSwagger {
+
     private final ReservationTimeService reservationTimeService;
 
     public ReservationTimeController(ReservationTimeService reservationTimeService) {
         this.reservationTimeService = reservationTimeService;
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> reservationTimeSave(
             @RequestBody ReservationTimeRequest reservationTimeRequest) {
@@ -32,11 +34,13 @@ public class ReservationTimeController {
                 .body(reservationTimeService.addReservationTime(reservationTimeRequest));
     }
 
+    @Override
     @GetMapping
     public List<ReservationTimeResponse> reservationTimesList() {
         return reservationTimeService.findReservationTimes();
     }
 
+    @Override
     @DeleteMapping("/{reservationTimeId}")
     public ResponseEntity<Void> reservationTimeRemove(@PathVariable long reservationTimeId) {
         reservationTimeService.removeReservationTime(reservationTimeId);
