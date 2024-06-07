@@ -32,4 +32,16 @@ public class Payment {
         this.amount = amount;
         this.paymentProduct = paymentProduct;
     }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public Long getPaymentProductId() {
+        return paymentProduct.getProductId();
+    }
 }
