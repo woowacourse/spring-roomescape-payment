@@ -1,7 +1,6 @@
 package roomescape.documentaion;
 
 import jakarta.servlet.http.Cookie;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -12,7 +11,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.presentation.AuthController;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
