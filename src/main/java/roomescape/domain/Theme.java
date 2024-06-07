@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 
 @Entity
 public class Theme {
@@ -22,15 +23,19 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
 
+    @Column(nullable = false)
+    private BigDecimal price;
+
     protected Theme() {
 
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    public Theme(Long id, String name, String description, String thumbnail, BigDecimal price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
     public Long getId() {
@@ -47,5 +52,9 @@ public class Theme {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
     }
 }

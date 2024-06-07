@@ -45,7 +45,7 @@ public class MockReservationTest {
         PaymentInfo paymentInfo = new PaymentInfo(BigDecimal.valueOf(1000000000), "orderId", "paymentKey");
         MemberResponse memberResponse = new MemberResponse(1L, "atto");
         TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
-        ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
+        ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(1L, memberResponse,
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 
@@ -76,7 +76,7 @@ public class MockReservationTest {
         PaymentInfo paymentInfo = new PaymentInfo(BigDecimal.valueOf(1000000001), "orderId", "paymentKey");
         MemberResponse memberResponse = new MemberResponse(1L, "atto");
         TimeSlotResponse timeSlotResponse = new TimeSlotResponse(1L, LocalTime.of(3, 20));
-        ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail");
+        ThemeResponse themeResponse = new ThemeResponse(1L, "ash", "description", "thumbnail", BigDecimal.valueOf(10000));
         ReservationResponse reservationResponse = new ReservationResponse(1L, memberResponse,
                 LocalDate.of(2999, 12, 31), timeSlotResponse, themeResponse);
 

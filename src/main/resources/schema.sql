@@ -22,6 +22,7 @@ create table if not exists theme (
     description varchar(255),
     name varchar(255),
     thumbnail varchar(255),
+    price decimal,
     primary key (id)
 );
 

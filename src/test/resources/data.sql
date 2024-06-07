@@ -28,6 +28,7 @@ create table if not exists theme (
     description varchar(255),
     name varchar(255),
     thumbnail varchar(255),
+    price decimal,
     primary key (id)
 );
 
@@ -57,10 +58,10 @@ INSERT INTO member(name, email, password, role)
 VALUES ('어드민', 'testDB@email.com', '1234', 'ADMIN'),
        ('사용자', 'test2DB@email.com', '1234', 'USER');
 
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('레벨1 탈출', '우테코 레벨2를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
-       ('레벨2 탈출', '우테코 레벨3를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
-       ('레벨3 탈출', '우테코 레벨4를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail, price)
+VALUES ('레벨1 탈출', '우테코 레벨2를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 10000),
+       ('레벨2 탈출', '우테코 레벨3를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 15000),
+       ('레벨3 탈출', '우테코 레벨4를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', 20000);
 
 INSERT INTO reservation(member_id, date, time_id, theme_id, status)
 VALUES (1, '2024-05-01', 1, 1, 'BOOKING'),
