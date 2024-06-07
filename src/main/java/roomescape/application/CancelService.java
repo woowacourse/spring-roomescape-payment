@@ -16,14 +16,14 @@ public class CancelService {
 
     @Transactional
     public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
+        Reservation reservation = reservationRepository.getById(reservationId);
         reservation.cancel(memberInfo.id());
         updateFirstWaitingToPending(reservation);
     }
 
     @Transactional
     public void cancelReservationByAdmin(Long reservationId) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
+        Reservation reservation = reservationRepository.getById(reservationId);
         reservation.cancelByAdmin();
         updateFirstWaitingToPending(reservation);
     }

@@ -21,14 +21,14 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     public List<MemberResponse> findAllMember() {
-        return memberRepository.getAll()
+        return memberRepository.findAll()
                 .stream()
                 .map(member -> new MemberResponse(member.getId(), member.getName()))
                 .toList();
     }
 
     public String login(LoginRequest loginRequest) {
-        Member findMember = memberRepository.findMember(loginRequest.email(), loginRequest.password())
+        Member findMember = memberRepository.findByEmailAndPassword(loginRequest.email(), loginRequest.password())
                 .orElseThrow(AuthenticationException::new);
         return "token=" + jwtProvider.encode(findMember);
     }
@@ -41,14 +41,14 @@ public class MemberService {
     }
 
     private void checkDuplicateEmail(String email) {
-        if (memberRepository.existsMember(email)) {
+        if (memberRepository.existsByEmail(email)) {
             throw new RoomEscapeException("이미 가입된 이메일입니다.");
         }
     }
 
     @Transactional
     public void withdrawal(Long memberId) {
-        Member findMember = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
-        memberRepository.deleteMember(findMember);
+        Member findMember = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
+        memberRepository.delete(findMember);
     }
 }

@@ -12,9 +12,9 @@ public class ReservationDetailFactory {
     private final ThemeRepository themeRepository;
 
     public ReservationDetail createReservationDetail(LocalDate date, Long timeId, Long themeId) {
-        ReservationTime time = reservationTimeRepository.getReservationTime(timeId);
+        ReservationTime time = reservationTimeRepository.getById(timeId);
         Theme theme = themeRepository.getById(themeId);
-        return reservationDetailRepository.findReservationDetail(date, time, theme)
+        return reservationDetailRepository.findByDateAndTimeAndTheme(date, time, theme)
                 .orElseGet(() -> reservationDetailRepository.save(new ReservationDetail(date, time, theme)));
     }
 }

@@ -6,13 +6,13 @@ import java.util.Optional;
 public interface MemberRepository {
     Member save(Member user);
 
-    Optional<Member> findMember(Long id);
+    Optional<Member> findById(Long id);
 
-    Optional<Member> findMember(String email, String password);
+    Optional<Member> findByEmailAndPassword(String email, String password);
 
-    List<Member> getAll();
+    List<Member> findAll();
 
-    boolean existsMember(String email);
+    boolean existsByEmail(String email);
 
-    void deleteMember(Member member);
+    void delete(Member member);
 }

@@ -49,7 +49,7 @@ public class ThemeService {
     @Transactional
     public void deleteTheme(Long id) {
         try {
-            themeRepository.delete(id);
+            themeRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             throw new RoomEscapeException("예약이 존재하는 테마입니다.");
         }

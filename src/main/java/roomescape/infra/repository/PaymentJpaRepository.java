@@ -1,10 +1,8 @@
 package roomescape.infra.repository;
 
-
 import org.springframework.data.repository.Repository;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 
-public interface PaymentJpaRepository extends Repository<Payment, Long> {
-
-    Payment save(Payment payment);
+public interface PaymentJpaRepository extends PaymentRepository, Repository<Payment, Long> {
 }

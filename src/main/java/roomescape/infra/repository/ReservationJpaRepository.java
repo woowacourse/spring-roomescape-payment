@@ -6,21 +6,12 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
-import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationWithRank;
-import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationDetail;
 
-public interface ReservationJpaRepository extends Repository<Reservation, Long> {
-
-    Reservation save(Reservation reservation);
-
-    Optional<Reservation> findById(Long id);
-
-    List<Reservation> findAll();
-
-    List<Reservation> findAllByStatus(Status status);
+public interface ReservationJpaRepository extends ReservationRepository, Repository<Reservation, Long> {
 
     @Query(""" 
             select r from Reservation r
@@ -43,7 +34,7 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
             order by r.createdAt
             limit 1
             """)
-    Optional<Reservation> findNextWaitingReservation(@Param("detail") ReservationDetail detail);
+    Optional<Reservation> findNextWaiting(@Param("detail") ReservationDetail detail);
 
     @Query(""" 
             select new roomescape.domain.reservation.ReservationWithRank(mine,
@@ -57,8 +48,4 @@ public interface ReservationJpaRepository extends Repository<Reservation, Long> 
                 and mine.detail.time.startAt > current_time))
             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
-
-    boolean existsByDetailAndMemberAndStatusIn(ReservationDetail detail, Member member, List<Status> status);
-
-    boolean existsByDetailAndStatusIn(ReservationDetail reservationDetail, List<Status> status);
 }

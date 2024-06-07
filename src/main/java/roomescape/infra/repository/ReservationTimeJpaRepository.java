@@ -3,19 +3,15 @@ package roomescape.infra.repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import roomescape.domain.reservationdetail.ReservationTime;
+import roomescape.domain.reservationdetail.ReservationTimeRepository;
 
-public interface ReservationTimeJpaRepository extends Repository<ReservationTime, LocalTime> {
-
-    ReservationTime save(ReservationTime time);
-
-    Optional<ReservationTime> findById(Long id);
-
-    List<ReservationTime> findAll();
+public interface ReservationTimeJpaRepository extends
+        ReservationTimeRepository,
+        Repository<ReservationTime, LocalTime> {
 
     @Query("""
             select d.time from ReservationDetail d
@@ -46,8 +42,4 @@ public interface ReservationTimeJpaRepository extends Repository<ReservationTime
             @Param("date") LocalDate date,
             @Param("themeId") Long themeId
     );
-
-    boolean existsByStartAt(LocalTime startAt);
-
-    void delete(ReservationTime time);
 }

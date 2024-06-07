@@ -62,7 +62,7 @@ public class ReservationService {
     }
 
     private Reservation saveReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(date, timeId, themeId);
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
         return reservationRepository.save(reservation);
@@ -78,7 +78,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
-        Reservation reservation = reservationRepository.getReservation(request.reservationId());
+        Reservation reservation = reservationRepository.getById(request.reservationId());
         rejectIfNotOwner(reservation, memberId);
         Payment payment = savePayment(request.toPaymentRequest(), reservation);
         reservation.completePayment(payment);
@@ -92,14 +92,14 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllReservedReservations() {
-        List<Reservation> reservations = reservationRepository.findAll(Status.RESERVED);
+        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
     public List<ReservationResponse> findAllReservationByConditions(ReservationSearchCondition condition) {
-        List<Reservation> reservations = reservationRepository.findReservation(
+        List<Reservation> reservations = reservationRepository.findByPeriodAndThemeAndMember(
                 condition.start(), condition.end(), condition.memberId(), condition.themeId());
         return reservations.stream()
                 .map(ReservationResponse::from)
@@ -115,7 +115,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllWaitings() {
-        List<Reservation> reservations = reservationRepository.findAll(Status.WAITING);
+        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.WAITING);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();

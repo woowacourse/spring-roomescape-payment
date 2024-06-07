@@ -84,7 +84,7 @@ class ReservationServiceTest extends BaseServiceTest {
         ReservationResponse response = reservationService.reserve(request, user.getId());
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThatCode(reservation::getPayment)
@@ -145,7 +145,7 @@ class ReservationServiceTest extends BaseServiceTest {
         ReservationResponse response = reservationService.reserve(memberRequest, user.getId());
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.WAITING);
             softly.assertThatThrownBy(reservation::getPayment)
@@ -171,7 +171,7 @@ class ReservationServiceTest extends BaseServiceTest {
         ReservationResponse response = reservationService.payForPending(request, admin.getId());
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThatCode(reservation::getPayment)

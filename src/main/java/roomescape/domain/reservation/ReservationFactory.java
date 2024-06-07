@@ -26,13 +26,13 @@ public class ReservationFactory {
     }
 
     private void rejectDuplicateReservation(ReservationDetail detail, Member member) {
-        if (reservationRepository.existsReservation(detail, member, Status.getStatusWithoutCancel())) {
+        if (reservationRepository.existsByDetailAndMemberAndStatusIn(detail, member, Status.getStatusWithoutCancel())) {
             throw new RoomEscapeException("중복된 예약입니다.");
         }
     }
 
     private Reservation getReservation(ReservationDetail detail, Member member) {
-        if (reservationRepository.existsReservation(detail, Status.getStatusWithoutCancel())) {
+        if (reservationRepository.existsByDetailAndStatusIn(detail, Status.getStatusWithoutCancel())) {
             return new Reservation(member, detail, Status.WAITING);
         }
         return new Reservation(member, detail, Status.PAYMENT_PENDING);

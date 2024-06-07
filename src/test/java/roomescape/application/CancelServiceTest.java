@@ -72,7 +72,7 @@ class CancelServiceTest extends BaseServiceTest {
         cancelService.cancelReservation(reservation.getId(), memberInfo);
 
         // then
-        Reservation canceledReservation = reservationRepository.getReservation(reservation.getId());
+        Reservation canceledReservation = reservationRepository.getById(reservation.getId());
         Assertions.assertThat(canceledReservation.getStatus()).isEqualTo(Status.CANCELED);
     }
 
@@ -88,7 +88,7 @@ class CancelServiceTest extends BaseServiceTest {
         cancelService.cancelReservation(reservation.getId(), memberInfo);
 
         // then
-        Reservation waitingReservation = reservationRepository.getReservation(nextReservation.getId());
+        Reservation waitingReservation = reservationRepository.getById(nextReservation.getId());
         Assertions.assertThat(waitingReservation.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
     }
 

@@ -127,6 +127,6 @@ class ReservationTimeServiceTest extends BaseServiceTest {
         reservationTimeService.deleteReservationTime(time.getId());
 
         // then
-        Assertions.assertThat(reservationTimeRepository.findReservationTime(timeId)).isEmpty();
+        Assertions.assertThat(reservationTimeRepository.findById(timeId)).isEmpty();
     }
 }
