@@ -27,8 +27,8 @@ public class ReservationDeleteService {
         validateIsAfterFromNow(reservation);
 
         findHighPriorityWaiting(reservationId).ifPresentOrElse(
-                Waiting::confirmReservation,
-                () -> reservationRepository.deleteById(reservationId));
+                this::confirmReservation,
+                () -> reservationRepository.delete(reservation));
     }
 
     private Reservation findReservation(Long id) {
@@ -44,5 +44,10 @@ public class ReservationDeleteService {
         if (reservation.isBefore(LocalDateTime.now())) {
             throw new BadArgumentRequestException("예약은 현재 날짜 이후여야 합니다.");
         }
+    }
+
+    private void confirmReservation(Waiting waiting) {
+        waiting.confirmReservation();
+        waitingRepository.delete(waiting);
     }
 }
