@@ -1,6 +1,7 @@
 package roomescape.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ public record MyReservationWaitingResponse(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         @JsonFormat(pattern = "HH:mm")
+        @Schema(type = "String", pattern = "HH:mm")
         LocalTime startAt,
         String status,
         String paymentKey,

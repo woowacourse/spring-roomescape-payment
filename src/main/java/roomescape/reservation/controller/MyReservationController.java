@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,7 @@ import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.service.ReservationService;
 import roomescape.waiting.service.WaitingService;
 
+@Tag(name = "나의 예약 API")
 @RestController
 @RequestMapping("/my/reservaitons")
 public class MyReservationController {
