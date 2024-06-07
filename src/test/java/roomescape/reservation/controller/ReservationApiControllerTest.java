@@ -1,8 +1,14 @@
 package roomescape.reservation.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.TODAY;
+import static roomescape.util.RestDocsFilter.CANCEL_RESERVATION_BY_USER;
+import static roomescape.util.RestDocsFilter.CREATE_RESERVATION_BY_USER;
+import static roomescape.util.RestDocsFilter.CREATE_WAITING;
+import static roomescape.util.RestDocsFilter.DELETE_WAITING;
+import static roomescape.util.RestDocsFilter.GET_MY_RESERVATION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,13 +39,20 @@ class ReservationApiControllerTest extends IntegrationTest {
     @DisplayName("회원별 예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findMemberReservations() {
-        RestAssured.given().log().all()
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateTomorrow();
+
+        RestAssured.given(spec).log().all()
+                .filter(GET_MY_RESERVATION.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
                 .get("/reservations/mine")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("responses", hasSize(1));
     }
 
     @DisplayName("회원이 예약을 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
@@ -55,7 +68,8 @@ class ReservationApiControllerTest extends IntegrationTest {
         PaymentResponse paymentResponse = new PaymentResponse("testKey", new BigDecimal("1000"));
         doReturn(paymentResponse).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(CREATE_RESERVATION_BY_USER.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(reservationSaveRequest))
@@ -98,7 +112,8 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(CREATE_WAITING.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(reservationSaveRequest))
@@ -118,7 +133,8 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
         saveSuccessReservationAsDateTomorrow();
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(CANCEL_RESERVATION_BY_USER.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
@@ -137,7 +153,8 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveSuccessReservationAsDateTomorrow();
         saveWaitingAsDateTomorrow();
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(DELETE_WAITING.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()

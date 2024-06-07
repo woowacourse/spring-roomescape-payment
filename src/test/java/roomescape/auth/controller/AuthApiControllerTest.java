@@ -1,12 +1,14 @@
 package roomescape.auth.controller;
 
+import static roomescape.util.RestDocsFilter.LOGIN;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.config.IntegrationTest;
 import roomescape.auth.dto.LoginRequest;
+import roomescape.config.IntegrationTest;
 import roomescape.member.dto.MemberSignUpRequest;
 import roomescape.util.CookieUtils;
 
@@ -28,7 +30,8 @@ class AuthApiControllerTest extends IntegrationTest {
                 .statusCode(201);
 
         LoginRequest loginRequest = new LoginRequest(email, password);
-        Response response = RestAssured.given().log().all()
+        Response response = RestAssured.given(spec).log().all()
+                .filter(LOGIN.getFilter())
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
