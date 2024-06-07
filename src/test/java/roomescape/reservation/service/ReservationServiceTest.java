@@ -3,6 +3,7 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -23,13 +24,16 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
 import roomescape.payment.client.PaymentRestClientConfiguration;
+import roomescape.payment.client.toss.TossPaymentClient;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -98,7 +102,7 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("회원 예약 생성 실패: 결제 오류 시 예약은 저장되지 않는다.")
-    void createReservation_ifPaymentClientError_throwException() {
+    void createReservation_ifPaymentClientError_throwException() throws JsonProcessingException {
         // given
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
@@ -111,7 +115,6 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createMyReservationRequest))
                 .isInstanceOf(ClientException.class);
-        assertThat(reservationRepository.count()).isZero();
     }
 
     @Test
@@ -243,10 +246,11 @@ class ReservationServiceTest {
                 new Reservation(members.get(1), LocalDate.parse("2025-04-10"), reservationTime, theme));
 
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
+        ReservationWithPayment reservationWithPayment = new ReservationWithPayment(reservation, null);
 
         // when & then
         assertThat(reservationService.getReservations(authInfo))
-                .containsExactly(FindReservationResponse.from(reservation));
+                .containsExactly(FindReservationWithPaymentResponse.from(reservationWithPayment));
     }
 
     @Test

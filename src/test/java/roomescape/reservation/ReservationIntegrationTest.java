@@ -32,7 +32,9 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -497,7 +499,7 @@ class ReservationIntegrationTest {
         Reservation reservation3 = reservationRepository.save(
                 ReservationFixture.getOneWithMemberTimeTheme(member2, reservationTime, themes.get(2)));
 
-        List<FindReservationResponse> findReservationResponses = RestAssured.given().log().all()
+        List<FindReservationWithPaymentResponse> findReservationResponses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member1))
                 .when().get("/members/reservations")
@@ -505,11 +507,11 @@ class ReservationIntegrationTest {
 
                 .statusCode(200)
                 .extract().jsonPath()
-                .getList(".", FindReservationResponse.class);
+                .getList(".", FindReservationWithPaymentResponse.class);
 
         assertThat(findReservationResponses.containsAll(List.of(
-                FindReservationResponse.from(reservation1),
-                FindReservationResponse.from(reservation2))
+                FindReservationWithPaymentResponse.from(new ReservationWithPayment(reservation1, null)),
+                FindReservationWithPaymentResponse.from(new ReservationWithPayment(reservation2, null)))
         ));
     }
 }
