@@ -36,8 +36,8 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     @Query("""
             select new roomescape.domain.dto.ReservationWithRank(r,
             (select count(*) from Reservation as cr
-            where cr.detail.id = r.detail.id and cr.createdAt < r.createdAt))
-            from Reservation r
+            where cr.detail.id = r.detail.id and cr.createdAt < r.createdAt), p)
+            from Reservation r join Payment p on r.payment.id = p.id
             where r.member.id = :memberId
             """)
     List<ReservationWithRank> findWithRankingByMemberId(@Param("memberId") long memberId);
