@@ -10,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 ext {
-    snippetsDir = file('build/generated-snippets') // 2
+    snippetsDir = file('build/generated-snippets')
 }
 
 configurations {
@@ -42,6 +42,7 @@ dependencies {
 }
 
 test {
+    include '**/*ControllerTest.*'
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
@@ -52,7 +53,7 @@ asciidoctor {
     dependsOn test
 }
 
-task copyDocument(type: Copy) { // 7
+task copyDocument(type: Copy) {
     dependsOn asciidoctor
 
     from file("build/docs/asciidoc")
@@ -60,5 +61,5 @@ task copyDocument(type: Copy) { // 7
 }
 
 bootJar {
-    dependsOn copyDocument // 8
+    dependsOn copyDocument
 }
