@@ -1,9 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +20,11 @@ import roomescape.service.reservationwaiting.dto.ReservationWaitingListResponse;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingRequest;
 import roomescape.service.reservationwaiting.dto.ReservationWaitingResponse;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 public class ReservationWaitingServiceTest extends ServiceTest {
     @Autowired
     private ReservationWaitingService reservationWaitingService;
@@ -41,8 +42,8 @@ public class ReservationWaitingServiceTest extends ServiceTest {
 
             ReservationWaitingListResponse response = reservationWaitingService.findAllReservationWaiting();
 
-            assertThat(response.getWaitings().size())
-                    .isEqualTo(1);
+            assertThat(response.getWaitings())
+                    .hasSize(1);
         }
     }
 

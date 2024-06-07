@@ -55,8 +55,8 @@ class ReservationServiceTest extends ServiceTest {
             ReservationListResponse response = reservationService.searchReservation(
                     null, null, null, null);
 
-            assertThat(response.getReservations().size())
-                    .isEqualTo(4);
+            assertThat(response.getReservations())
+                    .hasSize(4);
         }
 
         @Test
@@ -64,8 +64,8 @@ class ReservationServiceTest extends ServiceTest {
             ReservationListResponse response = reservationService.searchReservation(
                     user.getId(), null, null, null);
 
-            assertThat(response.getReservations().size())
-                    .isEqualTo(2);
+            assertThat(response.getReservations())
+                    .hasSize(2);
         }
 
         @Test
@@ -73,8 +73,8 @@ class ReservationServiceTest extends ServiceTest {
             ReservationListResponse response = reservationService.searchReservation(
                     null, firstTheme.getId(), null, null);
 
-            assertThat(response.getReservations().size())
-                    .isEqualTo(2);
+            assertThat(response.getReservations())
+                    .hasSize(2);
         }
 
         @Test
@@ -84,8 +84,8 @@ class ReservationServiceTest extends ServiceTest {
             ReservationListResponse response = reservationService.searchReservation(
                     null, null, dateFrom, dateTo);
 
-            assertThat(response.getReservations().size())
-                    .isEqualTo(2);
+            assertThat(response.getReservations())
+                    .hasSize(2);
         }
     }
 
@@ -107,8 +107,8 @@ class ReservationServiceTest extends ServiceTest {
         void 내_예약_목록을_조회할_수_있다() {
             ReservationMineListResponse response = reservationService.findMyReservation(member);
 
-            assertThat(response.getReservations().size())
-                    .isEqualTo(2);
+            assertThat(response.getReservations())
+                    .hasSize(2);
         }
 
         @Test

@@ -1,8 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +10,9 @@ import roomescape.domain.member.MemberName;
 import roomescape.exception.member.NotFoundMemberException;
 import roomescape.service.member.MemberService;
 import roomescape.service.member.dto.MemberListResponse;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MemberServiceTest extends ServiceTest {
     @Autowired
@@ -28,8 +28,8 @@ class MemberServiceTest extends ServiceTest {
 
             MemberListResponse response = memberService.findAllMember();
 
-            assertThat(response.getMembers().size())
-                    .isEqualTo(2);
+            assertThat(response.getMembers())
+                    .hasSize(2);
         }
     }
 
