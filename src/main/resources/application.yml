@@ -1,0 +1,23 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:database
+  jpa:
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+
+security:
+  jwt:
+    token:
+      expire-length: 3600000
+      secret-key: tecoroomescapememberwootecoroomescapememberwootecoroomescapemem
+payment:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  url: https://api.tosspayments.com/v1/payments
