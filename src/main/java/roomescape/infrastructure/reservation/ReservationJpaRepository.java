@@ -20,7 +20,7 @@ public interface ReservationJpaRepository extends
         JpaSpecificationExecutor<Reservation> {
 
     List<BookStatus> NON_CANCELLED_STATUSES = List.of(
-            BookStatus.WAITING, BookStatus.BOOKED
+            BookStatus.WAITING, BookStatus.BOOKED, BookStatus.PENDING_PAYMENT
     );
 
     @Override
