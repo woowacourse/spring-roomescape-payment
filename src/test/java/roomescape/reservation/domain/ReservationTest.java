@@ -55,7 +55,7 @@ class ReservationTest {
 
     @DisplayName("날짜를 통해 특정 시간대 이전임을 알 수 있다.")
     @Test
-    void isAfterTest_whenDateIsBefore() {
+    void isBeforeTest_whenDateIsBefore() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 5, 1, 10, 0);
@@ -65,7 +65,7 @@ class ReservationTest {
 
     @DisplayName("날짜를 통해 특정 시간대 이후임을 알 수 있다.")
     @Test
-    void isAfterTest_whenDateIsAfter() {
+    void isBeforeTest_whenDateIsAfter() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 29, 10, 0);
@@ -75,7 +75,7 @@ class ReservationTest {
 
     @DisplayName("날짜가 같은 경우, 시간을 통해 판단한다.")
     @Test
-    void isAfterTest_whenDateIsEqualTimeIsBefore() {
+    void isBeforeTest_whenDateIsEqualTimeIsBefore() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 30, 10, 0);
