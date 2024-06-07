@@ -3,6 +3,7 @@ package roomescape.payment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +16,7 @@ import roomescape.system.exception.RoomEscapeException;
 public class TossPaymentClient implements PaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
+
     private final RestClient restClient;
 
     public TossPaymentClient(RestClient restClient) {
@@ -33,10 +35,29 @@ public class TossPaymentClient implements PaymentClient {
                 .body(PaymentResponse.class);
     }
 
+    public PaymentCancelResponse cancelPayment(PaymentCancelRequest cancelRequest) {
+        logPaymentCancelInfo(cancelRequest);
+        Map<String, String> param = Map.of("cancelReason", cancelRequest.cancelReason());
+
+        return restClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", cancelRequest.paymentKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(param)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (req, res) -> handlePaymentError(res))
+                .body(PaymentCancelResponse.class);
+    }
+
     private void logPaymentInfo(PaymentRequest paymentRequest) {
-        log.error("결제 승인 요청: paymentKey={}, orderId={}, amount={}, paymentType={}",
+        log.info("결제 승인 요청: paymentKey={}, orderId={}, amount={}, paymentType={}",
                 paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount(),
                 paymentRequest.paymentType());
+    }
+
+    private void logPaymentCancelInfo(PaymentCancelRequest cancelRequest) {
+        log.info("결제 취소 요청: paymentKey={}, amount={}, cancelReason={}",
+                cancelRequest.paymentKey(), cancelRequest.amount(), cancelRequest.cancelReason());
     }
 
     private void handlePaymentError(ClientHttpResponse res)
