@@ -11,7 +11,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
 @Service
-@Transactional
 public class ReservationCancelService {
 
     private final ReservationRepository reservationRepository;
@@ -22,6 +21,7 @@ public class ReservationCancelService {
         this.waitingRepository = waitingRepository;
     }
 
+    @Transactional
     public void deleteReservation(Long reservationId) {
         Reservation reservation = findReservationById(reservationId);
         List<Reservation> waitingReservations = findWaitingReservation(reservation);
@@ -42,12 +42,12 @@ public class ReservationCancelService {
     private void adjustWaitingOrder(List<Reservation> reservationsToAdjust) {
         for (Reservation reservation : reservationsToAdjust) {
             Waiting waiting = findWaitingByReservationId(reservation.getId());
-            if (waiting.isFirstOrder()) {
-                reservation.changeStatusToReserve();
-                waitingRepository.delete(waiting);
-            }
             if (!waiting.isFirstOrder()) {
                 waiting.decreaseWaitingOrderByOne();
+            }
+            if (waiting.isFirstOrder()) {
+                reservation.changeStatusToPending();
+                waitingRepository.delete(waiting);
             }
         }
     }

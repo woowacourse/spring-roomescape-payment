@@ -18,6 +18,7 @@ public record UserReservationPaymentResponse(
 
     private static final String RESERVED = "예약";
     private static final String WAITING_ORDER = "%d번째 예약 대기";
+    private static final String PENDING = "결제 대기";
 
     public static UserReservationPaymentResponse of(final UserReservationResponse reservation, final PaymentResponse payment) {
         return new UserReservationPaymentResponse(
@@ -28,6 +29,18 @@ public record UserReservationPaymentResponse(
                 RESERVED,
                 payment.paymentKey(),
                 payment.totalAmount()
+        );
+    }
+
+    public static UserReservationPaymentResponse fromPending(final UserReservationResponse pending) {
+        return new UserReservationPaymentResponse(
+                pending.id(),
+                pending.theme(),
+                pending.date(),
+                pending.time(),
+                PENDING,
+                null,
+               null
         );
     }
 

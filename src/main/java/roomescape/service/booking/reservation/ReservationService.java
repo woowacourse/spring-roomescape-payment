@@ -3,7 +3,6 @@ package roomescape.service.booking.reservation;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
@@ -40,7 +39,6 @@ public class ReservationService {
         this.waitingService = waitingService;
     }
 
-    @Transactional
     public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest,
                                                            Long memberId) {
         Long id = reservationRegisterService.registerReservation(userReservationPaymentRequest, memberId);
@@ -60,7 +58,8 @@ public class ReservationService {
     }
 
     public List<UserReservationPaymentResponse> findReservationByMemberId(Long memberId) {
-        List<UserReservationResponse> reservationResponses = reservationSearchService.findReservationByMemberId(memberId);
+        List<UserReservationResponse> reservationResponses = reservationSearchService.findReservationByMemberId(
+                memberId);
         List<UserReservationPaymentResponse> reservationPaymentResponses = new ArrayList<>();
 
         for (UserReservationResponse reservationResponse : reservationResponses) {
@@ -68,7 +67,10 @@ public class ReservationService {
                 PaymentResponse paymentResponse = paymentService.findPaymentById(reservationResponse.paymentId());
                 reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservationResponse, paymentResponse));
             }
-            if (!reservationResponse.isReserved()) {
+            if (reservationResponse.isPending()) {
+                reservationPaymentResponses.add(UserReservationPaymentResponse.fromPending(reservationResponse));
+            }
+            if (reservationResponse.isWaiting()) {
                 WaitingResponse waitingResponse = waitingService.findWaitingByReservationId(reservationResponse.id());
                 reservationPaymentResponses.add(UserReservationPaymentResponse.from(waitingResponse));
             }
@@ -81,7 +83,6 @@ public class ReservationService {
         return reservationSearchService.findReservationsByFilter(filter);
     }
 
-    @Transactional
     public void deleteReservation(Long reservationId) {
         reservationCancelService.deleteReservation(reservationId);
     }

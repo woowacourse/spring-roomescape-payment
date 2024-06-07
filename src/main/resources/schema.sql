@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS reservation (
     time_id BIGINT,
     theme_id BIGINT,
     member_id BIGINT,
-    status VARCHAR(255) NOT NULL CHECK (status IN ('RESERVED', 'WAITING')),
+    status VARCHAR(255) NOT NULL CHECK (status IN ('RESERVED', 'WAITING', 'PENDING')),
     payment_id BIGINT,
     FOREIGN KEY (time_id) REFERENCES reservation_time(id),
     FOREIGN KEY (theme_id) REFERENCES theme(id),

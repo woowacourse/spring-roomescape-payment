@@ -16,6 +16,7 @@ public record UserReservationResponse(
 
     private static final String RESERVED = "예약";
     private static final String WAITING_ORDER = "%d번째 예약 대기";
+    private static final String PENDING = "결제 대기";
 
     public static UserReservationResponse create(Reservation reservation) {
         return new UserReservationResponse(
@@ -40,7 +41,26 @@ public record UserReservationResponse(
         );
     }
 
+    public static UserReservationResponse createPending(final Reservation reservation) {
+        return new UserReservationResponse(
+                reservation.getId(),
+                reservation.getTheme().getThemeName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                PENDING,
+                null
+        );
+    }
+
     public boolean isReserved() {
         return this.status.equals(RESERVED);
+    }
+
+    public boolean isPending() {
+        return this.status.equals(PENDING);
+    }
+
+    public boolean isWaiting() {
+        return !this.status.equals(RESERVED) && !this.status.equals(PENDING);
     }
 }

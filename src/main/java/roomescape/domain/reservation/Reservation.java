@@ -56,8 +56,16 @@ public class Reservation {
         status = Status.RESERVED;
     }
 
+    public void changeStatusToPending() {
+        status = Status.PENDING;
+    }
+
     public boolean isReserved() {
         return status == Status.RESERVED;
+    }
+
+    public boolean isPending() {
+        return status == Status.PENDING;
     }
 
     public Long getId() {

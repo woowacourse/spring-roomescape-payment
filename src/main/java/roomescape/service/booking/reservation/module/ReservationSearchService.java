@@ -2,7 +2,6 @@ package roomescape.service.booking.reservation.module;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
@@ -13,7 +12,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class ReservationSearchService {
 
     private final ReservationRepository reservationRepository;
@@ -59,6 +57,9 @@ public class ReservationSearchService {
     private UserReservationResponse createUserReservationResponse(Reservation reservation) {
         if (reservation.isReserved()) {
             return UserReservationResponse.create(reservation);
+        }
+        if (reservation.isPending()) {
+            return UserReservationResponse.createPending(reservation);
         }
 
         Waiting waiting = findWaitingByReservationId(reservation.getId());
