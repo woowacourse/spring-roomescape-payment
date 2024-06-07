@@ -16,7 +16,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 
 @DisplayName("결제 승인 api 호출 시 발생할 수 있는 예외를 적절히 처리하는지 테스트한다.")
-class TossPaymentClientExceptionTest extends IntegrationTest {
+class TossPaymentClientExceptionTest extends IntegrationTest { //todo: 가독성 떨어지는 듯.. 리팩터링 필요!
 
     @Autowired
     private TossPaymentClient tossPaymentClient;
