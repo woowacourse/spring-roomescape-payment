@@ -22,7 +22,7 @@ import roomescape.dto.response.ThemeResponse;
 import roomescape.dto.response.TimeSlotResponse;
 import roomescape.infrastructure.CheckAuthenticationInterceptor;
 import roomescape.infrastructure.LoginMemberArgumentResolver;
-import roomescape.infrastructure.PaymentClient;
+import roomescape.infrastructure.TossPaymentClient;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(ReservationController.class)
@@ -31,7 +31,7 @@ public class MockReservationTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClient;
     @MockBean
     private ReservationService reservationService;
     @MockBean
