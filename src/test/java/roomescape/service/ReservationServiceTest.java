@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.MemberRepository;
@@ -26,7 +25,6 @@ import roomescape.service.dto.request.ReservationSaveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.UserReservationResponse;
 
-@Transactional //TODO LazyLoading 예외처리
 class ReservationServiceTest extends IntegrationTestSupport {
 
     @Autowired

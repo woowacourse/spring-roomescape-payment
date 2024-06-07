@@ -1,5 +1,6 @@
 package roomescape.service.dto.response;
 
+import static roomescape.domain.reservation.Payment.EMPTY_PAYMENT;
 import static roomescape.domain.reservation.ReservationStatus.RESERVED;
 import static roomescape.domain.reservation.ReservationStatus.WAITING;
 
@@ -32,7 +33,7 @@ public record UserReservationResponse(
                 waitingWithRank.waiting().getId(),
                 waitingWithRank.waiting().getReservation().getReservationSlot(),
                 WAITING,
-                null, //TODO null 처리 고민
+                EMPTY_PAYMENT,//TODO null 처리 고민
                 OptionalLong.of(waitingWithRank.rank() + 1)
         );
     }

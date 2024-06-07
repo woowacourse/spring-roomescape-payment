@@ -1,27 +1,23 @@
 package roomescape.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static roomescape.controller.dto.ReservationStatusMessageMapper.WAITING_MESSAGE;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
 import roomescape.service.dto.response.WaitingResponse;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static roomescape.controller.dto.ReservationStatusMessageMapper.WAITING_MESSAGE;
-import static roomescape.domain.reservation.ReservationStatus.WAITING;
-
-@Transactional
 class WaitingControllerTest extends IntegrationTestSupport {
 
     long createdId;

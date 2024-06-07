@@ -6,9 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Payment {
+
+    @Transient
+    public static final Payment EMPTY_PAYMENT = new Payment(null, "", "", 0);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

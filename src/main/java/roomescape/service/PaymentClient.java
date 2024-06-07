@@ -40,7 +40,7 @@ public class PaymentClient {
 
     private String encodeSecretKey() {
         return Base64.getEncoder()
-                .encodeToString((secretKey + ":") //TODO 빼기
+                .encodeToString((secretKey + ":")
                         .getBytes(StandardCharsets.UTF_8));
     }
 }

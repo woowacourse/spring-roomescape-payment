@@ -16,6 +16,7 @@ import roomescape.controller.dto.UserReservationViewResponses;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.response.ReservationResponse;
+import roomescape.service.dto.response.UserReservationResponse;
 
 @RestController
 public class ReservationController {
@@ -41,7 +42,8 @@ public class ReservationController {
     @Operation(summary = "사용자 예약 조회 API", description = "사용자의 예약을 조회한다.")
     @GetMapping("/reservations-mine")
     public ResponseEntity<UserReservationViewResponses> findAllUserReservation(@Login LoginMember member) {
-        List<UserReservationViewResponse> reservationResponses = reservationService.findAllUserReservation(member.id())
+        List<UserReservationResponse> allUserReservation = reservationService.findAllUserReservation(member.id());
+        List<UserReservationViewResponse> reservationResponses = allUserReservation
                 .stream()
                 .map(UserReservationViewResponse::from)
                 .toList();
