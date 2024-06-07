@@ -9,14 +9,14 @@ public class PaymentStatusMessageMapper {
 
     public static String mapToPaymentKey(Payment payment) {
         if (payment == null) {
-            return "정보 없음";
+            return "결제 대기중";
         }
         return payment.getPaymentKey();
     }
 
     public static String mapToAmount(Payment payment) {
         if (payment == null) {
-            return "정보 없음";
+            return "결제 대기중";
         }
         return payment.getAmount().toString();
     }
