@@ -92,12 +92,12 @@ public class PaymentInfo {
     @Override
     public String toString() {
         return "Payment{" +
-                "id=" + id +
-                ", orderId='" + orderId + '\'' +
-                ", paymentKey='" + paymentKey + '\'' +
-                ", orderName='" + orderName + '\'' +
-                ", totalAmount=" + totalAmount +
-                ", reservation=" + reservation +
-                '}';
+               "id=" + id +
+               ", orderId='" + orderId + '\'' +
+               ", paymentKey='" + paymentKey + '\'' +
+               ", orderName='" + orderName + '\'' +
+               ", totalAmount=" + totalAmount +
+               ", reservation=" + reservation +
+               '}';
     }
 }
