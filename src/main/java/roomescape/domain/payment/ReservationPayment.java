@@ -12,13 +12,13 @@ import roomescape.domain.reservation.Reservation;
 @Entity
 @Table(name = "reservation_payment")
 public class ReservationPayment {
+    private static final ReservationPayment EMPTY_INSTANCE = new ReservationPayment(null,null,null,0);
 
     @Id
     private String orderId;
 
-    @OneToOne
     @JoinColumn(name = "reservation_id", nullable = false)
-    private Reservation reservation;
+    private Long reservationId;
 
     @Column(name = "payment_key", nullable = false)
     private String paymentKey;
@@ -29,11 +29,15 @@ public class ReservationPayment {
     protected ReservationPayment() {
     }
 
-    public ReservationPayment(String orderId, Reservation reservation, String paymentKey, long amount) {
+    public ReservationPayment(String orderId, Long reservationId, String paymentKey, long amount) {
         this.orderId = orderId;
-        this.reservation = reservation;
+        this.reservationId = reservationId;
         this.paymentKey = paymentKey;
         this.amount = amount;
+    }
+
+    public static ReservationPayment getEmptyInstance(){
+        return EMPTY_INSTANCE;
     }
 
     @Override
@@ -56,8 +60,8 @@ public class ReservationPayment {
         return orderId;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public Long getReservationId() {
+        return reservationId;
     }
 
     public String getPaymentKey() {

@@ -46,7 +46,7 @@ class PaymentServiceTest {
         given(paymentClient.requestPurchase(any(PaymentRequest.class)))
                 .willReturn(new Payment("paymentKey", "orderId", "DONE", theme.getPrice()));
 
-        paymentService.purchase(reservation, request);
+        paymentService.purchase(reservation.getId(), request);
 
         ReservationPayment reservationPayment = reservationPaymentRepository.getById("orderId");
         assertThat(reservationPayment.getPaymentKey()).isEqualTo("paymentKey");
