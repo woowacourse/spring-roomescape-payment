@@ -105,7 +105,12 @@ public class ReservationService {
             );
 
             responses.add(
-                    new MemberReservationStatusResponse(reservationWaiting,
+                    new MemberReservationStatusResponse(
+                            reservationWaiting.getId(),
+                            reservationWaiting.getTheme().getName(),
+                            reservationWaiting.getDate(),
+                            reservationWaiting.getTime().getStartAt(),
+                            reservationWaiting.getStatus().getValue(),
                             waitingRankCalculator.calculateWaitingRank(reservationWaiting)
                     )
             );

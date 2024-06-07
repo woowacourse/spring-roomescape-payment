@@ -3,7 +3,6 @@ package roomescape.reservation.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationWaiting;
 
 public record MemberReservationStatusResponse(
         Long reservationId,
@@ -21,12 +20,17 @@ public record MemberReservationStatusResponse(
         );
     }
 
-    public MemberReservationStatusResponse(ReservationWaiting reservationWaiting, Long rank) {
-        this(reservationWaiting.getId(),
-                reservationWaiting.getTheme().getName(),
-                reservationWaiting.getDate(),
-                reservationWaiting.getTime().getStartAt(),
-                rank + "번째 " + reservationWaiting.getStatus().getValue()
+    public MemberReservationStatusResponse(Long reservationId,
+                                           String theme,
+                                           LocalDate date,
+                                           LocalTime time,
+                                           String status,
+                                           Long rank) {
+        this(reservationId,
+                theme,
+                date,
+                time,
+                rank + "번째 " + status
         );
     }
 }
