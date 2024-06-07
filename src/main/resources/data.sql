@@ -1,7 +1,7 @@
 INSERT INTO theme(name, description, thumbnail)
-VALUES ('테마1', '테마1입니당 ^0^', 'https://file.miricanvas.com/template_thumb/2021/07/02/13/20/k4t92g5ntu46etia/thumb.jpg'),
-       ('테마2', '테마2입니당 ^0^', 'https://file.miricanvas.com/template_thumb/2021/07/02/13/20/k4t92g5ntu46etia/thumb.jpg'),
-       ('테마3', '테마3입니당 ^0^', 'https://file.miricanvas.com/template_thumb/2021/07/02/13/20/k4t92g5ntu46etia/thumb.jpg');
+VALUES ('도둑들(스릴러)', '훔치고 달아나라잇..!', 'https://lh3.googleusercontent.com/proxy/UijkDKTrQHQUzR8ykItHuqIn3bc5Vpc-MKOnMuSnEKK5dg43uF4Sj3XosPBTBhVvkMrgtb730f8CVkFVJBEh2E08Bcg1PVsHqdUsaoc'),
+       ('학교 탈출(공포)', '학교를 탈출하라..!', 'https://file.miricanvas.com/template_thumb/2022/05/15/13/50/k2nje40j0jwztqza/thumb.jpg'),
+       ('미리방 탈출(공포)', '미리미리 탈출하세요', 'https://file.miricanvas.com/template_thumb/2021/07/02/13/20/k4t92g5ntu46etia/thumb.jpg');
 
 INSERT INTO reservation_time(start_at)
 VALUES ('15:00:00'),
