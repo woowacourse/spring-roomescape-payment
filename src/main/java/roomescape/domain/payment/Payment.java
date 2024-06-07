@@ -35,8 +35,27 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(String paymentKey, BigDecimal amount) {
+    public Payment(String paymentKey, BigDecimal amount, Reservation reservation) {
+        validatePaymentKey(paymentKey);
+        validateReservation(reservation);
+
         this.paymentKey = paymentKey;
         this.amount = new Amount(amount);
+        this.reservation = reservation;
+    }
+
+    private void validatePaymentKey(String paymentKey) {
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("Payment key는 필수입니다.");
+        }
+        if (paymentKey.length() > MAX_PAYMENT_KEY_LENGTH) {
+            throw new IllegalArgumentException(String.format("Payment key는 최대 %d자입니다.", MAX_PAYMENT_KEY_LENGTH));
+        }
+    }
+
+    private void validateReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation은 필수입니다.");
+        }
     }
 }
