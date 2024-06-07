@@ -13,15 +13,15 @@ import roomescape.domain.reservation.ReservationWithRank;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
+import roomescape.exception.reservation.NotFoundReservationException;
 
 @Repository
-public interface ReservationJpaRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    Reservation save(Reservation reservation);
-
-    Optional<Reservation> findById(Long id);
-
-    List<Reservation> findAll();
+    default Reservation getReservationById(Long id) {
+        return findById(id)
+                .orElseThrow(NotFoundReservationException::new);
+    }
 
     List<Reservation> findAllByStatus(Status status);
 
@@ -37,17 +37,6 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             @Param("memberId") Long memberId, @Param("themeId") Long themeId
     );
 
-    @Query("""
-            select r from Reservation r
-            where r.theme = :theme
-            and r.date = :date
-            and r.time = :time
-            and r.status = 'WAITING'
-            order by r.createdAt
-            limit 1
-            """)
-    Optional<Reservation> findNextWaitingReservation(Theme theme, LocalDate date, ReservationTime time);
-
     @Query(""" 
             select new roomescape.domain.reservation.ReservationWithRank
             (r.id, r.theme.name, r.date, r.time.startAt, r.status, (SELECT count(r2) AS waiting_rank
@@ -60,14 +49,20 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
 
-    boolean existsByThemeAndDateAndTimeAndMemberAndStatusIn(Theme theme,
-                                                            LocalDate date,
-                                                            ReservationTime time,
-                                                            Member member,
-                                                            List<Status> status);
+    @Query("""
+            select r from Reservation r
+            where r.theme = :theme
+            and r.date = :date
+            and r.time = :time
+            and r.status = 'WAITING'
+            order by r.createdAt
+            limit 1
+            """)
+    Optional<Reservation> findNextWaiting(Theme theme, LocalDate date, ReservationTime time);
 
-    boolean existsByThemeAndDateAndTimeAndStatusIn(Theme theme,
-                                                   LocalDate date,
-                                                   ReservationTime time,
+    boolean existsByThemeAndDateAndTimeAndStatusIn(Theme theme, LocalDate date, ReservationTime time,
                                                    List<Status> status);
+
+    boolean existsByThemeAndDateAndTimeAndMemberAndStatusIn(Theme theme, LocalDate date, ReservationTime time,
+                                                            Member member, List<Status> status);
 }

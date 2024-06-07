@@ -8,7 +8,7 @@ import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.payment.CancelReason;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class CancelService {
 
     @Transactional
     public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
         reservation.cancel(memberInfo.id());
         reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);
@@ -27,7 +27,7 @@ public class CancelService {
 
     @Transactional
     public void cancelReservationByAdmin(Long reservationId) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
         reservation.cancel();
         reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);

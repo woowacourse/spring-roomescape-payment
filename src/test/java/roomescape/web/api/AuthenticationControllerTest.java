@@ -15,8 +15,8 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import roomescape.application.dto.request.member.LoginRequest;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.fixture.MemberFixture;
+import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {

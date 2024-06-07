@@ -9,8 +9,8 @@ import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.application.policy.RankingPolicy;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.theme.ReservationReferencedThemeException;
+import roomescape.infrastructure.repository.ThemeRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class ThemeService {
 
     public void deleteTheme(Long id) {
         try {
-            themeRepository.delete(id);
+            themeRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             throw new ReservationReferencedThemeException();
         }

@@ -16,8 +16,8 @@ import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
-import roomescape.infrastructure.repository.MemberJpaRepository;
-import roomescape.infrastructure.repository.ThemeJpaRepository;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {
@@ -34,10 +34,10 @@ class AdminThemeControllerTest {
     private JwtProvider jwtProvider;
 
     @Autowired
-    private ThemeJpaRepository themeRepository;
+    private ThemeRepository themeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
+    private MemberRepository memberRepository;
 
     String adminToken;
 

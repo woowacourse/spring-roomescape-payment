@@ -17,9 +17,9 @@ import roomescape.application.dto.request.member.LoginRequest;
 import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.member.DuplicatedEmailException;
+import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {

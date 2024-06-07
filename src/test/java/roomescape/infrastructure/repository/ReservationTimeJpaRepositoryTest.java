@@ -36,18 +36,16 @@ import roomescape.support.DatabaseCleanupListener;
 class ReservationTimeJpaRepositoryTest {
 
     @Autowired
-    private ReservationJpaRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationTimeJpaRepository timeRepository;
+    private ReservationTimeRepository timeRepository;
 
     @Autowired
-    private ThemeJpaRepository themeRepository;
+    private ThemeRepository themeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
-    @Autowired
-    private ReservationTimeJpaRepository reservationTimeJpaRepository;
+    private MemberRepository memberRepository;
 
     Reservation reservation(Member member, Theme theme, String date, ReservationTime time, Status status) {
         return new Reservation(member, theme, LocalDate.parse(date), time, status);
@@ -86,7 +84,7 @@ class ReservationTimeJpaRepositoryTest {
         reservationRepository.save(reservation(sun, bed, date.toString(), twoPm, RESERVED));
         reservationRepository.save(reservation(solar, database, "2024-06-05", onePm, RESERVED));
 
-        List<ReservationTime> expected = reservationTimeJpaRepository.findAllReservedTimeByDateAndThemeId(
+        List<ReservationTime> expected = timeRepository.findAllReservedTimeByDateAndThemeId(
                 date, bed.getId());
 
         assertThat(expected).containsExactly(twoPm);

@@ -15,10 +15,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import roomescape.application.dto.request.time.ReservationTimeRequest;
 import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.TimeFixture;
-import roomescape.infrastructure.repository.MemberJpaRepository;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 
@@ -39,7 +39,7 @@ class AdminReservationTimeControllerTest {
     private ReservationTimeRepository timeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
+    private MemberRepository memberRepository;
 
     String adminToken;
 

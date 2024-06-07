@@ -1,18 +1,18 @@
 package roomescape.infrastructure.repository;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationdetail.Theme;
+import roomescape.exception.theme.NotFoundThemeException;
 
 @Repository
-public interface ThemeJpaRepository extends JpaRepository<Theme, Long> {
+public interface ThemeRepository extends JpaRepository<Theme, Long> {
 
-    Theme save(Theme theme);
-
-    Optional<Theme> findById(Long id);
+    default Theme getThemeById(Long id) {
+        return findById(id).orElseThrow(NotFoundThemeException::new);
+    }
 
     @Query(value = """
             select theme.id, theme.name, theme.description, theme.thumbnail
@@ -24,8 +24,4 @@ public interface ThemeJpaRepository extends JpaRepository<Theme, Long> {
             limit ?;
             """, nativeQuery = true)
     List<Theme> findPopularThemes(String startDate, String endDate, int limit);
-
-    List<Theme> findAll();
-
-    void deleteById(Long themeId);
 }

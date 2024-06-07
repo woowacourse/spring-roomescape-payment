@@ -22,15 +22,15 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {
@@ -85,12 +85,12 @@ class CancelServiceTest {
         MemberInfo memberInfo = new MemberInfo(jazz.getId(), jazz.getName());
 
         Reservation reserved = reservationRepository.save(reservation(jazz, bed, date.toString(), onePm, RESERVED));
-        Reservation waiting = reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
+        reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
 
         cancelService.cancelReservation(reserved.getId(), memberInfo);
 
-        Reservation canceledReservation = reservationRepository.getReservation(1L);
-        Reservation pendingReservation = reservationRepository.getReservation(2L);
+        Reservation canceledReservation = reservationRepository.getReservationById(1L);
+        Reservation pendingReservation = reservationRepository.getReservationById(2L);
 
         assertAll(
                 () -> assertThat(canceledReservation.getStatus()).isEqualTo(CANCELED),

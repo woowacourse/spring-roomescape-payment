@@ -10,9 +10,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
+import roomescape.infrastructure.repository.ReservationRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class ReservationEventHandler {
     }
 
     private void checkPaymentStatusAndProcess(PaymentPendingEvent event) {
-        reservationRepository.findReservation(event.getReservationId())
+        reservationRepository.findById(event.getReservationId())
                 .filter(Reservation::isPaymentPending)
                 .ifPresent(this::handlePaymentFailure);
     }

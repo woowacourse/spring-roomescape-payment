@@ -37,16 +37,16 @@ import roomescape.support.DatabaseCleanupListener;
 class ThemeJpaRepositoryTest {
 
     @Autowired
-    private ReservationJpaRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationTimeJpaRepository timeRepository;
+    private ReservationTimeRepository timeRepository;
 
     @Autowired
-    private ThemeJpaRepository themeRepository;
+    private ThemeRepository themeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
+    private MemberRepository memberRepository;
 
     Reservation reservation(Member member, Theme theme, String date, ReservationTime time, Status status) {
         return new Reservation(member, theme, LocalDate.parse(date), time, status);

@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.reservation.DuplicatedReservationException;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -24,21 +25,23 @@ public class ReservationFactory {
     private final ReservationTimeRepository reservationTimeRepository;
 
     public Reservation create(long themeId, LocalDate date, long timeId, Member member) {
-        Theme theme = themeRepository.getById(themeId);
-        ReservationTime time = reservationTimeRepository.getReservationTime(timeId);
+        Theme theme = themeRepository.getThemeById(themeId);
+        ReservationTime time = reservationTimeRepository.getReservationTimeById(timeId);
         validatePastTime(date, time);
         validateDuplicateReservation(theme, date, time, member);
         return getReservation(theme, date, time, member);
     }
 
     private void validateDuplicateReservation(Theme theme, LocalDate date, ReservationTime time, Member member) {
-        if (reservationRepository.existsReservation(theme, date, time, member, Status.getStatusWithoutCancel())) {
+        if (reservationRepository.existsByThemeAndDateAndTimeAndMemberAndStatusIn(theme, date, time, member,
+                Status.getStatusWithoutCancel())) {
             throw new DuplicatedReservationException();
         }
     }
 
     private Reservation getReservation(Theme theme, LocalDate date, ReservationTime time, Member member) {
-        if (reservationRepository.existsReservation(theme, date, time, List.of(RESERVED, PAYMENT_PENDING))) {
+        if (reservationRepository.existsByThemeAndDateAndTimeAndStatusIn(theme, date, time,
+                List.of(RESERVED, PAYMENT_PENDING))) {
             return new Reservation(member, theme, date, time, WAITING);
         }
         return new Reservation(member, theme, date, time, RESERVED);

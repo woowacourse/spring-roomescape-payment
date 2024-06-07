@@ -10,9 +10,9 @@ import roomescape.application.dto.request.time.ReservationTimeRequest;
 import roomescape.application.dto.response.time.AvailableReservationTimeResponse;
 import roomescape.application.dto.response.time.ReservationTimeResponse;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.exception.time.DuplicatedTimeException;
 import roomescape.exception.time.ReservationReferencedTimeException;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,15 +20,16 @@ public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
 
     public List<ReservationTimeResponse> findAllReservationTime() {
-        List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
-        return reservationTimes.stream()
+        return reservationTimeRepository.findAll()
+                .stream()
                 .map(ReservationTimeResponse::from)
                 .toList();
     }
 
     public List<AvailableReservationTimeResponse> findAllAvailableReservationTime(LocalDate date, Long themeId) {
         List<ReservationTime> totalTimes = reservationTimeRepository.findAll();
-        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTime(date, themeId);
+        List<ReservationTime> reservedTimes = reservationTimeRepository.findAllReservedTimeByDateAndThemeId(date,
+                themeId);
 
         return totalTimes.stream()
                 .map(time -> AvailableReservationTimeResponse.of(time, reservedTimes))
@@ -37,17 +38,21 @@ public class ReservationTimeService {
 
     @Transactional
     public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
-        if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            throw new DuplicatedTimeException();
-        }
+        validateDuplicatedTime(request);
         ReservationTime reservationTime = request.toReservationTime();
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
         return ReservationTimeResponse.from(savedReservationTime);
     }
 
+    private void validateDuplicatedTime(ReservationTimeRequest request) {
+        if (reservationTimeRepository.existsByStartAt(request.startAt())) {
+            throw new DuplicatedTimeException();
+        }
+    }
+
     public void deleteReservationTime(Long id) {
         try {
-            reservationTimeRepository.delete(id);
+            reservationTimeRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             throw new ReservationReferencedTimeException();
         }

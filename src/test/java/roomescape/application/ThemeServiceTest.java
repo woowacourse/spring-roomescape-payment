@@ -28,16 +28,16 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.theme.ReservationReferencedThemeException;
 import roomescape.fake.FakeRankingPolicy;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {
@@ -121,7 +121,7 @@ class ThemeServiceTest {
     @DisplayName("테마를 정상적으로 삭제한다.")
     @Test
     void success_delete_theme() {
-        Theme bed = themeRepository.save(THEME_BED.create());
+        themeRepository.save(THEME_BED.create());
 
         assertThatNoException()
                 .isThrownBy(() -> themeService.deleteTheme(1L));

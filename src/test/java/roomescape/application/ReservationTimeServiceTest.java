@@ -20,16 +20,16 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import roomescape.application.dto.request.time.ReservationTimeRequest;
 import roomescape.application.dto.response.time.ReservationTimeResponse;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.time.DuplicatedTimeException;
 import roomescape.exception.time.ReservationReferencedTimeException;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {
@@ -61,7 +61,7 @@ class ReservationTimeServiceTest {
     @DisplayName("중복된 예약 시간을 저장하려고 시도하면 예외를 발생시킨다.")
     @Test
     void throw_exception_when_save_duplicated_time() {
-        ReservationTime onePm = timeRepository.save(ONE_PM.create());
+        timeRepository.save(ONE_PM.create());
         ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.parse(ONE_PM.getStartAt()));
 
         assertThatThrownBy(() -> timeService.saveReservationTime(request))
@@ -93,7 +93,7 @@ class ReservationTimeServiceTest {
     @DisplayName("예약 시간을 정상적으로 삭제한다.")
     @Test
     void success_delete_reservation_time() {
-        ReservationTime onePm = timeRepository.save(ONE_PM.create());
+        timeRepository.save(ONE_PM.create());
 
         assertThatNoException()
                 .isThrownBy(() -> timeService.deleteReservationTime(1L));

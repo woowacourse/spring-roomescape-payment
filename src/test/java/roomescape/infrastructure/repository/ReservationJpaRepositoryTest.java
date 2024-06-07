@@ -37,16 +37,16 @@ import roomescape.support.DatabaseCleanupListener;
 class ReservationJpaRepositoryTest {
 
     @Autowired
-    private ReservationJpaRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationTimeJpaRepository timeRepository;
+    private ReservationTimeRepository timeRepository;
 
     @Autowired
-    private ThemeJpaRepository themeRepository;
+    private ThemeRepository themeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
+    private MemberRepository memberRepository;
 
     Reservation reservation(Member member, Theme theme, String date, ReservationTime time, Status status) {
         return new Reservation(member, theme, LocalDate.parse(date), time, status);
@@ -101,7 +101,7 @@ class ReservationJpaRepositoryTest {
         reservationRepository.save(reservation(bri, java, date.toString(), onePm, Status.RESERVED));
         Reservation actual = reservationRepository.save(reservation(sun, java, date.toString(), onePm, Status.WAITING));
 
-        Optional<Reservation> expected = reservationRepository.findNextWaitingReservation(java, date, onePm);
+        Optional<Reservation> expected = reservationRepository.findNextWaiting(java, date, onePm);
 
         assertThat(expected.get()).isEqualTo(actual);
     }
