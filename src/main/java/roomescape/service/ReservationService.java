@@ -7,10 +7,7 @@ import roomescape.controller.request.AdminReservationRequest;
 import roomescape.controller.request.ReservationRequest;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
-import roomescape.model.Member;
-import roomescape.model.Reservation;
-import roomescape.model.ReservationTime;
-import roomescape.model.Theme;
+import roomescape.model.*;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -56,7 +53,7 @@ public class ReservationService {
                 request.themeId());
         Theme theme = getTheme(request.themeId());
 
-        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
+        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member, ReservationStatus.RESERVED);
         return reservationRepository.save(reservation);
     }
 
