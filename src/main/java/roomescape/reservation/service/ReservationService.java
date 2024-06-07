@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.PaymentResponse;
+import roomescape.payment.PaymentService;
+import roomescape.payment.ReservationPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -17,10 +20,9 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSearchSpecification;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
+import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
-import roomescape.reservation.dto.response.WaitingWithRankResponse;
-import roomescape.reservation.dto.response.WaitingWithRanksResponse;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
@@ -34,17 +36,19 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final MemberService memberService;
     private final ThemeService themeService;
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeService reservationTimeService,
             MemberService memberService,
-            ThemeService themeService
+            ThemeService themeService, PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeService = reservationTimeService;
         this.memberService = memberService;
         this.themeService = themeService;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -60,13 +64,16 @@ public class ReservationService {
     public void removeReservationById(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         reservationRepository.deleteById(reservationId);
+        paymentService.deletePaymentByReservationId(reservationId);
     }
 
-    public ReservationResponse addReservation(ReservationRequest request, Long memberId) {
+    public ReservationResponse addReservationWithPayment(ReservationRequest request, PaymentResponse paymentInfo, Long memberId) {
         validateIsReservationExist(request.themeId(), request.timeId(), request.date());
         Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.CONFIRMED);
         Reservation saved = reservationRepository.save(reservation);
-        return ReservationResponse.from(saved);
+        ReservationPaymentResponse reservationPaymentResponse = paymentService.savePayment(paymentInfo, saved);
+
+        return reservationPaymentResponse.reservation();
     }
 
     public ReservationResponse addWaiting(ReservationRequest request, Long memberId) {
@@ -157,13 +164,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public WaitingWithRanksResponse findWaitingWithRankById(Long memberId) {
-        List<WaitingWithRankResponse> waitingWithRanks = reservationRepository.findWaitingsWithRankByMemberId(
-                        memberId)
-                .stream()
-                .map(WaitingWithRankResponse::from)
-                .toList();
-        return new WaitingWithRanksResponse(waitingWithRanks);
+    public MyReservationsResponse findWaitingWithRankById(Long memberId) {
+        return new MyReservationsResponse(reservationRepository.findMyReservations(memberId));
     }
 
     public void approveWaiting(Long reservationId, Long memberId) {
