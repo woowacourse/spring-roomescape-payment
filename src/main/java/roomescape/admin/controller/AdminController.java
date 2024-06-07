@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @Auth(roles = MemberRole.ADMIN)
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminController implements AdminControllerSwagger {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
@@ -37,25 +37,30 @@ public class AdminController {
         this.waitingService = waitingService;
     }
 
+    @Override
     @PostMapping("/reservations")
     public ResponseEntity<Void> reservationSave(@RequestBody AdminReservationRequest adminReservationRequest) {
         reservationService.addAdminReservation(adminReservationRequest);
 
-        return ResponseEntity.created(URI.create("/admin/reservations/" + adminReservationRequest.memberId()))
+        return ResponseEntity
+                .created(URI.create("/admin/reservations/" + adminReservationRequest.memberId()))
                 .build();
     }
 
+    @Override
     @GetMapping("/reservations")
     public List<ReservationResponse> reservationFilteredList(
             @ModelAttribute ReservationFilterRequest reservationFilterRequest) {
         return reservationService.findFilteredReservations(reservationFilterRequest);
     }
 
+    @Override
     @GetMapping("/waitings")
     public List<WaitingResponse> waitingList() {
         return waitingService.findWaitings();
     }
 
+    @Override
     @DeleteMapping("/waitings/{waitingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void waitingReject(@PathVariable long waitingId) {
