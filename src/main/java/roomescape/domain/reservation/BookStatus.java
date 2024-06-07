@@ -5,7 +5,7 @@ public enum BookStatus {
     BOOKED,
     WAITING_CANCELLED,
     BOOKING_CANCELLED,
-    PENDING_PAYMENT
+    PENDING_PAYMENT,
     ;
 
     public BookStatus pendingPayment() {

@@ -20,11 +20,11 @@ import roomescape.exception.reservation.ReservationException;
 
 @RestControllerAdvice
 public class RoomescapeControllerAdvice {
-    private static final Logger logger = LoggerFactory.getLogger(RoomescapeControllerAdvice.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoomescapeControllerAdvice.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleDateTimeParseException(MethodArgumentNotValidException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         FieldError fieldError = exception.getBindingResult().getFieldError();
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST, fieldError.getDefaultMessage()
@@ -35,7 +35,7 @@ public class RoomescapeControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "값을 변환하는 중 오류가 발생했습니다.");
         problemDetail.setTitle("요청을 변환할 수 없습니다.");
         return problemDetail;
@@ -43,7 +43,7 @@ public class RoomescapeControllerAdvice {
 
     @ExceptionHandler(UnAuthorizedException.class)
     public ProblemDetail handleMalformedJwtException(RuntimeException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
@@ -52,31 +52,31 @@ public class RoomescapeControllerAdvice {
             AuthenticationInformationNotFoundException.class, AuthenticationException.class
     })
     public ProblemDetail handleUnAuthorizedException(RuntimeException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
     @ExceptionHandler({IllegalArgumentException.class, NoSuchElementException.class})
     public ProblemDetail handleIllegalArgumentException(RuntimeException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(PaymentException.class)
     public ProblemDetail handlePaymentException(PaymentException exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler(ReservationException.class)
     public ProblemDetail handleDuplicatedReservationException(ReservationException exception) {
-        logger.error(exception.getLogMessage(), exception);
+        LOGGER.error(exception.getLogMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(Exception exception) {
-        logger.error(exception.getMessage(), exception);
+        LOGGER.error(exception.getMessage(), exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "예기치 않은 오류가 발생했습니다.");
     }
 }
