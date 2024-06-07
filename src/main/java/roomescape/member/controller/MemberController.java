@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @RestController
-public class MemberController {
+public class MemberController implements MemberControllerSwagger {
 
     private final MemberService memberService;
     private final ReservationService reservationService;
@@ -26,11 +26,13 @@ public class MemberController {
         this.waitingService = waitingService;
     }
 
+    @Override
     @GetMapping("/members")
     public List<MemberResponse> memberIdList() {
         return memberService.findMembersId();
     }
 
+    @Override
     @GetMapping("/member/registrations")
     public List<RegistrationInfoDto> memberReservationList(@LoginMemberId long memberId) {
         List<RegistrationInfoDto> reservationsOfMember = reservationService.findMemberReservations(memberId)
