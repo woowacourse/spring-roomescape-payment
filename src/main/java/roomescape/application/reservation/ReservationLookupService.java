@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.reservation.dto.request.ReservationFilterRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationStatusResponse;
+import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.infrastructure.reservation.ReservationSpec;
@@ -15,9 +16,12 @@ import roomescape.infrastructure.reservation.ReservationSpec;
 @Transactional(readOnly = true)
 public class ReservationLookupService {
     private final ReservationRepository reservationRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
 
-    public ReservationLookupService(ReservationRepository reservationRepository) {
+    public ReservationLookupService(ReservationRepository reservationRepository,
+                                    ReservationPaymentRepository reservationPaymentRepository) {
         this.reservationRepository = reservationRepository;
+        this.reservationPaymentRepository = reservationPaymentRepository;
     }
 
     public List<ReservationResponse> findByFilter(ReservationFilterRequest request) {
@@ -53,7 +57,8 @@ public class ReservationLookupService {
                 .stream()
                 .map(reservation -> ReservationStatusResponse.of(
                         reservation,
-                        reservationRepository.getWaitingCount(reservation))
+                        reservationRepository.getWaitingCount(reservation),
+                        reservationPaymentRepository.getByReservationId(reservation.getId()))
                 ).toList();
     }
 }

@@ -19,7 +19,13 @@ values (1, '12:00'),
 
 insert into reservation (id, member_id, date, theme_id, time_id, created_at, status)
 values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED'),
-       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED');
+       (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED'),
+       (3, 2, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-02', 'WAITING');
+
+insert into reservation_payment (order_id, reservation_id, payment_key,amount)
+values ('order_id1',1,'payment_key1',10000),
+       ('order_id2',2,'payment_key2',20000);
+
 
 alter table member alter column id restart with 1000;
 alter table theme alter column id restart with 1000;
