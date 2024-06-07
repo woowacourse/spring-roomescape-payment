@@ -1,7 +1,10 @@
 # 방탈출 기능 요구 사항
 
-## API 문서
+### API 문서
 - [API 파일 바로가기](src/main/resources/static/docs/index.html)
+
+### ERD
+- [ERD 바로가기](ERD.png)
 
 ### 📌 reservation (예약)
 
