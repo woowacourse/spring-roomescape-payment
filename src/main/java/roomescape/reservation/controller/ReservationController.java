@@ -10,30 +10,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.payment.PaymentCancelRequest;
+import roomescape.payment.PaymentClient;
 import roomescape.payment.PaymentRequest;
-import roomescape.payment.TossPaymentClient;
+import roomescape.payment.PaymentResponse;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
+import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
-import roomescape.reservation.dto.response.WaitingWithRanksResponse;
 import roomescape.reservation.service.ReservationService;
 import roomescape.system.auth.annotation.Admin;
 import roomescape.system.auth.annotation.MemberId;
 import roomescape.system.dto.response.ApiResponse;
+import roomescape.system.exception.RoomEscapeException;
 
 @RestController
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final TossPaymentClient tossPaymentClient;
+    private final PaymentClient paymentClient;
 
-    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient) {
+    public ReservationController(ReservationService reservationService, PaymentClient paymentClient) {
         this.reservationService = reservationService;
-        this.tossPaymentClient = tossPaymentClient;
+        this.paymentClient = paymentClient;
     }
 
 
@@ -45,7 +47,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations-mine")
-    public ApiResponse<WaitingWithRanksResponse> getMemberReservations(@MemberId Long memberId) {
+    public ApiResponse<MyReservationsResponse> getMemberReservations(@MemberId Long memberId) {
         return ApiResponse.success(reservationService.findWaitingWithRankById(memberId));
     }
 
@@ -79,11 +81,19 @@ public class ReservationController {
             @MemberId Long memberId,
             HttpServletResponse response
     ) {
-        tossPaymentClient.confirmPayment(
-                new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(),
-                        reservationRequest.amount(), reservationRequest.paymentType()));
-        ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
-        return getResponse(reservationResponse, response);
+        PaymentRequest paymentRequest = reservationRequest.getPaymentRequest();
+        PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentRequest);
+
+        try {
+            ReservationResponse reservationResponse = reservationService.addReservationWithPayment(reservationRequest,
+                    paymentResponse, memberId);
+            return getCreatedReservationResponse(reservationResponse, response);
+        } catch (RoomEscapeException e) {
+            PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
+                    paymentRequest.amount(), e.getMessage());
+            paymentClient.cancelPayment(cancelRequest);
+            throw e;
+        }
     }
 
     @PostMapping("/reservations/waiting")
@@ -94,7 +104,7 @@ public class ReservationController {
             HttpServletResponse response
     ) {
         ReservationResponse reservationResponse = reservationService.addWaiting(reservationRequest, memberId);
-        return getResponse(reservationResponse, response);
+        return getCreatedReservationResponse(reservationResponse, response);
     }
 
     @DeleteMapping("/reservations/waiting/{id}")
@@ -131,7 +141,7 @@ public class ReservationController {
         return ApiResponse.success();
     }
 
-    private ApiResponse<ReservationResponse> getResponse(
+    private ApiResponse<ReservationResponse> getCreatedReservationResponse(
             ReservationResponse reservationResponse,
             HttpServletResponse response
     ) {
