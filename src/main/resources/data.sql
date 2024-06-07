@@ -26,3 +26,11 @@ insert into reservation(member_id, date, time_id, theme_id, reservation_status) 
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(3, DATEADD('DAY', 7, CURRENT_DATE()), 2, 4, 'WAITING');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(4, DATEADD('DAY', 7, CURRENT_DATE()), 2, 4, 'WAITING');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(5, DATEADD('DAY', 7, CURRENT_DATE()), 2, 4, 'WAITING');
+
+-- 결제 정보
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-1', 'paymentKey-1', 10000, 1, DATEADD('DAY', -1, CURRENT_DATE()) - 1);
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-2', 'paymentKey-2', 20000, 2, DATEADD('DAY', -2, CURRENT_DATE()) - 2);
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-3', 'paymentKey-3', 30000, 3, DATEADD('DAY', -3, CURRENT_DATE()));
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-4', 'paymentKey-4', 40000, 4, DATEADD('DAY', -4, CURRENT_DATE()));
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-5', 'paymentKey-5', 50000, 5, DATEADD('DAY', -5, CURRENT_DATE()));
+insert into payment(order_id, payment_key, total_amount, reservation_id, approved_at) values('orderId-6', 'paymentKey-6', 60000, 6, DATEADD('DAY', 7, CURRENT_DATE()));
