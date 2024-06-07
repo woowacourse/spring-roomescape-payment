@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +36,7 @@ public class AdminController {
     }
 
     @PostMapping("/reservations")
+    @Operation(summary = "관리자 예약 추가", description = "관리자가 예약을 추가 할 때 사용하는 API")
     public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest reservationRequest) {
         ReservationResponse saved = reservationService.save(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
@@ -43,6 +45,7 @@ public class AdminController {
 
     @GetMapping("/reservations")
     @ResponseBody
+    @Operation(summary = "관리자 예약 조회", description = "관리자가 회원, 테마, 기간을 기준으로 예약을 조회할 때 사용하는 API")
     public List<ReservationResponse> search(@RequestParam long memberId,
                                             @RequestParam long themeId,
                                             @RequestParam LocalDate start,

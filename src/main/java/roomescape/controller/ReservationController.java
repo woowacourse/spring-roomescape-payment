@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class ReservationController {
     }
 
     @PostMapping
+    @Operation(summary = "예약 생성", description = "회원이 자신의 예약을 생성할 때 사용하는 API")
     public ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
@@ -39,16 +41,19 @@ public class ReservationController {
     }
 
     @GetMapping
+    @Operation(summary = "전체 예약 조회", description = "전체 예약을 조회할 때 사용하는 API")
     public List<ReservationResponse> findAllReservations() {
         return reservationService.findAll();
     }
 
     @GetMapping("/mine")
+    @Operation(summary = "회원 예약 목록 조회", description = "회원이 자신의 예약 목록을 조회할 때 사용하는 API")
     public List<LoginMemberReservationResponse> findLoginMemberReservations(@Auth long memberId) {
         return myReservationService.findLoginMemberReservations(memberId);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 취소", description = "예약을 취소할 때 사용하는 API")
     public ResponseEntity<Void> delete(@Auth long memberId, @PathVariable("id") long reservationId) {
         reservationService.cancel(memberId, reservationId);
         return ResponseEntity.noContent().build();

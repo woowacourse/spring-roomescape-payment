@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "로그인 할 때 사용하는 API")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         long memberId = memberService.login(loginRequest);
         LocalDateTime now = LocalDateTime.now();
@@ -42,11 +44,13 @@ public class MemberController {
     }
 
     @GetMapping("/login/check")
+    @Operation(summary = "로그인 여부 확인", description = "로그인 여부를 확인할 때 사용하는 API")
     public MemberInfo myInfo(@Auth long memberId) {
         return memberService.findByMemberId(memberId);
     }
 
     @GetMapping("/members")
+    @Operation(summary = "회원 목록 조회", description = "회원 목록을 조회할 때 사용하는 API")
     public List<MemberInfo> allMembers() {
         return memberService.findAll();
     }
