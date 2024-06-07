@@ -1,4 +1,4 @@
-package roomescape.controller.api;
+package roomescape.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
