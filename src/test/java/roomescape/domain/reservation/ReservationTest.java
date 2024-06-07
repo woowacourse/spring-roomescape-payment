@@ -1,14 +1,15 @@
 package roomescape.domain.reservation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationtime.ReservationTime;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationTest {
     @ParameterizedTest
@@ -23,7 +24,8 @@ public class ReservationTest {
                 LocalDate.of(2000, 4, 7),
                 new ReservationTime(LocalTime.of(1, 0)),
                 null,
-                null
+                null,
+                ReservationStatus.BOOKED
         );
 
         assertThat(reservation.isPast(targetDateTime))
@@ -40,7 +42,8 @@ public class ReservationTest {
                 null,
                 null,
                 null,
-                new Member(1L, null, null, null, null)
+                new Member(1L, null, null, null, null),
+                ReservationStatus.BOOKED
         );
         Member targetMember = new Member(targetMemberId, null, null, null, null);
 

@@ -21,33 +21,41 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Embedded
     private ReservationInfo info;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id")
     private Member member;
+    private ReservationStatus status;
 
     protected Reservation() {
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, new ReservationInfo(date, time, theme), member);
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        this(null, new ReservationInfo(date, time, theme), member, status);
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, new ReservationInfo(date, time, theme), member);
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        this(id, new ReservationInfo(date, time, theme), member, status);
     }
 
-    public Reservation(Long id, ReservationInfo info, Member member) {
+    public Reservation(Long id, ReservationInfo info, Member member, ReservationStatus status) {
         this.id = id;
         this.info = info;
         this.member = member;
+        this.status = status;
+    }
+
+    public void changeStatusPaymentWaiting() {
+        this.status = ReservationStatus.PAYMENT_WAITING;
     }
 
     public void updateMember(Member member) {
         this.member = member;
+    }
+
+    public boolean isPaymentWaitingStatus() {
+        return this.status == ReservationStatus.PAYMENT_WAITING;
     }
 
     public boolean isPast(LocalDateTime now) {

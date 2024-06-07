@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.theme.Theme;
@@ -117,7 +116,7 @@ class ReservationServiceTest extends ServiceTest {
             ReservationMineListResponse response = reservationService.findMyReservation(member);
 
             assertThat(response.getReservations().get(1).getStatus())
-                    .isEqualTo(String.format(ReservationStatus.WAITING.getDescription(), 1));
+                    .isEqualTo("1번째 예약대기");
         }
     }
 
@@ -204,7 +203,7 @@ class ReservationServiceTest extends ServiceTest {
         }
 
         @Test
-        void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_예약자로_승격되면서_예약_대기가_삭제된다() {
+        void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
             Member otherMember = memberFixture.createAdminMember();
             waitingFixture.createWaiting(reservation, otherMember);
 
@@ -218,6 +217,7 @@ class ReservationServiceTest extends ServiceTest {
                     .satisfies(reservation -> {
                         assertThat(reservation).isEqualTo(this.reservation);
                         assertThat(reservation.getMember()).isEqualTo(otherMember);
+                        assertThat(reservation.isPaymentWaitingStatus()).isTrue();
                     });
             assertThat(waitings)
                     .isEmpty();

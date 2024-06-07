@@ -148,6 +148,7 @@ public class ReservationService {
 
     private void upgradeWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
         reservation.updateMember(waiting.getMember());
+        reservation.changeStatusPaymentWaiting();
         reservationWaitingRepository.delete(waiting);
     }
 }
