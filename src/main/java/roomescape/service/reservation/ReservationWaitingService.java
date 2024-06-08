@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
@@ -100,17 +101,18 @@ public class ReservationWaitingService {
         reservationWaitingRepository.deleteById(waitingId);
     }
 
+    @Transactional
     public void deleteById(long waitingId, long memberId) {
         reservationWaitingRepository.findById(waitingId)
                 .ifPresent(waiting -> {
                     waiting.checkCancelAuthority(memberId);
                     paymentService.cancel(waiting.getPayment());
                 });
-        deleteById(waitingId);
+        reservationWaitingRepository.deleteById(waitingId);
     }
 
     @Scheduled(cron = "${resetwaiting.schedule.cron}")
-    private void deleteTodayWaiting() {
+    protected void deleteTodayWaiting() {
         List<ReservationWaiting> waitingOfToday = reservationWaitingRepository.findBySchedule_Date(LocalDate.now());
         waitingOfToday.forEach(w -> deleteById(w.getId()));
     }
