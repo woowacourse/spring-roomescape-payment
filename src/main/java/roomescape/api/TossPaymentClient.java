@@ -8,10 +8,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.Payment;
+import roomescape.domain.PaymentClient;
 import roomescape.dto.PaymentErrorResponse;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
-import roomescape.domain.PaymentClient;
 
 public class TossPaymentClient implements PaymentClient {
 

@@ -2,9 +2,6 @@ package roomescape.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import roomescape.exception.PaymentException;
-import roomescape.exception.RoomescapeException;
-import roomescape.exception.RoomescapeExceptionType;
 
 @Entity
 public class Payed extends Payment {
@@ -28,13 +25,13 @@ public class Payed extends Payment {
     }
 
     private void validatePaymentKey(String paymentKey) {
-        if(paymentKey == null || paymentKey.isBlank()) {
+        if (paymentKey == null || paymentKey.isBlank()) {
             throw new IllegalArgumentException("PaymentKey 는 필수값입니다.");
         }
     }
 
     private void validateOrderId(String orderId) {
-        if(orderId == null || orderId.isBlank()) {
+        if (orderId == null || orderId.isBlank()) {
             throw new IllegalArgumentException("orderId 는 필수값입니다.");
         }
     }

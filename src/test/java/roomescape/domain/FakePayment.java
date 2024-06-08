@@ -2,7 +2,6 @@ package roomescape.domain;
 
 import static roomescape.api.TossPaymentExceptionType.INVALID_REQUEST;
 
-import roomescape.domain.Payment.State;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
 
