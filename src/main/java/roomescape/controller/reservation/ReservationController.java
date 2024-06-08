@@ -79,7 +79,6 @@ public class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
-    // TODO: 예약정보, 결제정보 Soft Delete 로 변경
     @RoleAllowed
     @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservation(

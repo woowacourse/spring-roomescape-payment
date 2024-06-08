@@ -232,7 +232,7 @@ function requestDelete(reservationId, memberId) {
         method: 'DELETE',
     };
 
-    return fetch(`${RESERVATION_API_ENDPOINT}/${reservationId}?memberId=${memberId}`, requestOptions)
+    return fetch(`${RESERVATION_API_ENDPOINT}/${reservationId}`, requestOptions)
         .then(response => {
             if (response.status !== 204) throw new Error('Delete failed');
         });

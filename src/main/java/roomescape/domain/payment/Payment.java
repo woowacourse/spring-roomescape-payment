@@ -82,4 +82,8 @@ public class Payment {
     public Reservation getReservation() {
         return reservation;
     }
+
+    public void cancel() {
+        status = PaymentStatus.CANCELED;
+    }
 }

@@ -139,12 +139,13 @@ public class ReservationService {
     public void deleteReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, member);
-        paymentService.cancelPayment(reservation);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
-                waiting -> upgradeWaitingToReservationAndDeleteWaiting(reservation, waiting),
-                () -> reservationRepository.delete(reservation)
+                waiting -> updateWaitingToReservationAndDeleteWaiting(reservation, waiting),
+                reservation::cancel
         );
+        paymentService.cancelPayment(reservation);
+
     }
 
     private void validateReservationMember(Reservation reservation, Member member) {
@@ -156,9 +157,12 @@ public class ReservationService {
         }
     }
 
-    private void upgradeWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
-        reservation.updateMember(waiting.getMember());
-        reservation.changeStatusPaymentWaiting();
+    private void updateWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
+        reservation.cancel();
+
+        Reservation newMemberReservation = reservation.changeMember(waiting.getMember());
+        reservationRepository.save(newMemberReservation);
+
         reservationWaitingRepository.delete(waiting);
     }
 }

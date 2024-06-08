@@ -318,7 +318,7 @@ Content-Type: application/json
 Request
 
 ```
-DELETE /reservations/1?memberId=1
+DELETE /reservations/1
 Cookie: token=hello.example.token
 ```
 

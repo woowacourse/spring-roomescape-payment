@@ -31,8 +31,8 @@ public class PaymentService {
     public void cancelPayment(Reservation reservation) {
         Payment payment = paymentRepository.findByReservation(reservation)
                 .orElseThrow(NotFoundPaymentException::new);
-        paymentRepository.delete(payment);
 
         paymentClient.cancelPayment(payment);
+        payment.cancel();
     }
 }

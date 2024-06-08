@@ -34,6 +34,10 @@ public class Reservation {
     protected Reservation() {
     }
 
+    public Reservation(ReservationInfo info, Member member, ReservationStatus reservationStatus) {
+        this(null, info, member, reservationStatus);
+    }
+
     public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
         this(null, new ReservationInfo(date, time, theme), member, status);
     }
@@ -49,20 +53,12 @@ public class Reservation {
         this.status = status;
     }
 
-    public void changeStatusPaymentWaiting() {
-        this.status = ReservationStatus.PAYMENT_WAITING;
-    }
-
-    public void updateMember(Member member) {
-        this.member = member;
+    public void cancel() {
+        this.status = ReservationStatus.CANCELED;
     }
 
     public boolean isPaymentWaitingStatus() {
         return this.status == ReservationStatus.PAYMENT_WAITING;
-    }
-
-    public boolean isBooked() {
-        return this.status == ReservationStatus.BOOKED;
     }
 
     public boolean isPast(LocalDateTime now) {
@@ -116,5 +112,9 @@ public class Reservation {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public Reservation changeMember(Member member) {
+        return new Reservation(this.info, member, ReservationStatus.PAYMENT_WAITING);
     }
 }
