@@ -11,9 +11,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import roomescape.common.TestClientConfiguration;
+import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentCancelResult;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
@@ -23,6 +25,7 @@ import roomescape.reservation.event.ReservationSavedEvent;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -105,7 +108,7 @@ class BookingWithPaymentServiceTest {
         @DisplayName("예약 생성에 실패하면 PG 결제 취소 API에 취소 요청을 한다.")
         void cancelCasedByRollBackWhenReservationCreateFailed() {
             // given
-            BDDMockito.willThrow(RuntimeException.class)
+            BDDMockito.willThrow(TestException.class)
                     .given(bookingManageService)
                     .create(any());
 
@@ -113,7 +116,7 @@ class BookingWithPaymentServiceTest {
 
             // when & then
             assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
-                    .isInstanceOf(RuntimeException.class);
+                    .isInstanceOf(TestException.class);
 
             long count = events.stream(ReservationFailedEvent.class).count();
             assertThat(count).isEqualTo(1);
@@ -124,7 +127,7 @@ class BookingWithPaymentServiceTest {
         @DisplayName("결제 내역 생성에 실패하면 PG 결제 취소 API에 취소 요청을 한다.")
         void cancelCasedByRollBackWhenPaymentCreateFailed() throws InterruptedException {
             // given
-            BDDMockito.willThrow(RuntimeException.class)
+            BDDMockito.willThrow(TestException.class)
                     .given(paymentService)
                     .create(any());
 
@@ -133,7 +136,7 @@ class BookingWithPaymentServiceTest {
             // when & then
             assertSoftly(softly -> {
                 softly.assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
-                        .isInstanceOf(RuntimeException.class);
+                        .isInstanceOf(TestException.class);
 
                 long count = events.stream(ReservationFailedEvent.class).count();
                 softly.assertThat(count).isEqualTo(1);
@@ -146,7 +149,7 @@ class BookingWithPaymentServiceTest {
         @DisplayName("결제 내역 생성에 실패하면 예약 생성도 롤백된다.")
         void rollBackCreatedReservationWhenPaymentCreateFailed() {
             // given
-            BDDMockito.willThrow(RuntimeException.class)
+            BDDMockito.willThrow(TestException.class)
                     .given(paymentService)
                     .create(any());
 
@@ -155,9 +158,12 @@ class BookingWithPaymentServiceTest {
             // when & then
             assertSoftly(softly -> {
                 softly.assertThatThrownBy(() -> bookingManageService.createWithPayment(reservation, confirmedPayment))
-                        .isInstanceOf(RuntimeException.class);
+                        .isInstanceOf(TestException.class);
                 softly.assertThat(reservationRepository.findAll()).hasSize(0);
             });
+        }
+
+        static class TestException extends RuntimeException {
         }
     }
 
@@ -179,6 +185,9 @@ class BookingWithPaymentServiceTest {
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
             bookingManageService.createWithPayment(reservation, confirmedPayment);
 
+            BDDMockito.given(paymentClient.cancel(any()))
+                    .willReturn(CompletableFuture.completedFuture(new PaymentCancelResult("CANCELED")));
+
             // when
             bookingManageService.delete(reservation.getId(), USER_ADMIN());
 
@@ -188,11 +197,30 @@ class BookingWithPaymentServiceTest {
         }
 
         @Test
+        @DisplayName("결제 취소 API에서 오류 응답을 받으면 예외가 발생한다.")
+        void throwExceptionWhenCancelApiReturnErrorResponse() {
+            // given
+            Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
+            bookingManageService.createWithPayment(reservation, confirmedPayment);
+
+            BDDMockito.given(paymentClient.cancel(any()))
+                    .willReturn(CompletableFuture.failedFuture(new ViolationException("오류 응답 메세지")));
+
+            // when & then
+            assertThatThrownBy(() -> bookingManageService.delete(reservation.getId(), USER_ADMIN()))
+                    .isInstanceOf(ViolationException.class)
+                    .hasMessage("오류 응답 메세지");
+        }
+
+        @Test
         @DisplayName("예약을 삭제하면 결제 내역이 삭제된다.")
         void deleteReservationWithPaymentDeleting() {
             // given
             Reservation reservation = MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING);
             bookingManageService.createWithPayment(reservation, confirmedPayment);
+
+            BDDMockito.given(paymentClient.cancel(any()))
+                    .willReturn(CompletableFuture.completedFuture(new PaymentCancelResult("CANCELED")));
 
             // when
             bookingManageService.delete(reservation.getId(), USER_ADMIN());
