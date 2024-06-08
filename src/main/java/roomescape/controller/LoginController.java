@@ -14,7 +14,6 @@ import roomescape.dto.LoginRequest;
 import roomescape.dto.LoginResponse;
 import roomescape.service.LoginService;
 
-//@Tag(name = "Login", description = "로그인 API")
 @Controller
 public class LoginController {
     private final LoginService loginService;

@@ -1,9 +1,11 @@
 package roomescape.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.*;
 import roomescape.dto.*;
+import roomescape.exception.PaymentException;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -51,16 +53,23 @@ public class ReservationService {
 
         Payment payment = paymentService.pay(reservationWithPaymentRequest.toPayment());
 
-        Reservation reservation = new Reservation(
-                requestedReservation.getDate(),
-                requestedReservation.getReservationTime(),
-                requestedReservation.getTheme(),
-                requestedReservation.getMember(),
-                payment
-        );
+        ReservationResponse response;
+        try {
+            Reservation reservation = new Reservation(
+                    requestedReservation.getDate(),
+                    requestedReservation.getReservationTime(),
+                    requestedReservation.getTheme(),
+                    requestedReservation.getMember(),
+                    payment
+            );
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(savedReservation);
+            Reservation savedReservation = reservationRepository.save(reservation);
+            response = ReservationResponse.from(savedReservation);
+        } catch (Exception e) {
+            paymentService.cancel(new CancelPayment(payment, new CancelReason("서버 오류")));
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 이후 로직 처리 중 에러");
+        }
+        return response;
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -132,7 +141,8 @@ public class ReservationService {
         return reservationRepository.findByDateBetween(dateFrom, dateTo);
     }
 
-    public void deleteByUser(LoginMemberRequest loginMemberRequest, long reservationId) {
+    @Transactional
+    public void delete(LoginMemberRequest loginMemberRequest, long reservationId) {
         Optional<Reservation> findResult = reservationRepository.findById(reservationId);
         if (findResult.isEmpty()) {
             return;
@@ -143,8 +153,14 @@ public class ReservationService {
             throw new RoomescapeException(FORBIDDEN_DELETE);
         }
         reservationRepository.delete(requestedReservation);
+
+        if (isAdminReservation(requestedReservation)) {
+            return;
+        }
+        paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("예약 취소")));
     }
 
+    @Transactional
     public void deleteWaitingByAdmin(long id) {
         Optional<Reservation> findResult = reservationRepository.findById(id);
         if (findResult.isEmpty()) {
@@ -156,6 +172,15 @@ public class ReservationService {
             throw new RoomescapeException(FORBIDDEN_DELETE);
         }
         reservationRepository.deleteById(id);
+
+        if (isAdminReservation(requestedReservation)) {
+            return;
+        }
+        paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("관리자의 대기 취소")));
+    }
+
+    private static boolean isAdminReservation(Reservation requestedReservation) {
+        return requestedReservation.getPayment() == null;
     }
 
     private boolean isNotWaiting(Reservation requestedReservation) {

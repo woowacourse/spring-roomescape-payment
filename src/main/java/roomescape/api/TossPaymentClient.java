@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.CancelReason;
 import roomescape.domain.Payment;
 import roomescape.dto.PaymentErrorResponse;
 import roomescape.exception.PaymentException;
@@ -40,5 +41,16 @@ public class TossPaymentClient implements PaymentClient {
         } catch (Exception e) {
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류로 결제에 실패했습니다.");
         }
+    }
+
+    @Override
+    public void cancel(Payment payment, CancelReason cancelReason) {
+        restClient.post()
+                .uri("v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
+                .header("Authorization", authorizations)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cancelReason)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

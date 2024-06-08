@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.domain.CancelPayment;
 import roomescape.domain.Payment;
 import roomescape.repository.PaymentRepository;
 
@@ -18,5 +19,10 @@ public class PaymentService {
     public Payment pay(Payment payment) {
         paymentClient.pay(payment);
         return paymentRepository.save(payment);
+    }
+
+    public void cancel(CancelPayment cancelPayment) {
+        paymentClient.cancel(cancelPayment.payment(), cancelPayment.cancelReason());
+        paymentRepository.deleteById(cancelPayment.payment().getId());
     }
 }

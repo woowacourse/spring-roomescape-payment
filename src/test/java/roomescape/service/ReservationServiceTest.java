@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import roomescape.config.TestPaymentConfig;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.dto.LoginMemberRequest;
 import roomescape.dto.ReservationDetailResponse;
@@ -17,6 +18,7 @@ import roomescape.dto.ReservationResponse;
 import roomescape.dto.ReservationWithPaymentRequest;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
+import roomescape.repository.PaymentRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +33,8 @@ class ReservationServiceTest extends FixtureUsingTest {
 
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @DisplayName("지나지 않은 시간에 대한 예약을 생성할 수 있다.")
     @Test
@@ -134,10 +138,12 @@ class ReservationServiceTest extends FixtureUsingTest {
         Reservation defaultReservation;
         Member usedMember = USER1;
         Member notUsedMember = USER2;
+        Payment payment;
 
         @BeforeEach
         void addDefaultReservation() {
-            defaultReservation = new Reservation(defaultDate, reservationTime_10_0, theme1, USER1);
+            payment = paymentRepository.save(FakePayment.CORRECT_REQ);
+            defaultReservation = new Reservation(defaultDate, reservationTime_10_0, theme1, USER1, payment);
             defaultReservation = reservationRepository.save(defaultReservation);
         }
 
@@ -145,7 +151,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteReservationTest() {
             //when
-            reservationService.deleteByUser(LoginMemberRequest.from(usedMember), 1L);
+            reservationService.delete(LoginMemberRequest.from(usedMember), 1L);
 
             //then
             assertThat(reservationRepository.findAll()).isEmpty();
@@ -155,7 +161,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteOthersReservationFailTest() {
             assertThatThrownBy(() ->
-                    reservationService.deleteByUser(LoginMemberRequest.from(notUsedMember), 1L))
+                    reservationService.delete(LoginMemberRequest.from(notUsedMember), 1L))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
 
@@ -166,7 +172,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteOthersReservationByAdminFailTest() {
             assertThatThrownBy(() ->
-                    reservationService.deleteByUser(LoginMemberRequest.from(ADMIN), 1L))
+                    reservationService.delete(LoginMemberRequest.from(ADMIN), 1L))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
 
@@ -198,7 +204,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteNotExistReservationNotThrowsException() {
             assertThatCode(
-                    () -> reservationService.deleteByUser(LoginMemberRequest.from(defaultReservation.getMember()), 2L))
+                    () -> reservationService.delete(LoginMemberRequest.from(defaultReservation.getMember()), 2L))
                     .doesNotThrowAnyException();
         }
     }

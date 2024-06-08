@@ -67,8 +67,6 @@ public class AdminIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
         params.put("memberId", 1);
-        params.put("paymentKey", "truePaymentKey");
-        params.put("amount", 1L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

@@ -115,7 +115,8 @@ public class ReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 defaultTime,
                 defaultTheme1,
-                savedUser
+                savedUser,
+                FakePayment.CORRECT_REQ
         );
 
         @BeforeEach

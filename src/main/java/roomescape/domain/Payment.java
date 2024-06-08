@@ -30,6 +30,10 @@ public class Payment {
         this(null, paymentKey, orderId, amount);
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getPaymentKey() {
         return paymentKey;
     }
