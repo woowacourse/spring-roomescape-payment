@@ -166,7 +166,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public MyReservationsResponse findWaitingWithRankById(Long memberId) {
+    public MyReservationsResponse findMemberReservations(Long memberId) {
         return new MyReservationsResponse(reservationRepository.findMyReservations(memberId));
     }
 

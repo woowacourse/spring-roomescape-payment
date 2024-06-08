@@ -53,7 +53,7 @@ public class ReservationController {
 
     @GetMapping("/reservations-mine")
     public ApiResponse<MyReservationsResponse> getMemberReservations(@MemberId Long memberId) {
-        return ApiResponse.success(reservationService.findWaitingWithRankById(memberId));
+        return ApiResponse.success(reservationService.findMemberReservations(memberId));
     }
 
     @Admin
