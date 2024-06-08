@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.Payment;
 import roomescape.dto.PaymentErrorResponse;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
@@ -28,15 +29,15 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void pay(PaymentRequest paymentRequest) {
+    public Payment pay(PaymentRequest paymentRequest) {
         try {
-            restClient.post()
+            return restClient.post()
                     .uri("v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
-                    .toBodilessEntity();
+                    .body(Payment.class);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             PaymentErrorResponse errorResponse = e.getResponseBodyAs(PaymentErrorResponse.class);
             TossPaymentExceptionType tossPaymentExceptionType = TossPaymentExceptionType.findBy(errorResponse.code());
