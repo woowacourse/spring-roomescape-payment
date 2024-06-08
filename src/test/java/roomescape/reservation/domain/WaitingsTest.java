@@ -14,6 +14,7 @@ import static roomescape.util.Fixture.KAKI_PASSWORD;
 import static roomescape.util.Fixture.TODAY;
 import static roomescape.util.Fixture.TOMORROW;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class WaitingsTest {
         Waitings waitings = new Waitings(List.of(kakiReservation1, kakiReservation2, jojoReservation1, jojoReservation2));
 
         ReservationWithPaymentResponse reservationWithPaymentResponse
-                = new ReservationWithPaymentResponse(1L, theme, TODAY, hourTen, ReservationStatus.WAIT, "", 0);
+                = new ReservationWithPaymentResponse(1L, theme, TODAY, hourTen, ReservationStatus.WAIT, "", new BigDecimal("0"));
 
         assertAll(
                 () -> assertThat(waitings.findMemberRank(reservationWithPaymentResponse, kaki.getId())).isEqualTo(1),

@@ -8,6 +8,7 @@ import static roomescape.util.Fixture.PAYMENT_KEY;
 import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ class PaymentRepositoryTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horroTheme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horroTheme, hour10, ReservationStatus.SUCCESS));
-        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, 1000));
+        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, new BigDecimal("1000")));
 
         Payment findPayment = paymentRepository.findByPaymentKey(payment.getPaymentKey()).get();
 
@@ -65,7 +66,7 @@ class PaymentRepositoryTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horroTheme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horroTheme, hour10, ReservationStatus.SUCCESS));
-        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, 1000));
+        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, new BigDecimal("1000")));
 
         Payment findPayment = paymentRepository.findByReservationId(reservation.getId()).get();
 

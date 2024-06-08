@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS payment (
     status VARCHAR(255) NOT NULL CHECK (status IN ('PAID', 'CANCELED')),
     method   VARCHAR(255) NOT NULL CHECK (method IN ('CARD', 'EASY_PAY')),
     currency VARCHAR(255) NOT NULL CHECK (currency IN ('KRW')),
-    total_amount INT NOT NULL,
+    total_amount DECIMAL NOT NULL,
     created_at TIMESTAMP NOT NULL default CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );

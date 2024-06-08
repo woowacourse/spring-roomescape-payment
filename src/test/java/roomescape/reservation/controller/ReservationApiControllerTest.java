@@ -1,11 +1,14 @@
 package roomescape.reservation.controller;
 
+import static roomescape.util.Fixture.ORDER_ID;
+import static roomescape.util.Fixture.PAYMENT_KEY;
 import static roomescape.util.Fixture.TODAY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +59,7 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
 
         UserReservationSaveRequest userReservationSaveRequest
-                = new UserReservationSaveRequest(TODAY, 1L, 1L, "testKey", "testId", 1000);
+                = new UserReservationSaveRequest(TODAY, 1L, 1L, PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -78,7 +81,7 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
 
         UserReservationSaveRequest userReservationSaveRequest
-                = new UserReservationSaveRequest(TODAY, 1L, 1L, "testKey", "testId", 1000);
+                = new UserReservationSaveRequest(TODAY, 1L, 1L, null, null, null);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

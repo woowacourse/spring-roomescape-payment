@@ -1,6 +1,7 @@
 package roomescape.reservation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.payment.dto.PaymentRequest;
@@ -25,8 +26,8 @@ public record UserReservationSaveRequest(
         @Schema(description = "주문번호", example = "테스트_주문번호")
         String orderId,
 
-        @Schema(description = "주문금액", example = "1234")
-        int amount
+        @Schema(description = "주문금액", example = "1000")
+        BigDecimal amount
 ) {
 
     public Reservation toEntity(Member member, Theme theme, ReservationTime reservationTime, ReservationStatus reservationStatus) {

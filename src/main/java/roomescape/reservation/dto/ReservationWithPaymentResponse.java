@@ -1,5 +1,6 @@
 package roomescape.reservation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -12,7 +13,7 @@ public class ReservationWithPaymentResponse {
     private final ReservationTime time;
     private final ReservationStatus status;
     private final String paymentKey;
-    private final int totalAmount;
+    private final BigDecimal totalAmount;
 
     public ReservationWithPaymentResponse(
             Long id,
@@ -21,7 +22,7 @@ public class ReservationWithPaymentResponse {
             ReservationTime time,
             ReservationStatus status,
             String paymentKey,
-            int totalAmount
+            BigDecimal totalAmount
     ) {
         this.id = id;
         this.theme = theme;
@@ -56,7 +57,7 @@ public class ReservationWithPaymentResponse {
         return paymentKey;
     }
 
-    public int getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 }

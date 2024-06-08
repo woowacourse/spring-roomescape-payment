@@ -17,6 +17,7 @@ import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 import static roomescape.util.Fixture.TOMORROW;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -83,10 +84,10 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
-        PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-        PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.PAID, 1000);
+        PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
+        PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.PAID, BigDecimal.valueOf(1000));
         doReturn(paymentSaveResponse).when(paymentService)
                 .payForReservation(paymentRequest, userReservationSaveRequest.toEntity(kaki, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
@@ -104,7 +105,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         doThrow(PaymentFailException.class).when(paymentService).payForReservation(any(PaymentRequest.class), any(Reservation.class));
 
@@ -119,7 +120,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), 11L, "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), 11L, PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -134,7 +135,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
         reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
@@ -150,7 +151,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
         reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT);
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT))
@@ -166,7 +167,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
         reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT))
@@ -182,7 +183,7 @@ class ReservationServiceTest {
         memberRepository.save(JOJO);
 
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         LoginMember loginMember1 = LOGIN_MEMBER_KAKI;
         reservationService.save(userReservationSaveRequest, loginMember1, ReservationStatus.WAIT);
@@ -212,7 +213,7 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         UserReservationSaveRequest userReservationSaveRequest =
-                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), "testKey", "testId", 1000);
+                new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
         ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         assertThatThrownBy(() -> reservationService.cancelById(reservationResponse.id(), RESERVATION_CANCEL_REASON))

@@ -13,6 +13,7 @@ import static roomescape.util.Fixture.RESERVATION_CANCEL_REASON;
 import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -84,8 +85,8 @@ class PaymentServiceTest {
             Theme horrorTheme = themeRepository.save(HORROR_THEME);
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
-            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", PaymentCurrency.KRW, 1000);
+            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", PaymentCurrency.KRW, BigDecimal.valueOf(1000));
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);
@@ -107,7 +108,7 @@ class PaymentServiceTest {
             Theme horrorTheme = themeRepository.save(HORROR_THEME);
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
-            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
+            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
 
             doThrow(PaymentFailException.class).when(tossPaymentClient)
                     .requestPayment(paymentRequest);
@@ -124,8 +125,8 @@ class PaymentServiceTest {
             Theme horrorTheme = themeRepository.save(HORROR_THEME);
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
-            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, 1000);
+            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, BigDecimal.valueOf(1000));
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);
@@ -149,8 +150,8 @@ class PaymentServiceTest {
             Theme horrorTheme = themeRepository.save(HORROR_THEME);
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
-            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, 1000);
+            PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, BigDecimal.valueOf(1000));
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);

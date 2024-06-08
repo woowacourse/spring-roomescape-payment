@@ -9,6 +9,7 @@ import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.TODAY;
 import static roomescape.util.Fixture.TOMORROW;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -234,7 +235,7 @@ public class ReservationRepositoryTest {
                 () -> assertThat(reservationWithPayment).hasSize(1),
                 () -> assertThat(reservationWithPayment.get(0).getId()).isEqualTo(kakiReservation.getId()),
                 () -> assertThat(reservationWithPayment.get(0).getPaymentKey()).isEqualTo(""),
-                () -> assertThat(reservationWithPayment.get(0).getTotalAmount()).isEqualTo(0)
+                () -> assertThat(reservationWithPayment.get(0).getTotalAmount()).isEqualTo(BigDecimal.valueOf(0))
         );
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -12,7 +13,7 @@ public record MemberReservationResponse(
         String status,
         int rank,
         String paymentKey,
-        int amount
+        BigDecimal amount
 ) {
 
     public static MemberReservationResponse toResponse(ReservationWithPaymentResponse reservationWithPaymentResponse, int rank) {

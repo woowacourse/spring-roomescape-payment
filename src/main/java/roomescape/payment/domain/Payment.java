@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.math.BigDecimal;
 import roomescape.common.domain.AuditedEntity;
 import roomescape.reservation.domain.Reservation;
 
@@ -43,14 +44,20 @@ public class Payment extends AuditedEntity {
     private PaymentCurrency currency;
 
     @Column(nullable = false)
-    private int totalAmount;
+    private BigDecimal totalAmount;
 
     protected Payment() {
     }
 
-    public Payment(Reservation reservation, String paymentKey, String orderId, PaymentStatus status,
-                   PaymentMethod method,
-                   PaymentCurrency currency, int totalAmount) {
+    public Payment(
+            Reservation reservation,
+            String paymentKey,
+            String orderId,
+            PaymentStatus status,
+            PaymentMethod method,
+            PaymentCurrency currency,
+            BigDecimal totalAmount
+    ) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
@@ -60,8 +67,16 @@ public class Payment extends AuditedEntity {
         this.totalAmount = totalAmount;
     }
 
-    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, PaymentStatus status,
-                   PaymentMethod method, PaymentCurrency currency, int totalAmount) {
+    public Payment(
+            Long id,
+            Reservation reservation,
+            String paymentKey,
+            String orderId,
+            PaymentStatus status,
+            PaymentMethod method,
+            PaymentCurrency currency,
+            BigDecimal totalAmount
+    ) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
@@ -104,7 +119,7 @@ public class Payment extends AuditedEntity {
         return currency;
     }
 
-    public int getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 }

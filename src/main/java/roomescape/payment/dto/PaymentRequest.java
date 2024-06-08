@@ -1,6 +1,7 @@
 package roomescape.payment.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import org.hibernate.validator.constraints.Range;
 
 public record PaymentRequest(
@@ -8,7 +9,7 @@ public record PaymentRequest(
         String orderId,
 
         @Range(min = 0, max = Integer.MAX_VALUE)
-        int amount,
+        BigDecimal amount,
 
         @NotNull
         String paymentKey
