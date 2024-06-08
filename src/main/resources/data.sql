@@ -34,4 +34,3 @@ VALUES ('sample_payment_key_1', 'sample_order_id_1', 1000, 1),
        ('sample_payment_key_5', 'sample_order_id_5', 1000, 5),
        ('sample_payment_key_6', 'sample_order_id_6', 1000, 6),
        ('sample_payment_key_7', 'sample_order_id_7', 1000, 7)
-

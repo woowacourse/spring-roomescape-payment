@@ -122,20 +122,20 @@ class ReservationRepositoryTest {
         return Stream.of(
                 Arguments.of(1L,
                         List.of(
-                                new ReservationRankResponse(1L, "봄", date.minusDays(3), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(3L, "여름", date.minusDays(1), LocalTime.of(16, 0), 1)
+                                new ReservationRankResponse(1L, "봄", date.minusDays(3), LocalTime.of(15, 0), 1, "sample_payment_key_1", 1000L),
+                                new ReservationRankResponse(3L, "여름", date.minusDays(1), LocalTime.of(16, 0), 1, "sample_payment_key_3", 1000L)
                         )),
                 Arguments.of(2L,
                         List.of(
-                                new ReservationRankResponse(2L, "여름", date.minusDays(2), LocalTime.of(17, 0), 1),
-                                new ReservationRankResponse(4L, "여름", date.minusDays(1), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(7L, "가을", date.plusDays(4), LocalTime.of(18, 0), 1)
+                                new ReservationRankResponse(2L, "여름", date.minusDays(2), LocalTime.of(17, 0), 1, "sample_payment_key_2", 1000L),
+                                new ReservationRankResponse(4L, "여름", date.minusDays(1), LocalTime.of(15, 0), 1, "sample_payment_key_4", 1000L),
+                                new ReservationRankResponse(7L, "가을", date.plusDays(4), LocalTime.of(18, 0), 1, "sample_payment_key_7", 1000L)
                         )),
                 Arguments.of(3L,
                         List.of(
-                                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1),
-                                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2)
+                                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1, "sample_payment_key_5", 1000L),
+                                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1, "sample_payment_key_6", 1000L),
+                                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2, null, null)
                         ))
         );
     }
@@ -143,7 +143,7 @@ class ReservationRepositoryTest {
     @Test
     @DisplayName("멤버를 삭제하면, 관련된 예약도 삭제된다.")
     void deleteMemberTest() {
-        long memberId = 1L;
+        long memberId = 3L;
         int totalReservationCount = reservationRepository.findAll().size();
         int memberReservationCount = reservationRepository.findAllByMemberId(memberId).size();
 
