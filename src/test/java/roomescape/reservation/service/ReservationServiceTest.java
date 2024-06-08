@@ -86,7 +86,7 @@ class ReservationServiceTest {
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, 1000);
 
         PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-        PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.DONE, 1000);
+        PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.PAID, 1000);
         doReturn(paymentSaveResponse).when(paymentService)
                 .payForReservation(paymentRequest, userReservationSaveRequest.toEntity(kaki, horrorTheme, hour10, ReservationStatus.SUCCESS));
 

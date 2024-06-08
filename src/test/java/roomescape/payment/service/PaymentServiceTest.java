@@ -93,7 +93,7 @@ class PaymentServiceTest {
 
             assertAll(
                     () -> assertThat(paymentSaveResponse.paymentKey()).isEqualTo(tossPaymentResponse.paymentKey()),
-                    () -> assertThat(paymentSaveResponse.status()).isEqualTo(PaymentStatus.DONE),
+                    () -> assertThat(paymentSaveResponse.status()).isEqualTo(PaymentStatus.PAID),
                     () -> assertThat(paymentSaveResponse.amount()).isEqualTo(tossPaymentResponse.totalAmount())
             );
         }
@@ -160,7 +160,7 @@ class PaymentServiceTest {
 
             Payment canceledPayment = paymentRepository.findByPaymentKey(PAYMENT_KEY).get();
 
-            assertThat(canceledPayment.getStatus()).isEqualTo(PaymentStatus.CANCEL);
+            assertThat(canceledPayment.getStatus()).isEqualTo(PaymentStatus.CANCELED);
         }
 
         @DisplayName("결제 되지 않은 예약을 취소할 경우 예외가 발생한다.")

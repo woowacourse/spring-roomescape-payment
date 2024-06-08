@@ -1,7 +1,7 @@
 package roomescape.payment.domain;
 
 public enum PaymentStatus {
-    DONE,
-    CANCEL,
+    PAID,
+    CANCELED,
     ;
 }
