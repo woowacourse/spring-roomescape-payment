@@ -74,7 +74,8 @@ public class ReservationWaiting {
                 date.getValue(),
                 time,
                 theme,
-                member
+                member,
+                PaymentStatus.WAITING
         );
     }
 

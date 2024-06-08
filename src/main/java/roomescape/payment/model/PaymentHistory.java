@@ -42,6 +42,10 @@ public class PaymentHistory {
         this.member = member;
     }
 
+    public boolean hasSameReservation(final Reservation other) {
+        return reservation.equals(other);
+    }
+
     public Long getId() {
         return id;
     }

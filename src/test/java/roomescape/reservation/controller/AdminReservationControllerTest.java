@@ -70,10 +70,7 @@ class AdminReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
-                1L,
-                "orderId",
-                1000L,
-                "paymentKey"
+                1L
         );
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));

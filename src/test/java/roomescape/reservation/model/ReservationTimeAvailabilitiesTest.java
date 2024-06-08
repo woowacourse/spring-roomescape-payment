@@ -30,9 +30,9 @@ class ReservationTimeAvailabilitiesTest {
 
         final LocalDate date = LocalDate.now().plusDays(3);
         final List<Reservation> reservations = List.of(
-                new Reservation(1L, reservationStatus, date, reservationTime1, theme, member),
-                new Reservation(2L, reservationStatus, date, reservationTime2, theme, member),
-                new Reservation(3L, reservationStatus, date, reservationTime3, theme, member)
+                new Reservation(1L, reservationStatus, date, reservationTime1, theme, member, PaymentStatus.DONE),
+                new Reservation(2L, reservationStatus, date, reservationTime2, theme, member, PaymentStatus.DONE),
+                new Reservation(3L, reservationStatus, date, reservationTime3, theme, member, PaymentStatus.DONE)
         );
 
         // When

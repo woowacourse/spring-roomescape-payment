@@ -69,6 +69,7 @@ class PaymentServiceTest {
     @Test
     @Sql("classpath:test-payment-credential-data.sql")
     void submitPayment() {
+        //given
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
@@ -76,13 +77,16 @@ class PaymentServiceTest {
         final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+        List<PaymentHistory> beforeHistories = paymentHistoryRepository.findAll();
 
+        //when
         paymentService.submitPayment(orderId, amount, primaryKey, reservation, member);
         List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAll();
         List<PaymentCredential> paymentCredentials = paymentCredentialRepository.findAll();
 
+        //then
         assertAll(
-                () -> assertThat(paymentHistories).hasSize(1),
+                () -> assertThat(paymentHistories).hasSize(beforeHistories.size() + 1),
                 () -> assertThat(paymentCredentials).isEmpty(),
                 () -> verify(paymentGateway, times(1)).confirm(anyString(), anyLong(), anyString())
         );

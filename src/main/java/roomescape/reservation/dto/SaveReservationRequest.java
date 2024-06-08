@@ -2,6 +2,7 @@ package roomescape.reservation.dto;
 
 import java.time.LocalDate;
 import roomescape.member.model.Member;
+import roomescape.reservation.model.PaymentStatus;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
@@ -26,7 +27,8 @@ public record SaveReservationRequest(
                 date,
                 reservationTime,
                 theme,
-                member
+                member,
+                PaymentStatus.DONE
         );
     }
 }

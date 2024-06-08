@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.util.Objects;
 import roomescape.member.model.Member;
 
 @Entity
@@ -33,6 +34,9 @@ public class Reservation {
     @Embedded
     private ReservationDate date;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
     protected Reservation() {
     }
 
@@ -41,7 +45,8 @@ public class Reservation {
             final LocalDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         this(
                 null,
@@ -49,7 +54,8 @@ public class Reservation {
                 new ReservationDate(date),
                 time,
                 theme,
-                member
+                member,
+                paymentStatus
         );
     }
 
@@ -59,7 +65,8 @@ public class Reservation {
             final LocalDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         this(
                 id,
@@ -67,7 +74,8 @@ public class Reservation {
                 new ReservationDate(date),
                 time,
                 theme,
-                member
+                member,
+                paymentStatus
         );
     }
 
@@ -77,7 +85,8 @@ public class Reservation {
             final ReservationDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         checkRequiredData(status, time, theme, member);
         this.id = id;
@@ -86,6 +95,7 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.member = member;
+        this.paymentStatus = paymentStatus;
     }
 
     private static void checkRequiredData(
@@ -121,5 +131,26 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Reservation other = (Reservation) o;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
