@@ -33,6 +33,7 @@
 
 == API
 
+include::auth.adoc[]
 include::member.adoc[]
 include::theme.adoc[]
 include::time.adoc[]
