@@ -122,10 +122,11 @@ public class ReservationService {
         Optional<Waiting> firstWaiting = waitingRepository
                 .findFirstByDateAndTimeAndTheme(reservation.getDate(), reservation.getTime(), reservation.getTheme());
 
+        // TODO: waiting에서 예약으로 갈 때 결제 어떻게 할지?
         firstWaiting.ifPresent(waiting -> {
             Reservation newReservation = Reservation
                     .createNewBooking(waiting.getMember(), reservation.getDate(), reservation.getTime(),
-                            reservation.getTheme());
+                            reservation.getTheme(), "notPayed");
             waitingRepository.delete(waiting);
             reservationRepository.save(newReservation);
         });

@@ -37,20 +37,26 @@ public class Reservation {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
 
+    @Column(nullable = false)
+    private String paymentKey;
+
     protected Reservation() {
     }
 
-    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme, ReservationStatus status) {
+    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme,
+                       ReservationStatus status, String paymentKey) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.status = status;
+        this.paymentKey = paymentKey;
     }
 
-    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme,
+                                               String paymentKey) {
+        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING, paymentKey);
     }
 
     public Long getId() {
@@ -75,5 +81,9 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 }

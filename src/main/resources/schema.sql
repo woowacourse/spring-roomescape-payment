@@ -14,6 +14,7 @@ create table if not exists reservation (
     theme_id bigint,
     time_id bigint,
     status varchar(255) check (status in ('BOOKING')),
+    payment_key varchar(255),
     primary key (id)
 );
 
