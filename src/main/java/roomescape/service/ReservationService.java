@@ -7,16 +7,10 @@ import roomescape.controller.reservation.dto.CreateAdminReservationRequest;
 import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.controller.time.dto.IsMineRequest;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import roomescape.domain.*;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
+import roomescape.repository.*;
 import roomescape.repository.dto.ReservationRankResponse;
 import roomescape.repository.dto.WaitingReservationResponse;
 import roomescape.service.exception.DuplicateReservationException;
@@ -37,17 +31,19 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository,
+                              final MemberRepository memberRepository, PaymentRepository paymentRepository,
                               final PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
 
@@ -101,9 +97,15 @@ public class ReservationService {
         final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
         validateBeforeDay(reservationDateTime);
         validateReservation(member, theme, time, date);
+
+        final Reservation savedReservation = reservationRepository.save(reservation);
+
         paymentClient.postPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
 
-        return reservationRepository.save(reservation);
+        final Payment payment = new Payment(null, request.paymentKey(), request.orderId(), request.amount(), savedReservation);
+        paymentRepository.save(payment);
+
+        return savedReservation;
     }
 
     private void validateReservation(final Member member, final Theme theme, final ReservationTime time, final LocalDate date) {
