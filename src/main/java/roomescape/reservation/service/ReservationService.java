@@ -123,6 +123,11 @@ public class ReservationService {
 
     @Transactional
     public void removeReservation(long id) {
+        Payment payment = paymentRepository.findByReservationId(id);
+        if (payment != null) {
+            paymentClient.cancelPayment(payment.getPaymentKey());
+            paymentRepository.deleteById(payment.getId());
+        }
         reservationRepository.deleteById(id);
     }
 }

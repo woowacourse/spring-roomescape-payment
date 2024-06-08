@@ -117,7 +117,7 @@ class ReservationServiceTest {
         assertThat(savedReservation).isEqualTo(new ReservationResponse(MEMBER_ID_1_RESERVATION));
     }
 
-    @DisplayName("현재보다 이전날짜로 예약 시 예외가 발생한다")
+    @DisplayName("현재보다 이전 날짜로 예약 시 예외가 발생한다")
     @Test
     void should_throw_exception_when_request_with_past_date() {
         when(memberService.findById(any(Long.class))).thenReturn(MemberFixture.MEMBER_ID_1);
