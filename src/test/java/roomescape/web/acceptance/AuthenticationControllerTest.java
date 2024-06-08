@@ -1,4 +1,4 @@
-package roomescape.web.api;
+package roomescape.web.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,10 +14,11 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import roomescape.application.dto.request.member.LoginRequest;
+import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.domain.member.Member;
-import roomescape.fixture.MemberFixture;
 import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.fixture.MemberFixture;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,
@@ -36,6 +37,19 @@ class AuthenticationControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @DisplayName("회원가입에 성공하면 응답과 201 상태코드를 반환한다.")
+    @Test
+    void return_201_when_signup() {
+        SignupRequest request = new SignupRequest("재즈", "jazz@woowa.com", "123");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/members")
+                .then().log().all()
+                .statusCode(201);
+    }
 
     @DisplayName("로그인에 성공하면 200 상태코드와 토큰을 반환한다.")
     @Test

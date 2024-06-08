@@ -1,15 +1,15 @@
 package roomescape.infrastructure.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.fixture.MemberFixture.MEMBER_BRI;
-import static roomescape.fixture.MemberFixture.MEMBER_SOLAR;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.ThemeFixture.THEME_DATABASE;
-import static roomescape.fixture.ThemeFixture.THEME_JAVA;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.THREE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SOLAR;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.ThemeFixture.THEME_DATABASE;
+import static roomescape.support.fixture.ThemeFixture.THEME_JAVA;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.THREE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -124,6 +124,8 @@ class ReservationJpaRepositoryTest {
                 reservation1.getDate(),
                 reservation1.getTime().getStartAt(),
                 Status.WAITING,
+                null,
+                null,
                 3
         );
         ReservationWithRank actual2 = new ReservationWithRank(
@@ -132,6 +134,8 @@ class ReservationJpaRepositoryTest {
                 reservation2.getDate(),
                 reservation2.getTime().getStartAt(),
                 Status.RESERVED,
+                null,
+                null,
                 1
         );
 

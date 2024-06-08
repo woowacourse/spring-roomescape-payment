@@ -1,4 +1,4 @@
-package roomescape.fixture;
+package roomescape.support.fixture;
 
 import static roomescape.domain.member.Role.ADMIN;
 import static roomescape.domain.member.Role.NORMAL;

@@ -1,18 +1,17 @@
-package roomescape.web.api;
+package roomescape.web.acceptance;
 
 import static org.hamcrest.Matchers.is;
 import static roomescape.domain.reservation.Status.RESERVED;
 import static roomescape.domain.reservation.Status.WAITING;
-import static roomescape.fixture.MemberFixture.MEMBER_BRI;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SOLAR;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.ThemeFixture.THEME_DATABASE;
-import static roomescape.fixture.ThemeFixture.THEME_JAVA;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.THREE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SOLAR;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.ThemeFixture.THEME_DATABASE;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.THREE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -64,18 +63,17 @@ class AdminReservationControllerTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    Member jazz;
-    Member bri;
-    Member solar;
-    Member sun;
+    private Member jazz;
+    private Member bri;
+    private Member solar;
+    private Member sun;
 
-    ReservationTime onePm;
-    ReservationTime twoPm;
-    ReservationTime threePm;
+    private ReservationTime onePm;
+    private ReservationTime twoPm;
+    private ReservationTime threePm;
 
-    Theme bed;
-    Theme java;
-    Theme database;
+    private Theme bed;
+    private Theme database;
 
     @BeforeEach
     void setUp() {
@@ -91,7 +89,6 @@ class AdminReservationControllerTest {
         threePm = timeRepository.save(THREE_PM.create());
 
         bed = themeRepository.save(THEME_BED.create());
-        java = themeRepository.save(THEME_JAVA.create());
         database = themeRepository.save(THEME_DATABASE.create());
     }
 

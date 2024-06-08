@@ -12,9 +12,9 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
-import roomescape.fixture.MemberFixture;
 import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.fixture.MemberFixture;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,

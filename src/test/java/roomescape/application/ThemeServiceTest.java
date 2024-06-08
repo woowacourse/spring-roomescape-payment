@@ -5,16 +5,16 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.domain.reservation.Status.RESERVED;
-import static roomescape.fixture.MemberFixture.MEMBER_BRI;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SOLAR;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.ThemeFixture.THEME_DATABASE;
-import static roomescape.fixture.ThemeFixture.THEME_JAVA;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.THREE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SOLAR;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.ThemeFixture.THEME_DATABASE;
+import static roomescape.support.fixture.ThemeFixture.THEME_JAVA;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.THREE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,12 +33,12 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.theme.ReservationReferencedThemeException;
-import roomescape.fake.FakeRankingPolicy;
 import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.ReservationTimeRepository;
 import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.fake.FakeRankingPolicy;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,

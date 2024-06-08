@@ -1,4 +1,4 @@
-package roomescape.fixture;
+package roomescape.support.fixture;
 
 import roomescape.domain.reservationdetail.Theme;
 

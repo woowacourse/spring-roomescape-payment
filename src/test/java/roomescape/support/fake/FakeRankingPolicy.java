@@ -1,4 +1,4 @@
-package roomescape.fake;
+package roomescape.support.fake;
 
 import java.time.LocalDate;
 import roomescape.application.policy.RankingPolicy;

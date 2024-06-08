@@ -1,4 +1,4 @@
-package roomescape.web.api;
+package roomescape.web.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -21,14 +21,14 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.fixture.MemberFixture;
-import roomescape.fixture.ThemeFixture;
-import roomescape.fixture.TimeFixture;
 import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.ReservationTimeRepository;
 import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.fixture.MemberFixture;
+import roomescape.support.fixture.ThemeFixture;
+import roomescape.support.fixture.TimeFixture;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,
