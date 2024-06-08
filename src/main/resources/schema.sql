@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS reservation
     id       BIGINT NOT NULL AUTO_INCREMENT,
     date     DATE   NOT NULL,
     time_id  BIGINT NOT NULL,
-    theme_id BIGINT NOT NULL,                    -- 컬럼 추가
+    theme_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
-    FOREIGN KEY (theme_id) REFERENCES theme (id) -- 외래키 추가
+    FOREIGN KEY (theme_id) REFERENCES theme (id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS member

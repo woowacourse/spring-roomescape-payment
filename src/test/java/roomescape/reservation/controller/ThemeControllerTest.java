@@ -78,7 +78,7 @@ class ThemeControllerTest extends ControllerTest {
 
     @DisplayName("테마 삭제 시, 204를 반환한다.")
     @Test
-    void deleteTest() throws Exception {
+    void deleteTest() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -93,7 +93,7 @@ class ThemeControllerTest extends ControllerTest {
                 .cookie("token", adminToken)
                 .when().delete("/api/v1/themes/" + themeResponse.id())
                 .then().log().all()
-                .apply(document("reservations/delete/success"))
+                .apply(document("themes/delete/success"))
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
