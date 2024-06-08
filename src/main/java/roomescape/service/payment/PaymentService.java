@@ -18,7 +18,7 @@ public class PaymentService {
     }
 
     public Payment confirm(PaymentRequest paymentRequest) {
-        if (paymentRequest.paymentType().isByAdmin()) {
+        if (paymentRequest.paymentType().isAdmin()) {
             return paymentRepository.save(Payment.ofAdmin());
         }
         PaymentResult paymentResult = paymentClient.confirm(paymentRequest);

@@ -46,7 +46,7 @@ public class Payment {
     }
 
     public boolean isByAdmin() {
-        return paymentType.isByAdmin();
+        return paymentType.isAdmin();
     }
 
     public Long getId() {

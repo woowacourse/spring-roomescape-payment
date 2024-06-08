@@ -45,7 +45,7 @@ public abstract class ServiceTestBase {
 
     private PaymentResult getMockedPaymentResult(InvocationOnMock invocation) {
         PaymentRequest argument = invocation.getArgument(0, PaymentRequest.class);
-        if (argument.paymentType().isByAdmin()) {
+        if (argument.paymentType().isAdmin()) {
             return new PaymentResult(BigDecimal.ZERO, "ADMIN", "ADMIN", "ADMIN");
         }
         if (argument.paymentKey().equals(PAYMENT_ERROR_KEY)) {
