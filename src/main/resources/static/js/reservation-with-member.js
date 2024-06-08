@@ -26,12 +26,14 @@ function render(data) {
 
     data.data.reservations.forEach(item => {
         const row = tableBody.insertRow();
+        const isPaid = item.status === 'CONFIRMED' ? '결제 완료' : '결제 대기';
 
         row.insertCell(0).textContent = item.id;              // 예약 id
         row.insertCell(1).textContent = item.member.name;     // 사용자 name
         row.insertCell(2).textContent = item.theme.name;      // 테마 name
         row.insertCell(3).textContent = item.date;            // date
         row.insertCell(4).textContent = item.time.startAt;    // 예약 시간 startAt
+        row.insertCell(5).textContent = isPaid;               // 결제
 
         const actionCell = row.insertCell(row.cells.length);
         actionCell.appendChild(createActionButton('삭제', 'btn-danger', deleteRow));

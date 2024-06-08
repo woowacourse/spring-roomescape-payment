@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import roomescape.member.dto.MemberResponse;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.dto.ThemeResponse;
 
 public record ReservationResponse(
@@ -11,7 +12,8 @@ public record ReservationResponse(
         LocalDate date,
         @JsonProperty("member") MemberResponse member,
         @JsonProperty("time") ReservationTimeResponse time,
-        @JsonProperty("theme") ThemeResponse theme
+        @JsonProperty("theme") ThemeResponse theme,
+        ReservationStatus status
 ) {
 
     public static ReservationResponse from(Reservation reservation) {
@@ -20,7 +22,8 @@ public record ReservationResponse(
                 reservation.getDate(),
                 MemberResponse.fromEntity(reservation.getMember()),
                 ReservationTimeResponse.from(reservation.getReservationTime()),
-                ThemeResponse.from(reservation.getTheme())
+                ThemeResponse.from(reservation.getTheme()),
+                reservation.getReservationStatus()
         );
     }
 }
