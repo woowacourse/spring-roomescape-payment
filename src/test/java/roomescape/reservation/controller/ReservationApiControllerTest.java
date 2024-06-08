@@ -32,6 +32,7 @@ import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 import roomescape.reservation.dto.response.TimeResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @WebMvcTest(ReservationApiController.class)
@@ -40,12 +41,12 @@ class ReservationApiControllerTest {
 
     @MockBean
     private ReservationService reservationService;
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
+    @MockBean
+    private PaymentService paymentService;
 
     @Test
     @DisplayName("예약 목록 조회에 성공하면 200 응답을 받는다.")

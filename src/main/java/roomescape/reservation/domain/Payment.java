@@ -27,4 +27,10 @@ public class Payment {
 
     protected Payment() {
     }
+
+    public Payment(long amount, String paymentKey, Reservation reservation) {
+        this.amount = amount;
+        this.paymentKey = paymentKey;
+        this.reservation = reservation;
+    }
 }

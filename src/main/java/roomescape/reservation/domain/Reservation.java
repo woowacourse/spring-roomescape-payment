@@ -38,7 +38,7 @@ public class Reservation {
     @JoinColumn(name = "theme_id", referencedColumnName = "id", nullable = false)
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_time", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "reservation_time_id", referencedColumnName = "id", nullable = false)
     private ReservationTime reservationTime;
 
     protected Reservation() {

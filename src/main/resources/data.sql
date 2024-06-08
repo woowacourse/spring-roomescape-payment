@@ -29,7 +29,7 @@ ALTER TABLE RESERVATION_TIME
     ALTER COLUMN ID RESTART WITH 11;
 
 -- 테마
-INSERT INTO THEME (THEME_NAME, DESCRIPTION, THUMBNAIL)
+INSERT INTO THEME (NAME, DESCRIPTION, THUMBNAIL)
 VALUES ('공포', '무서워요', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('sf', '미래', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('원숭이 사원', '원숭이들의 공격', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),

@@ -1,7 +1,7 @@
 package roomescape.client.fake;
 
 public enum FakeHeaderConstant {
-    AUTHORIZATION_HEADER("Authorization", "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6");
+    AUTHORIZATION_HEADER("Authorization", "Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6");
 
     private final String name;
     private final String value;

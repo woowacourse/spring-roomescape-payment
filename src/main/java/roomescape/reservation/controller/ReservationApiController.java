@@ -21,14 +21,17 @@ import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationApiController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService) {
+    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -47,15 +50,27 @@ public class ReservationApiController {
         return ResponseEntity.ok(reservationResponses);
     }
 
-    @PostMapping(path = {"/reservations", "/admin/reservations"})
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createMemberReservation(
-            @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
+            @Valid @RequestBody ReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
-        ReservationResponse reservationResponse = reservationService.findById(id);
+        long id = reservationService.save(request, loginMemberInToken);
+        ReservationResponse response = reservationService.findById(id);
+        paymentService.purchase(request.toPaymentRequest(), id);
 
-        return ResponseEntity.created(URI.create("/reservations/" + id)).body(reservationResponse);
+        return ResponseEntity.created(URI.create("/reservations/" + id)).body(response);
+    }
+
+    @PostMapping("/admin/reservations")
+    public ResponseEntity<ReservationResponse> createAdminReservation(
+            @Valid @RequestBody ReservationCreateRequest request,
+            @Login LoginMemberInToken loginMemberInToken
+    ) {
+        long id = reservationService.save(request, loginMemberInToken);
+        ReservationResponse response = reservationService.findById(id);
+
+        return ResponseEntity.created(URI.create("/reservations/" + id)).body(response);
     }
 
     @GetMapping("/reservations/waiting")
