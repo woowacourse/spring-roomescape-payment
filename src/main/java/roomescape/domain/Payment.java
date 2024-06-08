@@ -6,8 +6,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Payment {
 
     @Id
@@ -18,11 +21,11 @@ public abstract class Payment {
     private State state;
 
     //얘가 안에 있는 것이 자연스러운가? 밖에서도 객체를 만들기 위해서 사용하기도 하는데?
-    enum State {
+    public enum State {
         READY, DONE
     }
 
-    protected Payment(State state) {
+     Payment(State state) {
         this.state = state;
     }
 

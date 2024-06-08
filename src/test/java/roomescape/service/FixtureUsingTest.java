@@ -10,11 +10,14 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.domain.Email;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
+import roomescape.domain.NotPayed;
 import roomescape.domain.Password;
+import roomescape.domain.Payment;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -32,6 +35,8 @@ public class FixtureUsingTest {
     protected ThemeRepository themeRepository;
     @Autowired
     protected MemberRepository memberRepository;
+    @Autowired
+    protected PaymentRepository paymentRepository;
 
     protected Member ADMIN = new Member(new Name("ADMIN"), Role.ADMIN, new Email("email@email.com"),
             new Password("password"));
@@ -55,6 +60,7 @@ public class FixtureUsingTest {
     protected static Theme theme3 = new Theme("name3", "description3", "thumbnail3");
     protected static Theme theme4 = new Theme("name4", "description4", "thumbnail4");
     protected static Theme theme5 = new Theme("name5", "description5", "thumbnail5");
+    protected static Payment notPayed = new NotPayed();
 
     @BeforeEach
     void saveDefaultData() {
@@ -74,5 +80,7 @@ public class FixtureUsingTest {
         theme4 = themeRepository.save(theme4);
         theme5 = themeRepository.save(theme5);
         themeIdNotSaved = theme5.getId() + 1;
+
+        notPayed = paymentRepository.save(notPayed);
     }
 }

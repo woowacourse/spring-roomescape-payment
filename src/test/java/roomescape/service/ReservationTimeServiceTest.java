@@ -46,10 +46,10 @@ class ReservationTimeServiceTest extends FixtureUsingTest {
 
         reservationRepository.save(
                 new Reservation(null, selectedDate, reservationTime_10_0, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED));
+                        ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, selectedDate, reservationTime_12_0, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED));
+                        ReservationStatus.BOOKED, notPayed));
 
         //when
         List<AvailableTimeResponse> availableTimeResponses = reservationTimeService.findByThemeAndDate(selectedDate,
@@ -99,7 +99,7 @@ class ReservationTimeServiceTest extends FixtureUsingTest {
         //given
         reservationRepository.save(
                 new Reservation(null, LocalDate.now(), reservationTime_10_0, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED));
+                        ReservationStatus.BOOKED, notPayed));
 
         //when & then
         assertThatCode(() -> reservationTimeService.delete(reservationTime_10_0.getId()))

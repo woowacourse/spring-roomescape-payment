@@ -1,6 +1,7 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_THEME;
 import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_THEME;
 
@@ -24,12 +25,15 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.domain.Member;
+import roomescape.domain.NotPayed;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.ThemeResponse;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -50,15 +54,19 @@ public class ThemeControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private ReservationTime defaultReservationTime = new ReservationTime(LocalTime.of(11, 30));
     private Member defaultMember = Fixture.defaultMember;
+    private Payment notPayed = new NotPayed();
 
     @BeforeEach
     void initData() {
         RestAssured.port = port;
         defaultReservationTime = reservationTimeRepository.save(defaultReservationTime);
         defaultMember = memberRepository.save(defaultMember);
+        notPayed = paymentRepository.save(notPayed);
     }
 
     @DisplayName("테마를 인기순으로 조회할 수 있다.")
@@ -77,49 +85,49 @@ public class ThemeControllerTest {
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), defaultReservationTime, firstTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), defaultReservationTime, firstTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), defaultReservationTime, firstTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(4), defaultReservationTime, firstTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(5), defaultReservationTime, firstTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), defaultReservationTime, secondTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), defaultReservationTime, secondTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), defaultReservationTime, secondTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(4), defaultReservationTime, secondTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), defaultReservationTime, thirdTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), defaultReservationTime, thirdTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), defaultReservationTime, thirdTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), defaultReservationTime, fourthTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), defaultReservationTime, fourthTheme,
-                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
+                        defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
 
         //then
         List<ThemeResponse> themeResponses = RestAssured.given().log().all()
@@ -215,7 +223,7 @@ public class ThemeControllerTest {
         @Test
         void deleteUsedThemeTest() {
             reservationRepository.save(
-                    new Reservation(null, LocalDate.now(), defaultReservationTime, usedTheme, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED)
+                    new Reservation(null, LocalDate.now(), defaultReservationTime, usedTheme, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed)
             );
 
             RestAssured.given().log().all()

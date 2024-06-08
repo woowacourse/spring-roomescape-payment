@@ -39,7 +39,7 @@ public class Reservation implements Comparable<Reservation> {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    @OneToOne
+    @ManyToOne
     private Payment payment;
 
     protected Reservation() {
@@ -47,7 +47,7 @@ public class Reservation implements Comparable<Reservation> {
     }
 
     public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
-                       LocalDateTime createdAt, ReservationStatus reservationStatus) {
+                       LocalDateTime createdAt, ReservationStatus reservationStatus, Payment payment) {
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
@@ -59,6 +59,7 @@ public class Reservation implements Comparable<Reservation> {
         this.member = member;
         this.createdAt = createdAt;
         this.reservationStatus = reservationStatus;
+        this.payment = payment;
     }
 
     private void validateTheme(Theme theme) {

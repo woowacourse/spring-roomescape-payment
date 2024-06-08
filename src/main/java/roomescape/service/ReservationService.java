@@ -26,6 +26,7 @@ import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -38,15 +39,17 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -58,10 +61,11 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
         Member requestedMember = memberRepository.findById(loginMemberRequest.id())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+        Payment notPayed = paymentRepository.getNotPayed();
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now(), ReservationStatus.WAITING));
+                        LocalDateTime.now(), ReservationStatus.WAITING, notPayed));
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -71,10 +75,12 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
         Member requestedMember = memberRepository.findById(reservationRequest.memberId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+        Payment notPayed = paymentRepository.getNotPayed();
+
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now(), ReservationStatus.WAITING));
+                        LocalDateTime.now(), ReservationStatus.WAITING, notPayed));
     }
 
     private ReservationResponse saveReservation(Reservation reservation) {
