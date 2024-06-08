@@ -1,6 +1,8 @@
 package roomescape.core.service;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Payment;
@@ -22,6 +24,7 @@ public class PaymentService {
     protected static final String MEMBER_NOT_FOUND_EXCEPTION_MESSAGE = "존재하지 않는 회원입니다.";
     protected static final String RESERVATION_NOT_FOUND_EXCEPTION_MESSAGE = "존재하지 않는 예약입니다.";
     protected static final String PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE = "해당 예약의 결제 내역이 존재하지 않습니다.";
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
@@ -82,6 +85,8 @@ public class PaymentService {
 
             final PaymentCancelResponse response = paymentClient.getPaymentCancelResponse(payment.getPaymentKey());
             payment.cancel();
+            logger.info("Payment {} canceled.", response.getPaymentKey());
+            logger.info("Total amount: {}, Order Id: {}", response.getTotalAmount(), response.getOrderId());
         }
     }
 }

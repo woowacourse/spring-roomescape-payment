@@ -3,6 +3,8 @@ package roomescape.core.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,8 @@ import roomescape.core.service.ReservationService;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
+
     private final ReservationService reservationService;
     private final PaymentService paymentService;
 
@@ -36,7 +40,9 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
                                                       final LoginMember member) {
         final ReservationResponse response = getCreatedReservation(request, member);
-        paymentService.confirmPayment(response, request, member);
+        final PaymentConfirmResponse payment = paymentService.confirmPayment(response, request, member);
+        logger.info("Reservation {} payment {} confirmed.", response.getId(), request.getPaymentKey());
+        logger.info("Total amount: {}, Order Id: {}", payment.getTotalAmount(), payment.getOrderId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
                 .body(response);
@@ -73,7 +79,10 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id, final LoginMember loginMember) {
         reservationService.delete(id, loginMember);
+        logger.info("Reservation with id {} canceled.", id);
+
         paymentService.cancel(id);
+
         return ResponseEntity.noContent().build();
     }
 }
