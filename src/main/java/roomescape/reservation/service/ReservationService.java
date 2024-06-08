@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -67,7 +66,7 @@ public class ReservationService {
         if (status.isSuccess()) {
             validateDuplicatedReservationSuccess(reservation);
             savedReservation = reservationRepository.save(reservation);
-            paymentService.payForReservation(PaymentRequest.from(userReservationSaveRequest), savedReservation);
+            paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
         }
         if (status.isWait()) {
             validateReservationWait(loginMember, reservation);
