@@ -1,6 +1,7 @@
 package roomescape.domain.reservation;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ public class ReservationTime {
     private Long id;
 
     @NotNull
-    @Column(name = "start_at")
+    @Column(name = "start_at", unique = true)
     private LocalTime startAt;
 
     public ReservationTime(String startAt) {
@@ -45,5 +46,24 @@ public class ReservationTime {
 
     public LocalTime getStartAt() {
         return this.startAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReservationTime that = (ReservationTime) o;
+        if (id == null || that.id == null) {
+            return Objects.equals(startAt, that.startAt);
+        }
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return Objects.hash(startAt);
+        }
+        return Objects.hash(id);
     }
 }

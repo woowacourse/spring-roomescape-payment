@@ -7,7 +7,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
+@Table(name = "payment")
 @Entity
 public class Payment {
 
@@ -16,13 +19,16 @@ public class Payment {
     @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "orderId", unique = true, nullable = false)
+    @NotNull
+    @Column(name = "orderId", unique = true)
     String orderId;
 
-    @Column(name = "amount", nullable = false)
+    @NotNull
+    @Column(name = "amount")
     long amount;
 
-    @Column(name = "payementKey", nullable = false)
+    @NotNull
+    @Column(name = "payementKey")
     String paymentKey;
 
     public Payment(String orderId, long amount, String paymentKey) {
