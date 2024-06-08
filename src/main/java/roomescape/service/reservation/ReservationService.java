@@ -87,13 +87,17 @@ public class ReservationService {
     public ReservationMineListResponse findMyReservation(Member member) {
         List<ReservationWithPayment> reservationsWithPayment
                 = reservationRepository.findAllReservationWithPaymentByMemberId(member.getId());
+        List<Reservation> reservationsWithoutPayment
+                = reservationRepository.findAllReservationWithoutPaymentByMemberId(member.getId());
         List<ReservationWaitingWithRank> reservationWaitingsWithRank
                 = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
 
-        List<ReservationMineResponse> myReservations = Stream.concat(
+        List<ReservationMineResponse> myReservations = Stream.of(
                         reservationsWithPayment.stream().map(ReservationMineResponse::new),
+                        reservationsWithoutPayment.stream().map(ReservationMineResponse::new),
                         reservationWaitingsWithRank.stream().map(ReservationMineResponse::new)
                 )
+                .flatMap(s -> s)
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();
         return new ReservationMineListResponse(myReservations);

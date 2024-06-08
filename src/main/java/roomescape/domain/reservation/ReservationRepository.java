@@ -22,12 +22,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     @Query("""
             SELECT new roomescape.domain.reservation.ReservationWithPayment(r, p)
             FROM Reservation r
-            LEFT JOIN ReservationPayment p
+            INNER JOIN ReservationPayment p
                 ON p.reservation.id = r.id
             WHERE r.member.id = :memberId
             """)
-        // TODO: 쿼리 개선점 있는지 생각 필요
-    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId);
+    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId); // TODO: 쿼리 개선점 있는지 생각 필요
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            LEFT JOIN ReservationPayment p
+                ON p.reservation.id = r.id
+            WHERE r.member.id = :memberId AND p.id is null
+            """)
+    List<Reservation> findAllReservationWithoutPaymentByMemberId(Long memberId);
 
     @Query("""
             SELECT r.info.reservationTime.id
@@ -39,7 +47,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     @Query("""
             SELECT t
             FROM Reservation r
-            LEFT JOIN Theme t ON t.id=r.info.theme.id
+            LEFT JOIN Theme t ON t.id = r.info.theme.id
             WHERE r.info.date > :startDate AND r.info.date < :endDate
             GROUP BY t.id
             ORDER BY COUNT(*) DESC

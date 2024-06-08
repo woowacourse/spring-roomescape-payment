@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWithPayment;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
@@ -37,6 +38,17 @@ public class ReservationMineResponse {
                 ReservationStatus.BOOKED.getDescription(),
                 reservationWithPayment.getReservationPayment().getInfo().getPaymentKey(),
                 reservationWithPayment.getReservationPayment().getInfo().getTotalAmountWithCurrency()
+        );
+    }
+
+    public ReservationMineResponse(Reservation reservationWithoutPayment) {
+        this(reservationWithoutPayment.getId(),
+                reservationWithoutPayment.getTheme().getName().getName(),
+                reservationWithoutPayment.getDate(),
+                reservationWithoutPayment.getReservationTime().getStartAt(),
+                ReservationStatus.BOOKED.getDescription(),
+                null,
+                null
         );
     }
 
