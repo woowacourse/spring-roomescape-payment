@@ -3,12 +3,16 @@ package roomescape.controller.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,7 +67,12 @@ class LoginControllerTest {
             .andDo(print())
             .andDo(document("login/login",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("email").description("로그인 이메일"),
+                    fieldWithPath("password").description("로그인 비밀번호")
+                )
+            ))
             .andExpect(status().isOk());
     }
 
@@ -75,7 +84,10 @@ class LoginControllerTest {
             .andDo(print())
             .andDo(document("login/check",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestCookies(
+                    cookieWithName("token").description("사용자의 JWT 토큰")
+                )))
             .andExpect(status().isOk());
     }
 }

@@ -1,10 +1,12 @@
 package roomescape.controller.api;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +26,8 @@ import roomescape.global.auth.CheckUserInterceptor;
 @WebMvcTest(LogoutController.class)
 class LogoutControllerTest {
 
+    private static final String TOKEN = "token";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,11 +44,15 @@ class LogoutControllerTest {
     @Test
     void logout() throws Exception {
         mockMvc.perform(post("/logout")
-                .cookie(new Cookie("token", "user-token-example")))
+                .cookie(new Cookie(TOKEN, "user-token-example")))
             .andDo(print())
             .andDo(document("logout/logout",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestCookies(
+                    cookieWithName(TOKEN).description("로그아웃할 사용자의 JWT 토큰")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }

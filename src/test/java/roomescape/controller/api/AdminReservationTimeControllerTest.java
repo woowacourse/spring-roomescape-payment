@@ -5,11 +5,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,8 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import roomescape.controller.dto.CreateTimeRequest;
 import roomescape.controller.dto.CreateTimeResponse;
 import roomescape.controller.dto.FindTimeResponse;
@@ -75,7 +79,15 @@ class AdminReservationTimeControllerTest {
             .andDo(print())
             .andDo(document("admin/times/save",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("startAt").description("추가하려는 시간")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("추가된 시간 ID"),
+                    fieldWithPath("startAt").description("추가된 시간")
+                )
+            ))
             .andExpect(status().isCreated());
     }
 
@@ -86,12 +98,17 @@ class AdminReservationTimeControllerTest {
             .when(reservationTimeService)
             .delete(1L);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/admin/times/1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/times/{id}", 1L))
             .andDo(print())
             .andDo(document("admin/times/delete",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 시간 ID")
+                )
+            ))
             .andExpect(status().isNoContent());
+
     }
 
     @DisplayName("어드민 전체 시간 조회")
@@ -107,7 +124,12 @@ class AdminReservationTimeControllerTest {
             .andDo(print())
             .andDo(document("admin/times/findAll",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("시간 ID"),
+                    fieldWithPath("[].startAt").description("시간")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }

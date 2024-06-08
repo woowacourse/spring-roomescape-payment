@@ -5,12 +5,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,7 +87,23 @@ class UserReservationControllerTest {
             .andDo(print())
             .andDo(document("reservations/save",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("date").description("예약할 날짜"),
+                    fieldWithPath("themeId").description("테마 ID"),
+                    fieldWithPath("timeId").description("예약 시간 ID"),
+                    fieldWithPath("paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("orderId").description("토스 API 주문번호"),
+                    fieldWithPath("amount").description("결제 금액")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
             .andExpect(status().isCreated());
     }
 
@@ -100,9 +121,23 @@ class UserReservationControllerTest {
                 .content(request)
                 .contentType(APPLICATION_JSON))
             .andDo(print())
-            .andDo(document("reservations/pay",
+            .andDo(document("reservations/payStandby",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("reservationId").description("예약할 날짜"),
+                    fieldWithPath("paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("orderId").description("토스 API 주문번호"),
+                    fieldWithPath("amount").description("결제 금액")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
             .andExpect(status().isOk());
     }
 
@@ -122,7 +157,19 @@ class UserReservationControllerTest {
             .andDo(print())
             .andDo(document("reservations/standby",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("date").description("예약대기할 날짜"),
+                    fieldWithPath("themeId").description("테마 ID"),
+                    fieldWithPath("timeId").description("시간 ID")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약대기를 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )))
             .andExpect(status().isCreated());
     }
 
@@ -133,11 +180,14 @@ class UserReservationControllerTest {
             .when(userReservationService)
             .deleteStandby(any(), any());
 
-        mockMvc.perform(delete("/reservations/standby/1"))
+        mockMvc.perform(delete("/reservations/standby/{id}", 1))
             .andDo(print())
             .andDo(document("reservations/deleteStandby",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 예약 ID")
+                )))
             .andExpect(status().isNoContent());
     }
 
@@ -161,7 +211,19 @@ class UserReservationControllerTest {
             .andDo(print())
             .andDo(document("reservations/findMyReservations",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].theme").description("테마 이름"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].status").description("예약 상태"),
+                    fieldWithPath("[].rank").description("예약 대기번호"),
+                    fieldWithPath("[].paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("[].amount").description("결제 금액"),
+                    fieldWithPath("[].payMethod").description("결제 수단")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }

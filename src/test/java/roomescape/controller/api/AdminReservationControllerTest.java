@@ -5,11 +5,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import roomescape.controller.dto.CreateReservationRequest;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.FindReservationResponse;
@@ -84,7 +90,21 @@ class AdminReservationControllerTest {
             .andDo(print())
             .andDo(document("admin/reservations/save",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("memberId").description("회원 ID"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("timeId").description("예약 시간 ID"),
+                    fieldWithPath("themeId").description("테마 ID")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
             .andExpect(status().isCreated());
     }
 
@@ -95,11 +115,15 @@ class AdminReservationControllerTest {
             .when(adminReservationService)
             .deleteById(1L);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/admin/reservations/1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/reservations/{id}", 1L))
             .andDo(print())
             .andDo(document("admin/reservations/delete",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("예약 ID")
+                )
+            ))
             .andExpect(status().isNoContent());
     }
 
@@ -118,7 +142,15 @@ class AdminReservationControllerTest {
             .andDo(print())
             .andDo(document("admin/reservations/findAll",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].themeName").description("예약 테마명")
+                )
+            ))
             .andExpect(status().isOk());
     }
 
@@ -133,11 +165,19 @@ class AdminReservationControllerTest {
                     4L, "호돌", "신나는 방탈출", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"))
             ));
 
-        mockMvc.perform(get("/admin/reservations"))
+        mockMvc.perform(get("/admin/reservations/standby"))
             .andDo(print())
             .andDo(document("admin/reservations/findAllStandby",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].name").description("예약한 회원명"),
+                    fieldWithPath("[].theme").description("테마 이름"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].startAt").description("이용 시간")
+                )
+            ))
             .andExpect(status().isOk());
     }
 
@@ -148,11 +188,15 @@ class AdminReservationControllerTest {
             .when(adminReservationService)
             .deleteStandby(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/admin/reservations/standby/1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/reservations/standby/{reservationId}", 1L))
             .andDo(print())
             .andDo(document("admin/reservations/deleteStandby",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 ID")
+                )
+            ))
             .andExpect(status().isNoContent());
     }
 
@@ -177,7 +221,21 @@ class AdminReservationControllerTest {
             .andDo(print())
             .andDo(document("admin/reservations/find",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                queryParameters(
+                    parameterWithName("themeId").description("검색할 테마 ID"),
+                    parameterWithName("memberId").description("검색할 회원 ID"),
+                    parameterWithName("dateFrom").description("검색 날짜 시작일"),
+                    parameterWithName("dateTo").description("검색 날짜 종료일")
+                ),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].memberName").description("예약한 회원명"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].themeName").description("테마 이름")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }

@@ -3,10 +3,14 @@ package roomescape.controller.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,7 +65,17 @@ class UserReservationTimeControllerTest {
             .andDo(print())
             .andDo(document("times/available",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                queryParameters(
+                    parameterWithName("date").description("이용일"),
+                    parameterWithName("id").description("테마 ID")
+                ),
+                responseFields(
+                    fieldWithPath("[].id").description("시간 ID"),
+                    fieldWithPath("[].startAt").description("이용 시간"),
+                    fieldWithPath("[].alreadyBooked").description("이미 예약되었는지 여부 (true인 경우 이미 예약되어 예약 불가)")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }

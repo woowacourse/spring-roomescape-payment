@@ -5,10 +5,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import roomescape.controller.dto.CreateThemeRequest;
 import roomescape.controller.dto.CreateThemeResponse;
 import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
@@ -72,7 +77,19 @@ class AdminThemeControllerTest {
             .andDo(print())
             .andDo(document("admin/themes/save",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("name").description("테마 이름"),
+                    fieldWithPath("description").description("테마 설명"),
+                    fieldWithPath("thumbnail").description("테마 썸네일 URL")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("추가된 테마 ID"),
+                    fieldWithPath("name").description("추가된 테마 이름"),
+                    fieldWithPath("description").description("추가된 테마 설명"),
+                    fieldWithPath("thumbnail").description("추가된 테마 썸네일 URL")
+                )
+            ))
             .andExpect(status().isCreated());
     }
 
@@ -83,11 +100,15 @@ class AdminThemeControllerTest {
             .when(themeService)
             .delete(1L);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/admin/themes/1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/themes/{id}", 1))
             .andDo(print())
             .andDo(document("admin/themes/delete",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 테마 ID")
+                )
+            ))
             .andExpect(status().isNoContent());
     }
 }

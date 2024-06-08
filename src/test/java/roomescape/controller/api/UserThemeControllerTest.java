@@ -5,7 +5,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.controller.dto.FindThemeResponse;
 import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
@@ -52,11 +54,18 @@ class UserThemeControllerTest {
                 new FindThemeResponse(3L, "교도소 탈출하기", "테마 설명3", "https://test.com/test3.jpg")
             ));
 
-        mockMvc.perform(get("/themes"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/themes"))
             .andDo(print())
             .andDo(document("themes/findAll",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("테마 ID"),
+                    fieldWithPath("[].name").description("테마 이름"),
+                    fieldWithPath("[].description").description("테마 설명"),
+                    fieldWithPath("[].thumbnail").description("썸네일 이미지 URL")
+                )
+            ))
             .andExpect(status().isOk());
     }
 
@@ -70,11 +79,18 @@ class UserThemeControllerTest {
                 new FindThemeResponse(3L, "3위 테마", "테마 설명3", "https://test.com/test3.jpg")
             ));
 
-        mockMvc.perform(get("/themes/trending"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/themes/trending"))
             .andDo(print())
             .andDo(document("themes/findPopular",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())))
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("테마 ID"),
+                    fieldWithPath("[].name").description("테마 이름"),
+                    fieldWithPath("[].description").description("테마 설명"),
+                    fieldWithPath("[].thumbnail").description("썸네일 이미지 URL")
+                )
+            ))
             .andExpect(status().isOk());
     }
 }
