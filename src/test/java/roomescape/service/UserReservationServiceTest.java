@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
@@ -235,11 +236,18 @@ class UserReservationServiceTest {
     @DisplayName("성공: 예약대기를 결제 상태로 변경")
     @Test
     void updateStatusToReserved() {
+        doReturn(new TossPaymentResponseDto("", 0, ""))
+            .when(tossPaymentService)
+            .pay(any(String.class), any(Long.class), any(String.class));
+
         adminReservationService.reserve(adminId, date, timeId, themeId);
         userReservationService.standby(userId, date, timeId, themeId);
         adminReservationService.deleteById(1L);
 
-        userReservationService.updateStatusToReserved(2L, memberRepository.findById(userId).get());
+        userReservationService.payStandby(
+            new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+            memberRepository.findById(userId).get()
+        );
 
         assertThat(reservationRepository.findById(2L).get().getStatus()).isEqualTo(RESERVED);
     }
@@ -252,7 +260,10 @@ class UserReservationServiceTest {
         adminReservationService.deleteById(1L);
 
         assertThatThrownBy(
-            () -> userReservationService.updateStatusToReserved(2L, memberRepository.findById(adminId).get())
+            () -> userReservationService.payStandby(
+                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+                memberRepository.findById(adminId).get()
+            )
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("자신의 예약만 결제할 수 있습니다.");
     }
@@ -264,7 +275,10 @@ class UserReservationServiceTest {
         userReservationService.standby(userId, date, timeId, themeId);
 
         assertThatThrownBy(
-            () -> userReservationService.updateStatusToReserved(2L, memberRepository.findById(userId).get())
+            () -> userReservationService.payStandby(
+                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+                memberRepository.findById(userId).get()
+            )
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("결제대기 상태에서만 결제할 수 있습니다.");
     }
@@ -275,7 +289,10 @@ class UserReservationServiceTest {
         adminReservationService.reserve(adminId, date, timeId, themeId);
 
         assertThatThrownBy(
-            () -> userReservationService.updateStatusToReserved(1L, memberRepository.findById(adminId).get())
+            () -> userReservationService.payStandby(
+                new PayStandbyRequest(1L, "paymentKey", "orderId", 1000, "paymentType"),
+                memberRepository.findById(userId).get()
+            )
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("이미 결제된 예약입니다.");
     }

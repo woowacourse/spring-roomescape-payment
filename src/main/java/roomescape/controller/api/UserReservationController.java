@@ -18,7 +18,6 @@ import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
-import roomescape.service.TossPaymentService;
 import roomescape.service.UserReservationService;
 
 @RestController
@@ -26,12 +25,9 @@ import roomescape.service.UserReservationService;
 public class UserReservationController {
 
     private final UserReservationService userReservationService;
-    private final TossPaymentService tossPaymentService;
 
-    public UserReservationController(UserReservationService userReservationService,
-        TossPaymentService tossPaymentService) {
+    public UserReservationController(UserReservationService userReservationService) {
         this.userReservationService = userReservationService;
-        this.tossPaymentService = tossPaymentService;
     }
 
     @PostMapping
@@ -50,9 +46,7 @@ public class UserReservationController {
         @RequestBody PayStandbyRequest request,
         @AuthenticationPrincipal Member member) {
 
-        tossPaymentService.pay(request.orderId(), request.amount(), request.paymentKey());
-        CreateReservationResponse response =
-            userReservationService.updateStatusToReserved(request.reservationId(), member);
+        CreateReservationResponse response = userReservationService.payStandby(request, member);
         return ResponseEntity.ok(response);
     }
 

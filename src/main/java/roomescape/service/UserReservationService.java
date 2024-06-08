@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -18,7 +19,6 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
-import roomescape.repository.PaymentInfoRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -35,7 +35,6 @@ public class UserReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentInfoRepository paymentInfoRepository;
 
     public UserReservationService(
         TossPaymentService tossPaymentService,
@@ -43,8 +42,7 @@ public class UserReservationService {
         ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository,
         ThemeRepository themeRepository,
-        MemberRepository memberRepository,
-        PaymentInfoRepository paymentInfoRepository
+        MemberRepository memberRepository
     ) {
         this.tossPaymentService = tossPaymentService;
         this.paymentInfoService = paymentInfoService;
@@ -52,7 +50,6 @@ public class UserReservationService {
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentInfoRepository = paymentInfoRepository;
     }
 
     @Transactional
@@ -137,9 +134,20 @@ public class UserReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse updateStatusToReserved(Long id, Member member) {
-        Reservation reservation = reservationRepository.findById(id)
+    public CreateReservationResponse payStandby(PayStandbyRequest request, Member member) {
+        Reservation reservation = reservationRepository.findById(request.reservationId())
             .orElseThrow(() -> new RoomescapeException("예약이 존재하지 않습니다."));
+        validateReservation(member, reservation);
+
+        TossPaymentResponseDto paymentInfo = tossPaymentService.pay(
+            request.orderId(), request.amount(), request.paymentKey());
+
+        paymentInfoService.save(paymentInfo, reservation);
+        reservation.reserve();
+        return CreateReservationResponse.from(reservation);
+    }
+
+    private void validateReservation(Member member, Reservation reservation) {
         if (reservation.isReserved()) {
             throw new RoomescapeException("이미 결제된 예약입니다.");
         }
@@ -154,8 +162,5 @@ public class UserReservationService {
         ) {
             throw new RoomescapeException("결제대기 상태에서만 결제할 수 있습니다.");
         }
-
-        reservation.reserve();
-        return CreateReservationResponse.from(reservation);
     }
 }
