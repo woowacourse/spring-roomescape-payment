@@ -16,8 +16,5 @@ public record PayStandbyRequest(
     String orderId,
 
     @Positive(message = "양수만 입력할 수 있습니다.")
-    long amount,
-
-    @NotBlank(message = "null이거나 비어있을 수 없습니다.")
-    String paymentType
+    long amount
 ) { }

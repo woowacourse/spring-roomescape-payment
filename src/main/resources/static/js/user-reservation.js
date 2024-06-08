@@ -217,8 +217,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     timeId: reservationData.timeId,
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
-    amount: paymentData.amount,
-    paymentType: paymentData.paymentType,
+    amount: paymentData.amount
   }
 
   const reservationURL = "/reservations";

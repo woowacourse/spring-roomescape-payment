@@ -88,7 +88,7 @@ class UserReservationServiceTest {
             .pay(any(String.class), any(Long.class), any(String.class));
 
         CreateReservationResponse saved = userReservationService.reserve(
-            userId, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1, "a"));
+            userId, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1));
         assertThat(saved.id()).isEqualTo(1L);
     }
 
@@ -97,7 +97,7 @@ class UserReservationServiceTest {
     void save_MemberIdDoesntExist() {
         assertThatThrownBy(
             () -> userReservationService.reserve(
-                3L, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1, "a"))
+                3L, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1))
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다.");
     }
@@ -107,7 +107,7 @@ class UserReservationServiceTest {
     void save_TimeIdDoesntExist() {
         assertThatThrownBy(
             () -> userReservationService.reserve(
-                userId, new CreateUserReservationRequest(date, themeId, 2L, "a", "a", 1, "a"))
+                userId, new CreateUserReservationRequest(date, themeId, 2L, "a", "a", 1))
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다.");
     }
@@ -123,7 +123,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.reserve(
-                userId, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1, "a"))
+                userId, new CreateUserReservationRequest(date, themeId, timeId, "a", "a", 1))
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("해당 시간에 예약이 이미 존재합니다.");
     }
@@ -135,7 +135,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.reserve(
-                userId, new CreateUserReservationRequest(yesterday, themeId, timeId, "a", "a", 1, "a"))
+                userId, new CreateUserReservationRequest(yesterday, themeId, timeId, "a", "a", 1))
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("과거 예약을 추가할 수 없습니다.");
     }
@@ -148,7 +148,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.reserve(
-                userId, new CreateUserReservationRequest(today, themeId, savedTime.getId(), "a", "a", 1, "a"))
+                userId, new CreateUserReservationRequest(today, themeId, savedTime.getId(), "a", "a", 1))
         ).isInstanceOf(RoomescapeException.class)
             .hasMessage("과거 예약을 추가할 수 없습니다.");
     }
@@ -245,7 +245,7 @@ class UserReservationServiceTest {
         adminReservationService.deleteById(1L);
 
         userReservationService.payStandby(
-            new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+            new PayStandbyRequest(2L, "paymentKey", "orderId", 1000),
             memberRepository.findById(userId).get()
         );
 
@@ -261,7 +261,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.payStandby(
-                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000),
                 memberRepository.findById(adminId).get()
             )
         ).isInstanceOf(RoomescapeException.class)
@@ -276,7 +276,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.payStandby(
-                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000, "paymentType"),
+                new PayStandbyRequest(2L, "paymentKey", "orderId", 1000),
                 memberRepository.findById(userId).get()
             )
         ).isInstanceOf(RoomescapeException.class)
@@ -290,7 +290,7 @@ class UserReservationServiceTest {
 
         assertThatThrownBy(
             () -> userReservationService.payStandby(
-                new PayStandbyRequest(1L, "paymentKey", "orderId", 1000, "paymentType"),
+                new PayStandbyRequest(1L, "paymentKey", "orderId", 1000),
                 memberRepository.findById(userId).get()
             )
         ).isInstanceOf(RoomescapeException.class)
