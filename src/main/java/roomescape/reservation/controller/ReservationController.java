@@ -59,12 +59,8 @@ public class ReservationController {
     @Admin
     @GetMapping("/reservations/search")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationsResponse> getReservationBySearching(
-            ReservationSearchRequest request
-    ) {
-        return ApiResponse.success(
-                reservationService.findFilteredReservations(request)
-        );
+    public ApiResponse<ReservationsResponse> getReservationBySearching(ReservationSearchRequest request) {
+        return ApiResponse.success(reservationService.findFilteredReservations(request));
     }
 
     @Admin
@@ -75,6 +71,7 @@ public class ReservationController {
             @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
 
+        // 예약 대기 상태에서 관리자가 승인한 경우. 결제가 되지 않았기에 바로 제거.
         if (reservationWithPaymentService.isNotPaidReservation(reservationId)) {
             reservationService.removeReservationById(reservationId, memberId);
             return ApiResponse.success();
@@ -107,7 +104,7 @@ public class ReservationController {
             PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
                     paymentRequest.amount(), e.getMessage());
             PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(cancelRequest);
-            reservationWithPaymentService.cancelPaymentWhenErrorOccurred(paymentCancelResponse,
+            reservationWithPaymentService.saveCanceledPayment(paymentCancelResponse, paymentResponse.approvedAt(),
                     paymentRequest.paymentKey());
             throw e;
         }

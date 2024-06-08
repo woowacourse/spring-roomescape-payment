@@ -1,6 +1,6 @@
 package roomescape.reservation.service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.dto.request.PaymentCancelRequest;
@@ -33,8 +33,8 @@ public class ReservationWithPaymentService {
         return reservationPaymentResponse.reservation();
     }
 
-    public void cancelPaymentWhenErrorOccurred(PaymentCancelResponse cancelInfo, String paymentKey) {
-        paymentService.cancelPaymentWhenErrorOccurred(cancelInfo, paymentKey);
+    public void saveCanceledPayment(PaymentCancelResponse cancelInfo, OffsetDateTime approvedAt, String paymentKey) {
+        paymentService.saveCanceledPayment(cancelInfo, approvedAt, paymentKey);
     }
 
     public PaymentCancelRequest removeReservationWithPayment(Long reservationId, Long memberId) {
@@ -48,7 +48,7 @@ public class ReservationWithPaymentService {
         return paymentService.findPaymentByReservationId(reservationId).isEmpty();
     }
 
-    public void updateCanceledTime(String paymentKey, LocalDateTime canceledAt) {
+    public void updateCanceledTime(String paymentKey, OffsetDateTime canceledAt) {
         paymentService.updateCanceledTime(paymentKey, canceledAt);
     }
 }
