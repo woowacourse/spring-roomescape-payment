@@ -20,8 +20,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final CookieProvider cookieProvider;
 
     @Autowired
-    public WebMvcConfiguration(final MemberService memberService,
-                               final CookieProvider cookieProvider) {
+    public WebMvcConfiguration(
+            final MemberService memberService,
+            final CookieProvider cookieProvider
+    ) {
         this.memberService = memberService;
         this.cookieProvider = cookieProvider;
     }
