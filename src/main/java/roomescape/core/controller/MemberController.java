@@ -1,5 +1,7 @@
 package roomescape.core.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import roomescape.core.dto.member.MemberResponse;
 import roomescape.core.service.CookieService;
 import roomescape.core.service.MemberService;
 
+@Tag(name = "회원 관리 API")
 @Controller
 public class MemberController {
     private final MemberService memberService;
@@ -41,6 +44,7 @@ public class MemberController {
         return "login";
     }
 
+    @Operation(summary = "로그인 요청", description = "로그인에 성공하면 토큰을 헤더에 반환합니다.")
     @PostMapping("/login")
     public ResponseEntity<Void> loginProcess(@RequestBody final TokenRequest request,
                                              final HttpServletResponse response) {
@@ -73,6 +77,7 @@ public class MemberController {
         return "signup";
     }
 
+    @Operation(summary = "회원가입")
     @PostMapping("/members")
     public ResponseEntity<MemberResponse> signupProcess(@RequestBody final MemberRequest request) {
         final MemberResponse result = memberService.create(request);
@@ -81,6 +86,7 @@ public class MemberController {
                 .body(result);
     }
 
+    @Operation(summary = "모든 회원 조회")
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> findMembers() {
         final List<MemberResponse> memberResponses = memberService.findAll();
