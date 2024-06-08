@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.payment.toss;
 
 import static roomescape.infrastructure.payment.toss.TossPaymentErrorCode.SERVER_ERROR;
 
