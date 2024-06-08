@@ -22,7 +22,7 @@ public record MemberReservationResponse(
                 reservationWithRank.getReservation().getDate(),
                 reservationWithRank.getReservation().getTime(),
                 new ReservationStatusResponse(reservationWithRank.getReservation().getStatus().getDescription(), reservationWithRank.getRank()),
-                MemberPaymentResponse.of(reservationWithRank.getPayment())
+                MemberPaymentResponse.of(reservationWithRank.getReservation().getPayment())
         );
     }
 }
