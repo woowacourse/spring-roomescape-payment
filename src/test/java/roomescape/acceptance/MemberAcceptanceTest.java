@@ -65,7 +65,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
                             .then().log().all()
                             .assertThat().statusCode(201).body("status", is("예약"));
                 }),
-                DynamicTest.dynamicTest("guest1이 guest2와 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
+                DynamicTest.dynamicTest("guest1이 admin과 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", guestToken)
