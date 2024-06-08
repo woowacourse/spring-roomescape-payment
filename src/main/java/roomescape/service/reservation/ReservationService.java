@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -52,9 +53,8 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        paymentService.confirm(reservationRequest.toPaymentRequest());
+        Payment payment = paymentService.confirm(reservationRequest.toPaymentRequest());
+        Reservation savedReservation = reservationRepository.save(reservation.withPayment(payment));
         return new ReservationResponse(savedReservation);
     }
 

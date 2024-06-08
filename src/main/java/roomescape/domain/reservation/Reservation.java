@@ -47,17 +47,26 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(Member member, Schedule schedule, Theme theme, ReservationStatus status) {
+    public Reservation(Member member, Schedule schedule, Theme theme, Payment payment, ReservationStatus status) {
         this.member = member;
         this.schedule = schedule;
         this.theme = theme;
+        this.payment = payment;
         this.status = status;
+    }
+
+    public Reservation(Member member, Schedule schedule, Theme theme, ReservationStatus status) {
+        this(member, schedule, theme, null, status);
     }
 
     public void checkCancelAuthority(long memberId) {
         if (memberId != member.getId()) {
             throw new UnauthorizedException("예약을 삭제할 권한이 없습니다.");
         }
+    }
+
+    public Reservation withPayment(Payment payment) {
+        return new Reservation(member, schedule, theme, payment, status);
     }
 
     public Long getId() {
