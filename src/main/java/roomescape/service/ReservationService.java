@@ -16,7 +16,6 @@ import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.service.dto.request.CreateReservationRequest;
-import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -34,9 +33,8 @@ import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
-public class ReservationService {
+public class ReservationService { // todo cqrs
 
-    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -46,7 +44,6 @@ public class ReservationService {
     private final Clock clock;
 
     public ReservationService(
-            PaymentClient paymentClient,
             ReservationRepository reservationRepository,
             ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
@@ -55,7 +52,6 @@ public class ReservationService {
             PaymentRepository paymentRepository,
             Clock clock
     ) {
-        this.paymentClient = paymentClient;
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -87,12 +83,9 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addReservation(CreateReservationRequest createReservationRequest,
-                                              PaymentRequest paymentRequest) {
+    public Reservation addReservation(CreateReservationRequest createReservationRequest) {
         Reservation reservation = createValidatedReservation(createReservationRequest);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        paymentClient.pay(paymentRequest);
-        return ReservationResponse.from(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private Reservation createValidatedReservation(CreateReservationRequest createReservationRequest) {

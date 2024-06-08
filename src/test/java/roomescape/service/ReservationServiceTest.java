@@ -16,7 +16,6 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.service.dto.request.CreateReservationRequest;
-import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.MemberFixture;
@@ -26,7 +25,6 @@ import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ReservationWaitingFixture;
 import roomescape.support.fixture.ThemeFixture;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -98,15 +96,14 @@ class ReservationServiceTest extends BaseServiceTest {
                 theme.getId(),
                 member.getId()
         );
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.TEN);
 
-        ReservationResponse response = reservationService.addReservation(createReservationRequest, paymentRequest);
+        Reservation reservation = reservationService.addReservation(createReservationRequest);
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.date()).isEqualTo("2024-04-09");
-            softly.assertThat(response.name()).isEqualTo(member.getName());
-            softly.assertThat(response.theme()).isEqualTo(theme.getRawName());
-            softly.assertThat(response.startAt()).isEqualTo(time.getStartAt());
+            softly.assertThat(reservation.getDate()).isEqualTo("2024-04-09");
+            softly.assertThat(reservation.getMember().getName()).isEqualTo(member.getName());
+            softly.assertThat(reservation.getTheme().getRawName()).isEqualTo(theme.getRawName());
+            softly.assertThat(reservation.getTime().getStartAt()).isEqualTo(time.getStartAt());
         });
     }
 

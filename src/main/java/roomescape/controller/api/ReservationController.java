@@ -16,6 +16,7 @@ import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
+import roomescape.service.ReservationPaymentFacadeService;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
@@ -29,9 +30,11 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPaymentFacadeService reservationPaymentFacadeService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, ReservationPaymentFacadeService reservationPaymentFacadeService) {
         this.reservationService = reservationService;
+        this.reservationPaymentFacadeService = reservationPaymentFacadeService;
     }
 
     @GetMapping
@@ -55,7 +58,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid ReservationRequest request,
                                                               @Auth Authentication authentication) {
         long memberId = authentication.getId();
-        ReservationResponse response = reservationService.addReservation(
+        ReservationResponse response = reservationPaymentFacadeService.addReservation(
                 request.toCreateReservationRequest(memberId), request.toPaymentRequest()
         );
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
