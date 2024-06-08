@@ -8,12 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.core.domain.Member;
+import roomescape.core.domain.Payment;
+import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
 import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Role;
 import roomescape.core.domain.Theme;
 import roomescape.core.repository.MemberRepository;
+import roomescape.core.repository.PaymentRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
@@ -33,6 +36,9 @@ public class TestFixture {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Transactional
     public void initTestData() {
         persistAdmin();
@@ -41,6 +47,7 @@ public class TestFixture {
         persistReservationTimeAfterMinute(1);
         persistReservationTimeBeforeMinute(1);
         persistReservationWithDateAndTimeAndTheme(getTodayDate(), 1L, 1L);
+        persistPayment();
     }
 
     @Transactional
@@ -100,6 +107,19 @@ public class TestFixture {
                 .orElseThrow(IllegalArgumentException::new);
 
         reservationRepository.save(new Reservation(member, date, time, theme, ReservationStatus.BOOKED));
+    }
+
+    @Transactional
+    public void persistPayment() {
+        final Reservation reservation = reservationRepository.findById(1L)
+                .orElseThrow(IllegalAccessError::new);
+        final Member member = memberRepository.findById(1L)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final Payment payment = new Payment(reservation, member, "paymentKey", "orderId", 1000,
+                PaymentStatus.CONFIRMED);
+
+        paymentRepository.save(payment);
     }
 
     public static String getTomorrowDate() {
