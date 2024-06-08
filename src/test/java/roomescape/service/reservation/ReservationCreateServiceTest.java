@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
@@ -13,11 +14,13 @@ import roomescape.fixture.*;
 import roomescape.service.ServiceTest;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
+import roomescape.service.reservation.dto.ReservationResponse;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class ReservationCreateServiceTest extends ServiceTest {
     @Autowired
@@ -36,6 +39,24 @@ class ReservationCreateServiceTest extends ServiceTest {
 
         //when & then
         assertThatNoException().isThrownBy(() -> reservationCreateService.createAdminReservation(adminReservationRequest));
+    }
+
+    @DisplayName("어드민이 새로운 예약을 생성하면 예약 상태로 저장된다.")
+    @Test
+    void createAdminReservationIsReserved() {
+        //given
+        Member admin = memberRepository.save(MemberFixture.createAdmin());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        AdminReservationRequest adminReservationRequest = ReservationFixture.createAdminReservationRequest(admin, reservationDetail);
+
+        //when
+        ReservationResponse response = reservationCreateService.createAdminReservation(adminReservationRequest);
+
+        //then
+        assertThat(response.status()).isEqualTo(ReservationStatus.RESERVED.getDescription());
     }
 
     @DisplayName("사용자가 새로운 예약을 저장한다.")
