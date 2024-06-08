@@ -173,7 +173,7 @@ class ReservationServiceTest {
     @Test
     void deleteReservationTest() {
         // When
-        reservationService.deleteReservation(1L);
+        reservationService.deleteReservation(5L);
 
         // When
         final List<ReservationDto> reservations = reservationService.getReservations();

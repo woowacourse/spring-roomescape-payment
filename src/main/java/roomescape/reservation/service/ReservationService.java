@@ -128,6 +128,7 @@ public class ReservationService {
     public void deleteReservation(final Long reservationId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
+        paymentHistoryRepository.deleteAllByReservation(reservation);
         reservationRepository.deleteById(reservation.getId());
         reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
                         reservation.getDate(),
