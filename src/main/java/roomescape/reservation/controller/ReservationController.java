@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.payment.PaymentCancelRequest;
+import roomescape.payment.PaymentCancelResponse;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.PaymentRequest;
 import roomescape.payment.PaymentResponse;
@@ -22,6 +23,7 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationWithPaymentService;
 import roomescape.system.auth.annotation.Admin;
 import roomescape.system.auth.annotation.MemberId;
 import roomescape.system.dto.response.ApiResponse;
@@ -30,10 +32,13 @@ import roomescape.system.exception.RoomEscapeException;
 @RestController
 public class ReservationController {
 
+    private final ReservationWithPaymentService reservationWithPaymentService;
     private final ReservationService reservationService;
     private final PaymentClient paymentClient;
 
-    public ReservationController(ReservationService reservationService, PaymentClient paymentClient) {
+    public ReservationController(ReservationWithPaymentService reservationWithPaymentService,
+                                 ReservationService reservationService, PaymentClient paymentClient) {
+        this.reservationWithPaymentService = reservationWithPaymentService;
         this.reservationService = reservationService;
         this.paymentClient = paymentClient;
     }
@@ -69,8 +74,11 @@ public class ReservationController {
             @MemberId Long memberId,
             @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
-        reservationService.removeReservationById(reservationId, memberId);
-
+        PaymentCancelRequest paymentCancelRequest = reservationWithPaymentService.removeReservationWithPayment(
+                reservationId, memberId);
+        PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(paymentCancelRequest);
+        reservationWithPaymentService.updateCanceledTime(paymentCancelRequest.paymentKey(),
+                paymentCancelResponse.canceledAt());
         return ApiResponse.success();
     }
 
@@ -85,13 +93,16 @@ public class ReservationController {
         PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentRequest);
 
         try {
-            ReservationResponse reservationResponse = reservationService.addReservationWithPayment(reservationRequest,
+            ReservationResponse reservationResponse = reservationWithPaymentService.addReservationWithPayment(
+                    reservationRequest,
                     paymentResponse, memberId);
             return getCreatedReservationResponse(reservationResponse, response);
         } catch (RoomEscapeException e) {
             PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
                     paymentRequest.amount(), e.getMessage());
-            paymentClient.cancelPayment(cancelRequest);
+            PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(cancelRequest);
+            reservationWithPaymentService.cancelPaymentWhenErrorOccurred(paymentCancelResponse,
+                    paymentRequest.paymentKey());
             throw e;
         }
     }
