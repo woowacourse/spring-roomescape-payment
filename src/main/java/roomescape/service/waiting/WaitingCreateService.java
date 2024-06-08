@@ -50,7 +50,7 @@ public class WaitingCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         validateDuplication(reservationDetail, member);
 
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.WAITING, null));
+        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.WAITING));
         return new ReservationResponse(reservation);
     }
 
