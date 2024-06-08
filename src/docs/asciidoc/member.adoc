@@ -1,0 +1,15 @@
+== 회원
+
+=== 회원 가입
+==== 성공 케이스
+operation::member/post/success[snippets='http-request,http-response']
+==== 실패 케이스
+operation::member/post/fail[snippets='http-request,http-response']
+
+=== 조회
+==== 성공 케이스
+operation::member/get/all/success[snippets='http-request,http-response']
+==== 실패 케이스
+operation::member/get/all/fail[snippets='http-request,http-response']
+
+
