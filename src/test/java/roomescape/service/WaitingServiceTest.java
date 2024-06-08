@@ -76,10 +76,12 @@ class WaitingServiceTest {
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED))
                 .willReturn(true);
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED, waiting.getMember()))
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED,
+                waiting.getMember()))
                 .willReturn(false);
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING, waiting.getMember()))
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING,
+                waiting.getMember()))
                 .willReturn(false);
         given(reservationRepository.save(any())).willReturn(waiting);
 
@@ -128,9 +130,9 @@ class WaitingServiceTest {
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED
         )).willReturn(true);
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED, waiting.getMember()
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED,
+                waiting.getMember()
         )).willReturn(true);
-
 
         assertThatThrownBy(() -> waitingService.createReservationWaiting(reservationDto))
                 .isInstanceOf(RoomescapeException.class);
@@ -154,7 +156,8 @@ class WaitingServiceTest {
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED
         )).willReturn(true);
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED, waiting.getMember()
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED,
+                waiting.getMember()
         )).willReturn(false);
         given(reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
                 waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING, waiting.getMember()

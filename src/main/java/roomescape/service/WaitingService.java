@@ -40,7 +40,8 @@ public class WaitingService {
             final ReservationRepository reservationRepository,
             final MemberRepository memberRepository,
             final ReservationTimeRepository reservationTimeRepository,
-            final ThemeRepository themeRepository) {
+            final ThemeRepository themeRepository
+    ) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -72,7 +73,8 @@ public class WaitingService {
 
     private void validateAlreadyReserved(final Reservation waiting) {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED, waiting.getMember());
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.RESERVED,
+                waiting.getMember());
         if (exists) {
             throw new RoomescapeException(WAITING_FOR_MY_RESERVATION);
         }
@@ -80,7 +82,8 @@ public class WaitingService {
 
     private void validateDuplicatedWaiting(final Reservation waiting) {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING, waiting.getMember());
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING,
+                waiting.getMember());
         if (exists) {
             throw new RoomescapeException(WAITING_DUPLICATED);
         }

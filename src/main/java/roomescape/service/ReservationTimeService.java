@@ -26,8 +26,10 @@ public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeService(final ReservationTimeRepository reservationTimeRepository,
-                                  final ReservationRepository reservationRepository) {
+    public ReservationTimeService(
+            final ReservationTimeRepository reservationTimeRepository,
+            final ReservationRepository reservationRepository
+    ) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
@@ -69,8 +71,10 @@ public class ReservationTimeService {
     public List<AvailableReservationTimeResponse> findAvailableReservationTimes(
             final AvailableReservationTimeSearch condition
     ) {
-        final Set<Long> reservedTimeIds = reservationRepository.findByDateAndThemeId(condition.date(), condition.themeId())
-                .stream()
+        final Set<Long> reservedTimeIds = reservationRepository.findByDateAndThemeId(
+                        condition.date(),
+                        condition.themeId()
+                ).stream()
                 .map(Reservation::getTime)
                 .map(ReservationTime::getId)
                 .collect(Collectors.toUnmodifiableSet());

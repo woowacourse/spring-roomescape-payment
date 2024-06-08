@@ -123,7 +123,8 @@ class ReservationServiceTest {
         final LocalDate date = DATE_MAY_EIGHTH;
         final ReservationTime time = RESERVATION_TIME_SIX(1L);
         final Theme theme = THEME_HORROR(1L);
-        final ReservationSaveRequest request = new ReservationSaveRequest(DATE_MAY_EIGHTH, time.getId(), theme.getId(), PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationSaveRequest request = new ReservationSaveRequest(DATE_MAY_EIGHTH, time.getId(), theme.getId(),
+                PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, member.getId());
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
@@ -242,7 +243,8 @@ class ReservationServiceTest {
                 .willReturn(List.of(memberReservation, reservation, waiting, memberWaiting));
 
         // when
-        final List<MyReservationWithRankResponse> actual = reservationService.findMyReservationsAndWaitings(loginMember);
+        final List<MyReservationWithRankResponse> actual = reservationService.findMyReservationsAndWaitings(
+                loginMember);
 
         // then
         assertAll(

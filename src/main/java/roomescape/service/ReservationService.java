@@ -46,7 +46,8 @@ public class ReservationService {
             final ReservationRepository reservationRepository,
             final MemberRepository memberRepository,
             final ReservationTimeRepository reservationTimeRepository,
-            final ThemeRepository themeRepository) {
+            final ThemeRepository themeRepository
+    ) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -114,7 +115,8 @@ public class ReservationService {
         final List<Reservation> reservationsByMemberId = reservationRepository.findByMemberId(loginMember.id());
         final List<Reservation> reservations = reservationRepository.findAll();
         return reservationsByMemberId.stream()
-                .map(reservation -> new MyReservationWithRankResponse(reservation, calculateRank(reservations, reservation)))
+                .map(reservation -> new MyReservationWithRankResponse(reservation,
+                        calculateRank(reservations, reservation)))
                 .toList();
     }
 

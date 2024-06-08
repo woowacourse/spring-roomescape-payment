@@ -114,7 +114,8 @@ class ReservationTimeServiceTest {
         final ReservationTime reservedTime = RESERVATION_TIME_SIX(1L);
         final AvailableReservationTimeSearch availableReservationTimeSearch
                 = new AvailableReservationTimeSearch(DATE_MAY_EIGHTH, 1L);
-        final Reservation reservation = new Reservation(MEMBER_TENNY(1L), DATE_MAY_EIGHTH, reservedTime, THEME_HORROR(1L), ReservationStatus.RESERVED);
+        final Reservation reservation = new Reservation(MEMBER_TENNY(1L), DATE_MAY_EIGHTH, reservedTime,
+                THEME_HORROR(1L), ReservationStatus.RESERVED);
         given(reservationRepository.findByDateAndThemeId(DATE_MAY_EIGHTH, 1L))
                 .willReturn(List.of(reservation));
         given(reservationTimeRepository.findAll()).willReturn(List.of(reservedTime, RESERVATION_TIME_SEVEN(2L)));
@@ -130,7 +131,10 @@ class ReservationTimeServiceTest {
         });
     }
 
-    private boolean isReserved(final List<AvailableReservationTimeResponse> availableReservationTimes, final String time) {
+    private boolean isReserved(
+            final List<AvailableReservationTimeResponse> availableReservationTimes,
+            final String time
+    ) {
         return availableReservationTimes.stream()
                 .filter(response -> response.startAt().equals(time))
                 .findFirst()

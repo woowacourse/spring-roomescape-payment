@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.exception.RoomescapeException;
 
 class NameTest {
-    
+
     @Test
     @DisplayName("예약자 이름을 생성한다.")
     void createName() {
