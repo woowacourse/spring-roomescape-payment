@@ -3,7 +3,6 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
@@ -20,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.component.TossPaymentClient;
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -44,9 +44,10 @@ class PaymentServiceTest {
     @DisplayName("결제 승인 요청에 성공한다. ")
     void confirmSuccess() {
         var request = new PaymentConfirmRequest("expectedKey", "expectedId", 1000L, 1L);
+        var response = new PaymentConfirmResponse("expectedKey", "expectedId", 1000L);
 
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservationFixture(1)));
-        doNothing().when(paymentClient).confirm(any());
+        when(paymentClient.confirm(any())).thenReturn(response);
 
         assertDoesNotThrow(() -> paymentService.confirm(request));
     }
