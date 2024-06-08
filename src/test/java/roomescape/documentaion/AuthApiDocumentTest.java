@@ -19,6 +19,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -46,7 +47,11 @@ class AuthApiDocumentTest extends DocumentTest {
                 .andDo(document(
                                 "auth-login",
                                 preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint())
+                                preprocessResponse(prettyPrint()),
+                                requestFields(
+                                        fieldWithPath("email").type(JsonFieldType.STRING).description("로그인 이메일"),
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("로그인 비밀번호")
+                                )
                         )
                 );
     }
