@@ -19,6 +19,9 @@ spring:
     url: jdbc:h2:mem:database
     username: sa
     password:
+  sql:
+    init:
+      encoding: utf-8
 
 security:
   jwt:
