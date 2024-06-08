@@ -17,8 +17,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                             final LocalDate dateFrom,
                                                             final LocalDate dateTo);
 
-    List<Reservation> findAllByMember(final Member member);
-
     List<Reservation> findAllByMemberAndStatus(final Member member, final ReservationStatus status);
 
     Integer countByTime(final ReservationTime reservationTime);
