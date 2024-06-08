@@ -4,9 +4,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.LoginMemberId;
+import roomescape.domain.dto.PaymentRequest;
 import roomescape.service.reservation.ReservationCommonService;
 import roomescape.service.reservation.ReservationCreateService;
-import roomescape.service.reservation.dto.*;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
+import roomescape.service.reservation.dto.ReservationConfirmedResponse;
+import roomescape.service.reservation.dto.ReservationRequest;
+import roomescape.service.reservation.dto.ReservationResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -41,8 +45,8 @@ public class ReservationController {
     public ResponseEntity<ReservationConfirmedResponse> confirmReservation(
             @RequestBody @Valid PaymentRequest paymentRequest,
             @PathVariable("id") long id,
-            @LoginMemberId long memberId){
-        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(paymentRequest, id);
+            @LoginMemberId long memberId) {
+        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(id, paymentRequest);
         ReservationConfirmedResponse reservationConfirmedResponse = reservationCommonService.confirmReservation(reservationConfirmRequest, memberId);
         return ResponseEntity.ok(reservationConfirmedResponse);
     }

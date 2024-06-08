@@ -8,6 +8,7 @@ import roomescape.domain.dto.ReservationWithRank;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
@@ -15,12 +16,15 @@ import roomescape.domain.theme.Theme;
 import roomescape.exception.InvalidReservationException;
 import roomescape.fixture.*;
 import roomescape.service.ServiceTest;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
+import roomescape.service.reservation.dto.ReservationConfirmedResponse;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ReservationCommonServiceTest extends ServiceTest {
 
@@ -113,5 +117,27 @@ class ReservationCommonServiceTest extends ServiceTest {
         assertThatThrownBy(() -> reservationCommonService.deleteById(pastReservationId))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
+    }
+
+    @DisplayName("결제 대기 상태의 예약을 결제 후, 예약 상태로 변경한다.")
+    @Test
+    void confirmReservation() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(ReservationFixture.createPendingPayment(member, reservationDetail));
+        ReservationConfirmRequest reservationConfirmRequest = ReservationFixture.createReservationConfirmRequest(reservation);
+
+        //when
+        ReservationConfirmedResponse response = reservationCommonService.confirmReservation(reservationConfirmRequest, member.getId());
+
+        //then
+        assertAll(
+                () -> assertThat(response.payment().paymentKey()).isEqualTo(reservationConfirmRequest.paymentRequest().paymentKey()),
+                () -> assertThat(response.status()).isEqualTo(ReservationStatus.RESERVED.getDescription())
+        );
     }
 }

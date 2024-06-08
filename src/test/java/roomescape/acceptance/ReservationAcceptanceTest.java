@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.reservation.ReservationStatus;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.WaitingFixture;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -152,9 +153,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", adminToken)
+                            .body(PaymentFixture.createPaymentRequest())
                             .when().post("/reservations/" + waitingId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("reservationStatus.status", is(ReservationStatus.RESERVED.getDescription()));
+                            .assertThat().statusCode(200).body("status", is(ReservationStatus.RESERVED.getDescription()));
                 })
         );
     }

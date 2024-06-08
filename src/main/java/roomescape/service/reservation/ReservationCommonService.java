@@ -2,12 +2,14 @@ package roomescape.service.reservation;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationDate;
 import roomescape.exception.InvalidReservationException;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.ReservationConfirmRequest;
 import roomescape.service.reservation.dto.ReservationConfirmedResponse;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
@@ -20,9 +22,11 @@ import java.util.List;
 public class ReservationCommonService {
 
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
 
-    public ReservationCommonService(ReservationRepository reservationRepository) {
+    public ReservationCommonService(ReservationRepository reservationRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
@@ -72,7 +76,18 @@ public class ReservationCommonService {
         }
     }
 
+    @Transactional
     public ReservationConfirmedResponse confirmReservation(ReservationConfirmRequest request, long memberId) {
-        return null;
+        Reservation reservation = getById(request.reservationId());
+        if (reservation.isPendingPayment()) {
+            Payment payment = paymentService.approvePayment(request.paymentRequest());
+            reservation.paid(payment);
+        }
+        return new ReservationConfirmedResponse(reservation);
+    }
+
+    private Reservation getById(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 결제 대기 정보입니다."));
     }
 }

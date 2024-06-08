@@ -1,6 +1,7 @@
 package roomescape.service.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import roomescape.domain.reservation.Reservation;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,4 +14,12 @@ public record ReservationConfirmedResponse(
         String status,
         PaymentResponse payment
 ) {
+    public ReservationConfirmedResponse(Reservation reservation) {
+        this(reservation.getId(),
+                reservation.getTheme().getName().getValue(),
+                reservation.getDate(),
+                reservation.getTime(),
+                reservation.getStatus().getDescription(),
+                PaymentResponse.of(reservation.getPayment()));
+    }
 }

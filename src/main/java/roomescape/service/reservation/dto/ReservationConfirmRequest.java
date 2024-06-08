@@ -1,12 +1,9 @@
 package roomescape.service.reservation.dto;
 
+import roomescape.domain.dto.PaymentRequest;
+
 public record ReservationConfirmRequest(
         Long reservationId,
-        String paymentKey,
-        String orderId,
-        Long amount
+        PaymentRequest paymentRequest
 ) {
-    public ReservationConfirmRequest(PaymentRequest paymentRequest, Long reservationId) {
-        this(reservationId, paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount());
-    }
 }

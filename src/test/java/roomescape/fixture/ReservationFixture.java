@@ -1,5 +1,6 @@
 package roomescape.fixture;
 
+import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -7,6 +8,7 @@ import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.service.reservation.dto.AdminReservationRequest;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 
 import java.time.LocalDate;
@@ -42,5 +44,9 @@ public class ReservationFixture {
                 reservationDetail.getReservationTime().getId(),
                 reservationDetail.getTheme().getId(),
                 "paymentKey", "orderId", 1000L);
+    }
+
+    public static ReservationConfirmRequest createReservationConfirmRequest(Reservation reservation) {
+        return new ReservationConfirmRequest(reservation.getId(), new PaymentRequest("paymentKey", "orderId", 1000L));
     }
 }
