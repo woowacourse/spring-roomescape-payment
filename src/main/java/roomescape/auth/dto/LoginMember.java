@@ -7,6 +7,7 @@ public record LoginMember(
         @Schema(description = "회원 ID", example = "1")
         Long id,
 
+        @Schema(description = "회원 권한")
         Role role,
 
         @Schema(description = "로그인 이름", example = "카키")
