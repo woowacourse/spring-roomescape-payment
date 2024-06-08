@@ -8,9 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "payment")
+@SQLDelete(sql = "UPDATE PAYMENT SET deleted = TRUE WHERE PAYMENT.ID = ?")
+@SQLRestriction("deleted = FALSE")
 public class Payment {
     private static final String ADMIN_MARKER = "ADMIN";
 
@@ -26,6 +31,9 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
+
+    @ColumnDefault("false")
+    private boolean deleted;
 
     protected Payment() {
     }
