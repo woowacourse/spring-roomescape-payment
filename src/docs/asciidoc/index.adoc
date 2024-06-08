@@ -1,0 +1,36 @@
+= 방탈출 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: coderay
+:toc: left
+:toc-title: 목차
+:toclevels: 3
+:sectlinks:
+:sectnums:
+
+== 개요
+
+방탈출 예약 프로젝트 API 문서입니다.
+
+== 상태코드(HttpStatus)
+
+다음은 상태코드 설명입니다.
+
+[cols="3,3,3"]
+|====
+|HttpStatus  |메시지 |설명
+
+|`OK(200)`  | | 정상 응답
+|`CREATED(201)`  | | 신규 리소스 생성
+|`NO_CONTENT(204)`  | | 본문 없는 응답
+|`BAD_REQUEST(400)` |"상황에 따라 다름" | 요청값 누락 혹은 잘못된 기입
+|`UNAUTHORIZED(401)` |"상황에 따라 다름" | 인증 및 인가 실패
+|`NOT_FOUND(404)` |"상황에 따라 다름" | 요청값 누락 혹은 잘못된 기입, 적절한 핸들러 찾지 못함
+|`METHOD_NOT_ALLOWED(405)`| "Method Not Allowed" | 미지원 HTTP 호출
+|`INTERNAL_SERVER_ERROR(500)` |"상황에 따라 다름" |서버 내부 오류
+
+|====
+
+== API
+
+include::theme.adoc[]

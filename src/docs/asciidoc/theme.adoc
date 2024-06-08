@@ -1,0 +1,87 @@
+=== 테마(Theme)
+
+테마 생성 및 삭제, 조회와 인기 테마를 조회할 수 있습니다.
+
+==== 신규 테마 등록
+
+신규 테마를 등록합니다.
+
+===== curl
+
+include::{snippets}/theme-create/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/theme-create/http-request.adoc[]
+
+===== 요청 데이터 설명
+
+include::{snippets}/theme-create/request-fields.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/theme-create/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/theme-create/response-fields.adoc[]
+
+==== 테마 삭제
+
+테마를 삭제합니다.
+
+===== curl
+
+include::{snippets}/theme-delete/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/theme-delete/http-request.adoc[]
+
+===== 경로 데이터 설명
+
+include::{snippets}/theme-delete/path-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/theme-delete/http-response.adoc[]
+
+==== 테마 조회
+
+방탈출 테마 목록을 조회합니다.
+
+===== curl
+
+include::{snippets}/theme-find/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/theme-find/http-request.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/theme-find/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/theme-find/response-fields.adoc[]
+
+==== 인기 테마 조회
+
+최근 일주일간 인기 테마 목록을 조회합니다.
+
+===== curl
+
+include::{snippets}/theme-find-popular/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/theme-find-popular/http-request.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/theme-find-popular/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/theme-find-popular/response-fields.adoc[]
