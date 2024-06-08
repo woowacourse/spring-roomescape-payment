@@ -78,7 +78,7 @@ class ReservationCommonServiceTest extends ServiceTest {
         assertThatNoException().isThrownBy(() -> reservationRepository.deleteById(reservation.getId()));
     }
 
-    @DisplayName("예약을 삭제하고, 예약 대기가 있다면 가장 우선순위가 높은 예약 대기를 예약으로 전환한다.")
+    @DisplayName("예약을 삭제하고, 예약 대기가 있다면 가장 우선순위가 높은 예약 대기를 결제 대기로 전환한다.")
     @Test
     void deleteThenUpdateReservation() {
         //given
@@ -97,7 +97,7 @@ class ReservationCommonServiceTest extends ServiceTest {
         //then
         List<Boolean> reservations = reservationRepository.findWithRankingByMemberId(anotherMember.getId()).stream()
                 .map(ReservationWithRank::getReservation)
-                .map(Reservation::isReserved)
+                .map(Reservation::isPendingPayment)
                 .toList();
         assertThat(reservations).containsExactly(true);
     }
