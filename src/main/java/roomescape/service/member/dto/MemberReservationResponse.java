@@ -25,7 +25,8 @@ public record MemberReservationResponse(
                 reservation.getDate(),
                 reservation.getTime(),
                 reservation.getStatus().getDescription(),
-                null, null
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
