@@ -32,31 +32,9 @@ values (1, '10:00'),
        (11, '20:00'),
        (12, '21:00');
 
-insert into reservation (id, member_id, theme_id, date, reservation_time_id, status, created_at, payment_id)
-values (1, 1, 1, '2024-06-07', 1, 'RESERVED', '2099-07-01 00:00:00', null),
-       (2, 2, 1, '2024-06-07', 1, 'WAITING', '2099-07-01 00:00:02', null),
-       (3, 3, 1, '2024-06-07', 1, 'WAITING', '2099-07-01 00:00:03', null),
-       (4, 4, 1, '2024-06-07', 1, 'WAITING', '2099-07-01 00:00:04', null),
-       (5, 1, 1, '2024-06-08', 2, 'RESERVED', '2099-07-01 00:00:01', null),
-       (6, 2, 1, '2024-06-08', 2, 'WAITING', '2099-07-01 00:00:01', null),
-       (7, 1, 2, '2024-06-08', 4, 'WAITING', '2099-07-01 00:00:02', null),
-       (8, 4, 2, '2024-06-08', 4, 'RESERVED', '2099-07-01 00:00:02', null),
-       (9, 1, 1, '2024-06-09', 1, 'RESERVED', '2099-07-01 00:00:03', null),
-       (10, 1, 1, '2024-06-09', 1, 'RESERVED', '2099-07-01 00:00:00', null),
-       (11, 2, 1, '2024-06-09', 1, 'WAITING', '2099-07-01 00:00:00', null),
-       (12, 1, 1, '2024-06-09', 2, 'RESERVED', '2099-07-01 00:00:00', null),
-       (13, 1, 3, '2024-06-09', 3, 'RESERVED', '2099-07-01 00:00:00', null),
-       (14, 1, 4, '2024-06-09', 3, 'RESERVED', '2099-07-01 00:00:00', null),
-       (15, 4, 4, '2024-06-09', 3, 'WAITING', '2099-07-01 00:00:00', null),
-       (16, 1, 4, '2024-06-09', 4, 'RESERVED', '2099-07-01 00:00:00', null),
-       (17, 1, 3, '2024-06-09', 4, 'RESERVED', '2099-07-01 00:00:00', null),
-       (18, 1, 2, '2024-06-09', 4, 'WAITING', '2099-07-01 00:00:00', null);
-
 ALTER TABLE member
     ALTER COLUMN id RESTART WITH 5;
 ALTER TABLE theme
     ALTER COLUMN id RESTART WITH 5;
 ALTER TABLE reservation_time
     ALTER COLUMN id RESTART WITH 13;
-ALTER TABLE reservation
-    ALTER COLUMN id RESTART WITH 19;
