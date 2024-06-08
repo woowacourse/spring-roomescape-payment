@@ -7,10 +7,9 @@ import roomescape.domain.repository.PaymentRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentCancelDto;
 import roomescape.service.request.PaymentSaveDto;
 import roomescape.service.response.PaymentDto;
-
-import java.util.Optional;
 
 @Service
 public class PaymentService {
@@ -40,7 +39,7 @@ public class PaymentService {
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
 
-        return paymentRepository.save(payment);
+        return savePayment(payment);
     }
 
     private void validatePayment(PaymentSaveDto paymentSaveDto, Reservation reservation) {
@@ -57,16 +56,25 @@ public class PaymentService {
     }
 
     private void validatePaymentNotExistBy(Long reservationId) {
-        Optional<Payment> payment = paymentRepository.findByReservationId(reservationId);
-        if (payment.isPresent()) {
-            throw new IllegalArgumentException(String.format("이미 결제가 존재하는 예약입니다. (reservationId: %d)", reservationId));
-        }
+        paymentRepository.findByReservationId(reservationId)
+                .ifPresent((payment -> {
+                    throw new IllegalArgumentException(String.format("이미 결제가 존재하는 예약입니다. (reservationId: %d)", reservationId));
+                }));
     }
 
     private void validatePaymentAmount(Reservation reservation, Long amount) {
         boolean isValidAmount = reservation.isPriceEqual(amount);
         if (!isValidAmount) {
             throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
+        }
+    }
+
+    private Payment savePayment(Payment payment) {
+        try {
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            paymentManager.cancel(payment.getPaymentKey(), new PaymentCancelDto("결제 정보 저장 중 오류가 발생했습니다."));
+            throw e;
         }
     }
 }

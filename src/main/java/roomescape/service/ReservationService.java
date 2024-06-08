@@ -7,6 +7,7 @@ import roomescape.domain.*;
 import roomescape.domain.repository.*;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
+import roomescape.service.request.PaymentCancelDto;
 import roomescape.service.request.ReservationSaveDto;
 import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
@@ -69,7 +70,16 @@ public class ReservationService {
 
     private Payment savePayment(Reservation reservation, PaymentDto paymentDto) {
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
-        return paymentRepository.save(payment);
+        return savePayment(payment);
+    }
+
+    private Payment savePayment(Payment payment) {
+        try {
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            paymentManager.cancel(payment.getPaymentKey(), new PaymentCancelDto("결제 정보 저장 중 오류가 발생했습니다."));
+            throw e;
+        }
     }
 
     private ReservationTime findTime(Long timeId) {
