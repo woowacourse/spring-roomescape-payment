@@ -1,6 +1,7 @@
 package roomescape.payment.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +37,8 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public String findPaymentKeyByReservationId(Long reservationId) {
-        Payment payment = paymentRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        ErrorType.PAYMENT_NOT_POUND,
-                        String.format("[reservationId: %d]", reservationId),
-                        HttpStatus.NOT_FOUND));
-        return payment.getPaymentKey();
+    public Optional<Payment> findPaymentByReservationId(Long reservationId) {
+        return paymentRepository.findByReservationId(reservationId);
     }
 
     public void cancelPaymentWhenErrorOccurred(PaymentCancelResponse cancelInfo, String paymentKey) {
@@ -50,7 +46,10 @@ public class PaymentService {
     }
 
     public PaymentCancelRequest cancelPaymentByAdmin(Long reservationId) {
-        String paymentKey = findPaymentKeyByReservationId(reservationId);
+        String paymentKey = findPaymentByReservationId(reservationId)
+                .orElseThrow(() -> new RoomEscapeException(ErrorType.PAYMENT_NOT_POUND,
+                        String.format("[reservationId: %d]", reservationId), HttpStatus.NOT_FOUND))
+                .getPaymentKey();
         // 취소 시간은 현재 시간으로 일단 생성한 뒤, 결제 취소 완료 후 해당 시간으로 변경합니다.
         CanceledPayment canceled = cancelPayment(paymentKey, "고객 요청", LocalDateTime.now());
 

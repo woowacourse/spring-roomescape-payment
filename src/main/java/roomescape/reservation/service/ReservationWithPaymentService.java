@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
-import roomescape.payment.service.PaymentService;
 import roomescape.payment.dto.response.ReservationPaymentResponse;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -41,6 +41,11 @@ public class ReservationWithPaymentService {
         PaymentCancelRequest paymentCancelRequest = paymentService.cancelPaymentByAdmin(reservationId);
         reservationService.removeReservationById(reservationId, memberId);
         return paymentCancelRequest;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isNotPaidReservation(Long reservationId) {
+        return paymentService.findPaymentByReservationId(reservationId).isEmpty();
     }
 
     public void updateCanceledTime(String paymentKey, LocalDateTime canceledAt) {

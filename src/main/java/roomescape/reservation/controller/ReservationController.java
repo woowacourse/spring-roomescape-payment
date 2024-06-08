@@ -74,6 +74,12 @@ public class ReservationController {
             @MemberId Long memberId,
             @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {
+
+        if (reservationWithPaymentService.isNotPaidReservation(reservationId)) {
+            reservationService.removeReservationById(reservationId, memberId);
+            return ApiResponse.success();
+        }
+
         PaymentCancelRequest paymentCancelRequest = reservationWithPaymentService.removeReservationWithPayment(
                 reservationId, memberId);
         PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(paymentCancelRequest);
