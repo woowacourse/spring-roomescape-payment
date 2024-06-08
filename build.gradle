@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
     id 'java'
 }
 
@@ -12,19 +13,43 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    asciidoctorExt
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation 'io.jsonwebtoken:jjwt:0.12.5'
 
     runtimeOnly 'com.h2database:h2'
 
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }

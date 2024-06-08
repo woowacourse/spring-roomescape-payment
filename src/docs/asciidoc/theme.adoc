@@ -1,0 +1,19 @@
+= Coonect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Theme API
+
+=== 인기 테마 조회
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-response.adoc[]
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/response-fields.adoc[]
