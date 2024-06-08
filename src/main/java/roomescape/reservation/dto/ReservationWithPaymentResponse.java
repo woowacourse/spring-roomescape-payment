@@ -14,8 +14,15 @@ public class ReservationWithPaymentResponse {
     private final String paymentKey;
     private final int totalAmount;
 
-    public ReservationWithPaymentResponse(Long id, Theme theme, LocalDate date, ReservationTime time,
-                                          ReservationStatus status, String paymentKey, int totalAmount) {
+    public ReservationWithPaymentResponse(
+            Long id,
+            Theme theme,
+            LocalDate date,
+            ReservationTime time,
+            ReservationStatus status,
+            String paymentKey,
+            int totalAmount
+    ) {
         this.id = id;
         this.theme = theme;
         this.date = date;
