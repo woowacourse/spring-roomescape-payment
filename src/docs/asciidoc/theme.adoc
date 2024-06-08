@@ -7,6 +7,18 @@
 
 == Theme API
 
+=== 테마 등록
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/save/http-request.adoc[]
+include::{snippets}/theme-rest-docs-test/save/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/save/http-response.adoc[]
+include::{snippets}/theme-rest-docs-test/save/response-fields.adoc[]
+
 === 인기 테마 조회
 
 ==== Request
@@ -17,3 +29,14 @@ include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-reque
 
 include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-response.adoc[]
 include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/response-fields.adoc[]
+
+=== 테마 삭제
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/theme-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/delete/http-response.adoc[]
