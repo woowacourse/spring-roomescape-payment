@@ -35,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
         try {
             String timestamp = Instant.now().toString();
             logger.debug("Request body: {} Request time: {}", request, timestamp);
-            
+
             return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(APPLICATION_JSON)

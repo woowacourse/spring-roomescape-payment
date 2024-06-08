@@ -53,7 +53,7 @@ public class Payment {
     public Long getId() {
         return id;
     }
-    
+
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
     }

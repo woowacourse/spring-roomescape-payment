@@ -2,7 +2,6 @@ package roomescape.controller;
 
 import java.net.URI;
 import java.util.List;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +31,9 @@ public class WaitingController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createWaiting(
         @RequestBody WaitingRequest waitingRequest,
-        @LoginMemberId Long memberId){
+        @LoginMemberId Long memberId) {
         ReservationResponse response = waitingCreateService.createWaiting(waitingRequest, memberId);
-        return ResponseEntity.created(URI.create("/waitings/"+response.id())).body(response);
+        return ResponseEntity.created(URI.create("/waitings/" + response.id())).body(response);
     }
 
     @GetMapping
