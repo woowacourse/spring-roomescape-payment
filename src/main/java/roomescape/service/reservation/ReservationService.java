@@ -104,9 +104,19 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public void deleteById(long reservationId) {
         reservationRepository.findById(reservationId)
                 .ifPresent(this::cancelReservation);
+    }
+
+    @Transactional
+    public void deleteById(long reservationId, long memberId) {
+        reservationRepository.findById(reservationId)
+                .ifPresent(reservation -> {
+                    reservation.checkCancelAuthority(memberId);
+                    cancelReservation(reservation);
+                });
     }
 
     private void cancelReservation(Reservation reservation) {
@@ -115,6 +125,7 @@ public class ReservationService {
         reservationRepository.delete(reservation);
         reservationWaitingRepository.findTopByThemeAndScheduleOrderByCreatedAt(theme, schedule)
                 .ifPresent(this::convertFirstPriorityWaitingToReservation);
+        paymentService.cancel(reservation.getPayment());
     }
 
     private void convertFirstPriorityWaitingToReservation(ReservationWaiting waiting) {
@@ -123,12 +134,6 @@ public class ReservationService {
         );
         reservationRepository.save(reservation);
         reservationWaitingRepository.delete(waiting);
-    }
-
-    public void deleteById(long reservationId, long memberId) {
-        reservationRepository.findById(reservationId)
-                .ifPresent(reservation -> reservation.checkCancelAuthority(memberId));
-        deleteById(reservationId);
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
