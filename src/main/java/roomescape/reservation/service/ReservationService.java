@@ -2,7 +2,6 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -69,7 +68,7 @@ public class ReservationService {
             paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
         }
 
-        return ReservationResponse.toResponse(Objects.requireNonNull(savedReservation));
+        return ReservationResponse.toResponse(savedReservation);
     }
 
     private void validateReservation(LoginMember loginMember, Reservation reservation) {

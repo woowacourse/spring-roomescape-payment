@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
 import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -34,10 +33,9 @@ public class AdminReservationApiController {
     @Operation(summary = "관리자 예약 추가 API", description = "관리자가 회원의 예약을 추가 합니다.")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
-            @Valid @RequestBody AdminReservationSaveRequest adminReservationSaveRequest,
-            LoginMember loginMember
+            @Valid @RequestBody AdminReservationSaveRequest adminReservationSaveRequest
     ) {
-        ReservationResponse reservationResponse = adminReservationService.save(adminReservationSaveRequest, loginMember);
+        ReservationResponse reservationResponse = adminReservationService.save(adminReservationSaveRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

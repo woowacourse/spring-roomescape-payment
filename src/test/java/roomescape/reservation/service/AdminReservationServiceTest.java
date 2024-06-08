@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static roomescape.util.Fixture.HORROR_THEME;
 import static roomescape.util.Fixture.JOJO;
 import static roomescape.util.Fixture.KAKI;
-import static roomescape.util.Fixture.LOGIN_MEMBER_KAKI;
 import static roomescape.util.Fixture.RESERVATION_HOUR_10;
 import static roomescape.util.Fixture.RESERVATION_HOUR_11;
 import static roomescape.util.Fixture.TODAY;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -63,15 +61,14 @@ class AdminReservationServiceTest {
     void saveExceptionByDuplicatedReservation() {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horrorTheme = themeRepository.save(HORROR_THEME);
-        memberRepository.save(KAKI);
+        Member kaki = memberRepository.save(KAKI);
 
-        LoginMember loginMember = LOGIN_MEMBER_KAKI;
         AdminReservationSaveRequest adminReservationSaveRequest =
-                new AdminReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), loginMember.id());
+                new AdminReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), kaki.getId());
 
-        adminReservationService.save(adminReservationSaveRequest, loginMember);
+        adminReservationService.save(adminReservationSaveRequest);
 
-        assertThatThrownBy(() -> adminReservationService.save(adminReservationSaveRequest, loginMember))
+        assertThatThrownBy(() -> adminReservationService.save(adminReservationSaveRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
