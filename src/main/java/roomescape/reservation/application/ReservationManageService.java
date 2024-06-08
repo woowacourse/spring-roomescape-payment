@@ -8,18 +8,15 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public abstract class ReservationManageService {
-    protected static final int MAX_RESERVATION_NUMBER_IN_TIME_SLOT = 1;
-
     protected final ReservationRepository reservationRepository;
 
     public ReservationManageService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
     }
 
-    abstract protected void correctReservationStatus(int bookingCount, Reservation reservation);
+    abstract protected void correctReservationStatus(boolean existsReservation, Reservation reservation);
 
     abstract protected void scheduleAfterDeleting(Reservation deletedReservation);
 
@@ -31,6 +28,10 @@ public abstract class ReservationManageService {
     public Reservation create(Reservation reservation) {
         validateReservationDate(reservation);
         validateDuplicatedReservation(reservation);
+
+        boolean existsReservation = reservationRepository.existsByDateAndTimeAndThemeAndStatus(
+                reservation.getDate(), reservation.getTime(), reservation.getTheme(), ReservationStatus.BOOKING);
+        correctReservationStatus(existsReservation, reservation);
         return reservationRepository.save(reservation);
     }
 
@@ -47,14 +48,6 @@ public abstract class ReservationManageService {
         if (existDuplicatedReservation) {
             throw new ViolationException("동일한 사용자의 중복된 예약입니다.");
         }
-    }
-
-    @Transactional
-    public Reservation scheduleRecentReservation(Reservation reservation) {
-        List<Reservation> bookings = reservationRepository.findAllByDateAndTimeAndThemeAndStatus(
-                reservation.getDate(), reservation.getTime(), reservation.getTheme(), ReservationStatus.BOOKING);
-        correctReservationStatus(bookings.size(), reservation);
-        return reservation;
     }
 
     @Transactional

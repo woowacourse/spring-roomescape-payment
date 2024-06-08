@@ -43,13 +43,12 @@ class BookingManageServiceTest extends ReservationServiceTest {
 
         Reservation duplicatedReservation = new Reservation(
                 admin, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, BOOKING);
-        Reservation createReservation = bookingManageService.create(duplicatedReservation);
 
         // when
-        Reservation scheduledReservation = bookingManageService.scheduleRecentReservation(createReservation);
+        Reservation createReservation = bookingManageService.create(duplicatedReservation);
 
         // then
-        assertThat(scheduledReservation.getStatus()).isEqualTo(WAITING);
+        assertThat(createReservation.getStatus()).isEqualTo(WAITING);
     }
 
     @Test

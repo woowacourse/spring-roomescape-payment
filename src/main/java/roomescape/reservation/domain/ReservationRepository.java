@@ -46,11 +46,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                                                     @Param(value = "status") ReservationStatus status);
 
     @Query("""
-           SELECT r FROM Reservation r
-           JOIN FETCH r.time
-           JOIN FETCH r.theme
-           WHERE r.member = :member AND r.status = :status
-           """)
+            SELECT r FROM Reservation r
+            JOIN FETCH r.time
+            JOIN FETCH r.theme
+            WHERE r.member = :member AND r.status = :status
+            """)
     List<Reservation> findAllByMemberAndStatus(@Param(value = "member") Member member,
                                                @Param(value = "status") ReservationStatus status);
 
@@ -86,7 +86,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "10000")})
-    List<Reservation> findAllByDateAndTimeAndThemeAndStatus(LocalDate date, ReservationTime time, Theme theme, ReservationStatus status);
+    boolean existsByDateAndTimeAndThemeAndStatus(LocalDate date, ReservationTime time, Theme theme, ReservationStatus status);
 
     boolean existsByDateAndTimeAndThemeAndMember(LocalDate date, ReservationTime time, Theme theme, Member member);
 

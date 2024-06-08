@@ -105,7 +105,7 @@ class ReservationControllerTest extends ControllerTest {
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
         ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
-        BDDMockito.given(bookingManageService.scheduleRecentReservation(any()))
+        BDDMockito.given(bookingManageService.createWithPayment(any(), any()))
                 .willReturn(expectedReservation);
         BDDMockito.given(reservationTimeService.findById(anyLong()))
                 .willReturn(expectedTime);

@@ -64,9 +64,8 @@ public class ReservationController {
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
         ConfirmedPayment confirmedPayment = paymentService.confirm(request.newPayment());
         Reservation createdReservation = bookingManageService.createWithPayment(newReservation, confirmedPayment);
-        Reservation scheduledReservation = bookingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ReservationResponse.from(scheduledReservation));
+                .body(ReservationResponse.from(createdReservation));
     }
 
     @PostMapping("/waiting")
@@ -74,9 +73,8 @@ public class ReservationController {
                                                                         Member loginMember) {
         Reservation newReservation = toNewReservation(request, loginMember, ReservationStatus.WAITING);
         Reservation createdReservation = waitingManageService.create(newReservation);
-        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ReservationResponse.from(scheduledReservation));
+                .body(ReservationResponse.from(createdReservation));
     }
 
     private Reservation toNewReservation(ReservationSaveRequest request, Member loginMember, ReservationStatus status) {

@@ -145,6 +145,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
+        // 빈테이블에서는 데드락 발생
+        createTestReservation(TOMMY_RESERVATION_DATE, timeId, themeId, cookies.get(0).getValue(), BOOKING);
+
         // when
         for (int i = 0; i < threadCount; i++) {
             int threadIndex = i;
@@ -167,7 +170,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         List<WaitingReservationResponse> waitingResponses = findAllWaitingReservations(adminCookie);
 
         assertSoftly(softly -> {
-            softly.assertThat(reservationResponses).hasSize(1);
+            softly.assertThat(reservationResponses).hasSize(2);
             softly.assertThat(waitingResponses).hasSize(4);
         });
     }

@@ -41,10 +41,9 @@ public class BookingManageService extends ReservationManageService {
     }
 
     @Override
-    protected void correctReservationStatus(int bookingCount, Reservation reservation) {
-        if (bookingCount > MAX_RESERVATION_NUMBER_IN_TIME_SLOT) {
+    protected void correctReservationStatus(boolean existsReservation, Reservation reservation) {
+        if (existsReservation && reservation.isBooking()) {
             reservation.changeToWaiting();
-            reservationRepository.updateStatusById(ReservationStatus.WAITING, reservation.getId());
         }
     }
 

@@ -5,7 +5,6 @@ import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationStatus;
 
 @Service
 public class WaitingManageService extends ReservationManageService {
@@ -24,10 +23,9 @@ public class WaitingManageService extends ReservationManageService {
     }
 
     @Override
-    protected void correctReservationStatus(int bookingCount, Reservation reservation) {
-        if (bookingCount < MAX_RESERVATION_NUMBER_IN_TIME_SLOT) {
+    protected void correctReservationStatus(boolean existsReservation, Reservation reservation) {
+        if (!existsReservation && reservation.isWaiting()) {
             reservation.changeToBooking();
-            reservationRepository.updateStatusById(ReservationStatus.BOOKING, reservation.getId());
         }
     }
 

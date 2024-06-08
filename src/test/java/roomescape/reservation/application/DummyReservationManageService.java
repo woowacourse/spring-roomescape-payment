@@ -10,7 +10,7 @@ public class DummyReservationManageService extends ReservationManageService {
     }
 
     @Override
-    protected void correctReservationStatus(int bookingCount, Reservation reservation) {
+    protected void correctReservationStatus(boolean existsReservation, Reservation reservation) {
     }
 
     @Override

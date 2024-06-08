@@ -41,15 +41,14 @@ class WaitingManageServiceTest extends ReservationServiceTest {
 
         Reservation waitingReservation = new Reservation(
                 tommy, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING);
-        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // when
-        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // then
         assertSoftly(softly -> {
-            softly.assertThat(scheduledReservation.getId()).isNotNull();
-            softly.assertThat(scheduledReservation.getStatus()).isEqualTo(WAITING);
+            softly.assertThat(createdReservation.getId()).isNotNull();
+            softly.assertThat(createdReservation.getStatus()).isEqualTo(WAITING);
         });
     }
 
@@ -59,13 +58,12 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         // given
         Reservation waitingReservation = new Reservation(
                 tommy, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING);
-        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // when
-        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // then
-        assertThat(scheduledReservation.getStatus()).isEqualTo(BOOKING);
+        assertThat(createdReservation.getStatus()).isEqualTo(BOOKING);
     }
 
     @Test
