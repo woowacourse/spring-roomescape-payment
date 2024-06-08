@@ -6,6 +6,7 @@ import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRepository;
+import roomescape.domain.reservation.Reservation;
 
 @Service
 @Transactional
@@ -19,8 +20,9 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public Payment approvePayment(PaymentRequest request) {
+    public Payment approvePayment(PaymentRequest request, Reservation reservation) {
         Payment payment = paymentClient.approve(request);
+        payment.setReservation(reservation);
 
         return paymentRepository.save(payment);
     }

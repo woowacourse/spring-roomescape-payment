@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -48,19 +47,23 @@ public class ReservationCreateService {
     }
 
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
-        return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
+        Reservation reservation = createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
             adminReservationRequest.memberId(), adminReservationRequest.date());
+
+        return new ReservationResponse(reservation);
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
         PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
-        Payment payment = paymentService.approvePayment(request);
 
-        return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
+        Reservation reservation = createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
             reservationRequest.date());
+
+        paymentService.approvePayment(request, reservation);
+        return new ReservationResponse(reservation);
     }
 
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date) {
+    private Reservation createReservation(long timeId, long themeId, long memberId, LocalDate date) {
         ReservationDate reservationDate = ReservationDate.of(date);
         ReservationTime reservationTime = findTimeById(timeId);
         Theme theme = findThemeById(themeId);
@@ -68,8 +71,7 @@ public class ReservationCreateService {
         ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
         validateDuplication(reservationDetail);
 
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED));
-        return new ReservationResponse(reservation);
+        return reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED));
     }
 
     private ReservationTime findTimeById(long timeId) {
