@@ -34,7 +34,7 @@ function render(data) {
         } else if (item.status === 'PAYMENT_PENDING') {
             status = '결제 대기';
         } else if (item.status === 'WAITING') {
-            status = `${item.waitingRank}번째 예약대기`;
+            status = `${item.waitingRank - 1}번째 예약대기`;
         } else if (item.status === 'CANCELED') {
             status = '취소';
         } else {
