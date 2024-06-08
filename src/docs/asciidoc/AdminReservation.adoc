@@ -1,0 +1,174 @@
+= Admin Reservation API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Reservation 관련 API
+
+=== 예약 생성
+
+==== 요청
+
+include::{snippets}/admin-reservation-controller-test/save-reservation_201/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/admin-reservation-controller-test/save-reservation_201/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-reservation-controller-test/save-reservation_201/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-reservation-controller-test/save-reservation_201/response-fields.adoc[]
+
+=== 예약 삭제
+
+==== 요청
+
+include::{snippets}/admin-reservation-controller-test/delete-reservation_204/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-reservation-controller-test/delete-reservation_204/http-response.adoc[]
+
+
+=== 예약 대기 조회
+
+==== 요청
+
+include::{snippets}/admin-waiting-controller-test/all-waitings/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}//admin-waiting-controller-test/all-waitings/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}//admin-waiting-controller-test/all-waitings/response-fields.adoc[]
+
+=== 예약 대기 삭제
+
+==== 요청
+
+include::{snippets}/admin-waiting-controller-test/delete-waiting/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-waiting-controller-test/delete-waiting/http-response.adoc[]
+
+== Member 관련 API
+
+=== 멤버 조회
+
+==== 요청
+
+include::{snippets}/admin-member-controller-test/find-all/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-member-controller-test/find-all/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-member-controller-test/find-all/response-fields.adoc[]
+
+=== 멤버 삭제
+
+==== 요청
+
+include::{snippets}/admin-member-controller-test/withdraw/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-member-controller-test/withdraw/http-response.adoc[]
+
+== Theme 관련 API
+
+=== 테마 생성
+
+==== 요청
+
+include::{snippets}/admin-theme-controller-test/save-theme/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/admin-theme-controller-test/save-theme/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-theme-controller-test/save-theme/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-theme-controller-test/save-theme/response-fields.adoc[]
+
+=== 테마 조회
+
+==== 요청
+
+include::{snippets}/admin-theme-controller-test/get-themes/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-theme-controller-test/get-themes/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-theme-controller-test/get-themes/response-fields.adoc[]
+
+=== 테마 삭제
+
+==== 요청
+
+include::{snippets}/admin-theme-controller-test/delete-theme/http-request.adoc[]
+
+==== 응답
+include::{snippets}/admin-theme-controller-test/delete-theme/http-response.adoc[]
+
+== 예약 시간 관련 API
+
+=== 시간 생성
+
+==== 요청
+
+include::{snippets}/admin-reservation-time-controller-test/save-time/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/admin-reservation-time-controller-test/save-time/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-reservation-time-controller-test/save-time/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-reservation-time-controller-test/save-time/response-fields.adoc[]
+
+=== 시간 조회
+
+==== 요청
+
+include::{snippets}/admin-reservation-time-controller-test/get-times/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-reservation-time-controller-test/get-times/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-reservation-time-controller-test/get-times/response-fields.adoc[]
+
+=== 시간 삭제
+
+==== 요청
+
+include::{snippets}/admin-reservation-time-controller-test/delete-time/http-request.adoc[]
+
+==== 응답
+include::{snippets}/admin-reservation-time-controller-test/delete-time/http-response.adoc[]
+
