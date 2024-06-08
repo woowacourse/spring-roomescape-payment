@@ -9,6 +9,8 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +28,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.PaymentRequest;
-import roomescape.payment.PaymentResponse;
-import roomescape.payment.TossPaymentClient;
+import roomescape.payment.client.PaymentClient;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -51,7 +53,7 @@ public class ReservationControllerTest {
     private MemberRepository memberRepository;
 
     @MockBean
-    private TossPaymentClient tossPaymentClient;
+    private PaymentClient paymentClient;
 
     @LocalServerPort
     private int port;
@@ -67,18 +69,24 @@ public class ReservationControllerTest {
     void firstPost() {
         String accessTokenCookie = getAdminAccessTokenCookieByLogin("admin@admin.com", "12341234");
 
-        reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        LocalTime time = LocalTime.of(17, 30);
+        LocalDate date = LocalDate.now().plusDays(1L);
+
+        reservationTimeRepository.save(new ReservationTime(time));
         themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
 
         Map<String, String> reservationParams = Map.of(
-                "name", "썬",
-                "date", LocalDate.now().plusDays(1L).toString(),
+                "date", date.toString(),
                 "timeId", "1",
-                "themeId", "1"
+                "themeId", "1",
+                "paymentKey", "pk",
+                "orderId", "oi",
+                "amount", "1000",
+                "paymentType", "DEFAULT"
         );
 
-        when(tossPaymentClient.confirmPayment(any(PaymentRequest.class))).thenReturn(
-                new PaymentResponse("pk", "oi", 1000L));
+        when(paymentClient.confirmPayment(any(PaymentRequest.class))).thenReturn(
+                new PaymentResponse("pk", "oi", OffsetDateTime.of(date, time, ZoneOffset.ofHours(9)), 1000L));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -104,7 +112,8 @@ public class ReservationControllerTest {
         Member member1 = memberRepository.save(new Member("name1", "email1r@email.com", "password", Role.MEMBER));
 
         // when
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member1, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member1,
+                ReservationStatus.CONFIRMED));
         Reservation waiting = reservationRepository.save(
                 new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member,
                         ReservationStatus.WAITING));
@@ -130,7 +139,8 @@ public class ReservationControllerTest {
         Member waitingMember = memberRepository.save(new Member("name1", "email1r@email.com", "password", Role.MEMBER));
 
         // when
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, confirmedMember, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, confirmedMember,
+                ReservationStatus.CONFIRMED));
         Reservation waiting = reservationRepository.save(
                 new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, waitingMember,
                         ReservationStatus.WAITING));
@@ -141,7 +151,7 @@ public class ReservationControllerTest {
                 .header("Cookie", accessTokenCookie)
                 .when().delete("/reservations/waiting/{id}", waiting.getId())
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(404);
     }
 
     @Test
@@ -155,9 +165,12 @@ public class ReservationControllerTest {
         Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
 
         // when
-        reservationRepository.save(new Reservation(LocalDate.now(), reservationTime, theme, member));
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member));
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(2), reservationTime, theme, member));
+        reservationRepository.save(
+                new Reservation(LocalDate.now(), reservationTime, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime, theme, member,
+                ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(2), reservationTime, theme, member,
+                ReservationStatus.CONFIRMED));
 
         // then
         RestAssured.given().log().all()
@@ -179,7 +192,7 @@ public class ReservationControllerTest {
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
         Reservation reservation = reservationRepository.save(
-                new Reservation(LocalDate.now(), reservationTime, theme, member));
+                new Reservation(LocalDate.now(), reservationTime, theme, member, ReservationStatus.CONFIRMED));
 
         // when & then
         RestAssured.given().log().all()
@@ -227,7 +240,7 @@ public class ReservationControllerTest {
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
 
         Reservation reservation = reservationRepository.save(
-                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
+                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember, ReservationStatus.CONFIRMED));
 
         // when & then
         RestAssured.given().log().all()
@@ -250,7 +263,7 @@ public class ReservationControllerTest {
         Member anotherMember = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
 
         Reservation reservation = reservationRepository.save(
-                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember));
+                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember, ReservationStatus.CONFIRMED));
 
         // when & then
         RestAssured.given().log().all()

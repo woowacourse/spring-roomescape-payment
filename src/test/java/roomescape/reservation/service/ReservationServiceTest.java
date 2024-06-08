@@ -59,12 +59,12 @@ class ReservationServiceTest {
         // when
         reservationService.addReservation(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member2.getId());
+                        1000L, "paymentType"), member2.getId());
 
         // then
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member1.getId()))
+                        1000L, "paymentType"), member1.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -80,12 +80,12 @@ class ReservationServiceTest {
         // when
         reservationService.addReservation(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId());
+                        1000L, "paymentType"), member.getId());
 
         // then
         assertThatThrownBy(() -> reservationService.addWaiting(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId()))
+                        1000L, "paymentType"), member.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -102,16 +102,16 @@ class ReservationServiceTest {
         // when
         reservationService.addReservation(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId());
+                        1000L, "paymentType"), member.getId());
 
         reservationService.addWaiting(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member1.getId());
+                        1000L, "paymentType"), member1.getId());
 
         // then
         assertThatThrownBy(() -> reservationService.addWaiting(
                 new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member1.getId()))
+                        1000L, "paymentType"), member1.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -127,7 +127,7 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(beforeDate, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId()))
+                        1000L, "paymentType"), member.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -143,7 +143,7 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
-                        "orderId", "amount", "paymentType"), member.getId()))
+                        "orderId", 1000L, "paymentType"), member.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -159,7 +159,7 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(
                 new ReservationRequest(beforeTime.toLocalDate(), reservationTime.getId(), theme.getId(), "paymentKey",
-                        "orderId", "amount", "paymentType"),
+                        "orderId", 1000L, "paymentType"),
                 NotExistMemberId))
                 .isInstanceOf(RoomEscapeException.class);
     }
@@ -190,11 +190,11 @@ class ReservationServiceTest {
         reservationService.addReservation(
                 new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
                         "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId());
+                        1000L, "paymentType"), member.getId());
         ReservationResponse waiting = reservationService.addWaiting(
                 new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
                         "paymentKey", "orderId",
-                        "amount", "paymentType"), member1.getId());
+                        1000L, "paymentType"), member1.getId());
 
         // when & then
         assertThatThrownBy(() -> reservationService.approveWaiting(waiting.id(), admin.getId()))
@@ -214,11 +214,11 @@ class ReservationServiceTest {
         ReservationResponse waiting = reservationService.addWaiting(
                 new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
                         "paymentKey", "orderId",
-                        "amount", "paymentType"), member.getId());
+                        1000L, "paymentType"), member.getId());
         reservationService.approveWaiting(waiting.id(), admin.getId());
 
         // then
         Reservation confirmed = reservationRepository.findById(waiting.id()).get();
-        assertThat(confirmed.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED);
+        assertThat(confirmed.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED_PAYMENT_REQUIRED);
     }
 }

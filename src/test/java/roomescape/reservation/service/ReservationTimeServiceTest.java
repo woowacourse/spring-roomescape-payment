@@ -15,6 +15,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -59,7 +60,8 @@ class ReservationTimeServiceTest {
         Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
 
         // when
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1L), reservationTime, theme, member));
+        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1L), reservationTime, theme, member,
+                ReservationStatus.CONFIRMED));
 
         // then
         assertThatThrownBy(() -> reservationTimeService.removeTimeById(reservationTime.getId()))

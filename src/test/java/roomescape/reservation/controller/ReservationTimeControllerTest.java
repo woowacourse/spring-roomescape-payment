@@ -1,12 +1,10 @@
 package roomescape.reservation.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
@@ -19,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -228,9 +226,12 @@ public class ReservationTimeControllerTest {
         Theme theme = themeRepository.save(new Theme("테마명1", "설명", "썸네일URL"));
         Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
 
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime1, theme, member));
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime2, theme, member));
-        reservationRepository.save(new Reservation(today.plusDays(1), reservationTime3, theme, member));
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime1, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime2, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime3, theme, member, ReservationStatus.CONFIRMED));
 
         // when & then
         RestAssured.given().log().all()
