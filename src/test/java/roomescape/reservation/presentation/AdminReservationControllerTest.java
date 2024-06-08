@@ -13,8 +13,8 @@ import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.reservation.application.BookingManageService;
-import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -48,7 +48,7 @@ import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 )
 class AdminReservationControllerTest extends ControllerTest {
     @MockBean
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @MockBean
     private BookingManageService bookingManageService;
@@ -90,7 +90,7 @@ class AdminReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
 
-        BDDMockito.given(bookingQueryService.findAll())
+        BDDMockito.given(reservationQueryService.findAllInBooking())
                 .willReturn(List.of(expectedReservation));
 
         // when & then
@@ -112,7 +112,7 @@ class AdminReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
 
-        BDDMockito.given(bookingQueryService.findAllByMemberIdAndThemeIdAndDateBetween(anyLong(), anyLong(), any(), any()))
+        BDDMockito.given(reservationQueryService.findAllByMemberIdAndThemeIdAndDateBetween(anyLong(), anyLong(), any(), any()))
                 .willReturn(List.of(expectedReservation));
 
         // when & then

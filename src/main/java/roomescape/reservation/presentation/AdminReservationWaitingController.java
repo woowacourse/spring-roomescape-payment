@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.WaitingManageService;
-import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.response.WaitingReservationResponse;
 
@@ -18,18 +18,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/reservations/waiting")
 public class AdminReservationWaitingController {
-    private final WaitingQueryService waitingQueryService;
     private final WaitingManageService waitingManageService;
+    private final ReservationQueryService reservationQueryService;
 
-    public AdminReservationWaitingController(WaitingQueryService waitingQueryService,
-                                             WaitingManageService waitingManageService) {
-        this.waitingQueryService = waitingQueryService;
+    public AdminReservationWaitingController(WaitingManageService waitingManageService,
+                                             ReservationQueryService reservationQueryService) {
         this.waitingManageService = waitingManageService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @GetMapping
     public ResponseEntity<List<WaitingReservationResponse>> findWaitingReservations() {
-        List<Reservation> waitingReservations = waitingQueryService.findAll();
+        List<Reservation> waitingReservations = reservationQueryService.findAllInWaiting();
         return ResponseEntity.ok(waitingReservations.stream()
                 .map(WaitingReservationResponse::from)
                 .toList());

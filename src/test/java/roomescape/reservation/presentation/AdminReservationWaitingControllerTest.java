@@ -12,8 +12,8 @@ import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.WaitingManageService;
-import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 
@@ -49,7 +49,7 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 )
 class AdminReservationWaitingControllerTest extends ControllerTest {
     @MockBean
-    private WaitingQueryService waitingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @MockBean
     private WaitingManageService waitingManageService;
@@ -62,7 +62,7 @@ class AdminReservationWaitingControllerTest extends ControllerTest {
                 MIA_RESERVATION(new ReservationTime(MIA_RESERVATION_TIME), WOOTECO_THEME(), USER_MIA(), WAITING),
                 TOMMY_RESERVATION(new ReservationTime(TOMMY_RESERVATION_TIME), WOOTECO_THEME(), USER_TOMMY(), PENDING_PAYMENT)
         );
-        BDDMockito.given(waitingQueryService.findAll())
+        BDDMockito.given(reservationQueryService.findAllInWaiting())
                 .willReturn(expectedWaitingReservations);
 
         // when & then

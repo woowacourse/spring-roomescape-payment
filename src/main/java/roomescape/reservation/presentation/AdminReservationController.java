@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
 import roomescape.reservation.application.BookingManageService;
-import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.AdminReservationSaveRequest;
@@ -27,15 +27,15 @@ import java.util.List;
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
     private final ReservationFactory reservationFactory;
-    private final BookingQueryService bookingQueryService;
     private final BookingManageService bookingManageService;
+    private final ReservationQueryService reservationQueryService;
 
     public AdminReservationController(ReservationFactory reservationFactory,
-                                      BookingQueryService bookingQueryService,
-                                      BookingManageService bookingManageService) {
+                                      BookingManageService bookingManageService,
+                                      ReservationQueryService reservationQueryService) {
         this.reservationFactory = reservationFactory;
-        this.bookingQueryService = bookingQueryService;
         this.bookingManageService = bookingManageService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @PostMapping
@@ -49,7 +49,7 @@ public class AdminReservationController {
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findReservations() {
-        List<Reservation> reservations = bookingQueryService.findAll();
+        List<Reservation> reservations = reservationQueryService.findAllInBooking();
         return ResponseEntity.ok(reservations.stream()
                 .map(ReservationResponse::from)
                 .toList());
@@ -59,7 +59,7 @@ public class AdminReservationController {
     public ResponseEntity<List<ReservationResponse>> findReservationsByMemberIdAndThemeIdAndDateBetween(
             @RequestParam Long memberId, @RequestParam Long themeId,
             @RequestParam LocalDate fromDate, @RequestParam LocalDate toDate) {
-        List<Reservation> reservations = bookingQueryService.findAllByMemberIdAndThemeIdAndDateBetween(
+        List<Reservation> reservations = reservationQueryService.findAllByMemberIdAndThemeIdAndDateBetween(
                 memberId, themeId, fromDate, toDate);
         return ResponseEntity.ok(reservations.stream()
                 .map(ReservationResponse::from)

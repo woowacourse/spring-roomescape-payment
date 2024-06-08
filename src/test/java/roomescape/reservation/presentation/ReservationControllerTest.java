@@ -23,10 +23,9 @@ import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.BookingManageService;
-import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.WaitingManageService;
-import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationTime;
@@ -35,6 +34,7 @@ import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -73,16 +73,13 @@ class ReservationControllerTest extends ControllerTest {
             new PaymentConfirmRequest("key", "orderId", 1000L, "none");
 
     @MockBean
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @MockBean
     private BookingManageService bookingManageService;
 
     @MockBean
     private WaitingManageService waitingManageService;
-
-    @MockBean
-    private WaitingQueryService waitingQueryService;
 
     @MockBean
     private PaymentService paymentService;
@@ -258,11 +255,13 @@ class ReservationControllerTest extends ControllerTest {
         ReservationPayment expectedReservationPayment = new ReservationPayment(expectedReservation, expectedPayment);
         WaitingReservation expectedWaitingReservation = new WaitingReservation(
                 MIA_RESERVATION(expectedTime, HORROR_THEME(), USER_MIA(), WAITING), 0);
+        List<MyReservationResponse> myReservations = List.of(
+                MyReservationResponse.from(expectedReservationPayment),
+                MyReservationResponse.from(expectedWaitingReservation)
+        );
 
-        BDDMockito.given(bookingQueryService.findAllByMember(any()))
-                .willReturn(List.of(expectedReservationPayment));
-        BDDMockito.given(waitingQueryService.findAllWithPreviousCountByMember(any()))
-                .willReturn(List.of(expectedWaitingReservation));
+        BDDMockito.given(reservationQueryService.findAllMyReservations(any()))
+                .willReturn(myReservations);
 
         // when & then
         mockMvc.perform(get("/reservations/mine").contentType(MediaType.APPLICATION_JSON))

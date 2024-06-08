@@ -14,10 +14,9 @@ import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.application.BookingManageService;
-import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.WaitingManageService;
-import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationPayRequest;
@@ -25,31 +24,27 @@ import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationFactory reservationFactory;
-    private final BookingQueryService bookingQueryService;
     private final WaitingManageService waitingManageService;
     private final BookingManageService bookingManageService;
-    private final WaitingQueryService waitingQueryService;
     private final PaymentService paymentService;
+    private final ReservationQueryService reservationQueryService;
 
     public ReservationController(ReservationFactory reservationFactory,
-                                 BookingQueryService bookingQueryService,
                                  WaitingManageService waitingManageService,
                                  BookingManageService bookingManageService,
-                                 WaitingQueryService waitingQueryService,
-                                 PaymentService paymentService) {
+                                 PaymentService paymentService,
+                                 ReservationQueryService reservationQueryService) {
         this.reservationFactory = reservationFactory;
-        this.bookingQueryService = bookingQueryService;
         this.waitingManageService = waitingManageService;
         this.bookingManageService = bookingManageService;
-        this.waitingQueryService = waitingQueryService;
         this.paymentService = paymentService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @PostMapping
@@ -76,23 +71,7 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(Member loginMember) {
-        List<MyReservationResponse> myReservationResponses = new ArrayList<>();
-        myReservationResponses.addAll(
-                bookingQueryService.findAllByMember(loginMember).stream()
-                        .map(MyReservationResponse::from)
-                        .toList()
-        );
-        myReservationResponses.addAll(
-                waitingQueryService.findAllUnpaidByMember(loginMember).stream()
-                        .map(MyReservationResponse::from)
-                        .toList()
-        );
-        myReservationResponses.addAll(
-                waitingQueryService.findAllWithPreviousCountByMember(loginMember).stream()
-                        .map(MyReservationResponse::from)
-                        .toList()
-        );
-        return ResponseEntity.ok(myReservationResponses);
+        return ResponseEntity.ok(reservationQueryService.findAllMyReservations(loginMember));
     }
 
     @DeleteMapping("/{id}/waiting")

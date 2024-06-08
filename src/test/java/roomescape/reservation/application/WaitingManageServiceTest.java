@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationPayment;
-import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 import java.util.List;
 
@@ -28,10 +27,7 @@ class WaitingManageServiceTest extends ReservationServiceTest {
     private BookingManageService bookingManageService;
 
     @Autowired
-    private WaitingQueryService waitingQueryService;
-
-    @Autowired
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @Test
     @DisplayName("동일한 테마, 날짜, 시간에 예약이 있다면 대기 예약을 한다.")
@@ -78,8 +74,8 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         waitingManageService.delete(waitingReservation.getId(), mia);
 
         // then
-        List<WaitingReservation> waitingReservations = waitingQueryService.findAllWithPreviousCountByMember(mia);
-        assertThat(waitingReservations).hasSize(0);
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(0);
     }
 
     @Test
@@ -93,8 +89,8 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         waitingManageService.delete(waitingReservation.getId(), admin);
 
         // then
-        List<WaitingReservation> waitingReservations = waitingQueryService.findAllWithPreviousCountByMember(mia);
-        assertThat(waitingReservations).hasSize(0);
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(0);
     }
 
     @Test
@@ -120,10 +116,9 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         waitingManageService.approve(createdReservation.getId(), USER_ADMIN());
 
         // then
-        List<ReservationPayment> reservations = bookingQueryService.findAllByMember(mia);
-        assertThat(reservations).hasSize(1)
-                .extracting(ReservationPayment::reservation)
-                .extracting(Reservation::getId)
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(1)
+                .extracting(MyReservationResponse::reservationId)
                 .contains(createdReservation.getId());
     }
 }

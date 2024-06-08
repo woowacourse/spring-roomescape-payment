@@ -103,8 +103,8 @@ class ReservationRepositoryTest extends RepositoryTest {
         reservationRepository.save(new Reservation(mia, MIA_RESERVATION_DATE, reservationTime, horrorTheme, BOOKING));
 
         // when
-        List<Reservation> reservations = reservationRepository.findAllByMemberAndThemeAndDateBetween(
-                mia, wootecoTheme, MIA_RESERVATION_DATE, MIA_RESERVATION_DATE.plusDays(1));
+        List<Reservation> reservations = reservationRepository.findAllByMemberAndThemeAndStatusAndDateBetween(
+                mia, wootecoTheme, BOOKING, MIA_RESERVATION_DATE, MIA_RESERVATION_DATE.plusDays(1));
 
         // then
         assertSoftly(softly -> {
@@ -167,7 +167,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         reservationRepository.save(TOMMY_RESERVATION(reservationTime, wootecoTheme, tommy, BOOKING));
 
         //when
-        List<ReservationPayment> reservationsWithPayment = reservationRepository.findReservationsByMemberAndStatusWithDetailsAndPayment(mia, BOOKING);
+        List<ReservationPayment> reservationsWithPayment = reservationRepository.findAllByMemberAndStatusWithPayment(mia, BOOKING);
 
         //then
         assertThat(reservationsWithPayment).hasSize(2)
@@ -189,7 +189,7 @@ class ReservationRepositoryTest extends RepositoryTest {
 
         // when
         List<WaitingReservation> waitingReservations =
-                reservationRepository.findWaitingReservationsByMemberWithDetails(mia);
+                reservationRepository.findWaitingReservationsByMember(mia);
 
         // then
         assertThat(waitingReservations).hasSize(2)
