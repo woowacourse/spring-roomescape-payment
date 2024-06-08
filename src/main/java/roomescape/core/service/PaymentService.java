@@ -7,6 +7,7 @@ import roomescape.core.domain.Payment;
 import roomescape.core.domain.PaymentStatus;
 import roomescape.core.domain.Reservation;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentCancelResponse;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
@@ -79,7 +80,7 @@ public class PaymentService {
             final Payment payment = paymentRepository.findByReservation(reservation)
                     .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE));
 
-            paymentClient.getPaymentCancelResponse(payment.getPaymentKey());
+            final PaymentCancelResponse response = paymentClient.getPaymentCancelResponse(payment.getPaymentKey());
             payment.cancel();
         }
     }

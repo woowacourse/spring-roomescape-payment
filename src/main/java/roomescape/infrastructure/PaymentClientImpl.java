@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.core.dto.exception.HttpExceptionResponse;
 import roomescape.core.dto.payment.PaymentCancelRequest;
+import roomescape.core.dto.payment.PaymentCancelResponse;
 import roomescape.core.dto.payment.PaymentConfirmRequest;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.payment.PaymentRequest;
@@ -48,11 +49,11 @@ public class PaymentClientImpl implements PaymentClient {
     }
 
     @Override
-    public void getPaymentCancelResponse(final String paymentKey) {
+    public PaymentCancelResponse getPaymentCancelResponse(final String paymentKey) {
         final String authorizations = encoder.getEncodedSecretKey();
 
         try {
-            getCancelRequestResult(paymentKey, authorizations);
+            return getCancelRequestResult(paymentKey, authorizations);
         } catch (final HttpClientErrorException exception) {
             final HttpStatusCode statusCode = exception.getStatusCode();
             final String statusText = exception.getStatusText();
@@ -62,13 +63,13 @@ public class PaymentClientImpl implements PaymentClient {
         }
     }
 
-    private void getCancelRequestResult(final String paymentKey, final String authorizations) {
-        restClient.post()
+    private PaymentCancelResponse getCancelRequestResult(final String paymentKey, final String authorizations) {
+        return restClient.post()
                 .uri("/{paymentKey}/cancel", paymentKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", authorizations)
                 .body(new PaymentCancelRequest("단순 고객 변심"))
                 .retrieve()
-                .body(PaymentConfirmResponse.class);
+                .body(PaymentCancelResponse.class);
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.utils;
 
 import org.springframework.context.annotation.Profile;
+import roomescape.core.dto.payment.PaymentCancelResponse;
 import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.payment.PaymentRequest;
 import roomescape.infrastructure.PaymentClient;
@@ -13,6 +14,7 @@ public class FakePaymentClient implements PaymentClient {
     }
 
     @Override
-    public void getPaymentCancelResponse(final String paymentKey) {
+    public PaymentCancelResponse getPaymentCancelResponse(final String paymentKey) {
+        return new PaymentCancelResponse(1L, 1000, "orderId", "paymentKey");
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.core.dto.member.LoginMember;
+import roomescape.core.dto.payment.PaymentConfirmResponse;
 import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
