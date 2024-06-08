@@ -13,21 +13,26 @@ import roomescape.repository.WaitingRepository;
 @Service
 public class ReservationCancelService {
 
+    private final ReservationSearchService reservationSearchService;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationCancelService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+    public ReservationCancelService(final ReservationSearchService reservationSearchService, ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+        this.reservationSearchService = reservationSearchService;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
     }
 
-    @Transactional
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = findReservationById(reservationId);
+    public void deleteReservation(Reservation reservation) {
         List<Reservation> waitingReservations = findWaitingReservation(reservation);
-
-        reservationRepository.delete(reservation);
+        reservation.delete();
         adjustWaitingOrder(waitingReservations);
+    }
+
+    @Transactional
+    public void deleteReservation(final Long id) {
+        Reservation reservation = reservationSearchService.findReservationById(id);
+        deleteReservation(reservation);
     }
 
     private List<Reservation> findWaitingReservation(Reservation reservation) {

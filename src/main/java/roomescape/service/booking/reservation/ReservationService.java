@@ -3,6 +3,9 @@ package roomescape.service.booking.reservation;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.reservation.Reservation;
+import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
@@ -83,7 +86,9 @@ public class ReservationService {
         return reservationSearchService.findReservationsByFilter(filter);
     }
 
+    @Transactional
     public void deleteReservation(Long reservationId) {
-        reservationCancelService.deleteReservation(reservationId);
+        Reservation reservation = reservationSearchService.findReservationById(reservationId);
+        reservationCancelService.deleteReservation(reservation);
     }
 }
