@@ -1,0 +1,91 @@
+=== 예약 시간(Reservation Time)
+
+예약 시간 추가 및 삭제, 조회와 예약 가능 시간을 조회할 수 있습니다.
+
+==== 신규 시간 등록
+
+신규 시간을 등록합니다. 시간은 10분 단위로 생성해주세요.
+
+===== curl
+
+include::{snippets}/time-create/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/time-create/http-request.adoc[]
+
+===== 요청 데이터 설명
+
+include::{snippets}/time-create/request-fields.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/time-create/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/time-create/response-fields.adoc[]
+
+==== 시간 삭제
+
+시간을 삭제합니다.
+
+===== curl
+
+include::{snippets}/time-delete/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/time-delete/http-request.adoc[]
+
+===== 경로 데이터 설명
+
+include::{snippets}/time-delete/path-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/time-delete/http-response.adoc[]
+
+==== 시간 조회
+
+예약 시간 목록을 조회합니다.
+
+===== curl
+
+include::{snippets}/time-find/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/time-find/http-request.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/time-find/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/time-find/response-fields.adoc[]
+
+==== 예약 가능 시간 조회
+
+예약 가능 시간 목록을 조회합니다.
+
+===== curl
+
+include::{snippets}/time-find-available/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/time-find-available/http-request.adoc[]
+
+===== 요청 쿼리 파라미터 설명
+
+include::{snippets}/time-find-available/query-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/time-find-available/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/time-find-available/response-fields.adoc[]

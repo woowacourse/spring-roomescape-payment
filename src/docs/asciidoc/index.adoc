@@ -34,3 +34,4 @@
 == API
 
 include::theme.adoc[]
+include::time.adoc[]
