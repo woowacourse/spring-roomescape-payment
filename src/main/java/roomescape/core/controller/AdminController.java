@@ -1,5 +1,7 @@
 package roomescape.core.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import roomescape.core.service.ReservationService;
 import roomescape.core.service.ReservationTimeService;
 import roomescape.core.service.ThemeService;
 
+@Tag(name = "어드민 API", description = "어드민 페이지 관련 API 입니다.")
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -35,16 +38,19 @@ public class AdminController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "어드민 메인 페이지")
     @GetMapping
     public String admin() {
         return "admin/index";
     }
 
+    @Operation(summary = "어드민 예약 관리 페이지")
     @GetMapping("/reservation")
     public String reservation() {
         return "admin/reservation-new";
     }
 
+    @Operation(summary = "어드민 예약 API")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservationAsAdmin(
             @Valid @RequestBody final ReservationRequest request) {
@@ -53,11 +59,13 @@ public class AdminController {
                 .body(result);
     }
 
+    @Operation(summary = "어드민 시간 관리 페이지")
     @GetMapping("/time")
     public String time() {
         return "admin/time";
     }
 
+    @Operation(summary = "어드민 시간 추가 API")
     @PostMapping("/times")
     public ResponseEntity<ReservationTimeResponse> createTime(
             @Valid @RequestBody final ReservationTimeRequest request) {
@@ -66,17 +74,20 @@ public class AdminController {
                 .body(response);
     }
 
+    @Operation(summary = "어드민 시간 삭제 API")
     @DeleteMapping("/times/{id}")
     public ResponseEntity<Void> deleteTime(@PathVariable("id") final long id) {
         reservationTimeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "어드민 테마 관리 페이지")
     @GetMapping("/theme")
     public String theme() {
         return "admin/theme";
     }
 
+    @Operation(summary = "어드민 테마 추가 API")
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> createTheme(@Valid @RequestBody final ThemeRequest request) {
         final ThemeResponse response = themeService.create(request);
@@ -84,12 +95,14 @@ public class AdminController {
                 .body(response);
     }
 
+    @Operation(summary = "어드민 테마 삭제 API")
     @DeleteMapping("/themes/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final long id) {
         themeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "어드민 예약 대기 관리 페이지")
     @GetMapping("/waiting")
     public String waiting() {
         return "admin/waiting";

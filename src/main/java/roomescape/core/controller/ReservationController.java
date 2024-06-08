@@ -1,5 +1,7 @@
 package roomescape.core.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -23,6 +25,7 @@ import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
 import roomescape.infrastructure.PaymentClient;
 
+@Tag(name = "예약 API", description = "예약 관련 API 입니다.")
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
@@ -38,6 +41,7 @@ public class ReservationController {
         this.paymentClient = paymentClient;
     }
 
+    @Operation(summary = "예약 API")
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody final MemberReservationRequest memberRequest, final LoginMember member) {
@@ -56,16 +60,19 @@ public class ReservationController {
                 .body(result);
     }
 
+    @Operation(summary = "예약 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findAll() {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
+    @Operation(summary = "예약 대기 조회 API")
     @GetMapping("/waiting")
     public ResponseEntity<List<ReservationResponse>> findAllWaiting() {
         return ResponseEntity.ok(reservationService.findAllWaiting());
     }
 
+    @Operation(summary = "특정 기간, 테마, 사용자 예약 조회 API")
     @GetMapping(params = {"memberId", "themeId", "dateFrom", "dateTo"})
     public ResponseEntity<List<ReservationResponse>> findAllByMemberAndThemeAndPeriod(
             @RequestParam(required = false, name = "memberId") final Long memberId,
@@ -76,11 +83,13 @@ public class ReservationController {
                 reservationService.findAllByMemberAndThemeAndPeriod(memberId, themeId, dateFrom, dateTo));
     }
 
+    @Operation(summary = "로그인 회원의 예약 목록 조회 API")
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findAllByMember(loginMember));
     }
 
+    @Operation(summary = "예약 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id) {
         if (paymentService.existPaymentByReservationId(id)) {
