@@ -2,19 +2,49 @@
 
 ## 배포 주소 및 API 명세서
 
-[배포 주소](http://3.35.231.231:8080/)  
-[방탈출 API 명세서](https://alstn113.github.io/spring-roomescape-payment/src/main/resources/static/docs/index.html)
+⭐️ [배포 주소](http://3.35.231.231:8080/)  
+⭐️ [방탈출 API 명세서](https://alstn113.github.io/spring-roomescape-payment/src/main/resources/static/docs/index.html)
 
-## 미션 4 요구사항
+## ERD
+```mermaid
+classDiagram
+direction BT
+class Member {
+    Long  id
+    String  email
+    String  name
+    String  password
+    Role  role
+}
+class Payment {
+    Long  id
+    BigDecimal  amount
+    String  orderId
+    String  paymentKey
+}
+class Reservation {
+    Long  id
+}
+class ReservationTime {
+    Long  id
+    LocalTime  startAt
+}
+class Theme {
+    Long  id
+    String  description
+    String  name
+    String  thumbnail
+}
+class Waiting {
+    Long  id
+}
 
-- [x] 사용자가 날짜, 테마, 시간을 선택하고 결제를 해야 예약할 수 있다.
-- [x] 결제 기능은 외부의 결제 서비스를 사용하여 외부의 결제 API를 연동한다.
-- [x] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링 한다.
-    - [x] 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있다.
+Payment "0..1" --> "0..1" Reservation 
+Reservation "0..*" --> "0..1" Member 
+Reservation "0..*" --> "0..1" ReservationTime 
+Reservation "0..*" --> "0..1" Theme 
+Waiting "0..*" --> "0..1" Member 
+Waiting "0..*" --> "0..1" ReservationTime 
+Waiting "0..*" --> "0..1" Theme 
 
-- [x] 결제 테이블을 생성한다.
-- [x] 내 예약 페이지를 변경한다.
-    - [x] 상태, paymentKey, 결제 금액를 보여준다.
-- [x] AWS에 배포한다.
-- [x] 문서화를 한다.
-    - [x] RestDocs를 사용한다.
+```
