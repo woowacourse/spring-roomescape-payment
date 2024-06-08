@@ -36,16 +36,14 @@ public class PaymentService {
     }
 
     @Transactional
-    public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
+    public Payment pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         log.info("[결제 요청] payment: {}, member email: {}", paymentRequest, memberReservation.getMember().getEmail());
         PaymentResponse response = paymentClient.confirm(paymentRequest);
-        Payment payment = paymentRepository.save(
+        return paymentRepository.save(
                 Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
-
-        createHistory(memberReservation, payment);
     }
 
-    private void createHistory(MemberReservation memberReservation, Payment payment) {
+    public void createHistory(MemberReservation memberReservation, Payment payment) {
         paymentHistoryRepository.save(
                 new PaymentHistory(
                         payment.getPaymentKey(),

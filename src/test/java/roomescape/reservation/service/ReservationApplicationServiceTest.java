@@ -33,7 +33,9 @@ import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentHistoryRepository;
 import roomescape.payment.domain.repository.PaymentRepository;
+import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
@@ -202,5 +204,42 @@ class ReservationApplicationServiceTest extends ServiceTest {
 
         //then
         assertThat(paymentRepository.findByMemberReservationId(memberReservation.getId())).isEmpty();
+    }
+
+    @DisplayName("결제에 성공하면, 히스토리가 생성된다.")
+    @Test
+    void createHistory() {
+        //given
+        String paymentKey = "tgen_20240528172021mxEG4";
+        String paymentType = "카드";
+        String orderId = "235124";
+        BigDecimal totalAmount = BigDecimal.valueOf(1000L);
+        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        MemberReservation memberReservation = memberReservationRepository.save(
+                new MemberReservation(memberChoco, reservation, ReservationStatus.NOT_PAID));
+
+        PaymentResponse okResponse =
+                new PaymentResponse(paymentKey, "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
+        doReturn(okResponse).when(paymentClient).confirm(any());
+        AuthInfo authInfo = AuthInfo.from(memberChoco);
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(
+                memberReservation.getId(),
+                paymentKey,
+                orderId,
+                totalAmount
+        );
+
+        //when
+        reservationApplicationService.publish(authInfo, reservationPaymentRequest);
+
+        //then
+        Optional<PaymentHistory> paymentHistory = paymentHistoryRepository.findPaymentHistoryByPaymentKey(
+                paymentKey);
+
+        assertAll(
+                () -> assertThat(paymentHistory).isNotNull(),
+                () -> assertThat(paymentHistory.get().getPaymentType()).isEqualTo(PaymentType.from(paymentType)),
+                () -> assertThat(paymentHistory.get().getPaymentStatus()).isEqualTo(PaymentStatus.PAID)
+        );
     }
 }
