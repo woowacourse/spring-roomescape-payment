@@ -16,14 +16,14 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public Payment requestPurchase(PaymentClientRequest request) {
-        PaymentClientResponse payment = client.post()
+        PaymentClientResponse response = client.post()
                 .uri("/v1/payments/confirm")
                 .body(request)
                 .retrieve()
                 .body(PaymentClientResponse.class);
-        if (payment == null) {
+        if (response == null || response.isNotSuccessful()) {
             throw new PaymentException("결제에 실패했습니다.");
         }
-        return new Payment(payment.orderId(), payment.paymentKey(), payment.totalAmount());
+        return new Payment(response.orderId(), response.paymentKey(), response.totalAmount());
     }
 }

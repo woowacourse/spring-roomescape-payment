@@ -167,4 +167,27 @@ class TossPaymentClientTest {
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 서버 요청에 실패했습니다.");
     }
+
+    @Test
+    @DisplayName("결제 완료가 아닌 경우, 결제에 실패했다는 예외를 반환한다.")
+    void failPurchaseTest() {
+        String body = """
+                {
+                    "orderId": "1234abcd",
+                    "totalAmount": 1000,
+                    "paymentKey": "qwer",
+                    "status": "CANCELED"
+                }
+                """;
+        server.expect(manyTimes(), requestTo(property.url() + "/v1/payments/confirm"))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "BASIC " + Base64Utils.encode(property.secret() + ":")))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
+
+        PaymentClientRequest request = new PaymentClientRequest("1234abcd", 1000, "");
+        assertThatCode(() -> paymentClient.requestPurchase(request))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제에 실패했습니다.");
+    }
+
 }
