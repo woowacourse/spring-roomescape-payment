@@ -33,5 +33,6 @@
 
 == API
 
+include::member.adoc[]
 include::theme.adoc[]
 include::time.adoc[]
