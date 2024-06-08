@@ -1,9 +1,12 @@
 package roomescape.dto;
 
-import java.time.LocalTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.ReservationTime;
 
-public record ReservationTimeRequest(LocalTime startAt) {
+import java.time.LocalTime;
+
+public record ReservationTimeRequest(
+        @Schema(description = "예약 시간") LocalTime startAt) {
     public ReservationTime toReservationTime() {
         return new ReservationTime(startAt);
     }
