@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.repository.PaymentRepository;
@@ -24,6 +25,7 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public PaymentDto save(PaymentSaveDto paymentSaveDto) {
         Long reservationId = paymentSaveDto.reservationId();
         Reservation reservation = reservationRepository.findById(reservationId)

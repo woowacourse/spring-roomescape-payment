@@ -41,6 +41,7 @@ public class ReservationService {
         this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
         Reservation savedReservation = saveReservation(reservationSaveDto);
 
@@ -109,12 +110,14 @@ public class ReservationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationDto> findAll() {
         return reservationRepository.findAll().stream()
                 .map(ReservationDto::new)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationDto> findAllSearched(AdminSearchedReservationDto request) {
         Specification<Reservation> reservationSpecification = new ReservationSpecification().generate(request);
         List<Reservation> searchedReservations = reservationRepository.findAll(reservationSpecification);
@@ -124,6 +127,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationDto> findByMemberId(Long id) {
         return reservationRepository.findAllByMemberId(id)
                 .stream()
