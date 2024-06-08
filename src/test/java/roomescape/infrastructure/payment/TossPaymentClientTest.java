@@ -80,6 +80,6 @@ class TossPaymentClientTest {
 
         assertThatThrownBy(() -> tossPaymentClient.confirm(paymentRequest))
                 .isInstanceOf(PaymentFailException.class)
-                .hasMessage("결제에 실패했습니다.");
+                .hasMessage("일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 }
