@@ -104,7 +104,7 @@ class ReservationCommonServiceTest extends ServiceTest {
 
     @DisplayName("과거 예약을 삭제하려고 하면 예외가 발생한다.")
     @Test
-    @Sql({"/truncate.sql", "/member.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/reservation.sql"})
+    @Sql({"/truncate.sql", "/member.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/payment.sql", "/reservation.sql"})
     void cannotDeleteReservationByIdIfPast() {
         //given
         long pastReservationId = 1;
