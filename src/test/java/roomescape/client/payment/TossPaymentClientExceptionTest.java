@@ -16,7 +16,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 
 @DisplayName("결제 승인 api 호출 시 발생할 수 있는 예외를 적절히 처리하는지 테스트한다.")
-class TossPaymentClientExceptionTest extends IntegrationTest { //todo: 가독성 떨어지는 듯.. 리팩터링 필요!
+class TossPaymentClientExceptionTest extends IntegrationTest {
 
     @Autowired
     private TossPaymentClient tossPaymentClient;
@@ -29,13 +29,7 @@ class TossPaymentClientExceptionTest extends IntegrationTest { //todo: 가독성
     @DisplayName("예외 발생시, 사용자에게 메세지를 보여준다.")
     @Test
     void handleGeneralError() {
-        TossPaymentClient spyTossPaymentClient = spy(tossPaymentClient);
-        doAnswer(invocation -> {
-            HttpHeaders headers = invocation.getArgument(0);
-            headers.add(TEST_HEADER, "INVALID_REQUEST");
-            headers.setBasicAuth(ENCODED_TEST_AUTH_KEY);
-            return null;
-        }).when(spyTossPaymentClient).addHeaders(any(HttpHeaders.class));
+        TossPaymentClient spyTossPaymentClient = 예외상황_연출을_위해_클라이언트에_헤더를_추가("INVALID_REQUEST");
 
         assertThatThrownBy(() -> spyTossPaymentClient.sendPaymentConfirm(PAYMENT_CONFIRMATION_TO_TOSS_DTO))
                 .isInstanceOf(PaymentException.class);
@@ -46,7 +40,16 @@ class TossPaymentClientExceptionTest extends IntegrationTest { //todo: 가독성
     @ValueSource(strings = {"INVALID_API_KEY", "UNAUTHORIZED_KEY",
             "INCORRECT_BASIC_AUTH_FORMAT", "NOT_REGISTERED_BUSINESS", "INVALID_UNREGISTERED_SUBMALL"})
     void handleErrorToFilter(String errorCodeToFilter) {
+        TossPaymentClient spyTossPaymentClient = 예외상황_연출을_위해_클라이언트에_헤더를_추가(errorCodeToFilter);
+
+        assertThatThrownBy(() -> spyTossPaymentClient.sendPaymentConfirm(PAYMENT_CONFIRMATION_TO_TOSS_DTO))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제 승인에 실패했습니다.");
+    }
+
+    private TossPaymentClient 예외상황_연출을_위해_클라이언트에_헤더를_추가(String errorCodeToFilter) {
         TossPaymentClient spyTossPaymentClient = spy(tossPaymentClient);
+
         doAnswer(invocation -> {
             HttpHeaders headers = invocation.getArgument(0);
             headers.add(TEST_HEADER, errorCodeToFilter);
@@ -54,8 +57,6 @@ class TossPaymentClientExceptionTest extends IntegrationTest { //todo: 가독성
             return null;
         }).when(spyTossPaymentClient).addHeaders(any(HttpHeaders.class));
 
-        assertThatThrownBy(() -> spyTossPaymentClient.sendPaymentConfirm(PAYMENT_CONFIRMATION_TO_TOSS_DTO))
-                .isInstanceOf(PaymentException.class)
-                .hasMessage("결제 승인에 실패했습니다.");
+        return spyTossPaymentClient;
     }
 }
