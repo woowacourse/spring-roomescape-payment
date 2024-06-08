@@ -3,6 +3,8 @@ package roomescape.infra;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,8 @@ class PaymentRestClientTest {
                     "message": "잘못된 시크릿키 연동 정보 입니다."
                 }
                 """;
-        MockClientHttpResponse response = new MockClientHttpResponse(body.getBytes(), HttpStatus.BAD_REQUEST);
+        MockClientHttpResponse response = new MockClientHttpResponse(
+                body.getBytes(StandardCharsets.UTF_8), HttpStatus.BAD_REQUEST);
 
         server.expect(MockRestRequestMatchers.requestTo(url))
                 .andRespond(request -> response);
@@ -61,7 +64,8 @@ class PaymentRestClientTest {
                     "message": "카드 정보를 다시 확인해주세요. (유효기간)"
                 }
                 """;
-        MockClientHttpResponse response = new MockClientHttpResponse(body.getBytes(), HttpStatus.BAD_REQUEST);
+        MockClientHttpResponse response = new MockClientHttpResponse(
+                body.getBytes(StandardCharsets.UTF_8), HttpStatus.BAD_REQUEST);
 
         server.expect(MockRestRequestMatchers.requestTo(url))
                 .andRespond(request -> response);
