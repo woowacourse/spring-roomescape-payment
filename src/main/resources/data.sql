@@ -22,10 +22,10 @@ VALUES ('2024-06-05', 1, 2, 3),
        ('2024-06-07', 2, 1, 4),
        ('2024-06-05', 2, 3, 4);
 
-INSERT INTO waiting (reservation_id, member_id, created_at)
-VALUES (1, 2, '2024-05-27T13:45:30'),
-       (2, 1, '2024-05-27T14:00:00'),
-       (2, 3, '2024-05-28T12:12:12');
+INSERT INTO waiting (reservation_id, created_at)
+VALUES (1, '2024-05-27T13:45:30'),
+       (2, '2024-05-27T14:00:00'),
+       (2, '2024-05-28T12:12:12');
 
 INSERT INTO payment(external_payment_key, external_order_id, created_at, reservation_id)
 VALUES

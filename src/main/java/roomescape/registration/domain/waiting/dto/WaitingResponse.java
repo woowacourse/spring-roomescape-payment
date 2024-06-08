@@ -30,7 +30,7 @@ public record WaitingResponse(
 
         return new WaitingResponse(
                 waiting.getId(),
-                waiting.getMember().getName(),
+                waiting.getReservation().getMember().getName(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt()

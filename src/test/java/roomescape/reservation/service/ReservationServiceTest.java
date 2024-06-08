@@ -59,7 +59,6 @@ class ReservationServiceTest {
     private final Waiting waiting = new Waiting(
             1L,
             reservation,
-            new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER),
             LocalDateTime.now()
     );
 
@@ -141,7 +140,7 @@ class ReservationServiceTest {
                 () -> assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId())),
                 () -> assertThat(reservationService.findReservations()).hasSize(1),
                 () -> assertThat(reservationService.findReservations().get(0).memberName()).isEqualTo(
-                        waiting.getMember().getName()),
+                        waiting.getReservation().getMember().getName()),
                 () -> assertThat(waitingRepository.findAll()).isEmpty()
         );
     }

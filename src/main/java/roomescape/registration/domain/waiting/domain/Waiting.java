@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import org.springframework.data.annotation.CreatedDate;
-import roomescape.member.domain.Member;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
 import java.time.LocalDateTime;
@@ -26,10 +25,6 @@ public class Waiting {
     @JoinColumn(name = "reservation_id", referencedColumnName = "id", nullable = false)
     private Reservation reservation;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
-    private Member member;
-
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -37,17 +32,15 @@ public class Waiting {
     public Waiting() {
     }
 
-    public Waiting(Reservation reservation, Member member, LocalDateTime createdAt) {
+    public Waiting(Reservation reservation, LocalDateTime createdAt) {
         this.id = NULL_ID;
         this.reservation = reservation;
-        this.member = member;
         this.createdAt = createdAt;
     }
 
-    public Waiting(long id, Reservation reservation, Member member, LocalDateTime createdAt) {
+    public Waiting(long id, Reservation reservation, LocalDateTime createdAt) {
         this.id = id;
         this.reservation = reservation;
-        this.member = member;
         this.createdAt = createdAt;
     }
 
@@ -57,9 +50,5 @@ public class Waiting {
 
     public Reservation getReservation() {
         return reservation;
-    }
-
-    public Member getMember() {
-        return member;
     }
 }

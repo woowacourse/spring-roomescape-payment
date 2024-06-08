@@ -43,7 +43,6 @@ class WaitingControllerTest extends ControllerTest {
     private final Waiting waiting = new Waiting(
             1L,
             reservation,
-            new Member(2L, new Name("조앤"), "joen@wooteco.com", "joen1234", MemberRole.ADMIN),
             LocalDateTime.now()
     );
 
@@ -62,7 +61,7 @@ class WaitingControllerTest extends ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(waiting.getId()))
-                .andExpect(jsonPath("$[0].memberName").value(waiting.getMember().getName()))
+                .andExpect(jsonPath("$[0].memberName").value(waiting.getReservation().getMember().getName()))
                 .andExpect(jsonPath("$[0].themeName").value(waiting.getReservation().getTheme().getName()))
                 .andExpect(jsonPath("$[0].date").value(waiting.getReservation().getDate().toString()))
                 .andExpect(jsonPath("$[0].startAt")

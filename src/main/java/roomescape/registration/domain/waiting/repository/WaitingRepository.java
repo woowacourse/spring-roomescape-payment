@@ -22,10 +22,10 @@ public interface WaitingRepository extends CrudRepository<Waiting, Long> {
             "       AND w2.reservation.reservationTime.startAt = w.reservation.reservationTime.startAt " +
             "       AND w2.id < w.id))" +
             "FROM Waiting w " +
-            "WHERE w.member.id = :memberId")
+            "WHERE w.reservation.member.id = :memberId")
     List<WaitingWithRank> findWaitingsWithRankByMemberId(long memberId);
 
-    Waiting findByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndMemberId(
+    Waiting findByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndReservationMemberId(
             LocalDate date,
             long themeId,
             long reservationTimeId,
@@ -49,7 +49,7 @@ public interface WaitingRepository extends CrudRepository<Waiting, Long> {
 
     void deleteById(long id);
 
-    boolean existsByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndMemberId(
+    boolean existsByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndReservationMemberId(
             LocalDate date,
             long themeId,
             long reservationTimeId,

@@ -147,7 +147,7 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(ReservationExceptionCode.RESERVATION_NOT_EXIST));
-        reservation.setMember(waiting.get().getMember());
+        reservation.setMember(waiting.get().getReservation().getMember());
 
         reservationRepository.save(reservation);
         waitingRepository.deleteById(waiting.get().getId());
