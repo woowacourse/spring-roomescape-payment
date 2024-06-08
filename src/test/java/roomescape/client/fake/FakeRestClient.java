@@ -1,10 +1,7 @@
 package roomescape.client.fake;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
@@ -26,11 +23,13 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 import org.springframework.web.util.UriBuilder;
 
+import roomescape.client.PaymentException;
 import roomescape.client.TossErrorResponse;
+import roomescape.reservation.dto.request.PaymentRequest;
 
 public class FakeRestClient implements RestClient {
     private static final FakeRequestBodyUriSpec fakeRequestBodyUriSpec = new FakeRequestBodyUriSpec();
-    private static boolean validResponse;
+    private static boolean validResponse = true;
 
     @Override
     public RequestHeadersUriSpec<?> get() {
@@ -91,6 +90,10 @@ public class FakeRestClient implements RestClient {
 
         @Override
         public RequestBodySpec body(Object body) {
+            PaymentRequest request = (PaymentRequest) body;
+            if (request.amount() < 0 || request.paymentKey().isBlank() || request.orderId().isBlank()) {
+                validResponse = false;
+            }
             return this;
         }
 
@@ -203,6 +206,10 @@ public class FakeRestClient implements RestClient {
 
         @Override
         public RequestBodySpec body(Object body) {
+            PaymentRequest request = (PaymentRequest) body;
+            if (request.amount() < 0 || request.paymentKey().isBlank() || request.orderId().isBlank()) {
+                validResponse = false;
+            }
             return this;
         }
 
@@ -366,13 +373,7 @@ public class FakeRestClient implements RestClient {
 
         @Override
         public InputStream getBody() throws IOException {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-
-            TossErrorResponse tossErrorResponse = new TossErrorResponse("test error", "test error", "");
-            objectOutputStream.writeObject(tossErrorResponse);
-            objectOutputStream.flush();
-            return new ByteArrayInputStream(outputStream.toByteArray());
+            throw new PaymentException(new TossErrorResponse("400", "", ""), HttpStatusCode.valueOf(400));
         }
 
         @Override

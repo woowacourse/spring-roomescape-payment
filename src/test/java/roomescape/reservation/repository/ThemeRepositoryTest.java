@@ -3,27 +3,19 @@ package roomescape.reservation.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import roomescape.member.repository.MemberRepository;
+
 import roomescape.reservation.domain.Theme;
 
 @DataJpaTest
 class ThemeRepositoryTest {
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
     private ThemeRepository themeRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Test
     @DisplayName("id로 엔티티를 찾는다.")
@@ -54,7 +46,7 @@ class ThemeRepositoryTest {
         themeRepository.save(theme2);
         List<Theme> themes = themeRepository.findAll();
 
-        assertThat(themes.size()).isEqualTo(2);
+        assertThat(themes).hasSize(2);
     }
 
     @Test
@@ -65,6 +57,6 @@ class ThemeRepositoryTest {
         themeRepository.deleteById(themeId);
         List<Theme> themes = themeRepository.findAll();
 
-        assertThat(themes.size()).isEqualTo(0);
+        assertThat(themes).isEmpty();
     }
 }

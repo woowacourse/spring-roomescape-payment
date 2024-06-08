@@ -11,16 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import roomescape.client.PaymentClient;
 import roomescape.client.PaymentException;
 import roomescape.config.ClientConfig;
 import roomescape.config.DatabaseCleaner;
@@ -31,6 +28,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.dto.request.FreeReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
@@ -48,31 +46,45 @@ class ReservationServiceTest {
     private ReservationTimeRepository reservationTimeRepository;
     @Autowired
     private MemberRepository memberRepository;
-    @MockBean
-    private PaymentClient paymentClient;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private ReservationService reservationService;
 
     @AfterEach
-    void init() {
+    void tearDown() {
         databaseCleaner.cleanUp();
     }
 
     @Test
-    @DisplayName("예약이 생성한다.")
+    @DisplayName("예약을 생성한다.")
     void saveReservationWhenAccountIsCompleted() {
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("n", "e", "p"));
         ReservationCreateRequest reservationCreateRequest
-                = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "", "", 1000L,
-                "");
+                = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "paymentKey",
+                "orderId", 1000L, "paymentType");
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
                 member.getName(), member.getEmail());
 
         Long reservationId = reservationService.save(reservationCreateRequest, loginMemberInToken);
+
+        assertThat(reservationRepository.findById(reservationId)).isPresent();
+    }
+
+    @Test
+    @DisplayName("무료 예약을 생성한다.")
+    void saveReservationWhenFreePayment() {
+        Theme theme = themeRepository.save(new Theme("t", "d", "t"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
+        Member member = memberRepository.save(new Member("n", "e", "p"));
+        FreeReservationCreateRequest request
+                = new FreeReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId());
+        LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
+                member.getName(), member.getEmail());
+
+        Long reservationId = reservationService.save(request, loginMemberInToken);
 
         assertThat(reservationRepository.findById(reservationId)).isPresent();
     }
@@ -84,13 +96,13 @@ class ReservationServiceTest {
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("n", "e", "p"));
 
-        ReservationCreateRequest reservationCreateRequest
-                = new ReservationCreateRequest(LocalDate.now().minusDays(1), theme.getId(), time.getId(), "", "", 1000L,
-                "");
+        ReservationCreateRequest request
+                = new ReservationCreateRequest(LocalDate.now().minusDays(1), theme.getId(), time.getId(), "payment-key",
+                "order-id", 1000L, "type");
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
                 member.getName(), member.getEmail());
 
-        assertThatThrownBy(() -> reservationService.save(reservationCreateRequest, loginMemberInToken))
+        assertThatThrownBy(() -> reservationService.save(request, loginMemberInToken))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -98,32 +110,33 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")
     void notExistReservationTimeIdExceptionTest() {
         Theme theme = new Theme("공포", "호러 방탈출", "http://asdf.jpg");
-        Long themeId = themeRepository.save(theme).getId();
+        themeRepository.save(theme);
 
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(1L, USER, "카키", "kaki@email.com");
-        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                LocalDate.now(), 1L, 1L, "a", "a", 1000L, "a");
+        ReservationCreateRequest request
+                = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), 1L, "payment-key",
+                "order-id", 1000L, "type");
 
-        assertThatThrownBy(() -> reservationService.save(reservationCreateRequest, loginMemberInToken))
+        assertThatThrownBy(() -> reservationService.save(request, loginMemberInToken))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @Disabled
     @DisplayName("예약 생성 중 결제에 실패하면 예외를 발생시킨다.")
     void saveShouldThrowExceptionWhenAccountFailed() {
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("n", "e", "p"));
+        ReservationCreateRequest request
+                = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "payment-key",
+                "order-id", -1000L, "type");
 
-        ReservationCreateRequest reservationCreateRequest
-                = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "", "", 1000L,
-                "");
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
                 member.getName(), member.getEmail());
 
-        assertThatThrownBy(() -> reservationService.save(reservationCreateRequest, loginMemberInToken))
+        assertThatThrownBy(() -> reservationService.save(request, loginMemberInToken))
                 .isInstanceOf(PaymentException.class);
+
     }
 
     @Test

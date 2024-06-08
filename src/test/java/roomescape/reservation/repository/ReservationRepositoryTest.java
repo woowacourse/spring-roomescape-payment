@@ -5,10 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -18,7 +20,7 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 
 @DataJpaTest
-public class ReservationRepositoryTest {
+class ReservationRepositoryTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -51,7 +53,7 @@ public class ReservationRepositoryTest {
 
         List<Reservation> reservations = reservationRepository.findAll();
 
-        assertThat(reservations.size()).isEqualTo(1);
+        assertThat(reservations).hasSize(1);
     }
 
     @Test
@@ -133,7 +135,7 @@ public class ReservationRepositoryTest {
 
         List<Reservation> reservations = reservationRepository.findAllByMemberId(member.getId());
 
-        assertThat(reservations.size()).isEqualTo(1);
+        assertThat(reservations).hasSize(1);
     }
 
     @Test
@@ -150,7 +152,7 @@ public class ReservationRepositoryTest {
                 ));
         List<Reservation> dateBetween = reservationRepository.findByDateBetween(LocalDate.parse("2024-01-01"),
                 LocalDate.parse("2024-12-12"));
-        assertThat(dateBetween.size()).isEqualTo(1);
+        assertThat(dateBetween).hasSize(1);
     }
 
     @Test
@@ -172,7 +174,7 @@ public class ReservationRepositoryTest {
         reservationRepository.deleteById(reservationId);
         List<Reservation> reservations = reservationRepository.findAll();
 
-        assertThat(reservations.size()).isEqualTo(0);
+        assertThat(reservations).isEmpty();
     }
 
     @Test

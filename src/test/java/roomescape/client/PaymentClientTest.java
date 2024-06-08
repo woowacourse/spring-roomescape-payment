@@ -26,7 +26,7 @@ class PaymentClientTest {
     @DisplayName("결제 요청을 한다.")
     void confirm_payment_request() {
         // given
-        PaymentRequest requestBody = new PaymentRequest(100L, "", "");
+        PaymentRequest requestBody = new PaymentRequest(100L, "orderId", "paymentKey");
         String authorizationHeaderValue = FakeHeaderConstant.AUTHORIZATION_HEADER.getValue();
 
         // when
@@ -45,6 +45,6 @@ class PaymentClientTest {
 
         // when & then
         assertThatThrownBy(() -> paymentClient.confirm(authorizationHeaderValue, requestBody))
-                .cause();
+                .isInstanceOf(PaymentException.class);
     }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 
 import roomescape.config.ClientConfig;
+import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -40,6 +42,13 @@ class PaymentServiceTest {
     private ReservationTimeRepository timeRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleaner.cleanUp();
+    }
 
     @Test
     @DisplayName("결제 정보를 바탕으로 구매를 진행한다.")
@@ -54,7 +63,7 @@ class PaymentServiceTest {
         timeRepository.save(time);
         reservationRepository.save(reservation);
 
-        PaymentRequest request = new PaymentRequest(1000L, "", "");
+        PaymentRequest request = new PaymentRequest(1000L, "orderId", "paymentKey");
 
         // when
         paymentService.purchase(request, reservation.getId());

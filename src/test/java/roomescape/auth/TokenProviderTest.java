@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.LoginMemberInToken;
@@ -20,7 +21,7 @@ class TokenProviderTest {
     private Member member;
 
     @BeforeEach
-    void init() {
+    void setUp() {
         member = new Member(1L, Role.USER, "호기", "hogi@naver.com", "asd");
     }
 

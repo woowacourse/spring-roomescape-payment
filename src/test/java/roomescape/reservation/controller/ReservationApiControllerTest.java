@@ -96,7 +96,7 @@ class ReservationApiControllerTest {
                 "", "", 1000L, "");
         ReservationResponse response = new ReservationResponse(1L, name, date, theme, time);
 
-        Mockito.when(reservationService.save(any(), any()))
+        Mockito.when(reservationService.save(any(ReservationCreateRequest.class), any()))
                 .thenReturn(1L);
         Mockito.when(reservationService.findById(anyLong()))
                 .thenReturn(response);

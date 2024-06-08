@@ -16,22 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.auth.Login;
 import roomescape.member.dto.LoginMemberInToken;
+import roomescape.reservation.dto.request.FreeReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
-import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationApiController {
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationApiController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -57,14 +55,13 @@ public class ReservationApiController {
     ) {
         long id = reservationService.save(request, loginMemberInToken);
         ReservationResponse response = reservationService.findById(id);
-        paymentService.purchase(request.toPaymentRequest(), id);
 
         return ResponseEntity.created(URI.create("/reservations/" + id)).body(response);
     }
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> createAdminReservation(
-            @Valid @RequestBody ReservationCreateRequest request,
+            @Valid @RequestBody FreeReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
         long id = reservationService.save(request, loginMemberInToken);

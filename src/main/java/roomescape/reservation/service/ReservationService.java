@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
+import roomescape.reservation.dto.request.FreeReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -29,50 +31,60 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional
     public long save(ReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
-        Reservation reservation = getValidatedReservation(request, loginMemberInToken);
+        Reservation reservation = getValidatedReservation(request.date(), request.themeId(), request.timeId(),
+                loginMemberInToken);
 
+        Long reservationId = reservationRepository.save(reservation).getId();
+        paymentService.purchase(request.toPaymentRequest(), reservationId);
+        return reservationId;
+    }
+
+    @Transactional
+    public long save(FreeReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
+        Reservation reservation = getValidatedReservation(request.date(), request.themeId(), request.timeId(),
+                loginMemberInToken);
         return reservationRepository.save(reservation).getId();
     }
 
-    private Reservation getValidatedReservation(ReservationCreateRequest request,
+    private Reservation getValidatedReservation(LocalDate date,
+                                                long themeId,
+                                                long timeId,
                                                 LoginMemberInToken loginMemberInToken) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
+        ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
 
-        Theme theme = themeRepository.findById(request.themeId())
+        Theme theme = themeRepository.findById(themeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
 
-        Member member = getValidatedMemberByRole(loginMemberInToken);
+        Member member = memberRepository.findById(loginMemberInToken.id())
+                .orElseThrow(() -> new IllegalArgumentException("회원 인증에 실패했습니다."));
 
-        boolean reserved = reservationRepository.existsByDateAndReservationTimeIdAndThemeId(request.date(),
-                request.timeId(), request.themeId());
+        boolean reserved = reservationRepository.existsByDateAndReservationTimeIdAndThemeId(date, timeId, themeId);
         if (reserved) {
-            return new Reservation(member, request.date(), theme, reservationTime, Status.WAITING);
+            return new Reservation(member, date, theme, reservationTime, Status.WAITING);
         }
 
-        return new Reservation(member, request.date(), theme, reservationTime, Status.SUCCESS);
+        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS);
     }
 
-    private Member getValidatedMemberByRole(LoginMemberInToken loginMemberInToken) {
-        return memberRepository.findById(loginMemberInToken.id())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-    }
 
     public ReservationResponse findById(Long id) {
         Reservation reservation = reservationRepository.findById(id)
