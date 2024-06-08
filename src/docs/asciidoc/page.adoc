@@ -1,0 +1,9 @@
+== 관리자 페이지 접근
+==== 회원이 관리자 예약 페이지 접근
+operation::page/admin-page/reservation/by-member[snippets='http-request,http-response']
+==== 회원이 관리자 시간 페이지 접근
+operation::page/admin-page/time/by-member[snippets='http-request,http-response']
+==== 회원이 관리자 테마 페이지 접근
+operation::page/admin-page/theme/by-member[snippets='http-request,http-response']
+==== 회원이 관리자 예약 대기 페이지 접근
+operation::page/admin-page/waiting/by-member[snippets='http-request,http-response']
