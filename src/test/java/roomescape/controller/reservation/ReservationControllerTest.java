@@ -97,7 +97,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 .cookie("token", USER_TOKEN)
                 .contentType(ContentType.JSON)
                 .params(param)
-                .when().get("/reservations/search")
+                .when().get("/reservations/admin/search")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList("$", ReservationResponse.class);

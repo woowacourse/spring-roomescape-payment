@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import roomescape.controller.reservation.dto.CreateAdminReservationRequest;
 import roomescape.controller.reservation.dto.ReservationResponse;
+import roomescape.controller.reservation.dto.ReservationSearchCondition;
 import roomescape.domain.Reservation;
 import roomescape.repository.dto.WaitingReservationResponse;
 import roomescape.service.ReservationService;
@@ -50,5 +51,13 @@ public class AdminReservationController {
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent()
                 .build();
+    }
+
+    @GetMapping(value = "/admin/search", params = {"themeId", "memberId", "dateFrom", "dateTo"})
+    public List<ReservationResponse> searchReservations(final ReservationSearchCondition request) {
+        final List<Reservation> filter = reservationService.searchReservations(request);
+        return filter.stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 }
