@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
@@ -60,7 +61,7 @@ public class ReservationService {
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), ReservationStatus.WAITING));
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -73,7 +74,7 @@ public class ReservationService {
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), ReservationStatus.WAITING));
     }
 
     private ReservationResponse saveReservation(Reservation reservation) {

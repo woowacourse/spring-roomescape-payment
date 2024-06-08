@@ -8,6 +8,7 @@ import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_THEME;
 import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_THEME;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.dto.ThemeRequest;
 import roomescape.dto.ThemeResponse;
@@ -45,30 +47,30 @@ class ThemeServiceTest extends FixtureUsingTest {
         reservationTime = reservationTimeRepository.save(reservationTime);
 
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(1), reservationTime, theme1, USER1));
+                new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(2), reservationTime, theme1, USER1));
+                new Reservation(null, LocalDate.now().minusDays(2), reservationTime, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(3), reservationTime, theme1, USER1));
+                new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(4), reservationTime, theme1, USER1));
+                new Reservation(null, LocalDate.now().minusDays(4), reservationTime, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(5), reservationTime, theme1, USER1));
+                new Reservation(null, LocalDate.now().minusDays(5), reservationTime, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
 
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(1), reservationTime, theme3, USER1));
+                new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme3, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(2), reservationTime, theme3, USER1));
+                new Reservation(null, LocalDate.now().minusDays(2), reservationTime, theme3, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(3), reservationTime, theme3, USER1));
+                new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme3, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
 
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(1), reservationTime, theme2, USER1));
+                new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme2, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(3), reservationTime, theme2, USER1));
+                new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme2, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
 
         reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(3), reservationTime, theme4, USER1));
+                new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme4, USER1, LocalDateTime.now(), ReservationStatus.BOOKED));
 
         //when
         List<ThemeResponse> popularThemes = themeService.findAndOrderByPopularity(5);
@@ -111,7 +113,7 @@ class ThemeServiceTest extends FixtureUsingTest {
     void removeFailTest() {
         //given
         reservationRepository.save(
-                new Reservation(LocalDate.now().plusDays(1), reservationTime_10_0, theme1, defaultMember));
+                new Reservation(null, LocalDate.now().plusDays(1), reservationTime_10_0, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED));
 
         //when & then
         assertThatThrownBy(() -> themeService.delete(theme1.getId()))

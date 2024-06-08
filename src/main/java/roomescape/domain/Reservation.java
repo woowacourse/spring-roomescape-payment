@@ -46,27 +46,6 @@ public class Reservation implements Comparable<Reservation> {
 
     }
 
-    public Reservation(long id, Reservation reservationBeforeSave) {
-        this(id,
-                reservationBeforeSave.date,
-                reservationBeforeSave.time,
-                reservationBeforeSave.theme,
-                reservationBeforeSave.member);
-    }
-
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, date, time, theme, member, LocalDateTime.now());
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
-                       LocalDateTime createdAt) {
-        this(id, date, time, theme, member, createdAt, ReservationStatus.WAITING);
-    }
-
     public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
                        LocalDateTime createdAt, ReservationStatus reservationStatus) {
         validateDate(date);

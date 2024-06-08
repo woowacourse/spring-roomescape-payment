@@ -7,6 +7,7 @@ import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_TIME;
 import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_RESERVATION_TIME;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.dto.AvailableTimeResponse;
 import roomescape.dto.ReservationTimeRequest;
 import roomescape.dto.ReservationTimeResponse;
@@ -42,8 +44,12 @@ class ReservationTimeServiceTest extends FixtureUsingTest {
         //given
         LocalDate selectedDate = LocalDate.of(2024, 1, 1);
 
-        reservationRepository.save(new Reservation(selectedDate, reservationTime_10_0, theme1, USER1));
-        reservationRepository.save(new Reservation(selectedDate, reservationTime_12_0, theme1, USER1));
+        reservationRepository.save(
+                new Reservation(null, selectedDate, reservationTime_10_0, theme1, USER1, LocalDateTime.now(),
+                        ReservationStatus.BOOKED));
+        reservationRepository.save(
+                new Reservation(null, selectedDate, reservationTime_12_0, theme1, USER1, LocalDateTime.now(),
+                        ReservationStatus.BOOKED));
 
         //when
         List<AvailableTimeResponse> availableTimeResponses = reservationTimeService.findByThemeAndDate(selectedDate,
@@ -91,7 +97,9 @@ class ReservationTimeServiceTest extends FixtureUsingTest {
     @Test
     void usedReservationTimeDeleteTest() {
         //given
-        reservationRepository.save(new Reservation(LocalDate.now(), reservationTime_10_0, theme1, USER1));
+        reservationRepository.save(
+                new Reservation(null, LocalDate.now(), reservationTime_10_0, theme1, USER1, LocalDateTime.now(),
+                        ReservationStatus.BOOKED));
 
         //when & then
         assertThatCode(() -> reservationTimeService.delete(reservationTime_10_0.getId()))
