@@ -4,17 +4,18 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.service.payment.PaymentStatus;
 
-// TODO: requestedAt, approvedAt 저장하기
+import java.time.ZonedDateTime;
+
 public record PaymentConfirmOutput(
         String paymentKey,
         String orderId,
         String orderName,
         int totalAmount,
-        String provider,
-        String paymentMethod,
+        ZonedDateTime requestedAt,
+        ZonedDateTime approvedAt,
         PaymentStatus status) {
 
     public Payment toPayment(Reservation reservation) {
-        return new Payment(paymentKey, orderId, orderName, totalAmount, status, reservation);
+        return new Payment(paymentKey, orderId, totalAmount, orderName, requestedAt, approvedAt, status, reservation);
     }
 }

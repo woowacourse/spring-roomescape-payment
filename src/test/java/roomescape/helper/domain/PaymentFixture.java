@@ -7,14 +7,16 @@ import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.service.payment.PaymentStatus;
 
+import java.time.ZonedDateTime;
+
 @Component
 public class PaymentFixture {
     @Autowired
     private PaymentRepository paymentRepository;
 
     public Payment createPayment(Reservation reservation) {
-        Payment payment = new Payment("paymentKey", "orderId", "orderName", 0,
-                PaymentStatus.DONE, reservation);
+        Payment payment = new Payment("paymentKey", "orderId", 0, "orderName",
+                ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE, reservation);
         return paymentRepository.save(payment);
     }
 }

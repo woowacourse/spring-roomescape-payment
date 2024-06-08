@@ -20,6 +20,7 @@ import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.service.payment.config.PaymentExceptionInterceptor;
 import roomescape.service.payment.config.PaymentLoggingInterceptor;
 import roomescape.service.payment.dto.PaymentCancelInput;
+import roomescape.service.payment.dto.PaymentCancelOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 import roomescape.service.payment.dto.PaymentFailOutput;
@@ -77,9 +78,8 @@ public class PaymentClient {
                 .body(PaymentConfirmOutput.class);
     }
 
-    public PaymentConfirmOutput cancelPayment(Payment payment) {
+    public PaymentCancelOutput cancelPayment(Payment payment) {
         PaymentCancelInput cancelRequest = new PaymentCancelInput("단순 변심");
-        System.out.println(paymentProperties.getCancelUrl(payment.getPaymentKey()));
 
         return restClient.method(HttpMethod.POST)
                 .uri(paymentProperties.getCancelUrl(payment.getPaymentKey()))
@@ -89,7 +89,7 @@ public class PaymentClient {
                 .onStatus(HttpStatusCode::isError, (request, response) -> {
                     throw new PaymentCancelException(getPaymentCancelErrorCode(response));
                 })
-                .body(PaymentConfirmOutput.class);
+                .body(PaymentCancelOutput.class);
     }
 
     /**

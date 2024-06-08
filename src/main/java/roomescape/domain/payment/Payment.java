@@ -12,6 +12,8 @@ import jakarta.persistence.OneToOne;
 import roomescape.domain.reservation.Reservation;
 import roomescape.service.payment.PaymentStatus;
 
+import java.time.ZonedDateTime;
+
 @Entity
 public class Payment {
 
@@ -21,9 +23,11 @@ public class Payment {
     private String paymentKey;
     private String orderId;
     private int amount;
-    String orderName;
+    private String orderName;
+    private ZonedDateTime requestedAt;
+    private ZonedDateTime approvedAt;
     @Enumerated(EnumType.STRING)
-    PaymentStatus status;
+    private PaymentStatus status;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
@@ -31,12 +35,14 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String paymentKey, String orderId, String orderName, int amount, PaymentStatus status,
-                   Reservation reservation) {
+    public Payment(String paymentKey, String orderId, int amount, String orderName, ZonedDateTime requestedAt,
+                   ZonedDateTime approvedAt, PaymentStatus status, Reservation reservation) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
         this.orderName = orderName;
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
         this.status = status;
         this.reservation = reservation;
     }
@@ -57,15 +63,23 @@ public class Payment {
         return amount;
     }
 
-    public Reservation getReservation() {
-        return reservation;
-    }
-
     public String getOrderName() {
         return orderName;
     }
 
+    public ZonedDateTime getRequestedAt() {
+        return requestedAt;
+    }
+
+    public ZonedDateTime getApprovedAt() {
+        return approvedAt;
+    }
+
     public PaymentStatus getStatus() {
         return status;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
     }
 }
