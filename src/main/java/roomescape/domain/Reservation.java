@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,6 +38,9 @@ public class Reservation implements Comparable<Reservation> {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
+
+    @OneToOne
+    private Payment payment;
 
     protected Reservation() {
 
@@ -107,6 +111,10 @@ public class Reservation implements Comparable<Reservation> {
             //todo 예외 처리
         }
         this.reservationStatus = ReservationStatus.BOOKED;
+    }
+
+    public void purchase(Payment payment) {
+        this.payment = payment;
     }
 
     public boolean isBefore(LocalDateTime base) {

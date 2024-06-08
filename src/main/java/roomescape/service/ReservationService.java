@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentClient;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -38,18 +38,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
-                              PaymentClient paymentClient) {
+                              PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -98,8 +98,8 @@ public class ReservationService {
         Reservation requestedReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
         //todo -> 결제 메서드를 Reservation 내부로 이동 고려
-        paymentClient.pay(paymentRequest);
-        requestedReservation.book();
+        Payment payment = paymentService.pay(paymentRequest);
+        requestedReservation.purchase(payment);
     }
 
     public List<ReservationResponse> findAll() {

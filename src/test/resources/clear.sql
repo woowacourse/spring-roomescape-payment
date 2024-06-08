@@ -38,8 +38,20 @@ CREATE TABLE IF NOT EXISTS reservation
     member_id BIGINT NOT NULL,
     created_at DATETIME NOT NULL,
     reservation_status VARCHAR(255) NOT NULL,
+    payment_id BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (member_id) REFERENCES member (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
-    FOREIGN KEY (theme_id) REFERENCES theme (id)
+    FOREIGN KEY (theme_id) REFERENCES theme (id),
+    FOREIGN KEY (payment_id) REFERENCES payment (id)
 );
+
+CREATE TABLE IF NOT EXISTS PAYMENT
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    total_amount BIGINT NOT NULL,
+    order_id VARCHAR(255) NOT NULL,
+    payment_key VARCHAR(255) NOT NULL,
+    state VARCHAR(255) CHECK (STATE IN ('READY','DONE')),
+    PRIMARY KEY (id)
+)
