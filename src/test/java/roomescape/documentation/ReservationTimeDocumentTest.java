@@ -7,6 +7,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +83,10 @@ class ReservationTimeDocumentTest extends AbstractDocumentTest {
                 content().json(objectMapper.writeValueAsString(responses))
         ).andDo(
                 document("times/list/available",
+                        queryParameters(
+                                parameterWithName("date").description("조회 날짜"),
+                                parameterWithName("themeId").description("테마 식별자")
+                        ),
                         responseFields(
                                 fieldWithPath("[].timeId").description("예약 시간 식별자"),
                                 fieldWithPath("[].startAt").description("시작 시간"),

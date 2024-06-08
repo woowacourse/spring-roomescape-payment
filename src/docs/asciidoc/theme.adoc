@@ -2,8 +2,8 @@
 
 === 테마 목록 조회
 
-operation::themes/list[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::themes/list[snippets='curl-request,http-request,http-response,response-fields']
 
 === 인기 테마 목록 조회
 
-operation::themes/list/popular[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::themes/list/popular[snippets='curl-request,http-request,http-response,response-fields']

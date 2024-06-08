@@ -8,7 +8,10 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +55,11 @@ class AdminThemeDocumentTest extends AbstractDocumentTest {
                 content().json(objectMapper.writeValueAsString(response))
         ).andDo(
                 document("admin/themes/add",
+                        requestFields(
+                                fieldWithPath("name").description("이름"),
+                                fieldWithPath("description").description("설명"),
+                                fieldWithPath("thumbnail").description("이미지 URL")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("테마 식별자"),
                                 fieldWithPath("name").description("이름"),
@@ -93,7 +101,10 @@ class AdminThemeDocumentTest extends AbstractDocumentTest {
         ).andExpectAll(
                 status().isNoContent()
         ).andDo(
-                document("admin/themes/delete")
+                document("admin/themes/delete",
+                        pathParameters(
+                                parameterWithName("id").description("테마 식별자")
+                        ))
         );
     }
 

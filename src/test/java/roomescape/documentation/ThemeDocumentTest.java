@@ -7,6 +7,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,6 +79,11 @@ class ThemeDocumentTest extends AbstractDocumentTest {
                 content().json(objectMapper.writeValueAsString(responses))
         ).andDo(
                 document("themes/list/popular",
+                        queryParameters(
+                                parameterWithName("startDate").description("조회 시작 날짜"),
+                                parameterWithName("endDate").description("조회 종료 날짜"),
+                                parameterWithName("limit").description("조회 개수")
+                        ),
                         responseFields(
                                 fieldWithPath("[].id").description("테마 식별자"),
                                 fieldWithPath("[].name").description("테마 이름"),

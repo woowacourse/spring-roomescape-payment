@@ -5,11 +5,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
@@ -115,6 +117,9 @@ class AdminWaitingDocumentTest extends AbstractDocumentTest {
                 status().isOk()
         ).andDo(
                 document("admin/waitings/approve",
+                        pathParameters(
+                                parameterWithName("id").description("예약 대기 식별자")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("예약 식별자"),
                                 fieldWithPath("date").description("예약 날짜"),
@@ -144,6 +149,9 @@ class AdminWaitingDocumentTest extends AbstractDocumentTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(
-                document("admin/waitings/reject"));
+                document("admin/waitings/reject",
+                        pathParameters(
+                                parameterWithName("id").description("예약 대기 식별자")
+                        )));
     }
 }

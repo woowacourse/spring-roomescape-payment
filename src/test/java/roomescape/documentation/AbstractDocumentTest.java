@@ -3,6 +3,7 @@ package roomescape.documentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +50,12 @@ public abstract class AbstractDocumentTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation)
                         .operationPreprocessors()
-                        .withRequestDefaults(prettyPrint())
+                        .withRequestDefaults(
+                                modifyUris()
+                                        .scheme("https")
+                                        .host("api.roomescape.com")
+                                        .removePort(),
+                                prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
 

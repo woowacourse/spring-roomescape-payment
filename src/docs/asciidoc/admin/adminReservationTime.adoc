@@ -1,16 +1,16 @@
 == 어드민 예약 시간 API
 
 === 예약 생성
-operation::admin/times/add[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/times/add[snippets='curl-request,http-request,http-response,request-fields,response-fields']
 
 === 예약 생성 실패 - 이미 존재하는 시간
-operation::admin/times/add/already-exist[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/times/add/already-exist[snippets='curl-request,http-request,http-response,response-fields']
 
 === 예약 삭제
-operation::admin/times/delete[snippets='curl-request,http-request,http-response,response-body']
+operation::admin/times/delete[snippets='curl-request,http-request,http-response,path-parameters']
 
 === 예약 삭제 실패 - 존재하지 않는 시간
-operation::admin/times/delete/not-exist[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/times/delete/not-exist[snippets='curl-request,http-request,http-response,response-fields']
 
 === 예약 삭제 실패 - 이미 예약된 시간
-operation::admin/times/delete/using-time[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/times/delete/using-time[snippets='curl-request,http-request,http-response,response-fields']

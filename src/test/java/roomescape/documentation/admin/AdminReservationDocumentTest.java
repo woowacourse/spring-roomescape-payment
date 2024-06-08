@@ -4,13 +4,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
@@ -129,6 +131,12 @@ class AdminReservationDocumentTest extends AbstractDocumentTest {
                 status().isCreated()
         ).andDo(
                 document("admin/reservations/add",
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("timeId").description("예약 시간 식별자"),
+                                fieldWithPath("themeId").description("테마 식별자"),
+                                fieldWithPath("memberId").description("회원 식별자")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("예약 식별자"),
                                 fieldWithPath("date").description("예약 날짜"),
@@ -158,7 +166,10 @@ class AdminReservationDocumentTest extends AbstractDocumentTest {
         ).andExpectAll(
                 status().isNoContent()
         ).andDo(
-                document("admin/reservations/delete")
+                document("admin/reservations/delete",
+                        pathParameters(
+                                parameterWithName("id").description("예약 식별자")
+                        ))
         );
     }
 }

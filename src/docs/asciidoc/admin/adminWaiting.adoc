@@ -2,12 +2,12 @@
 
 === 예약 대기 목록 조회
 
-operation::admin/waitings/list[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/waitings/list[snippets='curl-request,http-request,http-response,response-fields']
 
 === 예약 대기를 예약으로 승인
 
-operation::admin/waitings/approve[snippets='curl-request,http-request,http-response,response-body,response-fields']
+operation::admin/waitings/approve[snippets='curl-request,http-request,http-response,path-parameters,response-fields']
 
 === 예약 대기를 예약으로 거절
 
-operation::admin/waitings/reject[snippets='curl-request,http-request,http-response,response-body']
+operation::admin/waitings/reject[snippets='curl-request,http-request,http-response,path-parameters']

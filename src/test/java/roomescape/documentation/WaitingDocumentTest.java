@@ -8,7 +8,10 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +73,11 @@ class WaitingDocumentTest extends AbstractDocumentTest {
                 content().json(objectMapper.writeValueAsString(response))
         ).andDo(
                 document("waiting/add",
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("timeId").description("예약 시간 식별자"),
+                                fieldWithPath("themeId").description("테마 식별자")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("예약 대기 식별자"),
                                 fieldWithPath("date").description("예약 날짜"),
@@ -101,7 +109,10 @@ class WaitingDocumentTest extends AbstractDocumentTest {
         ).andExpectAll(
                 status().isNoContent()
         ).andDo(
-                document("waiting/delete")
+                document("waiting/delete",
+                        pathParameters(
+                                parameterWithName("id").description("예약 대기 식별자")
+                        ))
         );
     }
 }

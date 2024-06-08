@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +47,11 @@ class MemberDocumentTest extends AbstractDocumentTest {
                 content().json(objectMapper.writeValueAsString(response))
         ).andDo(
                 document("members/signup",
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호"),
+                                fieldWithPath("name").description("이름")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("회원 식별자"),
                                 fieldWithPath("email").description("회원 이메일"),

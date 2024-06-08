@@ -449,7 +449,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h4 id="_어드민_회원_목록_조회_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/admin/members' -i -X GET \
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'https://api.roomescape.com/admin/members' -i -X GET \
     -H 'Content-Type: application/json' \
     --cookie 'token={ADMIN_TOKEN}'</code></pre>
 </div>
@@ -461,7 +461,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin/members HTTP/1.1
 Content-Type: application/json
-Host: localhost:8080
+Host: api.roomescape.com
 Cookie: token={ADMIN_TOKEN}</code></pre>
 </div>
 </div>
@@ -475,24 +475,6 @@ Content-Type: application/json
 Content-Length: 179
 
 [ {
-  "id" : 1,
-  "email" : "user@gmail.com",
-  "name" : "유저",
-  "role" : "USER"
-}, {
-  "id" : 2,
-  "email" : "admin@gmail.com",
-  "name" : "어드민",
-  "role" : "ADMIN"
-} ]</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_어드민_회원_목록_조회_response_body">Response body</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">[ {
   "id" : 1,
   "email" : "user@gmail.com",
   "name" : "유저",
@@ -552,7 +534,7 @@ Content-Length: 179
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-08 16:32:49 +0900
+Last updated 2024-06-08 22:54:18 +0900
 </div>
 </div>
 </body>

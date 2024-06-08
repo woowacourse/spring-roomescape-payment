@@ -449,7 +449,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h4 id="_테마_목록_조회_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/themes' -i -X GET \
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'https://api.roomescape.com/themes' -i -X GET \
     -H 'Content-Type: application/json'</code></pre>
 </div>
 </div>
@@ -460,7 +460,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /themes HTTP/1.1
 Content-Type: application/json
-Host: localhost:8080</code></pre>
+Host: api.roomescape.com</code></pre>
 </div>
 </div>
 </div>
@@ -473,24 +473,6 @@ Content-Type: application/json
 Content-Length: 250
 
 [ {
-  "id" : 1,
-  "name" : "테마1",
-  "description" : "테마1 설명",
-  "thumbnail" : "https://example.com/image1.jpg"
-}, {
-  "id" : 2,
-  "name" : "테마2",
-  "description" : "테마2 설명",
-  "thumbnail" : "https://example.com/image2.jpg"
-} ]</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_테마_목록_조회_response_body">Response body</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">[ {
   "id" : 1,
   "name" : "테마1",
   "description" : "테마1 설명",
@@ -550,7 +532,7 @@ Content-Length: 250
 <h4 id="_인기_테마_목록_조회_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/themes/popular?startDate=2024-05-08&amp;endDate=2024-05-09&amp;limit=2' -i -X GET \
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'https://api.roomescape.com/themes/popular?startDate=2024-05-08&amp;endDate=2024-05-09&amp;limit=2' -i -X GET \
     -H 'Content-Type: application/json'</code></pre>
 </div>
 </div>
@@ -561,7 +543,7 @@ Content-Length: 250
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /themes/popular?startDate=2024-05-08&amp;endDate=2024-05-09&amp;limit=2 HTTP/1.1
 Content-Type: application/json
-Host: localhost:8080</code></pre>
+Host: api.roomescape.com</code></pre>
 </div>
 </div>
 </div>
@@ -574,24 +556,6 @@ Content-Type: application/json
 Content-Length: 250
 
 [ {
-  "id" : 1,
-  "name" : "테마1",
-  "description" : "테마1 설명",
-  "thumbnail" : "https://example.com/image1.jpg"
-}, {
-  "id" : 2,
-  "name" : "테마2",
-  "description" : "테마2 설명",
-  "thumbnail" : "https://example.com/image2.jpg"
-} ]</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_인기_테마_목록_조회_response_body">Response body</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">[ {
   "id" : 1,
   "name" : "테마1",
   "description" : "테마1 설명",
@@ -651,7 +615,7 @@ Content-Length: 250
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-08 16:56:10 +0900
+Last updated 2024-06-08 22:53:45 +0900
 </div>
 </div>
 </body>
