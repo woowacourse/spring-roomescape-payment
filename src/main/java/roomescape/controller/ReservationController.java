@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -11,7 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.config.LoginMemberConverter;
-import roomescape.domain.reservation.Status;
+import roomescape.controller.swagger.SwaggerAuthHeader;
+import roomescape.controller.swagger.SwaggerBadRequestError;
+import roomescape.controller.swagger.SwaggerCreated;
+import roomescape.controller.swagger.SwaggerNoContent;
+import roomescape.controller.swagger.SwaggerNotFound;
+import roomescape.controller.swagger.SwaggerOk;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
@@ -20,6 +26,7 @@ import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.service.ReservationService;
 import roomescape.service.ReservationWaitingService;
 
+@Tag(name = "예약", description = "예약 및 예약 대기 API입니다.")
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
@@ -31,43 +38,53 @@ public class ReservationController {
         this.reservationWaitingService = reservationWaitingService;
     }
 
+    @SwaggerOk(summary = "전체 예약 조회")
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> findAllByReservation() {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
+    @SwaggerCreated(summary = "예약 생성(회원)", description = "회원에 의한 예약 생성 API")
+    @SwaggerBadRequestError
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByClient(
-            @LoginMemberConverter LoginMember loginMember,
+            @SwaggerAuthHeader @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
         ReservationResponse response = reservationService.saveReservationByClient(loginMember, reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
+    @SwaggerCreated(summary = "예약 대기 생성")
+    @SwaggerBadRequestError
     @PostMapping("/waitings")
     public ResponseEntity<ReservationResponse> saveWaitingByClient(
-            @LoginMemberConverter LoginMember loginMember,
+            @SwaggerAuthHeader @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid WaitingRequest waitingRequest
     ) {
         ReservationResponse response = reservationWaitingService.saveReservationWaiting(waitingRequest, loginMember);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
-    @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> deleteByReservation(@PathVariable long id) {
-        reservationService.deleteById(id);
+    @SwaggerNoContent(summary = "예약 삭제")
+    @SwaggerNotFound
+    @DeleteMapping("/reservations/{reservationId}")
+    public ResponseEntity<Void> deleteByReservation(@PathVariable long reservationId) {
+        reservationService.deleteById(reservationId);
         return ResponseEntity.noContent().build();
     }
 
+    @SwaggerNoContent(summary = "예약 대기 삭제")
+    @SwaggerNotFound
     @DeleteMapping("/waitings/{reservationWaitingId}")
     public ResponseEntity<Void> deleteByReservationWaiting(@PathVariable long reservationWaitingId) {
         reservationWaitingService.deleteById(reservationWaitingId);
         return ResponseEntity.noContent().build();
     }
 
+    @SwaggerOk(summary = "로그인 회원 예약 및 예약 대기 조회")
     @GetMapping("/reservations/mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(
-            @LoginMemberConverter LoginMember loginMember) {
+            @SwaggerAuthHeader @LoginMemberConverter LoginMember loginMember) {
         List<MyReservationResponse> responses = reservationService.findMyReservations(loginMember.id());
         return ResponseEntity.ok(responses);
     }

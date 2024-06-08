@@ -17,6 +17,21 @@ spring:
       ddl-auto: create-drop
     defer-datasource-initialization: true
 
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  paths-to-match:
+    - /reservations/**
+    - /waitings/**
+
 security:
   jwt:
     token:
