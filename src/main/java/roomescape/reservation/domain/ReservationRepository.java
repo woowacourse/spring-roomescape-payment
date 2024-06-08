@@ -25,8 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                                  r.status,
                                                                  r.createdAt)
             FROM Reservation AS r
-            WHERE r.member.id = :memberId
-            AND r.status = 'RESERVED'
+            WHERE r.member.id = :memberId AND r.status = 'RESERVED'
             """)
     List<Reservation> findAllReservedByMemberId(Long memberId);
 
@@ -64,6 +63,23 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.status = :status
             """)
     List<ReservationWaiting> findAllReservationByStatus(@Param("status") Status status);
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.ReservationWithPayment(
+                r.id,
+                r.theme.name,
+                r.date.value,
+                r.time.startAt,
+                r.status,
+                p.paymentKey,
+                p.totalAmount
+          )
+            FROM Reservation AS r
+            JOIN Payment AS p
+            ON r.id = p.reservationId
+            WHERE r.member.id = :memberId AND r.status = 'RESERVED'
+            """)
+    List<ReservationWithPayment> findAllReservedWithPaymentByMemberId(Long memberId);
 
     Optional<Reservation> findFirstByDateValueAndTimeIdAndThemeIdAndStatus(LocalDate date,
                                                                            Long timeId,

@@ -4,8 +4,9 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.DuplicateSaveException;
@@ -18,6 +19,7 @@ import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Status;
+import roomescape.reservation.dto.MemberMyReservationResponse;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
@@ -77,26 +79,32 @@ public class ReservationService {
     }
 
     public List<MemberReservationStatusResponse> findAllByMemberId(Long memberId) {
-        List<MemberReservationStatusResponse> memberReservationStatusResponses = new ArrayList<>();
+        Stream<MemberReservationStatusResponse> reservedReservationResponses = reservationRepository.findAllReservedByMemberId(memberId).stream()
+                .map(MemberReservationStatusResponse::new);
 
-        findAllMembersReservedReservation(memberReservationStatusResponses, memberId);
-        findAllMembersWaitingReservation(memberReservationStatusResponses, memberId);
+        Stream<MemberReservationStatusResponse> waitingReservationResponses = reservationRepository.findAllReservationWaitingByMemberId(memberId)
+                .stream()
+                .map(MemberReservationStatusResponse::new);
 
-        return memberReservationStatusResponses;
+        return Stream.concat(reservedReservationResponses, waitingReservationResponses)
+                .sorted(Comparator.comparing(MemberReservationStatusResponse::date))
+                .toList();
     }
 
-    private void findAllMembersReservedReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
-        reservationRepository.findAllReservedByMemberId(memberId)
+    public List<MemberMyReservationResponse> findMyReservation(Long memberId) {
+        Stream<MemberMyReservationResponse> reservedReservationWithPaymentResponses = reservationRepository.findAllReservedWithPaymentByMemberId(
+                        memberId)
                 .stream()
-                .map(MemberReservationStatusResponse::new)
-                .forEach(responses::add);
-    }
+                .map(MemberMyReservationResponse::new);
 
-    private void findAllMembersWaitingReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
-        reservationRepository.findAllReservationWaitingByMemberId(memberId)
+        Stream<MemberMyReservationResponse> waitingReservationResponses = reservationRepository.findAllReservationWaitingByMemberId(
+                        memberId)
                 .stream()
-                .map(MemberReservationStatusResponse::new)
-                .forEach(responses::add);
+                .map(MemberMyReservationResponse::new);
+
+        return Stream.concat(reservedReservationWithPaymentResponses, waitingReservationResponses)
+                .sorted(Comparator.comparing(MemberMyReservationResponse::date))
+                .toList();
     }
 
     @Transactional
