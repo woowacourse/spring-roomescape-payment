@@ -4,42 +4,30 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.RestClientControllerTest;
 import roomescape.auth.token.TokenProvider;
 import roomescape.fixture.PaymentConfirmFixtures;
 import roomescape.member.model.MemberRole;
 import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.reservation.dto.SaveReservationRequest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-class ReservationControllerTest {
+class ReservationControllerTest extends RestClientControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
 
     @MockBean
     private PaymentGateway paymentGateway;
-
-    @LocalServerPort
-    private int randomServerPort;
-
-    @BeforeEach
-    public void initReservation() {
-        RestAssured.port = randomServerPort;
-    }
 
     @DisplayName("예약 정보를 저장한다.")
     @Test
@@ -56,7 +44,8 @@ class ReservationControllerTest {
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("save-reservation"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createUserAccessToken())
                 .body(saveReservationRequest)
@@ -108,6 +97,18 @@ class ReservationControllerTest {
                 .then().log().all()
                 .statusCode(400)
                 .body("message", is("현재 날짜보다 이전 날짜를 예약할 수 없습니다."));
+    }
+
+    @DisplayName("내 예약 정보를 조회한다.")
+    @Test
+    void getMyReservations() {
+        RestAssured.given(spec).log().all()
+                .filter(document("find-All-my-reservations"))
+                .cookie("token", createAdminAccessToken())
+                .when().get("/reservations-mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(3));
     }
 
     private String createUserAccessToken() {

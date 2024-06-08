@@ -1,35 +1,22 @@
 package roomescape.auth.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.RestClientControllerTest;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-class AuthControllerTest {
+class AuthControllerTest extends RestClientControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
-
-    @LocalServerPort
-    int randomServerPort;
-
-    @BeforeEach
-    public void initReservation() {
-        RestAssured.port = randomServerPort;
-    }
 
     @DisplayName("로그인에 성공하면 인증 토큰이 담긴 쿠키를 반환한다.")
     @Test
@@ -94,7 +81,8 @@ class AuthControllerTest {
         final String accessToken = tokenProvider.createToken(memberId, role);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("login-check"))
                 .cookie("token", accessToken)
                 .when().get("/login/check")
                 .then().log().all()
@@ -169,5 +157,23 @@ class AuthControllerTest {
                 .then().log().all()
                 .statusCode(401)
                 .body("message", is("만료된 인증 토큰입니다."));
+    }
+
+    @DisplayName("로그아웃을 하면 200ok와 쿠키가 삭제된다.")
+    @Test
+    void logout() {
+        // Given
+        final Long memberId = 10L;
+        final MemberRole role = MemberRole.USER;
+        final String accessToken = tokenProvider.createToken(memberId, role);
+
+        // When & Then
+        RestAssured.given(spec).log().all()
+                .filter(document("logout"))
+                .cookie("token", accessToken)
+                .when().post("/logout")
+                .then().log().all()
+                .statusCode(200)
+                .cookie("token", is(""));
     }
 }
