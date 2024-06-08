@@ -3,6 +3,7 @@ package roomescape.service.booking.waiting;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.waiting.WaitingResponse;
@@ -28,8 +29,8 @@ public class WaitingService {
 
     @Transactional
     public ReservationResponse resisterWaiting(ReservationRequest request) {
-        Long id = waitingRegisterService.registerWaiting(request);
-        return waitingSearchService.findReservationWaiting(id);
+        Waiting waiting =  waitingRegisterService.registerWaiting(request);
+        return waitingSearchService.findReservationWaiting(waiting);
     }
 
     public List<WaitingResponse> findAllWaitingReservations() {

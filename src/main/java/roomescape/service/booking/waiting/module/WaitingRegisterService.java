@@ -3,7 +3,6 @@ package roomescape.service.booking.waiting.module;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
@@ -20,7 +19,6 @@ import roomescape.repository.WaitingRepository;
 import roomescape.util.DateUtil;
 
 @Service
-@Transactional
 public class WaitingRegisterService {
 
     private final WaitingRepository waitingRepository;
@@ -42,19 +40,18 @@ public class WaitingRegisterService {
         this.memberRepository = memberRepository;
     }
 
-    public Long registerWaiting(ReservationRequest request) {
+    public Waiting registerWaiting(ReservationRequest request) {
         Reservation reservation = convertReservation(request);
         validateAddableWaiting(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
-        addWaiting(savedReservation);
-        return savedReservation.getId();
+        return addWaiting(savedReservation);
     }
 
     private Reservation convertReservation(ReservationRequest request) {
         ReservationTime reservationTime = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member member = findMember(request.memberId());
-        return request.toEntity(reservationTime, theme, member, Status.WAITING, null);
+        return request.toEntity(reservationTime, theme, member, Status.WAITING);
     }
 
     private ReservationTime findReservationTime(Long timeId) {
@@ -81,14 +78,15 @@ public class WaitingRegisterService {
                 ));
     }
 
-    private void addWaiting(Reservation savedReservation) {
+    private Waiting addWaiting(Reservation savedReservation) {
         int waitingOrder = reservationRepository.countByDateAndTimeIdAndThemeIdAndStatus(
                 savedReservation.getDate(),
                 savedReservation.getTime().getId(),
                 savedReservation.getTheme().getId(),
                 savedReservation.getStatus()
         );
-        waitingRepository.save(new Waiting(savedReservation, waitingOrder));
+        Waiting waiting = waitingRepository.save(new Waiting(savedReservation, waitingOrder));
+        return waiting;
     }
 
     private void validateAddableWaiting(Reservation reservation) {
@@ -113,7 +111,7 @@ public class WaitingRegisterService {
                 reservation.getMember().getId())
         ) {
             throw new RoomEscapeException(
-                    "이미 사용자에게 등록되거나 대기중인 예약이 있습니다..",
+                    "이미 해당 사용자가 대기나 예약을 한 테마입니다.",
                     "생성 예약 대기 정보 : " + reservation
             );
         }

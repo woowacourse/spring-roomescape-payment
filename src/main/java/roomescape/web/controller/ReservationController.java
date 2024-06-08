@@ -30,9 +30,8 @@ class ReservationController {
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationByAdmin(
             @RequestBody ReservationRequest reservationRequest) {
-        Long savedId = reservationService.registerReservation(reservationRequest);
-        ReservationResponse reservationResponse = reservationService.findReservation(savedId);
-        return ResponseEntity.created(URI.create("/reservations/" + savedId)).body(reservationResponse);
+        ReservationResponse reservationResponse = reservationService.registerReservation(reservationRequest);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id())).body(reservationResponse);
     }
 
     @PostMapping("/reservations")

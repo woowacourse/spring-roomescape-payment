@@ -26,8 +26,7 @@ public class WaitingSearchService {
                 .toList();
     }
 
-    public ReservationResponse findReservationWaiting(final Long waitingId) {
-        Waiting waiting = findWaitingById(waitingId);
+    public ReservationResponse findReservationWaiting(final Waiting waiting) {
         return ReservationResponse.from(waiting.getReservation());
     }
 
