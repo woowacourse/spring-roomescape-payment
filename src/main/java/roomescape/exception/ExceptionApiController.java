@@ -3,6 +3,7 @@ package roomescape.exception;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,5 +39,11 @@ public class ExceptionApiController {
         ErrorResponse errorResponse = new ErrorResponse(paymentException.getMessage());
 
         return ResponseEntity.status(paymentException.getStatusCode()).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> unknownExHandler(Exception exception) {
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
