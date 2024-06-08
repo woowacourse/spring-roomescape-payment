@@ -164,7 +164,7 @@ public class ReservationService {
         if (reservationRepository.isExistConfirmedReservation(reservationId)) {
             throw new RoomEscapeException(ErrorType.RESERVATION_DUPLICATED, HttpStatus.CONFLICT);
         }
-        reservationRepository.updateStatusByReservationId(reservationId, ReservationStatus.CONFIRMED);
+        reservationRepository.updateStatusByReservationId(reservationId, ReservationStatus.CONFIRMED_PAYMENT_REQUIRED);
     }
 
     public void cancelWaiting(Long reservationId, Long memberId) {

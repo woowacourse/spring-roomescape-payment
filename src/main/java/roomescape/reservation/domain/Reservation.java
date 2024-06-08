@@ -135,7 +135,8 @@ public class Reservation {
 
     @JsonIgnore
     public boolean isConfirmed() {
-        return reservationStatus == ReservationStatus.CONFIRMED;
+        return reservationStatus == ReservationStatus.CONFIRMED
+                || reservationStatus == ReservationStatus.CONFIRMED_PAYMENT_REQUIRED;
     }
 
     @JsonIgnore

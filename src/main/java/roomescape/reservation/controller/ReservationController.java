@@ -79,6 +79,7 @@ public class ReservationController {
         PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(paymentCancelRequest);
         reservationWithPaymentService.updateCanceledTime(paymentCancelRequest.paymentKey(),
                 paymentCancelResponse.canceledAt());
+
         return ApiResponse.success();
     }
 
@@ -120,7 +121,7 @@ public class ReservationController {
 
     @DeleteMapping("/reservations/waiting/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<ReservationResponse> saveWaiting(
+    public ApiResponse<ReservationResponse> deleteWaiting(
             @MemberId Long memberId,
             @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") Long reservationId
     ) {

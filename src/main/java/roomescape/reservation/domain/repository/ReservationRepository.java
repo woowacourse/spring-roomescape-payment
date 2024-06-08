@@ -41,19 +41,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     boolean isExistConfirmedReservation(@Param("id") Long reservationId);
 
     @Query("""
-                    SELECT new roomescape.reservation.dto.response.MyReservationResponse(
-                        t.name,
-                        r.date,
-                        r.reservationTime.startAt,
-                        (SELECT COUNT (r2) FROM Reservation r2 WHERE r2.theme = r.theme AND r2.date = r.date AND r2.reservationTime = r.reservationTime AND r2.id < r.id),
-                        p.paymentKey,
-                        p.totalAmount
-                    )
-                    FROM Reservation r
-                    JOIN r.theme t
-                    JOIN Payment p
-                    ON r.id = p.reservation.id
-                    WHERE r.member.id = :memberId
+            SELECT new roomescape.reservation.dto.response.MyReservationResponse(
+                r.id,
+                t.name,
+                r.date,
+                r.reservationTime.startAt,
+                r.reservationStatus,
+                (SELECT COUNT (r2) FROM Reservation r2 WHERE r2.theme = r.theme AND r2.date = r.date AND r2.reservationTime = r.reservationTime AND r2.id < r.id),
+                p.paymentKey,
+                p.totalAmount
+            )
+            FROM Reservation r
+            JOIN r.theme t
+            LEFT JOIN Payment p
+            ON p.reservation = r
+            WHERE r.member.id = :memberId
             """)
     List<MyReservationResponse> findMyReservations(Long memberId);
 }
