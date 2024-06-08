@@ -16,21 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------  결제위젯 초기화 ------
   // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
   // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-  const paymentAmount = 1000;
   const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
   const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-  paymentWidget.renderPaymentMethods(
-      "#payment-method",
-      {value: paymentAmount},
-      {variantKey: "DEFAULT"}
-  );
 
-  document.getElementById('theme-slots').addEventListener('click', event => {
+  document.getElementById('theme-slots').addEventListener('click', async event => {
     if (event.target.classList.contains('theme-slot')) {
       document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
       event.target.classList.add('active');
       checkDateAndTheme();
     }
+    const themeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const theme = await requestTheme(themeId);
+
+    paymentWidget.renderPaymentMethods(
+        "#payment-method",
+        {value: theme.price},
+        {variantKey: "DEFAULT"}
+    );
   });
 
   document.getElementById('time-slots').addEventListener('click', event => {
@@ -174,17 +176,18 @@ function onReservationButtonClick(event, paymentWidget) {
     // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
     // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
     const orderIdPrefix = "ASHANDATTO";
+    const theme = requestTheme(selectedThemeId);
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
       orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
+      amount: theme.price,
     }).then(function (data) {
       console.debug(data);
       fetchReservationPayment(data, reservationData);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
     });
   } else {
     alert("Please select a date, theme, and time before making a reservation.");
@@ -271,4 +274,12 @@ function requestRead(endpoint) {
         if (response.status === 200) return response.json();
         throw new Error('Read failed');
       });
+}
+
+function requestTheme(selectedThemeId) {
+  return fetch(`/themes/${selectedThemeId}`)
+      .then(response => {
+        if (response.status === 200) return response.json();
+        throw new Error("테마 정보 조회 실패");
+  })
 }
