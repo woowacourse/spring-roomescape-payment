@@ -6,7 +6,7 @@ import roomescape.domain.reservation.ReservationWithRank;
 
 public record UserReservationResponse(
         long reservationId,
-        String theme,
+        String themeName,
         LocalDate date,
         LocalTime time,
         String status,
@@ -18,7 +18,7 @@ public record UserReservationResponse(
     public static UserReservationResponse from(ReservationWithRank reservation) {
         return new UserReservationResponse(
                 reservation.reservationId(),
-                reservation.theme(),
+                reservation.themeName(),
                 reservation.date(),
                 reservation.time(),
                 reservation.status().toString(),

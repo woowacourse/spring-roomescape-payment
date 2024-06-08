@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 public record ReservationWithRank(
         long reservationId,
-        String theme,
+        String themeName,
         LocalDate date,
         LocalTime time,
         Status status,

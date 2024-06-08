@@ -42,7 +42,7 @@ function render(data) {
         }
 
         row.insertCell(0).textContent = item.reservationId;
-        row.insertCell(1).textContent = item.theme;
+        row.insertCell(1).textContent = item.themeName;
         row.insertCell(2).textContent = item.date;
         row.insertCell(3).textContent = item.time;
         row.insertCell(4).textContent = status;
