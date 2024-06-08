@@ -42,21 +42,21 @@ public class ReservationService {
     }
 
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
-        Reservation savedReservation = validateAndSave(reservationSaveDto);
+        Reservation savedReservation = saveReservation(reservationSaveDto);
 
         return new ReservationDto(savedReservation);
     }
 
     @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
-        Reservation reservation = validateAndSave(reservationSaveDto);
+        Reservation reservation = saveReservation(reservationSaveDto);
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
         Payment payment = savePayment(reservation, paymentDto);
 
         return new ReservationDto(reservation.withPayment(payment));
     }
 
-    private Reservation validateAndSave(ReservationSaveDto reservationSaveDto) {
+    private Reservation saveReservation(ReservationSaveDto reservationSaveDto) {
         Member member = findMember(reservationSaveDto.memberId());
         ReservationDate date = new ReservationDate(reservationSaveDto.date());
         ReservationTime time = findTime(reservationSaveDto.timeId());
