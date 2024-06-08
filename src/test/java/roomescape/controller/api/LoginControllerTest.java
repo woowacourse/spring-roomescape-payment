@@ -61,7 +61,7 @@ class LoginControllerTest {
                 .content(request)
                 .contentType(APPLICATION_JSON))
             .andDo(print())
-            .andDo(document("admin/login/login",
+            .andDo(document("login/login",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())))
             .andExpect(status().isOk());
@@ -73,7 +73,7 @@ class LoginControllerTest {
         mockMvc.perform(get("/login/check")
                 .cookie(new Cookie("token", "test-token")))
             .andDo(print())
-            .andDo(document("admin/login/check",
+            .andDo(document("login/check",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())))
             .andExpect(status().isOk());
