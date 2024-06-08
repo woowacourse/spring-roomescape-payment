@@ -75,6 +75,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             )
             FROM Reservation r
             LEFT JOIN Payment p
+            ON r.id = p.reservation.id
             WHERE r.member.id = :memberId
             """)
     List<ReservationRankResponse> findMyReservation(@Param("memberId") long memberId);
