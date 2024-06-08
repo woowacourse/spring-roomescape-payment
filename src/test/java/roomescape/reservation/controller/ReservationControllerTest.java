@@ -16,6 +16,11 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
+
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
@@ -28,13 +33,20 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("회원별 예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findReservationsAndWaitingsByMember() {
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
+        saveWaitReservationAsDateNow();
+
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
                 .get("/reservations/mine")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("resources.$", hasSize(2));
     }
 
     @DisplayName("테마 아이디, 회원 아이디, 기간 조건 조회에 성공하면 200 응답을 받는다.")
@@ -65,6 +77,11 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약을 성공적으로 제거하면 204 응답을 받는다.")
     @Test
     void delete() {
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
+
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)

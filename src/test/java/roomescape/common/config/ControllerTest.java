@@ -1,22 +1,34 @@
 package roomescape.common.config;
 
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.domain.Role;
 import roomescape.auth.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Theme;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ExtendWith(RestDocumentationExtension.class)
 public class ControllerTest {
+
+    protected RequestSpecification spec;
 
     @LocalServerPort
     private int port;
@@ -31,8 +43,12 @@ public class ControllerTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setPort() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @AfterEach
@@ -77,10 +93,22 @@ public class ControllerTest {
         jdbcTemplate.update(sql, name, email, password, role);
     }
 
+    protected void saveTheme(Theme theme) {
+        String sql = "insert into theme(name, description, thumbnail) values (?, ?, ?)";
+
+        jdbcTemplate.update(sql, theme.getName(), theme.getDescription(), theme.getThumbnail());
+    }
+
     protected void saveThemeAsHorror() {
         String sql = "insert into theme(name, description, thumbnail) values ('공포', '무서운 테마', 'https://a.com/a.jpg')";
 
         jdbcTemplate.update(sql);
+    }
+
+    protected void saveReservationTime(ReservationTime time) {
+        String sql = "insert into reservation_time (start_at) values (?)";
+
+        jdbcTemplate.update(sql, time.getStartAt());
     }
 
     protected void saveReservationTimeAsTen() {
