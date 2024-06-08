@@ -53,8 +53,7 @@ public class PaymentService {
         // 취소 시간은 현재 시간으로 일단 생성한 뒤, 결제 취소 완료 후 해당 시간으로 변경합니다.
         CanceledPayment canceled = cancelPayment(paymentKey, "고객 요청", LocalDateTime.now());
 
-        return new PaymentCancelRequest(paymentKey, String.valueOf(canceled.getCancelAmount()),
-                canceled.getCancelReason());
+        return new PaymentCancelRequest(paymentKey, canceled.getCancelAmount(), canceled.getCancelReason());
     }
 
     private CanceledPayment cancelPayment(String paymentKey, String cancelReason, LocalDateTime canceledAt) {

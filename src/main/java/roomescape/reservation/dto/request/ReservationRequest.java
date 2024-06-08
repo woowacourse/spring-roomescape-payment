@@ -13,7 +13,7 @@ public record ReservationRequest(
     Long themeId,
     String paymentKey,
     String orderId,
-    String amount,
+    Long amount,
     String paymentType
 ) {
 
