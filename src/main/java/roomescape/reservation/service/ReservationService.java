@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.FreeReservations;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
@@ -57,7 +60,9 @@ public class ReservationService {
                 loginMemberInToken);
 
         Long reservationId = reservationRepository.save(reservation).getId();
-        paymentService.purchase(request.toPaymentRequest(), reservationId);
+        if (reservation.getStatus().isSuccess()) {
+            paymentService.purchase(request.toPaymentRequest(), reservationId);
+        }
         return reservationId;
     }
 
@@ -114,13 +119,28 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<MyReservationResponse> findAllByMemberId(Long memberId) {
+    public List<MyReservationResponse> findChargedReservationByMemberId(Long memberId) {
+        return paymentRepository.findByReservationMemberId(memberId)
+                .stream()
+                .map(MyReservationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<MyReservationResponse> findFreeReservationByMemberId(Long memberId) {
         List<Reservation> waitingReservation = reservationRepository.findAllByStatus(Status.WAITING);
         Waitings waitings = new Waitings(waitingReservation);
 
-        return reservationRepository.findAllByMemberId(memberId).stream()
-                .map(reservation -> MyReservationResponse.toResponse(reservation,
-                        waitings.findMemberRank(reservation, memberId)))
+        List<Reservation> allReservations = reservationRepository.findAllByMemberId(memberId);
+        List<Reservation> paidReservations = paymentRepository.findByReservationMemberId(memberId)
+                .stream()
+                .map(Payment::getReservation)
+                .toList();
+
+        FreeReservations freeReservations = new FreeReservations(allReservations, paidReservations);
+
+        return freeReservations.getReservations()
+                .stream()
+                .map(reservation -> new MyReservationResponse(reservation, waitings.findMemberRank(reservation)))
                 .toList();
     }
 

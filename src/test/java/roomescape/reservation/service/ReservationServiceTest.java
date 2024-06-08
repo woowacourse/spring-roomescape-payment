@@ -147,8 +147,8 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("맴버에 해당하는 모든 예약을 반환한다.")
-    void findAllByMemberIdTest() {
+    @DisplayName("맴버에 해당하는 모든 무료 예약을 반환한다.")
+    void findFreeReservationByMemberIdShouldGetFreeReservation() {
         Theme theme = themeRepository.save(new Theme("a", "a", "a"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.now()));
         Member member = memberRepository.save(new Member("hogi", "a", "a"));
@@ -157,7 +157,8 @@ class ReservationServiceTest {
         Reservation reservation2 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
 
-        List<MyReservationResponse> memberReservations = reservationService.findAllByMemberId(member.getId());
+        List<MyReservationResponse> memberReservations = reservationService.findFreeReservationByMemberId(
+                member.getId());
         assertThat(memberReservations).hasSize(2);
     }
 

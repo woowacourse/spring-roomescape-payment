@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
@@ -37,9 +39,9 @@ class WaitingsTest {
         Waitings waitings = new Waitings(waiting);
 
         assertAll(
-                () -> assertThat(waitings.findMemberRank(reservation3, 3L)).isEqualTo(3),
-                () -> assertThat(waitings.findMemberRank(reservation1, 2L)).isEqualTo(2),
-                () -> assertThat(waitings.findMemberRank(reservation2, 1L)).isEqualTo(1)
+                () -> assertThat(waitings.findMemberRank(reservation3)).isEqualTo(3),
+                () -> assertThat(waitings.findMemberRank(reservation1)).isEqualTo(1),
+                () -> assertThat(waitings.findMemberRank(reservation2)).isEqualTo(2)
         );
     }
 }

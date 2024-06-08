@@ -86,9 +86,10 @@ public class ReservationApiController {
 
     @GetMapping("/reservations/me")
     public ResponseEntity<List<MyReservationResponse>> myReservations(@Login LoginMemberInToken loginMemberInToken) {
-        List<MyReservationResponse> myReservationResponses = reservationService.findAllByMemberId(
+        List<MyReservationResponse> responses = reservationService.findChargedReservationByMemberId(
                 loginMemberInToken.id());
+        responses.addAll(reservationService.findFreeReservationByMemberId(loginMemberInToken.id()));
 
-        return ResponseEntity.ok(myReservationResponses);
+        return ResponseEntity.ok(responses);
     }
 }
