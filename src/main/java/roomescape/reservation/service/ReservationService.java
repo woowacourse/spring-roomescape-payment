@@ -20,6 +20,7 @@ import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -32,19 +33,22 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentService paymentService
+            PaymentService paymentService,
+            PaymentRepository paymentRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -124,6 +128,9 @@ public class ReservationService {
     public void delete(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 정보입니다."));
+        if (paymentRepository.existsByReservation(reservation)) {
+            throw new IllegalArgumentException("이미 결제된 예약은 삭제할 수 없습니다.");
+        }
         reservationRepository.deleteById(id);
 
         Waitings waitings = new Waitings(reservationRepository.findAllByDateAndReservationTimeIdAndThemeIdAndStatus(
