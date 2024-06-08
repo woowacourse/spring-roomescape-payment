@@ -69,7 +69,7 @@ public class Payment {
         return reservation;
     }
 
-    public Member member() {
+    public Member getMember() {
         return member;
     }
 
