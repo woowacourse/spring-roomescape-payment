@@ -44,7 +44,6 @@ public class ReservationController {
     }
 
 
-    @Admin
     @GetMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<ReservationsResponse> getAllReservations() {
@@ -120,7 +119,6 @@ public class ReservationController {
         }
     }
 
-    @Admin
     @GetMapping("/reservations/waiting")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<ReservationsResponse> getAllWaiting() {
