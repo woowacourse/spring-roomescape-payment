@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -10,6 +10,11 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.dto.response.TossPaymentErrorResponse;
+import roomescape.payment.dto.request.PaymentCancelRequest;
+import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 

@@ -1,6 +1,7 @@
-package roomescape.payment;
+package roomescape.payment.dto.response;
 
 import java.time.LocalDateTime;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.dto.response.ReservationResponse;
 
 public record ReservationPaymentResponse(Long id, String orderId, String paymentKey, Long totalAmount,

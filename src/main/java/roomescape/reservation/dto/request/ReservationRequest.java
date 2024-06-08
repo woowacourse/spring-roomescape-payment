@@ -2,7 +2,7 @@ package roomescape.reservation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import roomescape.payment.PaymentRequest;
+import roomescape.payment.dto.request.PaymentRequest;
 
 public record ReservationRequest(
     @NotNull(message = "예약 날짜는 null일 수 없습니다.")

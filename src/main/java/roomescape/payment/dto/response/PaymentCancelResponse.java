@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDateTime;

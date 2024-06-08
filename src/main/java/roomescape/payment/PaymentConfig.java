@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.client.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)

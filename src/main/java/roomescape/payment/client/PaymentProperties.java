@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.client;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
