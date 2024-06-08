@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.http.HttpStatus;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
@@ -19,13 +19,14 @@ public class CanceledPayment {
     private String paymentKey;
     private String cancelReason;
     private Long cancelAmount;
-    private LocalDateTime approvedAt;
-    private LocalDateTime canceledAt;
+    private OffsetDateTime approvedAt;
+    private OffsetDateTime canceledAt;
 
     public CanceledPayment() {
     }
 
-    public CanceledPayment(String paymentKey, String cancelReason, Long cancelAmount, LocalDateTime approvedAt, LocalDateTime canceledAt) {
+    public CanceledPayment(String paymentKey, String cancelReason, Long cancelAmount, OffsetDateTime approvedAt,
+                           OffsetDateTime canceledAt) {
         validateDate(approvedAt, canceledAt);
         this.paymentKey = paymentKey;
         this.cancelReason = cancelReason;
@@ -34,7 +35,7 @@ public class CanceledPayment {
         this.canceledAt = canceledAt;
     }
 
-    private void validateDate(LocalDateTime approvedAt, LocalDateTime canceledAt) {
+    private void validateDate(OffsetDateTime approvedAt, OffsetDateTime canceledAt) {
         if (canceledAt.isBefore(approvedAt)) {
             throw new RoomEscapeException(ErrorType.CANCELED_BEFORE_PAYMENT,
                     String.format("[approvedAt: %s, canceledAt: %s]", approvedAt, canceledAt),
@@ -58,15 +59,15 @@ public class CanceledPayment {
         return cancelAmount;
     }
 
-    public LocalDateTime getApprovedAt() {
+    public OffsetDateTime getApprovedAt() {
         return approvedAt;
     }
 
-    public LocalDateTime getCanceledAt() {
+    public OffsetDateTime getCanceledAt() {
         return canceledAt;
     }
 
-    public void setCanceledAt(LocalDateTime canceledAt) {
+    public void setCanceledAt(OffsetDateTime canceledAt) {
         this.canceledAt = canceledAt;
     }
 }

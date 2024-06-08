@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.http.HttpStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.system.exception.ErrorType;
@@ -35,13 +35,13 @@ public class Payment {
     private Reservation reservation;
 
     @Column(nullable = false)
-    private LocalDateTime approvedAt;
+    private OffsetDateTime approvedAt;
 
     public Payment() {
     }
 
     public Payment(String orderId, String paymentKey, Long totalAmount, Reservation reservation,
-                   LocalDateTime approvedAt) {
+                   OffsetDateTime approvedAt) {
         validate(orderId, paymentKey, totalAmount, reservation, approvedAt);
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -51,7 +51,7 @@ public class Payment {
     }
 
     private void validate(String orderId, String paymentKey, Long totalAmount, Reservation reservation,
-                          LocalDateTime approvedAt) {
+                          OffsetDateTime approvedAt) {
         validateIsNullOrBlank(orderId, "orderId");
         validateIsNullOrBlank(paymentKey, "paymentKey");
         validateIsInvalidAmount(totalAmount);
@@ -100,7 +100,7 @@ public class Payment {
         return reservation;
     }
 
-    public LocalDateTime getApprovedAt() {
+    public OffsetDateTime getApprovedAt() {
         return approvedAt;
     }
 }

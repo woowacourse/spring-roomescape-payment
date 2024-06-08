@@ -1,6 +1,6 @@
 package roomescape.payment.service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -41,8 +41,9 @@ public class PaymentService {
         return paymentRepository.findByReservationId(reservationId);
     }
 
-    public void cancelPaymentWhenErrorOccurred(PaymentCancelResponse cancelInfo, String paymentKey) {
-        cancelPayment(paymentKey, cancelInfo.cancelReason(), cancelInfo.canceledAt());
+    public void saveCanceledPayment(PaymentCancelResponse cancelInfo, OffsetDateTime approvedAt, String paymentKey) {
+        canceledPaymentRepository.save(new CanceledPayment(
+                paymentKey, cancelInfo.cancelReason(), cancelInfo.cancelAmount(), approvedAt, cancelInfo.canceledAt()));
     }
 
     public PaymentCancelRequest cancelPaymentByAdmin(Long reservationId) {
@@ -51,12 +52,12 @@ public class PaymentService {
                         String.format("[reservationId: %d]", reservationId), HttpStatus.NOT_FOUND))
                 .getPaymentKey();
         // 취소 시간은 현재 시간으로 일단 생성한 뒤, 결제 취소 완료 후 해당 시간으로 변경합니다.
-        CanceledPayment canceled = cancelPayment(paymentKey, "고객 요청", LocalDateTime.now());
+        CanceledPayment canceled = cancelPayment(paymentKey, "고객 요청", OffsetDateTime.now());
 
         return new PaymentCancelRequest(paymentKey, canceled.getCancelAmount(), canceled.getCancelReason());
     }
 
-    private CanceledPayment cancelPayment(String paymentKey, String cancelReason, LocalDateTime canceledAt) {
+    private CanceledPayment cancelPayment(String paymentKey, String cancelReason, OffsetDateTime canceledAt) {
         Payment payment = paymentRepository.findByPaymentKey(paymentKey)
                 .orElseThrow(() -> throwPaymentNotFoundByPaymentKey(paymentKey));
         paymentRepository.delete(payment);
@@ -65,7 +66,7 @@ public class PaymentService {
                 payment.getApprovedAt(), canceledAt));
     }
 
-    public void updateCanceledTime(String paymentKey, LocalDateTime canceledAt) {
+    public void updateCanceledTime(String paymentKey, OffsetDateTime canceledAt) {
         CanceledPayment canceledPayment = canceledPaymentRepository.findByPaymentKey(paymentKey)
                 .orElseThrow(() -> throwPaymentNotFoundByPaymentKey(paymentKey));
         canceledPayment.setCanceledAt(canceledAt);
