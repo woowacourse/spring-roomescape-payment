@@ -3,16 +3,12 @@ package roomescape.reservation.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentResponse;
-import roomescape.payment.PaymentService;
-import roomescape.payment.ReservationPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -53,6 +49,7 @@ public class ReservationService {
     public ReservationsResponse findAllReservations() {
         List<ReservationResponse> response = reservationRepository.findAll()
                 .stream()
+                .filter(Reservation::isConfirmed)
                 .map(ReservationResponse::from)
                 .toList();
 
@@ -172,19 +169,17 @@ public class ReservationService {
 
     public void cancelWaiting(Long reservationId, Long memberId) {
         Reservation waiting = reservationRepository.findById(reservationId)
-                .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
-                .filter(r -> Objects.equals(r.getMemberId(), memberId))
-                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
-                        String.format("[reservationId: %d]", reservationId), HttpStatus.BAD_REQUEST));
+                .filter(Reservation::isWaiting)
+                .filter(r -> r.isSameMember(memberId))
+                .orElseThrow(() -> throwReservationNotFound(reservationId));
         reservationRepository.delete(waiting);
     }
 
     public void denyWaiting(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         Reservation waiting = reservationRepository.findById(reservationId)
-                .filter(r -> r.getReservationStatus() == ReservationStatus.WAITING)
-                .orElseThrow(() -> new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
-                        String.format("[reservationId: %d]", reservationId), HttpStatus.BAD_REQUEST));
+                .filter(Reservation::isWaiting)
+                .orElseThrow(() -> throwReservationNotFound(reservationId));
         reservationRepository.delete(waiting);
     }
 
@@ -194,5 +189,10 @@ public class ReservationService {
             return;
         }
         throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST, HttpStatus.FORBIDDEN);
+    }
+
+    private RoomEscapeException throwReservationNotFound(Long reservationId) {
+        return new RoomEscapeException(ErrorType.RESERVATION_NOT_FOUND,
+                String.format("[reservationId: %d]", reservationId), HttpStatus.NOT_FOUND);
     }
 }

@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -127,7 +128,23 @@ public class Reservation {
         return reservationStatus;
     }
 
+    @JsonIgnore
     public boolean isSameDateAndTime(LocalDate date, ReservationTime time) {
         return this.date.equals(date) && time.getStartAt().equals(this.reservationTime.getStartAt());
+    }
+
+    @JsonIgnore
+    public boolean isConfirmed() {
+        return reservationStatus == ReservationStatus.CONFIRMED;
+    }
+
+    @JsonIgnore
+    public boolean isWaiting() {
+        return reservationStatus == ReservationStatus.WAITING;
+    }
+
+    @JsonIgnore
+    public boolean isSameMember(Long memberId) {
+        return getMemberId().equals(memberId);
     }
 }
