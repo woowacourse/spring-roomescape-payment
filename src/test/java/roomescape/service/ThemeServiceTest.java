@@ -60,7 +60,7 @@ class ThemeServiceTest extends ServiceTest {
     class SaveTheme {
         @Test
         void 테마를_추가할_수_있다() {
-            ThemeRequest request = new ThemeRequest("레벨3", "내용이다.", "https://naver.com");
+            ThemeRequest request = new ThemeRequest("레벨3", "내용이다.", "https://naver.com", 1000);
 
             ThemeResponse response = themeService.saveTheme(request);
 

@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 
 class ReservationServiceTest extends ServiceTest {
     @Autowired
@@ -205,6 +206,8 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
+            paymentClient.cancelPayment(any());
+            
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
             waitingFixture.createWaiting(reservation, anotherMember);
             reservationService.deleteReservation(reservation.getId(), member);

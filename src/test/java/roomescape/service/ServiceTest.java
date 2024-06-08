@@ -14,6 +14,7 @@ import roomescape.helper.domain.ReservationFixture;
 import roomescape.helper.domain.ReservationTimeFixture;
 import roomescape.helper.domain.ThemeFixture;
 import roomescape.helper.domain.WaitingFixture;
+import roomescape.service.payment.PaymentClient;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -50,6 +51,9 @@ abstract class ServiceTest {
 
     @MockBean
     protected Clock clock;
+
+    @MockBean
+    protected PaymentClient paymentClient;
 
     @BeforeEach
     protected void setUp() {

@@ -15,6 +15,7 @@ import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.service.payment.PaymentStatus;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,7 +130,7 @@ class ReservationIntegrationTest extends IntegrationTest {
             params.put("date", "2000-04-07");
             given(paymentClient.confirmPayment(any())).willReturn(
                     new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
-                            1000, "provider", "paymentMethod", PaymentStatus.DONE));
+                            1000, ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE));
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())
