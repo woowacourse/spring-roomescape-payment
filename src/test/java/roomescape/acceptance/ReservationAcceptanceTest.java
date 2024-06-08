@@ -133,7 +133,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .body(WaitingFixture.createWaitingRequest(reservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("status", is(ReservationStatus.WAITING.getDescription()))
+                            .assertThat().statusCode(HttpStatus.CREATED.value()).body("status", is(ReservationStatus.WAITING.getDescription()))
                             .extract().jsonPath().get("id"));
                 }),
                 DynamicTest.dynamicTest("admin이 guest의 예약을 삭제한다.", () -> {
@@ -141,7 +141,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().delete("/admin/reservations/" + reservationId)
                             .then().log().all()
-                            .assertThat().statusCode(204);
+                            .assertThat().statusCode(HttpStatus.NO_CONTENT.value());
                 }),
                 DynamicTest.dynamicTest("admin은 예약 대기에서 결제 대기로 전환되었다.", () -> {
                     RestAssured.given().log().all()
@@ -149,7 +149,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().get("/members/reservations")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
+                            .assertThat().statusCode(HttpStatus.OK.value()).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
                 }),
                 DynamicTest.dynamicTest("admin은 해당 결제 대기에 대해 결제를 진행해서 예약으로 전환된다.", () -> {
                     RestAssured.given().log().all()
@@ -184,7 +184,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .body(WaitingFixture.createWaitingRequest(reservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("status", is(ReservationStatus.WAITING.getDescription()))
+                            .assertThat().statusCode(HttpStatus.CREATED.value()).body("status", is(ReservationStatus.WAITING.getDescription()))
                             .extract().jsonPath().get("id"));
                 }),
                 DynamicTest.dynamicTest("admin은 해당 예약 대기에 대해 결제를 진행하려고 하면 예외가 발생한다.", () -> {
@@ -245,7 +245,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .body(WaitingFixture.createWaitingRequest(reservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("status", is(ReservationStatus.WAITING.getDescription()))
+                            .assertThat().statusCode(HttpStatus.CREATED.value()).body("status", is(ReservationStatus.WAITING.getDescription()))
                             .extract().jsonPath().get("id"));
                 }),
                 DynamicTest.dynamicTest("admin이 guest의 예약을 삭제한다.", () -> {
@@ -253,7 +253,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().delete("/admin/reservations/" + reservationId)
                             .then().log().all()
-                            .assertThat().statusCode(204);
+                            .assertThat().statusCode(HttpStatus.NO_CONTENT.value());
                 }),
                 DynamicTest.dynamicTest("admin은 예약 대기에서 결제 대기로 전환되었다.", () -> {
                     RestAssured.given().log().all()
@@ -261,7 +261,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().get("/members/reservations")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
+                            .assertThat().statusCode(HttpStatus.OK.value()).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
                 }),
                 DynamicTest.dynamicTest("guest가 해당 결제 대기에 대해 결제를 진행하려고 하면 예외가 발생한다.", () -> {
                     RestAssured.given().log().all()
@@ -296,7 +296,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .body(WaitingFixture.createWaitingRequest(reservationDetail))
                             .when().post("/waitings")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("status", is(ReservationStatus.WAITING.getDescription()))
+                            .assertThat().statusCode(HttpStatus.CREATED.value()).body("status", is(ReservationStatus.WAITING.getDescription()))
                             .extract().jsonPath().get("id"));
                 }),
                 DynamicTest.dynamicTest("admin이 admin의 예약을 삭제한다.", () -> {
@@ -304,7 +304,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().delete("/admin/reservations/" + reservationId)
                             .then().log().all()
-                            .assertThat().statusCode(204);
+                            .assertThat().statusCode(HttpStatus.NO_CONTENT.value());
                 }),
                 DynamicTest.dynamicTest("guest는 예약 대기에서 결제 대기로 전환되었다.", () -> {
                     RestAssured.given().log().all()
@@ -312,14 +312,14 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", guestToken)
                             .when().get("/members/reservations")
                             .then().log().all()
-                            .assertThat().statusCode(201).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
+                            .assertThat().statusCode(HttpStatus.OK.value()).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
                 }),
                 DynamicTest.dynamicTest("admin은 guest의 결제 대기 상태인 예약 정보를 삭제한다.", () -> {
                     RestAssured.given().log().all()
                             .cookie("token", adminToken)
                             .when().delete("/waitings/" + waitingId)
                             .then().log().all()
-                            .assertThat().statusCode(204);
+                            .assertThat().statusCode(HttpStatus.NO_CONTENT.value());
                 }),
                 DynamicTest.dynamicTest("admin은 방금 취소한 결제 대기에 대해 결제를 진행하려고 하면 예외가 발생한다.", () -> {
                     RestAssured.given().log().all()
@@ -327,7 +327,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                             .cookie("token", adminToken)
                             .when().post("/reservations/" + waitingId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("message", is("더이상 존재하지 않는 결제 대기 정보입니다."));
+                            .assertThat().statusCode(HttpStatus.OK.value()).body("message", is("더이상 존재하지 않는 결제 대기 정보입니다."));
                 })
         );
     }
