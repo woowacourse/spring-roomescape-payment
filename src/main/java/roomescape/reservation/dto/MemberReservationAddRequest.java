@@ -9,4 +9,12 @@ public record MemberReservationAddRequest(
         @NotNull(message = "예약 시간 선택은 필수 입니다.") @Positive Long timeId,
         @NotNull(message = "테마 선택은 필수 입니다.") @Positive Long themeId
 ) {
+
+    public MemberReservationAddRequest(MemberReservationWithPaymentAddRequest request) {
+        this(request.date(), request.timeId(), request.themeId());
+    }
+
+    public MemberReservationAddRequest(MemberReservationAddRequest request) {
+        this(request.date(), request.timeId(), request.themeId());
+    }
 }

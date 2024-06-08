@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -12,11 +13,14 @@ import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
@@ -26,19 +30,24 @@ import roomescape.time.domain.ReservationTimeRepository;
 @Service
 public class ReservationService {
 
+    private final PaymentService paymentService;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
 
-    public ReservationService(MemberRepository memberRepository,
-                              ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository) {
+    public ReservationService(
+            MemberRepository memberRepository,
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            PaymentService paymentService
+    ) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findAllReservation() {
@@ -60,7 +69,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllByMemberAndThemeAndPeriod(Long memberId, Long themeId, LocalDate dateFrom,
-                                                                      LocalDate dateTo) {
+            LocalDate dateTo) {
         return reservationRepository.findByMemberIdAndThemeIdAndDateValueBetween(memberId, themeId,
                         dateFrom, dateTo).stream()
                 .map(ReservationResponse::new)
@@ -90,14 +99,30 @@ public class ReservationService {
                 .forEach(responses::add);
     }
 
-    public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
-        validateDuplicatedReservation(request);
-        return saveMemberReservation(memberId, request, Status.RESERVED);
+    @Transactional
+    public ReservationResponse saveMemberReservation(Long memberId,
+            @Valid MemberReservationWithPaymentAddRequest request) {
+        MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(request);
+        validateDuplicatedReservation(memberReservationAddRequest);
+
+        Reservation reservation = saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        paymentService.confirmPayment(new PaymentConfirmRequest(request), reservation.getId());
+        return new ReservationResponse(reservation);
+    }
+
+    public ReservationResponse saveAdminReservation(Long memberId,
+            @Valid MemberReservationAddRequest request) {
+        MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(request);
+        validateDuplicatedReservation(memberReservationAddRequest);
+
+        Reservation reservation = saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        return new ReservationResponse(reservation);
     }
 
     public ReservationResponse saveMemberWaitingReservation(Long memberId, MemberReservationAddRequest request) {
         validateDuplicatedWaitingReservation(memberId, request);
-        return saveMemberReservation(memberId, request, Status.WAITING);
+        Reservation reservation = saveMemberReservation(memberId, request, Status.WAITING);
+        return new ReservationResponse(reservation);
     }
 
     private void validateDuplicatedReservation(MemberReservationAddRequest request) {
@@ -114,19 +139,18 @@ public class ReservationService {
         }
     }
 
-    private ReservationResponse saveMemberReservation(Long memberId,
-                                                      MemberReservationAddRequest request,
-                                                      Status status) {
+    private Reservation saveMemberReservation(
+            Long memberId,
+            MemberReservationAddRequest request,
+            Status status
+    ) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchRecordException("ID: " + memberId + " 해당하는 회원을 찾을 수 없습니다"));
         ReservationTime reservationTime = getReservationTime(request.timeId());
         validateReservingPastTime(request.date(), reservationTime.getStartAt());
         Theme theme = getTheme(request.themeId());
 
-        Reservation reservation
-                = new Reservation(member, request.date(), reservationTime, theme, status, LocalDateTime.now());
-        Reservation saved = reservationRepository.save(reservation);
-        return new ReservationResponse(saved);
+        return reservationRepository.save(new Reservation(member, request.date(), reservationTime, theme, status, LocalDateTime.now()));
     }
 
     private void validateReservingPastTime(LocalDate date, LocalTime time) {

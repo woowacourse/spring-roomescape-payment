@@ -11,12 +11,17 @@ public record ReservationResponse(Long id,
                                   MemberResponse member,
                                   LocalDate date,
                                   ReservationTimeResponse time,
-                                  ThemeResponse theme) {
+                                  ThemeResponse theme
+) {
 
     public ReservationResponse(Reservation reservation) {
-        this(reservation.getId(), new MemberResponse(reservation.getMember()), reservation.getDate(),
+        this(
+                reservation.getId(),
+                new MemberResponse(reservation.getMember()),
+                reservation.getDate(),
                 new ReservationTimeResponse(reservation.getTime()),
-                new ThemeResponse(reservation.getTheme()));
+                new ThemeResponse(reservation.getTheme())
+        );
     }
 
     public ReservationResponse(ReservationWaiting reservationWaiting) {
@@ -24,6 +29,7 @@ public record ReservationResponse(Long id,
                 new MemberResponse(reservationWaiting.getMember()),
                 reservationWaiting.getDate(),
                 new ReservationTimeResponse(reservationWaiting.getTime()),
-                new ThemeResponse(reservationWaiting.getTheme()));
+                new ThemeResponse(reservationWaiting.getTheme())
+        );
     }
 }

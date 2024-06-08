@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
 import roomescape.auth.dto.Accessor;
-import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
-import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
@@ -27,11 +24,9 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final TossPaymentClient tossPaymentClient;
 
-    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.tossPaymentClient = tossPaymentClient;
     }
 
     @GetMapping("/reservations")
@@ -66,20 +61,10 @@ public class ReservationController {
             @Authenticated Accessor accessor,
             @Valid @RequestBody MemberReservationWithPaymentAddRequest memberReservationWithPaymentAddRequest) {
 
-        MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(
-                memberReservationWithPaymentAddRequest.date(),
-                memberReservationWithPaymentAddRequest.timeId(),
-                memberReservationWithPaymentAddRequest.timeId()
+        ReservationResponse saveResponse = reservationService.saveMemberReservation(
+                accessor.id(),
+                memberReservationWithPaymentAddRequest
         );
-
-        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(new PaymentConfirmRequest(
-                memberReservationWithPaymentAddRequest.paymentKey(),
-                memberReservationWithPaymentAddRequest.orderId(),
-                memberReservationWithPaymentAddRequest.amount()
-        ));
-
-        ReservationResponse saveResponse = reservationService.saveMemberReservation(accessor.id(),
-                memberReservationAddRequest);
 
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);

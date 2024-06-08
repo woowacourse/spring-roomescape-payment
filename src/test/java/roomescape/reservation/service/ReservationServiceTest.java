@@ -3,10 +3,13 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static roomescape.member.fixture.MemberFixture.MEMBER_ID_1;
-import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
+import static roomescape.payment.fixture.PaymentFixture.PAYMENT;
+import static roomescape.reservation.fixture.ReservationFixture.PAST_RESERVATION_WITH_PAYMENT_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
+import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_WITH_PAYMENT_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_1;
 import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATION_2;
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
@@ -25,6 +28,8 @@ import roomescape.global.exception.DuplicateSaveException;
 import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.MemberReservationStatusResponse;
@@ -37,6 +42,12 @@ class ReservationServiceTest {
 
     @InjectMocks
     private ReservationService reservationService;
+
+    @Mock
+    private PaymentService paymentService;
+
+//    @Mock
+//    private TossPaymentClient tossPaymentClient;
 
     @Mock
     private MemberRepository memberRepository;
@@ -76,9 +87,10 @@ class ReservationServiceTest {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.of(THEME_1));
+        when(paymentService.confirmPayment(any(PaymentConfirmRequest.class), anyLong())).thenReturn(PAYMENT);
 
         ReservationResponse savedReservation = reservationService.saveMemberReservation(1L,
-                RESERVATION_REQUEST_1);
+                RESERVATION_WITH_PAYMENT_REQUEST_1);
 
         assertThat(savedReservation).isEqualTo(new ReservationResponse(SAVED_RESERVATION_1));
     }
@@ -90,7 +102,7 @@ class ReservationServiceTest {
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_WITH_PAYMENT_REQUEST_1))
                 .isInstanceOf(NoSuchRecordException.class);
     }
 
@@ -102,7 +114,7 @@ class ReservationServiceTest {
         when(themeRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_WITH_PAYMENT_REQUEST_1))
                 .isInstanceOf(NoSuchRecordException.class);
     }
 
@@ -114,7 +126,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L,
-                        PAST_DATE_RESERVATION_REQUEST))
+                        PAST_RESERVATION_WITH_PAYMENT_REQUEST_1))
                 .isInstanceOf(IllegalReservationDateException.class);
     }
 
@@ -124,7 +136,7 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDateValueAndTimeIdAndThemeId(TOMORROW, 1L, 1L)).thenReturn(true);
 
         assertThatThrownBy(
-                () -> reservationService.saveMemberReservation(1L, RESERVATION_REQUEST_1))
+                () -> reservationService.saveMemberReservation(1L, RESERVATION_WITH_PAYMENT_REQUEST_1))
                 .isInstanceOf(DuplicateSaveException.class);
     }
 
