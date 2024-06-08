@@ -23,10 +23,13 @@
   - cancel-url : 결제 취소 url
 - timeout
   - 최대 1번의 패킷 유실 시간을 고려한다. 
-  - connection timeout : 3초
-  - read timeout : 1초
+  - connection timeout : 60초
+  - read timeout : 30초
 - 예외 처리
-  - 최대 재시도 횟수 : 5회
+  - 최대 재시도 횟수 : 2회
   - Enum 클래스인 exception.ApiBadRequestExceptions : 토스 페이먼트 측 메시지 + 400 반환
   - 그 외 예외 : `결제 과정에서 문제가 발생했습니다.` + 500반환
 
+### Api 문서
+resources/static/docs/AdminReservation.html : 어드민 관련 API 문서
+resources/static/docs/UserReservation.html : 유저 관련 API 문서
