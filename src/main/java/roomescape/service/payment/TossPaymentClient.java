@@ -30,12 +30,6 @@ public class TossPaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    private record ConfirmRequest(BigDecimal amount, String orderId, String paymentKey) {
-    }
-
-    private record CancelRequest(String cancelReason) {
-    }
-
     public PaymentResult confirm(PaymentRequest request) {
         HttpHeaders headers = generateHttpHeaders();
         ConfirmRequest requestData = new ConfirmRequest(request.amount(), request.orderId(), request.paymentKey());
@@ -90,5 +84,11 @@ public class TossPaymentClient {
         } catch (IOException e) {
             throw new PaymentException("에러 메세지를 불러올 수 없습니다.");
         }
+    }
+
+    private record ConfirmRequest(BigDecimal amount, String orderId, String paymentKey) {
+    }
+
+    private record CancelRequest(String cancelReason) {
     }
 }
