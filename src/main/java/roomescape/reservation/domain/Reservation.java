@@ -49,15 +49,6 @@ public class Reservation {
             LocalDate date,
             ReservationTime reservationTime,
             Theme theme,
-            Member member
-    ) {
-        this(null, date, reservationTime, theme, member, ReservationStatus.WAITING);
-    }
-
-    public Reservation(
-            LocalDate date,
-            ReservationTime reservationTime,
-            Theme theme,
             Member member,
             ReservationStatus status
     ) {
