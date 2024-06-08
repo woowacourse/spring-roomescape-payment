@@ -10,4 +10,7 @@ public record PaymentRequest(
         BigDecimal amount,
         PaymentType paymentType
 ) {
+    public boolean isAdmin() {
+        return paymentType().isAdmin();
+    }
 }
