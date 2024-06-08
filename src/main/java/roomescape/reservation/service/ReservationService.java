@@ -36,19 +36,17 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final MemberService memberService;
     private final ThemeService themeService;
-    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeService reservationTimeService,
             MemberService memberService,
-            ThemeService themeService, PaymentService paymentService
+            ThemeService themeService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeService = reservationTimeService;
         this.memberService = memberService;
         this.themeService = themeService;
-        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -64,16 +62,12 @@ public class ReservationService {
     public void removeReservationById(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         reservationRepository.deleteById(reservationId);
-        paymentService.deletePaymentByReservationId(reservationId);
     }
 
-    public ReservationResponse addReservationWithPayment(ReservationRequest request, PaymentResponse paymentInfo, Long memberId) {
+    public Reservation addReservation(ReservationRequest request, Long memberId) {
         validateIsReservationExist(request.themeId(), request.timeId(), request.date());
         Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.CONFIRMED);
-        Reservation saved = reservationRepository.save(reservation);
-        ReservationPaymentResponse reservationPaymentResponse = paymentService.savePayment(paymentInfo, saved);
-
-        return reservationPaymentResponse.reservation();
+        return reservationRepository.save(reservation);
     }
 
     public ReservationResponse addWaiting(ReservationRequest request, Long memberId) {
