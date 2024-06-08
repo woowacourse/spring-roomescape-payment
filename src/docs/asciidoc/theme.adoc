@@ -17,3 +17,15 @@ include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-reque
 
 include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-response.adoc[]
 include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/response-fields.adoc[]
+
+=== 테마 등록
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/save/http-request.adoc[]
+include::{snippets}/theme-rest-docs-test/save/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/save/http-response.adoc[]
+include::{snippets}/theme-rest-docs-test/save/response-fields.adoc[]
