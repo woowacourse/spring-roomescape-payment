@@ -78,7 +78,3 @@ task createDocument(type: Copy) {
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
-
-bootJar {
-    dependsOn createDocument
-}
