@@ -97,7 +97,7 @@ class AdminEndToEndTest extends IntegrationTestSupport {
 
         RestAssured.given().log().all()
                 .cookie("token", ADMIN_TOKEN)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(8));

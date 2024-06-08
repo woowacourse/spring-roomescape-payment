@@ -26,14 +26,6 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping
-    public List<ReservationResponse> getReservations() {
-        return reservationService.getReservations()
-                .stream()
-                .map(ReservationResponse::from)
-                .toList();
-    }
-
     @GetMapping("/mine")
     public List<ReservationRankResponse> getMineReservation(final LoginMember member) {
         return reservationService.getMyReservation(member);

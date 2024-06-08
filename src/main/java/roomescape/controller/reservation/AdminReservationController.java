@@ -28,6 +28,14 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping("/admin/reservations")
+    public List<ReservationResponse> getReservations() {
+        return reservationService.getReservations()
+                .stream()
+                .map(ReservationResponse::from)
+                .toList();
+    }
+
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody @Valid final CreateAdminReservationRequest request) {
