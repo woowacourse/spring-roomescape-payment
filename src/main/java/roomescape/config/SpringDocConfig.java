@@ -6,16 +6,20 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SpringDocConfig {
-    private final RoomeescapeExceptionOperationCustomizer operationCustomizer;
+    private final RoomeescapeExceptionOperationCustomizer exceptionOperationCustomizer;
+    private final SuccessOperationCustomizer successOperationCustomizer;
 
-    public SpringDocConfig(RoomeescapeExceptionOperationCustomizer operationCustomizer) {
-        this.operationCustomizer = operationCustomizer;
+    public SpringDocConfig(RoomeescapeExceptionOperationCustomizer exceptionOperationCustomizer,
+                           SuccessOperationCustomizer successOperationCustomizer) {
+        this.exceptionOperationCustomizer = exceptionOperationCustomizer;
+        this.successOperationCustomizer = successOperationCustomizer;
     }
 
     @Bean
     public GroupedOpenApi adminApiGroup() {
         return GroupedOpenApi.builder()
-                .addOperationCustomizer(operationCustomizer)
+                .addOperationCustomizer(successOperationCustomizer)
+                .addOperationCustomizer(exceptionOperationCustomizer)
                 .group("관리자")
                 .pathsToMatch("/admin/**")
                 .build();
@@ -24,7 +28,8 @@ public class SpringDocConfig {
     @Bean
     public GroupedOpenApi memberApiGroup() {
         return GroupedOpenApi.builder()
-                .addOperationCustomizer(operationCustomizer)
+                .addOperationCustomizer(successOperationCustomizer)
+                .addOperationCustomizer(exceptionOperationCustomizer)
                 .group("회원")
                 .pathsToMatch("/**")
                 .pathsToExclude("/admin/**", "/login/**", "/themes/ranking")
@@ -34,7 +39,8 @@ public class SpringDocConfig {
     @Bean
     public GroupedOpenApi otherApiGroup() {
         return GroupedOpenApi.builder()
-                .addOperationCustomizer(operationCustomizer)
+                .addOperationCustomizer(successOperationCustomizer)
+                .addOperationCustomizer(exceptionOperationCustomizer)
                 .group("비회원")
                 .pathsToMatch("/login/**", "/themes/ranking")
                 .build();

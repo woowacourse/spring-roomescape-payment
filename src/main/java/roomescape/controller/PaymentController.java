@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.annotation.ApiSuccessResponse;
 import roomescape.annotation.Auth;
 import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.PaymentApproveRequest;
@@ -33,6 +34,7 @@ public class PaymentController {
     @ErrorApiResponse(value = {NOT_FOUND_RESERVATION, PAYMENT_FAIL_CAUSE_BALANCE, PAYMENT_FAIL_CAUSE_CARD_COMPANY,
             PAYMENT_FAIL_CAUSE_INVALID_PASSWORD, PAYMENT_FAIL_CAUSE_EXCEED_MAX_ONE_DAY_AMOUNT,
             PAYMENT_FAIL_CAUSE_INVALID_STOPPED_CARD, PAYMENT_FAIL_CAUSE_HIDDEN})
+    @ApiSuccessResponse
     public ResponseEntity<Void> approve(@Auth long memberId, @RequestBody PaymentApproveRequest paymentApproveRequest) {
         paymentService.approve(paymentApproveRequest, memberId);
 

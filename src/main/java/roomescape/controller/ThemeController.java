@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static roomescape.exception.ExceptionType.DELETE_USED_THEME;
 import static roomescape.exception.ExceptionType.DUPLICATE_THEME;
 import static roomescape.exception.ExceptionType.EMPTY_DESCRIPTION;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.annotation.ApiSuccessResponse;
 import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.ThemeRequest;
 import roomescape.dto.ThemeResponse;
@@ -36,12 +39,44 @@ public class ThemeController {
 
     @GetMapping("/themes")
     @Operation(summary = "테마 목록 조회", description = "테마목록을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = ThemeResponse.class, body = """
+            [
+                {
+                  "id": 1,
+                  "name": "테마이름",
+                  "description": "테마 설명",
+                  "thumbnail": "http://thumbnail"
+                },
+                {
+                  "id": 2,
+                  "name": "테마이름2",
+                  "description": "테마 설명2",
+                  "thumbnail": "http://thumbnail2"
+                }
+            ]
+            """)
     public List<ThemeResponse> findAll() {
         return themeService.findAll();
     }
 
     @GetMapping("/themes/ranking")
     @Operation(summary = "인기 테마 목록 조회", description = "기간에 따른 인기 테마 목록을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = ThemeResponse.class, body = """
+            [
+                {
+                  "id": 1,
+                  "name": "테마이름",
+                  "description": "테마 설명",
+                  "thumbnail": "http://thumbnail"
+                },
+                {
+                  "id": 2,
+                  "name": "테마이름2",
+                  "description": "테마 설명2",
+                  "thumbnail": "http://thumbnail2"
+                }
+            ]
+            """)
     public List<ThemeResponse> findAndOrderByPopularity(@RequestParam LocalDate start,
                                                         @RequestParam LocalDate end,
                                                         @RequestParam int count) {
@@ -51,6 +86,14 @@ public class ThemeController {
     @PostMapping("/admin/themes")
     @Operation(summary = "관리자 테마 생성", description = "관리자가 테마를 생성할 때 사용하는 API")
     @ErrorApiResponse({DUPLICATE_THEME, EMPTY_NAME, EMPTY_DESCRIPTION, EMPTY_THUMBNAIL, NOT_URL_BASE_THUMBNAIL})
+    @ApiSuccessResponse(status = CREATED, bodyType = ThemeResponse.class, body = """
+            {
+              "id": 1,
+              "name": "테마이름",
+              "description": "테마 설명",
+              "thumbnail": "http://thumbnail"
+            }
+            """)
     public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
         ThemeResponse saved = themeService.save(themeRequest);
         return ResponseEntity.created(URI.create("/themes/" + saved.id()))
@@ -58,8 +101,9 @@ public class ThemeController {
     }
 
     @DeleteMapping("/admin/themes/{id}")
-    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭제할 때 사용하는 API")
+    @Operation(summary = "관리자 테마 삭제", description = "관리자가 테마를 삭할 때 사용하는 API")
     @ErrorApiResponse(DELETE_USED_THEME)
+    @ApiSuccessResponse(status = NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable long id) {
         themeService.delete(id);
         return ResponseEntity.noContent().build();

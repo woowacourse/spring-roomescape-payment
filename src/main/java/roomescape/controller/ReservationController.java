@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.annotation.ApiSuccessResponse;
 import roomescape.annotation.Auth;
 import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.LoginMemberReservationResponse;
@@ -44,6 +46,23 @@ public class ReservationController {
     @Operation(summary = "예약 생성", description = "회원이 자신의 예약을 생성할 때 사용하는 API")
     @ErrorApiResponse({NOT_FOUND_RESERVATION_TIME, NOT_FOUND_THEME, NOT_FOUND_MEMBER, DUPLICATE_RESERVATION,
             PAST_TIME_RESERVATION})
+    @ApiSuccessResponse(status = HttpStatus.CREATED, bodyType = ReservationResponse.class, body = """
+            {
+              "id": 1,
+              "name": "예약자 이름",
+              "date": "2024-06-08",
+              "time": {
+                "id": 1,
+                "startAt": "19:30"
+              },
+              "theme": {
+                "id": 1,
+                "name": "테마 이름",
+                "description": "테마 설명",
+                "thumbnail": "https://thumbnail"
+              }
+            }
+            """)
     public ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
@@ -55,12 +74,68 @@ public class ReservationController {
 
     @GetMapping
     @Operation(summary = "전체 예약 조회", description = "전체 예약을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = ReservationResponse.class, body = """
+            [
+                {
+                  "id": 1,
+                  "name": "예약자 이름",
+                  "date": "2024-06-08",
+                  "time": {
+                    "id": 1,
+                    "startAt": "19:30"
+                  },
+                  "theme": {
+                    "id": 1,
+                    "name": "테마 이름",
+                    "description": "테마 설명",
+                    "thumbnail": "https://thumbnail"
+                  }
+                },
+                {
+                  "id": 2,
+                  "name": "예약자 이름2",
+                  "date": "2024-06-09",
+                  "time": {
+                    "id": 1,
+                    "startAt": "19:30"
+                  },
+                  "theme": {
+                    "id": 1,
+                    "name": "테마 이름",
+                    "description": "테마 설명",
+                    "thumbnail": "https://thumbnail"
+                  }
+                }
+            ]
+            """)
     public List<ReservationResponse> findAllReservations() {
         return reservationService.findAll();
     }
 
     @GetMapping("/mine")
     @Operation(summary = "회원 예약 목록 조회", description = "회원이 자신의 예약 목록을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = LoginMemberReservationResponse.class, body = """
+            [
+                {
+                  "reservationId": 1,
+                  "theme": "테마 이름 1",
+                  "date": "2024-06-08",
+                  "time": "19:30",
+                  "status": "WAITING_PAYMENT",
+                  "paymentKey": "paymentKey_d363d9c5de7a",
+                  "amount": 2000
+                },
+                {
+                  "reservationId": 2,
+                  "theme": "테마 이름 2",
+                  "date": "2024-06-09",
+                  "time": "19:30",
+                  "status": "SUCCESS",
+                  "paymentKey": "paymentKey_d363d9c5de7a",
+                  "amount": 1000
+                }
+            ]
+            """)
     public List<LoginMemberReservationResponse> findLoginMemberReservations(@Auth long memberId) {
         return myReservationService.findLoginMemberReservations(memberId);
     }
@@ -68,6 +143,7 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     @Operation(summary = "예약 취소", description = "예약을 취소할 때 사용하는 API")
     @ErrorApiResponse({PERMISSION_DENIED, NOT_FOUND_RESERVATION, NOT_FOUND_MEMBER})
+    @ApiSuccessResponse(status = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@Auth long memberId, @PathVariable("id") long reservationId) {
         reservationService.cancel(memberId, reservationId);
         return ResponseEntity.noContent().build();

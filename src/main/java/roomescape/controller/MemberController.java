@@ -4,6 +4,7 @@ import static roomescape.exception.ExceptionType.INVALID_TOKEN;
 import static roomescape.exception.ExceptionType.LOGIN_FAIL;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.annotation.ApiSuccessResponse;
 import roomescape.annotation.Auth;
 import roomescape.annotation.ErrorApiResponse;
 import roomescape.dto.LoginRequest;
@@ -36,6 +38,7 @@ public class MemberController {
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 할 때 사용하는 API")
     @ErrorApiResponse(LOGIN_FAIL)
+    @ApiResponse(responseCode = "200", description = "로그인 성공 시 쿠키에 token 이라는 이름으로 엑세스 토큰이 생성됩니다.")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         long memberId = memberService.login(loginRequest);
         LocalDateTime now = LocalDateTime.now();
@@ -53,12 +56,33 @@ public class MemberController {
     @GetMapping("/login/check")
     @Operation(summary = "로그인 여부 확인", description = "로그인 여부를 확인할 때 사용하는 API")
     @ErrorApiResponse(INVALID_TOKEN)
+    @ApiSuccessResponse(bodyType = MemberInfo.class, body = """
+            {
+              "id": 1,
+              "name": "robin",
+              "role": "ADMIN"
+            }
+            """)
     public MemberInfo myInfo(@Auth long memberId) {
         return memberService.findByMemberId(memberId);
     }
 
     @GetMapping("/members")
     @Operation(summary = "회원 목록 조회", description = "회원 목록을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = MemberInfo.class, body = """
+            [
+                {
+                  "id": 1,
+                  "name": "robin",
+                  "role": "ADMIN"
+                },
+                {
+                  "id": 2,
+                  "name": "polla",
+                  "role": "MEMBER"
+                }
+            ]
+            """)
     public List<MemberInfo> allMembers() {
         return memberService.findAll();
     }
