@@ -23,10 +23,13 @@ import roomescape.util.ServiceTest;
 
 @DisplayName("회원 로직 테스트")
 class AuthServiceTest extends ServiceTest {
+
     @Autowired
     MemberRepository memberRepository;
+
     @Autowired
     TokenProvider tokenProvider;
+
     @Autowired
     AuthService authService;
 

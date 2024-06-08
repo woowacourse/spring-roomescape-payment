@@ -27,7 +27,7 @@ public class Price {
         }
     }
 
-    private static boolean isOutOfRange(BigDecimal price) {
+    private boolean isOutOfRange(BigDecimal price) {
         return price.compareTo(MIN_PRICE) < 0 || price.compareTo(MAX_PRICE) > 0;
     }
 

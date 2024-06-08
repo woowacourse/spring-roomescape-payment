@@ -239,7 +239,8 @@ class AdminControllerTest extends ControllerTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
                 .when()
-                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny",
+                        waitingResponse.memberReservationId()))
                 .then().log().all()
                 .apply(document("deny/change/success"))
                 .statusCode(HttpStatus.OK.value());
