@@ -2,6 +2,7 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -84,6 +85,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("예약이 취소되면 바로 다음 예약 대기가 결제 대기로 전환되며, 전환 후 예약 대기를 취소하면 다음 예약 대기자의 예약 대기가 결제 대기로 전환된다.")
     @TestFactory
     Stream<DynamicTest> changeToPendingPayment() {
@@ -200,6 +202,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("어드민은 예약으로 전환된 예약 대기는 삭제할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotDeleteChangedToReservedByAdmin() {

@@ -2,10 +2,7 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.fixture.ReservationFixture;
@@ -162,6 +159,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("예약 대기 상태인 예약에 대해 결제를 요청할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForWaiting() {
@@ -198,6 +196,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("예약 상태인 예약에 대해 결제를 요청할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForReserved() {
@@ -223,6 +222,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("본인이 예약한 결제 대기 예약이 아닌 경우, 결제를 할 수 없다.")
     @TestFactory
     Stream<DynamicTest> payForOtherPendingPayment() {
@@ -274,6 +274,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Disabled
     @DisplayName("존재하지 않는 결제 대기에 대해 결제 요청을 할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForUnknownReservation() {

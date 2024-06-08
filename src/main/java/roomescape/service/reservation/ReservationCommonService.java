@@ -8,6 +8,8 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationDate;
 import roomescape.exception.InvalidReservationException;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
+import roomescape.service.reservation.dto.ReservationConfirmedResponse;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
@@ -26,8 +28,14 @@ public class ReservationCommonService {
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
         ReservationDate dateFrom = ReservationDate.of(reservationFilterRequest.dateFrom());
         ReservationDate dateTo = ReservationDate.of(reservationFilterRequest.dateTo());
-        return reservationRepository.findBy(reservationFilterRequest.memberId(), reservationFilterRequest.themeId(),
-                dateFrom, dateTo).stream().map(ReservationResponse::new).toList();
+        return reservationRepository.findBy(
+                        reservationFilterRequest.memberId(),
+                        reservationFilterRequest.themeId(),
+                        dateFrom,
+                        dateTo
+                ).stream()
+                .map(ReservationResponse::new)
+                .toList();
     }
 
     public List<ReservationResponse> findAll() {
@@ -62,5 +70,9 @@ public class ReservationCommonService {
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
                     .ifPresent(Reservation::pendingPayment);
         }
+    }
+
+    public ReservationConfirmedResponse confirmReservation(ReservationConfirmRequest request, long memberId) {
+        return null;
     }
 }
