@@ -15,7 +15,6 @@ import roomescape.service.reservation.ReservationTimeService;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,8 +30,8 @@ class ReservationTimeControllerTest extends RestDocsTestSupport {
     void getTimes() throws Exception {
         ReservationTimeResponses response = new ReservationTimeResponses(
                 List.of(
-                        new ReservationTimeResponse(1L, LocalTime.of(9,0,0)),
-                        new ReservationTimeResponse(2L, LocalTime.of(10,0,0))
+                        new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0)),
+                        new ReservationTimeResponse(2L, LocalTime.of(10, 0, 0))
                 )
         );
 
@@ -52,7 +51,7 @@ class ReservationTimeControllerTest extends RestDocsTestSupport {
                                         fieldWithPath("reservationTimeResponses[].id")
                                                 .type(JsonFieldType.NUMBER)
                                                 .description("시간 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("reservationTimeResponses[].startAt")
                                                 .type(JsonFieldType.STRING)
                                                 .description("예약 시간")
@@ -63,5 +62,6 @@ class ReservationTimeControllerTest extends RestDocsTestSupport {
 
     @Test
     void getTimesWithBooked() {
+        // TODO
     }
 }

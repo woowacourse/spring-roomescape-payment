@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Attributes;
 import roomescape.controller.config.RestDocsTestSupport;
 import roomescape.service.dto.request.ThemeSaveRequest;
@@ -32,7 +31,7 @@ class AdminThemeControllerTest extends RestDocsTestSupport {
 
     @Test
     @DisplayName("테마 저장")
-    void saveTheme() throws Exception{
+    void saveTheme() throws Exception {
         //given
         ThemeSaveRequest request = new ThemeSaveRequest("테마 이름", "테마 설명", "테마 섬네일 링크");
         ThemeResponse response = new ThemeResponse(1L, "테마 이름", "테마 설명", "테마 섬네일 링크");
@@ -40,10 +39,10 @@ class AdminThemeControllerTest extends RestDocsTestSupport {
         Mockito.when(themeService.saveTheme(any())).thenReturn(response);
 
         mockMvc.perform(post("/admin/themes")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .cookie(new Cookie("token", ADMIN_TOKEN))
-                    .requestAttr("loginMember", ADMIN)
-                    .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("token", ADMIN_TOKEN))
+                        .requestAttr("loginMember", ADMIN)
+                        .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(response.id()))
@@ -107,19 +106,19 @@ class AdminThemeControllerTest extends RestDocsTestSupport {
                                         fieldWithPath("themeResponses[].id")
                                                 .type(NUMBER)
                                                 .description("테마 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("themeResponses[].name")
                                                 .type(STRING)
                                                 .description("테마 이름")
-                                                .attributes(constraints( "not null")),
+                                                .attributes(constraints("not null")),
                                         fieldWithPath("themeResponses[].description")
                                                 .type(STRING)
                                                 .description("테마 설명")
-                                                .attributes(constraints( "255자 이내")),
+                                                .attributes(constraints("255자 이내")),
                                         fieldWithPath("themeResponses[].thumbnail")
                                                 .type(STRING)
                                                 .description("테마 섬네일 링크")
-                                                .attributes(constraints( "255자 이내"))
+                                                .attributes(constraints("255자 이내"))
                                 )
                         )
                 );

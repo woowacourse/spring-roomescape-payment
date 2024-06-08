@@ -17,7 +17,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +31,7 @@ class ThemeControllerTest extends RestDocsTestSupport {
     private ThemeService themeService;
 
     @Test
-    void getThemes() throws Exception{
+    void getThemes() throws Exception {
         ThemeResponses response = new ThemeResponses(
                 List.of(
                         new ThemeResponse(1L, "theme1", "theme_description1", "theme_thumbnail_link1"),
@@ -54,19 +55,19 @@ class ThemeControllerTest extends RestDocsTestSupport {
                                         fieldWithPath("themeResponses[].id")
                                                 .type(NUMBER)
                                                 .description("테마 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("themeResponses[].name")
                                                 .type(STRING)
                                                 .description("테마 이름")
-                                                .attributes(constraints( "not null")),
+                                                .attributes(constraints("not null")),
                                         fieldWithPath("themeResponses[].description")
                                                 .type(STRING)
                                                 .description("테마 설명")
-                                                .attributes(constraints( "255자 이내")),
+                                                .attributes(constraints("255자 이내")),
                                         fieldWithPath("themeResponses[].thumbnail")
                                                 .type(STRING)
                                                 .description("테마 섬네일 링크")
-                                                .attributes(constraints( "255자 이내"))
+                                                .attributes(constraints("255자 이내"))
                                 )
                         )
                 );
@@ -101,35 +102,35 @@ class ThemeControllerTest extends RestDocsTestSupport {
                 )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
-                        queryParameters(
-                                parameterWithName("startDate")
-                                        .description("인기 테마 산정 시작 날짜"),
-                                parameterWithName("endDate")
-                                        .description("인기 테마 산정 종료 날짜"),
-                                parameterWithName("limit")
-                                    .description("인기 테마 산정 개수")
-                                    .attributes(constraints( "not null / positive"))
-                        ),
-                        responseFields(
+                                queryParameters(
+                                        parameterWithName("startDate")
+                                                .description("인기 테마 산정 시작 날짜"),
+                                        parameterWithName("endDate")
+                                                .description("인기 테마 산정 종료 날짜"),
+                                        parameterWithName("limit")
+                                                .description("인기 테마 산정 개수")
+                                                .attributes(constraints("not null / positive"))
+                                ),
+                                responseFields(
                                         fieldWithPath("themeResponses")
                                                 .type(ARRAY)
                                                 .description("인기 테마 목록"),
                                         fieldWithPath("themeResponses[].id")
                                                 .type(NUMBER)
                                                 .description("인기 테마 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("themeResponses[].name")
                                                 .type(STRING)
                                                 .description("인기 테마 이름")
-                                                .attributes(constraints( "not null")),
+                                                .attributes(constraints("not null")),
                                         fieldWithPath("themeResponses[].description")
                                                 .type(STRING)
                                                 .description("인기 테마 설명")
-                                                .attributes(constraints( "255자 이내")),
+                                                .attributes(constraints("255자 이내")),
                                         fieldWithPath("themeResponses[].thumbnail")
                                                 .type(STRING)
                                                 .description("인기 테마 섬네일 링크")
-                                                .attributes(constraints( "255자 이내"))
+                                                .attributes(constraints("255자 이내"))
                                 )
                         )
                 );

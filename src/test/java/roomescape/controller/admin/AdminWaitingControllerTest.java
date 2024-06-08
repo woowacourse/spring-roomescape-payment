@@ -32,8 +32,8 @@ class AdminWaitingControllerTest extends RestDocsTestSupport {
     void allWaitings() throws Exception {
         WaitingResponses response = new WaitingResponses(
                 List.of(
-                        new WaitingResponse(1L, "memberName1", "themeName1", LocalDate.now().plusDays(1L), LocalTime.of(9,0,0)),
-                        new WaitingResponse(2L, "memberName2", "themeName2", LocalDate.now().plusDays(2L), LocalTime.of(9,0,0))
+                        new WaitingResponse(1L, "memberName1", "themeName1", LocalDate.now().plusDays(1L), LocalTime.of(9, 0, 0)),
+                        new WaitingResponse(2L, "memberName2", "themeName2", LocalDate.now().plusDays(2L), LocalTime.of(9, 0, 0))
                 )
         );
 
@@ -53,22 +53,22 @@ class AdminWaitingControllerTest extends RestDocsTestSupport {
                                         fieldWithPath("waitingResponses[].id")
                                                 .type(NUMBER)
                                                 .description("예약 대기 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("waitingResponses[].name")
                                                 .type(STRING)
                                                 .description("대기 멤버 이름")
-                                                .attributes(constraints( "not null")),
+                                                .attributes(constraints("not null")),
                                         fieldWithPath("waitingResponses[].theme")
                                                 .type(STRING)
                                                 .description("대기 테마 이름"),
                                         fieldWithPath("waitingResponses[].date")
                                                 .type(LocalDate.class)
                                                 .description("예약 대기 날짜")
-                                                .attributes(constraints( "오늘 이후만 가능합니다.")),
+                                                .attributes(constraints("오늘 이후만 가능합니다.")),
                                         fieldWithPath("waitingResponses[].time")
                                                 .type(LocalDate.class)
                                                 .description("예약 대기 시간")
-                                                .attributes(constraints( "오늘이 예약일이라면 현재 이후의 시간만 가능합니다."))
+                                                .attributes(constraints("오늘이 예약일이라면 현재 이후의 시간만 가능합니다."))
                                 )
                         )
                 );

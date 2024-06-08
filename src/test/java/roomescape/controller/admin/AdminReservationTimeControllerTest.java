@@ -33,8 +33,8 @@ class AdminReservationTimeControllerTest extends RestDocsTestSupport {
     void getTimes() throws Exception {
         ReservationTimeResponses response = new ReservationTimeResponses(
                 List.of(
-                        new ReservationTimeResponse(1L, LocalTime.of(9,0,0)),
-                        new ReservationTimeResponse(2L, LocalTime.of(10,0,0))
+                        new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0)),
+                        new ReservationTimeResponse(2L, LocalTime.of(10, 0, 0))
                 )
         );
 
@@ -54,12 +54,12 @@ class AdminReservationTimeControllerTest extends RestDocsTestSupport {
                                         fieldWithPath("reservationTimeResponses[].id")
                                                 .type(JsonFieldType.NUMBER)
                                                 .description("시간 아이디")
-                                                .attributes(constraints( "positive")),
+                                                .attributes(constraints("positive")),
                                         fieldWithPath("reservationTimeResponses[].startAt")
                                                 .type(JsonFieldType.STRING)
                                                 .description("예약 시간")
                                 )
-                    )
+                        )
                 );
     }
 
@@ -68,7 +68,7 @@ class AdminReservationTimeControllerTest extends RestDocsTestSupport {
     void saveTime() throws Exception {
         //given
         ReservationTimeSaveRequest request = new ReservationTimeSaveRequest(LocalTime.of(9, 0, 0));
-        ReservationTimeResponse response = new ReservationTimeResponse(1L, LocalTime.of(9,0,0));
+        ReservationTimeResponse response = new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0));
 
         Mockito.when(timeService.saveTime(any())).thenReturn(response);
 
@@ -86,17 +86,17 @@ class AdminReservationTimeControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("startAt")
                                         .type(LocalTime.class)
                                         .description("예약 시간")
-                                        .attributes(constraints( "not null"))
+                                        .attributes(constraints("not null"))
                         ),
                         responseFields(
                                 fieldWithPath("id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("시간 아이디")
-                                        .attributes(constraints( "양수인 시간 아이디입니다.")),
+                                        .attributes(constraints("양수인 시간 아이디입니다.")),
                                 fieldWithPath("startAt")
                                         .type(LocalTime.class)
                                         .description("예약 시간")
-                                        .attributes(constraints( "not null"))
+                                        .attributes(constraints("not null"))
                         )
                 ));
     }

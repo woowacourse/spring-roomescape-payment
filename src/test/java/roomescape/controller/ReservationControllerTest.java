@@ -157,72 +157,72 @@ public class ReservationControllerTest extends RestDocsTestSupport {
         Theme theme = new Theme("테마", "테마_설명", "테마_섬네일링크");
         ReservationTime time = new ReservationTime(LocalTime.of(9, 0, 0));
         Member member = new Member("user", "email@email.com", "password", Role.USER);
-        
+
         ReservationSlot slot = new ReservationSlot(LocalDate.now().plusDays(1), time, theme);
         ReservationSlot slot2 = new ReservationSlot(LocalDate.now().plusDays(2), time, theme);
-        
+
         Reservation reservation1 = new Reservation(member, slot);
 
         List<UserReservationResponse> response = List.of(
-                        new UserReservationResponse(
-                                1L,
-                                slot,
-                                ReservationStatus.RESERVED,
-                                OptionalLong.empty(),
-                                Optional.of(new Payment("testPaymentKey", "1000", reservation1))
-                        ),
-                        new UserReservationResponse(
-                                2L,
-                                slot2,
-                                ReservationStatus.WAITING,
-                                OptionalLong.of(2L),
-                                Optional.empty()
-                        )
-                );
+                new UserReservationResponse(
+                        1L,
+                        slot,
+                        ReservationStatus.RESERVED,
+                        OptionalLong.empty(),
+                        Optional.of(new Payment("testPaymentKey", "1000", reservation1))
+                ),
+                new UserReservationResponse(
+                        2L,
+                        slot2,
+                        ReservationStatus.WAITING,
+                        OptionalLong.of(2L),
+                        Optional.empty()
+                )
+        );
 
         Mockito.when(reservationService.findAllUserReservation(any()))
                 .thenReturn(response);
-        
+
         mockMvc.perform(get("/reservations-mine")
                         .contentType(MediaType.APPLICATION_JSON)
                         .cookie(new Cookie("token", USER_TOKEN))
                 )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
-                        responseFields(
-                                fieldWithPath("reservationViewResponses")
-                                        .type(ARRAY)
-                                        .description("나의 예약 목록"),
-                                fieldWithPath("reservationViewResponses[].id")
-                                        .type(NUMBER)
-                                        .description("나의 예약 아이디")
-                                        .attributes(constraints("positive")),
-                                fieldWithPath("reservationViewResponses[].theme")
-                                        .type(STRING)
-                                        .description("테마 이름"),
-                                fieldWithPath("reservationViewResponses[].date")
-                                        .type(LocalDate.class)
-                                        .description("예약 날짜")
-                                        .attributes(constraints("오늘 이후의 날짜입니다.")),
-                                fieldWithPath("reservationViewResponses[].time")
-                                        .type(LocalTime.class)
-                                        .description("예약 시간"),
-                                fieldWithPath("reservationViewResponses[].status")
-                                        .type(STRING)
-                                        .description("예약 상태")
-                                        .attributes(constraints("예약 / 0번째 예약 대기")),
-                                fieldWithPath("reservationViewResponses[].paymentKey")
-                                        .type(STRING)
-                                        .description("결제 키")
-                                        .optional()
-                                        .attributes(constraints("토스 페이먼츠에서 발급된 결제 키입니다.")),
-                                fieldWithPath("reservationViewResponses[].amount")
-                                        .type(STRING)
-                                        .description("결제 금액")
-                                        .optional()
-                                        .attributes(constraints("positive"))
+                                responseFields(
+                                        fieldWithPath("userReservationViewResponses")
+                                                .type(ARRAY)
+                                                .description("나의 예약 목록"),
+                                        fieldWithPath("userReservationViewResponses[].id")
+                                                .type(NUMBER)
+                                                .description("나의 예약 아이디")
+                                                .attributes(constraints("positive")),
+                                        fieldWithPath("userReservationViewResponses[].theme")
+                                                .type(STRING)
+                                                .description("테마 이름"),
+                                        fieldWithPath("userReservationViewResponses[].date")
+                                                .type(LocalDate.class)
+                                                .description("예약 날짜")
+                                                .attributes(constraints("오늘 이후의 날짜입니다.")),
+                                        fieldWithPath("userReservationViewResponses[].time")
+                                                .type(LocalTime.class)
+                                                .description("예약 시간"),
+                                        fieldWithPath("userReservationViewResponses[].status")
+                                                .type(STRING)
+                                                .description("예약 상태")
+                                                .attributes(constraints("예약 / 0번째 예약 대기")),
+                                        fieldWithPath("userReservationViewResponses[].paymentKey")
+                                                .type(STRING)
+                                                .description("결제 키")
+                                                .optional()
+                                                .attributes(constraints("토스 페이먼츠에서 발급된 결제 키입니다.")),
+                                        fieldWithPath("userReservationViewResponses[].amount")
+                                                .type(STRING)
+                                                .description("결제 금액")
+                                                .optional()
+                                                .attributes(constraints("positive"))
+                                )
                         )
-                )
-        );
+                );
     }
 }

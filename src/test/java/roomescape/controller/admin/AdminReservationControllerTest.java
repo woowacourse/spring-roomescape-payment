@@ -101,7 +101,7 @@ public class AdminReservationControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("member.role")
                                         .type(STRING)
                                         .description("회원 권한")
-                                        .attributes(constraints( "ADMIN: 어드민, USER : 사용자")),
+                                        .attributes(constraints("ADMIN: 어드민, USER : 사용자")),
                                 fieldWithPath("date")
                                         .type(LocalDate.class)
                                         .description("예약 날짜")
@@ -136,7 +136,7 @@ public class AdminReservationControllerTest extends RestDocsTestSupport {
 
     @Test
     @DisplayName("어드민의 예약 필터링 조회")
-    public void getReservations() throws Exception{
+    public void getReservations() throws Exception {
 
         //given
         ReservationConditionRequest request = new ReservationConditionRequest(
@@ -148,20 +148,20 @@ public class AdminReservationControllerTest extends RestDocsTestSupport {
 
         ReservationResponses response = new ReservationResponses(
                 List.of(
-                    new ReservationResponse(
-                            1L, 
-                            new MemberResponse(1L, "user", "USER"), 
-                            LocalDate.now().minusDays(1), 
-                            new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0)), 
-                            new ThemeResponse(1L, "테마1", "테마 설명", "섬네일 링크")
-                    ),
-                    new ReservationResponse(
-                            2L, 
-                            new MemberResponse(1L, "user", "USER"), 
-                            LocalDate.now().minusDays(2), 
-                            new ReservationTimeResponse(2L, LocalTime.of(10, 0, 0)), 
-                            new ThemeResponse(2L, "테마2", "테마 설명", "섬네일 링크")
-                    )
+                        new ReservationResponse(
+                                1L,
+                                new MemberResponse(1L, "user", "USER"),
+                                LocalDate.now().minusDays(1),
+                                new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0)),
+                                new ThemeResponse(1L, "테마1", "테마 설명", "섬네일 링크")
+                        ),
+                        new ReservationResponse(
+                                2L,
+                                new MemberResponse(1L, "user", "USER"),
+                                LocalDate.now().minusDays(2),
+                                new ReservationTimeResponse(2L, LocalTime.of(10, 0, 0)),
+                                new ThemeResponse(2L, "테마2", "테마 설명", "섬네일 링크")
+                        )
                 )
         );
 
@@ -216,7 +216,7 @@ public class AdminReservationControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("reservationResponses[].member.role")
                                         .type(STRING)
                                         .description("회원 권한")
-                                        .attributes(constraints( "ADMIN: 어드민, USER : 사용자")),
+                                        .attributes(constraints("ADMIN: 어드민, USER : 사용자")),
                                 fieldWithPath("reservationResponses[].date")
                                         .type(LocalDate.class)
                                         .description("예약 날짜")

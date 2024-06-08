@@ -25,6 +25,20 @@ include::{snippets}/reservation-controller-test/save-reservation_201/http-respon
 
 include::{snippets}/reservation-controller-test/save-reservation_201/response-fields.adoc[]
 
+=== 나의 예약 조회
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/get-my-reservations_200/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/get-my-reservations_200/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-controller-test/get-my-reservations_200/response-fields.adoc[]
+
 === 예약 대기 생성
 
 ==== 요청
@@ -74,5 +88,53 @@ include::{snippets}/member-controller-test/save/http-response.adoc[]
 ==== 응답 필드
 
 include::{snippets}/member-controller-test/save/response-fields.adoc[]
+
+== ReservationTime 관련 API
+
+=== 시간 조회
+
+==== 요청
+include::{snippets}/reservation-time-controller-test/get-times/http-request.adoc[]
+
+==== 응답
+include::{snippets}/reservation-time-controller-test/get-times/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/reservation-time-controller-test/get-times/response-fields.adoc[]
+
+== Theme 관련 API
+
+=== 테마 조회
+
+==== 요청
+include::{snippets}/theme-controller-test/get-themes/http-request.adoc[]
+
+==== 응답
+include::{snippets}/theme-controller-test/get-themes/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/theme-controller-test/get-themes/response-fields.adoc[]
+
+=== 인기 테마 랭킹 조회
+
+==== 요청
+
+include::{snippets}/theme-controller-test/get-popular-themes/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/theme-controller-test/get-popular-themes/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/theme-controller-test/get-popular-themes/http-response.adoc[]
+
+==== 응답필드
+
+include::{snippets}/theme-controller-test/get-popular-themes/response-fields.adoc[]
+
+
+
+
 
 

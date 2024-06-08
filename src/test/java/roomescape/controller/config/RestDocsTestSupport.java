@@ -53,12 +53,10 @@ public abstract class RestDocsTestSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @MockBean
-    private AuthService authService;
-
     @MockBean
     protected PaymentService paymentService;
+    @MockBean
+    private AuthService authService;
 
     protected static Attributes.Attribute constraints(final String value) {
         return new Attributes.Attribute("constraints", value);

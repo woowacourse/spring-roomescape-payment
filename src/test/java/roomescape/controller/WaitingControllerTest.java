@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import roomescape.controller.config.RestDocsTestSupport;
 import roomescape.service.dto.request.WaitingRequest;
@@ -19,7 +18,8 @@ import java.time.LocalTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,7 +49,7 @@ class WaitingControllerTest extends RestDocsTestSupport {
                 LocalDate.now().plusDays(1),
                 LocalTime.of(9, 0, 0)
         );
-   
+
         Mockito.when(waitingService.saveWaiting(any(), anyLong()))
                 .thenReturn(response);
 
@@ -70,11 +70,11 @@ class WaitingControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("date")
                                         .type(LocalDate.class)
                                         .description("예약 대기 날짜")
-                                        .attributes(constraints( "오늘 이후의 날짜만 가능합니다.")),
+                                        .attributes(constraints("오늘 이후의 날짜만 가능합니다.")),
                                 fieldWithPath("timeId")
                                         .type(NUMBER)
                                         .description("시간 아이디")
-                                        .attributes(constraints( "예약 대기 날짜가 오늘이라면 현재 이후의 시간 아이디만 가능합니다.")),
+                                        .attributes(constraints("예약 대기 날짜가 오늘이라면 현재 이후의 시간 아이디만 가능합니다.")),
                                 fieldWithPath("themeId")
                                         .type(NUMBER)
                                         .description("테마 아이디")
@@ -83,14 +83,14 @@ class WaitingControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("id")
                                         .type(NUMBER)
                                         .description("예약 아이디")
-                                        .attributes(constraints( "양수의 예약 아이디입니다")),
+                                        .attributes(constraints("양수의 예약 아이디입니다")),
                                 fieldWithPath("name")
                                         .type(STRING)
                                         .description("예약 회원 이름"),
                                 fieldWithPath("date")
                                         .type(LocalDate.class)
                                         .description("예약 날짜")
-                                        .attributes(constraints( "예약된 날짜(오늘 이후만 가능)")),
+                                        .attributes(constraints("예약된 날짜(오늘 이후만 가능)")),
                                 fieldWithPath("time")
                                         .type(LocalTime.class)
                                         .description("예약된 시간 정보"),

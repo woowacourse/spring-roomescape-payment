@@ -25,6 +25,24 @@ include::{snippets}/admin-reservation-controller-test/save-reservation_201/http-
 
 include::{snippets}/admin-reservation-controller-test/save-reservation_201/response-fields.adoc[]
 
+=== 예약 조회
+
+==== 요청
+
+include::{snippets}/admin-reservation-controller-test/get-reservations/http-request.adoc[]
+
+==== 요청 파라미터
+
+include::{snippets}/admin-reservation-controller-test/get-reservations/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/admin-reservation-controller-test/get-reservations/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/admin-reservation-controller-test/get-reservations/response-fields.adoc[]
+
 === 예약 삭제
 
 ==== 요청

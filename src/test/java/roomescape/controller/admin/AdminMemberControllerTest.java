@@ -13,7 +13,6 @@ import roomescape.service.dto.response.MemberResponse;
 import roomescape.service.dto.response.MemberResponses;
 import roomescape.service.reservation.MemberService;
 
-import javax.management.openmbean.SimpleType;
 import java.util.List;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -46,29 +45,29 @@ class AdminMemberControllerTest extends RestDocsTestSupport {
                 )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
-                        responseFields(
-                                fieldWithPath("memberResponses")
-                                        .type(JsonFieldType.ARRAY)
-                                        .description("전체 멤버 목록"),
-                                fieldWithPath("memberResponses[].id")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("멤버 아이디")
-                                        .attributes(constraints( "positive")),
-                                fieldWithPath("memberResponses[].name")
-                                        .type(JsonFieldType.STRING)
-                                        .description("멤버 이름")
-                                        .attributes(constraints( "not null")),
-                                fieldWithPath("memberResponses[].role")
-                                        .type(JsonFieldType.STRING)
-                                        .description("멤버 권한")
-                                        .attributes(constraints( "USER : 사용자%nADMIN : 관리자")))
+                                responseFields(
+                                        fieldWithPath("memberResponses")
+                                                .type(JsonFieldType.ARRAY)
+                                                .description("전체 멤버 목록"),
+                                        fieldWithPath("memberResponses[].id")
+                                                .type(JsonFieldType.NUMBER)
+                                                .description("멤버 아이디")
+                                                .attributes(constraints("positive")),
+                                        fieldWithPath("memberResponses[].name")
+                                                .type(JsonFieldType.STRING)
+                                                .description("멤버 이름")
+                                                .attributes(constraints("not null")),
+                                        fieldWithPath("memberResponses[].role")
+                                                .type(JsonFieldType.STRING)
+                                                .description("멤버 권한")
+                                                .attributes(constraints("USER : 사용자%nADMIN : 관리자")))
                         )
                 );
     }
 
     @Test
     @DisplayName("멤버 삭제")
-    void withdrawMember_204() throws Exception{
+    void withdrawMember_204() throws Exception {
         //given
         mockMvc.perform(delete("/admin/members/{id}", "1")
                         .contentType(MediaType.APPLICATION_JSON)
