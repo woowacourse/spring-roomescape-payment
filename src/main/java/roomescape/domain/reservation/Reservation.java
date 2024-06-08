@@ -8,10 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
@@ -32,6 +36,10 @@ public class Reservation {
 
     @ManyToOne
     private Theme theme;
+
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Payment payment;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
@@ -82,5 +90,9 @@ public class Reservation {
 
     public Schedule getSchedule() {
         return schedule;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }

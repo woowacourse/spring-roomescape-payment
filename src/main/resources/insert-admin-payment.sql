@@ -1,0 +1,15 @@
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
+INSERT INTO PAYMENT(amount, order_id, payment_key, payment_type) values (0, 'ADMIN', 'ADMIN', 'ADMIN');
