@@ -18,7 +18,7 @@ import java.util.Base64;
 
 @Service
 public class PaymentService {
-    private static final int RETRY_ATTEMPT = 5;
+    private static final int RETRY_ATTEMPT = 2;
 
     private final IdemPotencyKeyGenerator generator;
     private final PaymentProperties paymentProperties;
