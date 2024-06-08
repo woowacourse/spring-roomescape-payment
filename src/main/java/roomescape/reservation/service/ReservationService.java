@@ -13,7 +13,11 @@ import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
+import roomescape.payment.domain.PaymentMatcher;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWaiting;
@@ -35,17 +39,20 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentRepository paymentRepository;
     private final TossPaymentClient tossPaymentClient;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
+                              PaymentRepository paymentRepository,
                               TossPaymentClient tossPaymentClient) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.paymentRepository = paymentRepository;
         this.tossPaymentClient = tossPaymentClient;
     }
 
@@ -85,10 +92,23 @@ public class ReservationService {
     }
 
     private void findAllMembersReservedReservation(List<MemberReservationResponse> responses, Long memberId) {
-        reservationRepository.findAllReservedByMemberId(memberId)
-                .stream()
-                .map(MemberReservationResponse::new)
-                .forEach(responses::add);
+        List<Reservation> reservations = reservationRepository.findAllReservedByMemberId(memberId);
+        PaymentMatcher paymentMatcher = new PaymentMatcher(paymentRepository.findAllByMemberId(memberId));
+        for (Reservation reservation : reservations) {
+            Payment payment = paymentMatcher.getPaymentByReservationId(reservation.getId());
+            responses.add(
+                    new MemberReservationResponse(
+                            reservation.getId(),
+                            reservation.getTheme().getName(),
+                            reservation.getDate(),
+                            reservation.getTime().getStartAt(),
+                            reservation.getStatus().getValue(),
+                            payment.getPaymentKey(),
+                            payment.getOrderId(),
+                            payment.getAmount()
+                    )
+            );
+        }
     }
 
     private void findAllMembersWaitingReservation(List<MemberReservationResponse> responses, Long memberId) {
@@ -129,8 +149,11 @@ public class ReservationService {
 
         validateDuplicatedReservation(memberReservationAddRequest);
 
-        tossPaymentClient.confirmPayments(paymentConfirmRequest);
-        return saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        ReservationResponse reservationResponse
+                = saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        saveMemberPayment(reservationResponse, paymentConfirmResponse);
+        return reservationResponse;
     }
 
     public ReservationResponse saveMemberWaitingReservation(Long memberId, MemberReservationAddRequest request) {
@@ -165,6 +188,16 @@ public class ReservationService {
                 = new Reservation(member, request.date(), reservationTime, theme, status, LocalDateTime.now());
         Reservation saved = reservationRepository.save(reservation);
         return new ReservationResponse(saved);
+    }
+
+    private void saveMemberPayment(ReservationResponse reservationResponse,
+                                   PaymentConfirmResponse paymentConfirmResponse) {
+        Payment payment = new Payment(reservationResponse.id(),
+                reservationResponse.member().id(),
+                paymentConfirmResponse.paymentKey(),
+                paymentConfirmResponse.orderId(),
+                paymentConfirmResponse.totalAmount());
+        paymentRepository.save(payment);
     }
 
     private void validateReservingPastTime(LocalDate date, LocalTime time) {

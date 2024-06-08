@@ -82,7 +82,7 @@ class ReservationControllerE2ETest {
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse(null, null, null));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -199,7 +199,7 @@ class ReservationControllerE2ETest {
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse(null, null, null));
 
         return Stream.of(
                 dynamicTest("예약을 추가한다", () -> {

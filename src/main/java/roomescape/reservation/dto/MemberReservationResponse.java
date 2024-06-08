@@ -9,14 +9,20 @@ public record MemberReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status) {
+        String status,
+        String paymentKey,
+        String orderId,
+        Long amount) {
 
     public MemberReservationResponse(Reservation reservation) {
         this(reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                reservation.getStatus().getValue()
+                reservation.getStatus().getValue(),
+                null,
+                null,
+                null
         );
     }
 
@@ -30,7 +36,10 @@ public record MemberReservationResponse(
                 theme,
                 date,
                 time,
-                rank + "번째 " + status
+                rank + "번째 " + status,
+                null,
+                null
+                ,null
         );
     }
 }
