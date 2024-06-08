@@ -330,6 +330,65 @@
     "message": "존재하는 예약이 없습니다. 예약으로 다시 시도해주세요."
     }
     ```
+    
+### 예약 결제
+- http method: POST
+- uri: /reservations/{id}/payment
+  - path variable
+    - id: 예약 정보 식별자
+- description: 예약 대기에서 결제 대기로 전환되면 결제 요청을 할 수 있다.
+- request
+```
+POST /reservations/{id}/payment HTTP/1.1
+cookie: token={token}
+host: localhost:8080
+```
+
+- response
+  - 성공
+  ```
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+  
+  {
+    "reservationId": 1,
+    "theme": "테마1",
+    "date": "2024-03-01",
+    "time": "10:00",
+    "reservationStatus": {
+      "status": "예약",
+      "rank": 0
+    },
+    "payment": {
+      "paymentKey": "tgon_234567890"
+      "amount": 1000
+    }
+  }
+  ```
+  - 실패: 결제 대기 상태가 아님
+    ```
+    HTTP/1.1 400
+
+    {
+      "message": "결재 대기 상태에서만 결재 가능합니다."
+    }
+    ```
+  - 삭제 실패: 일반 사용자가 본인 결제 대기 외의 것을 결제 시도
+    ```
+    HTTP/1.1 403
+
+    {
+      "message": "본인의 예약만 결제할 수 있습니다."
+    }
+    ```
+  - 삭제 실패: 존재하지 않는 결제 대기를 삭제하려고 시도
+    ```
+    HTTP/1.1 400
+
+    {
+      "message": "더이상 존재하지 않는 예약 정보입니다."
+    }
+    ```
 
 ### 예약 삭제 - 어드민
 - http method: DELETE
@@ -370,7 +429,7 @@
     ```
     HTTP/1.1 204
     ```
-  - 삭제 실패: 예약으로 전환된 예약 대기를 삭제할 수 없다.
+  - 삭제 실패: 예약으로 전환된 예약대기/결제대기를 삭제할 수 없다.
     ```
     HTTP/1.1 400
 
@@ -378,7 +437,7 @@
     "message": "예약은 삭제할 수 없습니다. 관리자에게 문의해주세요."
     }
     ```
-  - 삭제 실패: 일반 사용자가 본인 예약 대기 외의 것을 삭제 시도
+  - 삭제 실패: 일반 사용자가 본인 예약대기/결제대기 외의 것을 삭제 시도
     ```
     HTTP/1.1 403
 
