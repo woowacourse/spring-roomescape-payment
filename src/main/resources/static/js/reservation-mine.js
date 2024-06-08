@@ -34,7 +34,7 @@ function render(data) {
         } else if (item.status === 'PAYMENT_PENDING') {
             status = '결제 대기';
         } else if (item.status === 'WAITING') {
-            status = `${item.rank}번째 예약대기`;
+            status = `${item.waitingRank}번째 예약대기`;
         } else if (item.status === 'CANCELED') {
             status = '취소';
         } else {
@@ -69,8 +69,8 @@ function render(data) {
                 requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
-        } else { // 예약 완료 상태일 때
-            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = item.paymentKey;
+            row.insertCell(7).textContent = item.amount;
         }
     });
 }
