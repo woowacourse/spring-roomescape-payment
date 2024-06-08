@@ -116,7 +116,10 @@ public class ReservationService {
 
         List<MyReservationResponse> myReservedReservations = reservationRepository.findAllByMemberId(memberId)
                 .stream()
-                .map(MyReservationResponse::from)
+                .map(r->{
+                    Payment payment = paymentService.getPayment(r);
+                    return MyReservationResponse.of(r,payment);
+                })
                 .toList();
         List<MyReservationResponse> myReservations = new ArrayList<>(myReservedReservations);
         myReservations.addAll(myWaitings);

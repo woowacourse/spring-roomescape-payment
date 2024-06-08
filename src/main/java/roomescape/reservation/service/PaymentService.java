@@ -66,4 +66,8 @@ public class PaymentService {
         JsonObject jsonObject = (JsonObject) JsonParser.parseReader(inputStreamReader);
         return jsonObject.get("message").toString().replace("\"", "");
     }
+
+    public Payment getPayment(Reservation reservation){
+        return paymentRepository.findByReservation(reservation);
+    }
 }

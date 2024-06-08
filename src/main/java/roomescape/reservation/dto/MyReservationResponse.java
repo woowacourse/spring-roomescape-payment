@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import roomescape.reservation.model.Payment;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.WaitingWithRank;
 
@@ -13,15 +14,19 @@ public record MyReservationResponse(
         String theme,
         LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
-    public static MyReservationResponse from(final Reservation reservation) {
+    public static MyReservationResponse of(final Reservation reservation, final Payment payment) {
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
-                "예약"
+                "예약",
+                payment.getPaymentKey(),
+                payment.getAmount()
         );
     }
 
@@ -31,7 +36,9 @@ public record MyReservationResponse(
                 waitingWithRank.getWaiting().getReservation().getTheme().getName().getValue(),
                 waitingWithRank.getWaiting().getReservation().getDate().getValue(),
                 waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
-                waitingWithRank.getRank() + "번째 예약대기"
+                waitingWithRank.getRank() + "번째 예약대기",
+                null,
+                null
         );
     }
 }
