@@ -13,6 +13,7 @@
 
 include::{snippets}/admin-reservation-controller-test/save-reservation_201/http-request.adoc[]
 
+
 ==== 요청 필드
 
 include::{snippets}/admin-reservation-controller-test/save-reservation_201/request-fields.adoc[]
