@@ -56,7 +56,6 @@ public class PaymentService {
         }
     }
 
-
     private void validatePaymentNotExistBy(Long reservationId) {
         Optional<Payment> payment = paymentRepository.findByReservationId(reservationId);
         if (payment.isPresent()) {
@@ -65,8 +64,8 @@ public class PaymentService {
     }
 
     private void validatePaymentAmount(Reservation reservation, Long amount) {
-        Long themePrice = reservation.getTheme().getPrice();
-        if (!themePrice.equals(amount)) {
+        boolean isValidAmount = reservation.isPriceEqual(amount);
+        if (!isValidAmount) {
             throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
         }
     }

@@ -72,6 +72,10 @@ public class Reservation {
         return date.isBeforeNow() || date.isToday() && time.isBeforeNow();
     }
 
+    public boolean isPriceEqual(Long price) {
+        return theme.isPriceEqual(price);
+    }
+
     public Long getId() {
         return id;
     }

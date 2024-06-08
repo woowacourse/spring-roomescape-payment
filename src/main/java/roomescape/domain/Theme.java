@@ -62,6 +62,10 @@ public class Theme {
         }
     }
 
+    public boolean isPriceEqual(Long price) {
+        return this.price.equals(price);
+    }
+
     public Long getId() {
         return id;
     }

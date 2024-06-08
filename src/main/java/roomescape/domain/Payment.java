@@ -54,8 +54,8 @@ public class Payment {
         if (amount == null) {
             throw new IllegalArgumentException("amount가 비어 있습니다. 값을 입력해 주세요.");
         }
-        Long expectedAmount = reservation.getTheme().getPrice();
-        if (!expectedAmount.equals(amount)) {
+        boolean isValidAmount = reservation.isPriceEqual(amount);
+        if (!isValidAmount) {
             throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
         }
     }
