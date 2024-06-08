@@ -1,5 +1,6 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.DynamicUpdate;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationdetail.ReservationTime;
@@ -30,6 +31,7 @@ import roomescape.exception.reservation.CancelReservationException;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
+@DynamicUpdate
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,7 +58,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @CreatedDate
+    @Column(name = "created_at")
     private OffsetDateTime createdAt;
 
     public Reservation(Member member, Theme theme, LocalDate date, ReservationTime time, Status status) {
