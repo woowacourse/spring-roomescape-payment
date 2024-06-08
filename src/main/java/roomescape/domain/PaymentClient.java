@@ -1,6 +1,5 @@
-package roomescape.service;
+package roomescape.domain;
 
-import roomescape.domain.Payment;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
 

@@ -28,7 +28,7 @@ public class Payment {
     private State state;
 
     //얘가 안에 있는 것이 자연스러운가? 밖에서도 객체를 만들기 위해서 사용하기도 하는데?
-    public enum State {
+    enum State {
         READY, DONE
     }
 

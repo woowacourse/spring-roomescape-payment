@@ -7,15 +7,14 @@ import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION
 import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.PaymentClient;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
