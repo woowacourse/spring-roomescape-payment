@@ -3,6 +3,7 @@ package roomescape.integration.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import static org.mockito.ArgumentMatchers.any;
 import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
 import static roomescape.exception.ExceptionType.NO_QUERY_PARAMETER;
 import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
@@ -13,12 +14,14 @@ import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME
 import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -31,6 +34,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import roomescape.config.PaymentClient;
 import roomescape.domain.Role;
+import roomescape.dto.PaymentResponse;
 import roomescape.dto.ReservationResponse;
 import roomescape.entity.Member;
 import roomescape.entity.Reservation;
@@ -59,7 +63,6 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
-
     @MockBean
     private PaymentClient paymentClient;
 
@@ -81,6 +84,14 @@ public class ReservationControllerTest {
         theme = themeRepository.save(theme);
         reservationTimeRepository.save(DEFAULT_RESERVATION_TIME);
         memberRepository.save(DEFAULT_MEMBER);
+        PaymentResponse response = new PaymentResponse(
+                "paymentKey",
+                "방탈출 예약",
+                LocalDateTime.now().toString(),
+                LocalDateTime.now().toString(),
+                "KRW",
+                1000);
+        Mockito.doReturn(response).when(paymentClient).approve(any());
     }
 
     @DisplayName("예약이 10개 존재할 때")

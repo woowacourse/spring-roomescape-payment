@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.domain.LoginMember;
 import roomescape.dto.*;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 import java.net.URI;
@@ -14,20 +13,17 @@ import java.util.List;
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationPaymentResponse> saveReservation(@Authenticated LoginMember loginMember,
                                                                       @RequestBody ReservationPaymentRequest request) {
-        PaymentResponse paymentResponse = paymentService.payment(PaymentRequest.from(request));
-        ReservationResponse savedReservationResponse = reservationService.save(loginMember, ReservationRequest.from(request));
-        return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
-                .body(new ReservationPaymentResponse(savedReservationResponse, paymentResponse));
+        ReservationPaymentResponse response = reservationService.save(loginMember, request);
+        return ResponseEntity.created(URI.create("/reservations/" + response.reservationResponse().id()))
+                .body(response);
     }
 
     @PostMapping("/reservations-waiting")

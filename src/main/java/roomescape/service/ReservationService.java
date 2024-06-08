@@ -9,6 +9,7 @@ import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -17,15 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Waiting;
-import roomescape.dto.AdminReservationDetailResponse;
-import roomescape.dto.AdminReservationRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
-import roomescape.entity.Member;
-import roomescape.entity.Reservation;
-import roomescape.entity.ReservationTime;
-import roomescape.entity.Theme;
+import roomescape.dto.*;
+import roomescape.entity.*;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -39,22 +33,29 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository,
+                              PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
-    public ReservationResponse save(LoginMember loginMember, ReservationRequest request) {
-        validateDuplicatedReservation(request);
+    @Transactional
+    public ReservationPaymentResponse save(LoginMember loginMember, ReservationPaymentRequest request) {
+        ReservationRequest reservationRequest = ReservationRequest.from(request);
+        validateDuplicatedReservation(reservationRequest);
+        Reservation reservation = reservationRepository.save(getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED));
 
-        Reservation reservation = getReservation(loginMember.getId(), request, ReservationStatus.BOOKED);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        PaymentRequest paymentRequest = PaymentRequest.from(request);
+        Payment payment = paymentService.pay(paymentRequest, reservation.getId());
+        return ReservationPaymentResponse.of(reservation, payment);
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest adminReservationRequest) {
