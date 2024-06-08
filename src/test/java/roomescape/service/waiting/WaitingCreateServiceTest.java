@@ -40,7 +40,7 @@ class WaitingCreateServiceTest extends ServiceTest {
 
     @DisplayName("사용자가 이미 예약인 상태에서 예약 대기 요청을 한다면 예외가 발생한다.")
     @Test
-    void cannotCreateByExistingMemberWaiting() {
+    void cannotCreateByExistingMemberReserved() {
         //given
         Member member = memberRepository.save(MemberFixture.createGuest());
         Theme theme = themeRepository.save(ThemeFixture.createTheme());
@@ -49,6 +49,42 @@ class WaitingCreateServiceTest extends ServiceTest {
         ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
         reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
 
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
+
+        //when & then
+        assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 예약(대기) 상태입니다.");
+    }
+
+    @DisplayName("사용자가 이미 예약 대기인 상태에서 예약 대기 요청을 한다면 예외가 발생한다.")
+    @Test
+    void cannotCreateByExistingMemberWaiting() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(WaitingFixture.create(member, reservationDetail));
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
+
+        //when & then
+        assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 예약(대기) 상태입니다.");
+    }
+
+    @DisplayName("사용자가 이미 결제 대기인 상태에서 예약 대기 요청을 한다면 예외가 발생한다.")
+    @Test
+    void cannotCreateByExistingMemberPendingPayment() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createPendingPayment(member, reservationDetail));
         WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
 
         //when & then
