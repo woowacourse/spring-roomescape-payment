@@ -45,6 +45,8 @@ function render(data) {
                 requestDeleteWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         } else { // 예약 완료 상태일 때
 
             /*
