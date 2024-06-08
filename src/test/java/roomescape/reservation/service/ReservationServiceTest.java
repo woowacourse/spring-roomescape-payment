@@ -2,17 +2,24 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
@@ -21,10 +28,11 @@ import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.FakePaymentClient;
+import roomescape.payment.client.PaymentClient;
 import roomescape.payment.client.PaymentProperties;
 import roomescape.payment.client.PaymentRestClientConfiguration;
 import roomescape.payment.client.toss.TossPaymentClient;
+import roomescape.payment.model.PaymentInfoFromClient;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
@@ -50,32 +58,24 @@ import roomescape.waiting.service.WaitingService;
 @Import({ReservationService.class,
         PaymentService.class,
         WaitingService.class,
-        FakePaymentClient.class,
+        TossPaymentClient.class,
         PaymentRestClientConfiguration.class})
 @EnableConfigurationProperties({PaymentProperties.class})
 class ReservationServiceTest {
 
-    private final ReservationService reservationService;
+    @MockBean private PaymentClient paymentClient;
 
-    private final ReservationTimeRepository reservationTimeRepository;
-    private final ThemeRepository themeRepository;
-    private final MemberRepository memberRepository;
-    private final WaitingRepository waitingRepository;
-    private final ReservationRepository reservationRepository;
+    @Autowired private ReservationService reservationService;
+    @Autowired private ReservationTimeRepository reservationTimeRepository;
+    @Autowired private ThemeRepository themeRepository;
+    @Autowired private MemberRepository memberRepository;
+    @Autowired private WaitingRepository waitingRepository;
+    @Autowired private ReservationRepository reservationRepository;
 
-    @Autowired
-    ReservationServiceTest(final ReservationService reservationService,
-                           final ReservationRepository reservationRepository,
-                           final ReservationTimeRepository reservationTimeRepository,
-                           final ThemeRepository themeRepository,
-                           final MemberRepository memberRepository,
-                           final WaitingRepository waitingRepository) {
-        this.reservationService = reservationService;
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
-        this.waitingRepository = waitingRepository;
+    @BeforeEach
+    void setUp() {
+        Mockito.when(paymentClient.confirm(any()))
+                .thenReturn(new PaymentInfoFromClient("paymentKey", "orderId", 100_000L));
     }
 
     @Test
@@ -111,6 +111,10 @@ class ReservationServiceTest {
         CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(
                 LocalDate.of(2024, 10, 10), reservationTime.getId(), theme.getId(), "failPayment", "orderId", 100_000L);
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
+
+        // stub
+        Mockito.when(paymentClient.confirm(any()))
+                .thenThrow(new ClientException("결제 오류입니다. 같은 문제가 반복된다면 문의해주세요."));
 
         // when & then
         assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createMyReservationRequest))
