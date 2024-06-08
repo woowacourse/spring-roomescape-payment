@@ -32,7 +32,8 @@ public class Payment {
     @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    protected Payment() {}
+    protected Payment() {
+    }
 
     public Payment(String externalPaymentId,
                    String externalOrderId, Reservation reservation) {

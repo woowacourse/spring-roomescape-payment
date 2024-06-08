@@ -56,9 +56,6 @@ public class MemberRoleInterceptor implements HandlerInterceptor {
         if (classAuth != null) {
             return classAuth;
         }
-        if (methodAuth != null) {
-            return methodAuth;
-        }
-        return null;
+        return methodAuth;
     }
 }

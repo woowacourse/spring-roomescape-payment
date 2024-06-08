@@ -36,7 +36,7 @@ public class PaymentService {
     }
 
     private void validateConfirmationStatus(PaymentConfirmationFromTossDto paymentConfirmationFromTossDto) {
-        if(!Objects.equals(paymentConfirmationFromTossDto.status(), PAYMENT_SAVE_CONDITION_STATUS)) {
+        if (!Objects.equals(paymentConfirmationFromTossDto.status(), PAYMENT_SAVE_CONDITION_STATUS)) {
             throw new PaymentException(HttpStatus.BAD_REQUEST, "결제가 승인되지 않았습니다.");
         }
     }

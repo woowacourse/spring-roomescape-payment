@@ -58,7 +58,7 @@ public class Waiting {
     public Reservation getReservation() {
         return reservation;
     }
-    
+
     public Member getMember() {
         return member;
     }

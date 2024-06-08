@@ -123,7 +123,7 @@ public class ReservationService {
         return reservations.stream()
                 .map(reservation -> {
                     Optional<Payment> optionalPayment = paymentRepository.findByReservationId(reservation.getId());
-                    if(optionalPayment.isPresent()) {
+                    if (optionalPayment.isPresent()) {
                         return ReservationResponse.from(reservation, optionalPayment.get());
                     }
 
@@ -134,7 +134,7 @@ public class ReservationService {
 
     @Transactional
     public void removeReservation(long reservationId) {
-        if(paymentRepository.existsByReservationId(reservationId)) {
+        if (paymentRepository.existsByReservationId(reservationId)) {
             throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_ALREADY_PAID_CAN_NOT_DELETE_EXCEPTION);
         }
 

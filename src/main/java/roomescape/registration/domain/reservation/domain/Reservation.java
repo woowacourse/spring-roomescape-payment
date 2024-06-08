@@ -50,10 +50,6 @@ public class Reservation {
         this(NULL_ID, date, reservationTime, theme, member);
     }
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
     public long getId() {
         return id;
     }
@@ -72,6 +68,10 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     @Override
