@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.request.AdminReservationRequest;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.controller.request.ReservationWithPaymentRequest;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.*;
@@ -104,6 +105,13 @@ public class ReservationService {
 
     public Reservation getReservationById(Long id) {
         return getById(reservationRepository, id);
+    }
+
+    @Transactional
+    public Reservation updateReservationStatus(ReservationWithPaymentRequest request, Member member) {
+        Reservation reservation = getById(reservationRepository, request.reservationId());
+        reservation.changeStatus();
+        return reservationRepository.save(reservation);
     }
 
     private <T> T getById(CrudRepository<T, Long> repository, Long id) {

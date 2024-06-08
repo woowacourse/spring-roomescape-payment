@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.annotation.AuthenticationPrincipal;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.controller.request.ReservationWithPaymentRequest;
 import roomescape.controller.response.MemberReservationResponse;
 import roomescape.controller.response.ReservationResponse;
 import roomescape.model.Member;
@@ -64,5 +65,13 @@ public class ReservationController {
         paymentService.cancelPayment(id);
         reservationWaitingService.deleteReservation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reservations-payment")
+    public ResponseEntity<ReservationResponse> createReservationWithPayment(@RequestBody ReservationWithPaymentRequest request,
+                                                                            @AuthenticationPrincipal Member member) {
+        Reservation reservation = reservationPaymentService.payReservationWithoutPayment(request, member);
+        ReservationResponse reservationResponse = new ReservationResponse(reservation);
+        return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservationResponse);
     }
 }

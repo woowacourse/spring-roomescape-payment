@@ -7,6 +7,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentCancelRequest;
 import roomescape.controller.request.PaymentRequest;
 import roomescape.controller.request.ReservationRequest;
+import roomescape.controller.request.ReservationWithPaymentRequest;
 import roomescape.exception.InvalidPaymentInformationException;
 import roomescape.exception.PaymentException;
 import roomescape.exception.PaymentServerErrorException;
@@ -47,6 +48,21 @@ public class PaymentService {
                 }).toBodilessEntity();
     }
 
+    public void confirmReservationPayments(ReservationWithPaymentRequest request) {
+        validatePayments(request.amount());
+        restClient.post()
+                .uri(confirmUrl)
+                .contentType(APPLICATION_JSON)
+                .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    throw new InvalidPaymentInformationException();
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new PaymentServerErrorException();
+                }).toBodilessEntity();
+    }
+
     private void validatePayments(long amount) {
         if (RESERVATION_PRICE != amount) {
             throw new PaymentException("클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [%d]".formatted(amount));
@@ -54,6 +70,11 @@ public class PaymentService {
     }
 
     public PaymentInfo addPayment(ReservationRequest request, Reservation reservation) {
+        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
+        return paymentInfoRepository.save(paymentInfo);
+    }
+
+    public PaymentInfo addPayment(ReservationWithPaymentRequest request, Reservation reservation) {
         PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
         return paymentInfoRepository.save(paymentInfo);
     }
