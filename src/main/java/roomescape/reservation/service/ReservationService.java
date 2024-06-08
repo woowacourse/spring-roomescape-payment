@@ -62,40 +62,37 @@ public class ReservationService {
 
         Reservation reservation = userReservationSaveRequest.toEntity(member, theme, reservationTime, status);
 
-        Reservation savedReservation = null;
+        validateReservation(loginMember, reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
         if (status.isSuccess()) {
-            validateDuplicatedReservationSuccess(reservation);
-            savedReservation = reservationRepository.save(reservation);
             paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
-        }
-        if (status.isWait()) {
-            validateReservationWait(loginMember, reservation);
-            savedReservation = reservationRepository.save(reservation);
         }
 
         return ReservationResponse.toResponse(Objects.requireNonNull(savedReservation));
     }
 
-    private void validateDuplicatedReservationSuccess(Reservation reservation) {
-        if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
-                reservation.getTheme(),
-                reservation.getDate(),
-                reservation.getStartAt(),
-                reservation.getStatus()
-        )) {
-            throw new IllegalArgumentException("중복된 예약이 있습니다.");
+    private void validateReservation(LoginMember loginMember, Reservation reservation) {
+        if (reservation.getStatus().isSuccess()) {
+            if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                    reservation.getTheme(),
+                    reservation.getDate(),
+                    reservation.getStartAt(),
+                    reservation.getStatus()
+            )) {
+                throw new IllegalArgumentException("중복된 예약이 있습니다.");
+            }
         }
-    }
 
-    private void validateReservationWait(LoginMember loginMember, Reservation reservation) {
-        List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(
-                loginMember.id(),
-                reservation.getTheme(),
-                reservation.getDate(),
-                reservation.getStartAt()
-        );
-        if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(ReservationStatus.WAIT)) {
-            throw new IllegalArgumentException("예약이 완료되었거나, 대기 상태로 등록된 예약입니다.");
+        if (reservation.getStatus().isWait()) {
+            List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(
+                    loginMember.id(),
+                    reservation.getTheme(),
+                    reservation.getDate(),
+                    reservation.getStartAt()
+            );
+            if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(ReservationStatus.WAIT)) {
+                throw new IllegalArgumentException("예약이 완료되었거나, 대기 상태로 등록된 예약입니다.");
+            }
         }
     }
 
