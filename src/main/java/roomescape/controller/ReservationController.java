@@ -41,7 +41,7 @@ public class ReservationController {
 
     @GetMapping("/member/reservation")
     public List<ReservationDetailResponse> findMemberReservations(@Authenticated LoginMember loginMember) {
-        return reservationService.findAllByMemberId(loginMember.getId());
+        return reservationService.findReservationsByMemberId(loginMember.getId());
     }
 
     @GetMapping("/reservations/search")

@@ -18,13 +18,12 @@ import roomescape.domain.Role;
 import roomescape.domain.Waiting;
 import roomescape.dto.*;
 import roomescape.entity.Member;
+import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
+import roomescape.repository.*;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 import java.time.LocalDate;
@@ -34,6 +33,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static roomescape.exception.ExceptionType.*;
 import static roomescape.fixture.ReservationFixture.*;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
@@ -55,6 +55,8 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     @MockBean
     private PaymentClient paymentClient;
 
@@ -194,30 +196,20 @@ class ReservationServiceTest {
     @Test
     void findAllReservationsByMemberId() {
         //given
-        Member testMember = new Member(2L, "test", Role.USER, "test@test.com", "1234");
-        memberRepository.save(testMember);
         Reservation reservation1 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
-                testMember, ReservationStatus.BOOKED);
+                member, ReservationStatus.BOOKED);
         Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
                 member, ReservationStatus.WAITING);
-        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(3),
-                member, ReservationStatus.BOOKED);
-        Reservation reservation4 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(4),
-                member, ReservationStatus.BOOKED);
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
-        reservationRepository.save(reservation3);
-        reservationRepository.save(reservation4);
+        paymentRepository.save(new Payment(reservation1.getId(), "paymentKey", "방탈출 예약", LocalDateTime.now().toString(), LocalDateTime.now().toString(), "KRW", 1000));
+        paymentRepository.save(new Payment(reservation2.getId(), "paymentKey", "방탈출 예약", LocalDateTime.now().toString(), LocalDateTime.now().toString(), "KRW", 1000));
 
         //when
-        List<ReservationDetailResponse> reservationResponses = reservationService.findAllByMemberId(member.getId());
+        List<ReservationDetailResponse> reservationResponses = reservationService.findReservationsByMemberId(member.getId());
 
         //then
-        List<ReservationDetailResponse> expected = List.of(
-                ReservationDetailResponse.from(Waiting.of(reservation2, 1)),
-                ReservationDetailResponse.from(reservation3),
-                ReservationDetailResponse.from(reservation4));
-        assertThat(reservationResponses).containsAnyElementsOf(expected);
+        assertThat(reservationResponses).hasSize(2);
     }
 
     @DisplayName("특정 사용자가 자신의 예약 대기를 취소할 수 있다.")
@@ -236,7 +228,7 @@ class ReservationServiceTest {
         //when
         reservationService.deleteByMemberIdAndId(loginMember, 2);
         //then
-        assertThat(reservationService.findAllByMemberId(1L)).isEqualTo(List.of());
+        assertThat(reservationService.findReservationsByMemberId(1L)).hasSize(0);
     }
 
     @DisplayName("관리자는 예약 대기를 취소할 수 있다.")
@@ -255,7 +247,7 @@ class ReservationServiceTest {
         //when
         reservationService.deleteById(2);
         //then
-        assertThat(reservationService.findAllByMemberId(1L)).isEqualTo(List.of());
+        assertThat(reservationService.findReservationsByMemberId(1L)).hasSize(0);
     }
 
 

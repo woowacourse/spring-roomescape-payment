@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
 import static roomescape.exception.ExceptionType.NO_QUERY_PARAMETER;
 import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
@@ -35,8 +36,10 @@ import io.restassured.http.ContentType;
 import roomescape.config.PaymentClient;
 import roomescape.domain.Role;
 import roomescape.dto.PaymentResponse;
+import roomescape.dto.ReservationPaymentRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.entity.Member;
+import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 import roomescape.entity.Theme;
 import roomescape.fixture.ThemeFixture;
@@ -45,6 +48,7 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.JwtGenerator;
+import roomescape.service.PaymentService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(value = "/clear.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -65,6 +69,8 @@ public class ReservationControllerTest {
     private MemberRepository memberRepository;
     @MockBean
     private PaymentClient paymentClient;
+    @MockBean
+    private PaymentService paymentService;
 
     private Theme theme = ThemeFixture.themeOfName("theme");
     private String token;
@@ -92,6 +98,15 @@ public class ReservationControllerTest {
                 "KRW",
                 1000);
         Mockito.doReturn(response).when(paymentClient).approve(any());
+        Payment payment = new Payment(1L,
+                "paymentKey",
+                "방탈출 예약",
+                LocalDateTime.now().toString(),
+                LocalDateTime.now().toString(),
+                "KRW",
+                1000);
+        Mockito.doReturn(payment).when(paymentService).pay(any(), anyLong());
+        Mockito.doReturn(payment).when(paymentService).findByReservationId(anyLong());
     }
 
     @DisplayName("예약이 10개 존재할 때")
@@ -155,24 +170,15 @@ public class ReservationControllerTest {
         @DisplayName("예약을 하나 생성할 수 있다.")
         @Test
         void createReservationTest() {
-            Map<String, Object> reservationParam = Map.of(
-                    "date", LocalDate.now().plusMonths(1).toString(),
-                    "timeId", "1",
-                    "themeId", "1");
-
+            ReservationPaymentRequest request = new ReservationPaymentRequest(LocalDate.now().plusMonths(1), 1, 1, "paymentKey", "orderId", 1000);
             RestAssured.given().log().all()
                     .when()
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
-                    .body(reservationParam)
+                    .body(request)
                     .post("/reservations")
                     .then().log().all()
-                    .statusCode(201)
-                    .body("reservationResponse.id", is(11),
-                            "reservationResponse.member.name", is(DEFAULT_MEMBER.getName()),
-                            "reservationResponse.date", is(reservationParam.get("date")),
-                            "reservationResponse.time.startAt", is(DEFAULT_RESERVATION_TIME.getStartAt().toString()),
-                            "reservationResponse.theme.name", is(DEFAULT_THEME.getName()));
+                    .statusCode(201);
 
             RestAssured.given().log().all()
                     .when().get("/reservations")

@@ -45,3 +45,28 @@ INSERT INTO reservation (date, created_at, time_id, theme_id, member_id, status)
 VALUES (CURRENT_DATE + 1, CURRENT_TIMESTAMP, 1, 2, 1, 'BOOKED');
 INSERT INTO reservation (date, created_at, time_id, theme_id, member_id, status)
 VALUES (CURRENT_DATE + 2, CURRENT_TIMESTAMP, 1, 2, 1, 'BOOKED');
+
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (1, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (2, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (3, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (4, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (5, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (6, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (7, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (8, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (9, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (10, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (11, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, currency, total_amount)
+VALUES (12, 'data-payment-key', '방탈출 결제 예약', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'KRW', 1000);

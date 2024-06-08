@@ -1,20 +1,7 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.DUPLICATE_WAITING_RESERVATION;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_ID;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Waiting;
@@ -25,6 +12,13 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static roomescape.exception.ExceptionType.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -129,12 +123,25 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
+    public List<ReservationDetailResponse> findReservationsByMemberId(long memberId) {
         List<Reservation> waitingReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.WAITING);
         List<Waiting> waitings = getWaitings(waitingReservations);
 
         List<Reservation> bookedReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.BOOKED);
-        return ReservationDetailResponse.of(bookedReservations, waitings);
+        return toReservationDetailResponses(bookedReservations, waitings);
+    }
+
+    private List<ReservationDetailResponse> toReservationDetailResponses(List<Reservation> bookedReservations, List<Waiting> waitings) {
+        return Stream.concat(bookedReservations.stream()
+                .map(reservation -> {
+                    Payment payment = paymentService.findByReservationId(reservation.getId());
+                    return ReservationDetailResponse.of(reservation, payment);
+                }), waitings.stream()
+                .map(waiting -> {
+                    Payment payment = paymentService.findByReservationId(waiting.getReservation().getId());
+                    return ReservationDetailResponse.of(waiting, payment);
+                })
+        ).toList();
     }
 
     @Transactional

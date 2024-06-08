@@ -22,4 +22,8 @@ public class PaymentService {
         Payment payment = paymentResponse.toModel(reservationId);
         return paymentRepository.save(payment);
     }
+
+    public Payment findByReservationId(long reservationId) {
+        return paymentRepository.findByReservationId(reservationId);
+    }
 }
