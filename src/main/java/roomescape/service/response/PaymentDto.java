@@ -1,25 +1,26 @@
 package roomescape.service.response;
 
 import roomescape.domain.Payment;
-import roomescape.domain.ReservationPayment;
 
 public record PaymentDto(Long id, String paymentKey, String orderId, Long totalAmount) {
+
+    private static final PaymentDto EMPTY_PAYMENT = new PaymentDto(null, null, null, null);
 
     public PaymentDto(String paymentKey, String orderId, Long totalAmount) {
         this(null, paymentKey, orderId, totalAmount);
     }
 
-    public PaymentDto(ReservationPayment reservationPayment) {
-        this(reservationPayment.getPaymentId(),
-                reservationPayment.getPaymentKey(),
-                reservationPayment.getOrderId(),
-                reservationPayment.getTotalAmount());
-    }
-
-    public PaymentDto(Payment payment) {
+    private PaymentDto(Payment payment) {
         this(payment.getId(),
                 payment.getPaymentKey(),
                 payment.getOrderId(),
                 payment.getTotalAmount());
+    }
+
+    public static PaymentDto from(Payment payment) {
+        if (payment == null) {
+            return EMPTY_PAYMENT;
+        }
+        return new PaymentDto(payment);
     }
 }

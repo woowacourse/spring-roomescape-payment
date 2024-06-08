@@ -12,8 +12,8 @@ import roomescape.domain.repository.*;
 import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.request.PaymentApproveDto;
 import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.ReservationPaymentDto;
 import roomescape.service.response.PaymentDto;
+import roomescape.service.response.ReservationDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -91,13 +91,13 @@ public class ReservationServicePaymentTest {
         when(paymentManager.approve(any())).thenReturn(paymentDto);
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "orderId", 1000L);
 
-        ReservationPaymentDto reservationPaymentDto = reservationService.save(reservationSaveDto, paymentApproveDto);
+        ReservationDto reservationDto = reservationService.save(reservationSaveDto, paymentApproveDto);
 
         assertAll(
-                () -> assertThat(paymentRepository.findById(reservationPaymentDto.paymentDto().id())).isNotEmpty(),
-                () -> assertThat(reservationRepository.findById(reservationPaymentDto.reservationDto().id())).isNotEmpty(),
-                () -> assertThat(reservationPaymentDto.reservationDto().name()).isEqualTo(member.getName().getName()),
-                () -> assertThat(reservationPaymentDto.paymentDto().paymentKey()).isEqualTo(paymentDto.paymentKey())
+                () -> assertThat(paymentRepository.findById(reservationDto.paymentDto().id())).isNotEmpty(),
+                () -> assertThat(reservationRepository.findById(reservationDto.id())).isNotEmpty(),
+                () -> assertThat(reservationDto.name()).isEqualTo(member.getName().getName()),
+                () -> assertThat(reservationDto.paymentDto().paymentKey()).isEqualTo(paymentDto.paymentKey())
         );
     }
 

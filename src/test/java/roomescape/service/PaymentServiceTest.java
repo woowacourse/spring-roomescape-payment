@@ -63,7 +63,7 @@ class PaymentServiceTest {
         PaymentDto paymentDto = paymentService.save(paymentSaveDto);
         Payment savedPayment = paymentRepository.findById(paymentDto.id()).orElseThrow();
 
-        assertThat(new PaymentDto(savedPayment)).isEqualTo(new PaymentDto(1L, "paymentKey", "orderId", theme.getPrice()));
+        assertThat(PaymentDto.from(savedPayment)).isEqualTo(new PaymentDto(1L, "paymentKey", "orderId", theme.getPrice()));
     }
 
     @DisplayName("결제가 있는 예약에 대한 결제 생성 시 예외가 발생한다.")

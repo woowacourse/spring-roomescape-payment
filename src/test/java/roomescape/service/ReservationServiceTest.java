@@ -16,6 +16,7 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.response.ReservationTimeDto;
 import roomescape.service.response.ThemeDto;
@@ -79,7 +80,8 @@ class ReservationServiceTest {
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
                 new ReservationTimeDto(reservation.getTime()),
-                new ThemeDto(reservation.getTheme()));
+                new ThemeDto(reservation.getTheme()),
+                PaymentDto.from(reservation.getPayment()));
 
         assertThat(actual).isEqualTo(expected);
     }

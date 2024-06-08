@@ -8,7 +8,6 @@ import roomescape.domain.repository.*;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
 import roomescape.service.request.ReservationSaveDto;
-import roomescape.service.response.ReservationPaymentDto;
 import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
@@ -48,13 +47,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         Reservation reservation = validateAndSave(reservationSaveDto);
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        Payment payment = saveReservationPayment(reservation, paymentDto);
-        ReservationPayment reservationPayment = new ReservationPayment(payment);
+        Payment payment = savePayment(reservation, paymentDto);
 
-        return new ReservationPaymentDto(reservationPayment);
+        return new ReservationDto(reservation.withPayment(payment));
     }
 
     private Reservation validateAndSave(ReservationSaveDto reservationSaveDto) {
@@ -69,7 +67,7 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    private Payment saveReservationPayment(Reservation reservation, PaymentDto paymentDto) {
+    private Payment savePayment(Reservation reservation, PaymentDto paymentDto) {
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
         return paymentRepository.save(payment);
     }
@@ -116,11 +114,10 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationPaymentDto> findByMemberId(Long id) {
-        List<ReservationPayment> reservationPayments = reservationRepository.findReservationPaymentByMemberId(id);
-
-        return reservationPayments.stream()
-                .map(ReservationPaymentDto::new)
+    public List<ReservationDto> findByMemberId(Long id) {
+        return reservationRepository.findAllByMemberId(id)
+                .stream()
+                .map(ReservationDto::new)
                 .toList();
     }
 }

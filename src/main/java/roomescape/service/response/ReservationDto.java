@@ -8,7 +8,8 @@ public record ReservationDto(
         String name,
         ReservationDate date,
         ReservationTimeDto time,
-        ThemeDto theme) {
+        ThemeDto theme,
+        PaymentDto paymentDto) {
 
     public ReservationDto(Reservation reservation) {
         this(
@@ -16,7 +17,8 @@ public record ReservationDto(
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
                 new ReservationTimeDto(reservation.getTime()),
-                new ThemeDto(reservation.getTheme())
+                new ThemeDto(reservation.getTheme()),
+                PaymentDto.from(reservation.getPayment())
         );
     }
 }

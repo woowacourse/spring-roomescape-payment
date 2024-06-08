@@ -1,6 +1,6 @@
 package roomescape.web.controller.response;
 
-import roomescape.service.response.ReservationPaymentDto;
+import roomescape.service.response.ReservationDto;
 
 import java.time.LocalDate;
 
@@ -11,11 +11,11 @@ public record ReservationMineResponse(
         ReservationTimeResponse time,
         PaymentResponse payment) {
 
-    public ReservationMineResponse(ReservationPaymentDto reservation) {
-        this(reservation.reservationDto().id(),
-                reservation.reservationDto().date().getDate(),
-                new ThemeResponse(reservation.reservationDto().theme()),
-                new ReservationTimeResponse(reservation.reservationDto().time()),
-                new PaymentResponse(reservation.paymentDto()));
+    public ReservationMineResponse(ReservationDto reservationDto) {
+        this(reservationDto.id(),
+                reservationDto.date().getDate(),
+                new ThemeResponse(reservationDto.theme()),
+                new ReservationTimeResponse(reservationDto.time()),
+                new PaymentResponse(reservationDto.paymentDto()));
     }
 }
