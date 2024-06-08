@@ -2,6 +2,8 @@ package roomescape.component;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -14,6 +16,8 @@ import roomescape.exception.TossPaymentErrorCode;
 
 @Component
 public class TossPaymentResponseErrorHandler implements ResponseErrorHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ObjectMapper objectMapper;
 
@@ -30,6 +34,7 @@ public class TossPaymentResponseErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(final ClientHttpResponse response) throws IOException {
         var errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
+        logger.error(errorResponse.toString());
         throw new RoomescapeException(TossPaymentErrorCode.from(errorResponse));
     }
 }
