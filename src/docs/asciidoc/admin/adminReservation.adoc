@@ -1,0 +1,10 @@
+== 어드민 예약 API
+
+=== 조건에 맞는 예약 목록 조회
+operation::admin/reservations/list[snippets='curl-request,http-request,http-response,response-body,response-fields']
+
+=== 예약 생성
+operation::admin/reservations/add[snippets='curl-request,http-request,http-response,response-body,response-fields']
+
+=== 예약 삭제
+operation::admin/reservations/delete[snippets='curl-request,http-request,http-response,response-body']

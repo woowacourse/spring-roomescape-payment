@@ -44,6 +44,7 @@ public class AuthController {
 
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> checkLogin(@Auth Accessor accessor) {
+        System.out.println("accessor = " + accessor);
         MemberResponse memberResponse = memberService.getById(accessor.id());
 
         return ResponseEntity.ok(memberResponse);

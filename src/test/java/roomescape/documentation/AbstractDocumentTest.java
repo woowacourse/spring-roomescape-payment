@@ -6,6 +6,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Clock;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,10 @@ public abstract class AbstractDocumentTest {
     private AuthInterceptor authInterceptor;
 
     @MockBean
-    private AuthArgumentResolver authArgumentResolver;
+    protected AuthArgumentResolver authArgumentResolver;
+
+    @MockBean
+    private Clock clock;
 
     @BeforeEach
     public void setUp(
@@ -52,5 +57,10 @@ public abstract class AbstractDocumentTest {
 
         when(authInterceptor.preHandle(any(), any(), any()))
                 .thenReturn(true);
+
+        when(clock.instant())
+                .thenReturn(Instant.parse("2024-04-08T00:00:00Z"));
+        when(clock.getZone())
+                .thenReturn(Clock.systemDefaultZone().getZone());
     }
 }

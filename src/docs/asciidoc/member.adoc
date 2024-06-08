@@ -1,0 +1,5 @@
+== 회원 API
+
+=== 회원 가입
+
+operation::members/signup[snippets='curl-request,http-request,http-response,response-body,response-fields']

@@ -1,0 +1,21 @@
+== 어드민 테마 API
+
+=== 테마 생성
+
+operation::admin/themes/add[snippets='curl-request,http-request,http-response,response-body,response-fields']
+
+=== 테마 생성 실패 - 이미 존재하는 테마
+
+operation::admin/themes/add/already-exist[snippets='curl-request,http-request,http-response,response-body']
+
+=== 테마 삭제
+
+operation::admin/themes/delete[snippets='curl-request,http-request,http-response,response-body']
+
+=== 테마 삭제 실패 - 존재하지 않는 테마
+
+operation::admin/themes/delete/not-exist[snippets='curl-request,http-request,http-response,response-body,response-fields']
+
+=== 테마 삭제 실패 - 이미 사용 중인 테마
+
+operation::admin/themes/delete/using-theme[snippets='curl-request,http-request,http-response,response-body,response-fields']
