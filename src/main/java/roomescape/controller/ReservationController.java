@@ -18,14 +18,17 @@ import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.dto.ReservationWithPaymentRequest;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 public class ReservationController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/reservations")
@@ -46,7 +49,7 @@ public class ReservationController {
             @Authenticated LoginMemberRequest loginMemberRequest,
             @RequestBody PaymentRequest paymentRequest
     ) {
-        reservationService.pay(id, paymentRequest);
+        paymentService.pay(id, paymentRequest);
     }
 
     @PostMapping("/admin/reservations")

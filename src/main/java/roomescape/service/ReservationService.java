@@ -20,7 +20,6 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
 import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
@@ -38,18 +37,15 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
-                              PaymentService paymentService) {
+                              MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -91,15 +87,11 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    //todo -> 트랜잭션 내부에 외부 API 호출이 존재
-    //todo -> 결제 대기 상태 X
     @Transactional
-    public void pay(long reservationId, PaymentRequest paymentRequest) {
-        Reservation requestedReservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
-        //todo -> 결제 메서드를 Reservation 내부로 이동 고려
-        Payment payment = paymentService.pay(paymentRequest);
-        requestedReservation.purchase(payment);
+    public void pay(long reservationId, Payment payment) {
+        reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION))
+                .purchase(payment);
     }
 
     public List<ReservationResponse> findAll() {

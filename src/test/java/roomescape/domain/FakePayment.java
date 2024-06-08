@@ -19,10 +19,9 @@ public class FakePayment implements PaymentClient {
         if (CORRECT_REQ.paymentKey().equals(paymentRequest.paymentKey())
                 && CORRECT_REQ.orderId().equals(paymentRequest.orderId())
                 && CORRECT_REQ.amount() == paymentRequest.amount()) {
-            return new Payment(paymentRequest.paymentKey(),
+            return new Payed(paymentRequest.paymentKey(),
                     paymentRequest.orderId(),
-                    paymentRequest.amount(),
-                    State.DONE);
+                    paymentRequest.amount());
         }
         throw new PaymentException(INVALID_REQUEST.getHttpStatus(), INVALID_REQUEST.getMessage(),
                 new RuntimeException());

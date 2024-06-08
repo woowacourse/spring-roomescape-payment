@@ -9,20 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Payment {
+public abstract class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String paymentKey;
-
-    @Column(nullable = false)
-    private String orderId;
-
-    @Column(nullable = false)
-    private long totalAmount;
 
     @Enumerated(EnumType.STRING)
     private State state;
@@ -32,10 +23,7 @@ public class Payment {
         READY, DONE
     }
 
-    public Payment(String paymentKey, String orderId, long totalAmount, State state) {
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
-        this.totalAmount = totalAmount;
+    protected Payment(State state) {
         this.state = state;
     }
 
