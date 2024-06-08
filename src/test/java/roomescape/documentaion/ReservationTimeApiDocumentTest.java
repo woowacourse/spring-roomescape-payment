@@ -136,7 +136,7 @@ class ReservationTimeApiDocumentTest extends DocumentTest {
                                         fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
                                         fieldWithPath("[].startAt").type(JsonFieldType.STRING)
                                                 .description("예약 시간(10분 단위) ex) 13:00"),
-                                        fieldWithPath("[].isReserved").type(JsonFieldType.BOOLEAN).description("예약 가능 여부")
+                                        fieldWithPath("[].isReserved").type(JsonFieldType.BOOLEAN).description("예약 여부")
                                 )
                         )
                 );
