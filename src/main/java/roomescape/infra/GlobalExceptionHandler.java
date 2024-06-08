@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RoomEscapeException.class)
     public ResponseEntity<String> handleCustomRoomEscapeException(RoomEscapeException exception) {
-        logger.error(exception.getMessage(), exception);
+        logger.warn(exception.getMessage(), exception);
         return ResponseEntity
                 .status(exception.getHttpStatus())
                 .body(exception.getMessage());
@@ -35,14 +35,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
-        logger.error(exception.getMessage(), exception);
+        logger.warn(exception.getMessage(), exception);
         return GlobalExceptionCode.METHOD_ARGUMENT_TYPE_INVALID.getMessage();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleInternalServerError(Exception exception) {
-        logger.error(exception.getMessage(), exception);
+        logger.warn(exception.getMessage(), exception);
         return GlobalExceptionCode.INTERNAL_SERVER_ERROR.getMessage();
     }
 }
