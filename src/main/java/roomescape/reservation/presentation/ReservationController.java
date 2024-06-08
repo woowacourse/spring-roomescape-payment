@@ -15,14 +15,11 @@ import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
+import roomescape.reservation.application.ReservationFactory;
 import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -34,34 +31,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
+    private final ReservationFactory reservationFactory;
     private final BookingQueryService bookingQueryService;
     private final WaitingManageService waitingManageService;
     private final BookingManageService bookingManageService;
     private final WaitingQueryService waitingQueryService;
-    private final ReservationTimeService reservationTimeService;
-    private final ThemeService themeService;
     private final PaymentService paymentService;
 
-    public ReservationController(BookingQueryService bookingQueryService,
+    public ReservationController(ReservationFactory reservationFactory,
+                                 BookingQueryService bookingQueryService,
                                  WaitingManageService waitingManageService,
                                  BookingManageService bookingManageService,
                                  WaitingQueryService waitingQueryService,
-                                 ReservationTimeService reservationTimeService,
-                                 ThemeService themeService,
                                  PaymentService paymentService) {
+        this.reservationFactory = reservationFactory;
         this.bookingQueryService = bookingQueryService;
         this.waitingManageService = waitingManageService;
         this.bookingManageService = bookingManageService;
         this.waitingQueryService = waitingQueryService;
-        this.reservationTimeService = reservationTimeService;
-        this.themeService = themeService;
         this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
-        Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
+        ReservationSaveRequest reservationSaveRequest = request.reservationSaveRequest();
+        Reservation newReservation = reservationFactory.create(reservationSaveRequest.timeId(),
+                reservationSaveRequest.themeId(), loginMember.getId(), reservationSaveRequest.date(), ReservationStatus.BOOKING);
         ConfirmedPayment confirmedPayment = paymentService.confirm(request.newPayment());
         Reservation createdReservation = bookingManageService.createWithPayment(newReservation, confirmedPayment);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -71,16 +67,11 @@ public class ReservationController {
     @PostMapping("/waiting")
     public ResponseEntity<ReservationResponse> createWaitingReservation(@RequestBody @Valid ReservationSaveRequest request,
                                                                         Member loginMember) {
-        Reservation newReservation = toNewReservation(request, loginMember, ReservationStatus.WAITING);
+        Reservation newReservation = reservationFactory.create(request.timeId(), request.themeId(),
+                loginMember.getId(), request.date(), ReservationStatus.WAITING);
         Reservation createdReservation = waitingManageService.create(newReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(createdReservation));
-    }
-
-    private Reservation toNewReservation(ReservationSaveRequest request, Member loginMember, ReservationStatus status) {
-        ReservationTime reservationTime = reservationTimeService.findById(request.timeId());
-        Theme theme = themeService.findById(request.themeId());
-        return new Reservation(loginMember, request.date(), reservationTime, theme, status);
     }
 
     @GetMapping("/mine")

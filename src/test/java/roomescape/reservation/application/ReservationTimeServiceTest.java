@@ -7,7 +7,6 @@ import roomescape.common.ServiceTest;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.application.MemberService;
 import roomescape.member.domain.Member;
-import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
@@ -99,13 +98,12 @@ class ReservationTimeServiceTest extends ServiceTest {
         ReservationTime miaReservationTime = reservationTimeService.create(new ReservationTime(MIA_RESERVATION_TIME));
         Theme theme = themeService.create(WOOTECO_THEME());
         Member mia = memberService.create(USER_MIA());
-        Reservation miaReservation = bookingManageService.create(MIA_RESERVATION(miaReservationTime, theme, mia, BOOKING));
-
+        bookingManageService.create(MIA_RESERVATION(miaReservationTime, theme, mia, BOOKING));
         reservationTimeService.create(new ReservationTime(LocalTime.of(16, 0)));
 
         // when
         List<AvailableReservationTimeResponse> availableReservationTimes
-                = reservationTimeService.findAvailableReservationTimes(MIA_RESERVATION_DATE, miaReservation.getTheme());
+                = reservationTimeService.findAvailableReservationTimes(MIA_RESERVATION_DATE, theme.getId());
 
         // then
         assertAll(() -> {

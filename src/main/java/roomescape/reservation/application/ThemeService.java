@@ -2,7 +2,6 @@ package roomescape.reservation.application;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import roomescape.global.exception.NotFoundException;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeRepository;
 
@@ -27,11 +26,6 @@ public class ThemeService {
 
     public List<Theme> findAll() {
         return themeRepository.findAll();
-    }
-
-    public Theme findById(Long id) {
-        return themeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("id 에 해당하는 테마가 없습니다."));
     }
 
     public void deleteById(Long id) {

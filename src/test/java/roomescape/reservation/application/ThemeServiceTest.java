@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.common.ServiceTest;
-import roomescape.global.exception.NotFoundException;
 import roomescape.member.application.MemberService;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
@@ -16,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static roomescape.TestFixture.HORROR_THEME;
 import static roomescape.TestFixture.HORROR_THEME_NAME;
@@ -66,17 +64,6 @@ class ThemeServiceTest extends ServiceTest {
         assertThat(themes).hasSize(2)
                 .extracting(Theme::getName)
                 .contains(WOOTECO_THEME_NAME, HORROR_THEME_NAME);
-    }
-
-    @Test
-    @DisplayName("Id로 조회하려는 테마가 존재하지 않는 경우 예외가 발생한다.")
-    void findByNotExistId() {
-        // given
-        Long notExistingId = 100L;
-
-        // when & then
-        assertThatThrownBy(() -> themeService.findById(notExistingId))
-                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

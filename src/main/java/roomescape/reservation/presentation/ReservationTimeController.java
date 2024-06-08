@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.ReservationTimeSaveRequest;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
@@ -26,11 +24,9 @@ import java.util.List;
 @RequestMapping("/times")
 public class ReservationTimeController {
     private final ReservationTimeService reservationTimeService;
-    private final ThemeService themeService;
 
-    public ReservationTimeController(ReservationTimeService reservationTimeService, ThemeService themeService) {
+    public ReservationTimeController(ReservationTimeService reservationTimeService) {
         this.reservationTimeService = reservationTimeService;
-        this.themeService = themeService;
     }
 
     @PostMapping
@@ -59,7 +55,6 @@ public class ReservationTimeController {
     @GetMapping("/available")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAllByDateAndThemeId(
             @RequestParam LocalDate date, @RequestParam Long themeId) {
-        Theme theme = themeService.findById(themeId);
-        return ResponseEntity.ok(reservationTimeService.findAvailableReservationTimes(date, theme));
+        return ResponseEntity.ok(reservationTimeService.findAvailableReservationTimes(date, themeId));
     }
 }

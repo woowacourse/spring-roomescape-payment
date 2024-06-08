@@ -13,7 +13,6 @@ import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.dto.request.ReservationTimeSaveRequest;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
@@ -41,9 +40,6 @@ import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 class ReservationTimeControllerTest extends ControllerTest {
     @MockBean
     private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private ThemeService themeService;
 
     @Test
     @DisplayName("예약 시간 POST 요청 시 상태코드 201을 반환한다.")

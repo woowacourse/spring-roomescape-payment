@@ -12,12 +12,9 @@ import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
-import roomescape.member.application.MemberService;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
-import roomescape.reservation.application.WaitingQueryService;
+import roomescape.reservation.application.ReservationFactory;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -54,19 +51,10 @@ class AdminReservationControllerTest extends ControllerTest {
     private BookingQueryService bookingQueryService;
 
     @MockBean
-    private WaitingQueryService waitingQueryService;
-
-    @MockBean
     private BookingManageService bookingManageService;
 
     @MockBean
-    private MemberService memberService;
-
-    @MockBean
-    private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private ThemeService themeService;
+    private ReservationFactory reservationFactory;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
@@ -77,12 +65,8 @@ class AdminReservationControllerTest extends ControllerTest {
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
 
-        BDDMockito.given(reservationTimeService.findById(anyLong()))
-                .willReturn(expectedTime);
-        BDDMockito.given(themeService.findById(anyLong()))
-                .willReturn(expectedTheme);
-        BDDMockito.given(memberService.findById(anyLong()))
-                .willReturn(USER_MIA(1L));
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
+                .willReturn(expectedReservation);
         BDDMockito.given(bookingManageService.create(any()))
                 .willReturn(expectedReservation);
 

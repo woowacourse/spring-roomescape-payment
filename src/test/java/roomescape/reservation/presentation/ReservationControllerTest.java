@@ -24,8 +24,7 @@ import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.BookingManageService;
 import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
+import roomescape.reservation.application.ReservationFactory;
 import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.application.WaitingQueryService;
 import roomescape.reservation.domain.Reservation;
@@ -86,13 +85,10 @@ class ReservationControllerTest extends ControllerTest {
     private WaitingQueryService waitingQueryService;
 
     @MockBean
-    private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private ThemeService themeService;
-
-    @MockBean
     private PaymentService paymentService;
+
+    @MockBean
+    private ReservationFactory reservationFactory;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
@@ -105,12 +101,10 @@ class ReservationControllerTest extends ControllerTest {
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
         ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
+                .willReturn(expectedReservation);
         BDDMockito.given(bookingManageService.createWithPayment(any(), any()))
                 .willReturn(expectedReservation);
-        BDDMockito.given(reservationTimeService.findById(anyLong()))
-                .willReturn(expectedTime);
-        BDDMockito.given(themeService.findById(anyLong()))
-                .willReturn(expectedTheme);
         BDDMockito.given(paymentService.confirm(any()))
                 .willReturn(expectedConfirmedPayment);
 
@@ -180,16 +174,15 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("동일한 사용자가 중복 예약 POST 요청 시 상태코드 400을 반환한다.")
     void createDuplicatedReservation() throws Exception {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, 1L, 1L);
+        ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
+        Theme expectedTheme = WOOTECO_THEME(1L);
+        Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
         ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
-        BDDMockito.given(themeService.findById(themeId))
-                .willReturn(WOOTECO_THEME(themeId));
-        BDDMockito.given(reservationTimeService.findById(timeId))
-                .willReturn(new ReservationTime(1L, MIA_RESERVATION_TIME));
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
+                .willReturn(expectedReservation);
         BDDMockito.willThrow(new ViolationException("동일한 사용자의 중복된 예약입니다."))
                 .given(bookingManageService)
                 .createWithPayment(any(), any());
@@ -216,11 +209,9 @@ class ReservationControllerTest extends ControllerTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
-        BDDMockito.given(themeService.findById(themeId))
-                .willReturn(WOOTECO_THEME(themeId));
         BDDMockito.willThrow(new NotFoundException("해당 ID의 예약 시간이 없습니다."))
-                .given(reservationTimeService)
-                .findById(anyLong());
+                .given(reservationFactory)
+                .create(anyLong(), anyLong(), anyLong(), any(), any());
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -242,11 +233,9 @@ class ReservationControllerTest extends ControllerTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, notExistingThemeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
-        BDDMockito.given(reservationTimeService.findById(timeId))
-                .willReturn(new ReservationTime(1L, MIA_RESERVATION_TIME));
-        BDDMockito.willThrow(new NotFoundException("id 에 해당하는 테마가 없습니다."))
-                .given(themeService)
-                .findById(anyLong());
+        BDDMockito.willThrow(new NotFoundException("해당 ID의 테마가 없습니다."))
+                .given(reservationFactory)
+                .create(anyLong(), anyLong(), anyLong(), any(), any());
 
         // when & then
         mockMvc.perform(post("/reservations")
