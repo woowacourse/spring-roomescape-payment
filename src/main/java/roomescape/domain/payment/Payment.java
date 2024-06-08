@@ -58,4 +58,20 @@ public class Payment {
             throw new IllegalArgumentException("Reservation은 필수입니다.");
         }
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public BigDecimal getAmount() {
+        return amount.getValue();
+    }
+
+    public Long getReservationId() {
+        return reservation.getId();
+    }
 }

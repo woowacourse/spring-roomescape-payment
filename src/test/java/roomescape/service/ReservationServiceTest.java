@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -19,6 +20,7 @@ import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.MemberFixture;
+import roomescape.support.fixture.PaymentFixture;
 import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ReservationWaitingFixture;
@@ -49,6 +51,9 @@ class ReservationServiceTest extends BaseServiceTest {
 
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private Member member;
 
@@ -137,9 +142,12 @@ class ReservationServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("나의 예약들을 조회한다.")
     void getReservationsByMemberId() {
-        reservationRepository.save(ReservationFixture.create("2024-04-09", member, time, theme));
-        reservationRepository.save(ReservationFixture.create("2024-04-10", member, time, theme));
-        reservationRepository.save(ReservationFixture.create("2024-04-11", member, time, theme));
+        Reservation reservation1 = reservationRepository.save(ReservationFixture.create("2024-04-09", member, time, theme));
+        paymentRepository.save(PaymentFixture.create(reservation1));
+        Reservation reservation2 = reservationRepository.save(ReservationFixture.create("2024-04-10", member, time, theme));
+        paymentRepository.save(PaymentFixture.create(reservation2));
+        Reservation reservation3 = reservationRepository.save(ReservationFixture.create("2024-04-11", member, time, theme));
+        paymentRepository.save(PaymentFixture.create(reservation3));
 
         List<PersonalReservationResponse> responses = reservationService.getReservationsByMemberId(member.getId());
 

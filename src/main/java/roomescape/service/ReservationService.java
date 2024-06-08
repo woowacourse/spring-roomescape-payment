@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -23,8 +25,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -37,6 +42,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
     public ReservationService(
@@ -46,6 +52,7 @@ public class ReservationService {
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
+            PaymentRepository paymentRepository,
             Clock clock
     ) {
         this.paymentClient = paymentClient;
@@ -54,6 +61,7 @@ public class ReservationService {
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
@@ -143,13 +151,16 @@ public class ReservationService {
         reservationWaitingRepository.delete(firstWaiting);
     }
 
-    public List<PersonalReservationResponse> getReservationsByMemberId(long memberId) {
+    public List<PersonalReservationResponse> getReservationsByMemberId(long memberId) { // todo refactor
         Member member = getMember(memberId);
         List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        Map<Long, Payment> reservationPayments = paymentRepository.findAllByReservationIn(reservations)
+                .stream()
+                .collect(Collectors.toMap(Payment::getReservationId, Function.identity()));
         List<WaitingWithRank> waitingWithRanks = reservationWaitingRepository.findAllWithRankByMember(member);
 
         return Stream.concat(
-                        reservations.stream().map(PersonalReservationResponse::from),
+                        reservations.stream().map(r -> PersonalReservationResponse.from(r, reservationPayments.get(r.getId()))),
                         waitingWithRanks.stream().map(PersonalReservationResponse::from))
                 .sorted(Comparator.comparing(PersonalReservationResponse::date)
                         .thenComparing(PersonalReservationResponse::time))
