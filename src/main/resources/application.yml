@@ -1,6 +1,6 @@
 spring:
   config:
-    import: config/private.yml
+    import: private/private.yml
   jpa:
     show-sql: true
     hibernate:
