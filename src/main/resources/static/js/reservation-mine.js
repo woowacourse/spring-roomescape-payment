@@ -14,16 +14,21 @@ function render(data) {
 
   data.forEach(item => {
     const row = tableBody.insertRow();
+
     const theme = item.theme;
     const date = item.date;
     const time = item.time;
     const status = item.status;
+    const paymentKey = item.paymentKey;
+    const amount = item.amount;
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
     row.insertCell(3).textContent = status;
     const buttonCell = row.insertCell(4);
+    row.insertCell(5).textContent = paymentKey;
+    row.insertCell(6).textContent = amount;
 
     if (status == '결제대기') {
       const paymentButton = document.createElement('button');
