@@ -1,5 +1,7 @@
 package roomescape.domain.reservation;
 
+import java.util.List;
+
 public enum ReservationStatus {
     RESERVED("예약"),
     WAITING("예약대기"),
@@ -10,6 +12,10 @@ public enum ReservationStatus {
 
     ReservationStatus(String description) {
         this.description = description;
+    }
+
+    public static List<ReservationStatus> getConfirmedStatuses() {
+        return List.of(ReservationStatus.RESERVED, ReservationStatus.PENDING_PAYMENT);
     }
 
     public String getDescription() {

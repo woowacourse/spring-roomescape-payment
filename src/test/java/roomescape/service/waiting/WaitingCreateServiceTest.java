@@ -20,9 +20,9 @@ class WaitingCreateServiceTest extends ServiceTest {
     @Autowired
     private WaitingCreateService waitingCreateService;
 
-    @DisplayName("사용자가 새로운 예약 대기를 저장한다.")
+    @DisplayName("예약이 있을 때 사용자가 새로운 예약 대기를 저장한다.")
     @Test
-    void createMemberReservation() {
+    void createMemberReservationWhenReservedExists() {
         //given
         Member member = memberRepository.save(MemberFixture.createGuest("lini"));
         Member anotherMember = memberRepository.save(MemberFixture.createGuest("pkpk"));
@@ -31,6 +31,24 @@ class WaitingCreateServiceTest extends ServiceTest {
         Schedule schedule = ScheduleFixture.createFutureSchedule(time);
         ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
         reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
+
+        //when & then
+        assertThatNoException().isThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, anotherMember.getId()));
+    }
+
+    @DisplayName("결제 대기가 있을 때 사용자가 새로운 예약 대기를 저장한다.")
+    @Test
+    void createMemberReservationWhenPendingPaymentExists() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest("lini"));
+        Member anotherMember = memberRepository.save(MemberFixture.createGuest("pkpk"));
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createPendingPayment(member, reservationDetail));
 
         WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
 
@@ -91,5 +109,22 @@ class WaitingCreateServiceTest extends ServiceTest {
         assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 예약(대기) 상태입니다.");
+    }
+
+    @DisplayName("예약이나 결제 대기가 없는 상태에서 예약 대기 요청을 한다면 예외가 발생한다.")
+    @Test
+    void cannotCreateByNoExistingReservedOrPendingPayment() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        WaitingRequest waitingRequest = WaitingFixture.createWaitingRequest(reservationDetail);
+
+        //when & then
+        assertThatThrownBy(() -> waitingCreateService.createWaiting(waitingRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("예약이 가능합니다. 예약으로 다시 시도해주세요.");
     }
 }

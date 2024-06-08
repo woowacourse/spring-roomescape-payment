@@ -79,8 +79,8 @@ public class WaitingCreateService {
         if (reservationRepository.existsByDetailIdAndMemberId(reservationDetail.getId(), member.getId())) {
             throw new InvalidReservationException("이미 예약(대기) 상태입니다.");
         }
-        if (!reservationRepository.existsByDetailIdAndStatus(reservationDetail.getId(), ReservationStatus.RESERVED)) {
-            throw new InvalidReservationException("존재하는 예약이 없습니다. 예약으로 다시 시도해주세요.");
+        if (!reservationRepository.existsByDetailIdAndStatusIn(reservationDetail.getId(), ReservationStatus.getConfirmedStatuses())) {
+            throw new InvalidReservationException("예약이 가능합니다. 예약으로 다시 시도해주세요.");
         }
     }
 }

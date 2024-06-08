@@ -296,7 +296,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                             .when().post("/waitings")
                             .then().log().all()
                             .assertThat().statusCode(HttpStatus.BAD_REQUEST.value())
-                            .body("message", is("존재하는 예약이 없습니다. 예약으로 다시 시도해주세요."));
+                            .body("message", is("예약이 가능합니다. 예약으로 다시 시도해주세요."));
                 })
         );
     }

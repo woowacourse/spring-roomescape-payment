@@ -42,5 +42,5 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             """)
     List<ReservationWithRank> findWithRankingByMemberId(@Param("memberId") long memberId);
 
-    boolean existsByDetailIdAndStatus(Long reservationDetailId, ReservationStatus status);
+    boolean existsByDetailIdAndStatusIn(Long reservationDetailId, List<ReservationStatus> statuses);
 }
