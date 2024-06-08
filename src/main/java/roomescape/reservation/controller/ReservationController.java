@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.dto.request.PaymentCancelRequest;
-import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.client.PaymentClient;
+import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
@@ -95,8 +95,7 @@ public class ReservationController {
 
         try {
             ReservationResponse reservationResponse = reservationWithPaymentService.addReservationWithPayment(
-                    reservationRequest,
-                    paymentResponse, memberId);
+                    reservationRequest, paymentResponse, memberId);
             return getCreatedReservationResponse(reservationResponse, response);
         } catch (RoomEscapeException e) {
             PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
@@ -106,6 +105,13 @@ public class ReservationController {
                     paymentRequest.paymentKey());
             throw e;
         }
+    }
+
+    @Admin
+    @GetMapping("/reservations/waiting")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<ReservationsResponse> getAllWaiting() {
+        return ApiResponse.success(reservationService.findAllWaiting());
     }
 
     @PostMapping("/reservations/waiting")
@@ -131,7 +137,7 @@ public class ReservationController {
 
     @Admin
     @PostMapping("/reservations/waiting/{id}/approve")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> approveWaiting(
             @MemberId Long memberId,
             @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") Long reservationId

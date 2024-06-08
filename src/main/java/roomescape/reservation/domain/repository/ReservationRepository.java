@@ -25,7 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             WHERE r.id = :id
             """)
     int updateStatusByReservationId(@Param(value = "id") Long reservationId,
-                                    @Param("status") ReservationStatus statusForChange);
+                                    @Param(value = "status") ReservationStatus statusForChange);
 
     @Query("""
             SELECT EXISTS (
@@ -33,10 +33,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                WHERE r.theme.id = r2.theme.id
                  AND r.reservationTime.id = r2.reservationTime.id
                  AND r.date = r2.date
-                 AND r.reservationStatus = 'CONFIRMED'
+                 AND r.reservationStatus != 'WAITING'
             )
             FROM Reservation r2
-            WHERE r2.id = :id AND r2.reservationStatus = 'WAITING'
+            WHERE r2.id = :id
             """)
     boolean isExistConfirmedReservation(@Param("id") Long reservationId);
 

@@ -56,6 +56,17 @@ public class ReservationService {
         return new ReservationsResponse(response);
     }
 
+    @Transactional(readOnly = true)
+    public ReservationsResponse findAllWaiting() {
+        List<ReservationResponse> response = reservationRepository.findAll()
+                .stream()
+                .filter(Reservation::isWaiting)
+                .map(ReservationResponse::from)
+                .toList();
+
+        return new ReservationsResponse(response);
+    }
+
     public void removeReservationById(Long reservationId, Long memberId) {
         validateIsMemberAdmin(memberId);
         reservationRepository.deleteById(reservationId);

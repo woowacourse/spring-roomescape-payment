@@ -17,7 +17,7 @@ function render(data) {
     const theme = item.themeName;
     const date = item.date;
     const time = item.time;
-    const status = (item.rank === 0 ? (item.status === 'CONFIRMED' ? '예약' : '예약 - 결제 필요') :  item.rank + '번째 예약 대기');
+    const status = item.status.includes('CONFIRMED') ? (item.status === 'CONFIRMED' ? '예약' : '예약 - 결제 필요') : item.rank + '번째 예약 대기';
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
