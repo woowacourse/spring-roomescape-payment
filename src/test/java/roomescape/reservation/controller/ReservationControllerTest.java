@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -8,15 +9,18 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +33,20 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.client.PaymentClient;
+import roomescape.payment.domain.CanceledPayment;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.CanceledPaymentRepository;
+import roomescape.payment.domain.repository.PaymentRepository;
+import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 
@@ -51,6 +62,10 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private CanceledPaymentRepository canceledPaymentRepository;
 
     @MockBean
     private PaymentClient paymentClient;
@@ -60,7 +75,6 @@ public class ReservationControllerTest {
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
         MockitoAnnotations.openMocks(this);
     }
 
@@ -330,9 +344,131 @@ public class ReservationControllerTest {
                 .statusCode(400);
     }
 
-    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
-        memberRepository.save(new Member("이름", email, password, Role.ADMIN));
+    @ParameterizedTest
+    @DisplayName("모든 예약 / 대기 중인 예약 / 현재 로그인된 회원의 예약 및 대기를 조회한다.")
+    @CsvSource(value = {"/reservations, reservations, 2", "/reservations/waiting, reservations, 1",
+            "/reservations-mine, myReservationResponses, 3"}, delimiter = ',')
+    void getAllReservations(String requestURI, String responseFieldName, int expectedSize) {
+        // given
+        LocalDate date = LocalDate.now().plusDays(1);
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        ReservationTime time1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(18, 30)));
+        ReservationTime time2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(19, 30)));
 
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        String accessToken = getAccessTokenCookieByLogin("email@email.com", "password");
+
+        // when : 예약은 2개, 예약 대기는 1개 조회되어야 한다.
+        reservationRepository.save(new Reservation(date, time, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(
+                new Reservation(date, time1, theme, member, ReservationStatus.CONFIRMED_PAYMENT_REQUIRED));
+        reservationRepository.save(new Reservation(date, time2, theme, member, ReservationStatus.WAITING));
+
+        // then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessToken)
+                .when().get(requestURI)
+                .then().log().all()
+                .statusCode(200)
+                .body("data." + responseFieldName + ".size()", is(expectedSize));
+    }
+
+    @Test
+    @DisplayName("예약을 삭제할 때, 승인되었으나 결제 대기중인 예약은 결제 취소 없이 바로 삭제한다.")
+    void removeNotPaidReservation() {
+        // given
+        LocalDate date = LocalDate.now().plusDays(1);
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        String accessToken = getAdminAccessTokenCookieByLogin("admin@email.com", "password");
+
+        // when
+        Reservation saved = reservationRepository.save(new Reservation(date, time, theme,
+                memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER)),
+                ReservationStatus.CONFIRMED_PAYMENT_REQUIRED));
+
+        // then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessToken)
+                .when().delete("/reservations/{id}", saved.getId())
+                .then().log().all()
+                .statusCode(204);
+    }
+
+    @Test
+    @DisplayName("이미 결제가 된 예약은 삭제 후 결제 취소를 요청한다.")
+    void removePaidReservation() {
+        // given
+        String accessToken = getAdminAccessTokenCookieByLogin("admin@email.com", "password");
+        LocalDate date = LocalDate.now().plusDays(1);
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+
+        Reservation saved = reservationRepository.save(
+                new Reservation(date, time, theme, member, ReservationStatus.CONFIRMED));
+        Payment savedPayment = paymentRepository.save(
+                new Payment("pk", "oi", 1000L, saved, OffsetDateTime.now().minusHours(1L)));
+
+        // when
+        when(paymentClient.cancelPayment(any(PaymentCancelRequest.class)))
+                .thenReturn(new PaymentCancelResponse("pk", "고객 요청", savedPayment.getTotalAmount(),
+                        OffsetDateTime.now()));
+
+        // then
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessToken)
+                .when().delete("/reservations/{id}", saved.getId())
+                .then().log().all()
+                .statusCode(204);
+
+    }
+
+    @Test
+    @DisplayName("예약을 추가할 때, 결제 승인 이후에 예외가 발생하면 결제를 취소한 뒤 결제 취소 테이블에 취소 정보를 저장한다.")
+    void saveReservationWithCancelPayment() {
+        // given
+        LocalDateTime localDateTime = LocalDateTime.now().minusHours(1L);
+        LocalDate date = localDateTime.toLocalDate();
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        String accessToken = getAccessTokenCookieByLogin(member.getEmail(), member.getPassword());
+
+        // when : 이전 날짜의 예약을 추가하여 결제 승인 이후 DB 저장 과정에서 예외를 발생시킨다.
+        String paymentKey = "pk";
+        OffsetDateTime canceledAt = OffsetDateTime.now().plusHours(1L);
+        when(paymentClient.confirmPayment(any(PaymentRequest.class)))
+                .thenReturn(new PaymentResponse(paymentKey, "oi", canceledAt.minusHours(1L), 1000L));
+
+        when(paymentClient.cancelPayment(any(PaymentCancelRequest.class)))
+                .thenReturn(new PaymentCancelResponse(paymentKey, "고객 요청", 1000L, canceledAt));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .port(port)
+                .header("Cookie", accessToken)
+                .body(new ReservationRequest(date, time.getId(), theme.getId(), "pk", "oi", 1000L, "DEFAULT"))
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+
+        // then
+        Optional<CanceledPayment> canceledPaymentOptional = canceledPaymentRepository.findByPaymentKey(paymentKey);
+        assertThat(canceledPaymentOptional).isNotNull();
+        assertThat(canceledPaymentOptional.get().getCanceledAt()).isEqualTo(canceledAt);
+        assertThat(canceledPaymentOptional.get().getCancelReason()).isEqualTo("고객 요청");
+        assertThat(canceledPaymentOptional.get().getCancelAmount()).isEqualTo(1000L);
+        assertThat(canceledPaymentOptional.get().getApprovedAt()).isEqualTo(canceledAt.minusHours(1L));
+
+    }
+
+
+    private String getAccessTokenCookieByLogin(final String email, final String password) {
         Map<String, String> loginParams = Map.of(
                 "email", email,
                 "password", password
@@ -348,7 +484,9 @@ public class ReservationControllerTest {
         return "accessToken=" + accessToken;
     }
 
-    private String getAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
+        memberRepository.save(new Member("이름", email, password, Role.ADMIN));
+
         Map<String, String> loginParams = Map.of(
                 "email", email,
                 "password", password
