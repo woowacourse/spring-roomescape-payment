@@ -1,6 +1,7 @@
 package roomescape.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,9 +13,9 @@ import roomescape.registration.dto.RegistrationInfoDto;
 
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
-@SecurityRequirement(name = BASIC_AUTH)
+@SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
 @Tag(name = "Member", description = "회원 관련 기능을 제공하는 API")
 public interface MemberControllerSwagger {
 
@@ -48,5 +49,5 @@ public interface MemberControllerSwagger {
                     )
             }
     )
-    List<RegistrationInfoDto> memberReservationList(long memberId);
+    List<RegistrationInfoDto> memberReservationList(@Parameter(hidden = true) long memberId);
 }

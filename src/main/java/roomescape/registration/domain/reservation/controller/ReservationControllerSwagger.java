@@ -17,12 +17,12 @@ import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilit
 import java.time.LocalDate;
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
 @Tag(name = "Reservation", description = "예약 관련 기능을 제공하는 API")
 public interface ReservationControllerSwagger {
 
-    @SecurityRequirement(name = BASIC_AUTH)
+    @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
     @Operation(
             summary = "예약 생성",
             description = "새로운 예약을 생성합니다.",
@@ -47,7 +47,7 @@ public interface ReservationControllerSwagger {
     )
     ResponseEntity<ReservationResponse> reservationSave(ReservationRequest reservationRequest, long id);
 
-    @SecurityRequirement(name = BASIC_AUTH)
+    @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
     @Operation(
             summary = "예약 목록 조회",
             description = "모든 예약 목록을 조회합니다.",
@@ -80,7 +80,7 @@ public interface ReservationControllerSwagger {
     )
     List<ReservationTimeAvailabilityResponse> reservationTimeList(long themeId, LocalDate date);
 
-    @SecurityRequirement(name = BASIC_AUTH)
+    @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
     @Operation(
             summary = "예약 삭제",
             description = "지정된 예약 ID를 가진 예약을 삭제합니다.",

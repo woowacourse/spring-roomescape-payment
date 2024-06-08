@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
@@ -18,9 +18,10 @@ import roomescape.registration.domain.waiting.dto.WaitingResponse;
 
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
-@SecurityRequirement(name = BASIC_AUTH)
+@SecurityRequirements
+@SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
 @Tag(name = "Admin", description = "관리자 기능을 제공하는 API")
 public interface AdminControllerSwagger {
 
@@ -88,5 +89,5 @@ public interface AdminControllerSwagger {
                     )
             }
     )
-    void waitingReject(@PathVariable long waitingId);
+    void waitingReject(long waitingId);
 }

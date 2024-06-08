@@ -17,9 +17,9 @@ import roomescape.theme.dto.ThemeResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
-@SecurityRequirement(name = BASIC_AUTH)
+@SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
 @Tag(name = "Theme", description = "테마 관련 기능을 제공하는 API")
 public interface ThemeControllerSwagger {
 

@@ -1,6 +1,7 @@
 package roomescape.registration.domain.waiting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,9 +16,9 @@ import roomescape.registration.domain.waiting.dto.WaitingResponse;
 
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
-@SecurityRequirement(name = BASIC_AUTH)
+@SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
 @Tag(name = "Waiting", description = "대기 관련 기능을 제공하는 API")
 public interface WaitingControllerSwagger {
 
@@ -43,7 +44,7 @@ public interface WaitingControllerSwagger {
                     )
             }
     )
-    ResponseEntity<WaitingResponse> waitingSave(WaitingRequest waitingRequest, long memberId);
+    ResponseEntity<WaitingResponse> waitingSave(WaitingRequest waitingRequest, @Parameter(hidden = true) long memberId);
 
     @Operation(
             summary = "대기 목록 조회",

@@ -1,6 +1,7 @@
 package roomescape.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.member.dto.MemberLoginCheckResponse;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
 @Tag(name = "Auth", description = "인증 기능을 제공하는 API")
 public interface AuthControllerSwagger {
@@ -44,7 +45,7 @@ public interface AuthControllerSwagger {
     )
     ResponseEntity<Void> login(LoginRequest loginRequest);
 
-    @SecurityRequirement(name = BASIC_AUTH)
+    @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
     @Operation(
             summary = "로그인 상태 확인",
             description = "로그인된 사용자의 정보를 확인합니다.",
@@ -58,5 +59,5 @@ public interface AuthControllerSwagger {
                     )
             }
     )
-    MemberLoginCheckResponse loginCheck(Long id);
+    MemberLoginCheckResponse loginCheck(@Parameter(hidden = true) Long id);
 }

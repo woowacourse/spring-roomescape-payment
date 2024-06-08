@@ -15,9 +15,9 @@ import roomescape.reservationtime.dto.ReservationTimeResponse;
 
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static roomescape.config.SwaggerConfig.JWT_TOKEN_COOKIE_AUTH;
 
-@SecurityRequirement(name = BASIC_AUTH)
+@SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
 @Tag(name = "ReservationTime", description = "예약 시간 관련 기능을 제공하는 API")
 public interface ReservationTimeControllerSwagger {
 
