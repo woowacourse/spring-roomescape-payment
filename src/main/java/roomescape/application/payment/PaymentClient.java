@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.application.payment.dto.Payment;
 import roomescape.application.payment.dto.request.PaymentRequest;
 import roomescape.exception.payment.PaymentException;
@@ -31,18 +32,17 @@ public class PaymentClient {
     }
 
     public Payment requestPurchase(PaymentRequest request) {
-        Payment payment = client.post()
-                .uri("/v1/payments/confirm")
-                .header(HttpHeaders.AUTHORIZATION, authorizationSecret)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .retrieve()
-                .onStatus(handler)
-                .body(Payment.class);
-
-        if (payment == null) {
-            throw new PaymentException("결제에 실패했습니다.");
+        try {
+            return client.post()
+                    .uri("/v1/payments/confirm")
+                    .header(HttpHeaders.AUTHORIZATION, authorizationSecret)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .onStatus(handler)
+                    .body(Payment.class);
+        } catch (RestClientException e) {
+            throw new PaymentException("결제에 실패 했습니다.");
         }
-        return payment;
     }
 }
