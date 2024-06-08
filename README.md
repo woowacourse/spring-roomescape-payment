@@ -341,7 +341,14 @@
 ```
 POST /reservations/{id}/payment HTTP/1.1
 cookie: token={token}
+Content-Type: application/json
 host: localhost:8080
+
+{
+  "paymentKey": "tgon_234567890",
+  "amount": 1000,
+  "orderId": "gwdskjfl"
+}
 ```
 
 - response
@@ -355,10 +362,7 @@ host: localhost:8080
     "theme": "테마1",
     "date": "2024-03-01",
     "time": "10:00",
-    "reservationStatus": {
-      "status": "예약",
-      "rank": 0
-    },
+    "status": "예약",
     "payment": {
       "paymentKey": "tgon_234567890"
       "amount": 1000
