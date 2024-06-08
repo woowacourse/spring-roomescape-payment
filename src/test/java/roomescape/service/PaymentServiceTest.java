@@ -151,7 +151,7 @@ class PaymentServiceTest {
         TestErrorResponse response = new TestErrorResponse("INTERNAL_SERVER_ERROR", "test_error");
         Reservation dummy = new Reservation(null, null);
 
-        mockServer.expect(ExpectedCount.times(5), requestTo(paymentProperties.getApproveUrl()))
+        mockServer.expect(ExpectedCount.times(2), requestTo(paymentProperties.getApproveUrl()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withServerError().body(makeJsonFrom(response)));
 
