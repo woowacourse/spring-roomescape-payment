@@ -38,15 +38,22 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     );
 
     @Query(""" 
-            select new roomescape.domain.reservation.ReservationWithRank
-            (r.id, r.theme.name, r.date, r.time.startAt, r.status, (SELECT count(r2) AS waiting_rank
-            FROM Reservation r2
-            WHERE r.createdAt >= r2.createdAt AND r.time = r2.time AND r.date = r2.date AND r.theme = r2.theme)
+            select new roomescape.domain.reservation.ReservationWithRank(
+                 r.id, r.theme.name, r.date, r.time.startAt, r.status, p.paymentKey, p.amount,
+                 (
+                     select count(r2) AS waiting_rank
+                     from Reservation r2
+                     where r.createdAt >= r2.createdAt 
+                     and r.time = r2.time 
+                     and r.date = r2.date 
+                     and r.theme = r2.theme
+                 )
             )
             from Reservation r
+            left join r.payment p
             where r.member.id = :memberId
-            and r.date > current_date
-            """)
+            order by r.id desc 
+             """)
     List<ReservationWithRank> findWithRank(@Param("memberId") Long memberId);
 
     @Query("""
