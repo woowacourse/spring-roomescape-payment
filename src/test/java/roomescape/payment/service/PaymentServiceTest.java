@@ -25,6 +25,7 @@ import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentCurrency;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentSaveResponse;
@@ -84,7 +85,7 @@ class PaymentServiceTest {
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
             PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", 1000);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", PaymentCurrency.KRW, 1000);
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);
@@ -124,7 +125,7 @@ class PaymentServiceTest {
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
             PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", 1000);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, 1000);
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);
@@ -149,7 +150,7 @@ class PaymentServiceTest {
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
             PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, 1000, PAYMENT_KEY);
-            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제", 1000);
+            TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(PAYMENT_KEY, ORDER_ID,"간편결제",  PaymentCurrency.KRW, 1000);
 
             doReturn(tossPaymentResponse).when(tossPaymentClient)
                     .requestPayment(paymentRequest);

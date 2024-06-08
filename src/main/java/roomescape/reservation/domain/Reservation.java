@@ -115,8 +115,4 @@ public class Reservation extends AuditedEntity {
     public ReservationStatus getStatus() {
         return status;
     }
-
-    public String getStatusDisplayName() {
-        return status.getDisplayName();
-    }
 }

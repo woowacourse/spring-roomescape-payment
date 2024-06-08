@@ -26,11 +26,12 @@ CREATE TABLE IF NOT EXISTS payment (
     reservation_id BIGINT NOT NULL,
     payment_key VARCHAR(255) NOT NULL UNIQUE,
     order_id    VARCHAR(255) NOT NULL UNIQUE,
-    status VARCHAR(255) NOT NULL CHECK (status IN ('DONE', 'CANCEL')),
+    status VARCHAR(255) NOT NULL CHECK (status IN ('PAID', 'CANCELED')),
     method   VARCHAR(255) NOT NULL CHECK (method IN ('CARD', 'EASY_PAY')),
-    created_at TIMESTAMP NOT NULL default CURRENT_TIMESTAMP,
+    currency VARCHAR(255) NOT NULL CHECK (currency IN ('KRW')),
     total_amount INT NOT NULL,
-    PRIMARY KEY (payment_key)
+    created_at TIMESTAMP NOT NULL default CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS reservation (

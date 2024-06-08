@@ -38,28 +38,37 @@ public class Payment extends AuditedEntity {
     @Column(nullable = false)
     private PaymentMethod method;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentCurrency currency;
+
     @Column(nullable = false)
     private int totalAmount;
 
     protected Payment() {
     }
 
-    public Payment(Reservation reservation, String paymentKey, String orderId, PaymentStatus status, PaymentMethod method, int totalAmount) {
+    public Payment(Reservation reservation, String paymentKey, String orderId, PaymentStatus status,
+                   PaymentMethod method,
+                   PaymentCurrency currency, int totalAmount) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.status = status;
         this.method = method;
+        this.currency = currency;
         this.totalAmount = totalAmount;
     }
 
-    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, PaymentStatus status, PaymentMethod method, int totalAmount) {
+    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, PaymentStatus status,
+                   PaymentMethod method, PaymentCurrency currency, int totalAmount) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.status = status;
         this.method = method;
+        this.currency = currency;
         this.totalAmount = totalAmount;
     }
 
@@ -89,6 +98,10 @@ public class Payment extends AuditedEntity {
 
     public PaymentMethod getMethod() {
         return method;
+    }
+
+    public PaymentCurrency getCurrency() {
+        return currency;
     }
 
     public int getTotalAmount() {

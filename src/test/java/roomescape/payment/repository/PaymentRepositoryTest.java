@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentCurrency;
 import roomescape.payment.domain.PaymentMethod;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
@@ -50,7 +51,7 @@ class PaymentRepositoryTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horroTheme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horroTheme, hour10, ReservationStatus.SUCCESS));
-        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, 1000));
+        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, 1000));
 
         Payment findPayment = paymentRepository.findByPaymentKey(payment.getPaymentKey()).get();
 
@@ -64,7 +65,7 @@ class PaymentRepositoryTest {
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_HOUR_10);
         Theme horroTheme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horroTheme, hour10, ReservationStatus.SUCCESS));
-        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, 1000));
+        Payment payment = paymentRepository.save(new Payment(reservation, PAYMENT_KEY, ORDER_ID, PaymentStatus.PAID, PaymentMethod.EASY_PAY, PaymentCurrency.KRW, 1000));
 
         Payment findPayment = paymentRepository.findByReservationId(reservation.getId()).get();
 
