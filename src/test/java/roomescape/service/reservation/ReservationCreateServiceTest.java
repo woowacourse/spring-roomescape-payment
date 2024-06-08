@@ -91,6 +91,42 @@ class ReservationCreateServiceTest extends ServiceTest {
                 .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
     }
 
+    @DisplayName("사용자가 이미 예약 대기인 상태에서 예약 요청을 한다면 예외가 발생한다.")
+    @Test
+    void cannotCreateByExistingMemberWaiting() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(WaitingFixture.create(member, reservationDetail));
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(reservationDetail.getSchedule(), reservationDetail.getTheme());
+
+        //when & then
+        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
+    }
+
+    @DisplayName("사용자가 이미 결제 대기인 상태에서 예약 요청을 한다면 예외가 발생한다.")
+    @Test
+    void cannotCreateByExistingMemberPendingPayment() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        reservationRepository.save(ReservationFixture.createPendingPayment(member, reservationDetail));
+        ReservationRequest reservationRequest = ReservationFixture.createReservationRequest(reservationDetail.getSchedule(), reservationDetail.getTheme());
+
+        //when & then
+        assertThatThrownBy(() -> reservationCreateService.createMemberReservation(reservationRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
+    }
+
     @DisplayName("존재하지 않는 시간으로 예약을 추가하면 예외를 발생시킨다.")
     @Test
     void cannotCreateByUnknownTime() {

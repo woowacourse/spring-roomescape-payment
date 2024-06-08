@@ -16,6 +16,10 @@ public class ReservationFixture {
         return new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
     }
 
+    public static Reservation createPendingPayment(Member member, ReservationDetail reservationDetail) {
+        return new Reservation(member, reservationDetail, ReservationStatus.PENDING_PAYMENT);
+    }
+
     public static AdminReservationRequest createAdminReservationRequest(Member admin, ReservationDetail reservationDetail) {
         return new AdminReservationRequest(reservationDetail.getDate(), admin.getId(),
                 reservationDetail.getReservationTime().getId(), reservationDetail.getTheme().getId());
