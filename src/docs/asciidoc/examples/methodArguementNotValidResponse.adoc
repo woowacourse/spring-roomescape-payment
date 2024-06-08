@@ -1,0 +1,15 @@
+[source,json]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 214
+
+{
+  "errorCode" : "COMMON-003",
+  "message" : "올바르지 않은 데이터 요청입니다.",
+  "validation" : {
+    "price" : "금액은 필수 값입니다.",
+    "name" : "이름은 필수 값입니다."
+  }
+}
+----

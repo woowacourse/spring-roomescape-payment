@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -16,7 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.controller.dto.TokenResponse;
 import roomescape.exception.AuthenticationException;
@@ -25,6 +28,7 @@ import roomescape.exception.ErrorType;
 import roomescape.util.ControllerTest;
 
 @DisplayName("회원 API 통합 테스트")
+@AutoConfigureRestDocs
 class AuthControllerTest extends ControllerTest {
 
     @DisplayName("로그인에 성공할 경우, 200을 반환한다.")
@@ -53,7 +57,11 @@ class AuthControllerTest extends ControllerTest {
                 .body(params)
                 .when().post("/api/v1/login")
                 .then().log().all()
-                .apply(document("login/success"))
+                .apply(document("login/success",
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                        )))
                 .statusCode(HttpStatus.OK.value());
     }
 
@@ -149,7 +157,12 @@ class AuthControllerTest extends ControllerTest {
                 .body(params)
                 .when().post("/api/v1/signup")
                 .then().log().all()
-                .apply(document("member/create/success"))
+                .apply(document("member/create/success",
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                        )))
                 .statusCode(HttpStatus.CREATED.value());
     }
 

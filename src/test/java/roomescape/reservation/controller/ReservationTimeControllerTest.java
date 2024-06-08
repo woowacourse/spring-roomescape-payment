@@ -7,7 +7,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -18,6 +22,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
@@ -137,6 +142,9 @@ class ReservationTimeControllerTest extends ControllerTest {
                 .when().get(String.format("/api/v1/times/available?date=%s&themeId=%d", date, themeId))
                 .then().log().all()
                 .apply(document("available-times/find/success",
+                        queryParameters(
+                                parameterWithName("date").description("예약 날짜"),
+                                parameterWithName("themeId").description("테마 식별자")),
                         responseFields(
                                 fieldWithPath("[].timeId").description("예약 시간의 식별자"),
                                 fieldWithPath("[].startAt").description("예약 시간"),

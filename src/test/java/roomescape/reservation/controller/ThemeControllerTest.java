@@ -6,6 +6,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
@@ -18,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
@@ -51,7 +57,13 @@ class ThemeControllerTest extends ControllerTest {
                 .body(params)
                 .when().post("/api/v1/themes")
                 .then().log().all()
-                .apply(document("themes/create/success"))
+                .apply(document("themes/create/success",
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("테마 이름"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("테마 설명"),
+                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일 이미지 url"),
+                                fieldWithPath("price").type(JsonFieldType.STRING).description("테마 가격")
+                        )))
                 .statusCode(HttpStatus.CREATED.value());
     }
 

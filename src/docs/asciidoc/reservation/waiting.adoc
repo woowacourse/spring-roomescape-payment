@@ -1,0 +1,14 @@
+=== 예약 대기 등록
+operation::waiting/create/success[snippets='curl-request']
+==== 성공
+operation::waiting/create/success[snippets='http-request,http-response']
+
+=== 예약 대기 삭제
+operation::waiting/delete/success[snippets='curl-request']
+==== 성공
+operation::waiting/delete/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| RESERVATION-005 | 예약자가 아닙니다. | 타인의 대기를 삭제할 경우
+|===

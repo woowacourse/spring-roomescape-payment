@@ -21,9 +21,7 @@ CREATE TABLE IF NOT EXISTS reservation
     date     DATE   NOT NULL,
     time_id  BIGINT NOT NULL,
     theme_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (time_id) REFERENCES reservation_time (id),
-    FOREIGN KEY (theme_id) REFERENCES theme (id)
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS member
@@ -47,8 +45,6 @@ CREATE TABLE IF NOT EXISTS member_reservation
     reservation_status VARCHAR(255) NOT NULL,
     created_at         timestamp(6) NOT NULL,
     updated_at         timestamp(6) NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member (id),
-    FOREIGN KEY (reservation_id) REFERENCES reservation (id),
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
@@ -61,7 +57,6 @@ CREATE TABLE IF NOT EXISTS payment
     member_reservation_id BIGINT                           NOT NULL,
     created_at            timestamp(6)                     NOT NULL,
     updated_at            timestamp(6)                     NOT NULL,
-    FOREIGN KEY (member_reservation_id) REFERENCES member_reservation (id),
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
@@ -75,6 +70,5 @@ CREATE TABLE IF NOT EXISTS payment_history
     member_id      BIGINT                           NOT NULL,
     created_at     timestamp(6)                     NOT NULL,
     updated_at     timestamp(6)                     NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member (id),
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;

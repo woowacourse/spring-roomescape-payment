@@ -1,0 +1,11 @@
+[source,json]
+----
+HTTP/1.1 201 Created
+Location: /times/2
+Content-Type: application/json
+Content-Length: 40
+{
+  "id" : 2,
+  "startAt" : "12:00:00"
+}
+----

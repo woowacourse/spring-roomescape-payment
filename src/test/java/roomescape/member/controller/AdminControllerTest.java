@@ -7,6 +7,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static roomescape.fixture.DateFixture.getNextDay;
 
 import io.restassured.http.ContentType;
@@ -18,6 +23,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.BadRequestException;
@@ -90,7 +96,13 @@ class AdminControllerTest extends ControllerTest {
                 .body(params)
                 .when().post("/api/v1/admin/reservations")
                 .then().log().all()
-                .apply(document("admin-reservations/create/success"))
+                .apply(document("admin-reservations/create/success",
+                        requestFields(
+                                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("사용자 식별자"),
+                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
+                                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
+                                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("테마 식별자")
+                        )))
                 .statusCode(HttpStatus.CREATED.value());
     }
 
