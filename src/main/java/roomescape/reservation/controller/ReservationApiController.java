@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
+import roomescape.payment.dto.TossPaymentCancelResponse;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationCancelReason;
@@ -81,10 +82,10 @@ public class ReservationApiController {
     @Operation(summary = "예약 취소 API", description = "예약을 상태를 취소로 변경합니다.")
     @Parameter(name = "id", description = "취소할 예약의 id", schema = @Schema(type = "integer", example = "1"))
     @PatchMapping("/reservations/{id}")
-    public ResponseEntity<Void> cancel(@PathVariable("id") Long id, @RequestBody ReservationCancelReason reservationCancelReason) {
-        reservationService.cancelById(id, reservationCancelReason);
+    public ResponseEntity<TossPaymentCancelResponse> cancel(@PathVariable("id") Long id, @RequestBody ReservationCancelReason reservationCancelReason) {
+        TossPaymentCancelResponse tossPaymentCancelResponse = reservationService.cancelById(id, reservationCancelReason);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(tossPaymentCancelResponse);
     }
 
     @Operation(summary = "예약 삭제 API", description = "예약 데이터를 삭제 합니다.")

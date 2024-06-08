@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.TossPaymentCancelResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -128,10 +129,10 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelById(Long id, ReservationCancelReason reservationCancelReason) {
+    public TossPaymentCancelResponse cancelById(Long id, ReservationCancelReason reservationCancelReason) {
         Reservation canceledReservation = getCanceledReservation(id);
         updateFirstWaitingReservation(canceledReservation);
-        paymentService.cancel(id, reservationCancelReason);
+        return paymentService.cancel(id, reservationCancelReason);
     }
 
     private Reservation getCanceledReservation(Long id) {
