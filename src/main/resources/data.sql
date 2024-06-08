@@ -25,3 +25,13 @@ VALUES (1, CURRENT_DATE - 3, 1, 1),
        (3, CURRENT_DATE + 3, 4, 3),
        (2, CURRENT_DATE + 4, 4, 3),
        (3, CURRENT_DATE + 4, 4, 3);
+
+INSERT INTO PAYMENT(PAYMENT_KEY, ORDER_ID, AMOUNT, RESERVATION_ID)
+VALUES ('sample_pament_key_1', 'sample_order_id_1', 1000, 1),
+       ('sample_pament_key_2', 'sample_order_id_2', 1000, 2),
+       ('sample_pament_key_3', 'sample_order_id_3', 1000, 3),
+       ('sample_pament_key_4', 'sample_order_id_4', 1000, 4),
+       ('sample_pament_key_5', 'sample_order_id_5', 1000, 5),
+       ('sample_pament_key_6', 'sample_order_id_6', 1000, 6),
+       ('sample_pament_key_7', 'sample_order_id_7', 1000, 7)
+
