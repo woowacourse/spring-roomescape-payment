@@ -67,8 +67,8 @@ public class Reservation {
         return status.isReserved();
     }
 
-    public void reserved() {
-        this.status = ReservationStatus.RESERVED;
+    public boolean isPendingPayment() {
+        return status.isPendingPayment();
     }
 
     @Override
@@ -123,8 +123,12 @@ public class Reservation {
         return payment;
     }
 
-    public boolean isPendingPayment() {
-        return status.isPendingPayment();
+    public void reserved() {
+        this.status = ReservationStatus.RESERVED;
+    }
+
+    public void pendingPayment() {
+        this.status = ReservationStatus.PENDING_PAYMENT;
     }
 
     public void paid(Payment payment) {

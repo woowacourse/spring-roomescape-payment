@@ -60,7 +60,7 @@ public class ReservationCommonService {
         if (reservation.isReserved()) {
             ReservationDetail detail = reservation.getDetail();
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
-                    .ifPresent(Reservation::reserved);
+                    .ifPresent(Reservation::pendingPayment);
         }
     }
 }
