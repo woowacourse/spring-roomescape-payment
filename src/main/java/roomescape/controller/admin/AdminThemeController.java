@@ -1,5 +1,7 @@
 package roomescape.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,7 @@ import roomescape.service.ThemeService;
 import roomescape.dto.request.theme.ThemeRequest;
 import roomescape.dto.response.theme.ThemeResponse;
 
+@Tag(name = "어드민 테마 API", description = "어드민 테마 관련 API 입니다.")
 @RestController
 @RequestMapping("/admin")
 public class AdminThemeController {
@@ -21,6 +24,7 @@ public class AdminThemeController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "어드민 테마 추가 API")
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> create(@RequestBody ThemeRequest themeRequest) {
         ThemeResponse response = themeService.save(themeRequest);
@@ -28,6 +32,7 @@ public class AdminThemeController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @Operation(summary = "어드민 테마 삭제 API")
     @DeleteMapping("/themes/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable long id) {
         themeService.deleteById(id);

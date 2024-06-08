@@ -10,10 +10,10 @@ import roomescape.dto.response.reservation.PaymentExceptionResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends AbstractExceptionHandler {
     @ExceptionHandler
-    public ResponseEntity<String> roomescapeExceptionHandler(RoomescapeException exception) {
+    public ResponseEntity<RoomescapeExceptionResponse> roomescapeExceptionHandler(RoomescapeException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
-                .body(exception.getMessage());
+                .body(exception.getRoomescapeExceptionResponse());
     }
 
     @ExceptionHandler
