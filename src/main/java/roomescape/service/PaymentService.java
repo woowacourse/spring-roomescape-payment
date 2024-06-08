@@ -4,7 +4,6 @@ import static roomescape.exception.RoomescapeExceptionCode.REQUEST_TIMEOUT;
 import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import roomescape.component.TossPaymentClient;
 import roomescape.domain.payment.Payment;
@@ -37,7 +36,7 @@ public class PaymentService {
         final Payment payment = request.toPayment(reservation);
         try {
             paymentClient.confirm(request);
-        } catch (ResourceAccessException e) {
+        } catch (Exception e) {
             throw new RoomescapeException(REQUEST_TIMEOUT);
         }
         paymentRepository.save(payment);

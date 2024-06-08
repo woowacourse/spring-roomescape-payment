@@ -19,5 +19,5 @@ security:
 payment:
   toss:
     secret: test
-    base-uri: /confirm
-    confirm-uri: doesnotmatter
+    base-uri: http://localhost
+    confirm-uri: /confirm
