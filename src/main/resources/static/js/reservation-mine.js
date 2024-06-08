@@ -65,8 +65,6 @@ function render(data) {
                     modal.classList.remove('on');
                 });
                 paymentCell.appendChild(paymentButton);
-                // TODO: 결제 팝업 나오도록 수정
-
             }
         }
     });

@@ -38,19 +38,15 @@ public class ReservationWaitingService {
                 new java.util.ArrayList<>(memberReservationsWithPaymentInfo.stream()
                         .map(MemberReservationResponse::new)
                         .toList());
-        System.out.println(allMemberReservations);
         List<MemberReservationResponse> allMemberReservationsWithoutPaymentInfo = memberReservationsWithoutPaymentInfo.stream()
                 .map(MemberReservationResponse::new)
                 .toList();
-        System.out.println(allMemberReservationsWithoutPaymentInfo);
         List<MemberReservationResponse> waiting = waitingWithRanks.stream()
                 .map(MemberReservationResponse::new)
                 .toList();
-        System.out.println(waiting);
 
         allMemberReservations.addAll(waiting);
         allMemberReservations.addAll(allMemberReservationsWithoutPaymentInfo);
-        System.out.println(allMemberReservations);
         return allMemberReservations;
     }
 
