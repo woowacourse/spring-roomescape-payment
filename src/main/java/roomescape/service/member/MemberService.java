@@ -52,13 +52,14 @@ public class MemberService {
     private MemberReservationResponse createMemberReservationResponse(ReservationWithRank reservationWithRank) {
         Optional<Payment> optionalPayment = paymentRepository.findByReservationId(reservationWithRank.getReservation().getId());
 
-        return new MemberReservationResponse(
-            reservationWithRank.getReservation().getId(),
-            reservationWithRank.getReservation().getTheme().getName().getValue(),
-            reservationWithRank.getReservation().getDate(),
-            reservationWithRank.getReservation().getTime(),
-            new ReservationStatusResponse(reservationWithRank.getReservation().getStatus().getDescription(), reservationWithRank.getRank()),
-            optionalPayment.map(PaymentResponse::from).orElse(null)
-        );
+        return optionalPayment
+            .map(payment -> new MemberReservationResponse(
+                reservationWithRank.getReservation().getId(),
+                reservationWithRank.getReservation().getTheme().getName().getValue(),
+                reservationWithRank.getReservation().getDate(),
+                reservationWithRank.getReservation().getTime(),
+                new ReservationStatusResponse(reservationWithRank.getReservation().getStatus().getDescription(), reservationWithRank.getRank()),
+                PaymentResponse.from(payment)))
+            .orElseGet(() -> MemberReservationResponse.createUnpaid(reservationWithRank));
     }
 }

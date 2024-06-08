@@ -14,14 +14,14 @@ public record MemberReservationResponse(
     PaymentResponse payment
 ) {
 
-    public static MemberReservationResponse from(ReservationWithRank reservationWithRank) {
+    public static MemberReservationResponse createUnpaid(ReservationWithRank reservationWithRank) {
         return new MemberReservationResponse(
             reservationWithRank.getReservation().getId(),
             reservationWithRank.getReservation().getTheme().getName().getValue(),
             reservationWithRank.getReservation().getDate(),
             reservationWithRank.getReservation().getTime(),
             new ReservationStatusResponse(reservationWithRank.getReservation().getStatus().getDescription(), reservationWithRank.getRank()),
-            null
+            new PaymentResponse("없음", 0L)
         );
     }
 }
