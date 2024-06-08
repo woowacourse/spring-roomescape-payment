@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.PaymentResponse;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SearchReservationsRequest;
 import roomescape.reservation.model.*;
@@ -45,6 +46,13 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
+    private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
+        final LocalDateTime reservationLocalDateTime = LocalDateTime.of(date.getValue(), time.getStartAt());
+        if (reservationLocalDateTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
+        }
+    }
+
     public List<Reservation> getReservations() {
         return reservationRepository.findAll();
     }
@@ -72,15 +80,9 @@ public class ReservationService {
         validateReservationDuplication(reservation);
 
         Reservation result = reservationRepository.save(reservation);
-        paymentService.requestTossPayment(request.toPaymentRequest());
+        PaymentResponse paymentResponse = paymentService.requestTossPayment(request.toPaymentRequest());
+        paymentService.savePayment(paymentResponse, result);
         return result;
-    }
-
-    private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
-        final LocalDateTime reservationLocalDateTime = LocalDateTime.of(date.getValue(), time.getStartAt());
-        if (reservationLocalDateTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
-        }
     }
 
     private void validateReservationDuplication(final Reservation reservation) {
@@ -112,7 +114,8 @@ public class ReservationService {
                 .map(MyReservationResponse::from)
                 .toList();
 
-        List<MyReservationResponse> myReservedReservations = reservationRepository.findAllByMemberId(memberId).stream()
+        List<MyReservationResponse> myReservedReservations = reservationRepository.findAllByMemberId(memberId)
+                .stream()
                 .map(MyReservationResponse::from)
                 .toList();
         List<MyReservationResponse> myReservations = new ArrayList<>(myReservedReservations);

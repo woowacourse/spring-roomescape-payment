@@ -1,4 +1,4 @@
 package roomescape.reservation.dto;
 
-public record PaymentResponse(String status, String paymentKey, String orderId) {
+public record PaymentResponse(String status, String paymentKey, String orderId, Long totalAmount) {
 }

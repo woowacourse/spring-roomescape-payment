@@ -1,9 +1,8 @@
-package roomescape;
+package roomescape.reservation.model;
 
 import jakarta.persistence.*;
 
 import roomescape.reservation.dto.PaymentResponse;
-import roomescape.reservation.model.Reservation;
 
 @Entity
 public class Payment {
