@@ -10,7 +10,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByReservationId(Long reservationId);
 
-    default Payment fetchByPaymentKey(String paymentKey) {
-        return findByPaymentKey(paymentKey).orElseThrow(RuntimeException::new);
+    default Payment fetchByReservationId(Long reservationId) {
+        return findByReservationId(reservationId).orElseThrow(() -> new IllegalArgumentException("해당 예약의 결제 정보가 없습니다."));
     }
 }

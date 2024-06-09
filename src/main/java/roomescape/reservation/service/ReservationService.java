@@ -51,18 +51,12 @@ public class ReservationService {
             LoginMember loginMember,
             ReservationStatus status
     ) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(userReservationSaveRequest.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
-
-        Theme theme = themeRepository.findById(userReservationSaveRequest.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
-
-        Member member = memberRepository.findById(loginMember.id())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(userReservationSaveRequest.timeId());
+        Theme theme = themeRepository.fetchById(userReservationSaveRequest.themeId());
+        Member member = memberRepository.fetchById(loginMember.id());
         Reservation reservation = userReservationSaveRequest.toEntity(member, theme, reservationTime, status);
-
         validateReservation(loginMember, reservation);
+
         Reservation savedReservation = reservationRepository.save(reservation);
         if (status.isSuccess()) {
             paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
@@ -98,8 +92,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationResponse findById(Long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        Reservation reservation = reservationRepository.fetchById(id);
 
         return ReservationResponse.toResponse(reservation);
     }
@@ -135,8 +128,7 @@ public class ReservationService {
     }
 
     private Reservation getCanceledReservation(Long id) {
-        Reservation successReservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        Reservation successReservation = reservationRepository.fetchById(id);
 
         if (successReservation.getDate().equals(LocalDate.now())) {
             throw new IllegalArgumentException("당일 예약은 취소할 수 없습니다.");

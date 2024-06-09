@@ -38,8 +38,7 @@ public class ReservationTimeService {
 
     @Transactional(readOnly = true)
     public TimeResponse findById(Long id) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다"));
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(id);
 
         return TimeResponse.toResponse(reservationTime);
     }

@@ -36,8 +36,7 @@ public class PaymentService {
     }
 
     public TossPaymentCancelResponse cancel(Long reservationId, ReservationCancelReason cancelReason) {
-        Payment payment = paymentRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약의 결제 정보가 없습니다."));
+        Payment payment = paymentRepository.fetchByReservationId(reservationId);
         TossPaymentCancelResponse tossPaymentCancelResponse = tossPaymentClient.requestPaymentCancel(payment.getPaymentKey(), cancelReason);
         payment.cancel();
 

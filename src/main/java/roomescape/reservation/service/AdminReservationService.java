@@ -40,14 +40,9 @@ public class AdminReservationService {
     }
 
     public ReservationResponse save(AdminReservationSaveRequest adminReservationSaveRequest) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(adminReservationSaveRequest.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
-
-        Theme theme = themeRepository.findById(adminReservationSaveRequest.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
-
-        Member memberToReservation = memberRepository.findById(adminReservationSaveRequest.memberId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(adminReservationSaveRequest.timeId());
+        Theme theme = themeRepository.fetchById(adminReservationSaveRequest.themeId());
+        Member memberToReservation = memberRepository.fetchById(adminReservationSaveRequest.memberId());
 
         Reservation reservation = adminReservationSaveRequest.toEntity(memberToReservation, theme, reservationTime, ReservationStatus.SUCCESS);
         if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(

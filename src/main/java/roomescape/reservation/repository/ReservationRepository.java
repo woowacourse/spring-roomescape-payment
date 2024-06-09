@@ -86,4 +86,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         order by r.date, rt.startAt, r.createdAt
 """)
     List<ReservationWithPaymentResponse> findAllMemberReservationWithPayment(Long memberId, LocalDate date);
+
+    default Reservation fetchById(Long id) {
+        return findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+    }
 }

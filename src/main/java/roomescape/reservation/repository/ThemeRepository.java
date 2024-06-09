@@ -25,4 +25,8 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
             limit :limitCount
                """)
     List<Theme> findLimitOfPopularThemesDescBetweenPeriod(LocalDate startDate, LocalDate endDate, int limitCount);
+
+    default Theme fetchById(Long id) {
+        return findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+    }
 }
