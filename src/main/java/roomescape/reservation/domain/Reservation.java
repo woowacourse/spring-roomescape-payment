@@ -13,9 +13,7 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
-import roomescape.payment.domain.PaymentStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -80,12 +78,17 @@ public class Reservation {
         return status.isPaid();
     }
 
+    public boolean canRefund() {
+        return status.isNeedRefund();
+    }
+
     public boolean isSameMember(Long memberId) {
         return member.isSameId(memberId);
     }
 
-    public void updateMember(Member other) {
-        this.member = other;
+    public void reconfirmReservation(Member newMember) {
+        this.member = newMember;
+        this.status = DEFAULT_STATUS;
     }
 
     public Long getId() {

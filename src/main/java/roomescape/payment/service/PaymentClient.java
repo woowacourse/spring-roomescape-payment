@@ -46,6 +46,23 @@ public class PaymentClient {
         }
     }
 
+    public void refundPayment(String paymentKey) {
+        try {
+            restClient.post()
+                    .uri("/{paymentKey}/cancel", paymentKey)
+                    .header(HttpHeaders.AUTHORIZATION, authorizationKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpClientErrorException | HttpServerErrorException exception) {
+            log.error("PaymentService Refund Error, paymentKey = {}", paymentKey, exception);
+            handleClientException(exception);
+        } catch (ResourceAccessException exception) {
+            log.error("PaymentService Refund Timeout Error, paymentKey = {}", paymentKey, exception);
+            throw new RestClientTimeOutException(exception);
+        }
+    }
+
     private void handleClientException(HttpStatusCodeException exception) {
         if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             throw new PaymentUnauthorizedException();

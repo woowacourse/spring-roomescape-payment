@@ -1,7 +1,6 @@
 package roomescape.payment.dto;
 
 import java.math.BigDecimal;
-import roomescape.reservation.dto.UserReservationCreateRequest;
 
 public record PaymentConfirmRequest(
         String paymentKey,

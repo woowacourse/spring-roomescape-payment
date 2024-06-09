@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Objects;
+import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Schedule;
 
@@ -47,6 +48,14 @@ public class Payment {
 
     public boolean isPaid() {
         return status.isPaid();
+    }
+
+    public void completeRefund() {
+        if (status.isPaid()) {
+            status = PaymentStatus.REFUND;
+            return;
+        }
+        throw new BadArgumentRequestException("이미 환불된 결제입니다.");
     }
 
     public Long getId() {

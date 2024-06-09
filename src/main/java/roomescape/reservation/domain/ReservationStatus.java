@@ -15,4 +15,8 @@ public enum ReservationStatus {
     public boolean isPaid() {
         return isPaid;
     }
+
+    public boolean isNeedRefund() {
+        return this == DONE_PAYMENT;
+    }
 }
