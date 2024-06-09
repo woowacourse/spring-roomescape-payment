@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date();
-
-    requestRead(`/themes/top?today=${formatDate(today)}`) // 인기 테마 목록 조회 API endpoint
+    requestRead(`/themes/weeklyBest`) // 인기 테마 목록 조회 API endpoint
         .then(render)
         .catch(error => console.error('Error fetching times:', error));
 });

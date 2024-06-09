@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,16 +48,14 @@ public class ThemeController {
         return RoomEscapeApiResponse.success(themeService.findAllThemes());
     }
 
-    @GetMapping("/themes/top")
+    @GetMapping("/themes/weeklyBest")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "인기 테마 조회", description = "접속일 기준 지난 7일간 가장 많이 예약된 상위 10개 테마를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
-    public RoomEscapeApiResponse<ThemesResponse> getTop10Themes(
-            @NotNull(message = "날짜는 null일 수 없습니다.") LocalDate today
-    ) {
-        return RoomEscapeApiResponse.success(themeService.getTop10Themes(today));
+    public RoomEscapeApiResponse<ThemesResponse> getTop10Themes() {
+        return RoomEscapeApiResponse.success(themeService.getWeeklyBestThemes());
     }
 
     @Admin

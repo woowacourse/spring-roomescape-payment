@@ -44,7 +44,8 @@ public class ThemeService {
     }
 
     @Transactional(readOnly = true)
-    public ThemesResponse getTop10Themes(LocalDate today) {
+    public ThemesResponse getWeeklyBestThemes() {
+        LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(7);
         LocalDate endDate = today.minusDays(1);
         int limit = 10;
