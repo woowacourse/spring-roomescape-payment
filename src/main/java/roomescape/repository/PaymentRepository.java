@@ -11,4 +11,8 @@ public interface PaymentRepository {
     List<Payment> findAllByReservationIn(List<Reservation> reservations);
 
     Optional<Payment> findByOrderIdAndPaymentKey(String orderId, String paymentKey);
+
+    Optional<Payment> findByReservationId(Long reservationId);
+
+    void deleteByReservationId(Long reservationId);
 }

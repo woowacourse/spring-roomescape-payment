@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 class JpaPaymentRepositoryTest extends DatabaseClearBeforeEachTest {
 
@@ -46,5 +47,17 @@ class JpaPaymentRepositoryTest extends DatabaseClearBeforeEachTest {
         Assertions.assertThat(paymentRepository.findByOrderIdAndPaymentKey(
                 DEFAULT_PAYMENT_WITHOUT_ID.getOrderId(), DEFAULT_PAYMENT_WITHOUT_ID.getPaymentKey()
         )).contains(saved);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("reservationId로 잘 삭제하는지 확인")
+    void deleteByReservationId() {
+        var reservation = reservationRepository.save(DEFAULT_RESERVATION);
+        paymentRepository.save(DEFAULT_PAYMENT_WITHOUT_ID);
+
+        paymentRepository.deleteByReservationId(reservation.getId());
+        Assertions.assertThat(paymentRepository.findByReservationId(reservation.getId()))
+                .isEmpty();
     }
 }

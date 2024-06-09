@@ -127,6 +127,7 @@ public class ReservationService {
     }
 
     private void deleteReservation(long reservationId) {
+        paymentRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservationId);
     }
 }

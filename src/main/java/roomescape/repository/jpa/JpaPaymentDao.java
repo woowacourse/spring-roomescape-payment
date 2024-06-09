@@ -11,4 +11,8 @@ public interface JpaPaymentDao extends JpaRepository<Payment, Long> {
     public List<Payment> findAllByReservationIn(List<Reservation> reservations);
 
     public Optional<Payment> findByOrderIdAndPaymentKey(String orderId, String paymentKey);
+
+    public Optional<Payment> findByReservationId(Long reservationId);
+
+    public void deleteByReservationId(Long reservationId);
 }

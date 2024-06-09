@@ -38,4 +38,16 @@ public class CollectionPaymentRepository implements PaymentRepository {
                 .filter(payment -> payment.getPaymentKey().equals(paymentKey))
                 .findFirst();
     }
+
+    @Override
+    public Optional<Payment> findByReservationId(Long reservationId) {
+        return payments.stream()
+                .filter(payment -> reservationId.equals(payment.getReservation().getId()))
+                .findFirst();
+    }
+
+    @Override
+    public void deleteByReservationId(Long reservationId) {
+        payments.removeIf(payment -> reservationId.equals(payment.getReservation().getId()));
+    }
 }

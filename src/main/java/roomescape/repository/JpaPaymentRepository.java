@@ -29,4 +29,14 @@ public class JpaPaymentRepository implements PaymentRepository {
     public Optional<Payment> findByOrderIdAndPaymentKey(String orderId, String paymentKey) {
         return jpaPaymentDao.findByOrderIdAndPaymentKey(orderId, paymentKey);
     }
+
+    @Override
+    public Optional<Payment> findByReservationId(Long reservationId) {
+        return jpaPaymentDao.findByReservationId(reservationId);
+    }
+
+    @Override
+    public void deleteByReservationId(Long reservationId) {
+        jpaPaymentDao.deleteByReservationId(reservationId);
+    }
 }
