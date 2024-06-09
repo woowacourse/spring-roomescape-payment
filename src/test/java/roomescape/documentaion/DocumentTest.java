@@ -2,18 +2,19 @@ package roomescape.documentaion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import roomescape.auth.application.AuthService;
-import roomescape.auth.presentation.LoginMemberArgumentResolver;
+import roomescape.common.StubLoginMemberArgumentResolver;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,8 +24,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 abstract class DocumentTest {
     protected static ObjectMapper objectMapper;
 
-    protected AuthService authService;
-    protected LoginMemberArgumentResolver loginMemberArgumentResolver;
     protected MockMvc mockMvc;
 
     @BeforeAll
@@ -32,16 +31,16 @@ abstract class DocumentTest {
         objectMapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
         module.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ISO_LOCAL_TIME));
+        module.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ISO_LOCAL_DATE));
         objectMapper.registerModule(module);
     }
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider provider) {
-        this.authService = Mockito.mock(AuthService.class);
-        this.loginMemberArgumentResolver = new LoginMemberArgumentResolver(authService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
                 .apply(documentationConfiguration(provider))
-                .setCustomArgumentResolvers(loginMemberArgumentResolver)
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .setCustomArgumentResolvers(new StubLoginMemberArgumentResolver())
                 .build();
     }
 
