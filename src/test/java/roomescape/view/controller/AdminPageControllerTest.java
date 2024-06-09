@@ -5,6 +5,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.util.Map;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin 으로 GET 요청을 보내면 403 FORBIDDEN 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminPageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -52,7 +53,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -71,7 +73,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/reservation 으로 GET 요청을 보내면 403 FORBIDDEN 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/reservation 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminReservationPageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -82,7 +84,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/reservation")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -101,7 +104,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/time 으로 GET 요청을 보내면 403 Forbidden 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/time 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminTimePageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -112,7 +115,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/time")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -131,7 +135,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/theme 으로 GET 요청을 보내면 403 Forbidden 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/theme 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminThemePageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -142,7 +146,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/theme")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -161,7 +166,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/waiting 으로 GET 요청을 보내면 403 Forbidden 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/waiting 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminWaitingPageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@email.com", "member");
@@ -172,7 +177,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/waiting")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
 
