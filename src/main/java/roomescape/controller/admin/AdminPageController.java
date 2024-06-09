@@ -39,4 +39,10 @@ public class AdminPageController {
     public String waitingPage() {
         return "admin/waiting";
     }
+
+    @Operation(summary = "어드민 예약 취소 관리 페이지")
+    @GetMapping("/reservation/canceled")
+    public String canceledReservation() {
+        return "admin/canceled-reservation";
+    }
 }

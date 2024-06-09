@@ -11,13 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.util.Objects;
-import org.springframework.http.HttpStatus;
 import roomescape.domain.member.Member;
 import roomescape.domain.theme.Theme;
-import roomescape.exception.RoomescapeException;
 
 @Entity
-public class Reservation {
+public class CanceledReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,36 +30,19 @@ public class Reservation {
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
-    protected Reservation() {
+    protected CanceledReservation() {
     }
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
+    public CanceledReservation(Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
         this(null, member, date, time, theme, status);
     }
 
-    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
-        if (date == null) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약 날짜는 필수입니다.");
-        }
+    public CanceledReservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
-        this.status = status;
-    }
-
-    public void changePaymentWaiting() {
-        if (status.isWaiting()) {
-            status = Status.PAYMENT_WAITING;
-        }
-    }
-
-    public CanceledReservation canceled() {
-        return new CanceledReservation(member, date, time, theme, status);
-    }
-
-    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -97,7 +78,7 @@ public class Reservation {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Reservation that = (Reservation) o;
+        CanceledReservation that = (CanceledReservation) o;
         return Objects.equals(id, that.id);
     }
 

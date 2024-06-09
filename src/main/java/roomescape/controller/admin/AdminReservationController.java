@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.service.ReservationService;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
+import roomescape.dto.response.reservation.CanceledReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
+import roomescape.service.ReservationService;
 
 @Tag(name = "어드민 예약 API", description = "어드민 예약 관련 API 입니다.")
 @RestController
@@ -47,5 +48,12 @@ public class AdminReservationController {
     public ResponseEntity<List<ReservationResponse>> searchAdmin(ReservationCriteriaRequest reservationCriteriaRequest) {
         List<ReservationResponse> responses = reservationService.findByCriteria(reservationCriteriaRequest);
         return ResponseEntity.ok(responses);
+    }
+
+    @Operation(summary = "어드민 취소 예약 조회 API")
+    @GetMapping("/reservations/canceled")
+    public ResponseEntity<List<CanceledReservationResponse>> findAllCanceledReservation() {
+        List<CanceledReservationResponse> canceledReservationResponses = reservationService.findAllCanceledReservation();
+        return ResponseEntity.ok(canceledReservationResponses);
     }
 }

@@ -10,7 +10,7 @@ ALTER TABLE  theme ALTER COLUMN id RESTART;
 SET REFERENTIAL_INTEGRITY TRUE;
 
 insert into member (name, email, password, role)
-values ('찰리', 'gomding@wooteco.com', 'wootecoCrew6!', 'BASIC'),
+values ('썬', 'sun@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('비토', 'bito@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('운영자', 'admin@wooteco.com', 'wootecoCrew6!', 'ADMIN');
