@@ -17,6 +17,9 @@ import roomescape.reservation.domain.Reservation;
 @Entity
 public class Payment extends AuditedEntity {
 
+    private static final BigDecimal MIN_AMOUNT_RANGE = BigDecimal.ZERO;
+    private static final BigDecimal MAX_AMOUNT_RANGE = BigDecimal.valueOf(Integer.MAX_VALUE);
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -71,6 +74,7 @@ public class Payment extends AuditedEntity {
             PaymentCurrency currency,
             BigDecimal totalAmount
     ) {
+        validateTotalAmountRange(totalAmount);
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
@@ -79,6 +83,12 @@ public class Payment extends AuditedEntity {
         this.method = method;
         this.currency = currency;
         this.totalAmount = totalAmount;
+    }
+
+    private void validateTotalAmountRange(BigDecimal totalAmount) {
+        if (totalAmount.compareTo(MIN_AMOUNT_RANGE) < 0 || totalAmount.compareTo(MAX_AMOUNT_RANGE) > 0) {
+            throw new IllegalArgumentException(String.format("%s ~ %s 사이의 금액만 결제 가능합니다.", MIN_AMOUNT_RANGE, MAX_AMOUNT_RANGE));
+        }
     }
 
     public void cancel() {
