@@ -26,8 +26,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void savePayment(final CreateReservationRequest request, final Reservation savedReservation) { // todo 이름 애매
-        //TODO 파라미터 애매함
+    public void savePayment(final CreateReservationRequest request, final Reservation savedReservation) {
         final PaymentConfirmResponse paymentConfirmResponse = paymentClient.postPayment(
                 new CreatePaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
         final PaymentInfo payment = paymentConfirmResponse.toPayment(savedReservation);
