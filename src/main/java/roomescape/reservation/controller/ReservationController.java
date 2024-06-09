@@ -20,6 +20,7 @@ import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
@@ -134,11 +135,11 @@ public class ReservationController {
     @PostMapping("/reservations/waiting")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ReservationResponse> saveWaiting(
-            @Valid @RequestBody ReservationRequest reservationRequest,
+            @Valid @RequestBody WaitingRequest waitingRequest,
             @MemberId Long memberId,
             HttpServletResponse response
     ) {
-        ReservationResponse reservationResponse = reservationService.addWaiting(reservationRequest, memberId);
+        ReservationResponse reservationResponse = reservationService.addWaiting(waitingRequest, memberId);
         return getCreatedReservationResponse(reservationResponse, response);
     }
 

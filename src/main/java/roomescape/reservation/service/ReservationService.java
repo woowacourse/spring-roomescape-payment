@@ -15,6 +15,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSearchSpecification;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
@@ -74,13 +75,15 @@ public class ReservationService {
 
     public Reservation addReservation(ReservationRequest request, Long memberId) {
         validateIsReservationExist(request.themeId(), request.timeId(), request.date());
-        Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.CONFIRMED);
+        Reservation reservation = getReservationForSave(request.timeId(), request.themeId(), request.date(), memberId,
+                ReservationStatus.CONFIRMED);
         return reservationRepository.save(reservation);
     }
 
-    public ReservationResponse addWaiting(ReservationRequest request, Long memberId) {
+    public ReservationResponse addWaiting(WaitingRequest request, Long memberId) {
         validateMemberAlreadyReserve(request.themeId(), request.timeId(), request.date(), memberId);
-        Reservation reservation = getReservationForSave(request, memberId, ReservationStatus.WAITING);
+        Reservation reservation = getReservationForSave(request.timeId(), request.themeId(), request.date(), memberId,
+                ReservationStatus.WAITING);
         Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.from(saved);
     }
@@ -126,14 +129,14 @@ public class ReservationService {
         }
     }
 
-    private Reservation getReservationForSave(ReservationRequest request, Long memberId,
+    private Reservation getReservationForSave(Long timeId, Long themeId, LocalDate date, Long memberId,
                                               ReservationStatus status) {
-        ReservationTime time = reservationTimeService.findTimeById(request.timeId());
-        Theme theme = themeService.findThemeById(request.themeId());
+        ReservationTime time = reservationTimeService.findTimeById(timeId);
+        Theme theme = themeService.findThemeById(themeId);
         Member member = memberService.findMemberById(memberId);
 
-        validateDateAndTime(request.date(), time);
-        return new Reservation(request.date(), time, theme, member, status);
+        validateDateAndTime(date, time);
+        return new Reservation(date, time, theme, member, status);
     }
 
     @Transactional(readOnly = true)

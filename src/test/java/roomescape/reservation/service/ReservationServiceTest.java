@@ -23,6 +23,7 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
@@ -83,8 +84,7 @@ class ReservationServiceTest {
 
         // then
         assertThatThrownBy(() -> reservationService.addWaiting(
-                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        1000L, "paymentType"), member.getId()))
+                new WaitingRequest(date, reservationTime.getId(), theme.getId()), member.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -104,13 +104,11 @@ class ReservationServiceTest {
                         1000L, "paymentType"), member.getId());
 
         reservationService.addWaiting(
-                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        1000L, "paymentType"), member1.getId());
+                new WaitingRequest(date, reservationTime.getId(), theme.getId()), member1.getId());
 
         // then
         assertThatThrownBy(() -> reservationService.addWaiting(
-                new ReservationRequest(date, reservationTime.getId(), theme.getId(), "paymentKey", "orderId",
-                        1000L, "paymentType"), member1.getId()))
+                new WaitingRequest(date, reservationTime.getId(), theme.getId()), member1.getId()))
                 .isInstanceOf(RoomEscapeException.class);
     }
 
@@ -190,9 +188,8 @@ class ReservationServiceTest {
                         "paymentKey", "orderId",
                         1000L, "paymentType"), member.getId());
         ReservationResponse waiting = reservationService.addWaiting(
-                new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
-                        "paymentKey", "orderId",
-                        1000L, "paymentType"), member1.getId());
+                new WaitingRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId()),
+                member1.getId());
 
         // when & then
         assertThatThrownBy(() -> reservationService.approveWaiting(waiting.id(), admin.getId()))
@@ -210,9 +207,8 @@ class ReservationServiceTest {
 
         // when
         ReservationResponse waiting = reservationService.addWaiting(
-                new ReservationRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId(),
-                        "paymentKey", "orderId",
-                        1000L, "paymentType"), member.getId());
+                new WaitingRequest(LocalDate.now().plusDays(1L), reservationTime.getId(), theme.getId()),
+                member.getId());
         reservationService.approveWaiting(waiting.id(), admin.getId());
 
         // then
