@@ -13,7 +13,9 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -35,6 +37,10 @@ public class Reservation {
 
     public Reservation(Member member, Schedule schedule) {
         this(null, member, schedule, DEFAULT_STATUS);
+    }
+
+    public Reservation(Member member, Schedule schedule, ReservationStatus status) {
+        this(null, member, schedule, status);
     }
 
     public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
@@ -61,6 +67,13 @@ public class Reservation {
 
     public boolean isBefore(LocalDateTime currentDateTime) {
         return schedule.isBefore(currentDateTime);
+    }
+
+    public void completePaying() {
+        if (status.isPaid()) {
+            throw new IllegalArgumentException("이미 결제된 예약입니다.");
+        }
+        status = ReservationStatus.DONE_PAYMENT;
     }
 
     public boolean isPaid() {
@@ -110,11 +123,12 @@ public class Reservation {
         Reservation that = (Reservation) object;
         return Objects.equals(id, that.id)
                 && Objects.equals(member, that.member)
-                && Objects.equals(schedule, that.schedule);
+                && Objects.equals(schedule, that.schedule)
+                && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, member, schedule);
+        return Objects.hash(id, member, schedule, status);
     }
 }

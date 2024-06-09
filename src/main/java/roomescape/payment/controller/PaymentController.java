@@ -11,7 +11,6 @@ import roomescape.payment.service.PaymentService;
 
 @RestController
 public class PaymentController {
-
     private final PaymentService paymentService;
 
     public PaymentController(PaymentService paymentService) {

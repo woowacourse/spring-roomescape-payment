@@ -7,9 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Schedule;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -28,42 +27,43 @@ public class ReservationCreateService {
     private final MemberRepository memberRepository;
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentClient paymentClient;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
                                     ScheduleRepository scheduleRepository,
                                     MemberRepository memberRepository,
                                     TimeRepository timeRepository,
-                                    ThemeRepository themeRepository,
-                                    PaymentClient paymentClient) {
+                                    ThemeRepository themeRepository) {
         this.reservationRepository = reservationRepository;
         this.scheduleRepository = scheduleRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
-        this.paymentClient = paymentClient;
-    }
-
-    @Transactional
-    public ReservationResponse createReservation(AdminReservationCreateRequest request) {
-        Reservation reservation = makeReservation(
-                request.memberId(), request.date(), request.timeId(), request.themeId());
-        return saveReservation(reservation);
     }
 
     @Transactional
     public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
-        paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
-
-        Reservation reservation = makeReservation(
+        Reservation reservation = makeReservationForUser(
                 memberId, request.date(), request.timeId(), request.themeId());
         return saveReservation(reservation);
     }
 
-    private Reservation makeReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
+    private Reservation makeReservationForUser(Long memberId, LocalDate date, Long timeId, Long themeId) {
         Member member = findMemberByMemberId(memberId);
         Schedule schedule = makeSchedule(date, timeId, themeId);
         return new Reservation(member, schedule);
+    }
+
+    @Transactional
+    public ReservationResponse createReservation(AdminReservationCreateRequest request) {
+        Reservation reservation = makeReservationForAdmin(
+                request.memberId(), request.date(), request.timeId(), request.themeId());
+        return saveReservation(reservation);
+    }
+
+    private Reservation makeReservationForAdmin(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        Member member = findMemberByMemberId(memberId);
+        Schedule schedule = makeSchedule(date, timeId, themeId);
+        return new Reservation(member, schedule, ReservationStatus.ADMIN_RESERVE);
     }
 
     private Member findMemberByMemberId(Long memberId) {

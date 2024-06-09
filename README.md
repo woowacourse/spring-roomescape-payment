@@ -45,9 +45,9 @@
 #### 결제 정보 저장 및 조회 도입
 - [x] `Payment` Table 도입
   - [x] scheduleId, memberId, paymentKey, amount, status(PAID, REFUND)로 구성
-- [ ] `Reservation` Table에 status 도입
+- [x] `Reservation` Table에 status 도입
   - [x] 'ADMIN_RESERVE', 'WAITING_FOR_PAYMENT', 'DONE_PAYMENT' 상태 도입
-  - [ ] 예약 API에서 결제를 확인하지 않도록 변경
+  - [x] 예약 API에서 결제를 확인하지 않도록 변경
 - [x] 결제 API 만들기
   - 현재 시간 이후의 예약만 결제할 수 있다.
   - 예약은 '결제 대기' 상태이어야 한다.

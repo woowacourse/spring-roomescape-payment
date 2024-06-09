@@ -34,6 +34,7 @@ public class PaymentService {
 
         paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
         Payment payment = savePayment(request, reservation);
+        reservation.completePaying();
         return PaymentResponse.from(payment);
     }
 
