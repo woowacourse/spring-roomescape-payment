@@ -4,7 +4,7 @@
 
 ==== 성공 케이스
 
-operation::themes/post/success[snippets='http-request,http-response']
+operation::themes/post/success[snippets='http-request,request-fields,http-response,response-fields']
 
 ==== 실패 케이스
 
@@ -22,6 +22,6 @@ operation::themes/delete/fail[snippets='http-request,http-response']
 
 === 조회
 ==== 전체 조회
-operation::themes/get/all/success[snippets='http-request,http-response']
+operation::themes/get/all/success[snippets='http-request,http-response,response-fields']
 ==== 인기 테마 조회
-operation::themes/get/popular/success[snippets='http-request,http-response']
+operation::themes/get/popular/success[snippets='http-request,http-response,response-fields']
