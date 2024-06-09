@@ -1,9 +1,9 @@
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
-      hibernate:
-        format_sql: true
+      #      hibernate:
+      #        format_sql: true
       ddl-auto: create-drop
     defer-datasource-initialization: true
 
@@ -25,8 +25,6 @@ security:
       secret-key: daijawligagaf@LIJ$@U)9nagnalkkgalijaddljfi
       access:
         expire-length: 1800000 # 30 분
-      refresh:
-        expire-length: 604800000 # 7일
 
 payment:
   widget:

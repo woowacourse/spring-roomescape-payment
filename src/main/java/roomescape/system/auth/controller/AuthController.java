@@ -33,7 +33,6 @@ public class AuthController {
     ) {
         TokenDto tokenInfo = authService.login(loginRequest);
         addCookieToResponse(new Cookie("accessToken", tokenInfo.accessToken()), response);
-        addCookieToResponse(new Cookie("refreshToken", tokenInfo.refreshToken()), response);
         return ApiResponse.success();
     }
 
@@ -49,46 +48,20 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        TokenDto tokenInfo = getTokenFromCookie(request);
-        Cookie cookie = new Cookie("accessToken", tokenInfo.accessToken());
-        Cookie cookie2 = new Cookie("refreshToken", tokenInfo.refreshToken());
+        Cookie cookie = getTokenCookie(request);
         cookie.setValue(null);
-        cookie2.setValue(null);
         cookie.setMaxAge(0);
-        cookie2.setMaxAge(0);
         addCookieToResponse(cookie, response);
-        addCookieToResponse(cookie2, response);
         return ApiResponse.success();
     }
 
-    @GetMapping("/token-reissue")
-    public ApiResponse<Void> reissueToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
-        TokenDto requestToken = getTokenFromCookie(request);
-
-        TokenDto tokenInfo = authService.reissueToken(requestToken.accessToken(), requestToken.refreshToken());
-        addCookieToResponse(new Cookie("accessToken", tokenInfo.accessToken()), response);
-        addCookieToResponse(new Cookie("refreshToken", tokenInfo.refreshToken()), response);
-
-        return ApiResponse.success();
-    }
-
-    private TokenDto getTokenFromCookie(HttpServletRequest request) {
-        String accessToken = "";
-        String refreshToken = "";
+    private Cookie getTokenCookie(HttpServletRequest request) {
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("accessToken")) {
-                accessToken = cookie.getValue();
-                cookie.setMaxAge(0);
-            }
-            if (cookie.getName().equals("refreshToken")) {
-                refreshToken = cookie.getValue();
-                cookie.setMaxAge(0);
+                return cookie;
             }
         }
-        return new TokenDto(accessToken, refreshToken);
+        return new Cookie("accessToken", null);
     }
 
     private void addCookieToResponse(Cookie cookie, HttpServletResponse response) {

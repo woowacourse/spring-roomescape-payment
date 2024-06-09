@@ -23,13 +23,9 @@ public class JwtHandler {
     @Value("${security.jwt.token.access.expire-length}")
     private long accessTokenExpireTime;
 
-    @Value("${security.jwt.token.refresh.expire-length}")
-    private long refreshTokenExpireTime;
-
     public TokenDto createToken(Long memberId) {
         Date date = new Date();
         Date accessTokenExpiredAt = new Date(date.getTime() + accessTokenExpireTime);
-        Date refreshTokenExpiredAt = new Date(date.getTime() + refreshTokenExpireTime);
 
         String accessToken = Jwts.builder()
                 .claim("memberId", memberId)
@@ -38,24 +34,12 @@ public class JwtHandler {
                 .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
                 .compact();
 
-        String refreshToken = Jwts.builder()
-                .setIssuedAt(date)
-                .setExpiration(refreshTokenExpiredAt)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
-                .compact();
-
-        return new TokenDto(accessToken, refreshToken);
+        return new TokenDto(accessToken);
     }
 
     public Long getMemberIdFromToken(String token) {
         validateToken(token);
 
-        return Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token)
-                .getBody()
-                .get("memberId", Long.class);
-    }
-
-    public Long getMemberIdFromTokenWithNotValidate(String token) {
         return Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token)
                 .getBody()
                 .get("memberId", Long.class);

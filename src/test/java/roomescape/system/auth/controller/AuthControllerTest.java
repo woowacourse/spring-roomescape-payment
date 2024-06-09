@@ -1,11 +1,11 @@
-package roomescape.auth.controller;
+package roomescape.system.auth.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import roomescape.member.domain.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-// Todo: 로그아웃 테스트 추가
 class AuthControllerTest {
 
     @Autowired
@@ -28,7 +27,7 @@ class AuthControllerTest {
     private int port;
 
     @Test
-    @DisplayName("로그인에 성공하면 JWT accessToken, refreshToken 을 Response 받는다.")
+    @DisplayName("로그인에 성공하면 JWT accessToken을 응답 받는다.")
     void getJwtAccessTokenWhenlogin() {
         // given
         String email = "test@email.com";
@@ -49,8 +48,7 @@ class AuthControllerTest {
                 .then().log().all().extract().cookies();
 
         // then
-        Assertions.assertThat(cookies.get("accessToken")).isNotNull();
-        Assertions.assertThat(cookies.get("refreshToken")).isNotNull();
+        assertThat(cookies.get("accessToken")).isNotNull();
     }
 
     @Test
@@ -84,7 +82,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("로그아웃 요청 시, accessToken, refreshToken 쿠키가 삭제된다.")
+    @DisplayName("로그아웃 요청 시, accessToken 쿠키가 삭제된다.")
     void checkLogout() {
         // given
         String accessToken = getAccessTokenCookieByLogin("email@email.com", "password");
@@ -96,8 +94,7 @@ class AuthControllerTest {
                 .when().post("/logout")
                 .then()
                 .statusCode(200)
-                .cookie("accessToken", "")
-                .cookie("refreshToken", "");
+                .cookie("accessToken", "");
     }
 
     private String getAccessTokenCookieByLogin(final String email, final String password) {

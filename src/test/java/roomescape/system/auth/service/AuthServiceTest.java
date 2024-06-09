@@ -1,6 +1,6 @@
-package roomescape.auth.service;
+package roomescape.system.auth.service;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,6 @@ import roomescape.member.service.MemberService;
 import roomescape.system.auth.dto.LoginRequest;
 import roomescape.system.auth.jwt.JwtHandler;
 import roomescape.system.auth.jwt.dto.TokenDto;
-import roomescape.system.auth.service.AuthService;
 import roomescape.system.exception.RoomEscapeException;
 
 @SpringBootTest
@@ -28,7 +27,7 @@ class AuthServiceTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("존재하는 회원의 email, password로 로그인하면 memberId, accessToken을 Response 한다.")
+    @DisplayName("로그인 성공시 JWT accessToken 을 반환한다.")
     void loginSuccess() {
         // given
         Member member = memberRepository.save(new Member("이름", "test@test.com", "12341234", Role.MEMBER));
@@ -37,14 +36,11 @@ class AuthServiceTest {
         TokenDto response = authService.login(new LoginRequest(member.getEmail(), member.getPassword()));
 
         // then
-        assertAll(
-                () -> Assertions.assertThat(response.accessToken()).isNotNull(),
-                () -> Assertions.assertThat(response.refreshToken()).isNotNull()
-        );
+        assertThat(response.accessToken()).isNotNull();
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원 email 또는 password로 로그인하면 예외를 발생한다.")
+    @DisplayName("존재하지 않는 회원 email 또는 password로 로그인하면 예외가 발생한다.")
     void loginFailByNotExistMemberInfo() {
         // given
         String notExistEmail = "invalid@test.com";
@@ -56,7 +52,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원의 memberId로 로그인 여부를 체크하면 예외를 발생한다.")
+    @DisplayName("존재하지 않는 회원의 memberId로 로그인 여부를 체크하면 예외가 발생한다.")
     void checkLoginFailByNotExistMemberInfo() {
         // given
         Long notExistMemberId = 1L;
