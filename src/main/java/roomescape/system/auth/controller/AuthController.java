@@ -52,6 +52,8 @@ public class AuthController {
         TokenDto tokenInfo = getTokenFromCookie(request);
         Cookie cookie = new Cookie("accessToken", tokenInfo.accessToken());
         Cookie cookie2 = new Cookie("refreshToken", tokenInfo.refreshToken());
+        cookie.setValue(null);
+        cookie2.setValue(null);
         cookie.setMaxAge(0);
         cookie2.setMaxAge(0);
         addCookieToResponse(cookie, response);

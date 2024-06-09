@@ -2,6 +2,7 @@ package roomescape.auth.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.matcher.DetailedCookieMatcher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+// Todo: 로그아웃 테스트 추가
 class AuthControllerTest {
 
     @Autowired
@@ -84,22 +86,21 @@ class AuthControllerTest {
                 .statusCode(401);
     }
 
-    private String getAdminAccessTokenCookie(final String email, final String password) {
-        memberRepository.save(new Member("이름", email, password, Role.ADMIN));
+    @Test
+    @DisplayName("로그아웃 요청 시, accessToken, refreshToken 쿠키가 삭제된다.")
+    void checkLogout() {
+        // given
+        String accessToken = getAccessTokenCookieByLogin("email@email.com", "password");
 
-        Map<String, String> loginParams = Map.of(
-                "email", email,
-                "password", password
-        );
-
-        String accessToken = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
+        // when & then
+        RestAssured.given().log().all()
                 .port(port)
-                .body(loginParams)
-                .when().post("/login")
-                .then().log().all().extract().cookie("accessToken");
-
-        return "accessToken=" + accessToken;
+                .header("cookie", accessToken)
+                .when().post("/logout")
+                .then()
+                .statusCode(200)
+                .cookie("accessToken", "")
+                .cookie("refreshToken", "");
     }
 
     private String getAccessTokenCookieByLogin(final String email, final String password) {
