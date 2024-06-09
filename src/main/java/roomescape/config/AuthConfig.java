@@ -33,7 +33,7 @@ public class AuthConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationExtractInterceptor)
-                .excludePathPatterns("/", "/login", "/signup", "/css/**", "/js/**", "/image/**", "/themes/popular");
+                .excludePathPatterns("/", "/login", "/signup", "/css/**", "/js/**", "/image/**", "/themes/popular", "docs/**");
         registry.addInterceptor(adminAccessInterceptor)
                 .addPathPatterns("/admin/**");
     }
