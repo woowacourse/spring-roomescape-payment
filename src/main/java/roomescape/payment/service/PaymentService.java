@@ -50,7 +50,7 @@ public class PaymentService {
         if (reservation.isPaid()) {
             throw new BadArgumentRequestException("해당 예약은 이미 결제 되었습니다.");
         }
-        if (reservation.isSameMember(memberId)) {
+        if (reservation.isDifferentMember(memberId)) {
             throw new BadArgumentRequestException("예약한 회원과 동일한 회원이 결제해야 합니다.");
         }
     }

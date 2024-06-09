@@ -82,8 +82,8 @@ public class Reservation {
         return status.isNeedRefund();
     }
 
-    public boolean isSameMember(Long memberId) {
-        return member.isSameId(memberId);
+    public boolean isDifferentMember(Long memberId) {
+        return member.isDifferentId(memberId);
     }
 
     public void reconfirmReservation(Member newMember) {
