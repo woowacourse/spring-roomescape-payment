@@ -23,7 +23,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
-import roomescape.controller.dto.response.CreateTimeResponse;
 import roomescape.controller.dto.response.TimeAndAvailabilityResponse;
 import roomescape.controller.dto.response.TimeResponse;
 import roomescape.domain.member.Member;
@@ -65,7 +64,7 @@ class ReservationTimeServiceTest {
         @DisplayName("성공: 예약 시간을 저장하고, id 값과 함께 반환한다.")
         @Test
         void save() {
-            CreateTimeResponse saved = reservationTimeService.save(rawTime);
+            TimeResponse saved = reservationTimeService.save(rawTime);
             assertThat(saved.id()).isEqualTo(1L);
         }
 

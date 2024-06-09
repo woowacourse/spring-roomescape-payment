@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.response.CreateTimeResponse;
 import roomescape.controller.dto.response.TimeAndAvailabilityResponse;
 import roomescape.controller.dto.response.TimeResponse;
 import roomescape.domain.reservation.Reservation;
@@ -28,10 +27,10 @@ public class ReservationTimeService {
     }
 
     @Transactional
-    public CreateTimeResponse save(String startAt) {
+    public TimeResponse save(String startAt) {
         ReservationTime reservationTime = new ReservationTime(startAt);
         validateDuplication(startAt);
-        return CreateTimeResponse.from(reservationTimeRepository.save(reservationTime));
+        return TimeResponse.from(reservationTimeRepository.save(reservationTime));
     }
 
     private void validateDuplication(String time) {
