@@ -40,7 +40,7 @@ class PaymentServiceTest {
     @DisplayName("외부 결제 승인 API 호출이 실패할 경우 예외가 발생하는지 확인")
     void approveFailWhenPaymentApiFail() {
         PaymentClient paymentClient = Mockito.mock(PaymentClient.class);
-        Mockito.when(paymentClient.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER))
+        Mockito.when(paymentClient.approve(DEFAULT_APPROVE_REQUEST))
                 .thenThrow(ApiCallException.class);
 
         PaymentRepository paymentRepository = new CollectionPaymentRepository();

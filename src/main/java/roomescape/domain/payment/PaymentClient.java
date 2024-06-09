@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.Member;
 import roomescape.dto.PaymentApproveRequest;
 
 @Component
@@ -38,15 +37,15 @@ public class PaymentClient {
         this.errorHandler = errorHandler;
     }
 
-    public Payment approve(PaymentApproveRequest paymentApproveRequest, Member member) {
+    public Payment approve(PaymentApproveRequest paymentApproveRequest) {
         try {
-            return callApiRequest(paymentApproveRequest, member);
+            return callApiRequest(paymentApproveRequest);
         } catch (ResourceAccessException e) {
             throw new ApiCallException(UNKNOWN_ERROR);
         }
     }
 
-    private Payment callApiRequest(PaymentApproveRequest paymentApproveRequest, Member member) {
+    private Payment callApiRequest(PaymentApproveRequest paymentApproveRequest) {
         String encryptedKey = Base64.getEncoder().encodeToString(approveSecretKey.getBytes());
         ApproveApiResponse response = Optional.ofNullable(restClient.post()
                         .uri(apiUri)
@@ -56,6 +55,6 @@ public class PaymentClient {
                         .onStatus(errorHandler)
                         .body(ApproveApiResponse.class))
                 .orElseThrow(() -> new ApiCallException(UNKNOWN_ERROR));
-        return new Payment(response.orderId(), response.paymentKey(), response.totalAmount(), member);
+        return new Payment(response.orderId(), response.paymentKey(), response.totalAmount());
     }
 }

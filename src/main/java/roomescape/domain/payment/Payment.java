@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.util.Objects;
-import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 
 @Entity
@@ -18,37 +17,31 @@ public class Payment {
     private String orderId;
     private String paymentKey;
     private long amount;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     protected Payment() {
     }
 
-    public Payment(String orderId, String paymentKey, long amount, Member member) {
-        this(null, orderId, paymentKey, amount, member, null);
+    public Payment(String orderId, String paymentKey, long amount) {
+        this(null, orderId, paymentKey, amount, null);
     }
 
-    public Payment(Long id, String orderId, String paymentKey, long amount, Member member, Reservation reservation) {
+    public Payment(Long id, String orderId, String paymentKey, long amount, Reservation reservation) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
-        this.member = member;
         this.reservation = reservation;
     }
 
     public Payment(long id, Payment payment) {
-        this(id, payment.orderId, payment.paymentKey, payment.amount, payment.member, payment.reservation);
+        this(id, payment.orderId, payment.paymentKey, payment.amount, payment.reservation);
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Member getMember() {
-        return member;
     }
 
     public Reservation getReservation() {
