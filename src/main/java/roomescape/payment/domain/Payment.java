@@ -37,6 +37,16 @@ public class Payment {
 
     public Payment(String paymentKey, String orderId, BigDecimal totalAmount, PaymentStatus status,
                    Long reservationId) {
+        this(null, paymentKey, orderId, totalAmount, status, reservationId);
+    }
+
+    public Payment(String paymentKey, String orderId, BigDecimal totalAmount, PaymentStatus status) {
+        this(null, paymentKey, orderId, totalAmount, status, null);
+    }
+
+    private Payment(Long id, String paymentKey, String orderId, BigDecimal totalAmount, PaymentStatus status,
+                   Long reservationId) {
+        this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.totalAmount = totalAmount;

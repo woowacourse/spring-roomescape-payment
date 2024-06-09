@@ -62,6 +62,21 @@ class TossPayRestClientTest {
         );
     }
 
+    @DisplayName("토스 서버로부터 비어있는 응답을 받으면 예외가 발생한다.")
+    @Test
+    void throwExceptionByNullResponse() {
+        String expectedBody = "";
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess().body(expectedBody).contentType(MediaType.APPLICATION_JSON));
+
+        PaymentRequest request = new PaymentRequest("orderId", 1000, "paymentKey");
+
+        assertThatCode(() -> tossPayRestClient.pay(request))
+                .isInstanceOf(PaymentFailException.class)
+                .hasMessage("결제에 실패했습니다.");
+    }
+
     @DisplayName("결제에 실패하면 예외가 발생한다.")
     @Test
     void throwException() {
