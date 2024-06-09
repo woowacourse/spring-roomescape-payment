@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Schedule;
@@ -22,6 +23,7 @@ public class Payment {
     private Long id;
     @Embedded
     private PaymentKey paymentKey;
+    private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PAID;
     @ManyToOne(optional = false)
@@ -31,8 +33,9 @@ public class Payment {
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
-    public Payment(String paymentKey, Member member, Schedule schedule) {
+    public Payment(String paymentKey, BigDecimal amount, Member member, Schedule schedule) {
         this.id = null;
+        this.amount = Objects.requireNonNull(amount);
         this.paymentKey = new PaymentKey(paymentKey);
         this.member = Objects.requireNonNull(member);
         this.schedule = Objects.requireNonNull(schedule);
