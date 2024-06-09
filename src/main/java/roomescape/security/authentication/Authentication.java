@@ -1,10 +1,10 @@
 package roomescape.security.authentication;
 
+import roomescape.domain.member.Member;
+
 public interface Authentication {
 
-    long getId();
-
-    String getName();
+    Member getPrincipal();
 
     boolean isNotAdmin();
 }

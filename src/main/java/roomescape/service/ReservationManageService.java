@@ -11,6 +11,7 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.service.dto.request.AdminReservationCreateRequest;
 import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -32,8 +33,7 @@ public class ReservationManageService {
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            Clock clock
+            MemberRepository memberRepository, Clock clock
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -43,26 +43,27 @@ public class ReservationManageService {
     }
 
     @Transactional
-    public ReservationResponse addReservationByAdmin(ReservationCreateRequest request) {
-        Reservation reservation = createValidatedReservation(request);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(savedReservation);
+    public ReservationResponse addReservationByAdmin(AdminReservationCreateRequest request) {
+        Member member = getMember(request.memberId());
+        ReservationTime reservationTime = getTime(request.timeId());
+        Theme theme = getTheme(request.themeId());
+        Reservation reservation = request.toReservation(member, reservationTime, theme);
+        validate(reservation);
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     @Transactional
     public Reservation addReservation(ReservationCreateRequest request) {
-        Reservation reservation = createValidatedReservation(request);
+        ReservationTime reservationTime = getTime(request.timeId());
+        Theme theme = getTheme(request.themeId());
+        Reservation reservation = request.toReservation(reservationTime, theme);
+        validate(reservation);
         return reservationRepository.save(reservation);
     }
 
-    private Reservation createValidatedReservation(ReservationCreateRequest request) {
-        Member member = getMember(request.memberId());
-        ReservationTime reservationTime = getTime(request.timeId());
-        Theme theme = getTheme(request.themeId());
-        Reservation reservation = request.toReservation(reservationTime, theme, member);
+    private void validate(Reservation reservation) {
         reservation.validateFutureReservation(LocalDateTime.now(clock));
         validateDuplicatedReservation(reservation);
-        return reservation;
     }
 
     private Member getMember(long memberId) {

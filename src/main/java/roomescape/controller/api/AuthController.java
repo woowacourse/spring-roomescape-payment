@@ -41,7 +41,7 @@ public class AuthController {
 
     @GetMapping("/login/check")
     public MemberResponse checkLogin(@Auth Authentication authentication) {
-        return new MemberResponse(authentication.getId(), authentication.getName());
+        return MemberResponse.from(authentication.getPrincipal());
     }
 
     @PostMapping("/logout")

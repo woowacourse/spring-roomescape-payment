@@ -34,9 +34,8 @@ public class ReservationWaitingController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservationWaiting(@Valid @RequestBody WaitingRequest request,
                                                                         @Auth Authentication authentication) {
-        long memberId = authentication.getId();
         ReservationResponse response = reservationWaitingService.addReservationWaiting(
-                request.toWaitingCreateRequest(memberId));
+                request.toWaitingCreateRequest(authentication.getPrincipal()));
         URI location = URI.create("/waitings/" + response.id());
         return ResponseEntity.created(location).body(response);
     }
@@ -44,7 +43,6 @@ public class ReservationWaitingController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservationWaiting(@Positive @PathVariable long id, @Auth Authentication authentication) {
-        long memberId = authentication.getId();
-        reservationWaitingService.deleteReservationWaiting(id, memberId);
+        reservationWaitingService.deleteReservationWaiting(id, authentication.getPrincipal());
     }
 }

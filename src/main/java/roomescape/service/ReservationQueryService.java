@@ -3,7 +3,6 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,16 +26,13 @@ public class ReservationQueryService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
-    private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
 
     public ReservationQueryService(ReservationRepository reservationRepository,
                                    ReservationWaitingRepository reservationWaitingRepository,
-                                   MemberRepository memberRepository,
                                    PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
-        this.memberRepository = memberRepository;
         this.paymentRepository = paymentRepository;
     }
 
@@ -53,9 +48,7 @@ public class ReservationQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<PersonalReservationResponse> getMyReservations(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+    public List<PersonalReservationResponse> getMyReservations(Member member) {
         List<Reservation> reservations = reservationRepository.findAllByMemberAndStatusIs(member, ReservationStatus.ACCEPTED);
         List<WaitingWithRank> waitingWithRanks = reservationWaitingRepository.findAllWithRankByMember(member);
 

@@ -12,13 +12,13 @@ public record ReservationCreateRequest(
         LocalDate date,
         Long timeId,
         Long themeId,
-        Long memberId,
+        Member member,
         String paymentKey,
         String orderId,
         BigDecimal amount
 ) {
 
-    public Reservation toReservation(ReservationTime time, Theme theme, Member member) {
+    public Reservation toReservation(ReservationTime time, Theme theme) {
         return new Reservation(date, member, time, theme);
     }
 

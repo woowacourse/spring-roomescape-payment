@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import roomescape.domain.member.Member;
 import roomescape.service.dto.request.ReservationCreateRequest;
 
 import java.math.BigDecimal;
@@ -33,7 +34,7 @@ public record ReservationRequest(
         BigDecimal amount
 ) {
 
-    public ReservationCreateRequest toReservationCreateRequest(long memberId) {
-        return new ReservationCreateRequest(date, timeId, themeId, memberId, paymentKey, orderId, amount);
+    public ReservationCreateRequest toReservationCreateRequest(Member member) {
+        return new ReservationCreateRequest(date, timeId, themeId, member, paymentKey, orderId, amount);
     }
 }

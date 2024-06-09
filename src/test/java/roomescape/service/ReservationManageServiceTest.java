@@ -54,7 +54,7 @@ class ReservationManageServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("예약을 추가한다.")
     void addReservation() {
-        ReservationCreateRequest request = ReservationFixture.createValidRequest(member.getId(), time.getId(), theme.getId());
+        ReservationCreateRequest request = ReservationFixture.createValidRequest(member, time.getId(), theme.getId());
 
         Reservation reservation = reservationManageService.addReservation(request);
 

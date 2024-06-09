@@ -56,7 +56,7 @@ class ReservationPaymentFacadeServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("예약을 생성한다.")
     void addReservation() {
-        ReservationCreateRequest request = ReservationFixture.createValidRequest(member.getId(), time.getId(), theme.getId());
+        ReservationCreateRequest request = ReservationFixture.createValidRequest(member, time.getId(), theme.getId());
 
         ReservationResponse response = reservationPaymentFacadeService.addReservation(request);
 
@@ -74,7 +74,7 @@ class ReservationPaymentFacadeServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("결제 승인에서 예외가 발생하면 저장한 예약, 결제를 롤백한다")
     void addReservationFailWhenPaymentConfirmFail() {
-        ReservationCreateRequest request = ReservationFixture.createInvalidRequest(member.getId(), time.getId(), theme.getId());
+        ReservationCreateRequest request = ReservationFixture.createInvalidRequest(member, time.getId(), theme.getId());
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThatThrownBy(() -> reservationPaymentFacadeService.addReservation(request));

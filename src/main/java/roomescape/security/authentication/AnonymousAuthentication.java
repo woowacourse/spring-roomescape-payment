@@ -1,16 +1,12 @@
 package roomescape.security.authentication;
 
+import roomescape.domain.member.Member;
 import roomescape.exception.UnauthorizedException;
 
 public class AnonymousAuthentication implements Authentication {
 
     @Override
-    public long getId() {
-        throw new UnauthorizedException();
-    }
-
-    @Override
-    public String getName() {
+    public Member getPrincipal() {
         throw new UnauthorizedException();
     }
 

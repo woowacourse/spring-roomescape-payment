@@ -51,15 +51,14 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ApiResponses<PersonalReservationResponse> getMyReservations(@Auth Authentication authentication) {
-        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(authentication.getId());
+        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(authentication.getPrincipal());
         return new ApiResponses<>(responses);
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> addReservation(@Valid @RequestBody ReservationRequest request,
                                                               @Auth Authentication authentication) {
-        long memberId = authentication.getId();
-        ReservationCreateRequest reservationCreateRequest = request.toReservationCreateRequest(memberId);
+        ReservationCreateRequest reservationCreateRequest = request.toReservationCreateRequest(authentication.getPrincipal());
         ReservationResponse response = reservationPaymentFacadeService.addReservation(reservationCreateRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);

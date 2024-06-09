@@ -1,35 +1,25 @@
 package roomescape.security.authentication;
 
 import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
 
 public class DefaultAuthentication implements Authentication {
-    private final long id;
-    private final String name;
-    private final Role role;
+    private final Member member;
 
-    private DefaultAuthentication(long id, String name, Role role) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
+    private DefaultAuthentication(Member member) {
+        this.member = member;
     }
 
     public static Authentication from(Member member) {
-        return new DefaultAuthentication(member.getId(), member.getName(), member.getRole());
+        return new DefaultAuthentication(member);
     }
 
     @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
+    public Member getPrincipal() {
+        return member;
     }
 
     @Override
     public boolean isNotAdmin() {
-        return role.isNotAdmin();
+        return member.isNotAdmin();
     }
 }

@@ -3,7 +3,6 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
@@ -35,7 +34,6 @@ public class ReservationWaitingService {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
     private final Clock clock;
 
@@ -43,14 +41,12 @@ public class ReservationWaitingService {
                                      ReservationRepository reservationRepository,
                                      ReservationTimeRepository reservationTimeRepository,
                                      ThemeRepository themeRepository,
-                                     MemberRepository memberRepository,
                                      PaymentRepository paymentRepository,
                                      Clock clock) {
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
         this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
@@ -58,13 +54,12 @@ public class ReservationWaitingService {
     @Transactional
     public ReservationResponse addReservationWaiting(WaitingCreateRequest request) {
         Reservation reservation = getReservation(request);
-        Member waitingMember = getMember(request.memberId());
+        Member waitingMember = request.member();
         reservation.validateOwnerNotSameAsWaitingMember(waitingMember);
         List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAllByReservation(reservation);
         validateWaitingCount(reservationWaitings);
         validateAlreadyWaitingMember(reservationWaitings, waitingMember);
-        ReservationWaiting reservationWaiting = reservationWaitingRepository.save(
-                request.toReservationWaiting(reservation, waitingMember));
+        ReservationWaiting reservationWaiting = reservationWaitingRepository.save(request.toReservationWaiting(reservation));
         reservationWaiting.validateFutureReservationWaiting(LocalDateTime.now(clock));
         return ReservationResponse.from(reservationWaiting);
     }
@@ -86,11 +81,6 @@ public class ReservationWaitingService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 테마입니다."));
     }
 
-    private Member getMember(long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-    }
-
     private void validateWaitingCount(List<ReservationWaiting> reservationWaitings) {
         if (reservationWaitings.size() >= MAX_RESERVATION_WAITING_COUNT) {
             throw new IllegalArgumentException("예약 대기열이 가득 찼습니다.");
@@ -110,7 +100,7 @@ public class ReservationWaitingService {
     public ReservationResponse acceptReservationWaiting(WaitingAcceptRequest request) {
         ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(request.waitingId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 대기입니다."));
-        validateAdmin(request.memberId());
+        validateAdmin(request.member());
         Reservation reservation = getChangedReservation(reservationWaiting);
         reservationWaitingRepository.delete(reservationWaiting);
         Payment payment = Payment.accountTransfer(request.accountNumber(), request.accountHolder(), request.bankName(), request.amount(), reservation);
@@ -118,8 +108,7 @@ public class ReservationWaitingService {
         return ReservationResponse.from(reservation);
     }
 
-    private void validateAdmin(Long memberId) {
-        Member member = getMember(memberId);
+    private void validateAdmin(Member member) {
         if (member.isNotAdmin()) {
             throw new AccessDeniedException("관리자만 예약 대기를 확정할 수 있습니다.");
         }
@@ -135,10 +124,9 @@ public class ReservationWaitingService {
     }
 
     @Transactional
-    public void deleteReservationWaiting(long waitingId, long memberId) {
+    public void deleteReservationWaiting(long waitingId, Member member) {
         ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 대기입니다."));
-        Member member = getMember(memberId);
         if (member.isNotAdmin()) {
             reservationWaiting.validateOwner(member);
         }

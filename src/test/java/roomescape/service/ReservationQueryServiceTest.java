@@ -88,7 +88,7 @@ class ReservationQueryServiceTest extends BaseServiceTest {
         Reservation reservation3 = reservationRepository.save(ReservationFixture.create("2024-04-11", member, time, theme));
         paymentRepository.save(PaymentFixture.create(reservation3));
 
-        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(member.getId());
+        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(member);
 
         SoftAssertions.assertSoftly(
                 softly -> {

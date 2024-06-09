@@ -18,6 +18,7 @@ import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationManageService;
 import roomescape.service.ReservationWaitingService;
+import roomescape.service.dto.request.WaitingAcceptRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.net.URI;
@@ -37,7 +38,7 @@ public class AdminController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addAdminReservation(@RequestBody @Valid AdminReservationRequest request) {
-        ReservationResponse response = reservationManageService.addReservationByAdmin(request.toCreateReservationRequest());
+        ReservationResponse response = reservationManageService.addReservationByAdmin(request.toAdminReservationCreateRequest());
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }
@@ -46,8 +47,9 @@ public class AdminController {
     public ResponseEntity<ReservationResponse> acceptReservationWaiting(@PathVariable long id,
                                                                         @Valid @RequestBody WaitingToReservationRequest request,
                                                                         @Auth Authentication authentication) {
-        long memberId = authentication.getId();
-        ReservationResponse response = reservationWaitingService.acceptReservationWaiting(request.toWaitingAcceptRequest(id, memberId));
+
+        WaitingAcceptRequest waitingAcceptRequest = request.toWaitingAcceptRequest(id, authentication.getPrincipal());
+        ReservationResponse response = reservationWaitingService.acceptReservationWaiting(waitingAcceptRequest);
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }
@@ -61,7 +63,6 @@ public class AdminController {
     @DeleteMapping("/waitings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservationWaiting(@PathVariable long id, @Auth Authentication authentication) {
-        long memberId = authentication.getId();
-        reservationWaitingService.deleteReservationWaiting(id, memberId);
+        reservationWaitingService.deleteReservationWaiting(id, authentication.getPrincipal());
     }
 }

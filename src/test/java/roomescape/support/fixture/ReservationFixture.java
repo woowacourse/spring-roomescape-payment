@@ -24,16 +24,16 @@ public class ReservationFixture {
         return new Reservation(date, member, time, theme);
     }
 
-    public static ReservationCreateRequest createValidRequest(Long memberId, Long timeId, Long themeId) {
-        return createRequest(memberId, timeId, themeId, "testPaymentKey");
+    public static ReservationCreateRequest createValidRequest(Member member, Long timeId, Long themeId) {
+        return createRequest(member, timeId, themeId, "testPaymentKey");
     }
 
-    public static ReservationCreateRequest createInvalidRequest(Long memberId, Long timeId, Long themeId) {
-        return createRequest(memberId, timeId, themeId, FakePaymentClient.PAYMENT_ERROR_KEY);
+    public static ReservationCreateRequest createInvalidRequest(Member member, Long timeId, Long themeId) {
+        return createRequest(member, timeId, themeId, FakePaymentClient.PAYMENT_ERROR_KEY);
     }
 
-    private static ReservationCreateRequest createRequest(Long memberId, Long timeId, Long themeId, String paymentKey) {
+    private static ReservationCreateRequest createRequest(Member member, Long timeId, Long themeId, String paymentKey) {
         LocalDate date = LocalDate.parse("2024-06-23");
-        return new ReservationCreateRequest(date, timeId, themeId, memberId, paymentKey, "testId", BigDecimal.TEN);
+        return new ReservationCreateRequest(date, timeId, themeId, member, paymentKey, "testId", BigDecimal.TEN);
     }
 }

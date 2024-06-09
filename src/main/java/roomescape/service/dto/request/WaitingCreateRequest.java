@@ -6,9 +6,9 @@ import roomescape.domain.reservationwaiting.ReservationWaiting;
 
 import java.time.LocalDate;
 
-public record WaitingCreateRequest(LocalDate date, Long timeId, Long themeId, Long memberId) {
+public record WaitingCreateRequest(LocalDate date, Long timeId, Long themeId, Member member) {
 
-    public ReservationWaiting toReservationWaiting(Reservation reservation, Member member) {
+    public ReservationWaiting toReservationWaiting(Reservation reservation) {
         return new ReservationWaiting(reservation, member);
     }
 }
