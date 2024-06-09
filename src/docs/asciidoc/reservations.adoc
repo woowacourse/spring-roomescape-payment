@@ -1,0 +1,58 @@
+= 예약
+
+=== 예약 생성
+
+==== Request
+
+include::{snippets}/reservations/create-reservations/request-fields.adoc[]
+include::{snippets}/reservations/create-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/create-reservations/response-fields.adoc[]
+include::{snippets}/reservations/create-reservations/http-response.adoc[]
+
+=== 예약 조회
+
+==== Request
+
+include::{snippets}/reservations/find-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/find-reservations/response-fields.adoc[]
+include::{snippets}/reservations/find-reservations/http-response.adoc[]
+
+=== 나의 예약 조회
+
+==== Request
+
+include::{snippets}/reservations/find-MineReservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/find-MineReservations/response-fields.adoc[]
+include::{snippets}/reservations/find-MineReservations/http-response.adoc[]
+
+=== 예약 결제
+
+==== Request
+
+include::{snippets}/reservations/payment/request-fields.adoc[]
+include::{snippets}/reservations/payment/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/payment/response-fields.adoc[]
+include::{snippets}/reservations/payment/http-response.adoc[]
+
+=== 예약 삭제
+
+==== Request
+
+include::{snippets}/reservations/delete/path-parameters.adoc[]
+include::{snippets}/reservations/delete/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/delete/http-response.adoc[]
