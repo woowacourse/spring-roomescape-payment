@@ -22,7 +22,6 @@ import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.PaymentFixture;
 import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
-import roomescape.support.fixture.ReservationWaitingFixture;
 import roomescape.support.fixture.ThemeFixture;
 
 import java.time.LocalDate;
@@ -108,32 +107,27 @@ class ReservationServiceTest extends BaseServiceTest {
     }
 
     @Test
-    @DisplayName("id로 예약을 삭제한다.")
+    @DisplayName("예약을 삭제하면 취소 상태가 된다.")
     void deleteReservationById() {
         Reservation reservation = reservationRepository.save(ReservationFixture.create(member, time, theme));
         long id = reservation.getId();
 
-        reservationService.deleteReservationById(id);
+        Reservation canceledReservation = reservationService.deleteReservationById(id);
 
-        assertThat(reservationRepository.findById(id)).isEmpty();
+        assertThat(canceledReservation.isCanceled()).isTrue();
     }
 
     @Test
-    @DisplayName("예약을 삭제할 때 예약 대기가 있으면 가장 일찍 예약 대기를 생성한 예약자로 변경한다.")
-    void deleteReservationByIdWithWaiting() {
+    @DisplayName("삭제한 예약을 롤백하면 다시 확정 상태가 된다.")
+    void rollbackReservationById() {
         Reservation reservation = reservationRepository.save(ReservationFixture.create(member, time, theme));
-        Member targetWaitingMember = memberRepository.save(MemberFixture.jamie());
-        reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, targetWaitingMember));
-        for (int cnt = 0; cnt < 5; cnt++) {
-            Member waitingMember = memberRepository.save(MemberFixture.create("waiting" + cnt + "@email.com"));
-            reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, waitingMember));
-        }
-
         long id = reservation.getId();
         reservationService.deleteReservationById(id);
 
-        List<Reservation> reservations = reservationRepository.findAllByMember(targetWaitingMember);
-        assertThat(reservations).hasSize(1);
+        reservationService.rollbackDelete(reservation);
+
+        Reservation rollbackedReservation = reservationRepository.findById(id).orElseThrow();
+        assertThat(rollbackedReservation.isCanceled()).isFalse();
     }
 
     @Test

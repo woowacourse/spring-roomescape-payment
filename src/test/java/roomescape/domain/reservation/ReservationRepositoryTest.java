@@ -80,7 +80,7 @@ class ReservationRepositoryTest extends BaseRepositoryTest {
         LocalDate date = LocalDate.parse("2024-04-09");
         save(ReservationFixture.create(date, member, time, theme));
 
-        Reservation reservation = reservationRepository.findByDateAndTimeAndTheme(date, time, theme).orElseThrow();
+        Reservation reservation = reservationRepository.findByDateAndTimeAndThemeAndStatusIs(date, time, theme, ReservationStatus.ACCEPTED).orElseThrow();
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getDate()).isEqualTo("2024-04-09");
@@ -96,7 +96,7 @@ class ReservationRepositoryTest extends BaseRepositoryTest {
         save(ReservationFixture.create("2024-04-09", member, time, theme));
 
         LocalDate otherDate = LocalDate.parse("2024-04-10");
-        assertThat(reservationRepository.findByDateAndTimeAndTheme(otherDate, time, theme)).isEmpty();
+        assertThat(reservationRepository.findByDateAndTimeAndThemeAndStatusIs(otherDate, time, theme, ReservationStatus.ACCEPTED)).isEmpty();
     }
 
     @Test
@@ -106,7 +106,7 @@ class ReservationRepositoryTest extends BaseRepositoryTest {
         save(ReservationFixture.create(date, member, time, theme));
 
         ReservationTime otherTime = save(ReservationTimeFixture.create("11:00"));
-        assertThat(reservationRepository.findByDateAndTimeAndTheme(date, otherTime, theme)).isEmpty();
+        assertThat(reservationRepository.findByDateAndTimeAndThemeAndStatusIs(date, otherTime, theme, ReservationStatus.ACCEPTED)).isEmpty();
     }
 
     @Test
@@ -116,7 +116,7 @@ class ReservationRepositoryTest extends BaseRepositoryTest {
         save(ReservationFixture.create(date, member, time, theme));
 
         Theme otherTheme = save(ThemeFixture.create("다른 테마"));
-        assertThat(reservationRepository.findByDateAndTimeAndTheme(date, time, otherTheme)).isEmpty();
+        assertThat(reservationRepository.findByDateAndTimeAndThemeAndStatusIs(date, time, otherTheme, ReservationStatus.ACCEPTED)).isEmpty();
     }
 
     @Test
@@ -126,7 +126,7 @@ class ReservationRepositoryTest extends BaseRepositoryTest {
         save(ReservationFixture.create("2024-04-10", member, time, theme));
         save(ReservationFixture.create("2024-04-11", member, time, theme));
 
-        List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        List<Reservation> reservations = reservationRepository.findAllByMemberAndStatusIs(member, ReservationStatus.ACCEPTED);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservations).hasSize(3);

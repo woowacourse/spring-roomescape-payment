@@ -8,9 +8,9 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
-import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
@@ -118,35 +118,30 @@ public class ReservationService { // todo cqrs
     }
 
     private void validateDuplicatedReservation(Reservation reservation) {
-        Optional<Reservation> optionalReservation = reservationRepository.findByDateAndTimeAndTheme(
-                reservation.getDate(), reservation.getTime(), reservation.getTheme());
+        Optional<Reservation> optionalReservation = reservationRepository.findByDateAndTimeAndThemeAndStatusIs(
+                reservation.getDate(), reservation.getTime(), reservation.getTheme(), ReservationStatus.ACCEPTED);
         optionalReservation.ifPresent(r -> {
             throw new IllegalArgumentException("해당 날짜/시간에 이미 예약이 존재합니다.");
         });
     }
 
     @Transactional
-    public void deleteReservationById(Long id) {
+    public Reservation deleteReservationById(Long id) { // todo 이름 변경
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약입니다."));
-        List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAllByReservation(reservation);
-        if (reservationWaitings.isEmpty()) {
-            reservationRepository.delete(reservation);
-            return;
-        }
-        changeReservationMember(reservation, reservationWaitings);
+        reservation.cancel();
+        return reservation;
     }
 
-    private void changeReservationMember(Reservation reservation, List<ReservationWaiting> reservationWaitings) {
-        reservationWaitings.sort(Comparator.comparing(ReservationWaiting::getCreatedAt));
-        ReservationWaiting firstWaiting = reservationWaitings.get(0);
-        reservation.changeMember(firstWaiting.getMember());
-        reservationWaitingRepository.delete(firstWaiting);
+    @Transactional
+    public void rollbackDelete(Reservation reservation) {
+        reservationRepository.findById(reservation.getId())
+                .ifPresent(Reservation::accept);
     }
 
     public List<PersonalReservationResponse> getReservationsByMemberId(long memberId) { // todo refactor
         Member member = getMember(memberId);
-        List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        List<Reservation> reservations = reservationRepository.findAllByMemberAndStatusIs(member, ReservationStatus.ACCEPTED);
         Map<Long, Payment> reservationPayments = paymentRepository.findAllByReservationIn(reservations)
                 .stream()
                 .collect(Collectors.toMap(Payment::getReservationId, Function.identity()));
