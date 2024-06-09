@@ -37,14 +37,14 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().post("/themes")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .apply(document("/themes/post/success"
-                        , requestFields(
+                .apply(document("/themes/post/success",
+                        requestFields(
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("테마명"),
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
                                 fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 url"),
                                 fieldWithPath("price").type(JsonFieldType.NUMBER).description("테마 가격")
-                        )
-                        , responseFields(
+                        ),
+                        responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("테마 식별자"),
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("테마명"),
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
@@ -90,8 +90,8 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().get("/themes")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/themes/get/all/success"
-                        , responseFields(
+                .apply(document("/themes/get/all/success",
+                        responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("테마 식별자"),
                                 fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마명"),
                                 fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
@@ -153,8 +153,8 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().get("/themes/popular")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/themes/get/popular/success"
-                        , responseFields(
+                .apply(document("/themes/get/popular/success",
+                        responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("테마 식별자"),
                                 fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마명"),
                                 fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마에 대한 설명"),

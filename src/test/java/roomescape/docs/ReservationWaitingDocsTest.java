@@ -47,16 +47,16 @@ class ReservationWaitingDocsTest extends RestDocsTest {
                 .when().post("/reservations/queue")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .apply(document("/waiting/post/success"
-                        , requestFields(
+                .apply(document("/waiting/post/success",
+                        requestFields(
                                 fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("예약 대기자 식별자"),
                                 fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("테마 식별자"),
                                 fieldWithPath("date").type(JsonFieldType.STRING).description("대기하려는 방탈출 날짜"),
                                 fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("대기하려는 방탈출 시간 식별자"),
                                 fieldWithPath("paymentKey").type(JsonFieldType.STRING).description("결제 정보 식별자"),
                                 fieldWithPath("orderId").type(JsonFieldType.STRING).description("주문 정보 식별자")
-                        )
-                        , responseFields(
+                        ),
+                        responseFields(
                                 fieldWithPath("reservation").type(JsonFieldType.OBJECT).description("예약 관련 정보를 담은 객체"),
                                 fieldWithPath("waitingCount").type(JsonFieldType.NUMBER).description("예약 대기 순위")
                         ).andWithPrefix("reservation.",

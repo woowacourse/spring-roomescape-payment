@@ -42,11 +42,11 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().post("/times")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .apply(document("/times/post/success"
-                        , requestFields(
+                .apply(document("/times/post/success",
+                        requestFields(
                                 fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
-                        )
-                        , responseFields(
+                        ),
+                        responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
                                 fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
                         )
@@ -92,8 +92,8 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().get("/times")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/times/get/all/success"
-                        , responseFields(
+                .apply(document("/times/get/all/success",
+                        responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
                                 fieldWithPath("[].startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
                         )
@@ -156,8 +156,8 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().get("/times/available")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/times/get/available/success"
-                        , responseFields(
+                .apply(document("/times/get/available/success",
+                        responseFields(
                                 fieldWithPath("[].time").type(JsonFieldType.OBJECT).description("예약 시간 관련 정보"),
                                 fieldWithPath("[].isBooked").type(JsonFieldType.BOOLEAN)
                                         .description("해당 시간 예약 여부, true면 예약된 시간")

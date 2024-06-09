@@ -142,8 +142,8 @@ class ReservationDocsTest extends RestDocsTest {
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/reservation/get/all/success"
-                        , responseFields(
+                .apply(document("/reservation/get/all/success",
+                        responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 식별자"),
                                 fieldWithPath("[].member").type(JsonFieldType.STRING).description("예약자 이름"),
                                 fieldWithPath("[].theme").type(JsonFieldType.STRING).description("예약한 방탈출 테마명"),
@@ -197,8 +197,8 @@ class ReservationDocsTest extends RestDocsTest {
                 .when().get("/reservations/me")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/reservation/get/me/success"
-                        , responseFields(
+                .apply(document("/reservation/get/me/success",
+                        responseFields(
                                 fieldWithPath("[].id").description(JsonFieldType.NUMBER).description("예약 식별자"),
                                 fieldWithPath("[].theme").description(JsonFieldType.STRING).description("테마명"),
                                 fieldWithPath("[].date").description(JsonFieldType.STRING).description("예약한 방탈출 날짜"),
