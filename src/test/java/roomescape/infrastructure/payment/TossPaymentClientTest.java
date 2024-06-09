@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -23,17 +26,23 @@ import roomescape.exception.PaymentException;
 import roomescape.util.LogSaver;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@EnableConfigurationProperties(PaymentProperties.class)
+@SpringBootTest
 class TossPaymentClientTest {
 
+    @Autowired
+    private PaymentProperties paymentProperties;
+
     private final LogSaver logSaver = new LogSaver(new ObjectMapper());
-    private final RestClient.Builder testBuilder = new PaymentConfig().createBuilder("toss");
-    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private RestClient.Builder testBuilder;
+    private MockRestServiceServer server;
 
     private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
-        server.reset();
+        testBuilder = new PaymentConfig(paymentProperties).createBuilder("toss");
+        server = MockRestServiceServer.bindTo(testBuilder).build();
         tossPaymentClient = new TossPaymentClient(testBuilder.build(), logSaver);
     }
 
@@ -113,9 +122,8 @@ class TossPaymentClientTest {
         // when && then
         assertThatThrownBy(() -> tossPaymentClient.confirm(paymentRequest))
                 .isInstanceOf(PaymentException.class)
-                .hasFieldOrPropertyWithValue("clientStatusCode",  HttpStatus.INTERNAL_SERVER_ERROR);
+                .hasFieldOrPropertyWithValue("clientStatusCode", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 //    //    @Disabled
 //    @Test
