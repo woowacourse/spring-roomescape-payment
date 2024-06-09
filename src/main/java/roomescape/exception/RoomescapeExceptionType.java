@@ -37,6 +37,7 @@ public enum RoomescapeExceptionType {
             String.format("잘못된 비밀번호 형식입니다. 비밀번호는 %d자 이상의 문자열이어야 합니다.", Password.MIN_PASSWORD_LENGTH)),
     FORBIDDEN_DELETE(FORBIDDEN, "삭제 권한이 없습니다."),
     ALREADY_BOOKED(BAD_REQUEST, "이미 완료된 예약입니다."),
+    NOT_MEMBERS_RESERVATION(FORBIDDEN, "본인의 예약이 아닙니다."),
     ;
 
     private final HttpStatus status;

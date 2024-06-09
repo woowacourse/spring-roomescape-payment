@@ -208,6 +208,9 @@ public class Reservation implements Comparable<Reservation> {
                 ", time=" + time +
                 ", theme=" + theme +
                 ", member=" + member +
+                ", createdAt=" + createdAt +
+                ", reservationStatus=" + reservationStatus +
+                ", payment=" + payment +
                 '}';
     }
 }

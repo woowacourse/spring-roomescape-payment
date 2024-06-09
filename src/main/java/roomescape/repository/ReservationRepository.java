@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 
@@ -75,7 +76,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         findByDateAndThemeAndTime(requestedReservation.getDate(),
                 requestedReservation.getTheme(),
                 requestedReservation.getReservationTime()
-        ).ifPresent(Reservation::book);
+        ).ifPresent(reservation -> {
+            if (reservation.getReservationStatus() == ReservationStatus.WAITING) {
+                reservation.book();
+            }
+        });
     }
 
     Optional<Reservation> findByDateAndThemeAndTime(LocalDate date, Theme theme, ReservationTime time);

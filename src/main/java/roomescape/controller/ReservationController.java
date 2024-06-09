@@ -48,6 +48,7 @@ public class ReservationController {
             @Authenticated LoginMemberRequest loginMemberRequest,
             @RequestBody PaymentRequest paymentRequest
     ) {
+        reservationService.validateReservationsAuthority(id, loginMemberRequest);
         paymentService.pay(id, paymentRequest);
     }
 

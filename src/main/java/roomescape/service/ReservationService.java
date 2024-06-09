@@ -25,6 +25,7 @@ import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionType;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -171,5 +172,13 @@ public class ReservationService {
         return reservationRepository.findAllRemainedWaiting(LocalDateTime.now()).stream()
                 .map(ReservationResponse::from)
                 .toList();
+    }
+
+    public void validateReservationsAuthority(long id, LoginMemberRequest loginMemberRequest) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
+        if (! reservation.isMemberIdOf(loginMemberRequest.id())) {
+            throw new RoomescapeException(RoomescapeExceptionType.NOT_MEMBERS_RESERVATION);
+        }
     }
 }
