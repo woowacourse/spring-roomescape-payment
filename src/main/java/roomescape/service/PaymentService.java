@@ -35,32 +35,22 @@ public class PaymentService {
 
     public void confirmReservationPayments(ReservationRequest request) {
         validatePayments(request.amount());
-        restClient.post()
+        RestClient.ResponseSpec paymentRequest = restClient.post()
                 .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
                 .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new InvalidPaymentInformationException();
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentServerErrorException();
-                }).toBodilessEntity();
+                .retrieve();
+        handleServerError(handleClientError(paymentRequest)).toBodilessEntity();
     }
 
     public void confirmReservationPayments(ReservationWithPaymentRequest request) {
         validatePayments(request.amount());
-        restClient.post()
+        RestClient.ResponseSpec paymentRequest = restClient.post()
                 .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
                 .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new InvalidPaymentInformationException();
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentServerErrorException();
-                }).toBodilessEntity();
+                .retrieve();
+        handleServerError(handleClientError(paymentRequest)).toBodilessEntity();
     }
 
     private void validatePayments(long amount) {
@@ -83,17 +73,24 @@ public class PaymentService {
         PaymentInfo paymentInfo = paymentInfoRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new PaymentException("id:[%s] 인 예약의 결제 정보가 존재하지 않습니다.".formatted(reservationId)));
         String paymentKey = paymentInfo.getPaymentKey();
-        restClient.post()
+        RestClient.ResponseSpec paymentRequest = restClient.post()
                 .uri("/" + paymentKey + cancelUrl)
                 .contentType(APPLICATION_JSON)
                 .body(new PaymentCancelRequest("고객 요청"))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    throw new InvalidPaymentInformationException();
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentServerErrorException();
-                }).toBodilessEntity();
+                .retrieve();
+        handleServerError(handleClientError(paymentRequest)).toBodilessEntity();
         paymentInfoRepository.deleteById(paymentInfo.getId());
+    }
+
+    private RestClient.ResponseSpec handleClientError(RestClient.ResponseSpec responseSpec) {
+        return responseSpec.onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+            throw new InvalidPaymentInformationException();
+        });
+    }
+
+    private RestClient.ResponseSpec handleServerError(RestClient.ResponseSpec responseSpec) {
+        return responseSpec.onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+            throw new PaymentServerErrorException();
+        });
     }
 }
