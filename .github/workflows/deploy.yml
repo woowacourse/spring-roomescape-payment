@@ -13,8 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Open ssh public temporarily
-        run: sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 22
+      - name: Stop web service temporarily
+        run: sudo systemctl stop nginx
 
 #      - name: Build with Gradle
 #        run: ./gradlew bootJar
