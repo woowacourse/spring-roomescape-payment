@@ -26,7 +26,7 @@ abstract class BaseDocumentationTest {
 
     protected final ObjectMapper objectMapper;
     protected final Cookie adminCookie = new Cookie("token", "admin-token");
-    protected final Cookie userCookie = new Cookie("token", "user-token");
+    protected final Cookie memberCookie = new Cookie("token", "member-token");
     protected MockMvc mockMvc;
 
     BaseDocumentationTest() {
