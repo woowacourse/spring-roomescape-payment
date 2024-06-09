@@ -1,14 +1,19 @@
 package roomescape.service;
 
+import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
 import static roomescape.exception.RoomescapeExceptionCode.REQUEST_TIMEOUT;
 import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import roomescape.component.TossPaymentClient;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -34,14 +39,25 @@ public class PaymentService {
         final Reservation reservation = getReservation(request.reservationId());
         final Payment payment = request.toPayment(reservation);
         try {
-            paymentClient.confirm(request);
-        } catch (Exception e) {
+            PaymentConfirmResponse response = paymentClient.confirm(request);
+            validateResponse(payment, response);
+        } catch (ResourceAccessException e) {
             throw new RoomescapeException(REQUEST_TIMEOUT);
         }
         paymentRepository.save(payment);
     }
 
-    private Reservation getReservation(long reservationId) {
+    private void validateResponse(final Payment payment, final PaymentConfirmResponse response) {
+        if (Objects.equals(payment.getPaymentKey(), response.paymentKey())
+                && Objects.equals(payment.getOrderId(), response.orderId())
+                && Objects.equals(payment.getAmount(), response.totalAmount())
+        ) {
+            return;
+        }
+        throw new RoomescapeException(INTERNAL_SERVER_ERROR);
+    }
+
+    private Reservation getReservation(final long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
     }
