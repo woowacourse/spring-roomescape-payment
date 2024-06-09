@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @EntityGraph(attributePaths = {"member", "theme", "time"})
     List<Reservation> findAll();
 
-    List<Reservation> findByMemberId(Long memberId);
+    List<Reservation> findByMemberIdAndStatusIsNot(Long memberId, Status status);
 
     @Query("""
             SELECT r

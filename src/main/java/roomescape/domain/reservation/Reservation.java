@@ -8,10 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import roomescape.domain.member.Member;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.time.ReservationTime;
 
@@ -36,28 +34,24 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne
-    private Payment payment;
-
     protected Reservation() {
     }
 
     public Reservation(final LocalDate date, final ReservationTime time, final Theme theme, final Member member,
-                       final Status status, final Payment payment) {
+                       final Status status) {
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
         this.status = status;
-        this.payment = payment;
     }
 
-    public void changeStatusToReserve() {
-        status = Status.RESERVED;
+    public void changeToPending() {
+        this.status = Status.PENDING;
     }
 
-    public void changeStatusToPending() {
-        status = Status.PENDING;
+    public void delete() {
+        this.status = Status.DELETE;
     }
 
     public boolean isReserved() {
@@ -66,6 +60,10 @@ public class Reservation {
 
     public boolean isPending() {
         return status == Status.PENDING;
+    }
+
+    public boolean isWaiting() {
+        return this.status == Status.WAITING;
     }
 
     public Long getId() {
@@ -90,24 +88,5 @@ public class Reservation {
 
     public Status getStatus() {
         return status;
-    }
-
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(final Payment payment) {
-        this.payment = payment;
-    }
-
-    @Override
-    public String toString() {
-        return "Reservation{" +
-                "id=" + id +
-                ", date=" + date +
-                ", time=" + time +
-                ", theme=" + theme +
-                ", member=" + member +
-                '}';
     }
 }

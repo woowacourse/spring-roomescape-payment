@@ -17,7 +17,8 @@ public class ReservationCancelService {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationCancelService(final ReservationSearchService reservationSearchService, ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+    public ReservationCancelService(final ReservationSearchService reservationSearchService,
+                                    ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
         this.reservationSearchService = reservationSearchService;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
@@ -47,22 +48,14 @@ public class ReservationCancelService {
     private void adjustWaitingOrder(List<Reservation> reservationsToAdjust) {
         for (Reservation reservation : reservationsToAdjust) {
             Waiting waiting = findWaitingByReservationId(reservation.getId());
+            if (waiting.isFirstOrder()) {
+                reservation.changeToPending();
+                waitingRepository.delete(waiting);
+            }
             if (!waiting.isFirstOrder()) {
                 waiting.decreaseWaitingOrderByOne();
             }
-            if (waiting.isFirstOrder()) {
-                reservation.changeStatusToPending();
-                waitingRepository.delete(waiting);
-            }
         }
-    }
-
-    private Reservation findReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "잘못된 예약 정보 입니다.",
-                        "reservation_id : " + reservationId
-                ));
     }
 
     private Waiting findWaitingByReservationId(Long reservationId) {

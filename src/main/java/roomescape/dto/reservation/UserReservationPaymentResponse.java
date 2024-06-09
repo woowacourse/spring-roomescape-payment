@@ -3,6 +3,7 @@ package roomescape.dto.reservation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.waiting.WaitingResponse;
 
@@ -20,32 +21,32 @@ public record UserReservationPaymentResponse(
     private static final String WAITING_ORDER = "%d번째 예약 대기";
     private static final String PENDING = "결제 대기";
 
-    public static UserReservationPaymentResponse of(final UserReservationResponse reservation, final PaymentResponse payment) {
+    public static UserReservationPaymentResponse of(final Reservation reservation, final PaymentResponse payment) {
         return new UserReservationPaymentResponse(
-                reservation.id(),
-                reservation.theme(),
-                reservation.date(),
-                reservation.time(),
+                reservation.getId(),
+                reservation.getTheme().getThemeName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
                 RESERVED,
                 payment.paymentKey(),
                 payment.totalAmount()
         );
     }
 
-    public static UserReservationPaymentResponse fromPending(final UserReservationResponse pending) {
+    public static UserReservationPaymentResponse fromPending(final Reservation pending) {
         return new UserReservationPaymentResponse(
-                pending.id(),
-                pending.theme(),
-                pending.date(),
-                pending.time(),
+                pending.getId(),
+                pending.getTheme().getThemeName(),
+                pending.getDate(),
+                pending.getTime().getStartAt(),
                 PENDING,
                 null,
-               null
+                null
         );
     }
 
     public static UserReservationPaymentResponse from(final WaitingResponse waiting) {
-                return new UserReservationPaymentResponse(
+        return new UserReservationPaymentResponse(
                 waiting.waitingId(),
                 waiting.theme(),
                 waiting.date(),

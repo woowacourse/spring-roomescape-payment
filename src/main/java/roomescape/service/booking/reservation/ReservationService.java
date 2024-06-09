@@ -12,7 +12,6 @@ import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationPaymentResponse;
-import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.dto.waiting.WaitingResponse;
 import roomescape.service.booking.reservation.module.PaymentService;
 import roomescape.service.booking.reservation.module.ReservationCancelService;
@@ -44,12 +43,24 @@ public class ReservationService {
 
     public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest,
                                                            Long memberId) {
-        Long id = reservationRegisterService.registerReservation(userReservationPaymentRequest, memberId);
-        return findReservation(id);
+        ReservationRequest reservationRequest = ReservationRequest.of(userReservationPaymentRequest, memberId);
+        Reservation reservation = reservationRegisterService.registerReservation(reservationRequest);
+        PaymentResponse paymentResponse = PaymentResponse.empty();
+
+        try {
+            PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
+            paymentResponse = paymentService.payByToss(paymentRequest);
+        } catch (Exception e) {
+            reservationCancelService.deleteReservation(reservation.getId());
+        }
+
+        paymentService.save(paymentResponse.toEntity(reservation));
+        return ReservationResponse.from(reservation);
     }
 
-    public Long registerReservation(ReservationRequest request) {
-        return reservationRegisterService.registerReservation(request);
+    public ReservationResponse registerReservation(ReservationRequest request) {
+        Reservation reservation = reservationRegisterService.registerReservation(request);
+        return ReservationResponse.from(reservation);
     }
 
     public ReservationResponse findReservation(Long reservationId) {
@@ -60,25 +71,24 @@ public class ReservationService {
         return reservationSearchService.findAllReservations();
     }
 
+    @Transactional
     public List<UserReservationPaymentResponse> findReservationByMemberId(Long memberId) {
-        List<UserReservationResponse> reservationResponses = reservationSearchService.findReservationByMemberId(
-                memberId);
+        List<Reservation> reservations = reservationSearchService.findReservationByMemberId(memberId);
         List<UserReservationPaymentResponse> reservationPaymentResponses = new ArrayList<>();
 
-        for (UserReservationResponse reservationResponse : reservationResponses) {
-            if (reservationResponse.isReserved()) {
-                PaymentResponse paymentResponse = paymentService.findPaymentById(reservationResponse.paymentId());
-                reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservationResponse, paymentResponse));
+        for (Reservation reservation : reservations) {
+            if (reservation.isReserved()) {
+                PaymentResponse paymentResponse = paymentService.findPaymentByReservation(reservation);
+                reservationPaymentResponses.add(UserReservationPaymentResponse.of(reservation, paymentResponse));
             }
-            if (reservationResponse.isPending()) {
-                reservationPaymentResponses.add(UserReservationPaymentResponse.fromPending(reservationResponse));
+            if (reservation.isPending()) {
+                reservationPaymentResponses.add(UserReservationPaymentResponse.fromPending(reservation));
             }
-            if (reservationResponse.isWaiting()) {
-                WaitingResponse waitingResponse = waitingService.findWaitingByReservationId(reservationResponse.id());
+            if (reservation.isWaiting()) {
+                WaitingResponse waitingResponse = waitingService.findWaitingByReservationId(reservation.getId());
                 reservationPaymentResponses.add(UserReservationPaymentResponse.from(waitingResponse));
             }
         }
-
         return reservationPaymentResponses;
     }
 

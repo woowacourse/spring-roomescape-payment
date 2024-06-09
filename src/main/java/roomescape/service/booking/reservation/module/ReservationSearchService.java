@@ -3,10 +3,10 @@ package roomescape.service.booking.reservation.module;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationfilterRequest;
-import roomescape.dto.reservation.UserReservationResponse;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
@@ -47,26 +47,11 @@ public class ReservationSearchService {
                 .toList();
     }
 
-    public List<UserReservationResponse> findReservationByMemberId(Long memberId) {
-        return reservationRepository.findByMemberId(memberId)
-                .stream()
-                .map(this::createUserReservationResponse)
-                .toList();
+    public List<Reservation> findReservationByMemberId(Long memberId) {
+        return reservationRepository.findByMemberIdAndStatusIsNot(memberId, Status.DELETE);
     }
 
-    private UserReservationResponse createUserReservationResponse(Reservation reservation) {
-        if (reservation.isReserved()) {
-            return UserReservationResponse.create(reservation);
-        }
-        if (reservation.isPending()) {
-            return UserReservationResponse.createPending(reservation);
-        }
-
-        Waiting waiting = findWaitingByReservationId(reservation.getId());
-        return UserReservationResponse.createByWaiting(waiting);
-    }
-
-    private Reservation findReservationById(Long reservationId) {
+    public Reservation findReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(
                         "잘못된 예약 정보 입니다.",

@@ -2,6 +2,7 @@ package roomescape.dto.payment;
 
 import java.math.BigDecimal;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.Reservation;
 
 public record PaymentResponse(
         String paymentKey,
@@ -12,7 +13,11 @@ public record PaymentResponse(
         return new PaymentResponse(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount());
     }
 
-    public Payment toEntity() {
-        return new Payment(orderId, totalAmount, paymentKey);
+    public static PaymentResponse empty() {
+        return null;
+    }
+
+    public Payment toEntity(final Reservation reservation) {
+        return new Payment(orderId, paymentKey, totalAmount, reservation);
     }
 }

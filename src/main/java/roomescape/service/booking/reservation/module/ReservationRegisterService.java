@@ -3,16 +3,13 @@ package roomescape.service.booking.reservation.module;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.time.ReservationTime;
-import roomescape.dto.payment.PaymentRequest;
-import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
-import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -23,50 +20,34 @@ import roomescape.util.DateUtil;
 @Service
 public class ReservationRegisterService {
 
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationRegisterService(final PaymentService paymentService, ReservationRepository reservationRepository,
+    public ReservationRegisterService(ReservationRepository reservationRepository,
                                       ReservationTimeRepository timeRepository,
                                       ThemeRepository themeRepository,
                                       MemberRepository memberRepository
     ) {
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
     }
 
-    public Long registerReservation(final UserReservationPaymentRequest userReservationPaymentRequest,
-                                    final Long memberId) {
-        ReservationRequest reservationRequest = ReservationRequest.of(userReservationPaymentRequest, memberId);
-        Reservation rawReservation = convertReservation(reservationRequest);
-        validateReservationAvailability(rawReservation);
-
-        PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
-        PaymentResponse paymentResponse = paymentService.payByToss(paymentRequest);
-        Payment payment = paymentService.save(paymentResponse.toEntity());
-
-        rawReservation.setPayment(payment);
-        Reservation reservation = reservationRepository.save(rawReservation);
-        return reservation.getId();
-    }
-
-    public Long registerReservation(ReservationRequest request) {
+    @Transactional
+    public Reservation registerReservation(ReservationRequest request) {
         Reservation reservation = convertReservation(request);
         validateReservationAvailability(reservation);
-        return reservationRepository.save(reservation).getId();
+        return reservationRepository.save(reservation);
     }
 
     private Reservation convertReservation(ReservationRequest request) {
         ReservationTime reservationTime = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member member = findMember(request.memberId());
-        return request.toEntity(reservationTime, theme, member, Status.RESERVED, null);
+        return request.toEntity(reservationTime, theme, member, Status.RESERVED);
     }
 
     private ReservationTime findReservationTime(Long timeId) {
