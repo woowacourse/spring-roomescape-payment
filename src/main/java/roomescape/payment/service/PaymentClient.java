@@ -12,6 +12,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
+import roomescape.payment.dto.PaymentRefundRequest;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 import roomescape.payment.exception.RestClientTimeOutException;
@@ -52,6 +53,7 @@ public class PaymentClient {
                     .uri("/{paymentKey}/cancel", paymentKey)
                     .header(HttpHeaders.AUTHORIZATION, authorizationKey)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .body(PaymentRefundRequest.DEFAULT_REQUEST)
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
