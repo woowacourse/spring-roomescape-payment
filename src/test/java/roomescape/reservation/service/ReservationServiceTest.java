@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.auth.dto.LoginMember;
+import roomescape.common.exception.EntityNotExistException;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -123,7 +124,7 @@ class ReservationServiceTest {
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), 11L, PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(EntityNotExistException.class);
     }
 
     @DisplayName("예약 성공 상태의 중복된 예약이 있다면 예외가 발생한다.")
@@ -201,7 +202,7 @@ class ReservationServiceTest {
     @Test
     void findByIdExceptionTest() {
         assertThatThrownBy(() -> reservationService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(EntityNotExistException.class);
     }
 
     @DisplayName("당일 예약을 삭제하면 예외가 발생한다.")

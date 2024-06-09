@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import roomescape.common.exception.EntityNotExistException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Theme;
@@ -88,6 +89,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationWithPaymentResponse> findAllMemberReservationWithPayment(Long memberId, LocalDate date);
 
     default Reservation fetchById(Long id) {
-        return findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        return findById(id).orElseThrow(() -> new EntityNotExistException("존재하지 않는 예약입니다."));
     }
 }

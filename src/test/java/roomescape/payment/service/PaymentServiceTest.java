@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import roomescape.common.exception.EntityNotExistException;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -174,7 +175,7 @@ class PaymentServiceTest {
             Reservation reservation = reservationRepository.save(new Reservation(kaki, TODAY, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
             assertThatThrownBy(() -> paymentService.cancel(reservation.getId(), RESERVATION_CANCEL_REASON))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotExistException.class);
         }
     }
 }

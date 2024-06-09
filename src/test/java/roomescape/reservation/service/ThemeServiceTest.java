@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import roomescape.common.exception.EntityNotExistException;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -75,7 +76,7 @@ class ThemeServiceTest {
     @Test
     void findByIdExceptionTest() {
         assertThatThrownBy(() -> themeService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(EntityNotExistException.class);
     }
 
     @DisplayName("파라미터로 받은 기간 동안에 예약된 상위 n 인기 테마들을 조회한다.")
