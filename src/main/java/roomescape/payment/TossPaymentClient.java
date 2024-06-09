@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.payment.dto.PaymentRequest;
@@ -21,7 +21,7 @@ public class TossPaymentClient implements PaymentClient{
 
     private final RestClient restClient;
 
-    public TossPaymentClient(final HttpComponentsClientHttpRequestFactory factory) {
+    public TossPaymentClient(final SimpleClientHttpRequestFactory factory) {
         this.restClient = RestClient.builder()
                 .requestFactory(factory)
                 .baseUrl("https://api.tosspayments.com")
