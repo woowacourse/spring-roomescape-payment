@@ -2,6 +2,8 @@ package roomescape.domain.reservation;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +45,10 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
+
     protected Reservation() {
     }
 
@@ -58,6 +64,7 @@ public class Reservation {
         this.member = member;
         this.time = time;
         this.theme = theme;
+        this.status = ReservationStatus.ACCEPTED;
     }
 
     private void validate(LocalDate date, Member member, ReservationTime time, Theme theme) {
@@ -92,7 +99,29 @@ public class Reservation {
     }
 
     public void changeMember(Member member) {
+        if (status == ReservationStatus.ACCEPTED) {
+            throw new IllegalArgumentException("확정된 예약은 변경할 수 없습니다.");
+        }
+        accept();
         this.member = member;
+    }
+
+    public void accept() {
+        if (status.isAccepted()) {
+            throw new IllegalArgumentException("이미 확정된 예약입니다.");
+        }
+        this.status = ReservationStatus.ACCEPTED;
+    }
+
+    public void cancel() {
+        if (status.isCanceled()) {
+            throw new IllegalArgumentException("이미 취소된 예약입니다.");
+        }
+        this.status = ReservationStatus.CANCELED;
+    }
+
+    public boolean isCanceled() {
+        return status.isCanceled();
     }
 
     @Override
