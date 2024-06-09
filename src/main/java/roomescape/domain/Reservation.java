@@ -173,6 +173,10 @@ public class Reservation implements Comparable<Reservation> {
         return reservationStatus;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
