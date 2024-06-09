@@ -181,7 +181,7 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_id와_예약자_id로_예약_대기가_존재하지_않는_예약을_삭제할_수_있다() {
-            reservationService.deleteReservation(reservation.getId(), member);
+            reservationService.cancelReservation(reservation.getId(), member);
 
             List<Reservation> reservations = reservationFixture.findAllReservation();
             assertThat(reservations)
@@ -192,7 +192,7 @@ class ReservationServiceTest extends ServiceTest {
         void 존재하지_않는_예약_id로_예약_삭제_시_예외가_발생한다() {
             long wrongReservationId = 10L;
 
-            assertThatThrownBy(() -> reservationService.deleteReservation(wrongReservationId, member))
+            assertThatThrownBy(() -> reservationService.cancelReservation(wrongReservationId, member))
                     .isInstanceOf(NotFoundReservationException.class);
         }
 
@@ -200,17 +200,17 @@ class ReservationServiceTest extends ServiceTest {
         void 예약자가_아닌_사용자_id로_예약_삭제_시_예외가_발생한다() {
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
-            assertThatThrownBy(() -> reservationService.deleteReservation(reservation.getId(), anotherMember))
+            assertThatThrownBy(() -> reservationService.cancelReservation(reservation.getId(), anotherMember))
                     .isInstanceOf(ReservationAuthorityNotExistException.class);
         }
 
         @Test
         void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
             paymentClient.cancelPayment(any());
-            
+
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
             waitingFixture.createWaiting(reservation, anotherMember);
-            reservationService.deleteReservation(reservation.getId(), member);
+            reservationService.cancelReservation(reservation.getId(), member);
 
             List<Reservation> reservations = reservationFixture.findAllReservation();
             List<ReservationWaiting> waitings = waitingFixture.findAllWaiting();

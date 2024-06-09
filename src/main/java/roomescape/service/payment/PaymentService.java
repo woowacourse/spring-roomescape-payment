@@ -28,11 +28,18 @@ public class PaymentService {
     }
 
     @Transactional
-    public void cancelPayment(Reservation reservation) {
+    public void cancelReservationPayment(Reservation reservation) {
         Payment payment = paymentRepository.findByReservation(reservation)
                 .orElseThrow(NotFoundPaymentException::new);
 
         paymentClient.cancelPayment(payment);
         payment.cancel();
+    }
+
+    public void deleteReservationPayment(Reservation reservation) {
+        Payment payment = paymentRepository.findByReservation(reservation)
+                .orElseThrow(NotFoundPaymentException::new);
+
+        paymentRepository.delete(payment);
     }
 }

@@ -76,6 +76,7 @@ public class ReservationService {
                         .and(hasThemeId(themeId))
                         .and(hasStartDate(dateFrom))
                         .and(hasEndDate(dateTo))
+                        .and(notStatus(ReservationStatus.CANCELED))
         );
         return new ReservationListResponse(reservations.stream()
                 .map(ReservationResponse::new)
@@ -149,7 +150,7 @@ public class ReservationService {
         }
     }
 
-    public void deleteReservation(long reservationId, Member member) {
+    public void cancelReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, member);
 
@@ -157,8 +158,15 @@ public class ReservationService {
                 waiting -> updateWaitingToReservationAndDeleteWaiting(reservation, waiting),
                 reservation::cancel
         );
-        paymentService.cancelPayment(reservation);
+        paymentService.cancelReservationPayment(reservation);
+    }
 
+    public void deleteReservation(long reservationId, Member member) {
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
+        validateReservationMember(reservation, member);
+
+        paymentService.deleteReservationPayment(reservation);
+        reservationRepository.delete(reservation);
     }
 
     private void validateReservationMember(Reservation reservation, Member member) {

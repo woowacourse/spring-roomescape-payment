@@ -15,6 +15,7 @@ public class ReservationMineResponse {
     private static final String BOOKED_MESSAGE = "예약";
     private static final String PAYMENT_WAITING_MESSAGE = "결제 대기";
     private static final String WAITING_MESSAGE = "%d번째 예약대기";
+    private static final String CANCELED_MESSAGE = "취소";
 
     private final Long reservationId;
     private final String theme;
@@ -36,12 +37,16 @@ public class ReservationMineResponse {
 
     public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
         if (reservationPayment.isPresent()) {
+            String message = BOOKED_MESSAGE;
+            if (reservation.isCancelStatus()) {
+                message = CANCELED_MESSAGE;
+            }
             Payment payment = reservationPayment.get();
             return new ReservationMineResponse(reservation.getId(),
                     reservation.getTheme().getName().getName(),
                     reservation.getDate(),
                     reservation.getTime().getStartAt(),
-                    BOOKED_MESSAGE,
+                    message,
                     payment.getPaymentKey(),
                     payment.getAmount()
             );
