@@ -20,14 +20,14 @@ public class AuthService {
         this.memberRepository = memberRepository;
     }
 
-    private Member findMemberByEmail(String email) {
+    private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 멤버입니다."));
     }
 
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
-        Member member = findMemberByEmail(request.email());
+        Member member = getMemberByEmail(request.email());
         member.validatePassword(request.password());
 
         String accessToken = jwtTokenProvider.generate(member);
@@ -36,7 +36,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public LoginCheckResponse checkLogin(LoginMember loginMember) {
-        Member member = findMemberByEmail(loginMember.email());
+        Member member = getMemberByEmail(loginMember.email());
         return LoginCheckResponse.from(member);
     }
 

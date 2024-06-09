@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.service.EncodingService;
+import roomescape.payment.service.PaymentKeyEncodingService;
 import roomescape.reservation.domain.entity.MemberReservation;
 
 import java.math.BigDecimal;
@@ -29,13 +29,13 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(
-            Long id,
-            String paymentKey,
-            String orderId,
-            BigDecimal amount,
-            LocalDateTime createdAt,
-            MemberReservation memberReservation) {
+    public Payment(Long id,
+                   String paymentKey,
+                   String orderId,
+                   BigDecimal amount,
+                   LocalDateTime createdAt,
+                   MemberReservation memberReservation
+    ) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
@@ -50,9 +50,9 @@ public class Payment {
 
     public static Payment of(PaymentResponse paymentResponse,
                              MemberReservation memberReservation,
-                             EncodingService encodingService
+                             PaymentKeyEncodingService paymentKeyEncodingService
     ) {
-        String encryptedPaymentKey = encodingService.encrypt(paymentResponse.paymentKey());
+        String encryptedPaymentKey = paymentKeyEncodingService.encrypt(paymentResponse.paymentKey());
         return new Payment(
                 encryptedPaymentKey,
                 paymentResponse.orderId(),
@@ -67,6 +67,10 @@ public class Payment {
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    public String getPaymentKey(PaymentKeyEncodingService paymentKeyEncodingService) {
+        return paymentKeyEncodingService.decrypt(paymentKey);
     }
 
     public String getOrderId() {

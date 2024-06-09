@@ -27,7 +27,8 @@ public class ReservationFacadeService {
     public ReservationFacadeService(ReservationService reservationService,
                                     ReservationCreateService reservationCreateService,
                                     WaitingReservationService waitingReservationService,
-                                    PaymentService paymentService) {
+                                    PaymentService paymentService
+    ) {
         this.reservationService = reservationService;
         this.reservationCreateService = reservationCreateService;
         this.waitingReservationService = waitingReservationService;
@@ -60,13 +61,15 @@ public class ReservationFacadeService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> readMemberReservations(LoginMember loginMember) {
-        List<MemberReservation> confirmationReservations = reservationService.readConfirmationMemberReservation(loginMember);
-        List<WaitingReservationRanking> waitingReservations = reservationService.readWaitingMemberReservation(loginMember);
+    public List<MyReservationResponse> readReservationsByMember(LoginMember loginMember) {
+        List<MemberReservation> confirmationReservations =
+                reservationService.readConfirmationMemberReservation(loginMember);
+        List<WaitingReservationRanking> waitingReservations =
+                reservationService.readWaitingMemberReservation(loginMember);
 
         return Stream.concat(
                         confirmationReservations.stream()
-                                .map(MyReservationResponse::from),
+                                .map(this::createMyConfirmationReservationResponse),
                         waitingReservations.stream()
                                 .map(MyReservationResponse::from)
                 )
@@ -74,6 +77,18 @@ public class ReservationFacadeService {
                         .thenComparing(MyReservationResponse::time)
                 )
                 .toList();
+    }
+
+    private MyReservationResponse createMyConfirmationReservationResponse(MemberReservation memberReservation) {
+        return paymentService.findByMemberReservation(memberReservation)
+                .map(payment -> MyReservationResponse.of(
+                                memberReservation,
+                                paymentService.getPlainPaymentKey(payment),
+                                payment.getAmount()
+                        )
+                )
+                .orElseGet(() -> MyReservationResponse.from(memberReservation));
+
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +131,7 @@ public class ReservationFacadeService {
     @Transactional(rollbackFor = Exception.class)
     public void confirmPendingReservation(Long id, PaymentRequest paymentRequest) {
         MemberReservation memberReservation = reservationService.readReservation(id);
-        paymentService.confirmPayment(paymentRequest, memberReservation);
         reservationService.confirmPendingReservation(id);
+        paymentService.confirmPayment(paymentRequest, memberReservation);
     }
 }

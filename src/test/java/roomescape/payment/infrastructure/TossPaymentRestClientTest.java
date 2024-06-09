@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClient;
 import roomescape.Fixtures;
-import roomescape.exception.BadRequestException;
+import roomescape.exception.PaymentFailureException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 
@@ -43,7 +43,7 @@ class TossPaymentRestClientTest {
                 .body(paymentRequest)
                 .retrieve()
                 .body(PaymentResponse.class))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(PaymentFailureException.class)
                 .hasMessage("정지된 카드 입니다.");
     }
 
@@ -61,7 +61,7 @@ class TossPaymentRestClientTest {
                 .body(paymentRequest)
                 .retrieve()
                 .body(PaymentResponse.class))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("서버에 오류가 발생했습니다.");
+                .isInstanceOf(PaymentFailureException.class)
+                .hasMessage("결제를 진행하던 중 서버에 오류가 발생했습니다.");
     }
 }

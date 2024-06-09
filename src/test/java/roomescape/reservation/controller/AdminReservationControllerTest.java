@@ -67,7 +67,7 @@ class AdminReservationControllerTest {
                 .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(11));
+                .body("size()", is(12));
     }
 
     @DisplayName("어드민 예약 컨트롤러는 예약 대기 조회 시 200을 응답한다.")
@@ -112,7 +112,7 @@ class AdminReservationControllerTest {
                 .when().get("/admin/reservations")
                 .then()
                 .statusCode(200)
-                .body("size()", is(11));
+                .body("size()", is(12));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -128,7 +128,7 @@ class AdminReservationControllerTest {
                 .when().get("/admin/reservations")
                 .then()
                 .statusCode(200)
-                .body("size()", is(12));
+                .body("size()", is(13));
     }
 
     @DisplayName("어드민 예약 컨트롤러는 사용자 id 없이 예약을 생성할 경우 400을 응답한다.")
@@ -165,7 +165,7 @@ class AdminReservationControllerTest {
                 .when().get("/admin/reservations")
                 .then()
                 .statusCode(200)
-                .body("size()", is(11));
+                .body("size()", is(12));
 
         Map<String, String> body = Map.of("cancelReason", "reason");
         Mockito.when(restClient.post("/testPaymentKey/cancel", body))
@@ -184,7 +184,7 @@ class AdminReservationControllerTest {
                 .when().get("/admin/reservations")
                 .then()
                 .statusCode(200)
-                .body("size()", is(10));
+                .body("size()", is(11));
     }
 
     @DisplayName("어드민 예약 컨트롤러는 예약 대기 승인시 200을 응답한다.")

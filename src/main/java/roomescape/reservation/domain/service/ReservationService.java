@@ -24,8 +24,9 @@ public class ReservationService {
         this.memberReservationRepository = memberReservationRepository;
     }
 
-    private MemberReservation findMemberReservationById(Long id) {
-        return memberReservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
+    private MemberReservation getMemberReservationById(Long id) {
+        return memberReservationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 예약입니다."));
     }
 
     public List<MemberReservation> readReservations() {
@@ -33,7 +34,10 @@ public class ReservationService {
     }
 
     public List<MemberReservation> readConfirmationMemberReservation(LoginMember loginMember) {
-        return memberReservationRepository.findByMemberIdAndStatuses(loginMember.id(), ReservationStatus.getConfirmationStatuses());
+        return memberReservationRepository.findByMemberIdAndStatuses(
+                loginMember.id(),
+                ReservationStatus.getConfirmationStatuses()
+        );
     }
 
     public List<WaitingReservationRanking> readWaitingMemberReservation(LoginMember loginMember) {
@@ -41,13 +45,17 @@ public class ReservationService {
     }
 
     public List<MemberReservation> searchReservations(ReservationSearchRequestParameter searchCondition) {
-        List<Reservation> reservations = reservationRepository.findByDateBetweenAndThemeId(searchCondition.dateFrom(), searchCondition.dateTo(), searchCondition.themeId());
+        List<Reservation> reservations = reservationRepository.findByDateBetweenAndThemeId(
+                searchCondition.dateFrom(),
+                searchCondition.dateTo(),
+                searchCondition.themeId()
+        );
 
         return memberReservationRepository.findByMemberIdAndReservationIn(searchCondition.memberId(), reservations);
     }
 
     public MemberReservation readReservation(Long id) {
-        return findMemberReservationById(id);
+        return getMemberReservationById(id);
     }
 
     public void deleteReservation(MemberReservation memberReservation, LoginMember loginMember) {
@@ -63,11 +71,12 @@ public class ReservationService {
     }
 
     private void confirmFirstWaitingReservation(Reservation reservation) {
-        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING).ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
+        memberReservationRepository.findFirstByReservationAndStatus(reservation, ReservationStatus.WAITING)
+                .ifPresent((memberReservation) -> memberReservation.setStatus(ReservationStatus.PENDING));
     }
 
     public void confirmPendingReservation(Long id) {
-        MemberReservation memberReservation = findMemberReservationById(id);
+        MemberReservation memberReservation = getMemberReservationById(id);
         memberReservation.validatePendingStatus();
         memberReservation.setStatus(ReservationStatus.CONFIRMATION);
     }

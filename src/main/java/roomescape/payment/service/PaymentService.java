@@ -11,32 +11,39 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.entity.MemberReservation;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PaymentService {
 
-    private final TossPaymentRestClient restClient;
+    private final TossPaymentRestClient tossPaymentRestClient;
     private final PaymentRepository paymentRepository;
-    private final EncodingService encodingService;
-    @Value("${toss.url.confirm-payment}")
-    private String confirmUrl;
-    @Value("${toss.url.cancel-payment}")
-    private String cancelUrl;
+    private final PaymentKeyEncodingService paymentKeyEncodingService;
+    private final String confirmUrl;
+    private final String cancelUrl;
 
     public PaymentService(PaymentRepository paymentRepository,
-                          TossPaymentRestClient restClient,
-                          EncodingService encodingService
+                          TossPaymentRestClient tossPaymentRestClient,
+                          PaymentKeyEncodingService paymentKeyEncodingService,
+                          @Value("${toss.url.confirm-payment}") String confirmUrl,
+                          @Value("${toss.url.cancel-payment}") String cancelUrl
     ) {
         this.paymentRepository = paymentRepository;
-        this.restClient = restClient;
-        this.encodingService = encodingService;
+        this.tossPaymentRestClient = tossPaymentRestClient;
+        this.paymentKeyEncodingService = paymentKeyEncodingService;
+        this.confirmUrl = confirmUrl;
+        this.cancelUrl = cancelUrl;
+    }
+
+    public Optional<Payment> findByMemberReservation(MemberReservation memberReservation) {
+        return paymentRepository.findByMemberReservation(memberReservation);
     }
 
     public void confirmPayment(PaymentRequest request, MemberReservation memberReservation) {
-        PaymentResponse response = restClient.post(confirmUrl, request)
+        PaymentResponse response = tossPaymentRestClient.post(confirmUrl, request)
                 .orElseThrow(() -> new PaymentFailureException("결제를 승인하던 중 오류가 발생했습니다."));
 
-        Payment payment = Payment.of(response, memberReservation, encodingService);
+        Payment payment = Payment.of(response, memberReservation, paymentKeyEncodingService);
         paymentRepository.save(payment);
     }
 
@@ -49,9 +56,13 @@ public class PaymentService {
     }
 
     private void postCancelPaymentRequest(Payment payment) {
-        String plainPaymentKey = encodingService.decrypt(payment.getPaymentKey());
+        String plainPaymentKey = getPlainPaymentKey(payment);
         String uri = String.format(cancelUrl, plainPaymentKey);
         Map<String, String> body = Map.of("cancelReason", "고객 변심");
-        restClient.post(uri, body);
+        tossPaymentRestClient.post(uri, body);
+    }
+
+    public String getPlainPaymentKey(Payment payment) {
+        return payment.getPaymentKey(paymentKeyEncodingService);
     }
 }

@@ -1,5 +1,8 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -13,24 +16,29 @@ import roomescape.auth.dto.*;
 import roomescape.auth.service.AuthService;
 import roomescape.auth.service.TokenCookieService;
 
+@Tag(name = "권한 컨트롤러")
 @Controller
 public class AuthController {
 
     private final AuthService authService;
     private final TokenCookieService tokenCookieService;
-    @Value("${jwt.expired-period}")
-    private long expiredPeriod;
+    private final long expiredPeriod;
 
-    public AuthController(AuthService authService, TokenCookieService tokenCookieService) {
+    public AuthController(AuthService authService,
+                          TokenCookieService tokenCookieService,
+                          @Value("${jwt.expired-period}") long expiredPeriod
+    ) {
         this.authService = authService;
         this.tokenCookieService = tokenCookieService;
+        this.expiredPeriod = expiredPeriod;
     }
 
     @GetMapping("/login")
     public String readLoginPage() {
-        return "/login";
+        return "login";
     }
 
+    @Operation(summary = "로그인")
     @ResponseBody
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request) {
@@ -42,12 +50,14 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(summary = "로그인 확인")
     @ResponseBody
     @GetMapping("/login/check")
-    public LoginCheckResponse checkLogin(LoginMember loginMember) {
+    public LoginCheckResponse checkLogin(@Parameter(hidden = true) LoginMember loginMember) {
         return authService.checkLogin(loginMember);
     }
 
+    @Operation(summary = "로그아웃")
     @ResponseBody
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
@@ -63,6 +73,7 @@ public class AuthController {
         return "signup";
     }
 
+    @Operation(summary = "회원가입")
     @ResponseBody
     @PostMapping("/signup")
     public LoginCheckResponse signup(@Valid @RequestBody SignupRequest request) {

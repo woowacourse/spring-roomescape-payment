@@ -12,7 +12,6 @@ import roomescape.time.domain.ReservationTime;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class Fixtures {
@@ -136,14 +135,9 @@ public class Fixtures {
     );
 
     public static final PaymentResponse paymentResponseFixture = new PaymentResponse(
-            "testKey",
-            "DONE",
-            "testId",
-            "test",
-            ZonedDateTime.now(),
-            ZonedDateTime.now(),
-            BigDecimal.valueOf(21000),
-            BigDecimal.valueOf(50000)
+            "paymentKey",
+            "orderId",
+            BigDecimal.valueOf(21000)
     );
 
     public static final PaymentRequest paymentRequestFixture = new PaymentRequest(
