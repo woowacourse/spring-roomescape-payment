@@ -121,6 +121,6 @@ public class ReservationWaitingService {
     @Scheduled(cron = "${resetwaiting.schedule.cron}")
     protected void deleteTodayWaiting() {
         List<ReservationWaiting> waitingOfToday = reservationWaitingRepository.findBySchedule_Date(LocalDate.now());
-        waitingOfToday.forEach(w -> deleteById(w.getId()));
+        waitingOfToday.forEach(this::cancelWaiting);
     }
 }
