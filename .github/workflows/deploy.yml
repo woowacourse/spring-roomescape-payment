@@ -25,4 +25,4 @@ jobs:
           /home/ubuntu/${{ github.event.repository.name }}/run.jar
 
       - name: Start the services
-        run: sudo systemctl start roomescape && sudo systemctl restart nginx
+        run: sudo systemctl start roomescape
