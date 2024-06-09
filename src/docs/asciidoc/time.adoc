@@ -1,0 +1,69 @@
+=== 예약 시간
+
+==== 전체 예약 시간 조회
+
+===== curl
+
+include::{snippets}/time/findAll/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/time/findAll/http-request.adoc[]
+
+===== response
+
+include::{snippets}/time/findAll/http-response.adoc[]
+
+include::{snippets}/time/findAll/response-fields.adoc[]
+
+==== 예약 시간 생성
+
+===== curl
+
+include::{snippets}/time/create/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/time/create/http-request.adoc[]
+
+include::{snippets}/time/create/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/time/create/http-response.adoc[]
+
+include::{snippets}/time/create/response-fields.adoc[]
+
+==== 예약 시간 삭제
+
+===== curl
+
+include::{snippets}/time/delete/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/time/delete/http-request.adoc[]
+
+include::{snippets}/time/delete/path-parameters.adoc[]
+
+===== response
+
+include::{snippets}/time/delete/http-response.adoc[]
+
+==== 예약 가능 시간 조회
+
+===== curl
+
+include::{snippets}/time/available/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/time/available/http-request.adoc[]
+
+include::{snippets}/time/available/query-parameters.adoc[]
+
+===== response
+
+include::{snippets}/time/available/http-response.adoc[]
+
+include::{snippets}/time/available/response-fields.adoc[]
