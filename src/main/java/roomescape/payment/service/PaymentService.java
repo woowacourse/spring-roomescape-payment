@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentSaveResponse;
 import roomescape.payment.dto.TossPaymentCancelResponse;
@@ -14,6 +15,7 @@ import roomescape.reservation.dto.ReservationCancelReason;
 
 @Service
 @Transactional
+@Validated
 public class PaymentService {
 
     private final TossPaymentClient tossPaymentClient;
