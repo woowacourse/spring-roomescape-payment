@@ -20,14 +20,14 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
-import roomescape.payment.service.PaymentServiceTest.TestConfig;
+import roomescape.payment.service.PaymentClientTest.TestConfig;
 
 @RestClientTest(value = TestConfig.class)
-class PaymentServiceTest {
+class PaymentClientTest {
     @Autowired
     private MockRestServiceServer mockRestServiceServer;
     @Autowired
-    private PaymentService paymentService;
+    private PaymentClient paymentClient;
 
     @DisplayName("결제 확인 되었을 경우 정상 처리한다.")
     @Test
@@ -37,7 +37,7 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withSuccess());
 
-        assertThatCode(() -> paymentService.confirmPayment(request)).doesNotThrowAnyException();
+        assertThatCode(() -> paymentClient.confirmPayment(request)).doesNotThrowAnyException();
     }
 
     @DisplayName("결제 확인 오류가 발생한 경우 예외를 던진다.")
@@ -55,7 +55,7 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("존재하지 않는 결제 입니다.");
     }
@@ -75,15 +75,15 @@ class PaymentServiceTest {
         mockRestServiceServer.expect(requestTo("/confirm"))
                 .andRespond(withUnauthorizedRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentUnauthorizedException.class);
     }
 
     @TestConfiguration
     static class TestConfig {
         @Bean
-        PaymentService paymentService(RestClient.Builder builder) {
-            return new PaymentService(builder.build(), "test");
+        PaymentClient paymentService(RestClient.Builder builder) {
+            return new PaymentClient(builder.build(), "test");
         }
     }
 }

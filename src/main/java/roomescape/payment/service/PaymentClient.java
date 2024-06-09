@@ -16,12 +16,12 @@ import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 import roomescape.payment.exception.RestClientTimeOutException;
 
-public class PaymentService {
+public class PaymentClient {
     private final RestClient restClient;
     private final String authorizationKey;
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public PaymentService(RestClient restClient, String authorizationKey) {
+    public PaymentClient(RestClient restClient, String authorizationKey) {
         this.restClient = restClient;
         this.authorizationKey = authorizationKey;
     }

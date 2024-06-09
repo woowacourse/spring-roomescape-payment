@@ -8,7 +8,7 @@ import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Schedule;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
@@ -28,20 +28,20 @@ public class ReservationCreateService {
     private final MemberRepository memberRepository;
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentService paymentService;
+    private final PaymentClient paymentClient;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
                                     ScheduleRepository scheduleRepository,
                                     MemberRepository memberRepository,
                                     TimeRepository timeRepository,
                                     ThemeRepository themeRepository,
-                                    PaymentService paymentService) {
+                                    PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.scheduleRepository = scheduleRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
-        this.paymentService = paymentService;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
@@ -53,7 +53,7 @@ public class ReservationCreateService {
 
     @Transactional
     public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
-        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
+        paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
 
         Reservation reservation = makeReservation(
                 memberId, request.date(), request.timeId(), request.themeId());
