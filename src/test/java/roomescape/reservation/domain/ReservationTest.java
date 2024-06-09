@@ -82,4 +82,14 @@ class ReservationTest {
 
         assertThat(reservation.isBefore(currentDateTime)).isTrue();
     }
+
+    @DisplayName("예약울 생성한 직후에는 아직 결제가 안되었다고 표기한다.")
+    @Test
+    void isPaidTest() {
+        Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
+
+        boolean actual = reservation.isPaid();
+
+        assertThat(actual).isFalse();
+    }
 }

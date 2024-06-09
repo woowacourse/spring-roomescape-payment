@@ -2,6 +2,8 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,6 +19,8 @@ import roomescape.time.domain.ReservationTime;
 
 @Entity
 public class Reservation {
+    private static final ReservationStatus DEFAULT_STATUS = ReservationStatus.WAITING_FOR_PAYMENT;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,23 +30,30 @@ public class Reservation {
     @OneToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
     public Reservation(Member member, Schedule schedule) {
-        this.id = null;
-        this.member = member;
-        this.schedule = schedule;
+        this(null, member, schedule, DEFAULT_STATUS);
     }
 
     public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
-        this.id = null;
-        this.member = Objects.requireNonNull(member);
-        this.schedule = new Schedule(date, time, theme);
+        this(null, member, new Schedule(date, time, theme), DEFAULT_STATUS);
+    }
+
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
+        this(null, member, new Schedule(date, time, theme), status);
     }
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme) {
-        this.id = Objects.requireNonNull(id);
+        this(Objects.requireNonNull(id), member, new Schedule(date, time, theme), DEFAULT_STATUS);
+    }
+
+    private Reservation(Long id, Member member, Schedule schedule, ReservationStatus status) {
+        this.id = id;
         this.member = Objects.requireNonNull(member);
-        this.schedule = new Schedule(date, time, theme);
+        this.schedule = Objects.requireNonNull(schedule);
+        this.status = Objects.requireNonNull(status);
     }
 
     protected Reservation() {
@@ -50,6 +61,10 @@ public class Reservation {
 
     public boolean isBefore(LocalDateTime currentDateTime) {
         return schedule.isBefore(currentDateTime);
+    }
+
+    public boolean isPaid() {
+        return status.isPaid();
     }
 
     public void updateMember(Member other) {
