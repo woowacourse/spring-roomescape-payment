@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.controller.dto.request.CreateTimeRequest;
 import roomescape.controller.dto.response.CreateTimeResponse;
-import roomescape.controller.dto.response.FindTimeResponse;
+import roomescape.controller.dto.response.TimeResponse;
 import roomescape.service.ReservationTimeService;
 
 @RestController
@@ -29,8 +29,8 @@ public class AdminReservationTimeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FindTimeResponse>> findAll() {
-        List<FindTimeResponse> response = reservationTimeService.findAll();
+    public ResponseEntity<List<TimeResponse>> findAll() {
+        List<TimeResponse> response = reservationTimeService.findAll();
         return ResponseEntity.ok(response);
     }
 

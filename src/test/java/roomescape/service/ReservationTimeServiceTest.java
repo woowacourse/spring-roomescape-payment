@@ -24,8 +24,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import roomescape.controller.dto.response.CreateTimeResponse;
-import roomescape.controller.dto.response.FindTimeAndAvailabilityResponse;
-import roomescape.controller.dto.response.FindTimeResponse;
+import roomescape.controller.dto.response.TimeAndAvailabilityResponse;
+import roomescape.controller.dto.response.TimeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -123,7 +123,7 @@ class ReservationTimeServiceTest {
             reservationTimeRepository.save(new ReservationTime("12:00"));
 
             assertThat(reservationTimeService.findAll())
-                    .extracting(FindTimeResponse::id)
+                    .extracting(TimeResponse::id)
                     .containsExactly(1L, 2L, 3L);
         }
     }
@@ -145,15 +145,15 @@ class ReservationTimeServiceTest {
             reservationRepository.save(new Reservation(member, date, LocalDateTime.now(), time1, theme, RESERVED));
             reservationRepository.save(new Reservation(member, date, LocalDateTime.now(), time3, theme, RESERVED));
 
-            List<FindTimeAndAvailabilityResponse> response =
+            List<TimeAndAvailabilityResponse> response =
                     reservationTimeService.findAllWithBookAvailability(date, 1L);
 
             Assertions.assertAll(
                     () -> assertThat(response)
-                            .extracting(FindTimeAndAvailabilityResponse::id)
+                            .extracting(available -> available.time().id())
                             .containsExactly(1L, 2L, 3L),
                     () -> assertThat(response)
-                            .extracting(FindTimeAndAvailabilityResponse::alreadyBooked)
+                            .extracting(TimeAndAvailabilityResponse::alreadyBooked)
                             .containsExactly(true, false, true)
             );
         }

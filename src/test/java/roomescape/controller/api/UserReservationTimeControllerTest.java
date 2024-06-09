@@ -76,8 +76,8 @@ class UserReservationTimeControllerTest {
                 .when().get("/times/available")
                 .then().log().all()
                 .statusCode(200)
-                .body("id", contains(1, 2))
-                .body("startAt", contains("10:00", "23:00"))
+                .body("time.id", contains(1, 2))
+                .body("time.startAt", contains("10:00", "23:00"))
                 .body("alreadyBooked", contains(true, false));
     }
 }

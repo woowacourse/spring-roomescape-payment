@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import roomescape.domain.reservation.ReservationTime;
 
-public record FindTimeResponse(Long id, @JsonFormat(pattern = "HH:mm") LocalTime startAt) {
-    public static FindTimeResponse from(ReservationTime time) {
-        return new FindTimeResponse(
+public record TimeResponse(Long id, @JsonFormat(pattern = "HH:mm") LocalTime startAt) {
+    public static TimeResponse from(ReservationTime time) {
+        return new TimeResponse(
                 time.getId(),
                 time.getStartAt()
         );

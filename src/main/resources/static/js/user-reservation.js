@@ -130,12 +130,12 @@ function renderAvailableTimes(times) {
     timeSlots.innerHTML = '<div class="no-times">선택할 수 있는 시간이 없습니다.</div>';
     return;
   }
-  times.forEach(time => {
-    const startAt = time.startAt;
-    const timeId = time.id;
-    const alreadyBooked = time.alreadyBooked;
+  times.forEach(data => {
+    const startAt = data.time.startAt;
+    const timeId = data.time.id;
+    const alreadyBooked = data.alreadyBooked;
 
-    const div = createSlot('time', startAt, timeId, alreadyBooked); // createSlot('time', 시작 시간, time id, 예약 여부)
+    const div = createSlot('time', startAt, timeId, alreadyBooked); // createSlot('data', 시작 시간, data id, 예약 여부)
     timeSlots.appendChild(div);
   });
 }
