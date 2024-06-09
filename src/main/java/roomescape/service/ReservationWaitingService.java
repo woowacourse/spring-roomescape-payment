@@ -15,7 +15,7 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.AccessDeniedException;
-import roomescape.service.dto.request.WaitingAcceptRequest;
+import roomescape.service.dto.request.WaitingApproveRequest;
 import roomescape.service.dto.request.WaitingCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -97,7 +97,7 @@ public class ReservationWaitingService {
     }
 
     @Transactional
-    public ReservationResponse acceptReservationWaiting(WaitingAcceptRequest request) {
+    public ReservationResponse approveReservationWaiting(WaitingApproveRequest request) {
         ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(request.waitingId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 대기입니다."));
         validateAdmin(request.member());

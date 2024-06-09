@@ -4,7 +4,7 @@ import roomescape.domain.member.Member;
 
 import java.math.BigDecimal;
 
-public record WaitingAcceptRequest(
+public record WaitingApproveRequest(
         long waitingId,
         Member member,
         String accountNumber,

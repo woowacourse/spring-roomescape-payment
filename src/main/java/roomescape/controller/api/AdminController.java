@@ -18,7 +18,7 @@ import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationManageService;
 import roomescape.service.ReservationWaitingService;
-import roomescape.service.dto.request.WaitingAcceptRequest;
+import roomescape.service.dto.request.WaitingApproveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.net.URI;
@@ -44,12 +44,12 @@ public class AdminController {
     }
 
     @PostMapping("/waitings/{id}")
-    public ResponseEntity<ReservationResponse> acceptReservationWaiting(@PathVariable long id,
-                                                                        @Valid @RequestBody WaitingToReservationRequest request,
-                                                                        @Auth Authentication authentication) {
+    public ResponseEntity<ReservationResponse> approveReservationWaiting(@PathVariable long id,
+                                                                         @Valid @RequestBody WaitingToReservationRequest request,
+                                                                         @Auth Authentication authentication) {
 
-        WaitingAcceptRequest waitingAcceptRequest = request.toWaitingAcceptRequest(id, authentication.getPrincipal());
-        ReservationResponse response = reservationWaitingService.acceptReservationWaiting(waitingAcceptRequest);
+        WaitingApproveRequest waitingApproveRequest = request.toWaitingApproveRequest(id, authentication.getPrincipal());
+        ReservationResponse response = reservationWaitingService.approveReservationWaiting(waitingApproveRequest);
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import roomescape.domain.member.Member;
-import roomescape.service.dto.request.WaitingAcceptRequest;
+import roomescape.service.dto.request.WaitingApproveRequest;
 
 import java.math.BigDecimal;
 
@@ -22,7 +22,7 @@ public record WaitingToReservationRequest(
         BigDecimal amount
 ) {
 
-    public WaitingAcceptRequest toWaitingAcceptRequest(long reservationId, Member member) {
-        return new WaitingAcceptRequest(reservationId, member, accountNumber, accountHolder, bankName, amount);
+    public WaitingApproveRequest toWaitingApproveRequest(long reservationId, Member member) {
+        return new WaitingApproveRequest(reservationId, member, accountNumber, accountHolder, bankName, amount);
     }
 }
