@@ -1,6 +1,7 @@
 package roomescape.acceptance;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import static roomescape.fixture.TestFixture.ADMIN_EMAIL;
 import static roomescape.fixture.TestFixture.AMOUNT;
@@ -13,6 +14,7 @@ import static roomescape.fixture.TestFixture.START_AT_SIX;
 import static roomescape.fixture.TestFixture.THEME_HORROR_DESCRIPTION;
 import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
 import static roomescape.fixture.TestFixture.THEME_HORROR_THUMBNAIL;
+import static roomescape.fixture.TestFixture.paymentConfirmResponseFixture;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,7 +47,7 @@ abstract class AcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        paymentClient.confirm(any());
+        when(paymentClient.confirm(any())).thenReturn(paymentConfirmResponseFixture());
     }
 
     protected Long saveReservationTime() {
@@ -152,7 +154,8 @@ abstract class AcceptanceTest {
     }
 
     protected ValidatableResponse assertPostResponseWithToken(final Object request, final String email,
-                                                              final String path, final int statusCode) {
+            final String path, final int statusCode
+    ) {
         final String accessToken = getAccessToken(email);
         return RestAssured.given().log().all()
                 .cookie("token", accessToken)
@@ -179,7 +182,9 @@ abstract class AcceptanceTest {
                 .statusCode(statusCode);
     }
 
-    protected ValidatableResponse assertGetResponseWithToken(final String token, final String path, final int statusCode) {
+    protected ValidatableResponse assertGetResponseWithToken(final String token, final String path,
+            final int statusCode
+    ) {
         return RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get(path)

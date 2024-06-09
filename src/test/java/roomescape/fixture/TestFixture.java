@@ -10,6 +10,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.payment.PaymentConfirmResponse;
 
 public class TestFixture {
 
@@ -31,8 +32,10 @@ public class TestFixture {
     );
 
     public static final List<Reservation> RESERVATIONS = List.of(
-            new Reservation(1L, memberFixture(1), LocalDate.parse("2024-06-01"), timeFixture(1), themeFixture(1), ReservationStatus.RESERVED),
-            new Reservation(2L, memberFixture(2), LocalDate.parse("2024-06-01"), timeFixture(2), themeFixture(2), ReservationStatus.WAITING)
+            new Reservation(1L, memberFixture(1), LocalDate.parse("2024-06-01"), timeFixture(1), themeFixture(1),
+                    ReservationStatus.RESERVED),
+            new Reservation(2L, memberFixture(2), LocalDate.parse("2024-06-01"), timeFixture(2), themeFixture(2),
+                    ReservationStatus.WAITING)
     );
 
     public static final String ADMIN_NAME = "냥인";
@@ -42,7 +45,7 @@ public class TestFixture {
     public static final String MEMBER_TENNY_EMAIL = "tenny@email.com";
     public static final String MEMBER_MIA_NAME = "미아";
     public static final String MEMBER_MIA_EMAIL = "mia@email.com";
-    public static final String MEMBER_BROWN_NAME= "브라운";
+    public static final String MEMBER_BROWN_NAME = "브라운";
     public static final String MEMBER_BROWN_EMAIL = "brown@email.com";
     public static final String MEMBER_PASSWORD = "1234";
 
@@ -54,15 +57,17 @@ public class TestFixture {
 
     public static final String THEME_HORROR_NAME = "호러";
     public static final String THEME_HORROR_DESCRIPTION = "매우 무섭습니다.";
-    public static final String THEME_HORROR_THUMBNAIL = "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";
+    public static final String THEME_HORROR_THUMBNAIL = "https://i.pinimg"
+            + ".com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";
 
     public static final String THEME_DETECTIVE_NAME = "추리";
     public static final String THEME_DETECTIVE_DESCRIPTION = "매우 어렵습니다.";
-    public static final String THEME_DETECTIVE_THUMBNAIL = "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";
+    public static final String THEME_DETECTIVE_THUMBNAIL = "https://i.pinimg"
+            + ".com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";
 
-    public static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
-    public static final String ORDER_ID = "MC4wNDYzMzA0OTc2MDgy";
-    public static final Long AMOUNT = 1000L;
+    public static final String PAYMENT_KEY = "paymentKey";
+    public static final String ORDER_ID = "orderId";
+    public static final long AMOUNT = 1000L;
 
     private TestFixture() {
     }
@@ -137,5 +142,9 @@ public class TestFixture {
 
     public static Reservation reservationFixture(int id) {
         return RESERVATIONS.get(id - 1);
+    }
+
+    public static PaymentConfirmResponse paymentConfirmResponseFixture() {
+        return new PaymentConfirmResponse("paymentKey", "orderId", 1000);
     }
 }
