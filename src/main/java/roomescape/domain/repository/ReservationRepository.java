@@ -53,7 +53,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         and r.reservationSlot.date >= :date
         order by r.reservationSlot.date asc, r.reservationSlot.time.startAt asc
     """)
-    List<Reservation> findByMemberAndDateGreaterThanEqual(@Param("member") Member member, @Param("date") LocalDate date);
+    List<Reservation> findMemberReservationsOrderByReservationSlot(@Param("member") Member member, @Param("date") LocalDate date);
 
     boolean existsByReservationSlot(ReservationSlot slot);
 

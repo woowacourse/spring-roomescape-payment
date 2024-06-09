@@ -22,7 +22,7 @@ public record UserReservationViewResponse(
                 userReservationResponse.reservationSlot().getDate(),
                 userReservationResponse.reservationSlot().getTime().getStartAt(),
                 PaymentStatusMessageMapper.mapToPaymentKey(userReservationResponse.payment()),
-                PaymentStatusMessageMapper.mapToAmount(userReservationResponse.payment()), //TODO 리팩토링 필요
+                PaymentStatusMessageMapper.mapToAmount(userReservationResponse.payment()),
                 ReservationStatusMessageMapper.mapTo(userReservationResponse.rank())
         );
     }

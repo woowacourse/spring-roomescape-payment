@@ -8,13 +8,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
 import roomescape.domain.member.Member;
 
 @Entity
-@Table
 public class Reservation {
 
     @Id
@@ -48,10 +46,6 @@ public class Reservation {
 
     public Member getMember() {
         return member;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
     }
 
     public LocalDate getDate() {

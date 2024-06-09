@@ -45,7 +45,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
       and rs.date >= :date
     """)
 
-    List<WaitingWithRank> findMemberWaitingWithRankAndDateGreaterThanEqual(@Param("member") Member member, @Param("date") LocalDate date);
+    List<WaitingWithRank> findMemberWaitingWithRank(@Param("member") Member member, @Param("date") LocalDate date);
 
     List<Waiting> findByReservationOrderById(Reservation reservation);
 }

@@ -30,11 +30,11 @@ public record UserReservationResponse(
 
     public static UserReservationResponse from(WaitingWithRank waitingWithRank) {
         return new UserReservationResponse(
-                waitingWithRank.waiting().getId(),
-                waitingWithRank.waiting().getReservation().getReservationSlot(),
+                waitingWithRank.getWaitingId(),
+                waitingWithRank.getReservationSlot(),
                 WAITING,
-                EMPTY_PAYMENT,//TODO null 처리 고민
-                OptionalLong.of(waitingWithRank.rank() + 1)
+                EMPTY_PAYMENT,
+                OptionalLong.of(waitingWithRank.getRank())
         );
     }
 }

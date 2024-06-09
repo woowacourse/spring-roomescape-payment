@@ -139,14 +139,14 @@ public class ReservationService {
     }
 
     private List<UserReservationResponse> findUserReservations(Member user) {
-        return reservationRepository.findByMemberAndDateGreaterThanEqual(user, LocalDate.now())
+        return reservationRepository.findMemberReservationsOrderByReservationSlot(user, LocalDate.now())
                 .stream()
                 .map(UserReservationResponse::reserved)
                 .toList();
     }
 
     private List<UserReservationResponse> findUserWaitings(Member user) {
-        return waitingRepository.findMemberWaitingWithRankAndDateGreaterThanEqual(user, LocalDate.now())
+        return waitingRepository.findMemberWaitingWithRank(user, LocalDate.now())
                 .stream()
                 .map(UserReservationResponse::from)
                 .toList();
