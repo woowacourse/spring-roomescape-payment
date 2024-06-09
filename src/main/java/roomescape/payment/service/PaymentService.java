@@ -7,9 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentHistory;
-import roomescape.payment.domain.PaymentStatus;
-import roomescape.payment.domain.repository.PaymentHistoryRepository;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
@@ -25,35 +22,20 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    private final PaymentHistoryRepository paymentHistoryRepository;
-
     public PaymentService(PaymentClient paymentClient,
-                          PaymentRepository paymentRepository,
-                          PaymentHistoryRepository paymentHistoryRepository) {
+                          PaymentRepository paymentRepository) {
         this.paymentClient = paymentClient;
         this.paymentRepository = paymentRepository;
-        this.paymentHistoryRepository = paymentHistoryRepository;
     }
 
     @Transactional
-    public Payment pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
+    public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
         log.info("[결제 요청] payment: {}, member email: {}", paymentRequest, memberReservation.getMember().getEmail());
         PaymentResponse response = paymentClient.confirm(paymentRequest);
-        return paymentRepository.save(
+        paymentRepository.save(
                 Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
     }
 
-    public void createHistory(MemberReservation memberReservation, Payment payment) {
-        paymentHistoryRepository.save(
-                new PaymentHistory(
-                        payment.getPaymentKey(),
-                        payment.getPaymentType(),
-                        PaymentStatus.PAID,
-                        payment.getAmount(),
-                        memberReservation.getMember()
-                )
-        );
-    }
 
     @Transactional
     public void refund(long memberReservationId) {
@@ -63,13 +45,6 @@ public class PaymentService {
         log.info("[환불 요청] payment: {}", payment);
 
         paymentRepository.delete(payment);
-        updateHistory(payment.getPaymentKey());
         paymentClient.cancel(payment.getPaymentKey());
-    }
-
-    private void updateHistory(String paymentKey) {
-        PaymentHistory paymentHistory = paymentHistoryRepository.findPaymentHistoryByPaymentKey(paymentKey)
-                .orElseThrow(IllegalStateException::new);
-        paymentHistory.cancel();
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.member.controller.AdminMemberReservationRequest;
 import roomescape.member.domain.Member;
-import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
@@ -64,10 +63,8 @@ public class ReservationApplicationService {
 
         memberReservation.approve();
 
-        Payment payment = paymentService.pay(
-                new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
-                        reservationPaymentRequest.paymentKey()), memberReservation);
-        paymentService.createHistory(memberReservation, payment);
+        paymentService.pay(new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
+                reservationPaymentRequest.paymentKey()), memberReservation);
         return ReservationResponse.from(memberReservation);
     }
 
@@ -75,10 +72,8 @@ public class ReservationApplicationService {
     public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
         MemberReservation memberReservation = reservationCommonService.create(
                 memberReservationCreate.toReservationCreate());
-        Payment payment = paymentService.pay(
-                new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
-                        memberReservationCreate.paymentKey()), memberReservation);
-        paymentService.createHistory(memberReservation, payment);
+        paymentService.pay(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
+                memberReservationCreate.paymentKey()), memberReservation);
         return ReservationResponse.from(memberReservation);
     }
 

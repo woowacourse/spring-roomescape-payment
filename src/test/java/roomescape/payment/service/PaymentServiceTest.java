@@ -25,10 +25,7 @@ import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentHistory;
-import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.PaymentType;
-import roomescape.payment.domain.repository.PaymentHistoryRepository;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
@@ -48,14 +45,15 @@ class PaymentServiceTest extends ServiceTest {
     Member memberChoco;
     Reservation reservation;
     MemberReservation memberReservation;
+
     @Autowired
     private PaymentService paymentService;
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private PaymentRepository paymentRepository;
-    @Autowired
-    private PaymentHistoryRepository paymentHistoryRepository;
 
     @BeforeEach
     void setUp() {
@@ -113,10 +111,8 @@ class PaymentServiceTest extends ServiceTest {
         //given
         String paymentKey = "paymentKey";
         PaymentType paymentType = PaymentType.CARD;
-        PaymentStatus paymentStatus = PaymentStatus.PAID;
         Price price = new Price(BigDecimal.valueOf(10000));
         paymentRepository.save(new Payment(paymentKey, paymentType, price, memberReservation));
-        paymentHistoryRepository.save(new PaymentHistory(paymentKey, paymentType, paymentStatus, price, memberChoco));
 
         //when
         paymentService.refund(memberReservation.getId());
@@ -124,30 +120,5 @@ class PaymentServiceTest extends ServiceTest {
         //then
         Optional<Payment> payment = paymentRepository.findByPaymentKey(paymentKey);
         assertThat(payment.isPresent()).isFalse();
-    }
-
-    @DisplayName("결제 환불 시, 히스토리가 갱신된다.")
-    @Test
-    void updateHistory() {
-        //given
-        String paymentKey = "paymentKey";
-        PaymentType paymentType = PaymentType.CARD;
-        PaymentStatus paymentStatus = PaymentStatus.PAID;
-        Price price = new Price(BigDecimal.valueOf(10000));
-        paymentRepository.save(new Payment(paymentKey, paymentType, price, memberReservation));
-        paymentHistoryRepository.save(new PaymentHistory(paymentKey, paymentType, paymentStatus, price, memberChoco));
-
-        //when
-        paymentService.refund(memberReservation.getId());
-
-        //then
-        Optional<PaymentHistory> paymentHistory = paymentHistoryRepository.findPaymentHistoryByPaymentKey(
-                paymentKey);
-
-        assertAll(
-                () -> assertThat(paymentHistory).isNotNull(),
-                () -> assertThat(paymentHistory.get().getPaymentType()).isEqualTo(paymentType),
-                () -> assertThat(paymentHistory.get().getPaymentStatus()).isEqualTo(PaymentStatus.CANCELLED)
-        );
     }
 }

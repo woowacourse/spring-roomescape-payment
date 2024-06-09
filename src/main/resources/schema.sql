@@ -59,16 +59,3 @@ CREATE TABLE IF NOT EXISTS payment
     updated_at            timestamp(6)                     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB;
-
-CREATE TABLE IF NOT EXISTS payment_history
-(
-    id             BIGINT                           NOT NULL AUTO_INCREMENT,
-    payment_key    VARCHAR(1023) CHARACTER SET utf8 NOT NULL UNIQUE,
-    payment_type   VARCHAR(255)                     NOT NULL,
-    payment_status VARCHAR(255)                     NOT NULL,
-    price          DECIMAL                          NOT NULL,
-    member_id      BIGINT                           NOT NULL,
-    created_at     timestamp(6)                     NOT NULL,
-    updated_at     timestamp(6)                     NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE = InnoDB;
