@@ -111,7 +111,6 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                 ));
 
         mockMvc.perform(get("/admin/waitings")
-                        .contentType(MediaType.APPLICATION_JSON)
                         .cookie(adminCookie)
                 )
                 .andExpect(status().isOk())
