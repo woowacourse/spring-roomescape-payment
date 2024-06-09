@@ -70,7 +70,7 @@ public class TestFixtures {
             "새멤버", "newmember@wooteco.com", "wootecoCrew6!"
     );
     public static final MemberResponse MEMBER_RESPONSE_1 = new MemberResponse(
-            1L, "찰리", "gomding@wooteco.com", Role.BASIC
+            1L, "썬", "sun@wooteco.com", Role.BASIC
     );
     public static final MemberResponse MEMBER_RESPONSE_2 = new MemberResponse(
             2L, "비토", "bito@wooteco.com", Role.BASIC

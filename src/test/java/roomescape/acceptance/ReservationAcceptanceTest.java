@@ -115,7 +115,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @Test
     void reservationPostWhenPaymentFail() {
         Reservation reservation = reservationRepository.findById(1L).orElseThrow();
-        ReservationRequest request = new ReservationRequest(reservation.getDate(), 3L, 1L, null, null, 1000);
+        ReservationRequest request = new ReservationRequest(reservation.getDate(), 3L, 1L, null, null, new BigDecimal("1000"));
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
         given(paymentService.pay(paymentRequest, reservation))
