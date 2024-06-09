@@ -25,7 +25,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AdminApiDocumentationTest extends BaseDocumentationTest {
@@ -47,7 +46,6 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                         .content(content)
                 )
                 .andExpect(status().isCreated())
-                .andDo(print())
                 .andDo(document("admin/reservation/create",
                         requestFields(
                                 fieldWithPath("date").description("예약 날짜"),
@@ -80,7 +78,6 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                         .content(content)
                 )
                 .andExpect(status().isCreated())
-                .andDo(print())
                 .andDo(document("admin/waiting/approve",
                         pathParameters(
                                 parameterWithName("id").description("예약 대기 id")
@@ -114,7 +111,6 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                         .cookie(adminCookie)
                 )
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andDo(document("admin/waiting/findAll",
                         responseFields(
                                 fieldWithPath("list.[].id").description("예약 대기 id"),
@@ -137,7 +133,6 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                         .cookie(adminCookie)
                 )
                 .andExpect(status().isNoContent())
-                .andDo(print())
                 .andDo(document("admin/waiting/deny",
                         pathParameters(
                                 parameterWithName("id").description("예약 대기 id")

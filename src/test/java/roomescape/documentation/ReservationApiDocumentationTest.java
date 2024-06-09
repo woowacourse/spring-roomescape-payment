@@ -23,7 +23,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -50,7 +49,6 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                         .param("dateTo", "2024-06-12")
                 )
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andDo(document("reservation/conditions",
                         queryParameters(
                                 parameterWithName("memberId").description("회원 id").optional(),
@@ -83,7 +81,6 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                         .cookie(memberCookie)
                 )
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andDo(document("reservation/mine",
                         responseFields(
                                 fieldWithPath("list.[].id").description("예약 id 또는 예약 대기 id"),
@@ -117,7 +114,6 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                         .content(content)
                 )
                 .andExpect(status().isCreated())
-                .andDo(print())
                 .andDo(document("reservation/create",
                         requestFields(
                                 fieldWithPath("date").description("예약 날짜"),

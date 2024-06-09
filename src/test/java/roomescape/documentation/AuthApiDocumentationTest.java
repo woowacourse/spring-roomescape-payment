@@ -16,7 +16,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +39,6 @@ class AuthApiDocumentationTest extends BaseDocumentationTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.SET_COOKIE, "token=member-token; Path=/; HttpOnly"))
-                .andDo(print())
                 .andDo(document("auth/login",
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
@@ -56,7 +54,6 @@ class AuthApiDocumentationTest extends BaseDocumentationTest {
                         .cookie(memberCookie)
                 )
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andDo(document("auth/check",
                         responseFields(
                                 fieldWithPath("id").description("회원 id"),
@@ -73,7 +70,6 @@ class AuthApiDocumentationTest extends BaseDocumentationTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.SET_COOKIE, "token=; Path=/; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT"))
-                .andDo(print())
                 .andDo(document("auth/logout"));
     }
 

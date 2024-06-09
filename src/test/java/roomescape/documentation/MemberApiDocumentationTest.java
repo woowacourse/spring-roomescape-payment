@@ -17,7 +17,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -39,7 +38,6 @@ class MemberApiDocumentationTest extends BaseDocumentationTest {
                         .content(content)
                 )
                 .andExpect(status().isCreated())
-                .andDo(print())
                 .andDo(document("member/signup",
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
@@ -64,7 +62,6 @@ class MemberApiDocumentationTest extends BaseDocumentationTest {
 
         mockMvc.perform(get("/members"))
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andDo(document("member/findAll",
                         responseFields(
                                 fieldWithPath("list.[].id").description("회원 id"),
