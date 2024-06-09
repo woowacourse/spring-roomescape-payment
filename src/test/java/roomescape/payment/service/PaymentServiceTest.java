@@ -62,7 +62,7 @@ class PaymentServiceTest {
     @Test
     void cancelPayment() {
         doNothing().when(paymentRestClient).cancelPayment("paymentKey");
-        when(paymentRepository.findByReservation_Id(1L))
+        when(paymentRepository.findByReservationId(1L))
                 .thenReturn(Optional.of(new Payment(RESERVATION, "paymentKey", BigDecimal.valueOf(1000), "orderId",
                         LocalDateTime.now())));
 

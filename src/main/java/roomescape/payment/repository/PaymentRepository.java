@@ -1,14 +1,18 @@
 package roomescape.payment.repository;
 
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import roomescape.payment.domain.Payment;
 
 public interface PaymentRepository extends Repository<Payment, Long> {
 
-    void save(Payment payment);
+    Payment save(Payment payment);
 
-    Optional<Payment> findByReservation_Id(Long reservationId);
+    @Query("""
+            SELECT p from Payment p WHERE p.reservation.id = :reservationId
+            """)
+    Optional<Payment> findByReservationId(Long reservationId);
 
     void deleteByReservation_Id(Long reservationId);
 }

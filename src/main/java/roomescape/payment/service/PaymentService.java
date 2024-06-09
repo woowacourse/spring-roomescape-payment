@@ -31,7 +31,7 @@ public class PaymentService {
     }
 
     public void cancelPayment(Long reservationId) {
-        Payment payment = paymentRepository.findByReservation_Id(reservationId)
+        Payment payment = paymentRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(
                         "결제되지 않은 예약이라 취소가 불가능합니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
         restClient.cancelPayment(payment.getPaymentKey());
@@ -39,6 +39,6 @@ public class PaymentService {
     }
 
     public Optional<Payment> findPaymentByReservation(Reservation reservation) {
-        return paymentRepository.findByReservation_Id(reservation.getId());
+        return paymentRepository.findByReservationId(reservation.getId());
     }
 }
