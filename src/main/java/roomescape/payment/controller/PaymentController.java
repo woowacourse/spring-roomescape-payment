@@ -2,6 +2,7 @@ package roomescape.payment.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
@@ -17,9 +18,9 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/payment")
+    @PostMapping("/payments")
     @ResponseStatus(HttpStatus.CREATED)
-    public PaymentResponse approve(PaymentRequest request, LoggedInMember member) {
+    public PaymentResponse createPayment(LoggedInMember member, @RequestBody PaymentRequest request) {
         return paymentService.createPayment(request, member.id());
     }
 }

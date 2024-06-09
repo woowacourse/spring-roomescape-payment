@@ -209,20 +209,11 @@ function requestRead(endpoint) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    /*
-    TODO: [1단계]
-        - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-        - 내 서버 URL에 맞게 reservationURL 변경
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
-    const reservationPaymentRequest = {
+
+    const reservationRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
-        timeId: reservationData.timeId,
-        paymentKey: paymentData.paymentKey,
-        orderId: paymentData.orderId,
-        amount: paymentData.amount,
-        paymentType: paymentData.paymentType,
+        timeId: reservationData.timeId
     }
 
     const reservationURL = "/reservations";
@@ -231,21 +222,54 @@ async function fetchReservationPayment(paymentData, reservationData) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(reservationPaymentRequest),
+        body: JSON.stringify(reservationRequest),
     }).then(response => {
-        if (!response.ok) {
-            return response.json().then(errorBody => {
-                console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert(errorBody.errorMessage);
+        if (response.status === 201) {
+            response.json().then(successBody => {
+                console.log("예약 성공 : " + JSON.stringify(successBody));
+                fetchPayment(paymentData, successBody.id);
             });
         } else {
-            response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
+            return response.json().then(errorBody => {
+                console.error("예약 실패 : " + JSON.stringify(errorBody));
+                window.alert(errorBody.errorMessage);
             });
         }
     }).catch(error => {
         console.error(error.message);
+    });
+}
+
+async function fetchPayment(paymentData, inputReservationId) {
+    const paymentRequest = {
+        paymentKey: paymentData.paymentKey,
+        orderId: paymentData.orderId,
+        amount: paymentData.amount,
+        reservationId: inputReservationId,
+        paymentType: paymentData.paymentType,
+    };
+
+    const paymentURL = "/payments";
+        fetch(paymentURL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentRequest),
+        }).then(response => {
+            if (response.status === 201) {
+                response.json().then(successBody => {
+                    console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                    window.location.reload();
+                });
+            } else {
+                return response.json().then(errorBody => {
+                    console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
+                    window.alert("마이 페이지에서 재결제 해주세요.");
+                });
+            }
+        }).catch(error => {
+            console.error(error.message);
     });
 }
 
