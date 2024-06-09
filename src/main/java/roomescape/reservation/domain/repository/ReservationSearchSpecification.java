@@ -33,7 +33,8 @@ public class ReservationSearchSpecification {
     public ReservationSearchSpecification sameTimeId(Long timeId) {
         if (timeId != null) {
             this.spec = this.spec.and(
-                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationTime").get("id"), timeId));
+                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationTime").get("id"),
+                            timeId));
         }
         return this;
     }
@@ -46,11 +47,20 @@ public class ReservationSearchSpecification {
         return this;
     }
 
-    public ReservationSearchSpecification sameStatus(ReservationStatus reservationStatus) {
-        if (reservationStatus != null) {
-            this.spec = this.spec.and(
-                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationStatus"), reservationStatus));
-        }
+    public ReservationSearchSpecification confirmed() {
+        this.spec = this.spec.and(
+                (root, query, criteriaBuilder) -> criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("reservationStatus"), ReservationStatus.CONFIRMED),
+                        criteriaBuilder.equal(root.get("reservationStatus"),
+                                ReservationStatus.CONFIRMED_PAYMENT_REQUIRED)
+                ));
+        return this;
+    }
+
+    public ReservationSearchSpecification waiting() {
+        this.spec = this.spec.and(
+                (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("reservationStatus"),
+                        ReservationStatus.WAITING));
         return this;
     }
 

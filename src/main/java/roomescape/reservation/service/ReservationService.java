@@ -47,24 +47,25 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationsResponse findAllReservations() {
-        List<ReservationResponse> response = reservationRepository.findAll()
-                .stream()
-                .filter(Reservation::isConfirmed)
-                .map(ReservationResponse::from)
-                .toList();
+        Specification<Reservation> spec = new ReservationSearchSpecification().confirmed().build();
+        List<ReservationResponse> response = findAllReservationByStatus(spec);
 
         return new ReservationsResponse(response);
     }
 
     @Transactional(readOnly = true)
     public ReservationsResponse findAllWaiting() {
-        List<ReservationResponse> response = reservationRepository.findAll()
-                .stream()
-                .filter(Reservation::isWaiting)
-                .map(ReservationResponse::from)
-                .toList();
+        Specification<Reservation> spec = new ReservationSearchSpecification().waiting().build();
+        List<ReservationResponse> response = findAllReservationByStatus(spec);
 
         return new ReservationsResponse(response);
+    }
+
+    private List<ReservationResponse> findAllReservationByStatus(Specification<Reservation> spec) {
+        return reservationRepository.findAll(spec)
+                .stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 
     public void removeReservationById(Long reservationId, Long memberId) {
@@ -100,10 +101,10 @@ public class ReservationService {
 
     private void validateIsReservationExist(Long themeId, Long timeId, LocalDate date) {
         Specification<Reservation> spec = new ReservationSearchSpecification()
+                .confirmed()
                 .sameThemeId(themeId)
                 .sameTimeId(timeId)
                 .sameDate(date)
-                .sameStatus(ReservationStatus.CONFIRMED)
                 .build();
 
         if (reservationRepository.exists(spec)) {
@@ -140,11 +141,11 @@ public class ReservationService {
     public ReservationsResponse findFilteredReservations(ReservationSearchRequest request) {
         validateDateForSearch(request.dateFrom(), request.dateTo());
         Specification<Reservation> spec = new ReservationSearchSpecification()
+                .confirmed()
                 .sameThemeId(request.themeId())
                 .sameMemberId(request.memberId())
                 .dateStartFrom(request.dateFrom())
                 .dateEndAt(request.dateTo())
-                .sameStatus(ReservationStatus.CONFIRMED)
                 .build();
 
         List<ReservationResponse> response = reservationRepository.findAll(spec)
