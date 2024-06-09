@@ -14,7 +14,7 @@ import roomescape.system.auth.annotation.Admin;
 import roomescape.system.dto.response.RoomEscapeApiResponse;
 
 @RestController
-@Tag(name = "2. 회원 API", description = "회원 정보를 조회하는 API")
+@Tag(name = "2. 회원 API", description = "회원 정보를 관리할 때 사용합니다.")
 public class MemberController {
 
     private final MemberService memberService;
