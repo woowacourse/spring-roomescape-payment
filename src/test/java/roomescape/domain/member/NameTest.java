@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import roomescape.BaseTest;
+import roomescape.exception.RoomEscapeException;
 
 class NameTest extends BaseTest {
 
@@ -14,7 +15,7 @@ class NameTest extends BaseTest {
 
         // when, then
         assertThatThrownBy(() -> new Name(name))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -24,7 +25,7 @@ class NameTest extends BaseTest {
 
         // when, then
         assertThatThrownBy(() -> new Name(name))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -34,6 +35,6 @@ class NameTest extends BaseTest {
 
         // when, then
         assertThatThrownBy(() -> new Name(name))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

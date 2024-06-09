@@ -1,6 +1,9 @@
 package roomescape.domain.theme;
 
+import static roomescape.exception.ErrorCode.THEME_NAME_LENGTH_ERROR;
+
 import jakarta.persistence.Embeddable;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class ThemeName {
@@ -23,9 +26,9 @@ public class ThemeName {
 
     private void validateName(String name) {
         if (name.isEmpty() || name.length() > MAX_THEME_NAME_LENGTH) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 테마이름은 1~20자만 가능합니다.",
-                    new Throwable("theme_name : " + name)
+            throw new RoomEscapeException(
+                    THEME_NAME_LENGTH_ERROR,
+                    "theme_name = " + name
             );
         }
     }
