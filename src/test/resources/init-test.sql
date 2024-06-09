@@ -59,16 +59,16 @@ VALUES ('2022-05-05', 2, 1);
 INSERT INTO schedule (date, time_id, theme_id)
 VALUES ('2050-05-05', 2, 2);
 
-INSERT INTO reservation (member_id, schedule_id)
-VALUES (2, 1);
-INSERT INTO reservation (member_id, schedule_id)
-VALUES (3, 2);
-INSERT INTO reservation (member_id, schedule_id)
-VALUES (4, 3);
-INSERT INTO reservation (member_id, schedule_id)
-VALUES (2, 4);
-INSERT INTO reservation (member_id, schedule_id)
-VALUES (2, 5);
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (2, 1, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (3, 2, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (4, 3, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (2, 4, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (2, 5, 'ADMIN_RESERVE');
 
 INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (5, 4, '2024-05-18 09:00:00.000');

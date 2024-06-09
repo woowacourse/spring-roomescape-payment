@@ -115,6 +115,10 @@ public class Reservation {
         return schedule.getTheme();
     }
 
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {

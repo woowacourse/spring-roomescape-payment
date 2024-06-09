@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,7 +43,8 @@ class WaitingServiceTest {
     private static final WaitingResponse RESPONSE1 = new WaitingResponse(3L, "브리", "레벨2 탈출",
             LocalDate.now().plusDays(7), LocalTime.of(19, 0));
     private static final MyReservationResponse MY_RESPONSE1 = new MyReservationResponse(1L, "레벨2 탈출",
-            LocalDate.now().plusDays(7), LocalTime.of(19, 0), "1번째 예약 대기", 3L);
+            LocalDate.now().plusDays(7), LocalTime.of(19, 0), "1번째 예약 대기", 3L,
+            "key_1234", BigDecimal.valueOf(1000L));
 
     @Mock
     private WaitingRepository waitingRepository;
