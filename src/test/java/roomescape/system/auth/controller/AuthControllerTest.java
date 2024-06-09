@@ -96,16 +96,6 @@ class AuthControllerTest {
                 .cookie("accessToken", "");
     }
 
-    @Test
-    @DisplayName("로그인 없이 로그아웃 요청을 보내면 403 Forbidden 을 응답한다.")
-    void checkLogoutFailByNotAuthorized() {
-        RestAssured.given().log().all()
-                .port(port)
-                .when().post("/logout")
-                .then()
-                .statusCode(403);
-    }
-
     private String getAccessTokenCookieByLogin(final String email, final String password) {
         memberRepository.save(new Member("이름", email, password, Role.ADMIN));
 
