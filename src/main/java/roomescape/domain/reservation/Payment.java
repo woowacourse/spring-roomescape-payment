@@ -7,10 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
     private String paymentKey;
 
     @NotNull
