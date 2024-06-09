@@ -15,40 +15,26 @@ import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service
-public class ReservationService {
+public class ReservationWriteService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationService(ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+    public ReservationWriteService(ReservationRepository reservationRepository,
+                                   ReservationTimeRepository reservationTimeRepository,
+                                   ThemeRepository themeRepository,
+                                   MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
     }
 
-    public List<Reservation> findAllReservations() {
-        return reservationRepository.findAll();
-    }
-
-    public List<Reservation> filterReservation(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo) {
-        Theme theme = themeRepository.findById(themeId)
-                .orElse(null);
-        Member member = memberRepository.findById(memberId)
-                .orElse(null);
-        return reservationRepository.findByConditions(theme, member, dateFrom, dateTo);
-    }
-
-    @Transactional
     public Reservation addReservation(ReservationRequest request, Member member) {
         ReservationTime reservationTime = getReservationTime(request.date(), request.timeId(),
                 request.themeId());
@@ -58,7 +44,6 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    @Transactional
     public Reservation addReservation(AdminReservationRequest request) {
         ReservationTime reservationTime = getReservationTime(request.date(), request.timeId(), request.themeId());
 
@@ -85,7 +70,6 @@ public class ReservationService {
         }
     }
 
-    @Transactional
     public void deleteReservation(long id) {
         validateExistReservation(id);
         reservationRepository.deleteById(id);
@@ -98,16 +82,6 @@ public class ReservationService {
         }
     }
 
-    public List<Reservation> findMemberReservations(Long memberId) {
-        Member member = getById(memberRepository, memberId);
-        return reservationRepository.findAllByMember(member);
-    }
-
-    public Reservation getReservationById(Long id) {
-        return getById(reservationRepository, id);
-    }
-
-    @Transactional
     public Reservation updateReservationStatus(ReservationWithPaymentRequest request, Member member) {
         Reservation reservation = getById(reservationRepository, request.reservationId());
         reservation.changeStatus();

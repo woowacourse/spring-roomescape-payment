@@ -15,7 +15,8 @@ import roomescape.controller.response.MemberNameResponse;
 import roomescape.controller.response.MemberResponse;
 import roomescape.model.Member;
 import roomescape.service.AuthService;
-import roomescape.service.MemberService;
+import roomescape.service.MemberReadService;
+import roomescape.service.MemberWriteService;
 
 import java.net.URI;
 import java.util.List;
@@ -23,17 +24,19 @@ import java.util.List;
 @RestController
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberReadService memberReadService;
+    private final MemberWriteService memberWriteService;
     private final AuthService authService;
 
-    public MemberController(MemberService memberService, AuthService authService) {
-        this.memberService = memberService;
+    public MemberController(MemberReadService memberReadService, MemberWriteService memberWriteService, AuthService authService) {
+        this.memberReadService = memberReadService;
+        this.memberWriteService = memberWriteService;
         this.authService = authService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse response) {
-        Member member = memberService.getMemberByEmailAndPassword(request);
+        Member member = memberReadService.getMemberByEmailAndPassword(request);
         Cookie cookie = authService.createCookieByMember(member);
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
@@ -46,7 +49,7 @@ public class MemberController {
 
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> getAllMembers() {
-        List<Member> members = memberService.findAllMembers();
+        List<Member> members = memberReadService.findAllMembers();
         List<MemberResponse> responses = members.stream()
                 .map(MemberResponse::new)
                 .toList();
@@ -61,7 +64,7 @@ public class MemberController {
 
     @PostMapping("/members")
     public ResponseEntity<MemberResponse> registerMember(@RequestBody RegisterRequest registerRequest) {
-        Member member = memberService.register(registerRequest);
+        Member member = memberWriteService.register(registerRequest);
         MemberResponse response = new MemberResponse(member);
         return ResponseEntity.created(URI.create("/members/" + member.getId())).body(response);
     }

@@ -3,6 +3,7 @@ package roomescape.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import roomescape.controller.request.PaymentCancelRequest;
 import roomescape.controller.request.PaymentRequest;
@@ -17,6 +18,7 @@ import roomescape.repository.PaymentInfoRepository;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@Transactional
 @Service
 public class PaymentService {
 

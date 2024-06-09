@@ -6,7 +6,8 @@ import roomescape.controller.request.ReservationTimeRequest;
 import roomescape.controller.response.IsReservedTimeResponse;
 import roomescape.controller.response.ReservationTimeResponse;
 import roomescape.model.ReservationTime;
-import roomescape.service.ReservationTimeService;
+import roomescape.service.ReservationTimeReadService;
+import roomescape.service.ReservationTimeWriteService;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -15,15 +16,17 @@ import java.util.List;
 @RestController
 public class ReservationTimeController {
 
-    private final ReservationTimeService reservationTimeService;
+    private final ReservationTimeReadService reservationTimeReadService;
+    private final ReservationTimeWriteService reservationTimeWriteService;
 
-    public ReservationTimeController(ReservationTimeService reservationTimeService) {
-        this.reservationTimeService = reservationTimeService;
+    public ReservationTimeController(ReservationTimeReadService reservationTimeReadService, ReservationTimeWriteService reservationTimeWriteService) {
+        this.reservationTimeReadService = reservationTimeReadService;
+        this.reservationTimeWriteService = reservationTimeWriteService;
     }
 
     @GetMapping("/times")
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
-        List<ReservationTime> reservationTimes = reservationTimeService.findAllReservationTimes();
+        List<ReservationTime> reservationTimes = reservationTimeReadService.findAllReservationTimes();
         List<ReservationTimeResponse> responses = reservationTimes.stream()
                 .map(time -> new ReservationTimeResponse(time.getId(), time.getStartAt()))
                 .toList();
@@ -32,14 +35,14 @@ public class ReservationTimeController {
 
     @PostMapping("/times")
     public ResponseEntity<ReservationTimeResponse> createReservationTime(@RequestBody ReservationTimeRequest request) {
-        ReservationTime reservationTime = reservationTimeService.addReservationTime(request);
+        ReservationTime reservationTime = reservationTimeWriteService.addReservationTime(request);
         ReservationTimeResponse response = new ReservationTimeResponse(reservationTime.getId(), reservationTime.getStartAt());
         return ResponseEntity.created(URI.create("/times/" + reservationTime.getId())).body(response);
     }
 
     @DeleteMapping("/times/{id}")
     public ResponseEntity<Void> deleteReservationTime(@PathVariable("id") long id) {
-        reservationTimeService.deleteReservationTime(id);
+        reservationTimeWriteService.deleteReservationTime(id);
         return ResponseEntity.ok().build();
     }
 
@@ -47,7 +50,7 @@ public class ReservationTimeController {
     public ResponseEntity<List<IsReservedTimeResponse>> getPossibleReservationTimes(
             @RequestParam(name = "date") LocalDate date,
             @RequestParam(name = "themeId") long themeId) {
-        List<IsReservedTimeResponse> response = reservationTimeService.getIsReservedTime(date, themeId);
+        List<IsReservedTimeResponse> response = reservationTimeReadService.getIsReservedTime(date, themeId);
         return ResponseEntity.ok(response);
     }
 }

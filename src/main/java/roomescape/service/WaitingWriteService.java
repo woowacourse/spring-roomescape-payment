@@ -5,33 +5,36 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.request.WaitingRequest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.model.*;
-import roomescape.repository.*;
+import roomescape.model.Member;
+import roomescape.model.ReservationTime;
+import roomescape.model.Theme;
+import roomescape.model.Waiting;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
+import roomescape.repository.WaitingRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service
-public class WaitingService {
+public class WaitingWriteService {
 
     private final WaitingRepository waitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
 
-    public WaitingService(WaitingRepository waitingRepository,
-                          ReservationTimeRepository reservationTimeRepository,
-                          ThemeRepository themeRepository, MemberRepository memberRepository, ReservationRepository reservationRepository) {
+    public WaitingWriteService(WaitingRepository waitingRepository,
+                               ReservationTimeRepository reservationTimeRepository,
+                               ThemeRepository themeRepository,
+                               ReservationRepository reservationRepository) {
         this.waitingRepository = waitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
     }
 
-    @Transactional
     public Waiting addWaiting(WaitingRequest request, Member member) {
         ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(request.timeId())));
@@ -59,11 +62,6 @@ public class WaitingService {
         }
     }
 
-    public boolean existsWaiting(Theme theme, LocalDate date, ReservationTime time) {
-        return waitingRepository.existsWaitingByThemeAndDateAndTime(theme, date, time);
-    }
-
-    @Transactional
     public void deleteWaiting(long id) {
         validateExistWaiting(id);
         waitingRepository.deleteById(id);
@@ -74,22 +72,5 @@ public class WaitingService {
         if (!exists) {
             throw new NotFoundException("해당 id:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(id));
         }
-    }
-
-    public List<WaitingWithRank> findMemberWaiting(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->
-                        new NotFoundException("해당 id:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(memberId)));
-        return waitingRepository.findWaitingWithRankByMemberId(member.getId());
-    }
-
-    public List<Waiting> findAllWaiting() {
-        return waitingRepository.findAll();
-    }
-
-    public Waiting getFirstWaitingByCondition(Theme theme, LocalDate date, ReservationTime time) {
-        return waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time)
-                .orElseThrow(() ->
-                        new NotFoundException("해당 테마:[%s], 날짜:[%s], 시간:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(theme.getName(), date, time.getStartAt())));
     }
 }

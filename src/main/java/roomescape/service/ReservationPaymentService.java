@@ -11,24 +11,25 @@ import roomescape.model.Reservation;
 @Service
 public class ReservationPaymentService {
 
-    private final ReservationService reservationService;
+    private final ReservationWriteService reservationWriteService;
     private final PaymentService paymentService;
 
-    public ReservationPaymentService(ReservationService reservationService, PaymentService paymentService) {
-        this.reservationService = reservationService;
+    public ReservationPaymentService(ReservationWriteService reservationWriteService,
+                                     PaymentService paymentService) {
+        this.reservationWriteService = reservationWriteService;
         this.paymentService = paymentService;
     }
 
     public Reservation payReservation(ReservationRequest request, Member member) {
         paymentService.confirmReservationPayments(request);
-        Reservation reservation = reservationService.addReservation(request, member);
+        Reservation reservation = reservationWriteService.addReservation(request, member);
         paymentService.addPayment(request, reservation);
         return reservation;
     }
 
     public Reservation payReservationWithoutPayment(ReservationWithPaymentRequest request, Member member) {
         paymentService.confirmReservationPayments(request);
-        Reservation reservation = reservationService.updateReservationStatus(request, member);
+        Reservation reservation = reservationWriteService.updateReservationStatus(request, member);
         paymentService.addPayment(request, reservation);
         return reservation;
     }

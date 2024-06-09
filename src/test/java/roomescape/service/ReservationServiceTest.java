@@ -28,20 +28,21 @@ class ReservationServiceTest {
 
     private ReservationRepository reservationRepository;
     private MemberRepository memberRepository;
-    private ReservationService reservationService;
+    private ReservationReadService reservationReadService;
+    private ReservationWriteService reservationWriteService;
 
     @Autowired
-    public ReservationServiceTest(ReservationRepository reservationRepository, MemberRepository memberRepository,
-                                  ReservationService reservationService) {
+    public ReservationServiceTest(ReservationRepository reservationRepository, MemberRepository memberRepository, ReservationReadService reservationReadService, ReservationWriteService reservationWriteService) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
-        this.reservationService = reservationService;
+        this.reservationReadService = reservationReadService;
+        this.reservationWriteService = reservationWriteService;
     }
 
     @DisplayName("모든 예약 시간을 반환한다")
     @Test
     void should_return_all_reservation_times() {
-        List<Reservation> reservations = reservationService.findAllReservations();
+        List<Reservation> reservations = reservationReadService.findAllReservations();
 
         assertThat(reservations).hasSize(2);
     }
@@ -49,7 +50,7 @@ class ReservationServiceTest {
     @DisplayName("검색 조건에 맞는 예약을 반환한다.")
     @Test
     void should_return_filtered_reservation() {
-        List<Reservation> reservations = reservationService
+        List<Reservation> reservations = reservationReadService
                 .filterReservation(1L, 1L, now().minusDays(1), now().plusDays(3));
 
         assertThat(reservations).hasSize(1);
@@ -62,7 +63,7 @@ class ReservationServiceTest {
 
         ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234L);
 
-        reservationService.addReservation(request, member);
+        reservationWriteService.addReservation(request, member);
 
         List<Reservation> allReservations = reservationRepository.findAll();
         assertThat(allReservations).hasSize(3);
@@ -73,7 +74,7 @@ class ReservationServiceTest {
     void should_add_reservation_times_when_give_admin_request() {
         AdminReservationRequest request =
                 new AdminReservationRequest(now().plusDays(2), 1L, 1L, 1L);
-        reservationService.addReservation(request);
+        reservationWriteService.addReservation(request);
 
         List<Reservation> allReservations = reservationRepository.findAll();
         assertThat(allReservations).hasSize(3);
@@ -85,7 +86,7 @@ class ReservationServiceTest {
         AdminReservationRequest request =
                 new AdminReservationRequest(now().plusDays(2), 1L, 1L, 99L);
 
-        assertThatThrownBy(() -> reservationService.addReservation(request))
+        assertThatThrownBy(() -> reservationWriteService.addReservation(request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 아이디가 99인 사용자가 존재하지 않습니다.");
     }
@@ -93,7 +94,7 @@ class ReservationServiceTest {
     @DisplayName("예약 시간을 삭제한다")
     @Test
     void should_remove_reservation_times() {
-        reservationService.deleteReservation(1L);
+        reservationWriteService.deleteReservation(1L);
 
         List<Reservation> reservations = reservationRepository.findAll();
         assertThat(reservations).hasSize(1);
@@ -102,7 +103,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 예약을 삭제하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_not_exist_reservation() {
-        assertThatThrownBy(() -> reservationService.deleteReservation(1000000))
+        assertThatThrownBy(() -> reservationWriteService.deleteReservation(1000000))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 id:[1000000] 값으로 예약된 내역이 존재하지 않습니다.");
     }
@@ -110,7 +111,7 @@ class ReservationServiceTest {
     @DisplayName("존재하는 예약을 삭제하면 예외가 발생하지 않는다.")
     @Test
     void should_not_throw_exception_when_exist_reservation() {
-        assertThatCode(() -> reservationService.deleteReservation(1))
+        assertThatCode(() -> reservationWriteService.deleteReservation(1))
                 .doesNotThrowAnyException();
     }
 
@@ -121,7 +122,7 @@ class ReservationServiceTest {
                 new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234L);
         Member member = new Member("수달", MEMBER, "otter@email.com", "1111");
 
-        assertThatThrownBy(() -> reservationService.addReservation(request, member))
+        assertThatThrownBy(() -> reservationWriteService.addReservation(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약할 수 없습니다.");
     }
@@ -134,7 +135,7 @@ class ReservationServiceTest {
         ReservationRequest request =
                 new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234L);
 
-        assertThatCode(() -> reservationService.addReservation(request, member))
+        assertThatCode(() -> reservationWriteService.addReservation(request, member))
                 .doesNotThrowAnyException();
     }
 
@@ -145,7 +146,7 @@ class ReservationServiceTest {
         Member member = memberRepository.findById(1L).get();
 
         ReservationRequest request = new ReservationRequest(date, 1L, 1L, "orderId", "paymentKey", 1234L);
-        assertThatThrownBy(() -> reservationService.addReservation(request, member))
+        assertThatThrownBy(() -> reservationWriteService.addReservation(request, member))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
     }
@@ -155,7 +156,7 @@ class ReservationServiceTest {
     void should_return_member_reservations() {
         Member member = memberRepository.findById(1L).get();
 
-        List<Reservation> reservations = reservationService
+        List<Reservation> reservations = reservationReadService
                 .findMemberReservations(member.getId());
 
         assertThat(reservations).hasSize(2);
@@ -164,7 +165,7 @@ class ReservationServiceTest {
     @DisplayName("주어진 아이디에 맞는 예약을 반환한다.")
     @Test
     void should_return_reservation_when_given_id() {
-        Reservation reservation = reservationService.getReservationById(1L);
+        Reservation reservation = reservationReadService.getReservationById(1L);
 
         assertThat(reservation.getId()).isEqualTo(1);
     }

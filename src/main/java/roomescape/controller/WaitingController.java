@@ -7,7 +7,8 @@ import roomescape.controller.request.WaitingRequest;
 import roomescape.controller.response.WaitingResponse;
 import roomescape.model.Member;
 import roomescape.model.Waiting;
-import roomescape.service.WaitingService;
+import roomescape.service.WaitingReadService;
+import roomescape.service.WaitingWriteService;
 
 import java.net.URI;
 import java.util.List;
@@ -15,29 +16,32 @@ import java.util.List;
 @RestController
 public class WaitingController {
 
-    private final WaitingService waitingService;
+    private final WaitingReadService waitingReadService;
+    private final WaitingWriteService waitingWriteService;
 
-    public WaitingController(WaitingService waitingService) {
-        this.waitingService = waitingService;
+    public WaitingController(WaitingReadService waitingReadService,
+                             WaitingWriteService waitingWriteService) {
+        this.waitingReadService = waitingReadService;
+        this.waitingWriteService = waitingWriteService;
     }
 
     @PostMapping("/waiting")
     public ResponseEntity<WaitingResponse> createWaiting(@RequestBody WaitingRequest request,
-                                                 @AuthenticationPrincipal Member member) {
-        Waiting waiting = waitingService.addWaiting(request, member);
+                                                         @AuthenticationPrincipal Member member) {
+        Waiting waiting = waitingWriteService.addWaiting(request, member);
         WaitingResponse response = new WaitingResponse(waiting);
         return ResponseEntity.created(URI.create("/waiting/" + waiting.getId())).body(response);
     }
 
     @DeleteMapping("/waiting/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable("id") long id) {
-        waitingService.deleteWaiting(id);
+        waitingWriteService.deleteWaiting(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/waitings")
     public ResponseEntity<List<WaitingResponse>> getWaiting() {
-        List<Waiting> waiting = waitingService.findAllWaiting();
+        List<Waiting> waiting = waitingReadService.findAllWaiting();
         List<WaitingResponse> waitingResponses = waiting.stream()
                 .map(WaitingResponse::new)
                 .toList();

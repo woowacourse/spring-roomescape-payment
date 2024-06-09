@@ -18,27 +18,30 @@ import java.util.List;
 @RestController
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationReadService reservationReadService;
     private final AuthService authService;
-    private final ReservationWaitingService reservationWaitingService;
+    private final ReservationWaitingReadService reservationWaitingReadService;
+    private final ReservationWaitingWriteService reservationWaitingWriteService;
     private final PaymentService paymentService;
     private final ReservationPaymentService reservationPaymentService;
 
-    public ReservationController(ReservationService reservationService,
+    public ReservationController(ReservationReadService reservationReadService,
                                  AuthService authService,
-                                 ReservationWaitingService reservationWaitingService,
+                                 ReservationWaitingReadService reservationWaitingReadService,
+                                 ReservationWaitingWriteService reservationWaitingWriteService,
                                  PaymentService paymentService,
                                  ReservationPaymentService reservationPaymentService) {
-        this.reservationService = reservationService;
+        this.reservationReadService = reservationReadService;
         this.authService = authService;
-        this.reservationWaitingService = reservationWaitingService;
+        this.reservationWaitingReadService = reservationWaitingReadService;
+        this.reservationWaitingWriteService = reservationWaitingWriteService;
         this.paymentService = paymentService;
         this.reservationPaymentService = reservationPaymentService;
     }
 
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservations() {
-        List<Reservation> allReservations = reservationService.findAllReservations();
+        List<Reservation> allReservations = reservationReadService.findAllReservations();
         List<ReservationResponse> responses = allReservations.stream()
                 .map(ReservationResponse::new)
                 .toList();
@@ -48,7 +51,7 @@ public class ReservationController {
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<MemberReservationResponse>> getMemberReservations(HttpServletRequest request) {
         Long memberId = authService.getMemberIdByCookie(request.getCookies());
-        List<MemberReservationResponse> responses = reservationWaitingService.getAllMemberReservationsAndWaiting(memberId);
+        List<MemberReservationResponse> responses = reservationWaitingReadService.getAllMemberReservationsAndWaiting(memberId);
         return ResponseEntity.ok(responses);
     }
 
@@ -63,7 +66,7 @@ public class ReservationController {
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") long id) {
         paymentService.cancelPayment(id);
-        reservationWaitingService.deleteReservation(id);
+        reservationWaitingWriteService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
 
