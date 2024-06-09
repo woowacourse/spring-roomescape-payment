@@ -2,5 +2,5 @@ package roomescape.domain.reservation;
 
 public enum Status {
 
-    RESERVED, PENDING, WAITING
+    RESERVED, PENDING, DELETE, WAITING
 }
