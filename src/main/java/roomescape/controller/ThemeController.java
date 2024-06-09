@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +20,7 @@ import roomescape.service.ThemeService;
 
 @RestController
 @RequestMapping("/themes")
+@Tag(name = "테마 API", description = "테마 관련 API 입니다.")
 public class ThemeController {
 
     private final ThemeService themeService;
@@ -27,11 +30,13 @@ public class ThemeController {
     }
 
     @GetMapping
+    @Operation(summary = "테마 목록 조회 API", description = "모든 테마 목록을 조회합니다.")
     public List<ThemeResponse> findAll() {
         return themeService.findAll();
     }
 
     @GetMapping("/ranking")
+    @Operation(summary = "인기 테마 목록 조회 API", description = "인기 테마 목록을 조회합니다.")
     public List<ThemeResponse> findAndOrderByPopularity(
             @RequestParam LocalDate start,
             @RequestParam LocalDate end,
@@ -41,6 +46,7 @@ public class ThemeController {
     }
 
     @PostMapping
+    @Operation(summary = "테마 등록 API", description = "테마를 등록합니다.")
     public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
         ThemeResponse saved = themeService.save(themeRequest);
         return ResponseEntity.created(URI.create("/themes/" + saved.id()))
@@ -48,6 +54,7 @@ public class ThemeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "테마 삭제 API", description = "테마를 삭제합니다.")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         themeService.delete(id);
         return ResponseEntity.noContent().build();
