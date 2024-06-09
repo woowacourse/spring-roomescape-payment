@@ -3,21 +3,29 @@ package roomescape.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
+import roomescape.config.properties.TossPaymentConfigProperties;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
+@EnableConfigurationProperties(TossPaymentConfigProperties.class)
 public class ConfigPropertiesTest {
 
     @Autowired
-    private PaymentConfigProperties paymentConfigProperties;
+    private TossPaymentConfigProperties tossPaymentConfigProperties;
 
     @Test
     void tossProperties() {
-        TossPaymentConfigProperties properties = paymentConfigProperties.getTossProperties();
-
-        assertThat(properties.getSecret()).isEqualTo("test");
-        assertThat(properties.getBaseUri()).isEqualTo("http://localhost");
-        assertThat(properties.getConfirmUri()).isEqualTo("/confirm");
+        assertThat(tossPaymentConfigProperties.secret()).isEqualTo("test");
+        assertThat(tossPaymentConfigProperties.baseUri()).isEqualTo("http://localhost");
+        assertThat(tossPaymentConfigProperties.confirmUri()).isEqualTo("/confirm");
+        assertThat(tossPaymentConfigProperties.connectTimeout()).isEqualTo(30);
+        assertThat(tossPaymentConfigProperties.readTimeout()).isEqualTo(30);
     }
 }

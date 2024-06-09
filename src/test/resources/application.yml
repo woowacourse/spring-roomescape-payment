@@ -21,3 +21,5 @@ payment:
     secret: test
     base-uri: http://localhost
     confirm-uri: /confirm
+    connect-timeout: 30
+    read-timeout: 30

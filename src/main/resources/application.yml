@@ -21,3 +21,5 @@ payment:
     secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     base-uri: https://api.tosspayments.com/v1/payments
     confirm-uri: /confirm
+    connect-timeout: 30
+    read-timeout: 30
