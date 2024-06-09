@@ -67,7 +67,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservationById(@PathVariable Long id, @RequestParam String reason) { // todo admin
+    public void deleteReservationById(@PathVariable Long id, @RequestParam String reason) {
         reservationPaymentFacadeService.cancelReservation(new ReservationCancelRequest(id, reason));
     }
 }
