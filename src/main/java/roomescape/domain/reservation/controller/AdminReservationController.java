@@ -71,6 +71,14 @@ public class AdminReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/admin/times")
+    public List<ReservationTimeResponse> getReservationTimes() {
+        return reservationTimeService.getReservationTimes()
+                .stream()
+                .map(ReservationTimeResponse::from)
+                .toList();
+    }
+
     @PostMapping("/admin/times")
     public ResponseEntity<ReservationTimeResponse> saveReservationTime(@RequestBody final SaveReservationTimeRequest request) {
         final ReservationTimeDto savedReservationTime = reservationTimeService.saveReservationTime(request);
