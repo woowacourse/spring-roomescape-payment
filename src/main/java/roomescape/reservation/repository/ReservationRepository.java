@@ -6,7 +6,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
+import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Schedule;
 
 @Repository
 public interface ReservationRepository extends ListCrudRepository<Reservation, Long> {
@@ -14,6 +16,8 @@ public interface ReservationRepository extends ListCrudRepository<Reservation, L
 
     Optional<Reservation> findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
             LocalDate date, Long timeId, Long themeId);
+
+    boolean existsByScheduleAndMember(Schedule schedule, Member member);
 
     @Query("""
             SELECT r FROM Reservation AS r

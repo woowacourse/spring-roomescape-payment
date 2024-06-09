@@ -35,17 +35,6 @@ class WaitingTest {
                 .isInstanceOf(NullPointerException.class);
     }
 
-    @DisplayName("예약 대기 정보를 통해, 예약을 확정할 수 있다.")
-    @Test
-    void confirmReservationTest() {
-        Waiting waiting = new Waiting(DEFAULT_RESERVATION, DEFAULT_MEMBER);
-
-        waiting.confirmReservation();
-
-        Member reservationOwner = waiting.getReservation().getMember();
-        assertThat(reservationOwner).isEqualTo(DEFAULT_MEMBER);
-    }
-
     @DisplayName("예약 대기 주인을 확인할 수 있다.")
     @Test
     void isNotWaitingOwnerTest_whenSameMemberId() {

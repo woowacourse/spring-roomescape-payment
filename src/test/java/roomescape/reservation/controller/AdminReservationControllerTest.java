@@ -37,7 +37,7 @@ class AdminReservationControllerTest {
     @Test
     void findReservationTest() {
         Cookies cookies = makeAdminCookie();
-        Map<String, String> parameters = Map.of("themeId", "1");;
+        Map<String, String> parameters = Map.of("themeId", "1");
 
         int size = RestAssured.given().log().all()
                 .cookies(cookies)

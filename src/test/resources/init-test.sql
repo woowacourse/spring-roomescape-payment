@@ -70,7 +70,7 @@ VALUES (2, 4);
 INSERT INTO reservation (member_id, schedule_id)
 VALUES (2, 5);
 
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (5, 4, '2024-05-18 09:00:00.000');
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (5, 5, '2024-05-19 09:00:00.000');

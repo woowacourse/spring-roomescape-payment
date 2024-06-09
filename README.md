@@ -39,8 +39,8 @@
 - [x] `Reservation` Table의 일부 컬럼(`date`, `timeId`, `themeId`)을 `Schedule` Table로 분리
   - [x] `Reservation`의 CRUD 정상 작동 확인
   - [x] `ReservationRepository`의 snake_case 지우기
-- [ ] `Waiting`이 `reservationId` 대신 `scheduleId`를 가지고 있도록 변경
-  - [ ] `Waiting`의 CRUD 정상 작동 확인
+- [x] `Waiting`이 `reservationId` 대신 `scheduleId`를 가지고 있도록 변경
+  - [x] `Waiting`의 CRUD 정상 작동 확인
 
 #### 결제 정보 저장 및 조회 도입
 - [ ] `Payment` Table 도입

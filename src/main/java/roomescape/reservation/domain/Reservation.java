@@ -64,6 +64,10 @@ public class Reservation {
         return member;
     }
 
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
     public LocalDate getDate() {
         return schedule.getDate();
     }

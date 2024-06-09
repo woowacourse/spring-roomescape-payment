@@ -37,7 +37,7 @@ VALUES (3, 3);
 INSERT INTO reservation (member_id, schedule_id)
 VALUES (2, 4);
 
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (4, 3, '2024-05-20 12:10:00.000');
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (4, 4, '2024-05-20 12:20:00.000');

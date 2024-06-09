@@ -47,8 +47,8 @@ public class ReservationFindMineService {
     }
 
     private Long countOrderOfWaiting(Waiting waiting) {
-        return waitingRepository.countByReservationAndCreatedAtLessThanEqual(
-                waiting.getReservation(), waiting.getCreatedAt());
+        return waitingRepository.countByScheduleAndCreatedAtLessThanEqual(
+                waiting.getSchedule(), waiting.getCreatedAt());
     }
 
     private List<MyReservationResponse> makeMyReservations(List<MyReservationResponse> reservations,

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Schedule;
 
 @Entity
 public class Waiting {
@@ -18,8 +19,8 @@ public class Waiting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(optional = false)
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
     @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -27,14 +28,15 @@ public class Waiting {
     private LocalDateTime createdAt;
 
     public Waiting(Reservation reservation, Member member) {
-        this.reservation = Objects.requireNonNull(reservation);
+        this.id = null;
+        this.schedule = Objects.requireNonNull(reservation).getSchedule();
         this.member = Objects.requireNonNull(member);
         this.createdAt = LocalDateTime.now();
     }
 
     public Waiting(Long id, Reservation reservation, Member member, LocalDateTime createdAt) {
         this.id = Objects.requireNonNull(id);
-        this.reservation = Objects.requireNonNull(reservation);
+        this.schedule = Objects.requireNonNull(reservation).getSchedule();
         this.member = Objects.requireNonNull(member);
         this.createdAt = Objects.requireNonNull(createdAt);
     }
@@ -43,11 +45,7 @@ public class Waiting {
     }
 
     public boolean isBefore(LocalDateTime dateTime) {
-        return reservation.isBefore(dateTime);
-    }
-
-    public void confirmReservation() {
-        reservation.updateMember(member);
+        return schedule.isBefore(dateTime);
     }
 
     public boolean isNotWaitingOwner(Long memberId) {
@@ -58,8 +56,8 @@ public class Waiting {
         return id;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public Schedule getSchedule() {
+        return schedule;
     }
 
     public Member getMember() {

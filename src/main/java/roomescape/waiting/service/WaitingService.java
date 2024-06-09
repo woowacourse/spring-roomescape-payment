@@ -8,6 +8,7 @@ import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Schedule;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.dto.WaitingRequest;
@@ -66,14 +67,14 @@ public class WaitingService {
         if (waiting.isBefore(LocalDateTime.now())) {
             throw new BadArgumentRequestException("예약 대기는 현재 시간 이후이어야 합니다.");
         }
-        if (isAlreadyWaited(waiting.getReservation(), waiting.getMember())) {
+        if (isAlreadyWaited(waiting.getSchedule(), waiting.getMember())) {
             throw new BadArgumentRequestException("이미 예약 했습니다.");
         }
     }
 
-    private boolean isAlreadyWaited(Reservation reservation, Member member) {
-        return reservation.getMember().equals(member)
-                || waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId());
+    private boolean isAlreadyWaited(Schedule schedule, Member member) {
+        return reservationRepository.existsByScheduleAndMember(schedule, member)
+                || waitingRepository.existsByScheduleAndMember(schedule, member);
     }
 
     public void deleteWaiting(Long id) {

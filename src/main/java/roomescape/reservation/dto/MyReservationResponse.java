@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Schedule;
 import roomescape.waiting.domain.Waiting;
 
 public record MyReservationResponse(Long id,
@@ -16,20 +17,20 @@ public record MyReservationResponse(Long id,
     private static final String WAITING_STATUS_FORMAT = "%d번째 예약 대기";
 
     public static MyReservationResponse from(Reservation reservation) {
-        return createResponse(reservation, RESERVATION_STATUS, null);
+        return createResponse(reservation.getSchedule(), RESERVATION_STATUS, null);
     }
 
     public static MyReservationResponse from(Waiting waiting, Long order) {
         String status = WAITING_STATUS_FORMAT.formatted(order);
-        return createResponse(waiting.getReservation(), status, waiting.getId());
+        return createResponse(waiting.getSchedule(), status, waiting.getId());
     }
 
-    private static MyReservationResponse createResponse(Reservation reservation, String status, Long waitingId) {
+    private static MyReservationResponse createResponse(Schedule schedule, String status, Long waitingId) {
         return new MyReservationResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getTime().getStartAt(),
+                schedule.getId(),
+                schedule.getTheme().getName(),
+                schedule.getDate(),
+                schedule.getTime().getStartAt(),
                 status,
                 waitingId);
     }

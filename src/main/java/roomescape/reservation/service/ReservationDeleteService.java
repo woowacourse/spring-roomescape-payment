@@ -27,7 +27,7 @@ public class ReservationDeleteService {
         validateIsAfterFromNow(reservation);
 
         findHighPriorityWaiting(reservationId).ifPresentOrElse(
-                this::confirmReservation,
+                waiting -> confirmReservation(reservation, waiting),
                 () -> reservationRepository.delete(reservation));
     }
 
@@ -37,7 +37,7 @@ public class ReservationDeleteService {
     }
 
     private Optional<Waiting> findHighPriorityWaiting(Long reservationId) {
-        return waitingRepository.findTopByReservationIdOrderByCreatedAtAsc(reservationId);
+        return waitingRepository.findTopByScheduleIdOrderByCreatedAtAsc(reservationId);
     }
 
     private void validateIsAfterFromNow(Reservation reservation) {
@@ -46,8 +46,8 @@ public class ReservationDeleteService {
         }
     }
 
-    private void confirmReservation(Waiting waiting) {
-        waiting.confirmReservation();
+    private void confirmReservation(Reservation reservation, Waiting waiting) {
+        reservation.updateMember(waiting.getMember());
         waitingRepository.delete(waiting);
     }
 }
