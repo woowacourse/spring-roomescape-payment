@@ -41,10 +41,10 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
-test {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
+//test {
+//    outputs.dir snippetsDir
+//    useJUnitPlatform()
+//}
 
 asciidoctor {
     configurations 'asciidoctorExt'
@@ -63,6 +63,6 @@ tasks.register('copyApiDocuments', Copy) {
     into file("src/main/resources/static/docs")
 }
 
-bootJar {
-    dependsOn copyApiDocuments
-}
+//bootJar {
+//    dependsOn copyApiDocuments
+//}
