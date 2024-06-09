@@ -1,15 +1,21 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.utils.DatabaseCleaner;
+import roomescape.utils.DocumentHelper;
 import roomescape.utils.TestFixture;
 
 @AcceptanceTest
@@ -25,9 +31,13 @@ class ThemeControllerTest {
     @Autowired
     private TestFixture testFixture;
 
+    private RequestSpecification specification;
+
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        specification = DocumentHelper.specification(restDocumentation);
 
         databaseCleaner.executeTruncate();
 
@@ -39,10 +49,16 @@ class ThemeControllerTest {
     @Test
     @DisplayName("모든 테마 목록을 조회한다.")
     void findAllThemes() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
+                .accept("application/json")
+                .filter(document("theme", responseFields(
+                        fieldWithPath("[].id").description("테마 ID"),
+                        fieldWithPath("[].name").description("테마 이름"),
+                        fieldWithPath("[].description").description("테마 설명"),
+                        fieldWithPath("[].thumbnail").description("테마 이미지"))))
                 .when().get("/themes")
-                .then().log().all()
-                .statusCode(200)
+                .then().assertThat()
+                .statusCode(is(200))
                 .body("size()", is(2));
     }
 
@@ -52,10 +68,16 @@ class ThemeControllerTest {
         createReservationTimes();
         createReservations();
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
+                .accept("application/json")
+                .filter(document("theme-popular", responseFields(
+                        fieldWithPath("[].id").description("테마 ID"),
+                        fieldWithPath("[].name").description("테마 이름"),
+                        fieldWithPath("[].description").description("테마 설명"),
+                        fieldWithPath("[].thumbnail").description("테마 이미지"))))
                 .when().get("/themes/popular")
-                .then().log().all()
-                .statusCode(200)
+                .then().assertThat()
+                .statusCode(is(200))
                 .body("size()", is(2))
                 .body("name", is(List.of("테마 2", "테마 1")));
     }

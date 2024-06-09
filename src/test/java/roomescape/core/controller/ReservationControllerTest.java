@@ -1,9 +1,16 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +21,13 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
+import roomescape.utils.DocumentHelper;
 import roomescape.utils.TestFixture;
 
 @AcceptanceTest
@@ -38,14 +47,52 @@ class ReservationControllerTest {
 
     private String accessToken;
 
+    private RequestSpecification specification;
+
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        specification = DocumentHelper.specification(restDocumentation);
 
         databaseCleaner.executeTruncate();
         testFixture.initTestData();
 
         accessToken = AccessTokenGenerator.adminTokenGenerate();
+    }
+
+    @Test
+    @DisplayName("예약을 생성할 수 있다.")
+    void createReservation() {
+        ReservationPaymentRequest request = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1000);
+
+        RestAssured.given(this.specification).log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .filter(document("reservation-create",
+                        requestFields(fieldWithPath("date").description("예약할 날짜"),
+                                fieldWithPath("timeId").description("예약할 시간"),
+                                fieldWithPath("themeId").description("예약할 테마"),
+                                fieldWithPath("paymentKey").description("결제 키"),
+                                fieldWithPath("orderId").description("주문 ID"),
+                                fieldWithPath("amount").description("결제 금액")),
+                        responseFields(fieldWithPath("id").description("예약 ID"),
+                                fieldWithPath("member").description("예약한 사용자"),
+                                fieldWithPath("member.id").description("예약한 사용자 ID"),
+                                fieldWithPath("member.name").description("예약한 사용자 이름"),
+                                fieldWithPath("date").description("예약된 날짜"),
+                                fieldWithPath("time").description("예약된 시간"),
+                                fieldWithPath("time.id").description("예약된 시간 ID"),
+                                fieldWithPath("time.startAt").description("예약된 시간 값"),
+                                fieldWithPath("theme").description("예약된 테마"),
+                                fieldWithPath("theme.id").description("예약된 테마 ID"),
+                                fieldWithPath("theme.name").description("예약된 테마 이름"),
+                                fieldWithPath("theme.description").description("예약된 테마 설명"),
+                                fieldWithPath("theme.thumbnail").description("예약된 테마 이미지"))))
+                .body(request)
+                .when().post("/waitings")
+                .then().assertThat()
+                .statusCode(is(201));
     }
 
     @ParameterizedTest
@@ -178,8 +225,23 @@ class ReservationControllerTest {
     @Test
     @DisplayName("모든 예약 내역을 조회한다.")
     void findAllReservations() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
+                .accept("application/json")
+                .filter(document("reservations",
+                        responseFields(fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].date").description("예약한 날짜"),
+                                fieldWithPath("[].member").description("예약한 사용자"),
+                                fieldWithPath("[].member.id").description("예약한 사용자 ID"),
+                                fieldWithPath("[].member.name").description("예약한 사용자 이름"),
+                                fieldWithPath("[].time").description("예약된 시간"),
+                                fieldWithPath("[].time.id").description("예약된 시간 ID"),
+                                fieldWithPath("[].time.startAt").description("예약된 시간 값"),
+                                fieldWithPath("[].theme").description("예약된 테마"),
+                                fieldWithPath("[].theme.id").description("예약된 테마 ID"),
+                                fieldWithPath("[].theme.name").description("예약된 테마 이름"),
+                                fieldWithPath("[].theme.description").description("예약된 테마 설명"),
+                                fieldWithPath("[].theme.thumbnail").description("예약된 테마 이미지"))))
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -189,9 +251,11 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약을 삭제한다.")
     void validateReservationDelete() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .when().delete("/reservations/1")
+                .filter(document("reservation-delete", pathParameters(
+                        parameterWithName("id").description("취소하려는 예약 ID"))))
+                .when().delete("/reservations/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
     }
@@ -204,25 +268,39 @@ class ReservationControllerTest {
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
+                .accept("application/json")
                 .queryParams(
                         "memberId", 1L,
                         "themeId", 1L,
                         "dateFrom", TOMORROW,
-                        "dateTo", TOMORROW
-                )
+                        "dateTo", TOMORROW)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(1));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
+                .accept("application/json")
                 .queryParams(
                         "memberId", 1L,
                         "themeId", 1L,
                         "dateFrom", TOMORROW,
-                        "dateTo", DAY_AFTER_TOMORROW
-                )
+                        "dateTo", DAY_AFTER_TOMORROW)
+                .filter(document("reservations-condition",
+                        responseFields(fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].date").description("예약한 날짜"),
+                                fieldWithPath("[].member").description("예약한 사용자"),
+                                fieldWithPath("[].member.id").description("예약한 사용자 ID"),
+                                fieldWithPath("[].member.name").description("예약한 사용자 이름"),
+                                fieldWithPath("[].time").description("예약된 시간"),
+                                fieldWithPath("[].time.id").description("예약된 시간 ID"),
+                                fieldWithPath("[].time.startAt").description("예약된 시간 값"),
+                                fieldWithPath("[].theme").description("예약된 테마"),
+                                fieldWithPath("[].theme.id").description("예약된 테마 ID"),
+                                fieldWithPath("[].theme.name").description("예약된 테마 이름"),
+                                fieldWithPath("[].theme.description").description("예약된 테마 설명"),
+                                fieldWithPath("[].theme.thumbnail").description("예약된 테마 이미지"))))
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -256,8 +334,16 @@ class ReservationControllerTest {
                 .then().log().all()
                 .statusCode(201);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
+                .filter(document("reservations-mine",
+                        responseFields(fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].date").description("예약한 날짜"),
+                                fieldWithPath("[].theme").description("예약한 테마"),
+                                fieldWithPath("[].time").description("예약한 시간"),
+                                fieldWithPath("[].status").description("예약 상태"),
+                                fieldWithPath("[].paymentKey").description("결제 키").optional(),
+                                fieldWithPath("[].amount").description("결제 금액").optional())))
                 .when().get("/reservations/mine")
                 .then().log().all()
                 .statusCode(200)

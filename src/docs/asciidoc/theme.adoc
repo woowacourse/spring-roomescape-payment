@@ -1,0 +1,23 @@
+== Theme API
+
+=== 전체 테마 조회
+
+==== Request
+
+include::{snippets}/theme/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme/http-response.adoc[]
+include::{snippets}/theme/response-fields.adoc[]
+
+=== 인기 테마 조회
+
+==== Request
+
+include::{snippets}/theme-popular/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme-popular/http-response.adoc[]
+include::{snippets}/theme-popular/response-fields.adoc[]

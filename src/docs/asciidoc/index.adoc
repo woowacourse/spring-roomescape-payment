@@ -1,0 +1,13 @@
+= 방탈출 예약 서비스 API 문서
+:doctype: book
+:source-highlighter: highlightjs
+:sectlinks:
+:toc: left
+:toclevels: 3
+
+include::{docdir}/src/docs/asciidoc/reservation.adoc[]
+include::{docdir}/src/docs/asciidoc/time.adoc[]
+include::{docdir}/src/docs/asciidoc/theme.adoc[]
+include::{docdir}/src/docs/asciidoc/waiting.adoc[]
+include::{docdir}/src/docs/asciidoc/admin.adoc[]
+include::{docdir}/src/docs/asciidoc/member.adoc[]

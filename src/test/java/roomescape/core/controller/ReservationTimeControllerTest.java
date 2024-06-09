@@ -1,15 +1,23 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.utils.AdminGenerator;
 import roomescape.utils.DatabaseCleaner;
+import roomescape.utils.DocumentHelper;
 import roomescape.utils.TestFixture;
 
 @AcceptanceTest
@@ -25,12 +33,17 @@ class ReservationTimeControllerTest {
 
     @Autowired
     private AdminGenerator adminGenerator;
+
     @Autowired
     private TestFixture testFixture;
 
+    private RequestSpecification specification;
+
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        specification = DocumentHelper.specification(restDocumentation);
 
         databaseCleaner.executeTruncate();
         adminGenerator.generate();
@@ -45,10 +58,14 @@ class ReservationTimeControllerTest {
     void findAll() {
         testFixture.persistReservationTimeAfterMinute(2);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
+                .accept("application/json")
+                .filter(document("time", responseFields(
+                        fieldWithPath("[].id").description("예약 시간 ID"),
+                        fieldWithPath("[].startAt").description("예약 시간 값"))))
                 .when().get("/times")
-                .then().log().all()
-                .statusCode(200)
+                .then().assertThat()
+                .statusCode(is(200))
                 .body("size()", is(2));
     }
 
@@ -57,10 +74,17 @@ class ReservationTimeControllerTest {
     void findBookable() {
         testFixture.persistReservationTimeAfterMinute(2);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
+                .accept("application/json")
+                .filter(document("time-bookable", queryParameters(
+                                parameterWithName("date").description("예약하려는 날짜"),
+                                parameterWithName("theme").description("예약하려는 테마 ID")),
+                        responseFields(fieldWithPath("[].id").description("예약 시간 ID"),
+                                fieldWithPath("[].startAt").description("예약 시간 값"),
+                                fieldWithPath("[].alreadyBooked").description("예약 여부"))))
                 .when().get("/times?date=" + TOMORROW + "&theme=1")
-                .then().log().all()
-                .statusCode(200)
+                .then().assertThat()
+                .statusCode(is(200))
                 .body("size()", is(2));
     }
 }

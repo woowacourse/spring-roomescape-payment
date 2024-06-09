@@ -1,0 +1,86 @@
+== Member API
+
+=== 사용자용 예약 페이지
+
+==== Request
+
+include::{snippets}/member-reservation-view/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-reservation-view/http-response.adoc[]
+
+=== 로그인 페이지
+
+==== Request
+
+include::{snippets}/member-login-view/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-login-view/http-response.adoc[]
+
+=== 회원 가입 페이지
+
+==== Request
+
+include::{snippets}/member-signup-view/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-signup-view/http-response.adoc[]
+
+=== 로그인
+
+==== Request
+
+include::{snippets}/member-login/http-request.adoc[]
+include::{snippets}/member-login/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/member-login/http-response.adoc[]
+
+=== 로그인 상태 확인
+
+==== Request
+
+include::{snippets}/member-login-check/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-login-check/http-response.adoc[]
+include::{snippets}/member-login-check/response-fields.adoc[]
+
+=== 로그아웃
+
+==== Request
+
+include::{snippets}/member-logout/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-logout/http-response.adoc[]
+
+=== 회원 가입
+
+==== Request
+
+include::{snippets}/member-signup/http-request.adoc[]
+include::{snippets}/member-signup/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/member-signup/http-response.adoc[]
+include::{snippets}/member-signup/response-fields.adoc[]
+
+=== 전체 사용자 조회
+
+==== Request
+
+include::{snippets}/members/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/members/http-response.adoc[]
+include::{snippets}/members/response-fields.adoc[]
