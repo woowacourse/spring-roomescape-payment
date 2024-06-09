@@ -107,8 +107,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("[].startAt").description("예약 시간"),
                 fieldWithPath("[].waitingCount").description("대기자 수"),
                 fieldWithPath("[].payment.paymentKey").description("결제 키"),
+                fieldWithPath("[].payment.orderId").description("주문 ID"),
                 fieldWithPath("[].payment.amount").description("결제 금액"),
-                fieldWithPath("[].payment.status").description("결제 상태")
+                fieldWithPath("[].payment.status").description("결제 상태"),
         };
 
         RestDocumentationFilter documentFilter = document(

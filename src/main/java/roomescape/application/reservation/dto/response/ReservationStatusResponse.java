@@ -24,7 +24,9 @@ public record ReservationStatusResponse(
                 date,
                 startAt,
                 waitingCount,
-                new PaymentResponse(payment.getPaymentKey(), payment.getAmount(), payment.getStatus())
+                new PaymentResponse(
+                        payment.getOrderId(), payment.getPaymentKey(), payment.getAmount(), payment.getStatus()
+                )
         );
     }
 }

@@ -2,10 +2,12 @@ var modal = document.getElementById("payment-modal");
 var btn = document.getElementById("reserve-button");
 var span = document.getElementsByClassName("close")[0];
 
-btn.onclick = function() {
-    modal.classList.remove('hide');
-    modal.classList.add('show');
-    modal.style.display = "block";
+if (btn != null) {
+    btn.onclick = function() {
+        modal.classList.remove('hide');
+        modal.classList.add('show');
+        modal.style.display = "block";
+    }
 }
 
 span.onclick = function() {

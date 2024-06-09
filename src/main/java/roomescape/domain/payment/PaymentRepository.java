@@ -10,5 +10,5 @@ public interface PaymentRepository {
 
     Payment getByOrderId(String orderId);
 
-    boolean updateStatus(String orderId, PaymentStatus status);
+    boolean updateStatus(String orderId, String paymentKey, PaymentStatus status);
 }

@@ -24,7 +24,7 @@ class PaymentJpaRepositoryTest {
     @DisplayName("결제 정보를 업데이트한다.")
     void updateStatus() {
         entityManager.persist(new Payment("orderId", "paymentKey", 1000));
-        boolean updated = paymentRepository.updateStatus("orderId", PaymentStatus.SUCCESS);
+        boolean updated = paymentRepository.updateStatus("orderId", "paymentKey", PaymentStatus.SUCCESS);
         Payment payment = paymentRepository.getByOrderId("orderId");
         assertAll(
                 () -> assertTrue(updated),

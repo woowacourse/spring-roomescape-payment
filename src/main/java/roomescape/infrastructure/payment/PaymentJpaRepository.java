@@ -23,11 +23,11 @@ public interface PaymentJpaRepository extends
 
     @Override
     @Transactional
-    default boolean updateStatus(String orderId, PaymentStatus status) {
-        return updateStatusByOrderId(orderId, status) > 0;
+    default boolean updateStatus(String orderId, String paymentKey, PaymentStatus status) {
+        return updateStatusByOrderId(orderId, paymentKey, status) > 0;
     }
 
     @Modifying(clearAutomatically = true)
-    @Query("update Payment p set p.status = :status where p.orderId = :orderId")
-    int updateStatusByOrderId(String orderId, PaymentStatus status);
+    @Query("UPDATE Payment p SET p.paymentKey = :paymentKey, p.status = :status WHERE p.orderId = :orderId")
+    int updateStatusByOrderId(String orderId, String paymentKey, PaymentStatus status);
 }

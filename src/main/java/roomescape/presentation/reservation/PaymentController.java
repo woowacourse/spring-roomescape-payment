@@ -22,6 +22,8 @@ public class PaymentController {
     @PostMapping
     public PaymentResponse purchase(@Valid @RequestBody PaymentRequest request) {
         Payment payment = paymentService.purchase(request);
-        return new PaymentResponse(payment.getOrderId(), payment.getAmount(), payment.getStatus());
+        return new PaymentResponse(
+                payment.getOrderId(), payment.getOrderId(), payment.getAmount(), payment.getStatus()
+        );
     }
 }

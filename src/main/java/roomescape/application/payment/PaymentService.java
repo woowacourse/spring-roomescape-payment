@@ -32,9 +32,9 @@ public class PaymentService {
             throw new PaymentException("이미 결제된 항목입니다.");
         }
         paymentClient.requestPurchase(
-                new PaymentClientRequest(payment.getOrderId(), payment.getAmount(), payment.getPaymentKey())
+                new PaymentClientRequest(payment.getOrderId(), payment.getAmount(), request.paymentKey())
         );
-        if (paymentRepository.updateStatus(request.orderId(), PaymentStatus.SUCCESS)) {
+        if (paymentRepository.updateStatus(request.orderId(), request.paymentKey(), PaymentStatus.SUCCESS)) {
             return payment.purchase();
         }
         throw new PaymentException("결제에 실패했습니다.");
