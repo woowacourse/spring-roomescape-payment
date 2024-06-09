@@ -4,6 +4,8 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
@@ -17,38 +19,12 @@ class UserPageControllerTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("인기 테마 페이지를 열 수 있다.")
-    @Test
-    void loadPopularThemePage() {
+    @DisplayName("유저 페이지를 열 수 있다.")
+    @ParameterizedTest
+    @CsvSource({"/", "/reservation", "/login", "/reservation-mine", "/payment"})
+    void loadUserPages(String uri) {
         RestAssured.given().log().all()
-                .when().get("/")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @DisplayName("사용자 예약 페이지를 열 수 있다.")
-    @Test
-    void loadUserReservationPage() {
-        RestAssured.given().log().all()
-                .when().get("/reservation")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @DisplayName("로그인 페이지를 열 수 있다.")
-    @Test
-    void loadUserLoginPage() {
-        RestAssured.given().log().all()
-                .when().get("/login")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @DisplayName("나의 예약 페이지를 열 수 있다.")
-    @Test
-    void loadMyReservationPage() {
-        RestAssured.given().log().all()
-                .when().get("/reservation-mine")
+                .when().get(uri)
                 .then().log().all()
                 .statusCode(200);
     }
