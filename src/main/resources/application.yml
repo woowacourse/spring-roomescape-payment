@@ -31,7 +31,10 @@ security:
     secret-key: abcdefghijklmnopqrstuvwxyz0123456789
     expiration-time: 3600000 # 1 hour
 
-toss:
-  payment-uri: https://api.tosspayments.com/v1/payments
-  confirm-path: /confirm
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+payment:
+  gateways:
+    toss:
+      uri: https://api.tosspayments.com/v1/payments
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connect-timeout: 5s
+      read-timeout: 30s
