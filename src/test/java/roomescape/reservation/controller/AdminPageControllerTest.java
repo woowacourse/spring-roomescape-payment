@@ -7,17 +7,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import roomescape.auth.TokenProvider;
 import roomescape.config.ControllerConfig;
-import roomescape.config.RoleCheckInterceptor;
 import roomescape.exception.ExceptionPageController;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.LoginMemberInToken;
@@ -25,21 +24,10 @@ import roomescape.member.dto.LoginMemberInToken;
 @WebMvcTest(AdminPageController.class)
 @Import({ControllerConfig.class, ExceptionPageController.class})
 class AdminPageControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private TokenProvider tokenProvider;
-
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(new AdminPageController())
-                .setControllerAdvice(new ExceptionPageController())
-                .addInterceptors(new RoleCheckInterceptor(tokenProvider))
-                .build();
-    }
 
     @Test
     @DisplayName("/admin 을 요청하면 index.html 를 반환한다.")

@@ -136,8 +136,8 @@ public class FakeRestClient implements RestClient {
 
         private Predicate<String> checkLegalAuth(String headerName) {
             return headerValue -> headerName.equals(FakeHeaderConstant.AUTHORIZATION_HEADER.getName())
-                    && headerValue.equals(
-                    FakeHeaderConstant.AUTHORIZATION_HEADER.getValue());
+                    && headerValue.equals(FakeHeaderConstant.AUTHORIZATION_HEADER.getValue())
+                    || headerValue.equals("Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6");
         }
 
         @Override
