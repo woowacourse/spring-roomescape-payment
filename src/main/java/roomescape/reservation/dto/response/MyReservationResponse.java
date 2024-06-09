@@ -14,4 +14,9 @@ public record MyReservationResponse(
         String paymentKey,
         Long amount
 ) {
+
+    public MyReservationResponse(Long id, String themeName, LocalDate date, LocalTime time, ReservationStatus status,
+                                 Integer rank, String paymentKey, Long amount) {
+        this(id, themeName, date, time, status, rank.longValue(), paymentKey, amount);
+    }
 }
