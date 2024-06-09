@@ -32,6 +32,17 @@ public record MyReservationWaitingResponse(
                 RESERVATION_STATUS);
     }
 
+    public static MyReservationWaitingResponse from(MyReservationResponse reservationResponse) {
+        return new MyReservationWaitingResponse(
+                reservationResponse.ownerId(),
+                reservationResponse.themeName(),
+                reservationResponse.date(),
+                reservationResponse.startAt(),
+                null,
+                0,
+                reservationResponse.reservationStatus().getName());
+    }
+
     public static MyReservationWaitingResponse from(WaitingWithOrder waitingWithOrder) {
         return new MyReservationWaitingResponse(
                 waitingWithOrder.getWaiting().getId(),

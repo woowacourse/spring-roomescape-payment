@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 
 public record MyReservationResponse(
         Long reservationId,
@@ -12,7 +13,8 @@ public record MyReservationResponse(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         @JsonFormat(pattern = "HH:mm")
-        LocalTime startAt
+        LocalTime startAt,
+        ReservationStatus reservationStatus
 ) {
 
     public static MyReservationResponse from(Reservation reservation) {
@@ -21,7 +23,12 @@ public record MyReservationResponse(
                 reservation.getMemberId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
-                reservation.getTime().getStartAt()
+                reservation.getTime().getStartAt(),
+                reservation.getReservationStatus()
         );
+    }
+
+    public boolean isPaymentPending() {
+        return reservationStatus == ReservationStatus.PAYMENT_PENDING;
     }
 }

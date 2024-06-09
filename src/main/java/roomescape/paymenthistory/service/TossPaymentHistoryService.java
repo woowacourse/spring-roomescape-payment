@@ -36,6 +36,7 @@ public class TossPaymentHistoryService {
     public PaymentResponse findPaymentHistory(long reservationId) {
         PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation_Id(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException(PAYMENT_HISTORY_NOT_FOUND));
+
         return new PaymentResponse(paymentHistory.getPaymentKey(), paymentHistory.getAmount().getAmount());
     }
 

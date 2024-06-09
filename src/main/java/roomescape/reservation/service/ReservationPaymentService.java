@@ -45,11 +45,16 @@ public class ReservationPaymentService {
         List<MyReservationResponse> reservations = reservationService.findMyReservations(memberId);
 
         return reservations.stream()
-                .map(reservationResponse -> {
-                    PaymentResponse paymentResponse = tossPaymentHistoryService.findPaymentHistory(
-                            reservationResponse.reservationId());
-                    return MyReservationWaitingResponse.from(reservationResponse, paymentResponse);
-                })
+                .map(this::getReservationWaitingResponse)
                 .toList();
+    }
+
+    private MyReservationWaitingResponse getReservationWaitingResponse(MyReservationResponse reservationResponse) {
+        if (reservationResponse.isPaymentPending()) {
+            return MyReservationWaitingResponse.from(reservationResponse);
+        }
+        PaymentResponse paymentResponse = tossPaymentHistoryService.findPaymentHistory(
+                reservationResponse.reservationId());
+        return MyReservationWaitingResponse.from(reservationResponse, paymentResponse);
     }
 }
