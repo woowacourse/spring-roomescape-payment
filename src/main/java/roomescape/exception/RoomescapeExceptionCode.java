@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatusCode;
 public enum RoomescapeExceptionCode {
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약입니다."),
     RESERVATION_TIME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 시간입니다."),

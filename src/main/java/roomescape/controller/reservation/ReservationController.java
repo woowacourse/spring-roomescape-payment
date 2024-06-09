@@ -62,8 +62,9 @@ public class ReservationController {
 
     @PostMapping("/{id}/pay")
     public ResponseEntity<Void> payForReservation(@PathVariable final Long id,
+                                                  @AuthenticationPrincipal final LoginMember loginMember,
                                                   @RequestBody final PaymentSaveRequest request) {
-        paymentService.payForReservation(PaymentDto.from(request), id);
+        paymentService.payForReservation(PaymentDto.from(request), id, loginMember.id());
         return ResponseEntity.ok().build();
     }
 }

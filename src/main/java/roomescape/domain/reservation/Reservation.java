@@ -64,6 +64,10 @@ public class Reservation {
         return this.status == ReservationStatus.WAITING;
     }
 
+    public boolean isNotReservedBy(final Long memberId) {
+        return !Objects.equals(memberId, this.member.getId());
+    }
+
     public Long getId() {
         return id;
     }

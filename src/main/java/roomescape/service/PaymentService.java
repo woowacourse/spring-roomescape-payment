@@ -58,14 +58,21 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
-    public void payForReservation(final PaymentDto paymentDto, final Long reservationId) {
-        paymentClient.confirm(paymentDto);
+    public void payForReservation(final PaymentDto paymentDto, final Long reservationId, final Long memberId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionCode.RESERVATION_NOT_FOUND));
-        reservation.changeStatus(ReservationStatus.RESERVED);
+        validateReservationMember(reservation, memberId);
 
+        paymentClient.confirm(paymentDto);
+        reservation.changeStatus(ReservationStatus.RESERVED);
         final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
         paymentRepository.save(payment);
+    }
+
+    private void validateReservationMember(final Reservation reservation, final Long memberId) {
+        if (reservation.isNotReservedBy(memberId)) {
+            throw new RoomescapeException(RoomescapeExceptionCode.ACCESS_DENIED);
+        }
     }
 
     public void cancelPayment(final Reservation reservation) {

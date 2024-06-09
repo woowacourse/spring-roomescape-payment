@@ -15,6 +15,7 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.payment.PaymentDto;
+import roomescape.exception.RoomescapeException;
 import roomescape.exception.TossPaymentsException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.willDoNothing;
 import static roomescape.TestFixture.*;
 import static roomescape.TestFixture.THEME_HORROR;
 import static roomescape.exception.RoomescapeExceptionCode.DATABASE_SAVE_ERROR;
@@ -159,12 +161,34 @@ class PaymentServiceTest {
         given(paymentRepository.save(payment)).willReturn(payment);
 
         // when
-        paymentService.payForReservation(paymentDto, reservationId);
+        paymentService.payForReservation(paymentDto, reservationId, member.getId());
 
         // then
         then(paymentClient).should().confirm(paymentDto);
         then(reservationRepository).should().findById(reservationId);
         then(paymentRepository).should().save(any(Payment.class));
+    }
+
+    @Test
+    @DisplayName("Id에 해당하는 예약 결제 시, 예약자 Id가 불일치 하면 예외가 발생한다.")
+    void throwExceptionWhenPayForReservationWithInvalidMemberId() {
+        // given
+        final Long reservationId = 1L;
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.PAYMENT_PENDING);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
+        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+        willDoNothing().given(paymentClient).confirm(paymentDto);
+        given(paymentRepository.save(payment)).willReturn(payment);
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.payForReservation(paymentDto, reservationId, 0L))
+                .isInstanceOf(RoomescapeException.class);
+        then(reservationRepository).should().findById(reservationId);
     }
     
     @Test
