@@ -11,7 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
-import roomescape.domain.event.CancelEventPublisher;
+import roomescape.domain.event.TimeoutEventPublisher;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.PaymentClient;
@@ -50,7 +50,7 @@ class CancelServiceTest extends BaseServiceTest {
     @SpyBean
     private PaymentClient paymentClient;
     @MockBean
-    private CancelEventPublisher eventPublisher;
+    private TimeoutEventPublisher eventPublisher;
 
     private Member user;
     private Member admin;
@@ -131,7 +131,7 @@ class CancelServiceTest extends BaseServiceTest {
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(1))
-                .publishPaymentPendingEvent(Mockito.any());
+                .publishTimeoutEvent(Mockito.any());
     }
 
     @DisplayName("예약 취소 시, 다음 예약 대기가 없으면 아무 일도 일어나지 않는다")
@@ -145,6 +145,6 @@ class CancelServiceTest extends BaseServiceTest {
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(0))
-                .publishPaymentPendingEvent(Mockito.any());
+                .publishTimeoutEvent(Mockito.any());
     }
 }
