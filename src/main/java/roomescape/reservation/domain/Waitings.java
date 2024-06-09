@@ -5,6 +5,9 @@ import roomescape.reservation.dto.ReservationWithPaymentResponse;
 
 public class Waitings {
 
+    private static final int NO_WAITING_RANK = 0;
+    private static final int MEMBER_DEFAULT_WAITING_RANK = 1;
+
     private final List<Reservation> waitings;
 
     public Waitings(List<Reservation> waitings) {
@@ -13,7 +16,7 @@ public class Waitings {
 
     public int findMemberRank(ReservationWithPaymentResponse reservation, Long memberId) {
         if (reservation.getStatus().isSuccess()) {
-            return 0;
+            return NO_WAITING_RANK;
         }
 
         return (int) waitings.stream()
@@ -21,6 +24,6 @@ public class Waitings {
                 .filter(waiting -> waiting.sameThemeId(reservation.getTheme().getId()))
                 .filter(waiting -> waiting.sameTimeId(reservation.getTime().getId()))
                 .takeWhile(waiting -> !waiting.getMember().sameMemberId(memberId))
-                .count() + 1;
+                .count() + MEMBER_DEFAULT_WAITING_RANK;
     }
 }
