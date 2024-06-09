@@ -25,6 +25,9 @@ public class Reservation {
     @ManyToOne
     private Member member;
 
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.REMOVE)
+    private Payment payment;
+
     public static Reservation of(
             final LocalDate date,
             final ReservationTime time,
