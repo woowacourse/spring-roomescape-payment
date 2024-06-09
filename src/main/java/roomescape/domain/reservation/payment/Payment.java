@@ -20,7 +20,7 @@ public class Payment {
     Long id;
 
     @NotNull
-    @Column(name = "orderId", unique = true)
+    @Column(name = "order_id", unique = true)
     String orderId;
 
     @NotNull
@@ -28,7 +28,7 @@ public class Payment {
     long amount;
 
     @NotNull
-    @Column(name = "payementKey")
+    @Column(name = "payment_key")
     String paymentKey;
 
     public Payment(String orderId, long amount, String paymentKey) {
@@ -45,7 +45,7 @@ public class Payment {
     protected Payment() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
