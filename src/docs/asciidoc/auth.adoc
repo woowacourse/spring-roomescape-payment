@@ -46,6 +46,12 @@ include::{snippets}/auth-logout/http-response.adoc[]
 
 로그인된 사용자의 인증 정보를 조회합니다.
 
+[IMPORTANT]
+====
+일반 사용자 권한 이상의 인가 정보가 요구됩니다.
+인가 문서를 확인해주세요.
+====
+
 ===== curl
 
 include::{snippets}/auth-login-check/curl-request.adoc[]
