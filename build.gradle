@@ -9,7 +9,6 @@ configurations {
     asciidoctorExt
 }
 
-
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
@@ -63,6 +62,6 @@ tasks.register('copyApiDocuments', Copy) {
     into file("src/main/resources/static/docs")
 }
 
-bootJar {
-    dependsOn copyApiDocuments
-}
+//bootJar {
+//    dependsOn copyApiDocuments
+//}
