@@ -31,7 +31,7 @@ public class ReservationPaymentFacadeService {
             return ReservationResponse.from(reservation);
         } catch (RuntimeException e) { // todo PaymentException
             paymentService.deleteByReservation(reservation);
-            reservationService.deleteReservationById(reservation.getId());
+            reservationService.delete(reservation);
             throw e;
         }
     }

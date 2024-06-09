@@ -126,6 +126,11 @@ public class ReservationService { // todo cqrs
     }
 
     @Transactional
+    public void delete(Reservation reservation) {
+        reservationRepository.delete(reservation);
+    }
+
+    @Transactional
     public Reservation deleteReservationById(Long id) { // todo 이름 변경
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약입니다."));

@@ -102,8 +102,8 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     @Sql("/reservation.sql")
     void getAvailableReservationTimes() {
         ExtractableResponse<Response> extractResponse = RestAssured.given().log().all()
-                .param("date", "2024-04-09")
-                .param("themeId", 1L)
+                .param("date", "2024-04-08")
+                .param("themeId", 3L)
                 .when().get("/times/available")
                 .then().log().all()
                 .extract();
@@ -124,11 +124,11 @@ class ReservationTimeControllerTest extends BaseControllerTest {
 
             softly.assertThat(responses.get(2).timeId()).isEqualTo(3L);
             softly.assertThat(responses.get(2).startAt()).isEqualTo("17:00");
-            softly.assertThat(responses.get(2).alreadyBooked()).isFalse();
+            softly.assertThat(responses.get(2).alreadyBooked()).isTrue();
 
             softly.assertThat(responses.get(3).timeId()).isEqualTo(4L);
             softly.assertThat(responses.get(3).startAt()).isEqualTo("21:00");
-            softly.assertThat(responses.get(3).alreadyBooked()).isTrue();
+            softly.assertThat(responses.get(3).alreadyBooked()).isFalse();
         });
     }
 
