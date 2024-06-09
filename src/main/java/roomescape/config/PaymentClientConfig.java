@@ -10,8 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.config.PaymentGatewayProperties.Gateway;
+import roomescape.infrastructure.payment.IOExceptionInterceptor;
 import roomescape.infrastructure.payment.LoggingInterceptor;
-import roomescape.infrastructure.payment.TimeoutInterceptor;
 import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.infrastructure.payment.TossPaymentClientErrorHandler;
 import roomescape.util.Base64Encoder;
@@ -30,7 +30,7 @@ public class PaymentClientConfig {
     @Bean
     public RestClient.Builder restClientBuilder() {
         return RestClient.builder()
-                .requestInterceptor(new TimeoutInterceptor())
+                .requestInterceptor(new IOExceptionInterceptor())
                 .requestInterceptor(new LoggingInterceptor());
     }
 
