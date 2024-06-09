@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MethodArgumentNotValidExceptionResponse {
-    private final String errorCode;
+    private final String code;
 
     private final String message;
     private Map<String, String> validation = new HashMap<>();
 
     public MethodArgumentNotValidExceptionResponse(String errorCode, String message) {
-        this.errorCode = errorCode;
+        this.code = errorCode;
         this.message = message;
     }
 
@@ -22,8 +22,8 @@ public class MethodArgumentNotValidExceptionResponse {
         this.validation.put(fieldName, errorMessage);
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public String getCode() {
+        return code;
     }
 
     public String getMessage() {

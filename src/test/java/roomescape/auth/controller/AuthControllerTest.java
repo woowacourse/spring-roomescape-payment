@@ -208,7 +208,7 @@ class AuthControllerTest extends ControllerTest {
                 .then().log().all()
                 .apply(document("member/create/fail/invalid-email-format",
                         responseFields(
-                                fieldWithPath("errorCode").description("에러코드"),
+                                fieldWithPath("code").description("에러코드"),
                                 fieldWithPath("message").description("메시지"),
                                 fieldWithPath("validation.email").description("상세 사유")
                         )))
@@ -233,7 +233,7 @@ class AuthControllerTest extends ControllerTest {
                 .then().log().all()
                 .apply(document("member/create/fail/invalid-password-format",
                         responseFields(
-                                fieldWithPath("errorCode").description("에러코드"),
+                                fieldWithPath("code").description("에러코드"),
                                 fieldWithPath("message").description("메시지"),
                                 fieldWithPath("validation.password").description("상세 사유")
                         )))
