@@ -39,8 +39,8 @@ public class TossPaymentClient {
                     .retrieve()
                     .body(PaymentResponse.class);
 
-            logSaver.logInfo(paymentRequest);
-            logSaver.logInfo(paymentResponse);
+            logSaver.logInfo("토스 결제 API 호출 요청 Json", paymentRequest);
+            logSaver.logInfo("토스 결제 API 호출 응답 Json", paymentResponse);
             return paymentResponse;
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {

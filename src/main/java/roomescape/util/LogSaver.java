@@ -17,8 +17,8 @@ public class LogSaver {
         this.objectMapper = objectMapper;
     }
 
-    public void logInfo(final Object object) throws JsonProcessingException {
+    public void logInfo(final String message, final Object object) throws JsonProcessingException {
         String json = objectMapper.writeValueAsString(object);
-        log.info(json);
+        log.info("[{}] {}", message, json);
     }
 }
