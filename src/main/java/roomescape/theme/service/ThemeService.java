@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
@@ -18,9 +19,11 @@ import roomescape.theme.dto.ThemesResponse;
 public class ThemeService {
 
     private final ThemeRepository themeRepository;
+    private final ReservationRepository reservationRepository;
 
-    public ThemeService(ThemeRepository themeRepository) {
+    public ThemeService(ThemeRepository themeRepository, ReservationRepository reservationRepository) {
         this.themeRepository = themeRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -65,11 +68,15 @@ public class ThemeService {
     private void validateIsSameThemeNameExist(String name) {
         if (themeRepository.existsByName(name)) {
             throw new RoomEscapeException(ErrorType.THEME_DUPLICATED,
-                    String.format("[name: %s]", name), HttpStatus.BAD_REQUEST);
+                    String.format("[name: %s]", name), HttpStatus.CONFLICT);
         }
     }
 
     public void removeThemeById(Long id) {
+        if (themeRepository.isReservedTheme(id)) {
+            throw new RoomEscapeException(ErrorType.THEME_IS_USED_CONFLICT,
+                    String.format("[themeId: %d]", id), HttpStatus.CONFLICT);
+        }
         themeRepository.deleteById(id);
     }
 }

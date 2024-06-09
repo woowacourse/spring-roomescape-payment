@@ -4,13 +4,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.Role;
+import roomescape.member.domain.repository.MemberRepository;
+import roomescape.member.service.MemberService;
+import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationTimeRequest;
+import roomescape.reservation.dto.response.ReservationTimeResponse;
+import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationTimeService;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
@@ -19,18 +29,24 @@ import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.dto.ThemesResponse;
 
 @DataJpaTest
+@Import({ReservationTimeService.class, ReservationService.class, MemberService.class, ThemeService.class})
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class ThemeServiceTest {
 
     @Autowired
     private ThemeRepository themeRepository;
 
+    @Autowired
     private ThemeService themeService;
 
-    @BeforeEach
-    void setUp() {
-        themeService = new ThemeService(themeRepository);
-    }
+    @Autowired
+    private ReservationTimeService reservationTimeService;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @Test
     @DisplayName("테마를 조회한다.")
@@ -125,5 +141,23 @@ class ThemeServiceTest {
 
         // then
         assertThat(themeRepository.findById(theme.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("예약이 존재하는 테마를 삭제하면 예외가 발생한다.")
+    void removeReservedTheme() {
+        // given
+        LocalDateTime dateTime = LocalDateTime.now().plusDays(1);
+        ReservationTimeResponse time = reservationTimeService.addTime(
+                new ReservationTimeRequest(dateTime.toLocalTime()));
+        Theme theme = themeRepository.save(new Theme("name", "description", "thumbnail"));
+        Member member = memberRepository.save(new Member("member", "password", "name", Role.MEMBER));
+        reservationService.addReservation(
+                new ReservationRequest(dateTime.toLocalDate(), time.id(), theme.getId(), "paymentKey", "orderId", 1000L,
+                        "NORMAL"), member.getId());
+
+        // when & then
+        assertThatThrownBy(() -> themeService.removeThemeById(theme.getId()))
+                .isInstanceOf(RoomEscapeException.class);
     }
 }
