@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import roomescape.controller.dto.request.CreateReservationRequest;
 import roomescape.controller.dto.request.CreateUserReservationRequest;
 import roomescape.controller.dto.response.ReservationResponse;
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
 import roomescape.service.dto.PaymentRequest;

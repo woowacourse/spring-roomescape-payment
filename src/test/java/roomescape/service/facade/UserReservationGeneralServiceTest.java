@@ -26,7 +26,7 @@ import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;

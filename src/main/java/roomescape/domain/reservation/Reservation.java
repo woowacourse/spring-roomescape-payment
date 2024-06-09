@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import roomescape.domain.member.Member;
-import roomescape.domain.reservation.payment.Payment;
 import roomescape.domain.theme.Theme;
 
 @Table(name = "reservation")

@@ -27,7 +27,7 @@ import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
 import roomescape.service.PaymentService;

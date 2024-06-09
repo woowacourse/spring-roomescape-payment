@@ -18,7 +18,7 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;

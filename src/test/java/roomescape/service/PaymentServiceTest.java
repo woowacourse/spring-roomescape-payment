@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.service.client.FakeTossPaymentClient;

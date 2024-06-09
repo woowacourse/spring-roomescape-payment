@@ -2,7 +2,7 @@ package roomescape.controller.dto.response;
 
 import java.util.Optional;
 
-import roomescape.domain.reservation.payment.Payment;
+import roomescape.domain.reservation.Payment;
 
 public record PaymentResponse(
         boolean isExists,
