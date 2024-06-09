@@ -13,12 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Forward ssh port and check
-        run: |
-          sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 22
-          sudo apt-get install iptables-persistent -y
-          sudo netfilter-persistent save
-          sudo iptables -t nat -L PREROUTING -v -n
+      - name: Establish ssh reverse tunneling
+        run: ssh -f -N -R 2222:127.0.0.1:22 root:YghHome1!@ca.iptime.org
 
 #      - name: Build with Gradle
 #        run: ./gradlew bootJar
