@@ -58,13 +58,7 @@ public class Payment extends AuditedEntity {
             PaymentCurrency currency,
             BigDecimal totalAmount
     ) {
-        this.reservation = reservation;
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
-        this.status = status;
-        this.method = method;
-        this.currency = currency;
-        this.totalAmount = totalAmount;
+        this(null, reservation, paymentKey, orderId, status, method, currency, totalAmount);
     }
 
     public Payment(

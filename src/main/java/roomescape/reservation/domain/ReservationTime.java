@@ -21,11 +21,11 @@ public class ReservationTime {
     }
 
     public ReservationTime(LocalTime startAt) {
-        validateIsNull(startAt);
-        this.startAt = startAt;
+        this(null, startAt);
     }
 
     public ReservationTime(Long id, LocalTime startAt) {
+        validateIsNull(startAt);
         this.id = id;
         this.startAt = startAt;
     }

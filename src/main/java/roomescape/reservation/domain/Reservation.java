@@ -45,15 +45,11 @@ public class Reservation extends AuditedEntity {
     }
 
     public Reservation(Member member, LocalDate date, Theme theme, ReservationTime time, ReservationStatus status) {
-        validateLastDate(date);
-        this.member = member;
-        this.date = date;
-        this.theme = theme;
-        this.time = time;
-        this.status = status;
+        this(null, member, date, theme, time, status);
     }
 
     public Reservation(Long id, Member member, LocalDate date, Theme theme, ReservationTime time, ReservationStatus status) {
+        validateLastDate(date);
         this.id = id;
         this.member = member;
         this.date = date;
