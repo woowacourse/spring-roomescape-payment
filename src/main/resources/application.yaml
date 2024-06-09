@@ -30,3 +30,10 @@ payment:
   widget:
     confirm:
       secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+springdoc:
+  swagger-ui:
+    operationsSorter: method
+    tagsSorter: alpha
+    doc-expansion: none
+  override-with-generic-response: false

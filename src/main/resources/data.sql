@@ -14,13 +14,16 @@ insert into member(name, email, password, role) values('2호', '2@2.2', '2', 'ME
 insert into member(name, email, password, role) values('3호', '3@3.3', '3', 'MEMBER');
 insert into member(name, email, password, role) values('4호', '4@4.4', '4', 'MEMBER');
 
--- 예약
+-- 예약: 결제 완료
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(1, DATEADD('DAY', -1, CURRENT_DATE()) - 1 , 1, 1, 'CONFIRMED');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(2, DATEADD('DAY', -2, CURRENT_DATE()) -2 , 3, 2, 'CONFIRMED');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(3, DATEADD('DAY', -3, CURRENT_DATE()), 2, 2, 'CONFIRMED');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(4, DATEADD('DAY', -4, CURRENT_DATE()), 1, 2, 'CONFIRMED');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(5, DATEADD('DAY', -5, CURRENT_DATE()), 1, 3, 'CONFIRMED');
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(2, DATEADD('DAY', 7, CURRENT_DATE()), 2, 4, 'CONFIRMED');
+
+-- 예약: 결제 대기
+insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(2, DATEADD('DAY', 8, CURRENT_DATE()), 2, 4, 'CONFIRMED_PAYMENT_REQUIRED');
 
 -- 예약 대기
 insert into reservation(member_id, date, time_id, theme_id, reservation_status) values(3, DATEADD('DAY', 7, CURRENT_DATE()), 2, 4, 'WAITING');
