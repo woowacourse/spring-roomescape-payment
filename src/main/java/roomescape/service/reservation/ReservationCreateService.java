@@ -17,12 +17,14 @@ import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.WaitingPaymentRequest;
 
 @Service
 @Transactional
@@ -54,12 +56,12 @@ public class ReservationCreateService {
     }
 
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
-        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
-
         Reservation reservation = createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
             reservationRequest.date());
 
+        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
         paymentService.approvePayment(request, reservation);
+
         return new ReservationResponse(reservation);
     }
 
@@ -98,6 +100,34 @@ public class ReservationCreateService {
     private void validateDuplication(ReservationDetail reservationDetail) {
         if (reservationRepository.existsByDetailId(reservationDetail.getId())) {
             throw new InvalidReservationException("이미 예약(대기)가 존재하여 예약이 불가능합니다.");
+        }
+    }
+
+    public ReservationResponse createMemberReservationWithWaitingPayment(WaitingPaymentRequest waitingPaymentRequest, long memberId) {
+        Reservation reservation = reservationRepository.findById(waitingPaymentRequest.reservationId())
+            .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기 입니다."));
+
+        validateMyWaiting(memberId, reservation);
+        validateStatusIsWaiting(reservation);
+
+        reservation.reserved();
+
+        PaymentRequest request = new PaymentRequest(waitingPaymentRequest.paymentKey(), waitingPaymentRequest.orderId(), waitingPaymentRequest.amount());
+        paymentService.approvePayment(request, reservation);
+
+        return new ReservationResponse(reservation);
+    }
+
+    private void validateMyWaiting(long memberId, Reservation reservation) {
+        Member member = findMemberById(memberId);
+        if (!reservation.isReservationOf(member)) {
+            throw new ForbiddenException("본인의 예약 대기가 아닙니다.");
+        }
+    }
+
+    private void validateStatusIsWaiting(Reservation reservation) {
+        if (reservation.isReserved()) {
+            throw new InvalidReservationException("이미 결제된 예약입니다.");
         }
     }
 }

@@ -8,6 +8,8 @@
   <link rel="stylesheet"
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/toss-style.css">
+  <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
@@ -59,6 +61,7 @@
       <th>시간</th>
       <th>상태</th>
       <th>대기 취소</th>
+      <th>결제 대기</th>
       <th>paymentKey</th>
       <th>결제금액</th>
       <th></th>
@@ -67,6 +70,23 @@
     <tbody id="table-body">
     </tbody>
   </table>
+</div>
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>
+    <div class="wrapper w-100">
+      <div class="max-w-540 w-100">
+        <div id="payment-method" class="w-100"></div>
+        <div id="agreement" class="w-100"></div>
+        <div class="btn-wrapper w-100">
+          <button id="payment-button" class="btn primary w-100">결제하기</button>
+        </div>
+      </div>
+    </div>
+    </p>
+  </div>
 </div>
 
 <script src="/js/user-scripts.js"></script>

@@ -14,6 +14,7 @@ import roomescape.service.reservation.ReservationCommonService;
 import roomescape.service.reservation.ReservationCreateService;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.WaitingPaymentRequest;
 
 @RestController
 @RequestMapping("/reservations")
@@ -37,6 +38,16 @@ public class ReservationController {
         @RequestBody @Valid ReservationRequest reservationRequest,
         @LoginMemberId long memberId) {
         ReservationResponse reservationResponse = reservationCreateService.createMemberReservation(reservationRequest, memberId);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
+            .body(reservationResponse);
+    }
+
+    @PostMapping("/waiting/payment")
+    public ResponseEntity<ReservationResponse> createReservationWithWaitingPayment(
+        @RequestBody @Valid WaitingPaymentRequest reservationRequest,
+        @LoginMemberId long memberId
+    ) {
+        ReservationResponse reservationResponse = reservationCreateService.createMemberReservationWithWaitingPayment(reservationRequest, memberId);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
             .body(reservationResponse);
     }
