@@ -1,8 +1,10 @@
 package roomescape.system.exception;
 
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -43,8 +45,12 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        logger.error(e.getMessage(), e);
-        return ErrorResponse.of(ErrorType.INVALID_REQUEST_DATA, e.getMessage());
+        String messages = e.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        logger.error(messages, e);
+        return ErrorResponse.of(ErrorType.INVALID_REQUEST_DATA, messages);
     }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
