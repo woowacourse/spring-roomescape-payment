@@ -15,7 +15,7 @@ public class ReservationFixture {
             DEFAULT_TIME, DEFAULT_THEME);
     public static final ReservationRequest DEFAULT_REQUEST = new ReservationRequest(
             DEFAULT_RESERVATION.getDate(), DEFAULT_MEMBER.getId(), DEFAULT_TIME.getId(),
-            DEFAULT_THEME.getId(), null);
+            DEFAULT_THEME.getId());
     public static final ReservationResponse DEFAULT_RESPONSE = new ReservationResponse(1L, DEFAULT_MEMBER.getName(),
             DEFAULT_RESERVATION.getDate(), ReservationTimeFixture.DEFAULT_RESPONSE,
             ThemeFixture.DEFAULT_RESPONSE);

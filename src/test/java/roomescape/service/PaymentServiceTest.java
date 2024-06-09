@@ -5,6 +5,7 @@ import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
 import static roomescape.fixture.PaymentFixture.DEFAULT_APPROVE_REQUEST;
 import static roomescape.fixture.PaymentFixture.DEFAULT_APPROVE_RESPONSE;
+import static roomescape.fixture.ReservationFixture.DEFAULT_RESERVATION;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +20,10 @@ import roomescape.domain.payment.PaymentErrorParser;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.CollectionMemberRepository;
 import roomescape.repository.CollectionPaymentRepository;
+import roomescape.repository.CollectionReservationRepository;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
+import roomescape.repository.ReservationRepository;
 
 class PaymentServiceTest {
 
@@ -34,7 +37,9 @@ class PaymentServiceTest {
         PaymentClient paymentClient = new PaymentClient(errorHandler);
         PaymentRepository paymentRepository = new CollectionPaymentRepository();
         MemberRepository memberRepository = new CollectionMemberRepository();
-        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository);
+        ReservationRepository reservationRepository = new CollectionReservationRepository();
+        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository,
+                reservationRepository);
 
         Assertions.assertThatThrownBy(() -> paymentService.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER.getId()))
                 .isInstanceOf(RoomescapeException.class)
@@ -50,7 +55,9 @@ class PaymentServiceTest {
 
         PaymentRepository paymentRepository = new CollectionPaymentRepository();
         MemberRepository memberRepository = new CollectionMemberRepository(List.of(DEFAULT_MEMBER));
-        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository);
+        ReservationRepository reservationRepository = new CollectionReservationRepository();
+        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository,
+                reservationRepository);
 
         Assertions.assertThatThrownBy(() -> paymentService.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER.getId()))
                 .isInstanceOf(RoomescapeException.class);
@@ -65,7 +72,10 @@ class PaymentServiceTest {
 
         PaymentRepository paymentRepository = new CollectionPaymentRepository();
         MemberRepository memberRepository = new CollectionMemberRepository(List.of(DEFAULT_MEMBER));
-        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository);
+        ReservationRepository reservationRepository = new CollectionReservationRepository();
+        reservationRepository.save(DEFAULT_RESERVATION);
+        PaymentService paymentService = new PaymentService(paymentClient, paymentRepository, memberRepository,
+                reservationRepository);
 
         assertDoesNotThrow(() -> paymentService.approve(DEFAULT_APPROVE_REQUEST, DEFAULT_MEMBER.getId()));
     }

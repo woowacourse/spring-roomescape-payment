@@ -1,13 +1,13 @@
 package roomescape.annotation;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import roomescape.exception.ExceptionType;
 
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-@Parameter(hidden = true)
-public @interface Auth {
+public @interface ErrorApiResponse {
+    ExceptionType[] value();
 }

@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -11,33 +12,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
+import roomescape.controller.document.DocumentedReservationController;
 import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.service.MyReservationService;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
 @RequestMapping("/reservations")
-public class ReservationController {
+@Tag(name = "예약", description = "회원용 예약 API")
+public class ReservationController implements DocumentedReservationController {
     private final ReservationService reservationService;
     private final MyReservationService myReservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, MyReservationService myReservationService,
-                                 PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService, MyReservationService myReservationService) {
         this.reservationService = reservationService;
         this.myReservationService = myReservationService;
-        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
                                                                @RequestBody ReservationRequest reservationRequest) {
         reservationRequest = new ReservationRequest(reservationRequest.date(), memberId, reservationRequest.timeId(),
-                reservationRequest.themeId(), reservationRequest.approveRequest());
-        paymentService.approve(reservationRequest.approveRequest(), memberId);
+                reservationRequest.themeId());
         ReservationResponse saved = reservationService.save(reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
                 .body(saved);

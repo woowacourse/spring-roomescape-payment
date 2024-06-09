@@ -153,56 +153,15 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
-  const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedThemeName = document.querySelector('.theme-slot.active')?.innerHTML;
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-  if (selectedDate && selectedThemeId && selectedTimeId) {
-    const reservationData = {
-      date: selectedDate,
-      themeId: Number(selectedThemeId),
-      timeId: Number(selectedTimeId)
-    };
-    const generateRandomString = () =>
-        window.btoa(Math.random()).slice(0, 20);
-    // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-    // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "MyNameIsNicoRobin";
-    paymentWidget.requestPayment({
-      orderId: orderIdPrefix + generateRandomString(),
-      orderName: selectedThemeName +" 테마 예약 결제"
-    }).then(function (data) {
-      console.debug(data);
-      fetchReservationPayment(data, reservationData);
-    }).catch(function (error) {
-      console.dir(error);
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
-    });
-
-  } else {
-    alert("Please select a date, theme, and time before making a reservation.");
-  }
-}
-async function fetchReservationPayment(paymentData, reservationData) {
-  const reservationPaymentRequest = {
-    date: reservationData.date,
-    themeId: reservationData.themeId,
-    timeId: reservationData.timeId,
-    approveRequest : {
-      paymentKey: paymentData.paymentKey,
-      orderId: paymentData.orderId,
-      amount: paymentData.amount
-    }
-  }
-
-  const reservationURL = "/reservations";
-  fetch(reservationURL, {
+function fetchPaymentApprove(data) {
+  console.log(data);
+  const reservationURL = "/payment";
+  return fetch(reservationURL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(reservationPaymentRequest),
+    body: JSON.stringify(data),
   }).then(response => {
     if (!response.ok) {
       return response.json().then(errorBody => {
@@ -217,6 +176,76 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }
   }).catch(error => {
     console.error(error.message);
+  });
+}
+
+function onReservationButtonClick(event, paymentWidget) {
+  const selectedDate = document.getElementById("datepicker").value;
+  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+  const selectedThemeName = document.querySelector('.theme-slot.active')?.innerHTML;
+  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+  if (selectedDate && selectedThemeId && selectedTimeId) {
+    const reservationData = {
+      date: selectedDate,
+      themeId: Number(selectedThemeId),
+      timeId: Number(selectedTimeId)
+    };
+    fetchReservation(reservationData)
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(errorBody => {
+              console.error("예약 실패 : " + errorBody.message);
+              window.alert(errorBody.message);
+            });
+          }
+          response.json().then(body => {
+            const generateRandomString = () =>
+                window.btoa(Math.random()).slice(0, 20);
+            // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
+            // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+            const orderIdPrefix = "MyNameIsNicoRobin";
+            paymentWidget.requestPayment({
+              orderId: orderIdPrefix + generateRandomString(),
+              orderName: selectedThemeName +" 테마 예약 결제"
+            }).then(function (data) {
+              const approveRequest = {
+                paymentKey: data.paymentKey,
+                orderId: data.orderId,
+                amount: data.amount,
+                reservationId: body.id
+              };
+              fetchPaymentApprove(approveRequest)
+                  .then(response => {
+                    window.location.href = "/reservation-mine";
+                  });
+            }).catch(function (error) {
+              console.dir(error);
+              alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+            });
+          })
+        })
+        .catch(error => {
+          alert("An error occurred while making the reservation waiting.");
+          console.error(error);
+        });
+  } else {
+    alert("Please select a date, theme, and time before making a reservation.");
+  }
+}
+function fetchReservation(reservationData) {
+  const reservationPaymentRequest = {
+    date: reservationData.date,
+    themeId: reservationData.themeId,
+    timeId: reservationData.timeId
+  }
+
+  const reservationURL = "/reservations";
+  return fetch(reservationURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(reservationPaymentRequest),
   });
 }
 

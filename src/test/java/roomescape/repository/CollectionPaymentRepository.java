@@ -1,8 +1,11 @@
 package roomescape.repository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import roomescape.domain.Reservation;
 import roomescape.domain.payment.Payment;
 
 public class CollectionPaymentRepository implements PaymentRepository {
@@ -20,5 +23,21 @@ public class CollectionPaymentRepository implements PaymentRepository {
         Payment saved = new Payment(atomicLong.incrementAndGet(), payment);
         payments.add(saved);
         return saved;
+    }
+
+    @Override
+    public List<Payment> findAllByReservationIn(List<Reservation> reservations) {
+        Set<Reservation> reservationSet = new HashSet<>(reservations);
+        return payments.stream()
+                .filter(payment -> reservationSet.contains(payment.getReservation()))
+                .toList();
+    }
+
+    @Override
+    public void deleteByReservationId(long reservationId) {
+        payments.stream()
+                .filter(payment -> payment.getReservation().hasIdOf(reservationId))
+                .findAny()
+                .ifPresent(payments::remove);
     }
 }

@@ -1,53 +1,29 @@
-package roomescape.controller;
+package roomescape.controller.document;
 
 import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
 import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
+import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION;
 import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
 import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
+import static roomescape.exception.ExceptionType.PERMISSION_DENIED;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import roomescape.annotation.ApiSuccessResponse;
+import roomescape.annotation.Auth;
 import roomescape.annotation.ErrorApiResponse;
+import roomescape.dto.LoginMemberReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
-import roomescape.service.ReservationService;
 
-@Controller
-@RequestMapping("/admin")
-@Tag(name = "관리자 예약", description = "관리자용 예약 API")
-public class AdminController {
-    private final ReservationService reservationService;
+public interface DocumentedReservationController {
 
-    public AdminController(ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
-
-    @GetMapping
-    public String mainPage() {
-        return "admin/index";
-    }
-
-    @GetMapping("/reservation")
-    public String reservationPage() {
-        return "admin/reservation-new";
-    }
-
-    @PostMapping("/reservations")
-    @Operation(summary = "관리자 예약 추가", description = "관리자가 예약을 추가 할 때 사용하는 API")
+    @Operation(summary = "예약 생성", description = "회원이 자신의 예약을 생성할 때 사용하는 API")
     @ErrorApiResponse({NOT_FOUND_RESERVATION_TIME, NOT_FOUND_THEME, NOT_FOUND_MEMBER, DUPLICATE_RESERVATION,
             PAST_TIME_RESERVATION})
     @ApiSuccessResponse(status = HttpStatus.CREATED, bodyType = ReservationResponse.class, body = """
@@ -67,15 +43,10 @@ public class AdminController {
               }
             }
             """)
-    public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest reservationRequest) {
-        ReservationResponse saved = reservationService.save(reservationRequest);
-        return ResponseEntity.created(URI.create("/reservations/" + saved.id()))
-                .body(saved);
-    }
+    ResponseEntity<ReservationResponse> saveReservation(@Auth long memberId,
+                                                        @RequestBody ReservationRequest reservationRequest);
 
-    @GetMapping("/reservations")
-    @ResponseBody
-    @Operation(summary = "관리자 예약 조회", description = "관리자가 회원, 테마, 기간을 기준으로 예약을 조회할 때 사용하는 API")
+    @Operation(summary = "전체 예약 조회", description = "전체 예약을 조회할 때 사용하는 API")
     @ApiSuccessResponse(bodyType = ReservationResponse.class, body = """
             [
                 {
@@ -110,25 +81,35 @@ public class AdminController {
                 }
             ]
             """)
-    public List<ReservationResponse> search(@RequestParam long memberId,
-                                            @RequestParam long themeId,
-                                            @RequestParam LocalDate start,
-                                            @RequestParam LocalDate end) {
-        return reservationService.findByMemberAndThemeBetweenDates(memberId, themeId, start, end);
-    }
+    List<ReservationResponse> findAllReservations();
 
-    @GetMapping("/time")
-    public String reservationTimePage() {
-        return "admin/time";
-    }
+    @Operation(summary = "회원 예약 목록 조회", description = "회원이 자신의 예약 목록을 조회할 때 사용하는 API")
+    @ApiSuccessResponse(bodyType = LoginMemberReservationResponse.class, body = """
+            [
+                {
+                  "reservationId": 1,
+                  "theme": "테마 이름 1",
+                  "date": "2024-06-08",
+                  "time": "19:30",
+                  "status": "WAITING_PAYMENT",
+                  "paymentKey": "paymentKey_d363d9c5de7a",
+                  "amount": 2000
+                },
+                {
+                  "reservationId": 2,
+                  "theme": "테마 이름 2",
+                  "date": "2024-06-09",
+                  "time": "19:30",
+                  "status": "SUCCESS",
+                  "paymentKey": "paymentKey_d363d9c5de7a",
+                  "amount": 1000
+                }
+            ]
+            """)
+    List<LoginMemberReservationResponse> findLoginMemberReservations(@Auth long memberId);
 
-    @GetMapping("/theme")
-    public String themePage() {
-        return "admin/theme";
-    }
-
-    @GetMapping("/waiting")
-    public String waitingManagePage() {
-        return "admin/waiting";
-    }
+    @Operation(summary = "예약 취소", description = "예약을 취소할 때 사용하는 API")
+    @ErrorApiResponse({PERMISSION_DENIED, NOT_FOUND_RESERVATION, NOT_FOUND_MEMBER})
+    @ApiSuccessResponse(status = HttpStatus.NO_CONTENT)
+    ResponseEntity<Void> delete(@Auth long memberId, @PathVariable("id") long reservationId);
 }

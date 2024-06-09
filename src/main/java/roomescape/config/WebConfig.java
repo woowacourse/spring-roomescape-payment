@@ -28,7 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/admin/**");
         registry.addInterceptor(loginCheckInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login/**", "/", "/themes/ranking", "/**/*.html", "/**/*.js", "/**/*.css");
+                .excludePathPatterns("/login/**", "/", "/themes/ranking", "/**/*.html", "/**/*.js", "/**/*.css",
+                        "/api-docs/**", "/swagger-ui/**", "/v3/**");
     }
 
     @Override
