@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -15,6 +16,7 @@ import roomescape.service.theme.ThemeService;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
 
+@Tag(name = "Theme", description = "테마 컨트롤러입니다.")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {

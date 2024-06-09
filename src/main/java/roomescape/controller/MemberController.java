@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.member.dto.MemberResponse;
 import roomescape.service.reservation.ReservationService;
 
+@Tag(name = "Member", description = "사용자 컨트롤러입니다.")
 @RestController
 @RequestMapping("/members")
 public class MemberController {

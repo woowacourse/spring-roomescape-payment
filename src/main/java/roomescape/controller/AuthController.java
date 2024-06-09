@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import roomescape.service.auth.dto.SignUpRequest;
 import roomescape.service.member.dto.MemberResponse;
 import roomescape.util.CookieUtil;
 
+@Tag(name = "Auth", description = "사용자 인증 컨트롤러입니다.")
 @RestController
 public class AuthController {
     private final AuthService authService;

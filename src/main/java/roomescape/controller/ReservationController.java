@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -16,6 +17,7 @@ import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
+@Tag(name = "Reservation", description = "예약 컨트롤러입니다.")
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
