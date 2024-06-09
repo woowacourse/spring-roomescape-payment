@@ -25,6 +25,7 @@ import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.USER_TOMMY;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.TestFixture.WOOTECO_THEME_NAME;
+import static roomescape.payment.domain.PGCompany.TOSS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
@@ -162,8 +163,8 @@ class ReservationRepositoryTest extends RepositoryTest {
         Reservation firstMiaReservation = reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
         Reservation secondMiaReservation = reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
 
-        Payment firstMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, firstMiaReservation));
-        Payment secondMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, secondMiaReservation));
+        Payment firstMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, firstMiaReservation, TOSS));
+        Payment secondMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, secondMiaReservation, TOSS));
         reservationRepository.save(TOMMY_RESERVATION(reservationTime, wootecoTheme, tommy, BOOKING));
 
         //when

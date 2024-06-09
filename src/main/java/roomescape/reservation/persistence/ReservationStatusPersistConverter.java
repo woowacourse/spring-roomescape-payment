@@ -2,9 +2,9 @@ package roomescape.reservation.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import org.springframework.stereotype.Component;
+import roomescape.global.exception.DataNotConvertedException;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.exception.DataNotConvertedException;
 
 @Component
 public class ReservationStatusPersistConverter implements AttributeConverter<ReservationStatus, String> {

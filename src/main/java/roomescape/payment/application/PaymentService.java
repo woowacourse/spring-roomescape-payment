@@ -58,7 +58,7 @@ public class PaymentService {
     public void cancelCasedByRollBack(ReservationFailedEvent event) {
         ConfirmedPayment confirmedPayment = event.confirmedPayment();
         PaymentCancelInfo paymentCancelInfo = new PaymentCancelInfo(
-                confirmedPayment.paymentKey(), CANCEL_REASON_CAUSED_BY_ROLL_BACK);
+                confirmedPayment.getPaymentKey(), CANCEL_REASON_CAUSED_BY_ROLL_BACK);
         CompletableFuture<PaymentCancelResult> future = paymentClient.cancel(paymentCancelInfo);
         handleCancellationException(future);
     }

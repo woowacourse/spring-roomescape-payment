@@ -58,6 +58,7 @@ import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.TestFixture.WOOTECO_THEME_NAME;
 import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_MEMBER;
+import static roomescape.payment.domain.PGCompany.TOSS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
@@ -251,7 +252,7 @@ class ReservationControllerTest extends ControllerTest {
         // given
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
-        Payment expectedPayment = new Payment("paymentKey", "orderId", 10L, expectedReservation);
+        Payment expectedPayment = new Payment("paymentKey", "orderId", 10L, expectedReservation, TOSS);
         ReservationPayment expectedReservationPayment = new ReservationPayment(expectedReservation, expectedPayment);
         WaitingReservation expectedWaitingReservation = new WaitingReservation(
                 MIA_RESERVATION(expectedTime, HORROR_THEME(), USER_MIA(), WAITING), 0);

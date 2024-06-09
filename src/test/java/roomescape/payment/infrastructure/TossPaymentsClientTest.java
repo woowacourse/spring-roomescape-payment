@@ -46,7 +46,7 @@ class TossPaymentsClientTest {
     @DisplayName("토스 결제 승인 API에서 승인 응답을 받는다.")
     void confirm() throws Exception {
         // given
-        ConfirmedPayment expectedResponse = new ConfirmedPayment("paymentKey", "orderId", 10);
+        ConfirmedPayment expectedResponse = new ConfirmedPayment("paymentKey", "orderId", 10L);
         mockRestServiceServer.expect(requestTo(CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(expectedResponse), MediaType.APPLICATION_JSON));
@@ -57,7 +57,7 @@ class TossPaymentsClientTest {
         ConfirmedPayment response = tossPaymentClient.confirm(newPayment);
 
         // then
-        assertThat(response.orderId()).isEqualTo(expectedResponse.orderId());
+        assertThat(response.getPaymentKey()).isEqualTo(expectedResponse.getPaymentKey());
     }
 
     @Test

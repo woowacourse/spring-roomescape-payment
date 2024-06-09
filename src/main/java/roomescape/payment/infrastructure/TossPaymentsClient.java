@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.payment.domain.NewPayment;
+import roomescape.payment.domain.PGCompany;
 import roomescape.payment.domain.PaymentCancelInfo;
 import roomescape.payment.domain.PaymentCancelResult;
 import roomescape.payment.domain.PaymentClient;
@@ -25,12 +26,17 @@ public class TossPaymentsClient implements PaymentClient {
 
     @Override
     public ConfirmedPayment confirm(NewPayment newPayment) {
-        return restClient.post()
+        ConfirmedPayment confirmedPayment = restClient.post()
                 .uri("/confirm")
                 .body(newPayment)
                 .retrieve()
                 .onStatus(errorHandler)
                 .body(ConfirmedPayment.class);
+        if (confirmedPayment == null) {
+            throw new PaymentServerException("결제가 실패했습니다.");
+        }
+        confirmedPayment.setCompany(PGCompany.TOSS);
+        return confirmedPayment;
     }
 
     @Override

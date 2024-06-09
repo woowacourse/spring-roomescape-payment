@@ -20,6 +20,7 @@ import static roomescape.TestFixture.MIA_RESERVATION;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
+import static roomescape.payment.domain.PGCompany.TOSS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 
 class PaymentRepositoryTest extends RepositoryTest {
@@ -47,7 +48,7 @@ class PaymentRepositoryTest extends RepositoryTest {
         Member member = memberRepository.save(USER_MIA());
         Reservation reservation = reservationRepository.save(MIA_RESERVATION(time, theme, member, BOOKING));
 
-        Payment savedPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, reservation));
+        Payment savedPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, reservation, TOSS));
 
         // when
         Optional<Payment> payment = paymentRepository.findByReservationId(reservation.getId());

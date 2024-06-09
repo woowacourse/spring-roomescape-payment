@@ -14,6 +14,7 @@ import roomescape.common.TestClientConfiguration;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.PGCompany;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentCancelResult;
 import roomescape.payment.domain.PaymentClient;
@@ -38,7 +39,7 @@ import static roomescape.TestFixture.USER_ADMIN;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 
 class BookingWithPaymentServiceTest {
-    private static final ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
+    private static final ConfirmedPayment confirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10, PGCompany.TOSS);
 
     @Nested
     @RecordApplicationEvents
