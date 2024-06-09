@@ -6,10 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 import roomescape.payment.dto.PaymentRequest;
 
-import java.net.SocketTimeoutException;
 import java.util.Base64;
 
 public class TossPaymentClient implements PaymentClient{
@@ -40,10 +38,7 @@ public class TossPaymentClient implements PaymentClient{
                     .body(paymentRequest)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (RestClientException e) {
-            if (e.getCause() instanceof SocketTimeoutException) {
-                return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
-            }
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
