@@ -1,0 +1,69 @@
+=== 테마
+
+==== 모든 테마 조회
+
+===== curl
+
+include::{snippets}/theme/findAll/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/theme/findAll/http-request.adoc[]
+
+===== response
+
+include::{snippets}/theme/findAll/http-response.adoc[]
+
+include::{snippets}/theme/findAll/response-fields.adoc[]
+
+==== 테마 생성
+
+===== curl
+
+include::{snippets}/theme/create/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/theme/create/http-request.adoc[]
+
+include::{snippets}/theme/create/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/theme/create/http-response.adoc[]
+
+include::{snippets}/theme/create/response-fields.adoc[]
+
+==== 테마 삭제
+
+===== curl
+
+include::{snippets}/theme/delete/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/theme/delete/http-request.adoc[]
+
+include::{snippets}/theme/delete/path-parameters.adoc[]
+
+===== response
+
+include::{snippets}/theme/delete/http-response.adoc[]
+
+==== 인기 테마 조회
+
+===== curl
+
+include::{snippets}/theme/popular/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/theme/popular/http-request.adoc[]
+
+include::{snippets}/theme/popular/query-parameters.adoc[]
+
+===== response
+
+include::{snippets}/theme/popular/http-response.adoc[]
+
+include::{snippets}/theme/popular/response-fields.adoc[]
