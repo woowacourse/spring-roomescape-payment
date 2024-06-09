@@ -63,6 +63,6 @@ tasks.register('copyApiDocuments', Copy) {
     into file("src/main/resources/static/docs")
 }
 
-//bootJar {
-//    dependsOn copyApiDocuments
-//}
+bootJar {
+    dependsOn copyApiDocuments
+}

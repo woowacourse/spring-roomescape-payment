@@ -1,0 +1,15 @@
+=== 테마 생성
+
+operation::saveTheme[snippets="http-request,request-cookies,request-fields,http-response"]
+
+=== 전체 테마 조회
+
+operation::getThemes[snippets="http-request,http-response,response-fields"]
+
+=== 테마 삭제
+
+operation::deleteTheme[snippets="http-request,request-cookies,path-parameters"]
+
+=== 테마 삭제 실패
+
+operation::deleteThemeFail[snippets="http-request,request-cookies,path-parameters"]
