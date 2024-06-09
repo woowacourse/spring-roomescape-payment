@@ -27,6 +27,7 @@ import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_MEMBER;
+import static roomescape.documentaion.ReservationResponseSnippets.RESERVATION_RESPONSE_ARRAY_SNIPPETS;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class AdminReservationWaitingApiDocumentTest extends DocumentTest {
@@ -71,7 +72,7 @@ class AdminReservationWaitingApiDocumentTest extends DocumentTest {
                                 "waiting-find-admin",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                AdminReservationApiDocumentTest.getReservationArrayResponseFields()
+                                RESERVATION_RESPONSE_ARRAY_SNIPPETS()
                         )
                 );
     }

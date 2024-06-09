@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import roomescape.member.application.MemberService;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
@@ -29,7 +28,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -41,6 +39,8 @@ import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_MEMBER;
+import static roomescape.documentaion.ReservationResponseSnippets.RESERVATION_RESPONSE_ARRAY_SNIPPETS;
+import static roomescape.documentaion.ReservationResponseSnippets.RESERVATION_RESPONSE_SINGLE_SNIPPETS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 
 class AdminReservationApiDocumentTest extends DocumentTest {
@@ -104,16 +104,7 @@ class AdminReservationApiDocumentTest extends DocumentTest {
                                         fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("테마 식별자"),
                                         fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("예약자 식별자")
                                 ),
-                                responseFields(
-                                        fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
-                                        fieldWithPath("memberName").type(JsonFieldType.STRING).description("예약자 이름"),
-                                        fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
-                                        fieldWithPath("time.id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
-                                        fieldWithPath("time.startAt").type(JsonFieldType.STRING)
-                                                .description("예약 시간(10분 단위) ex) 13:00"),
-                                        fieldWithPath("theme.id").type(JsonFieldType.NUMBER).description("테마 식별자"),
-                                        fieldWithPath("theme.name").type(JsonFieldType.STRING).description("테마 이름")
-                                )
+                                RESERVATION_RESPONSE_SINGLE_SNIPPETS()
                         )
                 );
     }
@@ -134,7 +125,7 @@ class AdminReservationApiDocumentTest extends DocumentTest {
                                 "reservation-find-admin",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                getReservationArrayResponseFields()
+                                RESERVATION_RESPONSE_ARRAY_SNIPPETS()
                         )
                 );
     }
@@ -165,22 +156,9 @@ class AdminReservationApiDocumentTest extends DocumentTest {
                                         parameterWithName("fromDate").description("검색 대상 시작 날짜"),
                                         parameterWithName("toDate").description("검색 대상 종료 날짜")
                                 ),
-                                getReservationArrayResponseFields()
+                                RESERVATION_RESPONSE_ARRAY_SNIPPETS()
                         )
                 );
-    }
-
-    public static ResponseFieldsSnippet getReservationArrayResponseFields() {
-        return responseFields(
-                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
-                fieldWithPath("[].memberName").type(JsonFieldType.STRING).description("예약자 이름"),
-                fieldWithPath("[].date").type(JsonFieldType.STRING).description("예약 날짜"),
-                fieldWithPath("[].time.id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
-                fieldWithPath("[].time.startAt").type(JsonFieldType.STRING)
-                        .description("예약 시간(10분 단위) ex) 13:00"),
-                fieldWithPath("[].theme.id").type(JsonFieldType.NUMBER).description("테마 식별자"),
-                fieldWithPath("[].theme.name").type(JsonFieldType.STRING).description("테마 이름")
-        );
     }
 
     @Override
