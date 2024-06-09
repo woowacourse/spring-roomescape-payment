@@ -1,13 +1,6 @@
 package roomescape.domain.payment;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
@@ -27,6 +20,7 @@ public class Payment {
     private Long amount;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
 
     protected Payment() {
