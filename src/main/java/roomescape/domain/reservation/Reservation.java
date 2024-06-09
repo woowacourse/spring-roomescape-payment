@@ -99,18 +99,20 @@ public class Reservation {
     }
 
     public void changeMember(Member member) {
-        if (status == ReservationStatus.ACCEPTED) {
-            throw new IllegalArgumentException("확정된 예약은 변경할 수 없습니다.");
-        }
+        validateAlreadyAccepted();
         accept();
         this.member = member;
     }
 
     public void accept() {
+        validateAlreadyAccepted();
+        this.status = ReservationStatus.ACCEPTED;
+    }
+
+    private void validateAlreadyAccepted() {
         if (status.isAccepted()) {
             throw new IllegalArgumentException("이미 확정된 예약입니다.");
         }
-        this.status = ReservationStatus.ACCEPTED;
     }
 
     public void cancel() {

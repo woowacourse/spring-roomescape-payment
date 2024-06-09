@@ -110,18 +110,28 @@ public class ReservationWaitingService {
     public ReservationResponse acceptReservationWaiting(WaitingAcceptRequest request) {
         ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(request.waitingId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 대기입니다."));
-        Member member = getMember(request.memberId());
+        validateAdmin(request.memberId());
+        Reservation reservation = getChangedReservation(reservationWaiting);
+        reservationWaitingRepository.delete(reservationWaiting);
+        Payment payment = Payment.accountTransfer(request.accountNumber(), request.accountHolder(), request.bankName(), request.amount(), reservation);
+        paymentRepository.save(payment);
+        return ReservationResponse.from(reservation);
+    }
+
+    private void validateAdmin(Long memberId) {
+        Member member = getMember(memberId);
         if (member.isNotAdmin()) {
             throw new AccessDeniedException("관리자만 예약 대기를 확정할 수 있습니다.");
         }
+    }
+
+    private Reservation getChangedReservation(ReservationWaiting reservationWaiting) {
         Reservation reservation = reservationWaiting.getReservation();
         if (!reservation.isCanceled()) {
-            throw new IllegalArgumentException("기존 예약이 취소되어야 예약 대기를 확정할 수 있습니다.");
+            throw new IllegalArgumentException("기존 예약이 취소되어야 합니다.");
         }
         reservation.changeMember(reservationWaiting.getMember());
-        reservationWaitingRepository.delete(reservationWaiting);
-        paymentRepository.save(Payment.accountTransfer(request.accountNumber(), request.accountHolder(), request.bankName(), request.amount(), reservation));
-        return ReservationResponse.from(reservation);
+        return reservation;
     }
 
     @Transactional
