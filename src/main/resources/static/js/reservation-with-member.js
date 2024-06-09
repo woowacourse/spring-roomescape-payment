@@ -25,6 +25,10 @@ function render(data) {
   tableBody.innerHTML = '';
 
   data.forEach(item => {
+    if (item.status !== "예약") {
+      return;
+    }
+
     const row = tableBody.insertRow();
 
     row.insertCell(0).textContent = item.id;              // 예약 id

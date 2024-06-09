@@ -15,13 +15,12 @@ import roomescape.domain.reservation.dto.SearchReservationsRequest;
 import roomescape.domain.reservation.exception.InvalidReserveInputException;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationDate;
+import roomescape.domain.reservation.model.ReservationStatus;
 import roomescape.domain.reservation.model.ReservationTime;
-import roomescape.domain.reservation.model.ReservationWaiting;
 import roomescape.domain.reservation.model.Theme;
 import roomescape.domain.reservation.repository.CustomReservationRepository;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
-import roomescape.domain.reservation.repository.ReservationWaitingRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 
 import java.time.LocalDateTime;
@@ -33,7 +32,6 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
-    private final ReservationWaitingRepository reservationWaitingRepository;
     private final CustomReservationRepository customReservationRepository;
     private final MemberRepository memberRepository;
     private final ThemeRepository themeRepository;
@@ -44,7 +42,6 @@ public class ReservationService {
             final CustomReservationRepository customReservationRepository,
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
-            final ReservationWaitingRepository reservationWaitingRepository,
             final MemberRepository memberRepository,
             final ThemeRepository themeRepository,
             final PaymentHistoryRepository paymentHistoryRepository,
@@ -53,7 +50,6 @@ public class ReservationService {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
-        this.reservationWaitingRepository = reservationWaitingRepository;
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
@@ -109,11 +105,14 @@ public class ReservationService {
     }
 
     private void validateReservationDuplicated(final Reservation reservation) {
-        if (reservationRepository.existsByDateAndTime_IdAndTheme_Id(
+        final boolean existReservation = reservationRepository.existsByDateAndTime_IdAndTheme_IdAndStatus(
                 reservation.getDate(),
                 reservation.getTime().getId(),
-                reservation.getTheme().getId())
-        ) {
+                reservation.getTheme().getId(),
+                ReservationStatus.RESERVATION
+        );
+
+        if (existReservation) {
             throw new InvalidReserveInputException("이미 해당 날짜/시간의 테마 예약이 있습니다.");
         }
     }
@@ -122,25 +121,8 @@ public class ReservationService {
     public void deleteReservation(final Long reservationId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
-        reservationRepository.deleteById(reservation.getId());
-        reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
-                        reservation.getDate(),
-                        reservation.getTime(),
-                        reservation.getTheme())
-                .ifPresent(this::saveReservationWithWaiting);
-    }
-
-    private void saveReservationWithWaiting(final ReservationWaiting reservationWaiting) {
-        final Reservation reservation = reservationWaiting.makeReservation();
-        reservationRepository.save(reservation);
-        reservationWaitingRepository.delete(reservationWaiting);
-    }
-
-    public List<ReservationDto> getMyReservations(final Long memberId) {
-        return reservationRepository.findAllByMember_Id(memberId)
-                .stream()
-                .map(ReservationDto::from)
-                .toList();
+        reservation.cancel();
+        paymentService.cancelPayment(reservation);
     }
 
     public List<ReservationWithPaymentHistoryDto> getMyReservationsWithPaymentHistory(final Long memberId) {

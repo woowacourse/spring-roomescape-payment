@@ -103,6 +103,14 @@ public class Reservation {
         }
     }
 
+    public void cancel() {
+        this.status = ReservationStatus.CANCEL;
+    }
+
+    public boolean isCancel() {
+        return this.status == ReservationStatus.CANCEL;
+    }
+
     public Long getId() {
         return id;
     }

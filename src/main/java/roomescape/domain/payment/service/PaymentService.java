@@ -12,6 +12,8 @@ import roomescape.domain.payment.repository.PaymentCredentialRepository;
 import roomescape.domain.payment.repository.PaymentHistoryRepository;
 import roomescape.domain.reservation.model.Reservation;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class PaymentService {
 
@@ -56,5 +58,12 @@ public class PaymentService {
         if (!isMatch) {
             throw new PaymentCredentialMissMatchException("결제 정보가 유효하지 않습니다.");
         }
+    }
+
+    @Transactional
+    public void cancelPayment(final Reservation reservation) {
+        final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
+                .orElseThrow(() -> new NoSuchElementException("해당 예약에 대한 결제 정보가 없습니다."));
+        paymentHistory.cancelPayment();
     }
 }

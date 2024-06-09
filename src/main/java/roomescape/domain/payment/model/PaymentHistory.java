@@ -66,6 +66,10 @@ public class PaymentHistory {
         this.reservation = reservation;
     }
 
+    public void cancelPayment() {
+        this.paymentStatus = PaymentStatus.CANCELED;
+    }
+
     public Long getId() {
         return id;
     }
