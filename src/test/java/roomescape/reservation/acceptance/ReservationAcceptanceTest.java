@@ -46,7 +46,7 @@ public class ReservationAcceptanceTest extends SpringBootTestBase {
                 dynamicTest("예약을 추가한다", () -> {
                     Cookies reservationMemberCookies = restAssuredTemplate.makeUserCookie(MEMBER_BRI);
                     ReservationCreateRequest reservationParams =
-                            new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 1000,
+                            new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId", 128000,
                                     PaymentType.NORMAL);
                     ReservationResponse response = restAssuredTemplate.create(reservationParams,
                             reservationMemberCookies);

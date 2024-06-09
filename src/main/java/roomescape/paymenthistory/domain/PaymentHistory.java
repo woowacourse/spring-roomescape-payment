@@ -1,6 +1,7 @@
 package roomescape.paymenthistory.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,10 +26,13 @@ public class PaymentHistory {
     private Reservation reservation;
     @Column(name = "payment_key")
     private String paymentKey;
+    @Embedded
+    private Amount amount;
 
-    public PaymentHistory(Reservation reservation, String paymentKey) {
+    public PaymentHistory(Reservation reservation, String paymentKey, long amount) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
+        this.amount = new Amount(amount);
     }
 
     protected PaymentHistory() {
@@ -48,6 +52,10 @@ public class PaymentHistory {
 
     public Reservation getReservation() {
         return reservation;
+    }
+
+    public Amount getAmount() {
+        return amount;
     }
 
     @Override
