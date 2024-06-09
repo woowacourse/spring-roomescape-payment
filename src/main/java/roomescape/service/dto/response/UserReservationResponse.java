@@ -23,7 +23,7 @@ public record UserReservationResponse(
                 reservation.getId(),
                 reservation.getReservationSlot(),
                 RESERVED,
-                reservation.getPayment(),
+                getPayment(reservation),
                 OptionalLong.empty()
         );
     }
@@ -33,8 +33,15 @@ public record UserReservationResponse(
                 waitingWithRank.getWaitingId(),
                 waitingWithRank.getReservationSlot(),
                 WAITING,
-                EMPTY_PAYMENT,
+                getPayment(waitingWithRank.getReservation()),
                 OptionalLong.of(waitingWithRank.getRank())
         );
+    }
+
+    private static Payment getPayment(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return EMPTY_PAYMENT;
+        }
+        return reservation.getPayment();
     }
 }

@@ -11,14 +11,14 @@ public class PaymentStatusMessageMapper {
 
     public static String mapToPaymentKey(Payment payment) {
         if (payment.equals(EMPTY_PAYMENT)) {
-            return "예약 대기중";
+            return "결제정보 없음";
         }
         return payment.getPaymentKey();
     }
 
     public static String mapToAmount(Payment payment) {
         if (payment.equals(EMPTY_PAYMENT)) {
-            return "예약 대기중";
+            return "결제정보 없음";
         }
         return payment.getAmount().toString();
     }

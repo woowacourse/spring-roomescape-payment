@@ -21,4 +21,8 @@ public class WaitingWithRank {
     public Long getRank() {
         return rank + 1;
     }
+
+    public Reservation getReservation() {
+        return waiting.getReservation();
+    }
 }
