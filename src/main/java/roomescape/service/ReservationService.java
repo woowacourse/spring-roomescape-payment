@@ -104,7 +104,7 @@ public class ReservationService {
     }
 
     public List<MyReservationResponse> findByMemberId(long memberId) {
-        return reservationRepository.findAllWithRankByMemberId(memberId)
+        return reservationRepository.findAllWithRankAndPaymentByMemberId(memberId)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();

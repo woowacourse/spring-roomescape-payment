@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
+import roomescape.dto.service.ReservationWithRankAndPayment;
 
 @SpringBootTest
 @Transactional
@@ -36,6 +39,9 @@ class JpaReservationRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private Member member;
     private ReservationTime time;
@@ -206,5 +212,44 @@ class JpaReservationRepositoryTest {
         assertThat(reservations)
                 .extracting(Reservation::getId)
                 .containsExactly(onPeriodreservation.getId());
+    }
+
+    @Test
+    @DisplayName("특정 회원의 예약을 순서와 결제정보와 함께 조회하는지 확인한다.")
+    void findAllWithRankAndPaymentByMemberId() {
+        Payment payment = paymentRepository.save(new Payment(1L, "paymentKey", "WTEST1234", 1000L));
+        reservationRepository.save(
+                Reservation.builder()
+                        .member(member)
+                        .date(LocalDate.now().plusDays(1))
+                        .time(time)
+                        .theme(theme)
+                        .payment(payment)
+                        .build());
+        List<ReservationWithRankAndPayment> reservations = reservationRepository.findAllWithRankAndPaymentByMemberId(
+                member.getId());
+
+        assertThat(reservations)
+                .extracting(ReservationWithRankAndPayment::getPayment)
+                .contains(payment);
+    }
+
+    @Test
+    @DisplayName("결제를 하지 않은 특정 회원의 예약을 순서를 조회하는지 확인한다.")
+    void findAllWithRankAndPaymentByMemberIdWhenNotPaid() {
+        reservationRepository.save(
+                Reservation.builder()
+                        .member(member)
+                        .date(LocalDate.now().plusDays(1))
+                        .time(time)
+                        .theme(theme)
+                        .status(ReservationStatus.RESERVED_UNPAID)
+                        .build());
+        List<ReservationWithRankAndPayment> reservations = reservationRepository.findAllWithRankAndPaymentByMemberId(
+                member.getId());
+
+        assertThat(reservations)
+                .extracting(ReservationWithRankAndPayment::getPayment)
+                .containsNull();
     }
 }

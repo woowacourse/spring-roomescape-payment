@@ -2,17 +2,20 @@ package roomescape.dto.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.Theme;
 
-public class ReservationWithRank {
+public class ReservationWithRankAndPayment {
 
     private Reservation reservation;
     private Long rank;
+    private Payment payment;
 
-    public ReservationWithRank(Reservation reservation, Long rank) {
+    public ReservationWithRankAndPayment(Reservation reservation, Long rank, Payment payment) {
         this.reservation = reservation;
         this.rank = rank;
+        this.payment = payment;
     }
 
     public long getId() {
@@ -33,5 +36,23 @@ public class ReservationWithRank {
 
     public String getStatusMessage() {
         return reservation.getStatus().makeStatusMessage(rank);
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public String getPaymentKey() {
+        if (payment == null) {
+            return null;
+        }
+        return payment.getPaymentKey();
+    }
+
+    public Long getPaymentAmount() {
+        if (payment == null) {
+            return null;
+        }
+        return payment.getAmount();
     }
 }
