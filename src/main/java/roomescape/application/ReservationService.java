@@ -86,7 +86,7 @@ public class ReservationService {
     }
 
     private void rejectIfNotOwner(Reservation reservation, Member member) {
-        if (reservation.isNotOwner(member.getId())) {
+        if (reservation.isNotOwner(member)) {
             throw new AuthorizationException();
         }
     }

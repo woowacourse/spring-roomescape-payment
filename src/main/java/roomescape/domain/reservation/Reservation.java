@@ -79,8 +79,8 @@ public class Reservation {
         this.status = Status.CANCELED;
     }
 
-    public boolean isNotOwner(Long id) {
-        return !this.member.getId().equals(id);
+    public boolean isNotOwner(Member member) {
+        return !this.member.equals(member);
     }
 
     public boolean isReserved() {

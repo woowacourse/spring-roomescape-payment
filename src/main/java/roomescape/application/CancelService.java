@@ -23,14 +23,14 @@ public class CancelService {
     @Transactional
     public void cancelReservation(Long reservationId, Member member) {
         Reservation reservation = reservationRepository.getById(reservationId);
-        rejectIfNotOwnerOrAdmin(reservation, member);
+        rejectIfNotAuthorized(reservation, member);
         reservation.toCancel();
         updateFirstWaitingToPending(reservation);
         cancelPayment(reservation);
     }
 
-    private void rejectIfNotOwnerOrAdmin(Reservation reservation, Member member) {
-        if (reservation.isNotOwner(member.getId())) {// && !memberInfo.isAdmin()) {
+    private void rejectIfNotAuthorized(Reservation reservation, Member member) {
+        if (reservation.isNotOwner(member) && member.isNotAdmin()) {
             throw new AuthorizationException();
         }
     }
