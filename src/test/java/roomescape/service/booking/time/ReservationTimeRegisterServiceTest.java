@@ -16,15 +16,15 @@ import roomescape.domain.time.ReservationTime;
 import roomescape.dto.reservationtime.ReservationTimeRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
-import roomescape.service.booking.time.module.TimeRegisterService;
+import roomescape.service.time.ReservationTimeRegisterService;
 
 @Sql("/test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class TimeRegisterServiceTest {
+class ReservationTimeRegisterServiceTest {
 
     @Autowired
-    TimeRegisterService timeRegisterService;
+    ReservationTimeRegisterService reservationTimeRegisterService;
 
     @Autowired
     ReservationTimeRepository timeRepository;
@@ -35,7 +35,7 @@ class TimeRegisterServiceTest {
         ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.parse("00:00"));
 
         // when
-        Long timeId = timeRegisterService.registerTime(reservationTimeRequest);
+        Long timeId = reservationTimeRegisterService.registerTime(reservationTimeRequest);
 
         // then
         ReservationTime time = timeRepository.findById(timeId).orElseThrow();
@@ -51,7 +51,7 @@ class TimeRegisterServiceTest {
         ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.parse("10:00"));
 
         // when, then
-        assertThatThrownBy(() -> timeRegisterService.registerTime(reservationTimeRequest))
+        assertThatThrownBy(() -> reservationTimeRegisterService.registerTime(reservationTimeRequest))
                 .isInstanceOf(RoomEscapeException.class);
     }
 }

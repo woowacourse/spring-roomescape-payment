@@ -15,7 +15,6 @@ import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
-import roomescape.service.theme.module.ThemeRegisterService;
 
 @Sql("/test-data.sql")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)

@@ -1,34 +1,34 @@
-package roomescape.service.booking.time.module;
+package roomescape.service.time.module;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalTime;
+import org.springframework.stereotype.Component;
 import roomescape.domain.time.ReservationTime;
 import roomescape.exception.ErrorCode;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
-@Service
-@Transactional
-public class TimeDeleteService {
+@Component
+public class ReservationTimeValidator {
 
     private final ReservationTimeRepository timeRepository;
     private final ReservationRepository reservationRepository;
 
-    public TimeDeleteService(ReservationTimeRepository reservationTimeRepository,
-                             ReservationRepository reservationRepository
-    ) {
-        this.timeRepository = reservationTimeRepository;
+    public ReservationTimeValidator(ReservationTimeRepository timeRepository, ReservationRepository reservationRepository) {
+        this.timeRepository = timeRepository;
         this.reservationRepository = reservationRepository;
     }
 
-    public void deleteTime(Long timeId) {
-        ReservationTime reservationTime = timeRepository.findByIdOrThrow(timeId);
-        validateDeletable(reservationTime);
-        timeRepository.delete(reservationTime);
+    public void validateTimeDuplicate(LocalTime time) {
+        if (timeRepository.existsByStartAt(time)) {
+            throw new RoomEscapeException(
+                    ErrorCode.TIME_NOT_REGISTER_BY_DUPLICATE,
+                    "등록 시간 = " + time
+            );
+        }
     }
 
-    private void validateDeletable(ReservationTime reservationTime) {
+    public void validateDeletable(ReservationTime reservationTime) {
         if (reservationRepository.existsByTimeId(reservationTime.getId())) {
             throw new RoomEscapeException(
                     ErrorCode.TIME_NOT_DELETE_BY_EXIST_TIME,

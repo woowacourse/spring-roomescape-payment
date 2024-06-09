@@ -11,7 +11,6 @@ import roomescape.domain.theme.Theme;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.theme.module.ThemeDeleteService;
 
 class ThemeDeleteServiceTest extends ServiceBaseTest {
 

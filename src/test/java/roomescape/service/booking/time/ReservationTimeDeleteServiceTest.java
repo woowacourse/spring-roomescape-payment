@@ -12,12 +12,12 @@ import roomescape.domain.time.ReservationTime;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.booking.time.module.TimeDeleteService;
+import roomescape.service.time.ReservationTimeDeleteService;
 
-class TimeDeleteServiceTest extends ServiceBaseTest {
+class ReservationTimeDeleteServiceTest extends ServiceBaseTest {
 
     @Autowired
-    TimeDeleteService timeDeleteService;
+    ReservationTimeDeleteService reservationTimeDeleteService;
 
     @Autowired
     ReservationTimeRepository timeRepository;
@@ -30,7 +30,7 @@ class TimeDeleteServiceTest extends ServiceBaseTest {
         timeRepository.save(new ReservationTime(LocalTime.now().plusHours(1)));
 
         // when
-        timeDeleteService.deleteTime(1L);
+        reservationTimeDeleteService.deleteTime(1L);
 
         // when
         List<ReservationTime> allTimes = timeRepository.findAll();
@@ -42,7 +42,7 @@ class TimeDeleteServiceTest extends ServiceBaseTest {
     @Test
     void 예약이_존재하는_시간대를_삭제할_경우_예외_발생() {
         // then
-        assertThatThrownBy(() -> timeDeleteService.deleteTime(1L))
+        assertThatThrownBy(() -> reservationTimeDeleteService.deleteTime(1L))
                 .isInstanceOf(RoomEscapeException.class);
     }
 }

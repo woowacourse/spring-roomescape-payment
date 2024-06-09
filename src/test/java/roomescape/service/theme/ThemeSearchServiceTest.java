@@ -11,7 +11,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.theme.ThemeResponse;
 import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.theme.module.ThemeSearchService;
 
 class ThemeSearchServiceTest extends ServiceBaseTest {
 

@@ -1,4 +1,4 @@
-package roomescape.web.controller;
+package roomescape.web.controller.auth;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;

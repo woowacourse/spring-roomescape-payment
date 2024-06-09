@@ -19,7 +19,7 @@ import roomescape.service.reservation.ReservationSearchService;
 import roomescape.service.reservation.WaitingApproveService;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
     private final ReservationRegisterService registerService;
@@ -35,26 +35,26 @@ public class AdminReservationController {
         this.waitingService = waitingService;
     }
 
-    @PostMapping("/reservations")
+    @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest request) {
         ReservationResponse response = registerService.registerReservationByAdmin(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
-    @GetMapping("/reservations/search")
+    @GetMapping("/search")
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilter(
             @ModelAttribute ReservationFilter reservationFilter) {
         List<ReservationResponse> responses = searchService.findReservationsByFilter(reservationFilter);
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/reservations/waiting")
+    @GetMapping("/waiting")
     public ResponseEntity<List<ReservationResponse>> getAllWaitingReservations() {
         List<ReservationResponse> responses = searchService.findAllWaitingReservations();
         return ResponseEntity.ok(responses);
     }
 
-    @PatchMapping("/reservations/waiting/approve/{id}")
+    @PatchMapping("/waiting/approve/{id}")
     public ResponseEntity<Void> approveWaitingReservation(@PathVariable Long id) {
         waitingService.approveWaitingReservation(id);
         return ResponseEntity.ok().build();

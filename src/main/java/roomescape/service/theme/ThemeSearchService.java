@@ -1,4 +1,4 @@
-package roomescape.service.theme.module;
+package roomescape.service.theme;
 
 import java.util.List;
 import org.springframework.stereotype.Service;

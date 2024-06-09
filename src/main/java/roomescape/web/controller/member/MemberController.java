@@ -1,4 +1,4 @@
-package roomescape.web.controller;
+package roomescape.web.controller.member;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.login.LoginMember;
 import roomescape.dto.payment.PaymentRequest;
@@ -21,6 +22,7 @@ import roomescape.service.reservation.ReservationRegisterService;
 import roomescape.service.reservation.ReservationSearchService;
 
 @RestController
+@RequestMapping("/reservations")
 class ReservationController {
 
     private final ReservationRegisterService registerService;
@@ -36,7 +38,7 @@ class ReservationController {
         this.cancelService = cancelService;
     }
 
-    @PostMapping("/reservations")
+    @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody UserReservationRequest userRequest,
                                                                  LoginMember loginMember
     ) {
@@ -46,7 +48,7 @@ class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
-    @PostMapping("/reservations/waiting")
+    @PostMapping("/waiting")
     public ResponseEntity<ReservationResponse> createWaitingReservation(@RequestBody UserReservationWaitingRequest userRequest,
                                                                         LoginMember loginMember
     ) {
@@ -55,32 +57,32 @@ class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
-    @PostMapping("reservations/pay/{id}")
+    @PostMapping("/pay/{id}")
     public ResponseEntity<ReservationResponse> requestReservationPayment(@RequestBody PaymentRequest paymentRequest,
                                                                          @PathVariable Long id) {
         ReservationResponse response = registerService.requestPaymentByPaymentPending(id, paymentRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
-    @GetMapping("/reservations/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getReservation(@PathVariable Long id) {
         ReservationResponse response = searchService.findReservation(id);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/reservations")
+    @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
         List<ReservationResponse> responses = searchService.findAllReservedReservations();
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/reservations/mine")
+    @GetMapping("/mine")
     public ResponseEntity<List<UserReservationResponse>> getReservationsByUser(LoginMember loginMember) {
         List<UserReservationResponse> responses = searchService.findReservationByMemberId(loginMember.id());
         return ResponseEntity.ok(responses);
     }
 
-    @DeleteMapping("/reservations/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
         cancelService.cancelReservation(id);
         return ResponseEntity.noContent().build();
