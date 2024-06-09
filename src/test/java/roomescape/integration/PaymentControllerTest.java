@@ -1,7 +1,6 @@
 package roomescape.integration;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.is;
 import static roomescape.domain.FakePayment.CORRECT_REQ;
 
 import io.restassured.RestAssured;
@@ -22,7 +21,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.TestPaymentConfig;
 import roomescape.domain.Email;
-import roomescape.domain.FakePayment;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
 import roomescape.domain.NotPayed;
@@ -75,6 +73,7 @@ public class PaymentControllerTest {
     private String token;
     private String othersToken;
     private Payment notPayed;
+
     @BeforeEach
     void init() {
         RestAssured.port = port;
@@ -138,7 +137,7 @@ public class PaymentControllerTest {
 
         Map<String, Object> paymentParam = Map.of(
                 "paymentKey", CORRECT_REQ.paymentKey(),
-               "amount",  CORRECT_REQ.amount(),
+                "amount", CORRECT_REQ.amount(),
                 "orderId", CORRECT_REQ.orderId()
         );
 
@@ -150,7 +149,7 @@ public class PaymentControllerTest {
                 .post("/payment/" + savedId)
                 .then().log().all();
 
-        Reservation savedReservation = reservationRepository.findById((long)savedId).get();
+        Reservation savedReservation = reservationRepository.findById((long) savedId).get();
         assertThat(savedReservation.getPayment()).isInstanceOf(Payed.class);
     }
 }

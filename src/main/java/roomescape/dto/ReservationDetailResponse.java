@@ -34,9 +34,10 @@ public record ReservationDetailResponse(
         Payment payment = reservation.getPayment();
         return switch (status) {
             case BOOKED -> {
-                    if(payment.getState() == State.READY)
-                        yield "결제 대기";
-                    yield "결제 완료";
+                if (payment.getState() == State.READY) {
+                    yield "결제 대기";
+                }
+                yield "결제 완료";
             }
             case WAITING -> String.format("%d번째 예약대기", index - 1);
         };

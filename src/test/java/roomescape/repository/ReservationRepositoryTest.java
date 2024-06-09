@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.Fixture;
 import roomescape.domain.Member;
-import roomescape.domain.NotPayed;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
@@ -72,26 +71,60 @@ class ReservationRepositoryTest {
     @Test
     void popularThemeTest() {
         //given
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_1, time1, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time2, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time3, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time4, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time5, theme1, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_1, time1, theme1, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time2, theme1, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time3, theme1, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time4, theme1, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time5, theme1, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
 
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_1, time1, theme2, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_1, time2, theme2, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time3, theme2, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time4, theme2, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_1, time1, theme2, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_1, time2, theme2, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time3, theme2, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time4, theme2, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
 
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time1, theme3, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time2, theme3, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_7, time3, theme3, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time1, theme3, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time2, theme3, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_7, time3, theme3, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
 
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time1, theme4, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time2, theme4, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time3, theme4, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time4, theme4, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
-        reservationRepository.save(new Reservation(null, DAY_BEFORE_10, time5, theme4, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time1, theme4, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time2, theme4, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time3, theme4, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time4, theme4, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
+        reservationRepository.save(
+                new Reservation(null, DAY_BEFORE_10, time5, theme4, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, notPayed));
 
         //when
         List<Theme> popularThemes =

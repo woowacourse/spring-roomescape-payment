@@ -77,7 +77,6 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
         Payment notPayed = paymentRepository.getNotPayed();
 
-
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
                         LocalDateTime.now(), ReservationStatus.WAITING, notPayed));

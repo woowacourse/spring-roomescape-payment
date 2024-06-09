@@ -128,7 +128,8 @@ class ReservationServiceTest extends FixtureUsingTest {
 
         @BeforeEach
         void addDefaultReservation() {
-            defaultReservation = new Reservation(null, defaultDate, reservationTime_10_0, theme1, USER1, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed);
+            defaultReservation = new Reservation(null, defaultDate, reservationTime_10_0, theme1, USER1,
+                    LocalDateTime.now(), ReservationStatus.BOOKED, notPayed);
             defaultReservation = reservationRepository.save(defaultReservation);
         }
 

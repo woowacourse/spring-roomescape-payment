@@ -1,7 +1,6 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static roomescape.exception.RoomescapeExceptionType.DELETE_USED_THEME;
 import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_THEME;
 
@@ -223,7 +222,8 @@ public class ThemeControllerTest {
         @Test
         void deleteUsedThemeTest() {
             reservationRepository.save(
-                    new Reservation(null, LocalDate.now(), defaultReservationTime, usedTheme, defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed)
+                    new Reservation(null, LocalDate.now(), defaultReservationTime, usedTheme, defaultMember,
+                            LocalDateTime.now(), ReservationStatus.BOOKED, notPayed)
             );
 
             RestAssured.given().log().all()

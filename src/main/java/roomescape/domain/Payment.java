@@ -25,6 +25,7 @@ public abstract class Payment {
     }
 
     public abstract String getPaymentKey();
+
     public abstract String getOrderId();
 
     public abstract Long getAmount();
