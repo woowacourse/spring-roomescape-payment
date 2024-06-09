@@ -12,7 +12,7 @@ import roomescape.payment.service.PaymentFindService;
 import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.MyReservationWithPaymentResponse;
-import roomescape.reservation.dto.PendingReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 
@@ -73,7 +73,7 @@ public class ReservationPayService {
         return makeMyReservations(reservationResponses, waitingResponses);
     }
 
-    public MyReservationResponse updateReservationPayment(PendingReservationPaymentRequest request, Long reservationId, Long memberId) {
+    public MyReservationResponse updateReservationPayment(ReservationPaymentRequest request, Long reservationId, Long memberId) {
         ReservationResponse reservation = reservationFindService.findReservation(reservationId);
         PaymentConfirmRequest paymentConfirmRequest = PaymentConfirmRequest.from(request, reservation.id(), memberId);
 

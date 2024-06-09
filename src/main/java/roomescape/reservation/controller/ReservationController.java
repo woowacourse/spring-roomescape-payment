@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.MyReservationWithPaymentResponse;
-import roomescape.reservation.dto.PendingReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.service.ReservationDeleteService;
@@ -61,7 +61,7 @@ public class ReservationController {
     @PostMapping("/{id}/payment")
     public ResponseEntity<MyReservationResponse> createPaymentWithPendingReservation(
             @PathVariable Long id,
-            @RequestBody PendingReservationPaymentRequest request,
+            @RequestBody ReservationPaymentRequest request,
             LoggedInMember member) {
         MyReservationResponse response = reservationPayService.updateReservationPayment(request, id, member.id());
 

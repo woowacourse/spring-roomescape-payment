@@ -46,7 +46,7 @@ import roomescape.reservation.controller.ReservationController;
 import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.MyReservationWithPaymentResponse;
-import roomescape.reservation.dto.PendingReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 import roomescape.reservation.service.ReservationDeleteService;
@@ -234,7 +234,7 @@ class ReservationApiTest {
     void methocreatePaymentWithPendingReservationTest() throws Exception {
         LoggedInMember loggedInMember = new LoggedInMember(1L, "testMember", "test@email.com", true);
         Cookie cookie = new Cookie("token", "testToken");
-        PendingReservationPaymentRequest request = new PendingReservationPaymentRequest(
+        ReservationPaymentRequest request = new ReservationPaymentRequest(
                 "paymentKey",
                 "orderId",
                 BigDecimal.ONE);
