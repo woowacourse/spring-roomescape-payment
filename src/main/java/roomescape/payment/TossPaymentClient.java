@@ -1,7 +1,6 @@
 package roomescape.payment;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -30,16 +29,12 @@ public class TossPaymentClient implements PaymentClient{
     public ResponseEntity<Void> postPayment(final PaymentRequest paymentRequest) {
         final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey+password).getBytes());
 
-        try {
-            return restClient.post()
-                    .uri("/v1/payments/confirm")
-                    .header("Authorization", secret)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(paymentRequest)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return restClient.post()
+                .uri("/v1/payments/confirm")
+                .header("Authorization", secret)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(paymentRequest)
+                .retrieve()
+                .toBodilessEntity();
     }
 }
