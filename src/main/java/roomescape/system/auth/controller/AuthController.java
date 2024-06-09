@@ -69,7 +69,7 @@ public class AuthController {
     @LoginRequired
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그아웃", description = "현재 로그인된 회원을 로그아웃합니다.")
+    @Operation(summary = "로그아웃", description = "현재 로그인된 회원을 로그아웃합니다.", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공시 쿠키에 저장된 토큰 정보를 삭제합니다.")
     })
