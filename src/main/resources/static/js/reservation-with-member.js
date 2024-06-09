@@ -234,8 +234,9 @@ function requestDelete(id) {
   const requestOptions = {
     method: 'DELETE',
   };
+  const reason = "단순 변심"
 
-  return fetch(`${RESERVATION_API_ENDPOINT}/${id}`, requestOptions)
+  return fetch(`${RESERVATION_API_ENDPOINT}/${id}?reason=${reason}`, requestOptions)
       .then(response => {
         if (response.status !== 204) throw new Error('Delete failed');
       });
