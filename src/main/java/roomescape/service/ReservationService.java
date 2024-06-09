@@ -115,7 +115,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(final long id) {
         final Reservation fetchReservation = reservationRepository.fetchById(id);
-        paymentService.deletePayment(id); //TODO 엥 이겨 이 id 맞나?
+        paymentService.deletePayment(id);
         reservationRepository.deleteById(fetchReservation.getId());
     }
 

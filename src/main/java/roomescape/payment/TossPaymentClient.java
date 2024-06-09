@@ -2,12 +2,12 @@ package roomescape.payment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.config.TossPaymentSettings;
 import roomescape.payment.dto.CancelPaymentRequest;
 import roomescape.payment.dto.CreatePaymentRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
@@ -20,35 +20,26 @@ public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final ResponseErrorHandler errorHandler;
-    private final String secretKey;
-    private final String password;
-    private final String createPaymentApi; //TODO yaml 접근하는 객체를 만들기
-    private final String cancelPaymentApi;
+    private final TossPaymentSettings tossPaymentSettings;
 
     public TossPaymentClient(final ClientHttpRequestFactory factory,
                              final ResponseErrorHandler errorHandler,
-                             @Value("${payments.toss.secret-key}") final String secretKey,
-                             @Value("${payments.toss.password}") final String password,
-                             @Value("${payments.toss.host-name}") final String hostName,
-                             @Value("${payments.toss.create-payment-api}") final String createPaymentApi,
-                             @Value("${payments.toss.cancel-payment-api}") final String cancelPaymentApi
+                             final TossPaymentSettings tossPaymentSettings
     ) {
+        this.tossPaymentSettings = tossPaymentSettings;
         this.restClient = RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl(hostName)
+                .baseUrl(tossPaymentSettings.getHostName())
                 .build();
         this.errorHandler = errorHandler;
-        this.secretKey = secretKey;
-        this.password = password;
-        this.createPaymentApi = createPaymentApi;
-        this.cancelPaymentApi = cancelPaymentApi;
     }
 
     @Override
     public PaymentConfirmResponse postPayment(final CreatePaymentRequest paymentRequest) {
-        final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
+        final String secret =
+                "Basic " + Base64.getEncoder().encodeToString((tossPaymentSettings.getSecretKey() + tossPaymentSettings.getPassword()).getBytes());
         final PaymentConfirmResponse confirmResponse = restClient.post()
-                .uri(createPaymentApi)
+                .uri(tossPaymentSettings.getCreatePaymentApi())
                 .header(HttpHeaders.AUTHORIZATION, secret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
@@ -61,9 +52,10 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void cancelPayment(final CancelPaymentRequest paymentRequest) {
-        final String secret = "Basic " + Base64.getEncoder().encodeToString((secretKey + password).getBytes());
+        final String secret =
+                "Basic " + Base64.getEncoder().encodeToString((tossPaymentSettings.getSecretKey() + tossPaymentSettings.getPassword()).getBytes());
         restClient.post()
-                .uri(cancelPaymentApi, paymentRequest.paymentKey())
+                .uri(tossPaymentSettings.getCancelPaymentApi(), paymentRequest.paymentKey())
                 .header(HttpHeaders.AUTHORIZATION, secret)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
