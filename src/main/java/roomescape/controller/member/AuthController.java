@@ -3,6 +3,8 @@ package roomescape.controller.member;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import roomescape.service.MemberService;
 @RequestMapping("/login")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final MemberService memberService;
 
     public AuthController(final MemberService memberService) {
@@ -35,7 +38,9 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(3600000);
         response.addCookie(cookie);
-        return ResponseEntity.ok().body(token);
+        log.info("로그인 email={}", memberLoginRequest.email());
+        return ResponseEntity.ok()
+                .body(token);
     }
 
     @GetMapping("/check")

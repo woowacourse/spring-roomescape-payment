@@ -1,6 +1,8 @@
 package roomescape.controller.theme;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RequestMapping("/themes")
 public class ThemeController {
 
+    private static final Logger log = LoggerFactory.getLogger(ThemeController.class);
     private static final Map<PopularThemeRequest, List<PopularThemeResponse>> popularThemeCache = new HashMap<>();
 
     private final ThemeService themeService;
@@ -45,7 +48,7 @@ public class ThemeController {
         final URI uri = UriComponentsBuilder.fromPath("/themes/{id}")
                 .buildAndExpand(theme.id())
                 .toUri();
-
+        log.info("테마 생성 theme={}", theme);
         return ResponseEntity.created(uri)
                 .body(theme);
     }
@@ -53,6 +56,7 @@ public class ThemeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final long id) {
         themeService.deleteTheme(id);
+        log.info("테마 삭제 id={}", id);
         return ResponseEntity.noContent()
                 .build();
     }

@@ -1,6 +1,8 @@
 package roomescape.controller.reservation;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import java.util.List;
 @RestController
 public class AdminReservationController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminReservationController.class);
     private final ReservationService reservationService;
 
     public AdminReservationController(final ReservationService reservationService) {
@@ -35,7 +38,7 @@ public class AdminReservationController {
         final URI uri = UriComponentsBuilder.fromPath("/reservations/{id}")
                 .buildAndExpand(reservation.getId())
                 .toUri();
-
+        log.info("어드민용 예약 생성 reservation={}", reservation);
         return ResponseEntity.created(uri)
                 .body(ReservationResponse.from(reservation));
     }
@@ -48,6 +51,7 @@ public class AdminReservationController {
     @DeleteMapping("/admin/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long id) {
         reservationService.deleteReservation(id);
+        log.info("예약 삭제 id={}", id);
         return ResponseEntity.noContent()
                 .build();
     }

@@ -21,28 +21,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .build();
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(final AuthorizationException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
     }
 
     @ExceptionHandler(TossPaymentException.class)
     public ResponseEntity<PaymentErrorResponse> handleTossPaymentException(final TossPaymentException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.badRequest()
                 .body(e.getErrorResponse());
     }
 
     @ExceptionHandler(RoomescapeException.class)
     public ResponseEntity<ErrorResponse> handleRoomescapeException(final RoomescapeException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             final MethodArgumentNotValidException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -58,14 +58,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             final HttpMessageNotReadableException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(final NoResourceFoundException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
         return ResponseEntity.notFound()
                 .build();
     }
