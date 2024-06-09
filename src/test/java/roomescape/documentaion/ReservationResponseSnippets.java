@@ -7,7 +7,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 public class ReservationResponseSnippets {
-
     public static ResponseFieldsSnippet RESERVATION_RESPONSE_ARRAY_SNIPPETS() {
         return responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
