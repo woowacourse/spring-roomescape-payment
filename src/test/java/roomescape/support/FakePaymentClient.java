@@ -2,6 +2,7 @@ package roomescape.support;
 
 import roomescape.exception.PaymentServerException;
 import roomescape.service.PaymentClient;
+import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.request.PaymentRequest;
 
 public class FakePaymentClient implements PaymentClient {
@@ -12,5 +13,9 @@ public class FakePaymentClient implements PaymentClient {
         if (PAYMENT_ERROR_KEY.equals(paymentRequest.paymentKey())) {
             throw new PaymentServerException("Payment error 발생"); // todo PaymentException
         }
+    }
+
+    @Override
+    public void cancel(PaymentCancelRequest cancelRequest) {
     }
 }
