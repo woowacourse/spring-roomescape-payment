@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
@@ -467,6 +468,59 @@ public class ReservationControllerTest {
 
     }
 
+    @DisplayName("테마만을 이용하여 예약을 조회한다.")
+    @ParameterizedTest(name = "테마 ID={0}로 조회 시 {1}개의 예약이 조회된다.")
+    @CsvSource(value = {"1/4", "2/3"}, delimiter = '/')
+    @Sql({"/truncate.sql", "/test_search_data.sql"})
+    void searchByTheme(String themeId, int expectedCount) {
+        RestAssured.given().log().all()
+                .port(port)
+                .param("themeId", themeId)
+                .param("memberId", "")
+                .param("dateFrom", "")
+                .param("dateTo", "")
+                .header("cookie", getAdminAccessTokenCookieByLogin("admin@email.com", "password"))
+                .when().get("/reservations/search")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("data.reservations.size()", is(expectedCount));
+    }
+
+    @DisplayName("시작 날짜만을 이용하여 예약을 조회한다.")
+    @ParameterizedTest(name = "오늘 날짜보다 {0}일 전인 날짜를 시작 날짜로 조회 시 {1}개의 예약이 조회된다.")
+    @CsvSource(value = {"1/1", "7/7"}, delimiter = '/')
+    @Sql({"/truncate.sql", "/test_search_data.sql"})
+    void searchByFromDate(int minusDays, int expectedCount) {
+        RestAssured.given().log().all()
+                .port(port)
+                .param("themeId", "")
+                .param("memberId", "")
+                .param("dateFrom", LocalDate.now().minusDays(minusDays).toString())
+                .param("dateTo", "")
+                .header("cookie", getAdminAccessTokenCookieByLogin("admin@email.com", "password"))
+                .when().get("/reservations/search")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("data.reservations.size()", is(expectedCount));
+    }
+
+    @DisplayName("종료 날짜만을 이용하여 예약을 조회한다..")
+    @ParameterizedTest(name = "오늘 날짜보다 {0}일 전인 날짜를 종료 날짜로 조회 시 {1}개의 예약이 조회된다.")
+    @CsvSource(value = {"1/7", "3/5", "7/1"}, delimiter = '/')
+    @Sql({"/truncate.sql", "/test_search_data.sql"})
+    void searchByToDate(int minusDays, int expectedCount) {
+        RestAssured.given().log().all()
+                .port(port)
+                .param("themeId", "")
+                .param("memberId", "")
+                .param("dateFrom", "")
+                .param("dateTo", LocalDate.now().minusDays(minusDays).toString())
+                .header("cookie", getAdminAccessTokenCookieByLogin("admin@email.com", "password"))
+                .when().get("/reservations/search")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body("data.reservations.size()", is(expectedCount));
+    }
 
     private String getAccessTokenCookieByLogin(final String email, final String password) {
         Map<String, String> loginParams = Map.of(
