@@ -1,0 +1,33 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: validate
+  h2:
+    console:
+      enabled: 'true'
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:h2:mem:test
+  profiles:
+    include: TOSS-KEY
+
+security:
+  jwt:
+    token:
+      secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E
+
+logging:
+  level:
+    org:
+      springframework:
+        transaction:
+          interceptor: trace
