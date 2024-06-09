@@ -15,7 +15,7 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -76,26 +76,26 @@ public class ReservationService { // todo cqrs
     }
 
     @Transactional
-    public ReservationResponse addReservationByAdmin(CreateReservationRequest createReservationRequest) {
-        Reservation reservation = createValidatedReservation(createReservationRequest);
+    public ReservationResponse addReservationByAdmin(ReservationCreateRequest reservationCreateRequest) {
+        Reservation reservation = createValidatedReservation(reservationCreateRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 
     @Transactional
-    public Reservation addReservation(CreateReservationRequest createReservationRequest) {
-        Reservation reservation = createValidatedReservation(createReservationRequest);
+    public Reservation addReservation(ReservationCreateRequest reservationCreateRequest) {
+        Reservation reservation = createValidatedReservation(reservationCreateRequest);
         return reservationRepository.save(reservation);
     }
 
-    private Reservation createValidatedReservation(CreateReservationRequest createReservationRequest) {
-        Reservation reservation = getReservation(createReservationRequest);
+    private Reservation createValidatedReservation(ReservationCreateRequest reservationCreateRequest) {
+        Reservation reservation = getReservation(reservationCreateRequest);
         reservation.validateFutureReservation(LocalDateTime.now(clock));
         validateDuplicatedReservation(reservation);
         return reservation;
     }
 
-    private Reservation getReservation(CreateReservationRequest request) {
+    private Reservation getReservation(ReservationCreateRequest request) {
         Member member = getMember(request.memberId());
         ReservationTime reservationTime = getTime(request.timeId());
         Theme theme = getTheme(request.themeId());
@@ -127,11 +127,12 @@ public class ReservationService { // todo cqrs
 
     @Transactional
     public void delete(Reservation reservation) {
-        reservationRepository.delete(reservation);
+        reservationRepository.findById(reservation.getId())
+                .ifPresent(reservationRepository::delete);
     }
 
     @Transactional
-    public Reservation deleteReservationById(Long id) { // todo 이름 변경
+    public Reservation cancel(Long id) { // todo 이름 변경
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약입니다."));
         reservation.cancel();
@@ -139,7 +140,7 @@ public class ReservationService { // todo cqrs
     }
 
     @Transactional
-    public void rollbackDelete(Reservation reservation) {
+    public void rollbackCancellation(Reservation reservation) {
         reservationRepository.findById(reservation.getId())
                 .ifPresent(Reservation::accept);
     }

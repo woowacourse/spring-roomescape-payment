@@ -16,8 +16,8 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.AccessDeniedException;
-import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.request.WaitingAcceptRequest;
+import roomescape.service.dto.request.WaitingCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.time.Clock;
@@ -56,7 +56,7 @@ public class ReservationWaitingService {
     }
 
     @Transactional
-    public ReservationResponse addReservationWaiting(CreateReservationRequest request) {
+    public ReservationResponse addReservationWaiting(WaitingCreateRequest request) {
         Reservation reservation = getReservation(request);
         Member waitingMember = getMember(request.memberId());
         reservation.validateOwnerNotSameAsWaitingMember(waitingMember);
@@ -69,7 +69,7 @@ public class ReservationWaitingService {
         return ReservationResponse.from(reservationWaiting);
     }
 
-    private Reservation getReservation(CreateReservationRequest request) {
+    private Reservation getReservation(WaitingCreateRequest request) {
         ReservationTime time = getTime(request.timeId());
         Theme theme = getTheme(request.themeId());
         return reservationRepository.findByDateAndTimeAndThemeAndStatusIs(request.date(), time, theme, ReservationStatus.ACCEPTED)

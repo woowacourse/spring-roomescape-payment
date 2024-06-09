@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.PaymentCreateRequest;
 
 import java.util.NoSuchElementException;
 
@@ -19,8 +19,8 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment addPayment(PaymentRequest paymentRequest, Reservation reservation) {
-        Payment payment = paymentRequest.toPayment(reservation);
+    public Payment addPayment(PaymentCreateRequest request) {
+        Payment payment = request.toPayment();
         return paymentRepository.save(payment);
     }
 

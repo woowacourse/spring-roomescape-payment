@@ -19,7 +19,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.config.PaymentClientConfig;
 import roomescape.exception.PaymentClientException;
 import roomescape.exception.PaymentServerException;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.PaymentConfirmRequest;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TossPaymentClientTest {
 
-    private final PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.TEN);
+    private final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest("paymentKey", "orderId", BigDecimal.TEN);
     private final MockRestServiceServer server;
     private final TossPaymentClient tossPaymentClient;
     @Autowired
@@ -59,7 +59,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withException(new IOException("timeout")));
 
-        assertThatThrownBy(() -> tossPaymentClient.pay(paymentRequest))
+        assertThatThrownBy(() -> tossPaymentClient.pay(paymentConfirmRequest))
                 .isExactlyInstanceOf(PaymentServerException.class);
     }
 
@@ -73,7 +73,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(httpStatus).body(response));
 
-        assertThatThrownBy(() -> tossPaymentClient.pay(paymentRequest))
+        assertThatThrownBy(() -> tossPaymentClient.pay(paymentConfirmRequest))
                 .isExactlyInstanceOf(PaymentClientException.class)
                 .hasMessageContaining(message)
                 .extracting("statusCode")
@@ -98,7 +98,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(httpStatus).body(response));
 
-        assertThatThrownBy(() -> tossPaymentClient.pay(paymentRequest))
+        assertThatThrownBy(() -> tossPaymentClient.pay(paymentConfirmRequest))
                 .isExactlyInstanceOf(PaymentServerException.class)
                 .hasMessageContaining(message);
     }

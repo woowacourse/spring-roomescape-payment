@@ -13,16 +13,12 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.CreateReservationRequest;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
-import roomescape.support.FakePaymentClient;
 import roomescape.support.fixture.MemberFixture;
+import roomescape.support.fixture.ReservationFixture;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 class ReservationPaymentFacadeServiceTest extends BaseServiceTest {
 
@@ -60,15 +56,13 @@ class ReservationPaymentFacadeServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("예약을 생성한다.")
     void addReservation() {
-        LocalDate date = LocalDate.parse("2024-06-07");
-        CreateReservationRequest reservationRequest = new CreateReservationRequest(date, time.getId(), theme.getId(), member.getId());
-        PaymentRequest paymentRequest = new PaymentRequest("testPaymentKey", "orderId", BigDecimal.TEN);
+        ReservationCreateRequest request = ReservationFixture.createValidRequest(member.getId(), time.getId(), theme.getId());
 
-        ReservationResponse response = reservationPaymentFacadeService.addReservation(reservationRequest, paymentRequest);
+        ReservationResponse response = reservationPaymentFacadeService.addReservation(request);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.id()).isEqualTo(1L);
-            softly.assertThat(response.date()).isEqualTo(date);
+            softly.assertThat(response.date()).isEqualTo(request.date());
             softly.assertThat(response.name()).isEqualTo(member.getName());
             softly.assertThat(response.theme()).isEqualTo(theme.getRawName());
             softly.assertThat(response.startAt()).isEqualTo(time.getStartAt());
@@ -80,12 +74,10 @@ class ReservationPaymentFacadeServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("결제 승인에서 예외가 발생하면 저장한 예약, 결제를 롤백한다")
     void addReservationFailWhenPaymentConfirmFail() {
-        LocalDate date = LocalDate.parse("2024-06-07");
-        CreateReservationRequest reservationRequest = new CreateReservationRequest(date, time.getId(), theme.getId(), member.getId());
-        PaymentRequest paymentRequest = new PaymentRequest(FakePaymentClient.PAYMENT_ERROR_KEY, "orderId", BigDecimal.TEN);
+        ReservationCreateRequest request = ReservationFixture.createInvalidRequest(member.getId(), time.getId(), theme.getId());
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThatThrownBy(() -> reservationPaymentFacadeService.addReservation(reservationRequest, paymentRequest));
+            softly.assertThatThrownBy(() -> reservationPaymentFacadeService.addReservation(request));
             softly.assertThat(reservationRepository.count()).isZero();
             softly.assertThat(paymentRepository.count()).isZero();
         });

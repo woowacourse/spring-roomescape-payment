@@ -3,10 +3,9 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
-import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.request.PaymentCancelRequest;
-import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.request.ReservationCancelRequest;
+import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 @Service
@@ -23,11 +22,11 @@ public class ReservationPaymentFacadeService {
         this.paymentClient = paymentClient;
     }
 
-    public ReservationResponse addReservation(CreateReservationRequest reservationRequest, PaymentRequest paymentRequest) {
-        Reservation reservation = reservationService.addReservation(reservationRequest);
-        paymentService.addPayment(paymentRequest, reservation);
+    public ReservationResponse addReservation(ReservationCreateRequest request) {
+        Reservation reservation = reservationService.addReservation(request);
+        paymentService.addPayment(request.toPaymentCreateRequest(reservation));
         try {
-            paymentClient.pay(paymentRequest);
+            paymentClient.pay(request.toPaymentConfirmRequest());
             return ReservationResponse.from(reservation);
         } catch (RuntimeException e) { // todo PaymentException
             paymentService.deleteByReservation(reservation);
@@ -37,19 +36,19 @@ public class ReservationPaymentFacadeService {
     }
 
     public void cancelReservation(ReservationCancelRequest request) {
-        Reservation deletedReservation = reservationService.deleteReservationById(request.id());
-        Payment deletedPayment = paymentService.deleteByReservation(deletedReservation);
+        Reservation canceledReservation = reservationService.cancel(request.id());
+        Payment deletedPayment = paymentService.deleteByReservation(canceledReservation);
         if (deletedPayment.isNotAccountTransfer()) {
-            invokeClient(request, deletedReservation, deletedPayment);
+            PaymentCancelRequest paymentCancelRequest = request.toPaymentCancelRequest(deletedPayment.getPaymentKey());
+            invokeClient(paymentCancelRequest, canceledReservation, deletedPayment);
         }
     }
 
-    private void invokeClient(ReservationCancelRequest request, Reservation deletedReservation, Payment deletedPayment) {
-        PaymentCancelRequest paymentCancelRequest = new PaymentCancelRequest(deletedPayment.getPaymentKey(), request.cancelReason());
+    private void invokeClient(PaymentCancelRequest request, Reservation cenceledReservation, Payment deletedPayment) {
         try {
-            paymentClient.cancel(paymentCancelRequest);
+            paymentClient.cancel(request);
         } catch (RuntimeException e) { // todo PaymentException
-            reservationService.rollbackDelete(deletedReservation);
+            reservationService.rollbackCancellation(cenceledReservation);
             paymentService.rollbackDelete(deletedPayment);
             throw e;
         }

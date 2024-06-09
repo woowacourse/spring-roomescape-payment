@@ -4,8 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import roomescape.service.dto.request.CreateReservationRequest;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.ReservationCreateRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,11 +33,7 @@ public record ReservationRequest(
         BigDecimal amount
 ) {
 
-    public CreateReservationRequest toCreateReservationRequest(long memberId) {
-        return new CreateReservationRequest(date, timeId, themeId, memberId);
-    }
-
-    public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(paymentKey, orderId, amount);
+    public ReservationCreateRequest toReservationCreateRequest(long memberId) {
+        return new ReservationCreateRequest(date, timeId, themeId, memberId, paymentKey, orderId, amount);
     }
 }

@@ -2,7 +2,7 @@ package roomescape.controller.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.WaitingCreateRequest;
 
 import java.time.LocalDate;
 
@@ -18,7 +18,8 @@ public record WaitingRequest(
         @Positive
         Long themeId
 ) {
-    public CreateReservationRequest toCreateReservationRequest(long memberId) {
-        return new CreateReservationRequest(date, timeId, themeId, memberId);
+
+    public WaitingCreateRequest toWaitingCreateRequest(Long memberId) {
+        return new WaitingCreateRequest(date, themeId, timeId, memberId);
     }
 }

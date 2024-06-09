@@ -19,6 +19,7 @@ import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationPaymentFacadeService;
 import roomescape.service.ReservationService;
 import roomescape.service.dto.request.ReservationCancelRequest;
+import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -59,9 +60,8 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid ReservationRequest request,
                                                               @Auth Authentication authentication) {
         long memberId = authentication.getId();
-        ReservationResponse response = reservationPaymentFacadeService.addReservation(
-                request.toCreateReservationRequest(memberId), request.toPaymentRequest()
-        );
+        ReservationCreateRequest reservationCreateRequest = request.toReservationCreateRequest(memberId);
+        ReservationResponse response = reservationPaymentFacadeService.addReservation(reservationCreateRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }

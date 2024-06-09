@@ -15,7 +15,7 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.PaymentCreateRequest;
 import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.PaymentFixture;
 import roomescape.support.fixture.ReservationFixture;
@@ -61,14 +61,14 @@ class PaymentServiceTest extends BaseServiceTest {
     @Test
     @DisplayName("결제를 생성한다.")
     void addPayment() {
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.TEN);
+        PaymentCreateRequest paymentConfirmRequest = new PaymentCreateRequest("paymentKey", "orderId", BigDecimal.TEN, reservation);
 
-        Payment payment = paymentService.addPayment(paymentRequest, reservation);
+        Payment payment = paymentService.addPayment(paymentConfirmRequest);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(payment.getId()).isEqualTo(1L);
-            softly.assertThat(payment.getPaymentKey()).isEqualTo(paymentRequest.paymentKey());
-            softly.assertThat(payment.getAmount()).isEqualTo(paymentRequest.amount());
+            softly.assertThat(payment.getPaymentKey()).isEqualTo(paymentConfirmRequest.paymentKey());
+            softly.assertThat(payment.getAmount()).isEqualTo(paymentConfirmRequest.amount());
         });
     }
 

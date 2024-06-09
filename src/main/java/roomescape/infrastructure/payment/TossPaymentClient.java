@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.service.PaymentClient;
 import roomescape.service.dto.request.PaymentCancelRequest;
-import roomescape.service.dto.request.PaymentRequest;
+import roomescape.service.dto.request.PaymentConfirmRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -15,21 +15,21 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void pay(PaymentRequest paymentRequest) {
+    public void pay(PaymentConfirmRequest paymentConfirmRequest) {
         restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(paymentConfirmRequest)
                 .retrieve()
                 .toBodilessEntity();
     }
 
     @Override
-    public void cancel(PaymentCancelRequest cancelRequest) {
+    public void cancel(PaymentCancelRequest paymentCancelRequest) {
         restClient.post()
-                .uri("/{paymentKey}/cancel", cancelRequest.paymentKey())
+                .uri("/{paymentKey}/cancel", paymentCancelRequest.paymentKey())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cancelRequest)
+                .body(paymentCancelRequest)
                 .retrieve()
                 .toBodilessEntity();
     }

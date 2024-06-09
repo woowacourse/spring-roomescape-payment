@@ -15,7 +15,7 @@ import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.WaitingCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.ReservationFixture;
@@ -70,7 +70,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("예약 대기를 생성한다.")
     void createReservationWaiting() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
                 theme.getId(), prin.getId());
 
         ReservationResponse response = reservationWaitingService.addReservationWaiting(request);
@@ -87,7 +87,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("확정된 예약이 존재하지 않으면 예약 대기를 생성할 수 없다.")
     void createReservationWaitingFailWhenReservationNotFound() {
         LocalDate date = LocalDate.parse("2024-05-24");
-        CreateReservationRequest request = new CreateReservationRequest(date, time.getId(), theme.getId(),
+        WaitingCreateRequest request = new WaitingCreateRequest(date, time.getId(), theme.getId(),
                 prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
@@ -99,7 +99,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("이미 예약한 멤버는 예약 대기를 생성할 수 없다")
     void createReservationWaitingFailWhenAlreadyReserved() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
                 theme.getId(), reservation.getMember().getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
@@ -115,7 +115,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
             Member prevWaitingMember = memberRepository.save(MemberFixture.create("waiting" + count + "@email.com"));
             reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prevWaitingMember));
         }
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
                 theme.getId(), prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
@@ -128,7 +128,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     void createReservationWaitingFailWhenAlreadyWaiting() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
         reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prin));
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
                 theme.getId(), prin.getId());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
