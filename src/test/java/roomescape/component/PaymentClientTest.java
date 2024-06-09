@@ -2,8 +2,6 @@ package roomescape.component;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -12,50 +10,52 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.config.properties.TossPaymentConfigProperties;
+import roomescape.config.payment.TossPaymentConfigProperties;
 import roomescape.dto.payment.PaymentConfirmRequest;
 import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.dto.payment.TossPaymentErrorResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.TossPaymentErrorCode;
 
-@RestClientTest(TossPaymentClient.class)
-@ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
-@EnableConfigurationProperties(TossPaymentConfigProperties.class)
+@SpringBootTest
 class PaymentClientTest {
 
     @Autowired
     private TossPaymentConfigProperties tossProperties;
 
     @Autowired
-    private TossPaymentClient paymentClient;
-
-    @MockBean
-    private ResponseErrorHandler errorHandler;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
+    private RestClient.Builder tossRestClientBuilder;
+
+    private TossPaymentClient paymentClient;
+
     private MockRestServiceServer mockServer;
+
+    private String uri;
+
+    @BeforeEach
+    void setUp() {
+        mockServer = MockRestServiceServer.bindTo(tossRestClientBuilder).build();
+        paymentClient = new TossPaymentClient(tossProperties, tossRestClientBuilder);
+        uri = tossProperties.baseUri() + tossProperties.confirmUri();
+    }
 
     @Test
     @DisplayName("결제 승인에 성공한다.")
@@ -64,12 +64,13 @@ class PaymentClientTest {
         var response = new PaymentConfirmResponse("paymentKey", "orderId", 1000L);
         var responseString = objectMapper.writeValueAsString(response);
 
-        mockServer.expect(requestTo(tossProperties.confirmUri()))
+        mockServer.expect(requestTo(uri))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(objectMapper.writeValueAsString(request)))
                 .andRespond(withSuccess(responseString, MediaType.APPLICATION_JSON));
 
         assertThat(paymentClient.confirm(request)).isEqualTo(response);
+
         mockServer.verify();
     }
 
@@ -81,19 +82,16 @@ class PaymentClientTest {
         var response = objectMapper.writeValueAsString(
                 new TossPaymentErrorResponse(errorCode.name(), errorCode.message()));
 
-        mockServer.expect(requestTo(tossProperties.confirmUri()))
+        mockServer.expect(requestTo(uri))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(errorCode.httpStatusCode())
                         .body(response)
                         .contentType(MediaType.APPLICATION_JSON));
-
-        when(errorHandler.hasError(any())).thenThrow(new RoomescapeException(errorCode));
 
         assertThatThrownBy(() -> paymentClient.confirm(request))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(errorCode.message());
 
         mockServer.verify();
-
     }
 }
