@@ -22,7 +22,7 @@ import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
-import roomescape.reservation.dto.MyReservationWaitingResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -100,10 +100,10 @@ class ReservationServiceTest {
         given(reservationRepository.findByMember_id(member.getId()))
                 .willReturn(List.of(reservation1, reservation2));
 
-        List<MyReservationWaitingResponse> actual = reservationService.findMyReservations(member.getId());
-        List<MyReservationWaitingResponse> expected = List.of(
-                MyReservationWaitingResponse.from(reservation1),
-                MyReservationWaitingResponse.from(reservation2));
+        List<MyReservationResponse> actual = reservationService.findMyReservations(member.getId());
+        List<MyReservationResponse> expected = List.of(
+                MyReservationResponse.from(reservation1),
+                MyReservationResponse.from(reservation2));
 
         assertThat(actual).isEqualTo(expected);
     }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static roomescape.fixture.MemberFixture.MEMBER_ADMIN;
 import static roomescape.fixture.MemberFixture.MEMBER_BRI;
 import static roomescape.fixture.ThemeFixture.THEME_1;
@@ -14,22 +15,32 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Cookies;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.fixture.CookieProvider;
+import roomescape.fixture.DateFixture;
+import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.fixture.TimeFixture;
 import roomescape.model.SpringBootTestBase;
 import roomescape.paymenthistory.PaymentType;
+import roomescape.paymenthistory.exception.PaymentException;
 import roomescape.paymenthistory.service.TossPaymentHistoryService;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.repository.ReservationRepository;
 
 @AutoConfigureMockMvc
 class ReservationControllerTest extends SpringBootTestBase {
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @MockBean
     private TossPaymentHistoryService tossPaymentHistoryService;
@@ -135,5 +146,37 @@ class ReservationControllerTest extends SpringBootTestBase {
                 .jsonPath().getList("", ReservationResponse.class);
 
         assertThat(reservationResponses).doesNotContain(response);
+    }
+
+    @DisplayName("사용자가 예약을 시도하던 도중 결제에 실패하는 경우 예약을 취소한 후 에러를 발생한다.")
+    @Test
+    void findMyReservationsWaitings_whenPaymentFails() {
+
+        Cookies loginMemberCookies = restAssuredTemplate.makeUserCookie(MemberFixture.MEMBER_BROWN);
+        Cookies adminCookies = restAssuredTemplate.makeUserCookie(MemberFixture.MEMBER_ADMIN);
+
+        Long themeId = restAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
+        Long timeId = restAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
+
+        ReservationCreateRequest reservationParams = new ReservationCreateRequest(DateFixture.TOMORROW_DATE, timeId,
+                themeId,
+                "paymentKey", "orderId",
+                214000, PaymentType.NORMAL);
+
+        doThrow(PaymentException.class)
+                .when(tossPaymentHistoryService).approvePayment(any());
+
+        RestAssured.given().log().all()
+                .cookies(loginMemberCookies)
+                .contentType(ContentType.JSON)
+                .body(reservationParams)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(500);
+
+        Optional<Reservation> reservation = reservationRepository.findById(1L);
+
+        assertThat(reservation)
+                .isEmpty();
     }
 }

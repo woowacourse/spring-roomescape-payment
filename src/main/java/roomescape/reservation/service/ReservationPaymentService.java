@@ -1,11 +1,15 @@
 package roomescape.reservation.service;
 
+import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoggedInMember;
 import roomescape.paymenthistory.dto.PaymentCreateRequest;
+import roomescape.paymenthistory.dto.PaymentResponse;
 import roomescape.paymenthistory.exception.PaymentException;
 import roomescape.paymenthistory.service.TossPaymentHistoryService;
+import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveResponse;
@@ -35,5 +39,17 @@ public class ReservationPaymentService {
             reservationService.deleteReservation(response.reservation().getId());
             throw exception;
         }
+    }
+
+    public List<MyReservationWaitingResponse> findMyReservationsWithPayment(long memberId) {
+        List<MyReservationResponse> reservations = reservationService.findMyReservations(memberId);
+
+        return reservations.stream()
+                .map(reservationResponse -> {
+                    PaymentResponse paymentResponse = tossPaymentHistoryService.findPaymentHistory(
+                            reservationResponse.reservationId());
+                    return MyReservationWaitingResponse.from(reservationResponse, paymentResponse);
+                })
+                .toList();
     }
 }
