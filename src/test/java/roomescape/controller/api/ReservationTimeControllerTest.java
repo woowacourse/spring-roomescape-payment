@@ -1,5 +1,13 @@
 package roomescape.controller.api;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -15,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.BaseControllerTest;
 import roomescape.controller.dto.request.ReservationTimeRequest;
@@ -87,7 +97,19 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     @DisplayName("이용가능한 시간들을 조회한다.")
     @Sql("/reservation.sql")
     void getAvailableReservationTimes() {
-        ExtractableResponse<Response> extractResponse = RestAssured.given().log().all()
+        ExtractableResponse<Response> extractResponse = RestAssured.given(spec).log().all()
+                .filter(document("time/getAvailableReservationTimes",
+                        preprocessRequest(Preprocessors.prettyPrint()),
+                        preprocessResponse(Preprocessors.prettyPrint()),
+                        queryParameters(
+                                parameterWithName("date").description("조회할 날짜"),
+                                parameterWithName("themeId").description("조회할 테마 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("list[].timeId").type(JsonFieldType.NUMBER).description("시간 아이디"),
+                                fieldWithPath("list[].startAt").type(JsonFieldType.STRING).description("시작 시간"),
+                                fieldWithPath("list[].alreadyBooked").type(JsonFieldType.BOOLEAN).description("예약 여부")
+                        )))
                 .param("date", "2024-04-09")
                 .param("themeId", 1L)
                 .when().get("/times/available")

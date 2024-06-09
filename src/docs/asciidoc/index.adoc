@@ -1,0 +1,22 @@
+= User Reservation Page API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 전체 테마 조회
+
+operation::theme/getAllThemes[snippets='http-request,http-response,response-fields']
+
+== 예약 가능한 시간 조회
+
+operation::time/getAvailableReservationTimes[snippets='http-request,query-parameters,http-response,response-fields']
+
+== 예약 생성
+
+operation::reservation/addReservation[snippets='http-request,request-fields,http-response,response-fields']
+
+== 예약 대기 생성
+
+operation::waiting/addReservationWaiting[snippets='http-request,request-fields,http-response,response-fields']

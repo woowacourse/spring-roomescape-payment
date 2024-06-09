@@ -1,13 +1,29 @@
 package roomescape.controller.api;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Stream;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.controller.BaseControllerTest;
 import roomescape.controller.dto.request.ReservationByAdminRequest;
 import roomescape.controller.dto.request.ReservationRequest;
@@ -19,10 +35,6 @@ import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Stream;
 
 class ReservationControllerTest extends BaseControllerTest {
 
@@ -96,7 +108,9 @@ class ReservationControllerTest extends BaseControllerTest {
     @DisplayName("나의 예약들을 조회한다")
     void getMyReservations() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest saveRequest = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000);
+        ReservationRequest saveRequest = new ReservationRequest(
+                date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000
+        );
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
@@ -195,12 +209,31 @@ class ReservationControllerTest extends BaseControllerTest {
 
     private void addReservation() {
         LocalDate date = LocalDate.of(2024, 4, 9);
-        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId", 1000);
+        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId(), "paymentKey", "orderId",
+                1000);
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given(spec).log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(request)
+                .filter(document("reservation/addReservation",
+                        preprocessRequest(Preprocessors.prettyPrint()),
+                        preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약할 날짜"),
+                                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("예약할 시간 아이디"),
+                                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("예약할 테마 아이디"),
+                                fieldWithPath("paymentKey").type(JsonFieldType.STRING).description("결제 키의 값"),
+                                fieldWithPath("orderId").type(JsonFieldType.STRING).description("주문번호"),
+                                fieldWithPath("amount").type(JsonFieldType.NUMBER).description("결제할 금액")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 아이디"),
+                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("예약자 이름"),
+                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간"),
+                                fieldWithPath("theme").type(JsonFieldType.STRING).description("예약 테마 이름")
+                        )))
                 .when().post("/reservations")
                 .then().log().all()
                 .extract();
@@ -218,7 +251,9 @@ class ReservationControllerTest extends BaseControllerTest {
     }
 
     private void addReservationFailWhenDuplicatedReservation() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 9), 1L, 1L, "paymentKey", "orderId", 1000);
+        ReservationRequest request = new ReservationRequest(
+                LocalDate.of(2024, 4, 9), 1L, 1L, "paymentKey", "orderId", 1000
+        );
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .cookie("token", token)
@@ -235,7 +270,9 @@ class ReservationControllerTest extends BaseControllerTest {
     }
 
     void addReservationFailWhenDateTimePassed() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 4, 7), 1L, 1L, "paymentKey", "orderId", 1000);
+        ReservationRequest request = new ReservationRequest(
+                LocalDate.of(2024, 4, 7), 1L, 1L, "paymentKey", "orderId", 1000
+        );
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
