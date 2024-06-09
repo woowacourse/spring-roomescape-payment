@@ -75,10 +75,6 @@ public class Reservation {
         this.status = ReservationStatus.PENDING;
     }
 
-    public void bookReservation() {
-        this.status = ReservationStatus.BOOKED;
-    }
-
     public Long getId() {
         return id;
     }

@@ -27,7 +27,6 @@ public class PaymentService {
         PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
 
         if (!Objects.equals(paymentResponse.totalAmount(), amount)) {
-            // TODO 돈 돌려주는 작업이 필요하지 않나??
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
         Payment payment = new Payment(

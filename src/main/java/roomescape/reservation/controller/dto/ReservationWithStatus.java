@@ -40,4 +40,8 @@ public record ReservationWithStatus(long reservationId,
                 null
         );
     }
+
+    public String getStatus() {
+        return status.getStatus();
+    }
 }

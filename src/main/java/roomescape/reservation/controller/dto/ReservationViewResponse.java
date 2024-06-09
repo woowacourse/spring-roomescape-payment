@@ -33,7 +33,7 @@ public record ReservationViewResponse(
                 reservationWithStatus.themeName(),
                 reservationWithStatus.date(),
                 reservationWithStatus.time(),
-                waitingCount + "번째 " + reservationWithStatus.status().getStatus(),
+                waitingCount + "번째 " + reservationWithStatus.getStatus(),
                 reservationWithStatus.paymentKey(),
                 reservationWithStatus.totalAmount()
         );
