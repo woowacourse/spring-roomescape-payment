@@ -28,7 +28,7 @@ async function fetchReservationPayment(paymentData) {
     paymentType: paymentData.paymentType,
   }
 
-  const reservationId = window.location.pathname.split('/')[3];
+  const reservationId = window.location.pathname.split('/')[2];
   const reservationURL = "/payment/" + reservationId;
   fetch(reservationURL, {
     method: "POST",

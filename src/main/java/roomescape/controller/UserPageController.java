@@ -20,7 +20,7 @@ public class UserPageController {
         return "reservation-mine";
     }
 
-    @GetMapping("/payment/reservation/{id}")
+    @GetMapping("/payment/{id}")
     public String paymentPage() {
         return "payment";
     }

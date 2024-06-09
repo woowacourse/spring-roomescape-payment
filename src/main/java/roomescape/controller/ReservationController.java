@@ -43,7 +43,7 @@ public class ReservationController {
     }
 
     //todo 결제 정보 저장 필요
-    @PostMapping("/payment/reservations/{id}")
+    @PostMapping("/payment/{id}")
     public void payReservation(
             @PathVariable long id,
             @Authenticated LoginMemberRequest loginMemberRequest,

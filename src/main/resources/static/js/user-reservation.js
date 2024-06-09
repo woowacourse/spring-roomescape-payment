@@ -164,7 +164,7 @@ function onReservationButtonClick() {
       .then(data => {
         alert("Reservation successful!");
         if(data.reservationStatus === '예약') {
-          window.location.href = "/payment/reservation/" + data.id;
+          window.location.href = "/payment/" + data.id;
         } else {
           alert('Reservation waiting successful!');
           window.location.href = "/";
