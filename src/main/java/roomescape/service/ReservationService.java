@@ -54,7 +54,7 @@ public class ReservationService {
                 request.themeId());
         Theme theme = getTheme(request.themeId());
 
-        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member, ReservationStatus.RESERVED);
+        Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member, ReservationStatus.RESERVED);
         return reservationRepository.save(reservation);
     }
 
@@ -65,7 +65,7 @@ public class ReservationService {
         Theme theme = getTheme(request.themeId());
         Member member = getMember(request.memberId());
 
-        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
+        Reservation reservation = Reservation.paymentWaitingStatusOf(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 

@@ -29,7 +29,7 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+    private Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
         validatePast(date, time);
         this.id = id;
         this.date = date;
@@ -39,12 +39,12 @@ public class Reservation {
         this.status = status;
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member, ReservationStatus.PAYMENT_WAITING);
+    public static Reservation of(LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        return new Reservation(null, date, time, theme, member, status);
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
-        this(null, date, time, theme, member, status);
+    public static Reservation paymentWaitingStatusOf(LocalDate date, ReservationTime time, Theme theme, Member member) {
+        return new Reservation(null, date, time, theme, member, ReservationStatus.PAYMENT_WAITING);
     }
 
     private void validatePast(LocalDate date, ReservationTime time) {
