@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import org.springframework.http.HttpStatus;
 import roomescape.member.domain.Member;
 import roomescape.system.exception.ErrorType;
@@ -63,24 +62,21 @@ public class Reservation {
             Member member,
             ReservationStatus status
     ) {
+        validateIsNull(date, reservationTime, theme, member, status);
         this.id = id;
         this.date = date;
         this.reservationTime = reservationTime;
         this.theme = theme;
         this.member = member;
         this.reservationStatus = status;
-        validateBlank();
     }
 
-    private void validateBlank() {
-        if (date == null || reservationTime == null || theme == null || member == null) {
+    private void validateIsNull(LocalDate date, ReservationTime reservationTime, Theme theme, Member member,
+                                ReservationStatus reservationStatus) {
+        if (date == null || reservationTime == null || theme == null || member == null || reservationStatus == null) {
             throw new RoomEscapeException(ErrorType.REQUEST_DATA_BLANK, String.format("[values: %s]", this),
                     HttpStatus.BAD_REQUEST);
         }
-    }
-
-    public boolean isReserved() {
-        return reservationStatus == ReservationStatus.CONFIRMED;
     }
 
     public Long getMemberId() {
@@ -97,14 +93,6 @@ public class Reservation {
 
     public ReservationTime getReservationTime() {
         return reservationTime;
-    }
-
-    public String getThemeName() {
-        return theme.getName();
-    }
-
-    public LocalTime getStartAt() {
-        return reservationTime.getStartAt();
     }
 
     public Theme getTheme() {
