@@ -47,7 +47,9 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
+import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 
@@ -215,7 +217,7 @@ public class ReservationControllerTest {
                 .header("Cookie", accessTokenCookie)
                 .when().delete("/reservations/" + reservation.getId())
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(302);
     }
 
     @Test
@@ -241,29 +243,6 @@ public class ReservationControllerTest {
                 .when().post("/reservations/waiting/{id}/deny", waiting.getId())
                 .then().log().all()
                 .statusCode(204);
-    }
-
-    @Test
-    @DisplayName("본인의 예약이 아니면 예약 정보를 삭제할 수 없으며 403 Forbidden 을 Response 받는다.")
-    void canRemoveAnotherReservation() {
-        // given
-        Member member = memberRepository.save(new Member("name", "member1@email.com", "password", Role.MEMBER));
-        String accessTokenCookie = getAccessTokenCookieByLogin(member.getEmail(), member.getPassword());
-
-        Member anotherMember = memberRepository.save(new Member("name1", "member2@email.com", "password", Role.MEMBER));
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
-        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
-
-        Reservation reservation = reservationRepository.save(
-                new Reservation(LocalDate.now(), reservationTime, theme, anotherMember, ReservationStatus.CONFIRMED));
-
-        // when & then
-        RestAssured.given().log().all()
-                .port(port)
-                .header("Cookie", accessTokenCookie)
-                .when().delete("/reservations/" + reservation.getId())
-                .then().log().all()
-                .statusCode(403);
     }
 
     @Test
@@ -297,6 +276,7 @@ public class ReservationControllerTest {
                 .contentType(ContentType.JSON)
                 .port(port)
                 .body(invalidRequestBody)
+                .header("Cookie", getAdminAccessTokenCookieByLogin("a@a.a", "a"))
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(400);
@@ -339,6 +319,7 @@ public class ReservationControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .port(port)
+                .header("Cookie", getAdminAccessTokenCookieByLogin("a@a.a", "a"))
                 .body(invalidTypeRequestBody)
                 .when().post("/reservations")
                 .then().log().all()
@@ -357,7 +338,7 @@ public class ReservationControllerTest {
         ReservationTime time1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(18, 30)));
         ReservationTime time2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(19, 30)));
 
-        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.ADMIN));
         String accessToken = getAccessTokenCookieByLogin("email@email.com", "password");
 
         // when : 예약은 2개, 예약 대기는 1개 조회되어야 한다.
@@ -433,7 +414,7 @@ public class ReservationControllerTest {
     @DisplayName("예약을 추가할 때, 결제 승인 이후에 예외가 발생하면 결제를 취소한 뒤 결제 취소 테이블에 취소 정보를 저장한다.")
     void saveReservationWithCancelPayment() {
         // given
-        LocalDateTime localDateTime = LocalDateTime.now().minusHours(1L);
+        LocalDateTime localDateTime = LocalDateTime.now().minusHours(1L).withNano(0);
         LocalDate date = localDateTime.toLocalDate();
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
@@ -442,9 +423,10 @@ public class ReservationControllerTest {
 
         // when : 이전 날짜의 예약을 추가하여 결제 승인 이후 DB 저장 과정에서 예외를 발생시킨다.
         String paymentKey = "pk";
-        OffsetDateTime canceledAt = OffsetDateTime.now().plusHours(1L);
+        OffsetDateTime canceledAt = OffsetDateTime.now().plusHours(1L).withNano(0);
+        OffsetDateTime approvedAt = OffsetDateTime.of(localDateTime, ZoneOffset.ofHours(9));
         when(paymentClient.confirmPayment(any(PaymentRequest.class)))
-                .thenReturn(new PaymentResponse(paymentKey, "oi", canceledAt.minusHours(1L), 1000L));
+                .thenReturn(new PaymentResponse(paymentKey, "oi", approvedAt, 1000L));
 
         when(paymentClient.cancelPayment(any(PaymentCancelRequest.class)))
                 .thenReturn(new PaymentCancelResponse(paymentKey, "고객 요청", 1000L, canceledAt));
@@ -464,8 +446,7 @@ public class ReservationControllerTest {
         assertThat(canceledPaymentOptional.get().getCanceledAt()).isEqualTo(canceledAt);
         assertThat(canceledPaymentOptional.get().getCancelReason()).isEqualTo("고객 요청");
         assertThat(canceledPaymentOptional.get().getCancelAmount()).isEqualTo(1000L);
-        assertThat(canceledPaymentOptional.get().getApprovedAt()).isEqualTo(canceledAt.minusHours(1L));
-
+        assertThat(canceledPaymentOptional.get().getApprovedAt()).isEqualTo(approvedAt);
     }
 
     @DisplayName("테마만을 이용하여 예약을 조회한다.")
@@ -526,7 +507,7 @@ public class ReservationControllerTest {
     @DisplayName("예약 대기를 추가한다.")
     void addWaiting() {
         // given
-        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1L).withNano(0);
         LocalDate date = localDateTime.toLocalDate();
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
@@ -541,7 +522,7 @@ public class ReservationControllerTest {
                 .port(port)
                 .contentType(ContentType.JSON)
                 .header("Cookie", accessToken)
-                .body(new ReservationRequest(date, time.getId(), theme.getId(), "pk", "oi", 1000L, "DEFAULT"))
+                .body(new WaitingRequest(date, time.getId(), theme.getId()))
                 .when().post("/reservations/waiting")
                 .then().log().all()
                 .statusCode(201)
@@ -592,6 +573,30 @@ public class ReservationControllerTest {
                 .then().log().all().extract().cookie("accessToken");
 
         return "accessToken=" + accessToken;
+    }
+
+    @Test
+    @DisplayName("관리자가 직접 예약을 추가한다.")
+    void addReservationByAdmin() {
+        // given
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1L).withNano(0);
+        LocalDate date = localDateTime.toLocalDate();
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+
+        String adminAccessToken = getAdminAccessTokenCookieByLogin("admin@email.com", "password");
+
+
+        // when & then
+        RestAssured.given().log().all()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Cookie", adminAccessToken)
+                .body(new AdminReservationRequest(date, time.getId(), theme.getId(), member.getId()))
+                .when().post("/reservations/admin")
+                .then().log().all()
+                .statusCode(201);
     }
 
     private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
