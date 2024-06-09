@@ -3,12 +3,32 @@
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :sectlinks:
 :sectnums:
 :docinfo: shared-head
 
 = v1.0.0
+== 공통
+include::domain/role.adoc[]
+include::domain/paymentStatus.adoc[]
+include::domain/paymentType.adoc[]
+include::domain/reservationStatus.adoc[]
+
+
+== 응답 형식
+=== 에러 코드
+include::domain/errorType.adoc[]
+
+=== 성공 예시
+include::responses/successResponse.adoc[]
+
+=== 공통 에러 예시
+include::responses/errorResponse.adoc[]
+
+=== 올바르지 않은 데이터 요청 에러 예시
+include::responses/methodArguementNotValidResponse.adoc[]
+
 == 사용자
 include::auth/login.adoc[]
 include::auth/signup.adoc[]
@@ -26,12 +46,4 @@ include::reservation/theme.adoc[]
 == 관리자
 include::admin/admin.adoc[]
 
-== 응답 형식
-=== 성공 예시
-include::examples/successResponse.adoc[]
 
-=== 공통 에러 예시
-include::examples/errorResponse.adoc[]
-
-=== 올바르지 않은 데이터 요청 에러 예시
-include::examples/methodArguementNotValidResponse.adoc[]
