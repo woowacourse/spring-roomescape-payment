@@ -2,12 +2,12 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.reservation.ReservationStatus;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.WaitingFixture;
 
@@ -85,11 +85,11 @@ class WaitingAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @Disabled
     @DisplayName("예약이 취소되면 바로 다음 예약 대기가 결제 대기로 전환되며, 전환 후 예약 대기를 취소하면 다음 예약 대기자의 예약 대기가 결제 대기로 전환된다.")
     @TestFactory
     Stream<DynamicTest> changeToPendingPayment() {
         AtomicLong reservationId = new AtomicLong();
+        AtomicLong pendingPaymentId = new AtomicLong();
         AtomicLong waitingId = new AtomicLong();
         return Stream.of(
                 DynamicTest.dynamicTest("guest가 요청한 일정과 테마로 예약이 존재하지 않아서 예약 상태로 생성한다.", () -> {
@@ -101,7 +101,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                             .then().extract().body().jsonPath().get("id"));
                 }),
                 DynamicTest.dynamicTest("admin이 guest와 동일한 테마와 일정으로 예약을 요청하고, 1번째 예약 대기 상태로 생성된다.", () -> {
-                    waitingId.set((int) RestAssured.given().log().all()
+                    pendingPaymentId.set((int) RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", adminToken)
                             .body(WaitingFixture.createWaitingRequest(reservationDetail))
@@ -138,7 +138,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                 DynamicTest.dynamicTest("admin은 본인의 결제 대기 상태인 예약 정보를 삭제한다.", () -> {
                     RestAssured.given().log().all()
                             .cookie("token", adminToken)
-                            .when().delete("/waitings/" + waitingId)
+                            .when().delete("/waitings/" + pendingPaymentId)
                             .then().log().all()
                             .assertThat().statusCode(HttpStatus.NO_CONTENT.value());
                 }),
@@ -202,7 +202,6 @@ class WaitingAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @Disabled
     @DisplayName("어드민은 예약으로 전환된 예약 대기는 삭제할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotDeleteChangedToReservedByAdmin() {
@@ -243,12 +242,13 @@ class WaitingAcceptanceTest extends AcceptanceTest {
                             .assertThat().statusCode(HttpStatus.OK.value()).body("[0].reservationStatus.status", is(ReservationStatus.PENDING_PAYMENT.getDescription()));
                 }),
                 DynamicTest.dynamicTest("admin은 해당 결제 대기에 대해 결제를 진행해서 예약으로 전환된다.", () -> {
-                   RestAssured.given().log().all()
-                           .contentType(ContentType.JSON)
-                           .cookie("token",adminToken)
-                           .when().post("/reservations/"+waitingId+"/payment")
-                           .then().log().all()
-                           .assertThat().statusCode(HttpStatus.OK.value()).body("reservationStatus.status", is(ReservationStatus.RESERVED.getDescription()));
+                    RestAssured.given().log().all()
+                            .contentType(ContentType.JSON)
+                            .cookie("token", adminToken)
+                            .body(PaymentFixture.createPaymentRequest())
+                            .when().post("/reservations/" + waitingId + "/payment")
+                            .then().log().all()
+                            .assertThat().statusCode(HttpStatus.OK.value()).body("status", is(ReservationStatus.RESERVED.getDescription()));
                 }),
                 DynamicTest.dynamicTest("어드민이 예약 대기를 삭제하려고 했는데, 이미 예약으로 전환되어 삭제할 수 없다.", () -> {
                     RestAssured.given().log().all()

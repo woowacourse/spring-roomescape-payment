@@ -7,6 +7,7 @@ import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
@@ -48,6 +49,7 @@ public class WaitingCommonService {
         validateAuthority(reservation, member);
         validateStatus(reservation);
         reservationRepository.deleteById(reservation.getId());
+        updateIfDeletedPendingPayment(reservation);
     }
 
     private void validateAuthority(Reservation reservation, Member member) {
@@ -59,6 +61,14 @@ public class WaitingCommonService {
     private void validateStatus(Reservation reservation) {
         if (reservation.isReserved()) {
             throw new InvalidReservationException("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
+        }
+    }
+
+    private void updateIfDeletedPendingPayment(Reservation reservation) {
+        if(reservation.isPendingPayment()){
+            ReservationDetail detail = reservation.getDetail();
+            reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
+                    .ifPresent(Reservation::pendingPayment);
         }
     }
 }
