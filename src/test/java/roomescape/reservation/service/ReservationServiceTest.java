@@ -170,10 +170,9 @@ class ReservationServiceTest {
         // given
         LocalDate dateFrom = LocalDate.now().plusDays(1);
         LocalDate dateTo = LocalDate.now();
-        ReservationSearchRequest request = new ReservationSearchRequest(1L, 1L, dateFrom, dateTo);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.findFilteredReservations(request))
+        assertThatThrownBy(() -> reservationService.findFilteredReservations(null, null, dateFrom, dateTo))
                 .isInstanceOf(RoomEscapeException.class);
     }
 

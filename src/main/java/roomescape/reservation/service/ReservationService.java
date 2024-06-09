@@ -15,7 +15,6 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSearchSpecification;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
@@ -138,14 +137,15 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationsResponse findFilteredReservations(ReservationSearchRequest request) {
-        validateDateForSearch(request.dateFrom(), request.dateTo());
+    public ReservationsResponse findFilteredReservations(Long themeId, Long memberId, LocalDate dateFrom,
+                                                         LocalDate dateTo) {
+        validateDateForSearch(dateFrom, dateTo);
         Specification<Reservation> spec = new ReservationSearchSpecification()
                 .confirmed()
-                .sameThemeId(request.themeId())
-                .sameMemberId(request.memberId())
-                .dateStartFrom(request.dateFrom())
-                .dateEndAt(request.dateTo())
+                .sameThemeId(themeId)
+                .sameMemberId(memberId)
+                .dateStartFrom(dateFrom)
+                .dateEndAt(dateTo)
                 .build();
 
         List<ReservationResponse> response = reservationRepository.findAll(spec)

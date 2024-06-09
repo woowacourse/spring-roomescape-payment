@@ -51,13 +51,6 @@ function fetchTimes() {
 function fetchThemes() {
     requestRead(THEME_API_ENDPOINT)
         .then(data => {
-            let mockTheme = {
-                "id": null,
-                "name": null,
-                "description": null,
-                "thumbnail": null
-            }
-            data.data.themes.unshift(mockTheme);
             themesOptions.push(...data.data.themes);
             populateSelect('theme', themesOptions, 'name');
         })
@@ -67,11 +60,6 @@ function fetchThemes() {
 function fetchMembers() {
     requestRead(MEMBER_API_ENDPOINT)
         .then(data => {
-            let mockMember = {
-                "id": null,
-                "name": null
-            }
-            data.data.members.unshift(mockMember);
             membersOptions.push(...data.data.members);
             populateSelect('member', membersOptions, 'name');
         })
@@ -206,7 +194,17 @@ function applyFilter(event) {
     const dateFrom = document.getElementById('date-from').value;
     const dateTo = document.getElementById('date-to').value;
 
-    fetch(`/reservations/search?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { // 예약 검색 API 호출
+    const queryParams = {
+        themeId : themeId,
+        memberId : memberId,
+        dateFrom : dateFrom,
+        dateTo : dateTo
+    }
+    const searchParams = new URLSearchParams(queryParams);
+    const endpoint = '/reservations/search';
+
+    const url = `${endpoint}?${searchParams.toString()}`;
+    fetch(url, { // 예약 검색 API 호출
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -3,6 +3,7 @@ package roomescape.reservation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.payment.client.PaymentClient;
@@ -18,7 +20,6 @@ import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
@@ -58,8 +59,13 @@ public class ReservationController {
     @Admin
     @GetMapping("/reservations/search")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationsResponse> getReservationBySearching(ReservationSearchRequest request) {
-        return ApiResponse.success(reservationService.findFilteredReservations(request));
+    public ApiResponse<ReservationsResponse> getReservationBySearching(
+            @RequestParam(required = false) Long themeId,
+            @RequestParam(required = false) Long memberId,
+            @RequestParam(required = false) LocalDate dateFrom,
+            @RequestParam(required = false) LocalDate dateTo
+    ) {
+        return ApiResponse.success(reservationService.findFilteredReservations(themeId, memberId, dateFrom, dateTo));
     }
 
     @Admin
