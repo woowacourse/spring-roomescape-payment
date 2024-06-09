@@ -30,7 +30,7 @@ public class ControllerAdvice {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ErrorMessageResponse> handlePaymentException(PaymentException e) {
         ErrorMessageResponse response = new ErrorMessageResponse(e.getMessage());
-        return ResponseEntity.internalServerError().body(response);
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(AuthorizationException.class)
