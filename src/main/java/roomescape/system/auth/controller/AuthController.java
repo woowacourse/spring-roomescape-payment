@@ -1,5 +1,12 @@
 package roomescape.system.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,9 +22,11 @@ import roomescape.system.auth.dto.LoginCheckResponse;
 import roomescape.system.auth.dto.LoginRequest;
 import roomescape.system.auth.jwt.dto.TokenDto;
 import roomescape.system.auth.service.AuthService;
-import roomescape.system.dto.response.ApiResponse;
+import roomescape.system.dto.response.ErrorResponse;
+import roomescape.system.dto.response.RoomEscapeApiResponse;
 
 @RestController
+@Tag(name = "1. 인증 / 인가 API", description = "로그인, 로그아웃 및 로그인 상태를 확인합니다")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,24 +36,44 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiResponse<Void> login(
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "로그인", description = "입력받은 이메일, 비밀번호로 로그인합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공시 쿠키에 토큰 정보를 저장합니다."),
+            @ApiResponse(responseCode = "400", description = "존재하지 않는 회원이거나, 이메일 또는 비밀번호가 잘못 입력되었습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<Void> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletResponse response
     ) {
         TokenDto tokenInfo = authService.login(loginRequest);
         addCookieToResponse(new Cookie("accessToken", tokenInfo.accessToken()), response);
-        return ApiResponse.success();
+        return RoomEscapeApiResponse.success();
     }
 
     @GetMapping("/login/check")
-    public ApiResponse<LoginCheckResponse> checkLogin(@MemberId Long memberId) {
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "로그인 상태 확인", description = "로그인 상태를 확인합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 상태이며, 로그인된 회원의 이름을 반환합니다."),
+            @ApiResponse(responseCode = "400", description = "쿠키에 있는 토큰 정보로 회원을 조회할 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "로그인되지 않은 상태이며, 로그인이 필요합니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<LoginCheckResponse> checkLogin(@MemberId @Parameter(hidden = true) Long memberId) {
         LoginCheckResponse response = authService.checkLogin(memberId);
-        return ApiResponse.success(response);
+        return RoomEscapeApiResponse.success(response);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<Void> logout(
+    @Operation(summary = "로그아웃", description = "현재 로그인된 회원을 로그아웃합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공시 쿠키에 저장된 토큰 정보를 삭제합니다.")
+    })
+    public RoomEscapeApiResponse<Void> logout(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
@@ -52,7 +81,7 @@ public class AuthController {
         cookie.setValue(null);
         cookie.setMaxAge(0);
         addCookieToResponse(cookie, response);
-        return ApiResponse.success();
+        return RoomEscapeApiResponse.success();
     }
 
     private Cookie getTokenCookie(HttpServletRequest request) {
