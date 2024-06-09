@@ -15,14 +15,14 @@ VALUES ('테마1', '테마1 설명', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461
        ('테마4', '테마4 설명', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('테마5', '테마5 설명', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
-INSERT INTO payment (payment_key, amount, order_id)
-VALUES ('payment_key1', 1000, 'order_id1'),
-       ('payment_key2', 1000, 'order_id2'),
-       ('payment_key3', 1000, 'order_id3'),
-       ('payment_key4', 1000, 'order_id4');
+INSERT INTO reservation (date, member_id, time_id, theme_id, status, create_at)
+VALUES ('2024-05-07', 1, 1, 1, 'BOOKED', '2024-05-07T11:44:30.000000'),
+       ('2224-05-08', 2, 1, 1, 'BOOKED', '2024-05-07T11:44:30.000000'),
+       ('2224-05-08', 3, 1, 1, 'STANDBY', '2024-05-08T11:44:30.000000'),
+       ('2224-05-08', 1, 1, 1, 'STANDBY', '2024-05-09T11:44:30.000000');
 
-INSERT INTO reservation (date, member_id, time_id, theme_id, status, create_at, payment_id)
-VALUES ('2024-05-07', 1, 1, 1, 'BOOKED', '2024-05-07T11:44:30.000000', 1),
-       ('2224-05-08', 2, 1, 1, 'BOOKED', '2024-05-07T11:44:30.000000', 2),
-       ('2224-05-08', 3, 1, 1, 'STANDBY', '2024-05-08T11:44:30.000000', 3),
-       ('2224-05-08', 1, 1, 1, 'STANDBY', '2024-05-09T11:44:30.000000', 4);
+INSERT INTO payment (payment_key, amount, order_id, reservation_id)
+VALUES ('payment_key1', 1000, 'order_id1', 1),
+       ('payment_key2', 1000, 'order_id2', 2),
+       ('payment_key3', 1000, 'order_id3', 3),
+       ('payment_key4', 1000, 'order_id4', 4);

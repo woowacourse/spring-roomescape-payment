@@ -9,13 +9,13 @@ import jakarta.validation.constraints.NotNull;
  */
 public class TossPaymentRequest {
     @NotBlank(message = "paymentKey 는 비어있을 수 없습니다.")
-    private String paymentKey;
+    private final String paymentKey;
 
     @NotBlank(message = "orderId 는 비어있을 수 없습니다.")
-    private String orderId;
+    private final String orderId;
 
     @NotNull(message = "amount 는 null일 수 없습니다.")
-    private Long amount;
+    private final Long amount;
 
     public TossPaymentRequest(String paymentKey, String orderId, Long amount) {
         this.paymentKey = paymentKey;

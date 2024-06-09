@@ -96,7 +96,7 @@
 | GET         | `/reservations/waiting`              | 예약 대기 목록 조회       |                                                       | [ReservationResponse](#ReservationResponse)                          |
 | GET         | `/admin/waiting`                     | 예약 대기 관리 페이지      |                                                       | `templates/admin/waiting.html`                                       |
 ### ERD
-![roomescape_waiting_erd](./roomescape_waiting_erd.png)
+![roomescape_erd](./roomescape_erd.png)
 
 ### MemberReservationRequest
 
