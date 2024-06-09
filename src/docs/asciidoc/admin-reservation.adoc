@@ -1,0 +1,131 @@
+=== 어드민 예약(Admin Reservation)
+
+어드민 사용자의 예약 관련 기능을 제공합니다.
+
+==== 어드민 신규 예약 등록
+
+신규 예약을 생성합니다.
+
+===== curl
+
+include::{snippets}/reservation-create-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/reservation-create-admin/http-request.adoc[]
+
+===== 요청 데이터 설명
+
+include::{snippets}/reservation-create-admin/request-fields.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/reservation-create-admin/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/reservation-create-admin/response-fields.adoc[]
+
+==== 어드민 예약 목록 조회
+
+전체 예약을 조회합니다.
+
+===== curl
+
+include::{snippets}/reservation-find-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/reservation-find-admin/http-request.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/reservation-find-admin/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/reservation-find-admin/response-fields.adoc[]
+
+==== 어드민 예약 목록 검색
+
+예약에 대한 조건 기반 검색을 합니다.
+
+===== curl
+
+include::{snippets}/reservation-search-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/reservation-search-admin/http-request.adoc[]
+
+===== 요청 쿼리 파라미터 설명
+
+include::{snippets}/reservation-search-admin/query-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/reservation-search-admin/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/reservation-search-admin/response-fields.adoc[]
+
+==== 어드민 예약 삭제
+
+예약을 삭제합니다.
+
+===== curl
+
+include::{snippets}/reservation-delete-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/reservation-delete-admin/http-request.adoc[]
+
+===== 경로 데이터 설명
+
+include::{snippets}/reservation-delete-admin/path-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/reservation-delete-admin/http-response.adoc[]
+
+==== 어드민 예약 대기 목록 조회
+
+예약 대기 목록을 조회합니다.
+
+===== curl
+
+include::{snippets}/waiting-find-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/waiting-find-admin/http-request.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/waiting-find-admin/http-response.adoc[]
+
+===== 응답 데이터 설명
+
+include::{snippets}/waiting-find-admin/response-fields.adoc[]
+
+==== 어드민 예약 대기 삭제
+
+예약 대기를 삭제합니다.
+
+===== curl
+
+include::{snippets}/waiting-delete-admin/curl-request.adoc[]
+
+===== 요청 데이터 예시
+
+include::{snippets}/waiting-delete-admin/http-request.adoc[]
+
+===== 경로 데이터 설명
+
+include::{snippets}/waiting-delete-admin/path-parameters.adoc[]
+
+===== 응답 데이터 예시
+
+include::{snippets}/waiting-delete-admin/http-response.adoc[]
