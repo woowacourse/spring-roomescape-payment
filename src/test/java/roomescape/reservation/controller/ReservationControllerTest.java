@@ -522,6 +522,62 @@ public class ReservationControllerTest {
                 .body("data.reservations.size()", is(expectedCount));
     }
 
+    @Test
+    @DisplayName("예약 대기를 추가한다.")
+    void addWaiting() {
+        // given
+        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDate date = localDateTime.toLocalDate();
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+        Member member1 = memberRepository.save(new Member("name1", "email1@email.com", "password", Role.MEMBER));
+
+        String accessToken = getAccessTokenCookieByLogin(member.getEmail(), member.getPassword());
+        reservationRepository.save(new Reservation(date, time, theme, member1, ReservationStatus.CONFIRMED));
+
+        // when & then
+        RestAssured.given().log().all()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Cookie", accessToken)
+                .body(new ReservationRequest(date, time.getId(), theme.getId(), "pk", "oi", 1000L, "DEFAULT"))
+                .when().post("/reservations/waiting")
+                .then().log().all()
+                .statusCode(201)
+                .body("data.status", is("WAITING"));
+    }
+
+    @Test
+    @DisplayName("대기중인 예약을 승인한다.")
+    void approveWaiting() {
+        // given
+        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDate date = localDateTime.toLocalDate();
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
+        Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+
+        String accessToken = getAdminAccessTokenCookieByLogin("admin@email.com", "password");
+        Reservation waiting = reservationRepository.save(
+                new Reservation(date, time, theme, member, ReservationStatus.WAITING));
+
+        // when
+        RestAssured.given().log().all()
+                .port(port)
+                .header("Cookie", accessToken)
+                .when().post("/reservations/waiting/{id}/approve", waiting.getId())
+                .then().log().all()
+                .statusCode(200);
+
+        // then
+        reservationRepository.findById(waiting.getId())
+                .ifPresent(r -> assertThat(r.getReservationStatus()).isEqualTo(
+                        ReservationStatus.CONFIRMED_PAYMENT_REQUIRED));
+
+    }
+
+
     private String getAccessTokenCookieByLogin(final String email, final String password) {
         Map<String, String> loginParams = Map.of(
                 "email", email,
