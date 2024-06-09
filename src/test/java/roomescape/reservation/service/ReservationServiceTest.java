@@ -88,7 +88,7 @@ class ReservationServiceTest {
         final Member member = memberRepository.findById(3L).orElseThrow();
         paymentService.saveCredential(new SavePaymentCredentialRequest(paymentKey, amount));
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse(paymentKey, amount));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse(orderId, paymentKey, amount));
 
         // When
         final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest, member.getId());

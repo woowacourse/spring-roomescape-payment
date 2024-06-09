@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,12 @@ class PaymentHistoryRepositoryTest {
         Member member1 = entityManager.find(Member.class, 1);
 
         PaymentHistory paymentHistory1 =
-                new PaymentHistory("paymentKey", 100L, null, member1);
+                new PaymentHistory("order1", "paymentKey", 100L, LocalDateTime.now(), null, member1);
         PaymentHistory paymentHistory2 =
-                new PaymentHistory("paymentKey", 100L, null, member1);
+                new PaymentHistory("order2", "paymentKey", 100L, LocalDateTime.now(), null, member1);
         PaymentHistory paymentHistory3 =
-                new PaymentHistory("paymentKey", 100L, null, entityManager.find(Member.class, 2));
+                new PaymentHistory("order3", "paymentKey", 100L, LocalDateTime.now(), null,
+                        entityManager.find(Member.class, 2));
 
         entityManager.persist(paymentHistory1);
         entityManager.persist(paymentHistory2);

@@ -33,16 +33,19 @@ class ReservationControllerTest extends RestClientControllerTest {
     @Test
     @Sql("classpath:test-payment-credential-data.sql")
     void saveReservationTest() {
+        final String orderId = "orderId";
+        final long amount = 1000L;
+        final String paymentKey = "paymentKey";
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "orderId",
-                1000L,
-                "paymentKey"
+                orderId,
+                amount,
+                paymentKey
         );
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse(orderId, paymentKey, amount));
 
         RestAssured.given(spec).log().all()
                 .filter(document("save-reservation"))

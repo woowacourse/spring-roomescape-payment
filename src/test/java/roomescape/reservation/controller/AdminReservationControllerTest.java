@@ -81,7 +81,7 @@ class AdminReservationControllerTest extends RestClientControllerTest {
                 1L
         );
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse("orderId", "1234", 1000L));
 
         RestAssured.given(spec).log().all()
                 .filter(document("admin-save-reservation"))

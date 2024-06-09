@@ -76,7 +76,7 @@ class PaymentServiceTest {
         final Member member = memberRepository.findById(1L).orElseThrow();
         final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse(orderId, primaryKey, amount));
         List<PaymentHistory> beforeHistories = paymentHistoryRepository.findAll();
 
         //when
