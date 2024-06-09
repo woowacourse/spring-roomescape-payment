@@ -1,4 +1,6 @@
 # API 명세서
+## ERD
+![img.png](docs/img.png)
 
 ## 어드민 권한 페이지
 - description: 어드민(ADMIN) 권한을 가진 사람만 접근 가능한 페이지입니다.
