@@ -9,4 +9,6 @@ public interface PaymentRepository {
     Optional<Payment> findByOrderId(String orderId);
 
     Payment getByOrderId(String orderId);
+
+    boolean updateStatus(String orderId, PaymentStatus status);
 }

@@ -22,9 +22,9 @@ values (1, 1, TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, '2024-01-01', 'BOOKED',
        (2, 2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01', 'BOOKED', 'order11'),
        (3, 1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), 2, 2, '2024-01-01T09:00', 'WAITING', 'order13');
 
-insert into payment (id, order_id, payment_key, amount)
-values (1, 'order12', 'paymentkey123', 10000),
-       (2, 'order11', 'paymentkey234', 20000);
+insert into payment (id, order_id, payment_key, amount, status)
+values (1, 'order12', 'paymentkey123', 10000, 'SUCCESS'),
+       (2, 'order11', 'paymentkey234', 20000, 'SUCCESS');
 
 alter table member alter column id restart with 1000;
 alter table theme alter column id restart with 1000;

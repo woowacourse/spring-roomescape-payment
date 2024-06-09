@@ -3,7 +3,7 @@ package roomescape.application.reservation.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import roomescape.application.payment.dto.PaymentClientRequest;
+import roomescape.application.payment.dto.PaymentRequest;
 
 public record ReservationPaymentRequest(
         Long memberId,
@@ -26,7 +26,7 @@ public record ReservationPaymentRequest(
         return new ReservationRequest(memberId, themeId, date, timeId);
     }
 
-    public PaymentClientRequest toPaymentRequest(long price) {
-        return new PaymentClientRequest(orderId, price, paymentKey);
+    public PaymentRequest toPaymentRequest(long price) {
+        return new PaymentRequest(orderId, price, paymentKey);
     }
 }

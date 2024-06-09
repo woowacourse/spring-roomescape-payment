@@ -49,11 +49,14 @@ public class ReservationService {
         this.clock = clock;
     }
 
-    public ReservationResponse bookReservation(ReservationPaymentRequest request) {
+    @Transactional
+    public ReservationResponse createReservation(ReservationPaymentRequest request) {
         Reservation reservation = getReservationFromRequest(request.toReservationRequest());
         Theme theme = reservation.getTheme();
-        Payment payment = paymentService.purchase(request.toPaymentRequest(theme.getPrice()));
-        return ReservationResponse.from(reservationRepository.save(reservation.withOrderId(payment.getOrderId())));
+        Payment payment = paymentService.createPayment(request.toPaymentRequest(theme.getPrice()));
+        return ReservationResponse.from(
+                reservationRepository.save(reservation.withOrderId(payment.getOrderId()))
+        );
     }
 
     @Transactional
