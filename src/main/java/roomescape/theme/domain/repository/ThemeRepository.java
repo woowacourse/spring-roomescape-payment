@@ -18,4 +18,6 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
                 LIMIT :limit
             """, nativeQuery = true)
     List<Theme> findTopNThemeBetweenStartDateAndEndDate(LocalDate startDate, LocalDate endDate, int limit);
+
+    boolean existsByName(String name);
 }

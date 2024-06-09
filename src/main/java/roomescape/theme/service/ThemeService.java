@@ -56,9 +56,17 @@ public class ThemeService {
     }
 
     public ThemeResponse addTheme(ThemeRequest request) {
+        validateIsSameThemeNameExist(request.name());
         Theme theme = themeRepository.save(new Theme(request.name(), request.description(), request.thumbnail()));
 
         return ThemeResponse.from(theme);
+    }
+
+    private void validateIsSameThemeNameExist(String name) {
+        if (themeRepository.existsByName(name)) {
+            throw new RoomEscapeException(ErrorType.THEME_DUPLICATED,
+                    String.format("[name: %s]", name), HttpStatus.BAD_REQUEST);
+        }
     }
 
     public void removeThemeById(Long id) {
