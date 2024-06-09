@@ -52,5 +52,5 @@ VALUES ('2024-05-04 11.11.11', 1, 2),
        (current_date, 19, 2);
 
 INSERT INTO payment (reservation_id, payment_key, order_id, amount)
-values (18, 'afjdslfjdfeafefd', 'test', 30000),
-       (19, 'adfjlasdjfl;ewfa', 'test', 25000)
+values (18, 'tgen_20240609140413d4073', 'test', 30000),
+       (19, 'tgen_20240607120513d5013', 'test', 25000)
