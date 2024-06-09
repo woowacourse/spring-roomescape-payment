@@ -32,4 +32,5 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     boolean existsByDateAndTimeAndThemeAndMember(LocalDate date, TimeSlot timeSlot, Theme theme, Member member);
 
+    boolean existsByDateAndTimeAndTheme(LocalDate date, TimeSlot timeSlot, Theme theme);
 }

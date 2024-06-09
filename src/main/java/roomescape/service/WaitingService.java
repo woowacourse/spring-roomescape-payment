@@ -19,9 +19,9 @@ import roomescape.repository.WaitingRepository;
 @Service
 @Transactional
 public class WaitingService {
+
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
-
     private final MemberService memberService;
     private final TimeService timeService;
     private final ThemeService themeService;
@@ -71,6 +71,7 @@ public class WaitingService {
     private void validate(LocalDate date, TimeSlot timeSlot, Theme theme, Member member) {
         validateReservation(date, timeSlot);
         validateDuplicatedReservation(date, timeSlot, theme, member);
+        validateExistReservation(date, timeSlot, theme);
     }
 
     private void validateReservation(LocalDate date, TimeSlot time) {
@@ -87,5 +88,16 @@ public class WaitingService {
         if (waitingRepository.existsByDateAndTimeAndThemeAndMember(date, timeSlot, theme, member)) {
             throw new IllegalArgumentException("[ERROR] 예약 대기는 중복으로 신청할 수 없습니다.");
         }
+    }
+
+    private void validateExistReservation(LocalDate date, TimeSlot timeSlot, Theme theme) {
+        if (!existsReservationOrPending(date, timeSlot, theme)) {
+            throw new IllegalArgumentException("[ERROR] 예약이 존재하지 않아 예약 대기를 걸 수 없습니다.");
+        }
+    }
+
+    private boolean existsReservationOrPending(LocalDate date, TimeSlot timeSlot, Theme theme) {
+        return reservationRepository.existsByDateAndTimeAndTheme(date, timeSlot, theme)
+                || waitingRepository.existsByDateAndTimeAndTheme(date, timeSlot, theme);
     }
 }

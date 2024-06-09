@@ -44,7 +44,7 @@ create table if not exists waiting (
     member_id bigint,
     theme_id bigint,
     time_id bigint,
-    status varchar(255) check (status in ('WAITING')),
+    status varchar(255) check (status in ('WAITING', 'PENDING')),
     primary key (id)
 );
 
@@ -79,4 +79,5 @@ VALUES (2, '2024-05-01', 1, 1, 'WAITING'),
        (1, '2024-05-24', 1, 1, 'WAITING'),
        (1, '2024-05-19', 3, 3, 'WAITING'),
        (1, '2024-05-18', 3, 3, 'WAITING'),
-       (1, '2024-05-17', 3, 3, 'WAITING');
+       (1, '2024-05-17', 3, 3, 'WAITING'),
+       (2, '2099-05-30', 1, 1, 'PENDING');
