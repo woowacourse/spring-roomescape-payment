@@ -14,9 +14,6 @@
 === 로그인 성공
 operation::login[snippets="curl-request,http-request,http-response,request-body,request-fields,response-cookies"]
 
-=== 로그인 실패
-operation::notMemberLogin[]
-
 === 로그아웃
 operation::logout[snippets="curl-request,http-request,request-cookies,http-response"]
 

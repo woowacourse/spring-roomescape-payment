@@ -32,12 +32,6 @@ public enum DocumentFilter {
             ),
             responseCookies(cookieWithName("token").description("로그인된 사용자의 토큰"))
     ),
-    NOT_MEMBER_LOGIN("notMemberLogin",
-            requestFields(
-                    fieldWithPath("email").description("로그인 할 사용자의 이메일"),
-                    fieldWithPath("password").description("로그인 할 사용자의 비밀번호")
-            )
-    ),
     LOGOUT("logout",
             requestCookies(cookieWithName("token").description("유효한 사용자 토큰")),
             responseCookies(cookieWithName("token").description("토큰 제거를 위한 헤더"))
