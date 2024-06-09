@@ -13,7 +13,6 @@ import roomescape.service.ThemeService;
 @RestController
 @RequestMapping("/themes")
 public class UserThemeController {
-
     private final ThemeService themeService;
 
     public UserThemeController(ThemeService themeService) {

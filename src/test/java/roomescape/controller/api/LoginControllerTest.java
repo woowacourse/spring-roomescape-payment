@@ -27,15 +27,14 @@ import roomescape.repository.MemberRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class LoginControllerTest {
+    private static final String ID = "admin@a.com";
+    private static final String PASSWORD = "123a!";
 
     @LocalServerPort
     int port;
 
     @Autowired
     private MemberRepository memberRepository;
-
-    private static final String ID = "admin@a.com";
-    private static final String PASSWORD = "123a!";
 
     @BeforeEach
     void setUpData() {

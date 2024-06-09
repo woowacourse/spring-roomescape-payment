@@ -39,6 +39,12 @@ import roomescape.repository.ThemeRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationServiceTest {
+    private final LocalDate date = LocalDate.parse("2060-01-01");
+    private final Long timeId = 1L;
+    private final Long themeId = 1L;
+    private final Long paymentId = 1L;
+    private final Long userId = 1L;
+    private final Long adminId = 2L;
 
     @LocalServerPort
     int port;
@@ -57,14 +63,6 @@ class UserReservationServiceTest {
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
-    private final LocalDate date = LocalDate.parse("2060-01-01");
-
-    private final Long timeId = 1L;
-    private final Long themeId = 1L;
-    private final Long paymentId = 1L;
-    private final Long userId = 1L;
-    private final Long adminId = 2L;
 
     @BeforeEach
     void setUpData() {

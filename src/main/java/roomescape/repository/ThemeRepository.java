@@ -11,7 +11,6 @@ import roomescape.domain.theme.Theme;
 
 @Repository
 public interface ThemeRepository extends JpaRepository<Theme, Long> {
-
     boolean existsByName(String name);
 
     @Query(nativeQuery = true, value = """

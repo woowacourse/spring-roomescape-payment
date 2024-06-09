@@ -12,7 +12,6 @@ import roomescape.service.MemberService;
 
 @Component
 public class CheckRoleInterceptor implements HandlerInterceptor {
-
     private final JwtManager jwtManager;
     private final MemberService memberService;
 

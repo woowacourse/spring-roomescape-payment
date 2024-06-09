@@ -22,7 +22,6 @@ import roomescape.service.dto.PaymentRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class PaymentServiceTest {
-
     PaymentService paymentService;
 
     @Autowired

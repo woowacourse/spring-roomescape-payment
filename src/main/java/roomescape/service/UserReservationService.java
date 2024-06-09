@@ -30,7 +30,6 @@ import roomescape.repository.dto.ReservationWithRank;
 
 @Service
 public class UserReservationService {
-
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;

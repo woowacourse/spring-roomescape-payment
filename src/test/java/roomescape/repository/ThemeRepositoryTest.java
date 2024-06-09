@@ -22,7 +22,6 @@ import roomescape.domain.theme.Theme;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ThemeRepositoryTest {
-
     @LocalServerPort
     int port;
 

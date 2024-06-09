@@ -14,7 +14,6 @@ import roomescape.service.dto.PaymentRequest;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
-
     public static final String AUTHORIZATION = "Authorization";
     private static final String AUTHORIZATION_PREFIX = "Basic ";
     private static final String TOSS_PAYMENTS_URL = "https://api.tosspayments.com/v1/payments/confirm";

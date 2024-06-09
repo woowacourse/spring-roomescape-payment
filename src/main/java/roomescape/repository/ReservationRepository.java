@@ -16,7 +16,6 @@ import roomescape.repository.dto.ReservationWithRank;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-
     Boolean existsByTimeId(Long id);
 
     Boolean existsByThemeId(Long id);

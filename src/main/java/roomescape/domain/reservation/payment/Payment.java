@@ -13,7 +13,6 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "payment")
 @Entity
 public class Payment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

@@ -33,6 +33,13 @@ import roomescape.service.UserReservationService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminReservationControllerTest {
+    private static final Long ADMIN_ID = 1L;
+    private static final Long USER_ID = 2L;
+    private static final Long TIME_ID = 1L;
+    private static final Long THEME_ID = 1L;
+    private static final Long PAYMENT_ID = 1L;
+    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
+    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
 
     @LocalServerPort
     int port;
@@ -54,16 +61,6 @@ class AdminReservationControllerTest {
 
     @Autowired
     private UserReservationService userReservationService;
-
-    private static final Long ADMIN_ID = 1L;
-    private static final Long USER_ID = 2L;
-
-    private static final Long TIME_ID = 1L;
-    private static final Long THEME_ID = 1L;
-    private static final Long PAYMENT_ID = 1L;
-
-    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
-    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
 
     private String adminToken;
     private String userToken;

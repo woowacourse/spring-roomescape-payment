@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/logout")
 public class LogoutController {
-
     @PostMapping
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("token", null);

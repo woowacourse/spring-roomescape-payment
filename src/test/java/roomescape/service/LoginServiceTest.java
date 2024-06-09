@@ -24,7 +24,6 @@ import roomescape.repository.MemberRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class LoginServiceTest {
-
     @LocalServerPort
     int port;
 

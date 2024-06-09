@@ -24,11 +24,28 @@ import roomescape.service.AdminReservationService;
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
-
     private final AdminReservationService adminReservationService;
 
     public AdminReservationController(AdminReservationService adminReservationService) {
         this.adminReservationService = adminReservationService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FindReservationResponse>> findAll() {
+        List<FindReservationResponse> response = adminReservationService.findAllReserved();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FindReservationResponse>> find(SearchReservationFilterRequest request) {
+        List<FindReservationResponse> response = adminReservationService.findAllByFilter(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/standby")
+    public ResponseEntity<List<FindReservationStandbyResponse>> findAllStandby() {
+        List<FindReservationStandbyResponse> response = adminReservationService.findAllStandby();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -45,27 +62,9 @@ public class AdminReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<FindReservationResponse>> findAll() {
-        List<FindReservationResponse> response = adminReservationService.findAllReserved();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/standby")
-    public ResponseEntity<List<FindReservationStandbyResponse>> findAllStandby() {
-        List<FindReservationStandbyResponse> response = adminReservationService.findAllStandby();
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/standby/{id}")
     public ResponseEntity<Void> deleteStandby(@PathVariable Long id) {
         adminReservationService.deleteStandby(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<FindReservationResponse>> find(SearchReservationFilterRequest request) {
-        List<FindReservationResponse> response = adminReservationService.findAllByFilter(request);
-        return ResponseEntity.ok(response);
     }
 }

@@ -40,26 +40,19 @@ import roomescape.repository.ThemeRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ReservationTimeServiceTest {
-
+    private final String rawTime = "19:00";
     @LocalServerPort
     int port;
-
     @Autowired
     private ReservationTimeService reservationTimeService;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
     @Autowired
     private ReservationRepository reservationRepository;
-
-    private final String rawTime = "19:00";
 
     @BeforeEach
     void setUp() {

@@ -19,7 +19,6 @@ import roomescape.repository.MemberRepository;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminPageControllerTest {
-
     @LocalServerPort
     int port;
 

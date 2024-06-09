@@ -36,6 +36,9 @@ import roomescape.repository.ThemeRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ThemeServiceTest {
+    private final String name = "테마1";
+    private final String description = "테마1에 대한 설명입니다.";
+    private final String thumbnail = "https://test.com/test.jpg";
 
     @LocalServerPort
     int port;
@@ -54,10 +57,6 @@ class ThemeServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
-
-    private final String name = "테마1";
-    private final String description = "테마1에 대한 설명입니다.";
-    private final String thumbnail = "https://test.com/test.jpg";
 
     @BeforeEach
     void setUp() {

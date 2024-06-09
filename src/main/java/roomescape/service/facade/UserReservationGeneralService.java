@@ -12,7 +12,6 @@ import roomescape.service.dto.PaymentRequest;
 
 @Service
 public class UserReservationGeneralService {
-
     private final UserReservationService userReservationService;
     private final PaymentService paymentService;
 

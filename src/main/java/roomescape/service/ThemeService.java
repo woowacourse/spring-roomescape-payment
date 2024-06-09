@@ -16,7 +16,6 @@ import roomescape.repository.ThemeRepository;
 
 @Service
 public class ThemeService {
-
     private static final int POPULAR_START_DATE = 8;
     private static final int POPULAR_END_DATE = 1;
     private static final int POPULAR_THEME_COUNT = 10;

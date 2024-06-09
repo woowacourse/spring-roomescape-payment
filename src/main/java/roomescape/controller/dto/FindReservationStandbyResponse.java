@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import roomescape.domain.reservation.Reservation;
 
-public record FindReservationStandbyResponse(Long id,
-                                             String name,
-                                             String theme,
-                                             LocalDate date,
-                                             @JsonFormat(pattern = "HH:mm") LocalTime startAt) {
-
+public record FindReservationStandbyResponse(
+        Long id,
+        String name,
+        String theme,
+        LocalDate date,
+        @JsonFormat(pattern = "HH:mm") LocalTime startAt) {
     public static FindReservationStandbyResponse from(Reservation reservation) {
         return new FindReservationStandbyResponse(
                 reservation.getId(),

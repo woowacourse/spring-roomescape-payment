@@ -39,6 +39,13 @@ import roomescape.service.dto.PaymentRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationControllerTest {
+    private static final Long USER_ID = 1L;
+    private static final Long ANOTHER_USER_ID = 2L;
+    private static final Long TIME_ID = 1L;
+    private static final Long THEME_ID = 1L;
+    private static final Long PAYMENT_ID = 1L;
+    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
+    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
 
     @LocalServerPort
     int port;
@@ -60,16 +67,6 @@ class UserReservationControllerTest {
 
     @MockBean
     private PaymentService paymentService;
-
-    private static final Long USER_ID = 1L;
-    private static final Long ANOTHER_USER_ID = 2L;
-
-    private static final Long TIME_ID = 1L;
-    private static final Long THEME_ID = 1L;
-    private static final Long PAYMENT_ID = 1L;
-
-    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
-    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
 
     private String userToken;
 

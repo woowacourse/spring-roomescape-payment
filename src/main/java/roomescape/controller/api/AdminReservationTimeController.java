@@ -22,11 +22,16 @@ import roomescape.service.ReservationTimeService;
 @RestController
 @RequestMapping("/admin/times")
 public class AdminReservationTimeController {
-
     private final ReservationTimeService reservationTimeService;
 
     public AdminReservationTimeController(ReservationTimeService reservationTimeService) {
         this.reservationTimeService = reservationTimeService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FindTimeResponse>> findAll() {
+        List<FindTimeResponse> response = reservationTimeService.findAll();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -40,11 +45,5 @@ public class AdminReservationTimeController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         reservationTimeService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<FindTimeResponse>> findAll() {
-        List<FindTimeResponse> response = reservationTimeService.findAll();
-        return ResponseEntity.ok(response);
     }
 }

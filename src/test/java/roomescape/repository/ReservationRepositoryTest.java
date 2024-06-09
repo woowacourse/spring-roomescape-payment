@@ -19,7 +19,6 @@ import roomescape.repository.dto.ReservationWithRank;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ReservationRepositoryTest {
-
     @LocalServerPort
     int port;
 

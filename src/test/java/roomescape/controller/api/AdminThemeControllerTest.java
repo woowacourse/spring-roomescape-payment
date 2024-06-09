@@ -31,7 +31,6 @@ import roomescape.service.ThemeService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminThemeControllerTest {
-
     @LocalServerPort
     int port;
 

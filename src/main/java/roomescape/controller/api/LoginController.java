@@ -22,11 +22,15 @@ import roomescape.service.LoginService;
 @RestController
 @RequestMapping("/login")
 public class LoginController {
-
     private final LoginService loginService;
 
     public LoginController(LoginService loginService) {
         this.loginService = loginService;
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<LoginCheckResponse> checkLogin(@AuthenticationPrincipal Member member) {
+        return ResponseEntity.ok(new LoginCheckResponse(member.getName(), member.getRole()));
     }
 
     @PostMapping
@@ -42,10 +46,5 @@ public class LoginController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
-    }
-
-    @GetMapping("/check")
-    public ResponseEntity<LoginCheckResponse> checkLogin(@AuthenticationPrincipal Member member) {
-        return ResponseEntity.ok(new LoginCheckResponse(member.getName(), member.getRole()));
     }
 }

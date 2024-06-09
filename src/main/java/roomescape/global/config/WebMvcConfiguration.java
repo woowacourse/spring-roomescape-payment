@@ -16,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
     private final HandlerMethodArgumentResolver argumentResolver;
     private final HandlerInterceptor checkRoleInterceptor;
     private final HandlerInterceptor checkUserInterceptor;

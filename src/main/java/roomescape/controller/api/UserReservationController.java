@@ -26,7 +26,6 @@ import roomescape.service.facade.UserReservationGeneralService;
 @RestController
 @RequestMapping("/reservations")
 public class UserReservationController {
-
     private final UserReservationGeneralService reservationGeneralService;
     private final UserReservationService reservationService;
 
@@ -35,6 +34,11 @@ public class UserReservationController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<FindMyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
+        List<FindMyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<CreateReservationResponse> save(
@@ -62,11 +66,5 @@ public class UserReservationController {
     public ResponseEntity<Void> deleteStandby(@PathVariable Long id, @AuthenticationPrincipal Member member) {
         reservationService.deleteStandby(id, member);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/mine")
-    public ResponseEntity<List<FindMyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
-        List<FindMyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
-        return ResponseEntity.ok(response);
     }
 }
