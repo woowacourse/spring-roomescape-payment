@@ -16,7 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
-import roomescape.controller.dto.response.FindMemberResponse;
+import roomescape.controller.dto.response.MemberResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.global.exception.RoomescapeException;
@@ -50,7 +50,7 @@ class MemberServiceTest {
             memberRepository.save(new Member("안돌", "andole@test.com", "123a!", Role.USER));
 
             assertThat(memberService.findAll())
-                    .extracting(FindMemberResponse::id)
+                    .extracting(MemberResponse::id)
                     .containsExactly(1L, 2L, 3L);
         }
     }
@@ -71,7 +71,7 @@ class MemberServiceTest {
                     () -> assertThat(member.getName()).isEqualTo("트레"),
                     () -> assertThat(member.getEmail()).isEqualTo("tre@test.com"),
                     () -> assertThat(member.getPassword()).isEqualTo("123a!"),
-                    () -> assertThat(member.getRole()).isEqualTo("USER")
+                    () -> assertThat(member.getRole()).isEqualTo(Role.USER)
             );
         }
 

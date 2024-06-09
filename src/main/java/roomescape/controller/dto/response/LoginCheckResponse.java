@@ -1,4 +1,6 @@
 package roomescape.controller.dto.response;
 
-public record LoginCheckResponse(String name, String role) {
+import roomescape.domain.member.Role;
+
+public record LoginCheckResponse(String name, Role role) {
 }
