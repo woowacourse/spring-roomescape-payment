@@ -1,10 +1,15 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 import org.hibernate.annotations.CreationTimestamp;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.member.domain.Member;

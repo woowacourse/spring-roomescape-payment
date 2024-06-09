@@ -4,10 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.controller.dto.PaymentRequest;
-import roomescape.reservation.controller.dto.PaymentResponse;
 import roomescape.reservation.domain.Payment;
 
 public class PaymentWithRestClient {

@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
@@ -14,8 +15,6 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.ReservationRepository;
 
-import java.util.List;
-
 @Service
 public class WaitingReservationService {
 
@@ -28,7 +27,8 @@ public class WaitingReservationService {
         this.memberRepository = memberRepository;
     }
 
-    public List<ReservationViewResponse> convertReservationsWithStatusToViewResponses(List<ReservationWithStatus> reservationWithStatuses) {
+    public List<ReservationViewResponse> convertReservationsWithStatusToViewResponses(
+            List<ReservationWithStatus> reservationWithStatuses) {
         return reservationWithStatuses
                 .stream()
                 .map(this::generateReservationViewResponse)
@@ -64,6 +64,6 @@ public class WaitingReservationService {
         }
         reservationRepository.deleteById(reservationId);
         reservationRepository.findFirstByReservationSlotOrderByCreatedAt(reservation.getReservationSlot())
-                        .ifPresent(Reservation::bookReservation);
+                .ifPresent(Reservation::bookReservation);
     }
 }

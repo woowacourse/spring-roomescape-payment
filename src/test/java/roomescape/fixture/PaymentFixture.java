@@ -1,20 +1,18 @@
 package roomescape.fixture;
 
-import static org.mockito.ArgumentMatchers.any;
-
 import roomescape.reservation.domain.Payment;
 
 public class PaymentFixture {
     public static Payment getPayment() {
         return new Payment(1L,
-                        "paymentKey",
-                        "orderId",
-                        "orderName",
-                        "method",
-                        1000L,
-                        "status",
-                        "requestedAt",
-                        "approvedAt");
+                "paymentKey",
+                "orderId",
+                "orderName",
+                "method",
+                1000L,
+                "status",
+                "requestedAt",
+                "approvedAt");
     }
 
     public static Payment getWrongPayment() {

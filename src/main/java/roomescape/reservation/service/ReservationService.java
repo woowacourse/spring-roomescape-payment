@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,17 +11,24 @@ import roomescape.exception.custom.ForbiddenException;
 import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.domain.*;
+import roomescape.reservation.controller.dto.PaymentRequest;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
+import roomescape.reservation.controller.dto.ReservationQueryRequest;
+import roomescape.reservation.controller.dto.ReservationRequest;
+import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.reservation.domain.Payment;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationSlot;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.specification.ReservationSpecification;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @Transactional
@@ -66,7 +75,8 @@ public class ReservationService {
         Member member = memberRepository.findById(authInfo.getId())
                 .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
         return reservationRepository.findAllByMember(member).stream()
-                .map(reservation -> ReservationWithStatus.of(reservation, findPaymentById(reservation.getPayment().getId())))
+                .map(reservation -> ReservationWithStatus.of(reservation,
+                        findPaymentById(reservation.getPayment().getId())))
                 .toList();
     }
 
@@ -80,7 +90,8 @@ public class ReservationService {
         Payment payment = paymentWithRestClient.confirm(paymentRequest);
         paymentRepository.save(payment);
 
-        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
+        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(),
+                reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
         Reservation reservation = reservationRepository.save(findReservation(reservationRequest, memberId, payment));
 
         return ReservationResponse.from(reservation);

@@ -3,7 +3,6 @@ package roomescape.reservation.controller.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import roomescape.member.controller.dto.MemberResponse;
-import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 

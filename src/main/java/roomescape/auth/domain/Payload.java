@@ -1,7 +1,6 @@
 package roomescape.auth.domain;
 
 import java.util.function.Supplier;
-
 import roomescape.exception.custom.UnauthorizedException;
 
 public class Payload<T> {

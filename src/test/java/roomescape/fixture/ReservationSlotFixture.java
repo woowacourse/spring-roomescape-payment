@@ -7,7 +7,8 @@ import roomescape.reservation.domain.Theme;
 
 public class ReservationSlotFixture {
     public static ReservationSlot getReservationSlot1() {
-        return new ReservationSlot(1L, LocalDate.now().plusMonths(1), ReservationTimeFixture.get2PM(), ThemeFixture.getTheme2());
+        return new ReservationSlot(1L, LocalDate.now().plusMonths(1), ReservationTimeFixture.get2PM(),
+                ThemeFixture.getTheme2());
     }
 
     public static ReservationSlot getNextDayReservationSlot(ReservationTime time, Theme theme) {

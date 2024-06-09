@@ -1,5 +1,21 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static roomescape.fixture.MemberFixture.getMemberChoco;
+import static roomescape.fixture.MemberFixture.getMemberClover;
+import static roomescape.fixture.MemberFixture.getMemberTacan;
+import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlot;
+import static roomescape.fixture.ReservationTimeFixture.getNoon;
+import static roomescape.fixture.ThemeFixture.getTheme1;
+import static roomescape.fixture.ThemeFixture.getTheme2;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,29 +32,23 @@ import roomescape.fixture.ReservationTimeFixture;
 import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.domain.*;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
+import roomescape.reservation.controller.dto.ReservationQueryRequest;
+import roomescape.reservation.controller.dto.ReservationRequest;
+import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.reservation.domain.Payment;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationSlot;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.specification.ReservationSpecification;
 import roomescape.util.ServiceTest;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static roomescape.fixture.MemberFixture.*;
-import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlot;
-import static roomescape.fixture.ReservationTimeFixture.getNoon;
-import static roomescape.fixture.ThemeFixture.getTheme1;
-import static roomescape.fixture.ThemeFixture.getTheme2;
 
 @DisplayName("예약 로직 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -78,10 +88,10 @@ class ReservationServiceTest extends ServiceTest {
                 1000L,
                 "test payment type");
 
-
         reservationSlotRepository.save(new ReservationSlot(LocalDate.parse(date), time, theme));
 
-        ReservationResponse reservationResponse = reservationService.createReservation(reservationPaymentRequest, getMemberTacan().getId());
+        ReservationResponse reservationResponse = reservationService.createReservation(reservationPaymentRequest,
+                getMemberTacan().getId());
         //then
         assertAll(() -> assertThat(reservationResponse.date()).isEqualTo(date),
                 () -> assertThat(reservationResponse.time().id()).isEqualTo(time.getId()),
@@ -108,12 +118,12 @@ class ReservationServiceTest extends ServiceTest {
                 0L,
                 "test payment type");
 
-
         reservationSlotRepository.save(new ReservationSlot(LocalDate.parse(date), time, theme));
 
         //then
         assertAll(
-                () -> assertThatThrownBy(() -> reservationService.createReservation(reservationPaymentRequest, getMemberTacan().getId()))
+                () -> assertThatThrownBy(
+                        () -> reservationService.createReservation(reservationPaymentRequest, getMemberTacan().getId()))
                         .isInstanceOf(BadRequestException.class),
                 () -> assertThat(reservationRepository.findAll().size()).isEqualTo(2)
         );
@@ -236,7 +246,8 @@ class ReservationServiceTest extends ServiceTest {
 
         //when
         reservationService.deleteReservation(AuthInfo.of(member), reservation.getId());
-        Specification<Reservation> spec = Specification.where(ReservationSpecification.greaterThanOrEqualToStartDate(LocalDate.now()))
+        Specification<Reservation> spec = Specification.where(
+                        ReservationSpecification.greaterThanOrEqualToStartDate(LocalDate.now()))
                 .and(ReservationSpecification.lessThanOrEqualToEndDate(LocalDate.now().plusDays(1)));
 
         //then
@@ -253,7 +264,8 @@ class ReservationServiceTest extends ServiceTest {
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
         reservationRepository.save(new Reservation(member, reservationSlot, PaymentFixture.getPayment()));
 
-        ReservationRequest reservationRequest = new ReservationRequest(reservationSlot.getDate().toString(), time.getId(),
+        ReservationRequest reservationRequest = new ReservationRequest(reservationSlot.getDate().toString(),
+                time.getId(),
                 theme.getId());
 
         //when & then
@@ -318,14 +330,15 @@ class ReservationServiceTest extends ServiceTest {
 
         //when
         reservationService.createAdminReservation(new ReservationRequest(
-                reservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
-                reservationSlot.getTime().getId(),
-                reservationSlot.getTheme().getId()),
+                        reservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
+                        reservationSlot.getTime().getId(),
+                        reservationSlot.getTheme().getId()),
                 tacan.getId());
         List<Reservation> allByMember = reservationRepository.findAllByMember(tacan);
         Reservation addedReservation = allByMember
                 .stream()
-                .filter(reservation -> Objects.equals(reservation.getReservationSlot().getId(), reservationSlot.getId()))
+                .filter(reservation -> Objects.equals(reservation.getReservationSlot().getId(),
+                        reservationSlot.getId()))
                 .findAny()
                 .get();
 

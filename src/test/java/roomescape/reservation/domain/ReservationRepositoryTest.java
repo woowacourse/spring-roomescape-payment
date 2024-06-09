@@ -1,5 +1,8 @@
 package roomescape.reservation.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +14,6 @@ import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class ReservationRepositoryTest {
@@ -30,23 +29,26 @@ class ReservationRepositoryTest {
     @Test
     void addReservation() {
         //given
-        ReservationSlot nextDayReservationSlot = ReservationSlotFixture.getTestYearReservationSlot(ReservationTimeFixture.get2PM(), ThemeFixture.getTheme2());
+        ReservationSlot nextDayReservationSlot = ReservationSlotFixture.getTestYearReservationSlot(
+                ReservationTimeFixture.get2PM(), ThemeFixture.getTheme2());
 
         //when
         ReservationSlot reservationSlot = slotRepository.save(nextDayReservationSlot);
-        Reservation beforeSaveReservation = new Reservation(MemberFixture.getMemberTacan(), reservationSlot, PaymentFixture.getPayment());
+        Reservation beforeSaveReservation = new Reservation(MemberFixture.getMemberTacan(), reservationSlot,
+                PaymentFixture.getPayment());
         Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
 
         //then
         assertThat(savedReservation.getId()).isNotNull();
     }
-    
+
     @DisplayName("성공 : 예약 대기 순서를 조회한다.")
     @Test
     void addWaitingReservation() {
         //given
         ReservationSlot reservedSlot = ReservationSlotFixture.getReservationSlot1();
-        Reservation reservation = new Reservation(MemberFixture.getMemberTacan(), reservedSlot, PaymentFixture.getPayment());
+        Reservation reservation = new Reservation(MemberFixture.getMemberTacan(), reservedSlot,
+                PaymentFixture.getPayment());
 
         //when
         Reservation savedReservation = reservationRepository.save(reservation);

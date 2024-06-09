@@ -18,7 +18,7 @@ public record AdminReservationRequest(
         @NotNull(message = "테마가 입력되지 않았습니다.")
         long themeId
 ) {
-        public ReservationRequest toReservationRequest() {
-                return new ReservationRequest(date, timeId, themeId);
-        }
+    public ReservationRequest toReservationRequest() {
+        return new ReservationRequest(date, timeId, themeId);
+    }
 }

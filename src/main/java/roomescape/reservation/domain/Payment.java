@@ -21,7 +21,7 @@ public class Payment {
     private String requestedAt;
     private String approvedAt;
 
-    public Payment(){
+    public Payment() {
     }
 
     public Payment(Long id, String paymentKey, String orderId, String orderName, String method, Long totalAmount,
