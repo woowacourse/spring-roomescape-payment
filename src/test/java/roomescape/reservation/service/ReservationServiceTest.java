@@ -150,12 +150,12 @@ class ReservationServiceTest {
     @DisplayName("맴버에 해당하는 모든 무료 예약을 반환한다.")
     void findFreeReservationByMemberIdShouldGetFreeReservation() {
         Theme theme = themeRepository.save(new Theme("a", "a", "a"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.now()));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("hogi", "a", "a"));
-        Reservation reservation1 = reservationRepository.save(
-                new Reservation(member, LocalDate.now(), theme, time, Status.WAITING));
-        Reservation reservation2 = reservationRepository.save(
-                new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
+        Reservation reservation1 = new Reservation(member, LocalDate.now().plusDays(10), theme, time, Status.WAITING);
+        reservationRepository.save(reservation1);
+        Reservation reservation2 = new Reservation(member, LocalDate.now().plusDays(10), theme, time, Status.SUCCESS);
+        reservationRepository.save(reservation2);
 
         List<MyReservationResponse> memberReservations = reservationService.findFreeReservationByMemberId(
                 member.getId());
