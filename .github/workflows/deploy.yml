@@ -13,8 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Establish ssh reverse tunneling
-        run: nohup sshpass -p 'YghHome1!' ssh -f -N -R 2222:localhost:22 root@ca.iptime.org -p 22
+      - name: Try port forwarding
+        run: |
+          sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 22
+          sudo netstat -nltp
 
 #      - name: Build with Gradle
 #        run: ./gradlew bootJar
