@@ -52,6 +52,20 @@ class ReservationTimeServiceTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 ID로 시간을 조회하면 예외가 발생한다.")
+    void findTimeByIdFail() {
+        // given
+        ReservationTime saved = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 30)));
+
+        // when
+        Long invalidTimeId = saved.getId() + 1;
+
+        // when & then
+        assertThatThrownBy(() -> reservationTimeService.findTimeById(invalidTimeId))
+                .isInstanceOf(RoomEscapeException.class);
+    }
+
+    @Test
     @DisplayName("삭제하려는 시간에 예약이 존재하면 예외를 발생한다.")
     void usingTimeDeleteFail() {
         // given
