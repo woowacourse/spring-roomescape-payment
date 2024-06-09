@@ -24,6 +24,6 @@ public class UserReservationGeneralService {
     public CreateReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(), request.paymentKey());
         Payment payment = paymentService.pay(paymentRequest);
-        return userReservationService.reserve(CreateReservationRequest.to(memberId, request));
+        return userReservationService.reserve(CreateReservationRequest.to(memberId, request), payment.getId());
     }
 }

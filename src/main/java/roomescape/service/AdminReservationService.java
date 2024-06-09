@@ -79,7 +79,7 @@ public class AdminReservationService {
 
     @Transactional
     public void deleteById(Long id) {
-        Reservation reservation = reservationRepository.findByIdAndStatus(id, RESERVED)
+        Reservation reservation = reservationRepository.findByIdAndStatusNot(id, STANDBY)
                 .orElseThrow(() -> new RoomescapeException("예약이 존재하지 않아 삭제할 수 없습니다."));
 
         reservationRepository.deleteById(reservation.getId());
@@ -104,7 +104,7 @@ public class AdminReservationService {
 
     @Transactional(readOnly = true)
     public List<FindReservationResponse> findAllReserved() {
-        List<Reservation> reservations = reservationRepository.findAllByStatusOrderByDateAscTimeStartAtAsc(RESERVED);
+        List<Reservation> reservations = reservationRepository.findAllByStatusNotOrderByDateAscTimeStartAtAsc(STANDBY);
         return reservations.stream()
                 .map(FindReservationResponse::from)
                 .toList();

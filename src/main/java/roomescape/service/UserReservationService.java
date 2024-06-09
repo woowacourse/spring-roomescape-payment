@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.domain.reservation.ReservationStatus.RESERVED;
+import static roomescape.domain.reservation.ReservationStatus.PAYMENT_RESERVED;
 import static roomescape.domain.reservation.ReservationStatus.STANDBY;
 
 import java.time.LocalDate;
@@ -18,9 +18,11 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -33,22 +35,26 @@ public class UserReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public UserReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository, MemberRepository memberRepository) {
+            ThemeRepository themeRepository, MemberRepository memberRepository,
+            PaymentRepository paymentRepository) {
 
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
-    public CreateReservationResponse reserve(CreateReservationRequest request) {
+    public CreateReservationResponse reserve(CreateReservationRequest request, Long paymentId) {
         validateDuplication(request.date(), request.timeId(), request.themeId());
-        return save(request.memberId(), request.date(), request.timeId(), request.themeId(), RESERVED);
+        return savePaymentReserved(
+                request.memberId(), request.date(), request.timeId(), request.themeId(), paymentId);
     }
 
     private void validateDuplication(LocalDate date, Long timeId, Long themeId) {
@@ -60,23 +66,30 @@ public class UserReservationService {
     @Transactional
     public CreateReservationResponse standby(Long memberId, CreateUserReservationStandbyRequest request) {
         validateAlreadyBookedByMember(memberId, request.date(), request.timeId(), request.themeId());
-        return save(memberId, request.date(), request.timeId(), request.themeId(), STANDBY);
+        return saveStandBy(memberId, request.date(), request.timeId(), request.themeId());
     }
 
     private void validateAlreadyBookedByMember(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-                memberId, date, timeId, themeId, RESERVED)) {
-            throw new RoomescapeException("이미 예약하셨습니다. 대기 없이 이용 가능합니다.");
-        }
-
-        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-                memberId, date, timeId, themeId, STANDBY)) {
-            throw new RoomescapeException("이미 대기중인 예약입니다.");
+        if (reservationRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(
+                memberId, date, timeId, themeId)) {
+            throw new RoomescapeException("이미 예약 혹은 대기가 있습니다.");
         }
     }
 
+    private CreateReservationResponse savePaymentReserved(Long memberId, LocalDate date, Long timeId,
+                                                          Long themeId, Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RoomescapeException("결제되지 않았습니다."));
+
+        return save(memberId, date, timeId, themeId, payment, PAYMENT_RESERVED);
+    }
+
+    private CreateReservationResponse saveStandBy(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        return save(memberId, date, timeId, themeId, null, STANDBY);
+    }
+
     private CreateReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
-                                           ReservationStatus status) {
+                                           Payment payment, ReservationStatus status) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
         ReservationTime time = reservationTimeRepository.findById(timeId)
@@ -85,7 +98,7 @@ public class UserReservationService {
                 .orElseThrow(() -> new RoomescapeException("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
         LocalDateTime createdAt = LocalDateTime.now();
 
-        Reservation reservation = new Reservation(member, date, createdAt, time, theme, status);
+        Reservation reservation = new Reservation(member, date, createdAt, time, theme, payment, status);
         validatePastReservation(date, time);
 
         return CreateReservationResponse.from(reservationRepository.save(reservation));

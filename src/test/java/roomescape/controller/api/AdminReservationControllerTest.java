@@ -22,7 +22,9 @@ import roomescape.controller.dto.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.service.AdminReservationService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
@@ -37,6 +39,9 @@ class AdminReservationControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private ThemeService themeService;
@@ -55,6 +60,7 @@ class AdminReservationControllerTest {
 
     private static final Long TIME_ID = 1L;
     private static final Long THEME_ID = 1L;
+    private static final Long PAYMENT_ID = 1L;
 
     private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
     private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
@@ -68,6 +74,8 @@ class AdminReservationControllerTest {
 
         reservationTimeService.save("10:00");
         themeService.save(new CreateThemeRequest("테마1", "설명1", "https://test.com/test.jpg"));
+        paymentRepository.save(new Payment("orderId", 1000, "paymenyKey"));
+
         memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
         memberRepository.save(new Member("사용자", "user@a.com", "123a!", Role.USER));
 
@@ -90,9 +98,9 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 예약 삭제 가능, 다음 순위 예약대기는 자동 예약")
     @Test
     void delete() {
-        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
         userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
-        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID), PAYMENT_ID);
         userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
@@ -153,9 +161,9 @@ class AdminReservationControllerTest {
     @DisplayName("성공: 전체 대기목록 조회 -> 200")
     @Test
     void findAllStandby() {
-        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
         userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
-        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID));
+        userReservationService.reserve(new CreateReservationRequest(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID), PAYMENT_ID);
         userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()

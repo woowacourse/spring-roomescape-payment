@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.payment.Payment;
 import roomescape.domain.theme.Theme;
 
 @Table(name = "reservation")
@@ -52,6 +53,10 @@ public class Reservation {
     @JoinColumn(name = "theme_id")
     private Theme theme;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "status")
@@ -59,11 +64,16 @@ public class Reservation {
 
     public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time, Theme theme,
                        ReservationStatus status) {
-        this(null, Member, date, createdAt, time, theme, status);
+        this(null, Member, date, createdAt, time, theme, null, status);
+    }
+
+    public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time,
+                       Theme theme, Payment payment, ReservationStatus status) {
+        this(null, Member, date, createdAt, time, theme, payment, status);
     }
 
     public Reservation(Long id, Member Member, LocalDate date, LocalDateTime createdAt,
-                       ReservationTime time, Theme theme, ReservationStatus status) {
+                       ReservationTime time, Theme theme, Payment payment, ReservationStatus status) {
 
         this.id = id;
         this.member = Member;
@@ -71,6 +81,7 @@ public class Reservation {
         this.createdAt = createdAt;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
         this.status = status;
     }
 
@@ -107,6 +118,10 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     public ReservationStatus getStatus() {

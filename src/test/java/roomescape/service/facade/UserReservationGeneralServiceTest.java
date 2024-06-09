@@ -3,7 +3,6 @@ package roomescape.service.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -31,6 +30,7 @@ import roomescape.domain.reservation.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.PaymentService;
@@ -44,14 +44,17 @@ class UserReservationGeneralServiceTest {
     @LocalServerPort
     int port;
 
+    @MockBean
+    private PaymentService paymentService;
+
     @Autowired
     private UserReservationGeneralService reservationFacadeService;
 
     @Autowired
     private UserReservationService userReservationService;
 
-    @MockBean
-    private PaymentService paymentService;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -81,7 +84,7 @@ class UserReservationGeneralServiceTest {
         reservationTimeRepository.save(new ReservationTime("08:00"));
 
         Payment payment = new Payment(orderId, amount, paymentKey);
-
+        paymentRepository.save(payment);
         when(paymentService.pay(any(PaymentRequest.class)))
                 .thenReturn(payment);
     }
