@@ -51,14 +51,18 @@ test {
 }
 
 asciidoctor {
+    dependsOn test
     inputs.dir snippetsDir
     configurations 'asciidoctorExt'
-    dependsOn test
+    sources {
+        include("**/index.adoc")
+    }
+    baseDirFollowsSourceFile()
 }
 
 bootJar {
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
+    from("${asciidoctor.outputDir}") {
         into 'static/docs'
     }
 }
