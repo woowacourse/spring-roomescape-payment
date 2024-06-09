@@ -27,6 +27,6 @@ public class FakePaymentClient implements PaymentClient {
 
     @Override
     public void cancel(String paymentKey) {
-        
+
     }
 }
