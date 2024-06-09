@@ -33,4 +33,14 @@ class ClientPageControllerTest {
                 .then().log().all()
                 .statusCode(200);
     }
+
+    @Test
+    @DisplayName("/reservation-mine 으로 GET 요청을 보내면 방탈출 예약 페이지와 200 OK 를 받는다.")
+    void getMyReservationPage() {
+        RestAssured.given().log().all()
+                .port(port)
+                .when().get("/reservation-mine")
+                .then().log().all()
+                .statusCode(200);
+    }
 }
