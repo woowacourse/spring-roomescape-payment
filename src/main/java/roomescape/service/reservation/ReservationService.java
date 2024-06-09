@@ -50,7 +50,6 @@ public class ReservationService {
         try {
             ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
             Reservation reservation = createReservation(reservationSaveRequest);
-            validateUnique(reservation);
             Reservation savedReservation = reservationRepository.save(reservation);
 
             PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
@@ -65,7 +64,6 @@ public class ReservationService {
 
     public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
         Reservation reservation = createReservation(reservationSaveRequest);
-        validateUnique(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
         return new ReservationResponse(savedReservation);
     }
@@ -154,7 +152,9 @@ public class ReservationService {
                 findThemeById(request.themeId())
         );
 
-        return new Reservation(findMemberById(request.memberId()), slot);
+        Reservation reservation = new Reservation(findMemberById(request.memberId()), slot);
+        validateUnique(reservation);
+        return reservation;
     }
 
     private Member findMemberById(Long memberId) {
