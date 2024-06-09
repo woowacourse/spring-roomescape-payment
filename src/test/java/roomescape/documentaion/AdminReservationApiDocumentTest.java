@@ -170,7 +170,7 @@ class AdminReservationApiDocumentTest extends DocumentTest {
                 );
     }
 
-    private ResponseFieldsSnippet getReservationArrayResponseFields() {
+    public static ResponseFieldsSnippet getReservationArrayResponseFields() {
         return responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
                 fieldWithPath("[].memberName").type(JsonFieldType.STRING).description("예약자 이름"),
