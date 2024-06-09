@@ -18,6 +18,7 @@ import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationPaymentFacadeService;
 import roomescape.service.ReservationService;
+import roomescape.service.dto.request.ReservationCancelRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -67,7 +68,7 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservationById(@PathVariable Long id) {
-        reservationService.deleteReservationById(id);
+    public void deleteReservationById(@PathVariable Long id, @RequestParam String reason) { // todo admin
+        reservationPaymentFacadeService.cancelReservation(new ReservationCancelRequest(id, reason));
     }
 }
