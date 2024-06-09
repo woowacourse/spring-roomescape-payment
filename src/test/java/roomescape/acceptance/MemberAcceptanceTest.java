@@ -14,9 +14,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.fixture.ReservationDetailFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ScheduleFixture;
-import roomescape.fixture.WaitingFixture;
 
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;

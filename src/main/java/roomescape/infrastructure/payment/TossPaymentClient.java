@@ -64,8 +64,8 @@ public class TossPaymentClient implements PaymentClient {
     public void cancel(PaymentCancelRequest request) {
         String authorizations = getEncodedKey();
         restClient.post()
-                        .uri("/v1/payments/" + request.paymentKey() + "/cancel")
-                        .header(HttpHeaders.AUTHORIZATION, authorizations);
+                .uri("/v1/payments/" + request.paymentKey() + "/cancel")
+                .header(HttpHeaders.AUTHORIZATION, authorizations);
     }
 
     private String getEncodedKey() {

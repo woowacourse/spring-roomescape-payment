@@ -65,7 +65,7 @@ public class WaitingCommonService {
     }
 
     private void updateIfDeletedPendingPayment(Reservation reservation) {
-        if(reservation.isPendingPayment()){
+        if (reservation.isPendingPayment()) {
             ReservationDetail detail = reservation.getDetail();
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
                     .ifPresent(Reservation::pendingPayment);
