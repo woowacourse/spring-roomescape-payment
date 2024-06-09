@@ -22,5 +22,4 @@ public class TossPaymentClient implements PaymentClient {
                 .retrieve()
                 .toBodilessEntity();
     }
-    // todo response
 }
