@@ -24,5 +24,3 @@ toss:
   secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
   connect-timeout: 5s
   read-timeout: 30s
-  endpoint-confirm: /v1/payments/confirm
-  endpoint-cancel: /v1/payments/{paymentKey}/cancel

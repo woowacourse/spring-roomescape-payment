@@ -26,6 +26,9 @@ import java.util.Map;
 @Component
 public class TossPaymentRestClient {
 
+    private static final String ENDPOINT_CONFIRM = "/v1/payments/confirm";
+    private static final String ENDPOINT_CANCEL = "/v1/payments/{paymentKey}/cancel";
+
     private final RestClient restClient;
     private final PaymentProperties properties;
     private final Logger logger = LoggerFactory.getLogger(TossPaymentRestClient.class);
@@ -85,7 +88,7 @@ public class TossPaymentRestClient {
 
     public PaymentResponse confirm(PaymentRequest request) {
         URI uri = UriComponentsBuilder.fromHttpUrl(properties.baseUrl())
-                .path(properties.endpointConfirm())
+                .path(ENDPOINT_CONFIRM)
                 .build()
                 .toUri();
         return post(uri, request);
@@ -93,7 +96,7 @@ public class TossPaymentRestClient {
 
     public PaymentResponse cancel(String cancelReason) {
         URI uri = UriComponentsBuilder.fromHttpUrl(properties.baseUrl())
-                .path(properties.endpointCancel())
+                .path(ENDPOINT_CANCEL)
                 .build()
                 .toUri();
         return post(uri, Map.of("cancelReason", cancelReason));
