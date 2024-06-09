@@ -17,6 +17,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public Payment confirm(PaymentRequest paymentRequest) {
         if (paymentRequest.isAdmin()) {
             return paymentRepository.save(Payment.ofAdmin());

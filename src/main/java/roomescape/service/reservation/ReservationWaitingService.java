@@ -46,6 +46,7 @@ public class ReservationWaitingService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationWaitingResponse create(ReservationRequest waitingRequest, long memberId) {
         ReservationDate reservationDate = ReservationDate.of(waitingRequest.date());
         ReservationTime reservationTime = findTimeById(waitingRequest.timeId());
@@ -97,8 +98,10 @@ public class ReservationWaitingService {
         }
     }
 
+    @Transactional
     public void deleteById(long waitingId) {
-        reservationWaitingRepository.deleteById(waitingId);
+        reservationWaitingRepository.findById(waitingId)
+                .ifPresent(this::cancelWaiting);
     }
 
     @Transactional
@@ -106,9 +109,13 @@ public class ReservationWaitingService {
         reservationWaitingRepository.findById(waitingId)
                 .ifPresent(waiting -> {
                     waiting.checkCancelAuthority(memberId);
-                    paymentService.cancel(waiting.getPayment());
+                    cancelWaiting(waiting);
                 });
-        reservationWaitingRepository.deleteById(waitingId);
+    }
+
+    private void cancelWaiting(ReservationWaiting waiting) {
+        reservationWaitingRepository.deleteById(waiting.getId());
+        paymentService.cancel(waiting.getPayment());
     }
 
     @Scheduled(cron = "${resetwaiting.schedule.cron}")
