@@ -1,0 +1,91 @@
+:path_all_times: reservation-time/all-times
+
+:path_available_time: reservation-time/available-time
+
+:path_create_time: reservation-time/create-time
+:path_create_time_exist_exception: reservation-time/create-time/exist-exception
+
+:path_delete_time: reservation-time/delete-time
+
+= 예약 시간 관련 API
+
+
+
+== 전체 예약 시간 조회 API
+전체 예약 시간을 조회한다.
+
+=== 요청
+include::{snippets}/{path_all_times}/http-request.adoc[]
+
+=== 응답
+==== 응답 바디
+include::{snippets}/{path_all_times}/response-body.adoc[]
+include::{snippets}/{path_all_times}/response-fields.adoc[]
+
+
+
+== 시간 예약 여부 조회 API
+예약 시간의 예약 여부를 조회한다.
+
+=== 요청
+include::{snippets}/{path_available_time}/http-request.adoc[]
+
+=== 응답
+==== 응답 바디
+include::{snippets}/{path_available_time}/response-body.adoc[]
+
+==== 응답 파라미터
+include::{snippets}/{path_available_time}/response-fields.adoc[]
+
+
+
+== 예약 시간 추가 API
+예약 시간을 추가합니다.
+
+=== 요청
+include::{snippets}/{path_create_time}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 서버에게 받는 쿠키 값을 헤더에 설정합니다.
+include::{snippets}/reservation-time/cookies/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_time}/request-body.adoc[]
+include::{snippets}/{path_create_time}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_time}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_time}/response-body.adoc[]
+include::{snippets}/{path_create_time}/response-fields.adoc[]
+
+=== 에러 메시지
+추가하려는 예약 시간이 이미 존재한다면 400을 반환한다.
+
+include::{snippets}/{path_create_time_exist_exception}/response-body.adoc[]
+include::{snippets}/{path_create_time_exist_exception}/response-fields.adoc[]
+
+
+
+== 예약 시간 삭제 API
+예약 시간을 삭제합니다.
+
+=== 요청
+include::{snippets}/{path_delete_time}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 서버에게 받는 쿠키 값을 헤더에 설정합니다.
+include::{snippets}/{path_delete_time}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_delete_time}/http-response.adoc[]
+
+=== 에러 메시지
+존재하지 않는 예약 시간을 삭제하면 예외 메시지를 응답합니다.
+include::{snippets}/{path_delete_time}/exception/not-exist/response-body.adoc[]
+include::{snippets}/{path_delete_time}/exception/not-exist/response-fields.adoc[]
+
+이미 사용 중인 예약 시간을 삭제하면 예외 메시지를 응답합니다.
+include::{snippets}/{path_delete_time}/exception/already-exist/response-body.adoc[]
+include::{snippets}/{path_delete_time}/exception/already-exist/response-fields.adoc[]
