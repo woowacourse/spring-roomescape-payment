@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.common.RepositoryTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,7 @@ import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.USER_TOMMY;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.TestFixture.WOOTECO_THEME_NAME;
+import static roomescape.payment.domain.PGCompany.TOSS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
@@ -38,6 +41,9 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private ReservationTime reservationTime;
     private Theme wootecoTheme;
@@ -74,7 +80,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
 
         // when
-        List<Reservation> reservations = reservationRepository.findAllByStatusWithDetails(BOOKING);
+        List<Reservation> reservations = reservationRepository.findAllByStatusWithDetails(List.of(BOOKING));
 
         // then
         assertSoftly(softly -> {
@@ -98,8 +104,8 @@ class ReservationRepositoryTest extends RepositoryTest {
         reservationRepository.save(new Reservation(mia, MIA_RESERVATION_DATE, reservationTime, horrorTheme, BOOKING));
 
         // when
-        List<Reservation> reservations = reservationRepository.findAllByMemberAndThemeAndDateBetween(
-                mia, wootecoTheme, MIA_RESERVATION_DATE, MIA_RESERVATION_DATE.plusDays(1));
+        List<Reservation> reservations = reservationRepository.findAllByMemberAndThemeAndStatusAndDateBetween(
+                mia, wootecoTheme, BOOKING, MIA_RESERVATION_DATE, MIA_RESERVATION_DATE.plusDays(1));
 
         // then
         assertSoftly(softly -> {
@@ -151,18 +157,24 @@ class ReservationRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("사용자의 예약 목록을 조회한다.")
+    @DisplayName("사용자의 예약 목록을 결제 내역과 함께 조회한다.")
     void findAllByMemberAndStatusWithDetails() {
         //given
-        reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
-        reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
+        Reservation firstMiaReservation = reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
+        Reservation secondMiaReservation = reservationRepository.save(MIA_RESERVATION(reservationTime, wootecoTheme, mia, BOOKING));
+
+        Payment firstMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, firstMiaReservation, TOSS));
+        Payment secondMiaPayment = paymentRepository.save(new Payment("paymentKey", "orderId", 10L, secondMiaReservation, TOSS));
         reservationRepository.save(TOMMY_RESERVATION(reservationTime, wootecoTheme, tommy, BOOKING));
 
         //when
-        List<Reservation> reservations = reservationRepository.findAllByMemberAndStatusWithDetails(mia, BOOKING);
+        List<ReservationPayment> reservationsWithPayment = reservationRepository.findAllByMemberAndStatusWithPayment(mia, BOOKING);
 
         //then
-        assertThat(reservations).hasSize(2);
+        assertThat(reservationsWithPayment).hasSize(2)
+                .extracting(ReservationPayment::payment)
+                .extracting(Payment::getId)
+                .containsAll(List.of(firstMiaPayment.getId(), secondMiaPayment.getId()));
     }
 
     @Test
@@ -178,7 +190,7 @@ class ReservationRepositoryTest extends RepositoryTest {
 
         // when
         List<WaitingReservation> waitingReservations =
-                reservationRepository.findWaitingReservationsByMemberWithDetails(mia);
+                reservationRepository.findWaitingReservationsByMember(mia);
 
         // then
         assertThat(waitingReservations).hasSize(2)

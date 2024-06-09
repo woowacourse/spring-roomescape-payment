@@ -8,6 +8,7 @@ import roomescape.member.domain.Member;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 
+import static roomescape.TestFixture.HORROR_THEME;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
 import static roomescape.TestFixture.USER_ADMIN;
 import static roomescape.TestFixture.USER_MIA;
@@ -26,6 +27,7 @@ abstract class ReservationServiceTest extends ServiceTest {
 
     protected ReservationTime miaReservationTime;
     protected Theme wootecoTheme;
+    protected Theme horrorTheme;
     protected Member mia;
     protected Member tommy;
     protected Member admin;
@@ -34,6 +36,7 @@ abstract class ReservationServiceTest extends ServiceTest {
     void setUp() {
         this.miaReservationTime = reservationTimeService.create(new ReservationTime(MIA_RESERVATION_TIME));
         this.wootecoTheme = themeService.create(WOOTECO_THEME());
+        this.horrorTheme = themeService.create(HORROR_THEME());
         this.mia = memberService.create(USER_MIA());
         this.tommy = memberService.create(USER_TOMMY());
         this.admin = memberService.create(USER_ADMIN());

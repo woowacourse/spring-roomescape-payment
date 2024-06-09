@@ -1,4 +1,4 @@
-package roomescape.reservation.exception;
+package roomescape.global.exception;
 
 public class DataNotConvertedException extends RuntimeException {
     private final String message;

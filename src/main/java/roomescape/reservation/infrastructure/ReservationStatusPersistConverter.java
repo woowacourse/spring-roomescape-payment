@@ -1,10 +1,10 @@
-package roomescape.reservation.persistence;
+package roomescape.reservation.infrastructure;
 
 import jakarta.persistence.AttributeConverter;
 import org.springframework.stereotype.Component;
-import roomescape.global.exception.ViolationException;
+import roomescape.global.exception.DataNotConvertedException;
+import roomescape.global.exception.NotFoundException;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.exception.DataNotConvertedException;
 
 @Component
 public class ReservationStatusPersistConverter implements AttributeConverter<ReservationStatus, String> {
@@ -23,7 +23,7 @@ public class ReservationStatusPersistConverter implements AttributeConverter<Res
         }
         try {
             return ReservationStatus.from(dbData);
-        } catch (ViolationException e) {
+        } catch (NotFoundException e) {
             throw new DataNotConvertedException("ReservationStatus의 dbData가 유효하지 않습니다.");
         }
     }

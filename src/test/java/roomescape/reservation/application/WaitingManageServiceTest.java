@@ -3,10 +3,9 @@ package roomescape.reservation.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 import java.util.List;
 
@@ -15,20 +14,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static roomescape.TestFixture.MIA_RESERVATION;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
+import static roomescape.TestFixture.USER_ADMIN;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
+import static roomescape.reservation.domain.ReservationStatus.PENDING_PAYMENT;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class WaitingManageServiceTest extends ReservationServiceTest {
     @Autowired
-    @Qualifier("waitingManageService")
-    private ReservationManageService waitingManageService;
+    private WaitingManageService waitingManageService;
 
     @Autowired
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @Autowired
-    private WaitingQueryService waitingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @Test
     @DisplayName("동일한 테마, 날짜, 시간에 예약이 있다면 대기 예약을 한다.")
@@ -38,15 +37,14 @@ class WaitingManageServiceTest extends ReservationServiceTest {
 
         Reservation waitingReservation = new Reservation(
                 tommy, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING);
-        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // when
-        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // then
         assertSoftly(softly -> {
-            softly.assertThat(scheduledReservation.getId()).isNotNull();
-            softly.assertThat(scheduledReservation.getStatus()).isEqualTo(WAITING);
+            softly.assertThat(createdReservation.getId()).isNotNull();
+            softly.assertThat(createdReservation.getStatus()).isEqualTo(WAITING);
         });
     }
 
@@ -56,13 +54,12 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         // given
         Reservation waitingReservation = new Reservation(
                 tommy, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING);
-        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // when
-        Reservation scheduledReservation = waitingManageService.scheduleRecentReservation(createdReservation);
+        Reservation createdReservation = waitingManageService.create(waitingReservation);
 
         // then
-        assertThat(scheduledReservation.getStatus()).isEqualTo(BOOKING);
+        assertThat(createdReservation.getStatus()).isEqualTo(BOOKING);
     }
 
     @Test
@@ -77,8 +74,8 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         waitingManageService.delete(waitingReservation.getId(), mia);
 
         // then
-        List<WaitingReservation> waitingReservations = waitingQueryService.findAllWithPreviousCountByMember(mia);
-        assertThat(waitingReservations).hasSize(0);
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(0);
     }
 
     @Test
@@ -92,8 +89,8 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         waitingManageService.delete(waitingReservation.getId(), admin);
 
         // then
-        List<WaitingReservation> waitingReservations = waitingQueryService.findAllWithPreviousCountByMember(mia);
-        assertThat(waitingReservations).hasSize(0);
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(0);
     }
 
     @Test
@@ -107,5 +104,21 @@ class WaitingManageServiceTest extends ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> waitingManageService.delete(miaWaitingReservation.getId(), tommy))
                 .isInstanceOf(ViolationException.class);
+    }
+
+    @Test
+    @DisplayName("관리자가 결제 대기 예약을 승인한다.")
+    void approve() {
+        // given
+        Reservation createdReservation = bookingManageService.create(MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, PENDING_PAYMENT));
+
+        // when
+        waitingManageService.approve(createdReservation.getId(), USER_ADMIN());
+
+        // then
+        List<MyReservationResponse> miaReservations = reservationQueryService.findAllMyReservations(mia);
+        assertThat(miaReservations).hasSize(1)
+                .extracting(MyReservationResponse::reservationId)
+                .contains(createdReservation.getId());
     }
 }

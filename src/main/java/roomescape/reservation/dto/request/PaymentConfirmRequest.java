@@ -1,6 +1,7 @@
-package roomescape.payment.dto;
+package roomescape.reservation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import roomescape.payment.domain.NewPayment;
 
 public record PaymentConfirmRequest(
         @NotNull(message = "결제 키는 비어있을 수 없습니다.")
@@ -11,4 +12,8 @@ public record PaymentConfirmRequest(
         Long amount,
         @NotNull(message = "결제 타입은 비어있을 수 없습니다.")
         String paymentType) {
+
+    public NewPayment toNewPayment() {
+        return new NewPayment(paymentKey, orderId, amount, paymentType);
+    }
 }

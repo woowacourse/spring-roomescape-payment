@@ -16,7 +16,7 @@ import roomescape.reservation.domain.ThemeRepository;
 import java.time.LocalTime;
 import java.util.List;
 
-@Profile({"default", "!test"})
+@Profile({"!deploy&!test"})
 @Component
 @Transactional
 public class DatabaseInitializer implements ApplicationRunner {

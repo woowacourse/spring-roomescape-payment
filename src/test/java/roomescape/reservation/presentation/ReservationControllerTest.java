@@ -6,14 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import roomescape.acceptance.TestClientConfiguration;
 import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
@@ -21,24 +19,29 @@ import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationManageService;
-import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
-import roomescape.reservation.application.WaitingQueryService;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.ConfirmedPayment;
+import roomescape.payment.domain.Payment;
+import roomescape.reservation.application.BookingManageService;
+import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
+import roomescape.reservation.application.WaitingManageService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,15 +54,15 @@ import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
-import static roomescape.TestFixture.TEST_ERROR_MESSAGE;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.TestFixture.WOOTECO_THEME_NAME;
 import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_MEMBER;
+import static roomescape.payment.domain.PGCompany.TOSS;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
-@Import({TestWebMvcConfiguration.class, TestClientConfiguration.class})
+@Import(TestWebMvcConfiguration.class)
 @WebMvcTest(
         value = ReservationController.class,
         excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE,
@@ -71,24 +74,19 @@ class ReservationControllerTest extends ControllerTest {
             new PaymentConfirmRequest("key", "orderId", 1000L, "none");
 
     @MockBean
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @MockBean
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @MockBean
-    @Qualifier("waitingManageService")
-    private ReservationManageService waitingManageService;
+    private WaitingManageService waitingManageService;
 
     @MockBean
-    private WaitingQueryService waitingQueryService;
+    private PaymentService paymentService;
 
     @MockBean
-    private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private ThemeService themeService;
+    private ReservationFactory reservationFactory;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
@@ -99,13 +97,14 @@ class ReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
+        ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
-        BDDMockito.given(bookingManageService.scheduleRecentReservation(any()))
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
                 .willReturn(expectedReservation);
-        BDDMockito.given(reservationTimeService.findById(anyLong()))
-                .willReturn(expectedTime);
-        BDDMockito.given(themeService.findById(anyLong()))
-                .willReturn(expectedTheme);
+        BDDMockito.given(bookingManageService.createWithPayment(any(), any()))
+                .willReturn(expectedReservation);
+        BDDMockito.given(paymentService.confirm(any()))
+                .willReturn(expectedConfirmedPayment);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -117,7 +116,8 @@ class ReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.memberName").value(MIA_NAME))
                 .andExpect(jsonPath("$.time.id").value(1L))
                 .andExpect(jsonPath("$.time.startAt").value(MIA_RESERVATION_TIME.toString()))
-                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("reservations/create/success"));
     }
 
     @ParameterizedTest
@@ -133,7 +133,8 @@ class ReservationControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/create/fail/null-field"));
     }
 
     private static Stream<ReservationSaveRequest> invalidPostRequests() {
@@ -163,25 +164,28 @@ class ReservationControllerTest extends ControllerTest {
                         .content(invalidDateFormatRequest))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/create/fail/date-format"));
     }
 
     @Test
-    @DisplayName("서비스 정책에 맞지 않는 예약 POST 요청 시 상태코드 400을 반환한다.")
+    @DisplayName("동일한 사용자가 중복 예약 POST 요청 시 상태코드 400을 반환한다.")
     void createDuplicatedReservation() throws Exception {
         // given
-        Long themeId = 1L;
-        Long timeId = 1L;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, 1L, 1L);
+        ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
+        Theme expectedTheme = WOOTECO_THEME(1L);
+        Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ConfirmedPayment expectedConfirmedPayment = new ConfirmedPayment("paymentKey", "orderId", 10);
 
-        BDDMockito.given(themeService.findById(themeId))
-                .willReturn(WOOTECO_THEME(themeId));
-        BDDMockito.given(reservationTimeService.findById(timeId))
-                .willReturn(new ReservationTime(1L, MIA_RESERVATION_TIME));
-        BDDMockito.willThrow(new ViolationException(TEST_ERROR_MESSAGE))
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
+                .willReturn(expectedReservation);
+        BDDMockito.willThrow(new ViolationException("동일한 사용자의 중복된 예약입니다."))
                 .given(bookingManageService)
-                .scheduleRecentReservation(any());
+                .createWithPayment(any(), any());
+        BDDMockito.given(paymentService.confirm(any()))
+                .willReturn(expectedConfirmedPayment);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -190,7 +194,8 @@ class ReservationControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/create/fail/duplicated-reservation"));
     }
 
     @Test
@@ -202,11 +207,9 @@ class ReservationControllerTest extends ControllerTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
-        BDDMockito.given(themeService.findById(themeId))
-                .willReturn(WOOTECO_THEME(themeId));
-        BDDMockito.willThrow(new NotFoundException(TEST_ERROR_MESSAGE))
-                .given(reservationTimeService)
-                .findById(anyLong());
+        BDDMockito.willThrow(new NotFoundException("해당 ID의 예약 시간이 없습니다."))
+                .given(reservationFactory)
+                .create(anyLong(), anyLong(), anyLong(), any(), any());
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -215,7 +218,8 @@ class ReservationControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/create/fail/time-not-found"));
     }
 
     @Test
@@ -227,11 +231,9 @@ class ReservationControllerTest extends ControllerTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, notExistingThemeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
-        BDDMockito.given(reservationTimeService.findById(timeId))
-                .willReturn(new ReservationTime(1L, MIA_RESERVATION_TIME));
-        BDDMockito.willThrow(new NotFoundException(TEST_ERROR_MESSAGE))
-                .given(themeService)
-                .findById(anyLong());
+        BDDMockito.willThrow(new NotFoundException("해당 ID의 테마가 없습니다."))
+                .given(reservationFactory)
+                .create(anyLong(), anyLong(), anyLong(), any(), any());
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -240,7 +242,8 @@ class ReservationControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/create/fail/theme-not-found"));
     }
 
     @Test
@@ -249,13 +252,17 @@ class ReservationControllerTest extends ControllerTest {
         // given
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
+        Payment expectedPayment = new Payment("paymentKey", "orderId", 10L, expectedReservation, TOSS);
+        ReservationPayment expectedReservationPayment = new ReservationPayment(expectedReservation, expectedPayment);
         WaitingReservation expectedWaitingReservation = new WaitingReservation(
                 MIA_RESERVATION(expectedTime, HORROR_THEME(), USER_MIA(), WAITING), 0);
+        List<MyReservationResponse> myReservations = List.of(
+                MyReservationResponse.from(expectedReservationPayment),
+                MyReservationResponse.from(expectedWaitingReservation)
+        );
 
-        BDDMockito.given(bookingQueryService.findAllByMember(any()))
-                .willReturn(List.of(expectedReservation));
-        BDDMockito.given(waitingQueryService.findAllWithPreviousCountByMember(any()))
-                .willReturn(List.of(expectedWaitingReservation));
+        BDDMockito.given(reservationQueryService.findAllMyReservations(any()))
+                .willReturn(myReservations);
 
         // when & then
         mockMvc.perform(get("/reservations/mine").contentType(MediaType.APPLICATION_JSON))
@@ -265,8 +272,11 @@ class ReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
                 .andExpect(jsonPath("$[0].time").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].status").value("예약"))
+                .andExpect(jsonPath("$[0].paymentKey").value("paymentKey"))
+                .andExpect(jsonPath("$[0].amount").value(10L))
                 .andExpect(jsonPath("$[1].theme").value(HORROR_THEME_NAME))
-                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"));
+                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"))
+                .andDo(document("reservations/find-mine/success"));
     }
 
     @Test
@@ -281,14 +291,15 @@ class ReservationControllerTest extends ControllerTest {
         mockMvc.perform(delete("/reservations/{id}/waiting", 1L)
                         .cookie(COOKIE))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("reservations/delete/success"));
     }
 
     @Test
-    @DisplayName("서비스 정책에 맞지 않는 대기 예약 DELETE 요청 시 상태코드 400을 반환한다.")
+    @DisplayName("예약자가 아닌 사용자가 대기 예약 DELETE 요청 시 상태코드 400을 반환한다.")
     void deleteMyWaitingReservationWithoutOwnerShip() throws Exception {
         // given
-        BDDMockito.willThrow(new ViolationException(TEST_ERROR_MESSAGE))
+        BDDMockito.willThrow(new ViolationException("대기 예약을 삭제할 권한이 없습니다. 예약자 혹은 관리자만 삭제할 수 있습니다."))
                 .given(waitingManageService)
                 .delete(1L, STUBBED_LOGIN_MEMBER);
 
@@ -297,6 +308,7 @@ class ReservationControllerTest extends ControllerTest {
                         .cookie(COOKIE))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(TEST_ERROR_MESSAGE));
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("reservations/delete/fail/permission"));
     }
 }

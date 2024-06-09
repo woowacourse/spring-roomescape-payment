@@ -8,6 +8,7 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.ReservationTimeRepository;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.ThemeRepository;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
 
 import java.time.LocalDate;
@@ -20,11 +21,14 @@ import java.util.stream.Collectors;
 public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
+    private final ThemeRepository themeRepository;
 
     public ReservationTimeService(ReservationTimeRepository reservationTimeRepository,
-                                  ReservationRepository reservationRepository) {
+                                  ReservationRepository reservationRepository,
+                                  ThemeRepository themeRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
+        this.themeRepository = themeRepository;
     }
 
     public ReservationTime create(ReservationTime reservationTime) {
@@ -33,11 +37,6 @@ public class ReservationTimeService {
 
     public List<ReservationTime> findAll() {
         return reservationTimeRepository.findAll();
-    }
-
-    public ReservationTime findById(Long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("해당 ID의 예약 시간이 없습니다."));
     }
 
     @Transactional
@@ -55,7 +54,9 @@ public class ReservationTimeService {
         }
     }
 
-    public List<AvailableReservationTimeResponse> findAvailableReservationTimes(LocalDate date, Theme theme) {
+    public List<AvailableReservationTimeResponse> findAvailableReservationTimes(LocalDate date, Long themeId) {
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new NotFoundException("해당 ID의 테마가 없습니다."));
         Set<Long> reservedTimeIds = new HashSet<>(reservationRepository.findAllTimeIdsByDateAndTheme(date, theme));
         List<ReservationTime> times = reservationTimeRepository.findAll();
 

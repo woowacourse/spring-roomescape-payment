@@ -3,9 +3,9 @@ package roomescape.reservation.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import roomescape.global.exception.ViolationException;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.response.MyReservationResponse;
 
 import java.util.List;
 
@@ -20,15 +20,13 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class BookingManageServiceTest extends ReservationServiceTest {
     @Autowired
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingManageService;
+    private BookingManageService bookingManageService;
 
     @Autowired
-    @Qualifier("waitingManageService")
-    private ReservationManageService waitingManageService;
+    private WaitingManageService waitingManageService;
 
     @Autowired
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @Test
     @DisplayName("예약을 생성한다.")
@@ -54,13 +52,12 @@ class BookingManageServiceTest extends ReservationServiceTest {
 
         Reservation duplicatedReservation = new Reservation(
                 admin, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, BOOKING);
-        Reservation createReservation = bookingManageService.create(duplicatedReservation);
 
         // when
-        Reservation scheduledReservation = bookingManageService.scheduleRecentReservation(createReservation);
+        Reservation createReservation = bookingManageService.create(duplicatedReservation);
 
         // then
-        assertThat(scheduledReservation.getStatus()).isEqualTo(WAITING);
+        assertThat(createReservation.getStatus()).isEqualTo(WAITING);
     }
 
     @Test
@@ -75,23 +72,6 @@ class BookingManageServiceTest extends ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 삭제하면 첫 번째 대기 예약 상태가 예약 중으로 바뀐다.")
-    void deleteAndChangeToBooking() {
-        // given
-        Reservation reservationInBooking = bookingManageService.create(MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING));
-        Reservation reservationInWaiting = waitingManageService.create(new Reservation(admin, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING));
-
-        // when
-        bookingManageService.delete(reservationInBooking.getId(), admin);
-
-        // then
-        List<Reservation> changedBookings = bookingQueryService.findAllByMember(admin);
-        assertThat(changedBookings).hasSize(1)
-                .extracting(Reservation::getId)
-                .contains(reservationInWaiting.getId());
-    }
-
-    @Test
     @DisplayName("사용자는 확정된 예약을 취소할 수 없다.")
     void deleteMyReservationInBooking() {
         // given
@@ -100,5 +80,20 @@ class BookingManageServiceTest extends ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> bookingManageService.delete(reservation.getId(), mia))
                 .isInstanceOf(ViolationException.class);
+    }
+
+    @Test
+    @DisplayName("예약을 삭제하면 첫 번째 대기 예약 상태가 결제 대기로 바뀐다.")
+    void deleteAndChangeToBooking() {
+        // given
+        Reservation reservationInBooking = bookingManageService.create(MIA_RESERVATION(miaReservationTime, wootecoTheme, mia, BOOKING));
+        waitingManageService.create(new Reservation(admin, MIA_RESERVATION_DATE, miaReservationTime, wootecoTheme, WAITING));
+
+        // when
+        bookingManageService.delete(reservationInBooking.getId(), admin);
+
+        // then
+        List<MyReservationResponse> reservations = reservationQueryService.findAllMyReservations(admin);
+        assertThat(reservations.get(0).status()).isEqualTo("결제 대기");
     }
 }

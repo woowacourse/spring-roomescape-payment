@@ -15,6 +15,7 @@ import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.WaitingReservationResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,6 +145,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
 
+        // 빈테이블에서는 데드락 발생
+        createTestReservation(TOMMY_RESERVATION_DATE, timeId, themeId, cookies.get(0).getValue(), BOOKING);
+
         // when
         for (int i = 0; i < threadCount; i++) {
             int threadIndex = i;
@@ -163,10 +167,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Cookie adminCookie = new Cookie.Builder("token", adminToken).build();
 
         List<ReservationResponse> reservationResponses = findAllReservations(adminCookie);
-        List<ReservationResponse> waitingResponses = findAllWaitingReservations(adminCookie);
+        List<WaitingReservationResponse> waitingResponses = findAllWaitingReservations(adminCookie);
 
         assertSoftly(softly -> {
-            softly.assertThat(reservationResponses).hasSize(1);
+            softly.assertThat(reservationResponses).hasSize(2);
             softly.assertThat(waitingResponses).hasSize(4);
         });
     }
@@ -218,7 +222,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
         // then
         Thread.sleep(1000);
-        List<ReservationResponse> waitings = findAllWaitingReservations(adminCookie);
+        List<WaitingReservationResponse> waitings = findAllWaitingReservations(adminCookie);
         List<ReservationResponse> bookings = findAllReservations(adminCookie);
         assertSoftly(softly -> {
             softly.assertThat(waitings).hasSize(0);
@@ -237,12 +241,12 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 .toList();
     }
 
-    private List<ReservationResponse> findAllWaitingReservations(Cookie adminCookie) {
+    private List<WaitingReservationResponse> findAllWaitingReservations(Cookie adminCookie) {
         ExtractableResponse<Response> response = RestAssured.given()
                 .cookie(adminCookie)
                 .when().get("/admin/reservations/waiting")
                 .then().extract();
-        return Arrays.stream(response.as(ReservationResponse[].class))
+        return Arrays.stream(response.as(WaitingReservationResponse[].class))
                 .toList();
     }
 

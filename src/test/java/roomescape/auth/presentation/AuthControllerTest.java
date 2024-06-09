@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -27,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.TestFixture.MIA_EMAIL;
 import static roomescape.TestFixture.MIA_NAME;
-import static roomescape.TestFixture.TEST_ERROR_MESSAGE;
 import static roomescape.TestFixture.TEST_PASSWORD;
 import static roomescape.TestFixture.USER_MIA;
 
@@ -52,7 +52,8 @@ class AuthControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, "token=" + expectedToken));
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, "token=" + expectedToken))
+                .andDo(document("auth/login/success"));
     }
 
     @ParameterizedTest
@@ -65,7 +66,8 @@ class AuthControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("auth/login/fail/null-field"));
     }
 
     private static Stream<LoginRequest> invalidRequests() {
@@ -80,12 +82,12 @@ class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 로그인 요청 시 상태코드 401을 반환한다.")
+    @DisplayName("존재하지 않는 이메일 혹은 잘못된 비밀번호로 로그인 요청 시 상태코드 401을 반환한다.")
     void loginWithNotExistingEmail() throws Exception {
         // given
         LoginRequest request = new LoginRequest("not existing email", TEST_PASSWORD);
 
-        BDDMockito.willThrow(new AuthorizationException(TEST_ERROR_MESSAGE))
+        BDDMockito.willThrow(new AuthorizationException("사용자의 비밀번호와 입력 비밀번호가 일치하지 않습니다."))
                 .given(authService)
                 .createToken(anyString(), anyString());
 
@@ -95,7 +97,8 @@ class AuthControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("auth/login/fail/not-existing-info"));
     }
 
     @Test
@@ -112,7 +115,8 @@ class AuthControllerTest extends ControllerTest {
                         .cookie(cookie))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(MIA_NAME));
+                .andExpect(jsonPath("$.name").value(MIA_NAME))
+                .andDo(document("auth/find/success"));
     }
 
     @Test
@@ -121,7 +125,7 @@ class AuthControllerTest extends ControllerTest {
         // given
         Cookie cookie = new Cookie("token", "invalid-token");
 
-        BDDMockito.willThrow(new AuthorizationException(TEST_ERROR_MESSAGE))
+        BDDMockito.willThrow(new AuthorizationException("유효하지 않은 JWT 토큰입니다."))
                 .given(authService)
                 .extractMember(any());
 
@@ -130,7 +134,8 @@ class AuthControllerTest extends ControllerTest {
                         .cookie(cookie))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("auth/find/fail/invalid-token"));
     }
 
     @Test
@@ -140,6 +145,7 @@ class AuthControllerTest extends ControllerTest {
         mockMvc.perform(get("/login/check"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("auth/find/fail/without-token"));
     }
 }

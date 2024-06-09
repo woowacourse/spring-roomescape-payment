@@ -1,26 +1,49 @@
 package roomescape.reservation.application;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.TossPaymentsClient;
+import roomescape.payment.domain.ConfirmedPayment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.event.ReservationDeletedEvent;
+import roomescape.reservation.event.ReservationFailedEvent;
+import roomescape.reservation.event.ReservationSavedEvent;
 
 import java.util.Optional;
 
 @Service
 public class BookingManageService extends ReservationManageService {
-    public BookingManageService(ReservationRepository reservationRepository, TossPaymentsClient tossPaymentsClient) {
-        super(reservationRepository, tossPaymentsClient);
+    private final ApplicationEventPublisher eventPublisher;
+
+    public BookingManageService(ReservationRepository reservationRepository, ApplicationEventPublisher eventPublisher) {
+        super(reservationRepository);
+        this.eventPublisher = eventPublisher;
+    }
+
+    @Transactional
+    public Reservation createWithPayment(Reservation reservation, ConfirmedPayment confirmedPayment) {
+        eventPublisher.publishEvent(new ReservationFailedEvent(confirmedPayment));
+
+        Reservation savedReservation = super.create(reservation);
+        eventPublisher.publishEvent(new ReservationSavedEvent(savedReservation, confirmedPayment));
+        return savedReservation;
     }
 
     @Override
-    protected void correctReservationStatus(int bookingCount, Reservation reservation) {
-        if (bookingCount > MAX_RESERVATION_NUMBER_IN_TIME_SLOT) {
+    @Transactional
+    public void delete(Long id, Member agent) {
+        super.delete(id, agent);
+        eventPublisher.publishEvent(new ReservationDeletedEvent(id));
+    }
+
+    @Override
+    protected void correctReservationStatus(boolean existsReservation, Reservation reservation) {
+        if (existsReservation && reservation.isBooking()) {
             reservation.changeToWaiting();
-            reservationRepository.updateStatusById(ReservationStatus.WAITING, reservation.getId());
         }
     }
 
@@ -29,7 +52,7 @@ public class BookingManageService extends ReservationManageService {
         Optional<Reservation> firstWaitingReservation = reservationRepository.findFirstByDateAndTimeAndThemeAndStatusOrderById(
                 deletedReservation.getDate(), deletedReservation.getTime(),
                 deletedReservation.getTheme(), ReservationStatus.WAITING);
-        firstWaitingReservation.ifPresent(Reservation::changeToBooking);
+        firstWaitingReservation.ifPresent(Reservation::changeToUnpaid);
     }
 
     @Override

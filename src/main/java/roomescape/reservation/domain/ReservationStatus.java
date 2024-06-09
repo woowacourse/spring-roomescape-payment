@@ -1,12 +1,13 @@
 package roomescape.reservation.domain;
 
-import roomescape.global.exception.ViolationException;
+import roomescape.global.exception.NotFoundException;
 
 import java.util.Arrays;
 
 public enum ReservationStatus {
     BOOKING("BOOKING"),
-    WAITING("WAITING");
+    WAITING("WAITING"),
+    PENDING_PAYMENT("PENDING PAYMENT");
 
     private final String identifier;
 
@@ -18,7 +19,7 @@ public enum ReservationStatus {
         return Arrays.stream(ReservationStatus.values())
                 .filter(status -> status.identifier.equals(identifier))
                 .findAny()
-                .orElseThrow(() -> new ViolationException("예약 상태 식별자가 올바르지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(identifier + "가 식별자인 reservation status가 없습니다.."));
     }
 
     public boolean isBooking() {

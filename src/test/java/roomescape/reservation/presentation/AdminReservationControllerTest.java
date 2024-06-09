@@ -3,7 +3,6 @@ package roomescape.reservation.presentation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,12 +12,9 @@ import roomescape.auth.presentation.AdminAuthorizationInterceptor;
 import roomescape.auth.presentation.LoginMemberArgumentResolver;
 import roomescape.common.ControllerTest;
 import roomescape.global.config.WebMvcConfiguration;
-import roomescape.member.application.MemberService;
-import roomescape.reservation.application.BookingQueryService;
-import roomescape.reservation.application.ReservationManageService;
-import roomescape.reservation.application.ReservationTimeService;
-import roomescape.reservation.application.ThemeService;
-import roomescape.reservation.application.WaitingQueryService;
+import roomescape.reservation.application.BookingManageService;
+import roomescape.reservation.application.ReservationFactory;
+import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -28,6 +24,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,23 +48,13 @@ import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 )
 class AdminReservationControllerTest extends ControllerTest {
     @MockBean
-    private BookingQueryService bookingQueryService;
+    private ReservationQueryService reservationQueryService;
 
     @MockBean
-    private WaitingQueryService waitingQueryService;
+    private BookingManageService bookingManageService;
 
     @MockBean
-    @Qualifier("bookingManageService")
-    private ReservationManageService bookingScheduler;
-
-    @MockBean
-    private MemberService memberService;
-
-    @MockBean
-    private ReservationTimeService reservationTimeService;
-
-    @MockBean
-    private ThemeService themeService;
+    private ReservationFactory reservationFactory;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
@@ -78,13 +65,9 @@ class AdminReservationControllerTest extends ControllerTest {
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
 
-        BDDMockito.given(reservationTimeService.findById(anyLong()))
-                .willReturn(expectedTime);
-        BDDMockito.given(themeService.findById(anyLong()))
-                .willReturn(expectedTheme);
-        BDDMockito.given(memberService.findById(anyLong()))
-                .willReturn(USER_MIA(1L));
-        BDDMockito.given(bookingScheduler.scheduleRecentReservation(any()))
+        BDDMockito.given(reservationFactory.create(anyLong(), anyLong(), anyLong(), any(), any()))
+                .willReturn(expectedReservation);
+        BDDMockito.given(bookingManageService.create(any()))
                 .willReturn(expectedReservation);
 
         // when
@@ -96,7 +79,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.memberName").value(MIA_NAME))
                 .andExpect(jsonPath("$.time.id").value(1L))
                 .andExpect(jsonPath("$.time.startAt").value(MIA_RESERVATION_TIME.toString()))
-                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$.date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/create/success"));
     }
 
     @Test
@@ -106,7 +90,7 @@ class AdminReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
 
-        BDDMockito.given(bookingQueryService.findAll())
+        BDDMockito.given(reservationQueryService.findAllInBooking())
                 .willReturn(List.of(expectedReservation));
 
         // when & then
@@ -117,7 +101,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].time.id").value(1L))
                 .andExpect(jsonPath("$[0].time.startAt").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].theme.name").value(WOOTECO_THEME_NAME))
-                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/find-all/success"));
     }
 
     @Test
@@ -127,7 +112,7 @@ class AdminReservationControllerTest extends ControllerTest {
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
 
-        BDDMockito.given(bookingQueryService.findAllByMemberIdAndThemeIdAndDateBetween(anyLong(), anyLong(), any(), any()))
+        BDDMockito.given(reservationQueryService.findAllByMemberIdAndThemeIdAndDateBetween(anyLong(), anyLong(), any(), any()))
                 .willReturn(List.of(expectedReservation));
 
         // when & then
@@ -143,7 +128,8 @@ class AdminReservationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$[0].time.id").value(1L))
                 .andExpect(jsonPath("$[0].time.startAt").value(MIA_RESERVATION_TIME.toString()))
                 .andExpect(jsonPath("$[0].theme.name").value(WOOTECO_THEME_NAME))
-                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()));
+                .andExpect(jsonPath("$[0].date").value(MIA_RESERVATION_DATE.toString()))
+                .andDo(document("admin-reservations/search/success"));
     }
 
     @Test
@@ -157,7 +143,8 @@ class AdminReservationControllerTest extends ControllerTest {
                         .param("toDate", MIA_RESERVATION_DATE.toString()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.message").exists())
+                .andDo(document("admin-reservations/search/fail/null-parameter"));
     }
 
     @Test
@@ -165,13 +152,14 @@ class AdminReservationControllerTest extends ControllerTest {
     void deleteReservation() throws Exception {
         // given
         BDDMockito.willDoNothing()
-                .given(bookingScheduler)
+                .given(bookingManageService)
                 .delete(1L, STUBBED_LOGIN_MEMBER);
 
         // when & then
         mockMvc.perform(delete("/admin/reservations/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("admin-reservations/delete/success"));
     }
 }

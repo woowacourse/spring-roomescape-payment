@@ -23,15 +23,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH r.time
             JOIN FETCH r.theme
             JOIN FETCH r.member
-            WHERE r.member = :member AND r.theme = :theme AND r.date >= :from AND r.date <= :to
+            WHERE r.member = :member AND r.theme = :theme AND r.status = :status AND r.date >= :from AND r.date <= :to
             """)
-    List<Reservation> findAllByMemberAndThemeAndDateBetween(@Param(value = "member") Member member,
-                                                            @Param(value = "theme") Theme theme,
-                                                            @Param(value = "from") LocalDate fromDate,
-                                                            @Param(value = "to") LocalDate toDate);
+    List<Reservation> findAllByMemberAndThemeAndStatusAndDateBetween(@Param(value = "member") Member member,
+                                                                     @Param(value = "theme") Theme theme,
+                                                                     @Param(value = "status") ReservationStatus status,
+                                                                     @Param(value = "from") LocalDate fromDate,
+                                                                     @Param(value = "to") LocalDate toDate);
 
     @Query("SELECT r.time.id FROM Reservation r WHERE r.date = :date AND r.theme = :theme")
     List<Long> findAllTimeIdsByDateAndTheme(@Param(value = "date") LocalDate date, @Param(value = "theme") Theme theme);
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.ReservationPayment(r, p)
+            FROM Reservation r
+            JOIN FETCH r.time
+            JOIN FETCH r.theme
+            LEFT OUTER JOIN Payment p
+            ON p.reservation = r
+            WHERE r.member = :member AND r.status = :status
+            """)
+    List<ReservationPayment> findAllByMemberAndStatusWithPayment(@Param(value = "member") Member member,
+                                                                 @Param(value = "status") ReservationStatus status);
 
     @Query("""
             SELECT r FROM Reservation r
@@ -39,8 +52,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH r.theme
             WHERE r.member = :member AND r.status = :status
             """)
-    List<Reservation> findAllByMemberAndStatusWithDetails(@Param(value = "member") Member member,
-                                                          @Param(value = "status") ReservationStatus status);
+    List<Reservation> findAllByMemberAndStatus(@Param(value = "member") Member member,
+                                               @Param(value = "status") ReservationStatus status);
 
     int countByTime(ReservationTime time);
 
@@ -58,23 +71,23 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH r.theme
             WHERE r.member = :member AND r.status = roomescape.reservation.domain.ReservationStatus.WAITING
             """)
-    List<WaitingReservation> findWaitingReservationsByMemberWithDetails(@Param(value = "member") Member member);
+    List<WaitingReservation> findWaitingReservationsByMember(@Param(value = "member") Member member);
 
     @Query("""
             SELECT r FROM Reservation r
             JOIN FETCH r.member
             JOIN FETCH r.theme
             JOIN FETCH r.time
-            WHERE r.status = :status
+            WHERE r.status IN :status
             """)
-    List<Reservation> findAllByStatusWithDetails(@Param(value = "status") ReservationStatus status);
+    List<Reservation> findAllByStatusWithDetails(@Param(value = "status") List<ReservationStatus> statusConditions);
 
     Optional<Reservation> findFirstByDateAndTimeAndThemeAndStatusOrderById(LocalDate date, ReservationTime time,
                                                                            Theme theme, ReservationStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "10000")})
-    List<Reservation> findAllByDateAndTimeAndThemeAndStatus(LocalDate date, ReservationTime time, Theme theme, ReservationStatus status);
+    boolean existsByDateAndTimeAndThemeAndStatus(LocalDate date, ReservationTime time, Theme theme, ReservationStatus status);
 
     boolean existsByDateAndTimeAndThemeAndMember(LocalDate date, ReservationTime time, Theme theme, Member member);
 

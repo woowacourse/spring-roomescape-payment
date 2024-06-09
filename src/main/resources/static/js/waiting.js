@@ -22,17 +22,33 @@ function render(data) {
         const theme = item.theme.name;
         const date = item.date;
         const startAt = item.time.startAt;
+        const status = item.status;
 
         row.insertCell(0).textContent = id;            // 예약 대기 id
         row.insertCell(1).textContent = name;          // 예약자명
         row.insertCell(2).textContent = theme;         // 테마명
         row.insertCell(3).textContent = date;          // 예약 날짜
         row.insertCell(4).textContent = startAt;       // 시작 시간
+        row.insertCell(5).textContent = status;
 
         const actionCell = row.insertCell(row.cells.length);
 
+        if (status === '결제 대기') actionCell.appendChild(createActionButton('승인', 'btn-primary', approve));
         actionCell.appendChild(createActionButton('거절', 'btn-danger', deny));
     });
+}
+
+function approve(event) {
+    const row = event.target.closest('tr');
+    const id = row.cells[0].textContent;
+
+    const endpoint = `${WAITING_RESERVATION_API_ENDPOINT}/${id}/approval`;
+    return fetch(endpoint, {
+        method: 'PATCH'
+    }).then(response => {
+        if (response.status === 200) return;
+        throw new Error('Approve failed');
+    }).then(() => location.reload());
 }
 
 function deny(event) {
