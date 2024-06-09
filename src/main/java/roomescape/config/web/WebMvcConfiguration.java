@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.web;
 
 import java.util.List;
 

@@ -31,8 +31,7 @@ public class PaymentService {
     }
 
     public void confirm(final PaymentConfirmRequest request) {
-        final Reservation reservation = reservationRepository.findById(request.reservationId())
-                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
+        final Reservation reservation = getReservation(request.reservationId());
         final Payment payment = request.toPayment(reservation);
         try {
             paymentClient.confirm(request);
@@ -40,5 +39,10 @@ public class PaymentService {
             throw new RoomescapeException(REQUEST_TIMEOUT);
         }
         paymentRepository.save(payment);
+    }
+
+    private Reservation getReservation(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
     }
 }

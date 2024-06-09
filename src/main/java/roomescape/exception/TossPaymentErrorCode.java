@@ -6,7 +6,6 @@ import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -55,13 +54,13 @@ public enum TossPaymentErrorCode implements RoomescapeErrorCode {
     NOT_AVAILABLE_BANK(HttpStatus.FORBIDDEN, "은행 서비스 시간이 아닙니다."),
     INVALID_PASSWORD(HttpStatus.FORBIDDEN, "결제 비밀번호가 일치하지 않습니다."),
     INCORRECT_BASIC_AUTH_FORMAT(HttpStatus.FORBIDDEN, "잘못된 요청입니다. ':' 를 포함해 인코딩해주세요."),
-    FDS_ERROR(HttpStatus.FORBIDDEN, "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다. (고객센터: 1644-8051)"),
+    FDS_ERROR(HttpStatus.FORBIDDEN,
+            "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다. (고객센터: 1644-8051)"),
     NOT_FOUND_PAYMENT(HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보 입니다."),
     NOT_FOUND_PAYMENT_SESSION(HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
     FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 완료되지 않았어요. 다시 시도해주세요."),
     FAILED_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
-    UNKNOWN_PAYMENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요.")
-    ;
+    UNKNOWN_PAYMENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요.");
 
     private static final Map<String, TossPaymentErrorCode> CACHE = Arrays.stream(values())
             .collect(toMap(Enum::name, code -> code));
@@ -86,11 +85,7 @@ public enum TossPaymentErrorCode implements RoomescapeErrorCode {
     }
 
     private static boolean isKnown(TossPaymentErrorResponse response) {
-        if (CACHE.containsKey(response.code())) {
-            var errorCode = CACHE.get(response.code());
-            return Objects.equals(errorCode.message, response.message());
-        }
-        return false;
+        return CACHE.containsKey(response.code());
     }
 
     @Override

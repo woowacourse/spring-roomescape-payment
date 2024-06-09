@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.payment;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -13,14 +13,17 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-import roomescape.config.properties.TossPaymentConfigProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class PaymentRestClientConfig {
 
+    private final ObjectMapper objectMapper;
+
     private final TossPaymentConfigProperties tossProperties;
 
-    public PaymentRestClientConfig(TossPaymentConfigProperties tossProperties) {
+    public PaymentRestClientConfig(ObjectMapper objectMapper, TossPaymentConfigProperties tossProperties) {
+        this.objectMapper = objectMapper;
         this.tossProperties = tossProperties;
     }
 
@@ -29,6 +32,7 @@ public class PaymentRestClientConfig {
         return RestClient.builder()
                 .baseUrl(tossProperties.baseUri())
                 .defaultHeaders(this::setTossHeaders)
+                .defaultStatusHandler(new TossPaymentResponseErrorHandler(objectMapper))
                 .requestFactory(tossRequestFactory());
     }
 

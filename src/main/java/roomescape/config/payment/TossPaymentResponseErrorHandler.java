@@ -1,11 +1,10 @@
-package roomescape.component;
+package roomescape.config.payment;
 
 import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +13,6 @@ import roomescape.dto.payment.TossPaymentErrorResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.TossPaymentErrorCode;
 
-@Component
 public class TossPaymentResponseErrorHandler implements ResponseErrorHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
