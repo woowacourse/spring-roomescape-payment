@@ -25,7 +25,7 @@ public class PaymentRestClientConfiguration {
     }
 
     @Bean
-    public PaymentClient paymentService() {
+    public PaymentClient paymentClient() {
         return new PaymentClient(createRestClientBuilder(), initializeAuthorizationKey());
     }
 
