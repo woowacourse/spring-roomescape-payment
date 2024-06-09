@@ -276,7 +276,6 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @Disabled
     @DisplayName("존재하지 않는 결제 대기에 대해 결제 요청을 할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForUnknownReservation() {
@@ -328,9 +327,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", adminToken)
+                            .body(PaymentFixture.createPaymentRequest())
                             .when().post("/reservations/" + waitingId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(HttpStatus.OK.value()).body("message", is("더이상 존재하지 않는 결제 대기 정보입니다."));
+                            .assertThat().statusCode(HttpStatus.BAD_REQUEST.value()).body("message", is("더이상 존재하지 않는 결제 대기 정보입니다."));
                 })
         );
     }

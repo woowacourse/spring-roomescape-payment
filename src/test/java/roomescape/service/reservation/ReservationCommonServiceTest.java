@@ -140,4 +140,18 @@ class ReservationCommonServiceTest extends ServiceTest {
                 () -> assertThat(response.status()).isEqualTo(ReservationStatus.RESERVED.getDescription())
         );
     }
+
+    @DisplayName("결제 대기 상태의 예약을 결제 후, 예약 상태로 변경한다.")
+    @Test
+    void cannotConfirmReservationOfUnknownReservation() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        long unknownId = 0;
+        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(unknownId, PaymentFixture.createPaymentRequest());
+
+        //when & then
+        assertThatThrownBy(() -> reservationCommonService.confirmReservation(reservationConfirmRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("더이상 존재하지 않는 결제 대기 정보입니다.");
+    }
 }
