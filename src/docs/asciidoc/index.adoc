@@ -1,0 +1,19 @@
+= Roomescape API Guide
+:doctype: book
+:icons: font
+:toc: left
+:toc-title: ToC
+:toclevels: 3
+:source-highlighter: highlightjs
+:sectlinks:
+:sectnums:
+
+== API
+
+include::member.adoc[]
+include::auth.adoc[]
+include::theme.adoc[]
+include::time.adoc[]
+include::reservation.adoc[]
+include::reservationWaiting.adoc[]
+include::admin.adoc[]
