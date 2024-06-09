@@ -70,9 +70,8 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 없이, 검증요청을 보내면 401 Unauthorized 를 발생한다.")
+    @DisplayName("로그인 없이 검증요청을 보내면 401 Unauthorized 를 응답한다.")
     void checkLoginFailByNotAuthorized() {
-        // given
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .port(port)
@@ -95,6 +94,16 @@ class AuthControllerTest {
                 .then()
                 .statusCode(200)
                 .cookie("accessToken", "");
+    }
+
+    @Test
+    @DisplayName("로그인 없이 로그아웃 요청을 보내면 403 Forbidden 을 응답한다.")
+    void checkLogoutFailByNotAuthorized() {
+        RestAssured.given().log().all()
+                .port(port)
+                .when().post("/logout")
+                .then()
+                .statusCode(403);
     }
 
     private String getAccessTokenCookieByLogin(final String email, final String password) {

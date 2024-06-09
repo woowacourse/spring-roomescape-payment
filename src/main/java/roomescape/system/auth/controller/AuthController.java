@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.system.auth.annotation.LoginRequired;
 import roomescape.system.auth.annotation.MemberId;
 import roomescape.system.auth.dto.LoginCheckResponse;
 import roomescape.system.auth.dto.LoginRequest;
@@ -59,14 +60,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "로그인 상태이며, 로그인된 회원의 이름을 반환합니다."),
             @ApiResponse(responseCode = "400", description = "쿠키에 있는 토큰 정보로 회원을 조회할 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "로그인되지 않은 상태이며, 로그인이 필요합니다.",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public RoomEscapeApiResponse<LoginCheckResponse> checkLogin(@MemberId @Parameter(hidden = true) Long memberId) {
         LoginCheckResponse response = authService.checkLogin(memberId);
         return RoomEscapeApiResponse.success(response);
     }
 
+    @LoginRequired
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "로그아웃", description = "현재 로그인된 회원을 로그아웃합니다.")
