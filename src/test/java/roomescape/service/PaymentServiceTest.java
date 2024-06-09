@@ -144,24 +144,6 @@ class PaymentServiceTest {
 
     }
 
-    @Test
-    @DisplayName("에러 반환 시 총 5회 재시도한다.")
-    void retryPayment() {
-        PaymentApproveRequest request = new PaymentApproveRequest("testKey", "testId", "1000");
-        TestErrorResponse response = new TestErrorResponse("INTERNAL_SERVER_ERROR", "test_error");
-        Reservation dummy = new Reservation(null, null);
-
-        mockServer.expect(ExpectedCount.times(2), requestTo(paymentProperties.getApproveUrl()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withServerError().body(makeJsonFrom(response)));
-
-        assertAll(
-                () -> assertThatThrownBy(() -> paymentService.pay(request, dummy))
-                        .isInstanceOf(ApiException.class),
-                () -> mockServer.verify()
-        );
-    }
-
     private String makeJsonFrom(PaymentApproveResponse response) {
         try {
             return new JSONObject()

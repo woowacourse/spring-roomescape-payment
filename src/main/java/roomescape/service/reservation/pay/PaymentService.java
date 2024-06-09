@@ -37,21 +37,21 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Retryable(maxAttempts = RETRY_ATTEMPT)
     public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest, Reservation reservation) {
-        ResponseEntity<PaymentApproveResponse> response = approvePay(paymentApproveRequest);
-        validateStatusCode(response.getStatusCode());
         Payment payment = new Payment(paymentApproveRequest.paymentKey(), paymentApproveRequest.amount(), reservation);
         paymentRepository.save(payment);
-        return response.getBody();
+        return approvePay(paymentApproveRequest);
     }
 
-    private ResponseEntity<PaymentApproveResponse> approvePay(PaymentApproveRequest paymentApproveRequest) {
-        return restTemplate.postForEntity(
+    @Retryable(maxAttempts = RETRY_ATTEMPT)
+    private PaymentApproveResponse approvePay(PaymentApproveRequest paymentApproveRequest) {
+        ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 paymentProperties.getApproveUrl(),
                 new HttpEntity<>(paymentApproveRequest, header()),
                 PaymentApproveResponse.class
         );
+        validateStatusCode(response.getStatusCode());
+        return response.getBody();
     }
 
     @Retryable(maxAttempts = RETRY_ATTEMPT)
