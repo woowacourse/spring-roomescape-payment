@@ -5,9 +5,10 @@ import roomescape.domain.reservation.Reservation;
 
 import java.math.BigDecimal;
 
-public record PaymentRequest(String paymentKey, String orderId, BigDecimal amount) { // todo Reservation
+public record PaymentRequest(String paymentKey, String orderId,
+                             BigDecimal amount) { // todo Reservation, 이름 PaymentConfirmRequest로 변경
 
     public Payment toPayment(Reservation reservation) {
-        return new Payment(paymentKey, amount, reservation);
+        return Payment.tossPay(paymentKey, amount, reservation);
     }
 }

@@ -17,7 +17,11 @@ public record PersonalReservationResponse(
         String theme,
         String status,
         String paymentKey,
-        BigDecimal amount
+        BigDecimal amount,
+        String paymentType,
+        String accountNumber,
+        String accountHolder,
+        String bankName
 ) {
 
     public static PersonalReservationResponse from(Reservation reservation, Payment payment) {
@@ -28,7 +32,11 @@ public record PersonalReservationResponse(
                 reservation.getTheme().getRawName(),
                 "예약",
                 payment.getPaymentKey(),
-                payment.getAmount()
+                payment.getAmount(),
+                payment.getPayType().getDescription(),
+                payment.getAccountNumber(),
+                payment.getAccountHolder(),
+                payment.getBankName()
         );
     }
 
@@ -39,6 +47,10 @@ public record PersonalReservationResponse(
                 waitingWithRank.time(),
                 waitingWithRank.themeName(),
                 String.format("%d번째 예약 대기", waitingWithRank.rank()),
+                null,
+                null,
+                null,
+                null,
                 null,
                 null
         );

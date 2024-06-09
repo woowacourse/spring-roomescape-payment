@@ -8,6 +8,6 @@ import java.math.BigDecimal;
 public class PaymentFixture {
 
     public static Payment create(Reservation reservation) {
-        return new Payment("paymentKey", new BigDecimal("10000"), reservation);
+        return Payment.tossPay("paymentKey", new BigDecimal("10000"), reservation);
     }
 }
