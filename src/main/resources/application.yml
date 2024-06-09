@@ -33,7 +33,6 @@ logging:
 springdoc:
   swagger-ui:
     path: /api-docs
-    use-root-path: true
     groups-order: desc
     tags-sorter: alpha
     operations-sorter: method
