@@ -42,7 +42,18 @@ public class Payment {
     private PayType payType;
 
     public static Payment tossPay(String paymentKey, BigDecimal amount, Reservation reservation) {
+        validatePaymentKey(paymentKey);
         return new Payment(paymentKey, null, amount, reservation, PayType.TOSS_PAY);
+    }
+
+    private static void validatePaymentKey(String paymentKey) {
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("Payment key는 필수입니다.");
+        }
+
+        if (paymentKey.length() > MAX_PAYMENT_KEY_LENGTH) {
+            throw new IllegalArgumentException(String.format("Payment key는 최대 %d자입니다.", MAX_PAYMENT_KEY_LENGTH));
+        }
     }
 
     public static Payment accountTransfer(String accountNumber, String accountHolder, String bankName, BigDecimal amount, Reservation reservation) {
@@ -57,7 +68,6 @@ public class Payment {
     }
 
     private Payment(String paymentKey, Account account, Amount amount, Reservation reservation, PayType payType) {
-        validatePaymentKey(paymentKey);
         validateReservation(reservation);
 
         this.paymentKey = paymentKey;
@@ -65,12 +75,6 @@ public class Payment {
         this.amount = amount;
         this.reservation = reservation;
         this.payType = payType;
-    }
-
-    private void validatePaymentKey(String paymentKey) {
-        if (paymentKey != null && paymentKey.length() > MAX_PAYMENT_KEY_LENGTH) {
-            throw new IllegalArgumentException(String.format("Payment key는 최대 %d자입니다.", MAX_PAYMENT_KEY_LENGTH));
-        }
     }
 
     private void validateReservation(Reservation reservation) {
