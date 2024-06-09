@@ -172,4 +172,40 @@ class ReservationCommonServiceTest extends ServiceTest {
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("본인의 예약만 결제할 수 있습니다.");
     }
+
+    @DisplayName("예약 대기에 대해 결제를 진행하려고 하면 예외가 발생한다.")
+    @Test
+    void cannotConfirmReservationOfWaiting() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(WaitingFixture.create(member, reservationDetail));
+        ReservationConfirmRequest reservationConfirmRequest = ReservationFixture.createReservationConfirmRequest(reservation);
+
+        //when & then
+        assertThatThrownBy(() -> reservationCommonService.confirmReservation(reservationConfirmRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("결재 대기 상태에서만 결재 가능합니다.");
+    }
+
+    @DisplayName("예약에 대해 결제를 진행하려고 하면 예외가 발생한다.")
+    @Test
+    void cannotConfirmReservationOfReserved() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+        ReservationConfirmRequest reservationConfirmRequest = ReservationFixture.createReservationConfirmRequest(reservation);
+
+        //when & then
+        assertThatThrownBy(() -> reservationCommonService.confirmReservation(reservationConfirmRequest, member.getId()))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessage("결재 대기 상태에서만 결재 가능합니다.");
+    }
 }

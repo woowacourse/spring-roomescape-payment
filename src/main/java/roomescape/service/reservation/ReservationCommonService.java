@@ -87,6 +87,7 @@ public class ReservationCommonService {
         Reservation reservation = getReservationById(request.reservationId());
         Member member = getMemberById(memberId);
         validateAuthority(reservation, member);
+        validateStatus(reservation);
         if (reservation.isPendingPayment()) {
             Payment payment = paymentService.approvePayment(request.paymentRequest());
             reservation.paid(payment);
@@ -107,6 +108,12 @@ public class ReservationCommonService {
     private void validateAuthority(Reservation reservation, Member member) {
         if (!reservation.isReservationOf(member)) {
             throw new ForbiddenException("본인의 예약만 결제할 수 있습니다.");
+        }
+    }
+
+    private void validateStatus(Reservation reservation) {
+        if (!reservation.isPendingPayment()) {
+            throw new InvalidReservationException("결재 대기 상태에서만 결재 가능합니다.");
         }
     }
 }

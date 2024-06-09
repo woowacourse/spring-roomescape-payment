@@ -2,7 +2,10 @@ package roomescape.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.fixture.PaymentFixture;
@@ -161,7 +164,6 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @Disabled
     @DisplayName("예약 대기 상태인 예약에 대해 결제를 요청할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForWaiting() {
@@ -191,14 +193,14 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", adminToken)
+                            .body(PaymentFixture.createPaymentRequest())
                             .when().post("/reservations/" + waitingId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("message", is("결재 대기 상태에서만 결재 가능합니다."));
+                            .assertThat().statusCode(HttpStatus.BAD_REQUEST.value()).body("message", is("결재 대기 상태에서만 결재 가능합니다."));
                 })
         );
     }
 
-    @Disabled
     @DisplayName("예약 상태인 예약에 대해 결제를 요청할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotPayForReserved() {
@@ -217,9 +219,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", guestToken)
+                            .body(PaymentFixture.createPaymentRequest())
                             .when().post("/reservations/" + reservationId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("message", is("결재 대기 상태에서만 결재 가능합니다."));
+                            .assertThat().statusCode(HttpStatus.BAD_REQUEST.value()).body("message", is("결재 대기 상태에서만 결재 가능합니다."));
                 })
         );
     }
