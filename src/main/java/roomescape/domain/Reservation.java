@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionType;
 
 @Entity
 public class Reservation implements Comparable<Reservation> {
@@ -88,7 +89,7 @@ public class Reservation implements Comparable<Reservation> {
 
     public void book() {
         if (reservationStatus != ReservationStatus.WAITING) {
-            //todo 예외 처리
+            throw new RoomescapeException(RoomescapeExceptionType.ALREADY_BOOKED);
         }
         this.reservationStatus = ReservationStatus.BOOKED;
     }
