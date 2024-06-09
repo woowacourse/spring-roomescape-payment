@@ -9,9 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function render(data) {
-    // ------  결제위젯 초기화 ------
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
     const paymentAmount = 1999999;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
@@ -87,8 +84,6 @@ function onPayButtonClickWithPaymentWidget(paymentWidget, reservationId) {
 
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
-        // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-        // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
         const orderIdPrefix = "MOVINPOKE";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
@@ -98,8 +93,6 @@ function onPayButtonClickWithPaymentWidget(paymentWidget, reservationId) {
             console.debug(data);
             fetchReservationPayment(data, selectedReservationId);
         }).catch(function (error) {
-            // TOSS 에러 처리: 에러 목록을 확인하세요
-            // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
             alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
         });
     } else {
