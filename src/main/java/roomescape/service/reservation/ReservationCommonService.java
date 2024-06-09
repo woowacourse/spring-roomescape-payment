@@ -1,6 +1,7 @@
 package roomescape.service.reservation;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
@@ -9,6 +10,7 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationDate;
 import roomescape.exception.InvalidReservationException;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
@@ -17,9 +19,11 @@ import roomescape.service.reservation.dto.ReservationResponse;
 public class ReservationCommonService {
 
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
 
-    public ReservationCommonService(ReservationRepository reservationRepository) {
+    public ReservationCommonService(ReservationRepository reservationRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
@@ -40,12 +44,13 @@ public class ReservationCommonService {
         reservationRepository.findById(id)
             .ifPresent(reservation -> {
                 deleteIfAvailable(reservation);
-                updateIfDeletedReserved(reservation);
+//                updateIfDeletedReserved(reservation);
             });
     }
 
     private void deleteIfAvailable(Reservation reservation) {
         validatePastReservation(reservation);
+        paymentService.cancelPayment(reservation);
         reservationRepository.deleteById(reservation.getId());
     }
 
@@ -61,5 +66,10 @@ public class ReservationCommonService {
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
                 .ifPresent(Reservation::reserved);
         }
+    }
+
+    public Reservation findById(long id) {
+        return reservationRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 ID입니다."));
     }
 }

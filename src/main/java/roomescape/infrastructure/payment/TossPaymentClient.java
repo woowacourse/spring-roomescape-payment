@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import roomescape.domain.dto.PaymentCancelRequest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
@@ -34,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
     public Payment approve(PaymentRequest request) {
         try {
             String timestamp = Instant.now().toString();
-            logger.debug("Request body: {} Request time: {}", request, timestamp);
+            logger.info("[토스 결제 요청] Request body: {} Request time: {}", request, timestamp);
 
             return restClient.post()
                 .uri("/v1/payments/confirm")
@@ -60,6 +61,40 @@ public class TossPaymentClient implements PaymentClient {
         } catch (Exception e) {
             logger.error("[토스 결제 에러] {}", e.getMessage(), e);
             throw new TossPaymentException(TossPaymentErrorCode.PAYMENT_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public void cancel(String paymentKey) {
+        try {
+            PaymentCancelRequest request = new PaymentCancelRequest("예약 최소");
+            String timestamp = Instant.now().toString();
+            logger.info("[토스 결제 취소 요청] Request body: {} Request time: {}", request, timestamp);
+
+            restClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
+                .contentType(APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(Payment.class);
+        } catch (RestClientResponseException re) {
+            logger.error("[토스 결제 취소 에러] {}", re.getResponseBodyAsString(), re);
+            TossErrorResponse error = re.getResponseBodyAs(TossErrorResponse.class);
+            throw new TossPaymentException(error, (HttpStatus) re.getStatusCode());
+        } catch (ResourceAccessException re) {
+            logger.error(re.getMessage(), re);
+            if (re.getCause() instanceof SocketTimeoutException) {
+                if (re.getMessage().contains("Connect timed out")) {
+                    throw new TossPaymentException(TossPaymentErrorCode.CONNECT_TIMEOUT);
+                }
+                if (re.getMessage().contains("Read timed out")) {
+                    throw new TossPaymentException(TossPaymentErrorCode.READ_TIMEOUT);
+                }
+            }
+            throw new TossPaymentException(TossPaymentErrorCode.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("[토스 결제 취소 에러] {}", e.getMessage(), e);
+            throw new TossPaymentException(TossPaymentErrorCode.PAYMENT_CANCEL_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

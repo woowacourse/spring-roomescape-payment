@@ -1,6 +1,8 @@
 package roomescape.domain.payment;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,9 +20,8 @@ public class Payment {
 
     private Long totalAmount;
 
-    private String requestedAt;
-
-    private String approvedAt;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
     @OneToOne
     private Reservation reservation;
@@ -31,15 +32,22 @@ public class Payment {
     public Payment(
         String paymentKey,
         Long totalAmount,
-        String requestedAt,
-        String approvedAt,
+        PaymentStatus status,
         Reservation reservation
     ) {
         this.paymentKey = paymentKey;
         this.totalAmount = totalAmount;
-        this.requestedAt = requestedAt;
-        this.approvedAt = approvedAt;
+        this.status = status;
         this.reservation = reservation;
+    }
+
+    public void complete(Reservation reservation) {
+        this.reservation = reservation;
+        this.status = PaymentStatus.DONE;
+    }
+
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
     }
 
     public String getPaymentKey() {
@@ -52,9 +60,5 @@ public class Payment {
 
     public Long getId() {
         return id;
-    }
-
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
     }
 }

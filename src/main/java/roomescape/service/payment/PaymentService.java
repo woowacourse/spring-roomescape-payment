@@ -22,8 +22,16 @@ public class PaymentService {
 
     public Payment approvePayment(PaymentRequest request, Reservation reservation) {
         Payment payment = paymentClient.approve(request);
-        payment.setReservation(reservation);
+        payment.complete(reservation);
 
         return paymentRepository.save(payment);
+    }
+
+    public void cancelPayment(Reservation reservation) {
+        paymentRepository.findByReservationId(reservation.getId())
+            .ifPresent(payment -> {
+                paymentClient.cancel(payment.getPaymentKey());
+                payment.cancel();
+            });
     }
 }
