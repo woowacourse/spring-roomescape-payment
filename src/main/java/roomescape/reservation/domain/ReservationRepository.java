@@ -75,7 +75,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 p.totalAmount
           )
             FROM Reservation AS r
-            JOIN Payment AS p
+            LEFT JOIN Payment AS p
             ON r.id = p.reservationId
             WHERE r.member.id = :memberId AND r.status = 'RESERVED'
             """)

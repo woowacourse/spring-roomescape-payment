@@ -11,9 +11,9 @@ public class ReservationWithPayment {
     private final LocalTime time;
     private final Status status;
     private final String paymentKey;
-    private final long totalAmount;
+    private final Long totalAmount;
 
-    public ReservationWithPayment(Long id, String theme, LocalDate date, LocalTime time, Status status, String paymentKey, long totalAmount) {
+    public ReservationWithPayment(Long id, String theme, LocalDate date, LocalTime time, Status status, String paymentKey, Long totalAmount) {
         this.id = id;
         this.theme = theme;
         this.date = date;
@@ -47,7 +47,7 @@ public class ReservationWithPayment {
         return paymentKey;
     }
 
-    public long getTotalAmount() {
+    public Long getTotalAmount() {
         return totalAmount;
     }
 }

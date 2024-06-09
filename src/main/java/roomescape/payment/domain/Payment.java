@@ -24,9 +24,9 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Long id, final Long reservationId, final String paymentKey, final String orderId,
-            final String orderName, final long totalAmount,
-            final LocalDateTime requestedAt) {
+    public Payment(Long id, Long reservationId, String paymentKey, String orderId,
+            String orderName, long totalAmount,
+            LocalDateTime requestedAt) {
         this.id = id;
         this.reservationId = reservationId;
         this.paymentKey = paymentKey;
@@ -40,10 +40,6 @@ public class Payment {
         this(null, reservationId, paymentConfirmResponse.paymentKey(), paymentConfirmResponse.orderId(),
                 paymentConfirmResponse.orderName(), paymentConfirmResponse.totalAmount(),
                 paymentConfirmResponse.requestedAt());
-    }
-
-    public boolean isMatchingReservationId(Long id) {
-        return this.reservationId.equals(id);
     }
 
     @Override
