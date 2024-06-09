@@ -55,7 +55,7 @@ class AuthServiceTest {
     @DisplayName("존재하지 않는 회원의 memberId로 로그인 여부를 체크하면 예외가 발생한다.")
     void checkLoginFailByNotExistMemberInfo() {
         // given
-        Long notExistMemberId = 1L;
+        Long notExistMemberId = (long) (memberRepository.findAll().size() + 1);
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.checkLogin(notExistMemberId))
