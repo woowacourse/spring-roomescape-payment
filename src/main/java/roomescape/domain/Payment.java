@@ -20,6 +20,15 @@ public abstract class Payment {
     @Enumerated(EnumType.STRING)
     private State state;
 
+    public State getState() {
+        return state;
+    }
+
+    public abstract String getPaymentKey();
+    public abstract String getOrderId();
+
+    public abstract Long getAmount();
+
     //얘가 안에 있는 것이 자연스러운가? 밖에서도 객체를 만들기 위해서 사용하기도 하는데?
     public enum State {
         READY, DONE

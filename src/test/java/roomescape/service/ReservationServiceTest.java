@@ -212,13 +212,17 @@ class ReservationServiceTest extends FixtureUsingTest {
                         waitingReservation.theme().name(),
                         waitingReservation.date(),
                         waitingReservation.time().startAt(),
-                        "1번째 예약대기"
+                        "1번째 예약대기",
+                        null,
+                        null
                 ), new ReservationDetailResponse(
                         bookedReservation.id(),
                         bookedReservation.theme().name(),
                         bookedReservation.date(),
                         bookedReservation.time().startAt(),
-                        "예약"
+                        "결제 대기",
+                        null,
+                        null
                 )
         );
     }

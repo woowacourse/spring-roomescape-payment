@@ -147,7 +147,7 @@ public class PaymentControllerTest {
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(paymentParam)
-                .post("/payment/reservations/" + savedId)
+                .post("/payment/" + savedId)
                 .then().log().all();
 
         Reservation savedReservation = reservationRepository.findById((long)savedId).get();

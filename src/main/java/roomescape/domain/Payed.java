@@ -24,6 +24,10 @@ public class Payed extends Payment {
         this.totalAmount = totalAmount;
     }
 
+    protected Payed() {
+
+    }
+
     private void validatePaymentKey(String paymentKey) {
         if (paymentKey == null || paymentKey.isBlank()) {
             throw new IllegalArgumentException("PaymentKey 는 필수값입니다.");
@@ -36,7 +40,18 @@ public class Payed extends Payment {
         }
     }
 
-    protected Payed() {
+    @Override
+    public String getPaymentKey() {
+        return paymentKey;
+    }
 
+    @Override
+    public String getOrderId() {
+        return orderId;
+    }
+
+    @Override
+    public Long getAmount() {
+        return totalAmount;
     }
 }
