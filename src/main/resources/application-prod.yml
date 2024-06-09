@@ -17,10 +17,18 @@ spring:
     defer-datasource-initialization: true
   sql.init.mode: always
 
+jwt:
+  secret: secretKeyIsWootecoWiib12341234
+  expire-in-millis: 1800000
+
+payment:
+  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  url: https://api.tosspayments.com
+
 logging.level.org:
   hibernate:
     SQL: debug
     orm.jdbc.bind: trace
-        
+
 file:
   name: /var/log/payment/app.log

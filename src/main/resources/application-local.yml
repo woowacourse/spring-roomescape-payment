@@ -18,6 +18,15 @@ spring:
   sql.init.mode: always
 
 logging.level.org:
-      hibernate:
-        SQL: debug
-        orm.jdbc.bind: trace
+  hibernate:
+    SQL: debug
+    orm.jdbc.bind: trace
+
+jwt:
+  secret: devdevdevdevdevdevdevdevdevdevdevdev
+  expire-in-millis: 1800000
+
+payment:
+  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  url: https://api.tosspayments.com
+

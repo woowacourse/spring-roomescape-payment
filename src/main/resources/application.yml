@@ -1,13 +1,3 @@
 spring:
-  config:
-    import:
-      - classpath:application-local.yml
-      - classpath:application-dev.yml
-
-jwt:
-  secret: devdevdevdevdevdevdevdevdevdevdevdev
-  expire-in-millis: 1800000
-
-payment:
-  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  url: https://api.tosspayments.com
+  profiles:
+    active: prod
