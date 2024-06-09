@@ -8,6 +8,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import java.time.LocalDate;
@@ -130,6 +131,18 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                         fieldWithPath("paymentKey").description("토스API 페이먼트 키"),
                         fieldWithPath("orderId").description("토스API 오더 아이디"),
                         fieldWithPath("paymentType").description("토스API 결제 타입")
+                ),
+                responseFields(
+                        fieldWithPath("id").description("예약 식별자"),
+                        fieldWithPath("member.id").description("회원 식별자"),
+                        fieldWithPath("member.name").description("회원명"),
+                        fieldWithPath("date").description("예약 날짜"),
+                        fieldWithPath("theme.id").description("테마 식별자"),
+                        fieldWithPath("theme.name").description("테마명"),
+                        fieldWithPath("theme.description").description("테마 설명"),
+                        fieldWithPath("theme.thumbnail").description("테마 썸네일 사진 url"),
+                        fieldWithPath("time.id").description("예약 시간 식별자"),
+                        fieldWithPath("time.startAt").description("예약 시간")
                 )
         );
 
@@ -158,7 +171,7 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 .when()
                 .post("/reservations")
 
-                .then()
+                .then().log().all()
                 .statusCode(is(HttpStatus.SC_CREATED))
                 .header(HttpHeaders.LOCATION, "/reservations/1");
     }
@@ -166,7 +179,7 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약을 저장한다.(어드민)")
     void saveAdminReservation_ShouldSaveReservation() {
-        RestDocumentationFilter filter = document("reservation/save",
+        RestDocumentationFilter filter = document("reservation/save-admin",
                 requestCookies(
                         cookieWithName("token").description("어드민 권한 사용자 토큰")
                 ),
@@ -174,6 +187,18 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                         fieldWithPath("date").description("예약 날짜"),
                         fieldWithPath("themeId").description("테마 식별자"),
                         fieldWithPath("timeId").description("시간 식별자")
+                ),
+                responseFields(
+                        fieldWithPath("id").description("예약 식별자"),
+                        fieldWithPath("member.id").description("회원 식별자"),
+                        fieldWithPath("member.name").description("회원명"),
+                        fieldWithPath("date").description("예약 날짜"),
+                        fieldWithPath("theme.id").description("테마 식별자"),
+                        fieldWithPath("theme.name").description("테마명"),
+                        fieldWithPath("theme.description").description("테마 설명"),
+                        fieldWithPath("theme.thumbnail").description("테마 썸네일 사진 url"),
+                        fieldWithPath("time.id").description("예약 시간 식별자"),
+                        fieldWithPath("time.startAt").description("예약 시간")
                 )
         );
 
@@ -209,6 +234,12 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         RestDocumentationFilter filter = document("reservation/search-cond",
                 requestCookies(
                         cookieWithName("token").description("일반 사용자 권한 토큰")
+                ),
+                queryParameters(
+                        parameterWithName("memberId").description("회원 식별자"),
+                        parameterWithName("themeId").description("테마 식별자"),
+                        parameterWithName("dateFrom").description("조회 시작 날짜"),
+                        parameterWithName("dateTo").description("조회 마지막 날짜")
                 ),
                 responseFields(
                         fieldWithPath("[].id").description("예약 식별자"),

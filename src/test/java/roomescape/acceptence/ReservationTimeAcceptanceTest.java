@@ -109,6 +109,10 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
         RestDocumentationFilter filter = document("time/search",
                 requestCookies(
                         cookieWithName("token").description("일반 권한 사용자 토큰")
+                ),
+                responseFields(
+                        fieldWithPath("[].id").description("예약 시간 식별자"),
+                        fieldWithPath("[].startAt").description("예약 시간")
                 )
         );
 
@@ -231,10 +235,12 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
                 .given(spec)
                 .filter(filter)
                 .accept(ContentType.JSON)
+                .queryParam("date", date)
+                .queryParam("theme-id", "1")
                 .cookie(normalToken)
 
                 .when()
-                .get("/times/available?date=" + date + "&theme-id=1")
+                .get("/times/available")
 
                 .then().log().all()
                 .statusCode(is(HttpStatus.SC_OK))

@@ -96,6 +96,12 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
         RestDocumentationFilter filter = document("theme/search",
                 requestCookies(
                         cookieWithName("token").description("일반 권한 사용자 토큰")
+                ),
+                responseFields(
+                        fieldWithPath("[].id").description("테마 식별자"),
+                        fieldWithPath("[].name").description("테마명"),
+                        fieldWithPath("[].description").description("테마 설명"),
+                        fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
                 )
         );
 
@@ -170,7 +176,15 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("주간 인기 테마 10개를 인기순으로 조회한다.")
     void findTopTenThemesOfLastWeek_ShouldGet10PopularThemes_WhileOnceAWeek() {
-        RestDocumentationFilter filter = document("theme/popular"
+        RestDocumentationFilter filter = document("theme/popular",
+                requestCookies(
+                        cookieWithName("token").description("일반 사용자 권한 토큰")
+                ),
+                responseFields(
+                        fieldWithPath("[].name").description("테마명"),
+                        fieldWithPath("[].description").description("테마 설명"),
+                        fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
+                )
         );
 
         // given

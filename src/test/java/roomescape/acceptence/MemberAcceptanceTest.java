@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -58,6 +59,9 @@ class MemberAcceptanceTest extends AcceptanceFixture {
                 requestFields(
                         fieldWithPath("email").description("회원 이메일"),
                         fieldWithPath("password").description("회원 비밀번호")
+                ),
+                responseCookies(
+                        cookieWithName("token").description("JWT 토큰")
                 )
         );
 

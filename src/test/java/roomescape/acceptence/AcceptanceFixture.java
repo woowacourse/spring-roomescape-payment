@@ -1,5 +1,7 @@
 package roomescape.acceptence;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.removeHeaders;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import org.junit.jupiter.api.AfterEach;
@@ -43,7 +45,12 @@ public abstract class AcceptanceFixture {
     @BeforeEach
     void setUp(RestDocumentationContextProvider provider) {
         RestAssured.port = port;
-        spec = new RequestSpecBuilder().addFilter(documentationConfiguration(provider))
+        spec = new RequestSpecBuilder().addFilter(documentationConfiguration(provider)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(removeHeaders("Transfer-Encoding", "Date", "Keep-Alive", "Connection"),
+                                prettyPrint())
+                )
                 .build();
         RestAssuredMockMvc.standaloneSetup(MockMvcBuilders.standaloneSetup(paymentClient));
     }
