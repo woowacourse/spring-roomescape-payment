@@ -25,7 +25,7 @@ public class Payment {
     private PaymentKey paymentKey;
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status = PaymentStatus.PAID;
+    private PaymentStatus status;
     @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -37,11 +37,16 @@ public class Payment {
         this.id = null;
         this.amount = Objects.requireNonNull(amount);
         this.paymentKey = new PaymentKey(paymentKey);
+        this.status = PaymentStatus.PAID;
         this.member = Objects.requireNonNull(member);
         this.schedule = Objects.requireNonNull(schedule);
     }
 
     protected Payment() {
+    }
+
+    public boolean isPaid() {
+        return status.isPaid();
     }
 
     public Long getId() {
@@ -52,8 +57,8 @@ public class Payment {
         return paymentKey.paymentKey();
     }
 
-    public boolean isPaid() {
-        return status.isPaid();
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     public Member getMember() {

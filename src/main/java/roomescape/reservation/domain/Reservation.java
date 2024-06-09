@@ -67,6 +67,10 @@ public class Reservation {
         return status.isPaid();
     }
 
+    public boolean isSameMember(Long memberId) {
+        return member.isSameId(memberId);
+    }
+
     public void updateMember(Member other) {
         this.member = other;
     }

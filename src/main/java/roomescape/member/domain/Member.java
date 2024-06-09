@@ -47,6 +47,10 @@ public class Member {
         return role.isAdmin();
     }
 
+    public boolean isSameId(Long otherId) {
+        return this.id.equals(otherId);
+    }
+
     public Long getId() {
         return id;
     }

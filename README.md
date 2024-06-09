@@ -43,15 +43,16 @@
   - [x] `Waiting`의 CRUD 정상 작동 확인
 
 #### 결제 정보 저장 및 조회 도입
-- [ ] `Payment` Table 도입
+- [x] `Payment` Table 도입
   - [x] scheduleId, memberId, paymentKey, amount, status(PAID, REFUND)로 구성
 - [ ] `Reservation` Table에 status 도입
   - [x] 'ADMIN_RESERVE', 'WAITING_FOR_PAYMENT', 'DONE_PAYMENT' 상태 도입
   - [ ] 예약 API에서 결제를 확인하지 않도록 변경
-- [ ] 결제 API 만들기
+- [x] 결제 API 만들기
   - 현재 시간 이후의 예약만 결제할 수 있다.
   - 예약은 '결제 대기' 상태이어야 한다.
-  - [ ] 예약 취소 시, 환불 기능 추가
+  - 예약한 유저와 결제한 유저가 동일해야 한다.
+- [ ] 예약 취소 시, 환불 기능 추가
 - [ ] 예약 & 결제 진행 과정 리팩터링
   - 예약 API를 호출해서, 예약이 성공한 이후에, 결제 API를 호출하도록 변경 
 - [ ] 마이 페이지 조회 기능 변경
