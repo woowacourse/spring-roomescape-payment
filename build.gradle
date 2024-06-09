@@ -64,16 +64,10 @@ task cleanSnippets(type: Delete) {
     delete snippetsDir
 }
 
-task generateDocs(type: Test) {
-    outputs.upToDateWhen { false }
-    dependsOn 'cleanSnippets'
-    finalizedBy 'asciidoctor'
-}
-
 task createDocument(type: Copy) {
     dependsOn asciidoctor
-    from file("build/docs/asciidoc")
-    into file("src/main/resources/static")
+    from file("build/docs/asciidoc/index.html")
+    into file("src/main/resources/static/docs")
 }
 
 bootJar {
