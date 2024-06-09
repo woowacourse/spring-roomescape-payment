@@ -41,8 +41,8 @@ function render(data) {
      결제 정보 필드명은 자신의 response 에 맞게 변경하기
      */
       row.insertCell(4).textContent = '';
-      row.insertCell(5).textContent = item.paymentKey;
-      row.insertCell(6).textContent = item.amount;
+      row.insertCell(5).textContent = item.payment?.paymentKey;
+      row.insertCell(6).textContent = item.payment?.amount;
     }
   });
 }

@@ -6,12 +6,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.payment.Payment;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.TossPaymentClientErrorHandler;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.service.dto.request.PaymentRequest;
-import roomescape.service.dto.response.PaymentResponse;
+import roomescape.payment.TossPaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -35,7 +34,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public TossPaymentResponse confirm(PaymentRequest paymentRequest) {
         try {
             return restClient.post()
                     .uri(uri)
@@ -44,7 +43,7 @@ public class TossPaymentClient implements PaymentClient {
                     .body(paymentRequest)
                     .retrieve()
                     .onStatus(tossPaymentClientErrorHandler)
-                    .toEntity(PaymentResponse.class).getBody();
+                    .toEntity(TossPaymentResponse.class).getBody();
         } catch (ResourceAccessException e) {
             throw new PaymentServerException(e.getMessage());
         }

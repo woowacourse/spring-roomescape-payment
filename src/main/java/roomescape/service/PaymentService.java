@@ -5,7 +5,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.PaymentRequest;
-import roomescape.service.dto.response.PaymentResponse;
+import roomescape.payment.TossPaymentResponse;
 
 @Service
 public class PaymentService {
@@ -19,12 +19,7 @@ public class PaymentService {
     }
 
     public Payment addPayment(PaymentRequest paymentRequest) {
-        PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
-        Payment payment = new Payment(
-                paymentResponse.paymentKey(),
-                paymentResponse.orderId(),
-                paymentResponse.amount()
-        );
-        return paymentRepository.save(payment);
+        TossPaymentResponse tossPaymentResponse = paymentClient.confirm(paymentRequest);
+        return paymentRepository.save(tossPaymentResponse.toPayment());
     }
 }

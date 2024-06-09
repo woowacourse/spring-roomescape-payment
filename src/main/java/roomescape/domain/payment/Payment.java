@@ -17,22 +17,18 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private String orderId;
-
-    @Column(nullable = false)
     private int amount;
 
     protected Payment() {
     }
 
-    public Payment(String paymentKey, String orderId, int amount) {
-        this(null, paymentKey, orderId, amount);
+    public Payment(String paymentKey, int amount) {
+        this(null, paymentKey, amount);
     }
 
-    public Payment(Long id, String paymentKey, String orderId, int amount) {
+    public Payment(Long id, String paymentKey, int amount) {
         this.id = id;
         this.paymentKey = paymentKey;
-        this.orderId = orderId;
         this.amount = amount;
     }
 
@@ -42,10 +38,6 @@ public class Payment {
 
     public String getPaymentKey() {
         return paymentKey;
-    }
-
-    public String getOrderId() {
-        return orderId;
     }
 
     public int getAmount() {
