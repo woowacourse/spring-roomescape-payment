@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
-import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationDate;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.payment.PaymentService;
@@ -42,10 +41,7 @@ public class ReservationCommonService {
     @Transactional
     public void deleteById(long id) {
         reservationRepository.findById(id)
-            .ifPresent(reservation -> {
-                deleteIfAvailable(reservation);
-//                updateIfDeletedReserved(reservation);
-            });
+            .ifPresent(this::deleteIfAvailable);
     }
 
     private void deleteIfAvailable(Reservation reservation) {
@@ -57,14 +53,6 @@ public class ReservationCommonService {
     private void validatePastReservation(Reservation reservation) {
         if (reservation.isReserved() && reservation.isPast()) {
             throw new InvalidReservationException("이미 지난 예약은 삭제할 수 없습니다.");
-        }
-    }
-
-    private void updateIfDeletedReserved(Reservation reservation) {
-        if (reservation.isReserved()) {
-            ReservationDetail detail = reservation.getDetail();
-            reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
-                .ifPresent(Reservation::reserved);
         }
     }
 
