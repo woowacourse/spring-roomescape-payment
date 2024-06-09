@@ -47,13 +47,14 @@ ext {
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
+    systemProperty 'file.encoding', 'UTF-8'
 }
 
 asciidoctor {
     configurations 'asciidoctorExt'
     baseDirFollowsSourceFile()
     inputs.dir snippetsDir
-    outputDir file('build/asciidoc')
+    outputDir file('build/docs/asciidoc')
     dependsOn test
     doFirst {
         delete file('src/main/resources/static/docs')
