@@ -45,6 +45,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             member = memberService.findMemberById(memberId);
             return member != null;
         } catch (RoomEscapeException e) {
+            response.sendRedirect("/login");
             throw new RoomEscapeException(ErrorType.LOGIN_REQUIRED, HttpStatus.FORBIDDEN);
         }
     }

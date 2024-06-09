@@ -38,16 +38,23 @@ public class AdminInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        Cookie token = getToken(request);
-        Long memberId = jwtHandler.getMemberIdFromToken(token.getValue());
-        Member member = memberService.findMemberById(memberId);
+        Member member;
+        try {
+            Cookie token = getToken(request);
+            Long memberId = jwtHandler.getMemberIdFromToken(token.getValue());
+            member = memberService.findMemberById(memberId);
+        } catch (RoomEscapeException e) {
+            response.sendRedirect("/login");
+            throw e;
+        }
 
         if (member.isAdmin()) {
             return true;
+        } else {
+            response.sendRedirect("/login");
+            throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST,
+                    String.format("[memberId: %d, Role: %s]", member.getId(), member.getRole()), HttpStatus.FORBIDDEN);
         }
-
-        throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST,
-                String.format("[memberId: %d, Role: %s]", member.getId(), member.getRole()), HttpStatus.FORBIDDEN);
     }
 
     private Cookie getToken(HttpServletRequest request) {
