@@ -54,6 +54,16 @@ public class WaitingRegisterService {
         return request.toEntity(reservationTime, theme, member, Status.WAITING);
     }
 
+    private Waiting addWaiting(Reservation savedReservation) {
+        int waitingOrder = reservationRepository.countByDateAndTimeIdAndThemeIdAndStatus(
+                savedReservation.getDate(),
+                savedReservation.getTime().getId(),
+                savedReservation.getTheme().getId(),
+                savedReservation.getStatus()
+        );
+        return waitingRepository.save(new Waiting(savedReservation, waitingOrder));
+    }
+
     private ReservationTime findReservationTime(Long timeId) {
         return timeRepository.findById(timeId)
                 .orElseThrow(() -> new RoomEscapeException(
@@ -76,17 +86,6 @@ public class WaitingRegisterService {
                         "잘못된 사용자 정보 입니다.",
                         "member_id : " + memberId
                 ));
-    }
-
-    private Waiting addWaiting(Reservation savedReservation) {
-        int waitingOrder = reservationRepository.countByDateAndTimeIdAndThemeIdAndStatus(
-                savedReservation.getDate(),
-                savedReservation.getTime().getId(),
-                savedReservation.getTheme().getId(),
-                savedReservation.getStatus()
-        );
-        Waiting waiting = waitingRepository.save(new Waiting(savedReservation, waitingOrder));
-        return waiting;
     }
 
     private void validateAddableWaiting(Reservation reservation) {

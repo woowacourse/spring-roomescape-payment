@@ -19,23 +19,12 @@ public class WaitingSearchService {
         this.waitingRepository = waitingRepository;
     }
 
-    public List<WaitingResponse> findAllWaitingReservations() {
-        return waitingRepository.findAll()
-                .stream()
-                .map(WaitingResponse::from)
-                .toList();
+    public List<Waiting> findAllWaitingReservations() {
+        return waitingRepository.findAll();
     }
 
     public ReservationResponse findReservationWaiting(final Waiting waiting) {
         return ReservationResponse.from(waiting.getReservation());
-    }
-
-    private Waiting findWaitingById(final Long waitingId) {
-        return waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "잘못된 예약 대기 정보 입니다.",
-                        "waiting_id : " + waitingId
-                ));
     }
 
     public WaitingResponse findWaitingByReservationId(final Long reservationId) {

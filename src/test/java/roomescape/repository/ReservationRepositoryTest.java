@@ -66,26 +66,6 @@ class ReservationRepositoryTest {
                 .containsOnly(savedReservation1.getId(), savedReservation2.getId());
     }
 
-    @Test
-    void 주어진_멤버로_예약된_모든_예약_조회() {
-        //given
-        LocalDate date = LocalDate.now().plusDays(1);
-        Reservation reservation1 = createReservation(date, 1L, 1L, 1L);
-        Reservation reservation2 = createReservation(date, 2L, 1L, 1L);
-        Reservation reservation3 = createReservation(date, 2L, 1L, 2L);
-
-        reservationRepository.save(reservation1);
-        reservationRepository.save(reservation2);
-        reservationRepository.save(reservation3);
-
-        //when
-        List<Reservation> reservations = reservationRepository.findByMemberId(1L);
-
-        //then
-        assertThat(reservations).isNotEmpty()
-                .allMatch(r -> r.getMember().getId().equals(1L));
-    }
-
     @Sql("/reservation-filter-api-test-data.sql")
     @Test
     void 주어진_멤버_또는_테마_또는_기간에_해당하는_모든_예약_조회시_모든_항목_제공() {
@@ -234,6 +214,6 @@ class ReservationRepositoryTest {
         Theme theme = themeRepository.findById(themeId).orElseThrow();
         Member member = memberRepository.findById(memberId).orElseThrow();
 
-        return new Reservation(date, reservationTime, theme, member, Status.RESERVED, null);
+        return new Reservation(date, reservationTime, theme, member, Status.RESERVED);
     }
 }

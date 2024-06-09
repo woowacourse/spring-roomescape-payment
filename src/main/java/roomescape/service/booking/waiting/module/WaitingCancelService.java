@@ -2,7 +2,6 @@ package roomescape.service.booking.waiting.module;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.waiting.Waiting;
 import roomescape.exception.RoomEscapeException;
@@ -10,7 +9,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
 @Service
-@Transactional
 public class WaitingCancelService {
 
     private final WaitingRepository waitingRepository;
@@ -30,8 +28,9 @@ public class WaitingCancelService {
         Waiting waiting = findWaitingById(waitingId);
         Reservation reservation = waiting.getReservation();
 
-        List<Reservation> waitingReservations = findWaitingReservationBySameConditions(reservation);
-        adjustWaitingOrder(waitingReservations, waiting.getWaitingOrderValue());
+        List<Reservation> waitings = findWaitingReservationBySameConditions(reservation);
+        adjustWaitingOrder(waitings, waiting.getWaitingOrderValue());
+
         waitingRepository.delete(waiting);
         reservationRepository.delete(reservation);
     }
@@ -45,9 +44,9 @@ public class WaitingCancelService {
         );
     }
 
-    private void adjustWaitingOrder(List<Reservation> reservationsToAdjust, int waitingOrderToDelete) {
-        for (Reservation reservation : reservationsToAdjust) {
-            Waiting waiting = findWaitingByReservationId(reservation.getId());
+    private void adjustWaitingOrder(List<Reservation> waitingsToAdjust, int waitingOrderToDelete) {
+        for (Reservation waitingReservation : waitingsToAdjust) {
+            Waiting waiting = findWaitingByReservationId(waitingReservation.getId());
             if (waiting.isWaitingOrderGreaterThan(waitingOrderToDelete)) {
                 waiting.decreaseWaitingOrderByOne();
             }

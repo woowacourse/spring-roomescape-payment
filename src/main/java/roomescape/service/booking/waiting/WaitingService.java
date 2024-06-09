@@ -29,12 +29,15 @@ public class WaitingService {
 
     @Transactional
     public ReservationResponse resisterWaiting(ReservationRequest request) {
-        Waiting waiting =  waitingRegisterService.registerWaiting(request);
+        Waiting waiting = waitingRegisterService.registerWaiting(request);
         return waitingSearchService.findReservationWaiting(waiting);
     }
 
     public List<WaitingResponse> findAllWaitingReservations() {
-        return waitingSearchService.findAllWaitingReservations();
+        return waitingSearchService.findAllWaitingReservations()
+                .stream()
+                .map(WaitingResponse::from)
+                .toList();
     }
 
     @Transactional

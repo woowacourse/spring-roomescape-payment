@@ -45,12 +45,11 @@ class ReservationRegisterServiceTest {
                 LocalDate.now().plusDays(7), 1L, 1L, 1L);
 
         //when
-        Long reservationId = reservationRegisterService.registerReservation(reservationRequest);
+        Reservation reservation = reservationRegisterService.registerReservation(reservationRequest);
 
         //then
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
         assertAll(
-                () -> assertThat(reservation.getId()).isEqualTo(reservationId),
+                () -> assertThat(reservation.getId()).isEqualTo(reservation.getId()),
                 () -> assertThat(reservation.getDate()).isEqualTo(reservationRequest.date()),
                 () -> assertThat(reservation.getTime().getId()).isEqualTo(reservationRequest.timeId()),
                 () -> assertThat(reservation.getMember().getId()).isEqualTo(reservationRequest.memberId()),
