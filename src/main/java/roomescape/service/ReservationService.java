@@ -136,11 +136,7 @@ public class ReservationService {
                 .map(reservation -> {
                     Payment payment = paymentService.findByReservationId(reservation.getId());
                     return ReservationDetailResponse.of(reservation, payment);
-                }), waitings.stream()
-                .map(waiting -> {
-                    Payment payment = paymentService.findByReservationId(waiting.getReservation().getId());
-                    return ReservationDetailResponse.of(waiting, payment);
-                })
+                }), waitings.stream().map(ReservationDetailResponse::from)
         ).toList();
     }
 

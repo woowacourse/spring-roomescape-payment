@@ -15,8 +15,20 @@ public record ReservationDetailResponse(
         LocalTime time,
         String status,
         String paymentKey,
-        long amount
+        Long amount
 ) {
+
+    public static ReservationDetailResponse from(Waiting waiting) {
+        Reservation reservation = waiting.getReservation();
+        return new ReservationDetailResponse(
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getReservationTime().getStartAt(),
+                String.format(getStatusName(reservation.getStatus()), waiting.getRank()),
+                null,
+                null);
+    }
 
     public static ReservationDetailResponse of(Reservation reservation, Payment payment) {
         return new ReservationDetailResponse(
