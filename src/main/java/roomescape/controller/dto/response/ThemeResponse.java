@@ -2,10 +2,13 @@ package roomescape.controller.dto.response;
 
 import roomescape.domain.theme.Theme;
 
-public record CreateThemeResponse(Long id, String name, String description, String thumbnail) {
-
-    public static CreateThemeResponse from(Theme theme) {
-        return new CreateThemeResponse(
+public record ThemeResponse(
+        Long id,
+        String name,
+        String description,
+        String thumbnail) {
+    public static ThemeResponse from(Theme theme) {
+        return new ThemeResponse(
                 theme.getId(),
                 theme.getName(),
                 theme.getDescription(),

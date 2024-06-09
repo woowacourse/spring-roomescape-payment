@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.response.FindThemeResponse;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.service.ThemeService;
 
 @RestController
@@ -20,14 +20,14 @@ public class UserThemeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FindThemeResponse>> findAll() {
-        List<FindThemeResponse> response = themeService.findAll();
+    public ResponseEntity<List<ThemeResponse>> findAll() {
+        List<ThemeResponse> response = themeService.findAll();
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/trending")
-    public ResponseEntity<List<FindThemeResponse>> findPopular() {
-        List<FindThemeResponse> response = themeService.findPopular();
+    public ResponseEntity<List<ThemeResponse>> findPopular() {
+        List<ThemeResponse> response = themeService.findPopular();
         return ResponseEntity.ok().body(response);
     }
 }

@@ -19,8 +19,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import roomescape.controller.dto.request.CreateThemeRequest;
-import roomescape.controller.dto.response.CreateThemeResponse;
-import roomescape.controller.dto.response.FindThemeResponse;
+import roomescape.controller.dto.response.ThemeResponse;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -70,7 +70,7 @@ class ThemeServiceTest {
         @DisplayName("성공: 테마 추가")
         @Test
         void save() {
-            CreateThemeResponse saved = themeService.save(new CreateThemeRequest(name, description, thumbnail));
+            ThemeResponse saved = themeService.save(new CreateThemeRequest(name, description, thumbnail));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
@@ -96,7 +96,7 @@ class ThemeServiceTest {
             themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
 
             assertThat(themeService.findAll())
-                    .extracting(FindThemeResponse::id)
+                    .extracting(ThemeResponse::id)
                     .containsExactly(1L, 2L, 3L);
         }
     }
@@ -113,7 +113,7 @@ class ThemeServiceTest {
 
             themeService.delete(2L);
             assertThat(themeService.findAll())
-                    .extracting(FindThemeResponse::id)
+                    .extracting(ThemeResponse::id)
                     .containsExactly(1L, 3L);
         }
 

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.controller.dto.request.CreateThemeRequest;
-import roomescape.controller.dto.response.CreateThemeResponse;
-import roomescape.controller.dto.response.FindThemeResponse;
+import roomescape.controller.dto.response.ThemeResponse;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;
@@ -29,10 +29,10 @@ public class ThemeService {
     }
 
     @Transactional
-    public CreateThemeResponse save(CreateThemeRequest request) {
+    public ThemeResponse save(CreateThemeRequest request) {
         Theme theme = new Theme(request.name(), request.description(), request.thumbnail());
         validateDuplication(request.name());
-        return CreateThemeResponse.from(themeRepository.save(theme));
+        return ThemeResponse.from(themeRepository.save(theme));
     }
 
     private void validateDuplication(String name) {
@@ -50,20 +50,20 @@ public class ThemeService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindThemeResponse> findAll() {
+    public List<ThemeResponse> findAll() {
         List<Theme> themes = themeRepository.findAll();
         return themes.stream()
-                .map(FindThemeResponse::from)
+                .map(ThemeResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<FindThemeResponse> findPopular() {
+    public List<ThemeResponse> findPopular() {
         LocalDate start = LocalDate.now().minusDays(POPULAR_START_DATE);
         LocalDate end = LocalDate.now().minusDays(POPULAR_END_DATE);
         List<Theme> themes = themeRepository.findPopular(start, end, POPULAR_THEME_COUNT);
         return themes.stream()
-                .map(FindThemeResponse::from)
+                .map(ThemeResponse::from)
                 .toList();
     }
 }
