@@ -15,13 +15,13 @@ public class Account {
     private static final Pattern ACCOUNT_HOLDER_PATTERN = Pattern.compile("^[가-힣]*$");
     private static final int MAX_BANK_NAME_LENGTH = 10;
 
-    @Column(nullable = false, length = MAX_ACCOUNT_NUMBER_LENGTH)
+    @Column(length = MAX_ACCOUNT_NUMBER_LENGTH)
     private String accountNumber;
 
-    @Column(nullable = false, length = MAX_ACCOUNT_HOLDER_LENGTH)
+    @Column(length = MAX_ACCOUNT_HOLDER_LENGTH)
     private String accountHolder;
 
-    @Column(nullable = false, length = MAX_BANK_NAME_LENGTH)
+    @Column(length = MAX_BANK_NAME_LENGTH)
     private String bankName;
 
     protected Account() {
