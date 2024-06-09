@@ -113,12 +113,6 @@ public class Reservation {
     }
 
     @JsonIgnore
-    public boolean isConfirmed() {
-        return reservationStatus == ReservationStatus.CONFIRMED
-                || reservationStatus == ReservationStatus.CONFIRMED_PAYMENT_REQUIRED;
-    }
-
-    @JsonIgnore
     public boolean isWaiting() {
         return reservationStatus == ReservationStatus.WAITING;
     }

@@ -43,14 +43,6 @@ public class CanceledPayment {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
     public String getCancelReason() {
         return cancelReason;
     }
