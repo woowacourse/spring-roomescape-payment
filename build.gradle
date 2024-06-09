@@ -8,6 +8,7 @@ plugins {
 configurations {
     asciidoctorExt
 }
+
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
@@ -52,10 +53,6 @@ dependencyManagement {
 }
 
 test {
-    doFirst {
-        delete file("build/generated-snippets")
-    }
-
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
@@ -68,8 +65,9 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
+    copy {
+        from asciidoctor.outputDir
+        into "static/docs"
     }
 }
 

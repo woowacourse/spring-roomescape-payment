@@ -1,0 +1,61 @@
+= 방탈출 예약 시간
+
+== 저장 API
+
+=== 예약 시간 저장
+**curl**
+include::{snippets}/time/save/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/time/save/request-cookies.adoc[]
+include::{snippets}/time/save/request-fields.adoc[]
+include::{snippets}/time/save/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/time/save/request-fields.adoc[]
+include::{snippets}/time/save/http-response.adoc[]
+
+== 조회 API
+
+=== 모든 시간 조회
+**curl**
+include::{snippets}/time/search/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/time/search/request-cookies.adoc[]
+include::{snippets}/time/search/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/time/search/response-fields.adoc[]
+include::{snippets}/time/search/http-response.adoc[]
+
+=== 예약 가능 시간 조회
+**curl**
+include::{snippets}/time/available/curl-request.adoc[]
+
+**요청**
+include::{snippets}/time/available/query-parameters.adoc[]
+include::{snippets}/time/available/request-cookies.adoc[]
+
+**응답**
+include::{snippets}/time/available/response-fields.adoc[]
+include::{snippets}/time/available/http-response.adoc[]
+
+== 삭제 API
+
+=== 예약 시간 삭제
+**curl**
+include::{snippets}/time/delete/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/time/delete/path-parameters.adoc[]
+include::{snippets}/time/delete/request-cookies.adoc[]
+include::{snippets}/time/delete/http-request.adoc[]
+
+**응답**
+include::{snippets}/time/delete/http-response.adoc[]

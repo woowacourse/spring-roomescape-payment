@@ -1,0 +1,68 @@
+= 방탈출 회원
+
+== 저장 API
+
+=== 회원 가입
+**curl**
+include::{snippets}/member/save/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/member/save/request-fields.adoc[]
+include::{snippets}/member/save/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/member/save/http-response.adoc[]
+
+== 조회 API
+
+=== 모든 회원 조회
+
+**curl**
+
+include::{snippets}/member/search/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/member/search/request-cookies.adoc[]
+include::{snippets}/member/search/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/member/search/response-fields.adoc[]
+include::{snippets}/member/search/http-response.adoc[]
+
+=== 로그인
+
+**curl**
+
+include::{snippets}/login/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/login/request-fields.adoc[]
+include::{snippets}/login/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/login/response-cookies.adoc[]
+include::{snippets}/login/http-response.adoc[]
+
+=== 토큰 검증
+
+**curl**
+
+include::{snippets}/login/check/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/login/check/request-cookies.adoc[]
+
+include::{snippets}/login/check/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/login/check/response-fields.adoc[]
+
+include::{snippets}/login/check/http-response.adoc[]

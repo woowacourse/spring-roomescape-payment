@@ -1,0 +1,56 @@
+= 방탈출 테마
+
+== 저장 API
+
+=== 테마 저장
+**curl**
+include::{snippets}/theme/save/curl-request.adoc[]
+**요청**
+include::{snippets}/theme/save/request-cookies.adoc[]
+include::{snippets}/theme/save/request-fields.adoc[]
+include::{snippets}/theme/save/http-request.adoc[]
+
+**응답**
+include::{snippets}/theme/save/response-fields.adoc[]
+include::{snippets}/theme/save/http-response.adoc[]
+
+== 조회 API
+
+=== 모든 테마 조회
+**curl**
+include::{snippets}/theme/search/curl-request.adoc[]
+
+**요청**
+include::{snippets}/theme/search/request-cookies.adoc[]
+include::{snippets}/theme/search/http-request.adoc[]
+**응답**
+include::{snippets}/theme/search/response-fields.adoc[]
+include::{snippets}/theme/search/http-response.adoc[]
+
+=== 인기 테마 조회
+**curl**
+include::{snippets}/theme/popular/curl-request.adoc[]
+
+**요청**
+include::{snippets}/theme/popular/request-cookies.adoc[]
+include::{snippets}/theme/popular/http-request.adoc[]
+
+**응답**
+include::{snippets}/theme/popular/response-fields.adoc[]
+include::{snippets}/theme/popular/http-response.adoc[]
+
+
+== 삭제 API
+**curl**
+include::{snippets}/theme/delete/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/theme/delete/path-parameters.adoc[]
+
+include::{snippets}/theme/delete/request-cookies.adoc[]
+
+include::{snippets}/theme/delete/http-request.adoc[]
+
+**응답**
+include::{snippets}/theme/delete/http-response.adoc[]
