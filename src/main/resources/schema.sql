@@ -1,10 +1,9 @@
-
 CREATE TABLE IF NOT EXISTS reservation_time
 (
     id       BIGINT NOT NULL AUTO_INCREMENT,
     start_at TIME   NOT NULL,
     PRIMARY KEY (id)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS theme
 (
@@ -13,7 +12,7 @@ CREATE TABLE IF NOT EXISTS theme
     description VARCHAR(255) NOT NULL,
     thumbnail   VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS member
 (
@@ -23,27 +22,43 @@ CREATE TABLE IF NOT EXISTS member
     password VARCHAR(255) NOT NULL,
     role     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS reservation_slot
 (
-    id       BIGINT NOT NULL AUTO_INCREMENT,
-    date     DATE   NOT NULL,
-    reservation_time_id  BIGINT NOT NULL,
-    theme_id BIGINT NOT NULL,                             -- 컬럼 추가
+    id                  BIGINT NOT NULL AUTO_INCREMENT,
+    date                DATE   NOT NULL,
+    reservation_time_id BIGINT NOT NULL,
+    theme_id            BIGINT NOT NULL,         -- 컬럼 추가
     PRIMARY KEY (id),
     FOREIGN KEY (reservation_time_id) REFERENCES reservation_time (id),
     FOREIGN KEY (theme_id) REFERENCES theme (id) -- 외래키 추가
-    );
+);
+
+CREATE TABLE IF NOT EXISTS payment
+(
+    id           BIGINT       NOT NULL AUTO_INCREMENT,
+    payment_key  VARCHAR(255) NOT NULL,
+    order_id     VARCHAR(255) NOT NULL,
+    order_name   VARCHAR(255) NOT NULL,
+    method       VARCHAR(255) NOT NULL,
+    total_amount BIGINT       NOT NULL,
+    status       VARCHAR(255) NOT NULL,
+    requested_at VARCHAR(255) NOT NULL,
+    approved_at  VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
 
 CREATE TABLE IF NOT EXISTS reservation
 (
-    id             BIGINT NOT NULL AUTO_INCREMENT,
-    member_id      BIGINT NOT NULL,
-    reservation_slot_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL,
-    status VARCHAR(255),
+    id                  BIGINT   NOT NULL AUTO_INCREMENT,
+    member_id           BIGINT   NOT NULL,
+    reservation_slot_id BIGINT   NOT NULL,
+    payment_id          BIGINT,
+    created_at          DATETIME NOT NULL,
+    status              VARCHAR(255),
     FOREIGN KEY (member_id) REFERENCES member (id),
     FOREIGN KEY (reservation_slot_id) REFERENCES reservation_slot (id),
+    FOREIGN KEY (payment_id) REFERENCES payment (id),
     PRIMARY KEY (id)
-    );
+);

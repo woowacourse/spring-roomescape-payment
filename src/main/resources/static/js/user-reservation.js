@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-    document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+    document.getElementById('wait-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
 
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
@@ -235,41 +235,38 @@ async function fetchReservationPayment(paymentData, reservationData) {
     });
 }
 
-function onWaitButtonClick() {
-    const selectedDate = document.getElementById("datepicker").value;
-    const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-    const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
-    if (selectedDate && selectedThemeId && selectedTimeId) {
-        const reservationData = {
-            date: selectedDate,
-            themeId: selectedThemeId,
-            timeId: selectedTimeId
-        };
-
-        fetch('/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(reservationData)
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Reservation waiting failed');
-                return response.json();
-            })
-            .then(data => {
-                alert('Reservation waiting successful!');
-                window.location.href = "/";
-            })
-            .catch(error => {
-                alert("An error occurred while making the reservation waiting.");
-                console.error(error);
-            });
-    } else {
-        alert("Please select a date, theme, and time before making a reservation waiting.");
-    }
-}
+// TODO : 필요없으면 삭제
+// function onWaitButtonClick() {
+//     const reservationPaymentRequest = {
+//         date: reservationData.date,
+//         themeId: reservationData.themeId,
+//         timeId: reservationData.timeId,
+//         paymentKey: paymentData.paymentKey,
+//         orderId: paymentData.orderId,
+//         amount: paymentData.amount,
+//         paymentType: paymentData.paymentType,
+//     }
+//
+//     fetch('/reservations', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(reservationData)
+//     })
+//         .then(response => {
+//             if (!response.ok) throw new Error('Reservation waiting failed');
+//             return response.json();
+//         })
+//         .then(data => {
+//             alert('Reservation waiting successful!');
+//             window.location.href = "/";
+//         })
+//         .catch(error => {
+//             alert("An error occurred while making the reservation waiting.");
+//             console.error(error);
+//         });
+// }
 
 function requestRead(endpoint) {
     return fetch(endpoint)

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
-import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingReservationService;
@@ -42,7 +41,7 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
                                                       @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, authInfo.getId());
+        ReservationResponse response = reservationService.createReservation(reservationPaymentRequest, authInfo.getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
     }
