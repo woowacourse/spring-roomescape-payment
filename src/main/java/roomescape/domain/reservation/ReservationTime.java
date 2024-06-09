@@ -1,7 +1,7 @@
 package roomescape.domain.reservation;
 
-import static roomescape.exception.RoomescapeExceptionCode.EMPTY_TIME;
-import static roomescape.exception.RoomescapeExceptionCode.INVALID_TIME_FORMAT;
+import static roomescape.exception.RoomescapeErrorCode.EMPTY_TIME;
+import static roomescape.exception.RoomescapeErrorCode.INVALID_TIME_FORMAT;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;

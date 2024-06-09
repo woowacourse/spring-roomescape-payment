@@ -1,6 +1,6 @@
 package roomescape.domain.member;
 
-import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
+import static roomescape.exception.RoomescapeErrorCode.UNAUTHORIZED;
 
 import java.util.Objects;
 

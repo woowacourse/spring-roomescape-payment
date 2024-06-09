@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.THEME_NOT_FOUND;
 
 import java.time.LocalDate;
 import java.util.List;

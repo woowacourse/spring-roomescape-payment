@@ -1,13 +1,13 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_DUPLICATED;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_MY_RESERVATION;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_FOR_NO_RESERVATION;
-import static roomescape.exception.RoomescapeExceptionCode.WAITING_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_ALREADY_EXISTS;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.THEME_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.WAITING_DUPLICATED;
+import static roomescape.exception.RoomescapeErrorCode.WAITING_FOR_MY_RESERVATION;
+import static roomescape.exception.RoomescapeErrorCode.WAITING_FOR_NO_RESERVATION;
+import static roomescape.exception.RoomescapeErrorCode.WAITING_NOT_FOUND;
 
 import java.util.List;
 

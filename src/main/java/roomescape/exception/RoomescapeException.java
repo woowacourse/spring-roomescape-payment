@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatusCode;
 
 public class RoomescapeException extends RuntimeException {
 
-    private final RoomescapeErrorCode exceptionCode;
+    private final ErrorCodeWithHttpStatusCode exceptionCode;
 
-    public RoomescapeException(final RoomescapeErrorCode exceptionCode) {
+    public RoomescapeException(final ErrorCodeWithHttpStatusCode exceptionCode) {
         this.exceptionCode = exceptionCode;
     }
 

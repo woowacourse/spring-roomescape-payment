@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
 import static roomescape.fixture.TestFixture.reservationFixture;
 
 import java.util.Optional;

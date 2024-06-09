@@ -1,8 +1,8 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
-import static roomescape.exception.RoomescapeExceptionCode.REQUEST_TIMEOUT;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
+import static roomescape.exception.RoomescapeErrorCode.REQUEST_TIMEOUT;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
 
 import java.util.Objects;
 

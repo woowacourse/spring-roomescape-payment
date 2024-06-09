@@ -1,12 +1,12 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.INVALID_DATE;
-import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.PAYMENT_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_TIME_NOT_FOUND;
-import static roomescape.exception.RoomescapeExceptionCode.THEME_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.INVALID_DATE;
+import static roomescape.exception.RoomescapeErrorCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.PAYMENT_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_ALREADY_EXISTS;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_TIME_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.THEME_NOT_FOUND;
 
 import java.time.LocalDate;
 import java.util.List;
