@@ -60,6 +60,10 @@ public class TestFixture {
         return new Member(id, new Name(ADMIN_NAME), new Email(ADMIN_EMAIL), TEST_PASSWORD, ADMIN);
     }
 
+    public static Reservation MIA_RESERVATION(Long id, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        return new Reservation(id, member, MIA_RESERVATION_DATE, time, theme, status);
+    }
+
     public static Reservation MIA_RESERVATION() {
         return MIA_RESERVATION(new ReservationTime(MIA_RESERVATION_TIME), WOOTECO_THEME(), USER_MIA(), BOOKING);
     }
