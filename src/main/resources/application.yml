@@ -36,5 +36,3 @@ security:
 toss:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
   uri: https://api.tosspayments.com/v1/payments/confirm
-server:
-  port: 80
