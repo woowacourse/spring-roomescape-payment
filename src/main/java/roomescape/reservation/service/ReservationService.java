@@ -131,7 +131,7 @@ public class ReservationService {
             throw new BadRequestException("올바르지 않는 데이터 요청입니다.");
         }
         if (reservationRepository.existsByReservationSlotAndMember(reservationSlot, member)) {
-            throw new ForbiddenException("중복된 예약입니다.");
+            throw new BadRequestException("중복된 예약입니다.");
         }
     }
 

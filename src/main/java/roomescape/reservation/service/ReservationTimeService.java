@@ -33,7 +33,7 @@ public class ReservationTimeService {
     public ReservationTimeResponse create(ReservationTimeRequest reservationTimeRequest) {
         LocalTime time = LocalTime.parse(reservationTimeRequest.startAt());
         if (reservationTimeRepository.existsByStartAt(time)) {
-            throw new ForbiddenException("중복된 예약 시간입니다.");
+            throw new BadRequestException("중복된 예약 시간입니다.");
         }
 
         ReservationTime reservationTime = new ReservationTime(time);

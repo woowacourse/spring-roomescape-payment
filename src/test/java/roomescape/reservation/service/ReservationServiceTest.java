@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.member.domain.Member;
@@ -235,7 +236,7 @@ class ReservationServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, member.getId(), ReservationStatus.BOOKED))
-                .isInstanceOf(ForbiddenException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("예약 삭제 시, 사용자 예약도 함께 삭제된다.")
