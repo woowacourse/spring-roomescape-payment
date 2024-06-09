@@ -60,11 +60,10 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Authenticated LoginMemberRequest loginMemberRequest,
-            //Todo 다시 ReservationRequest 로 변경하기
-            @RequestBody ReservationWithPaymentRequest reservationWithPaymentRequest
+            @RequestBody ReservationRequest reservationRequest
     ) {
         ReservationResponse savedReservationResponse = reservationService.saveByUser(loginMemberRequest,
-                ReservationRequest.from(reservationWithPaymentRequest));
+                reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + savedReservationResponse.id()))
                 .body(savedReservationResponse);
     }
