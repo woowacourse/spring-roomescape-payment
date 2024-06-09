@@ -4,11 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.application.member.dto.response.MemberResponse;
 import roomescape.application.member.dto.response.TokenResponse;
@@ -32,7 +35,12 @@ class AuthDocsTest extends RestDocsTest {
                 .when().post("/login")
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
-                .apply(document("/auth/login/success"));
+                .apply(document("/auth/login/success",
+                        requestFields(
+                                fieldWithPath("name.name").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("email.address").type(JsonFieldType.STRING).description("이메일 주소"),
+                                fieldWithPath("password.password").type(JsonFieldType.STRING).description("비밀번호")
+                        )));
     }
 
     @Test

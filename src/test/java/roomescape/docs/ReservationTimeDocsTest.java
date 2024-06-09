@@ -5,6 +5,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -13,6 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.application.reservation.dto.request.ReservationTimeRequest;
 import roomescape.application.reservation.dto.response.AvailableTimeResponse;
 import roomescape.application.reservation.dto.response.ReservationTimeResponse;
@@ -38,7 +42,15 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().post("/times")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .apply(document("/times/post/success"));
+                .apply(document("/times/post/success"
+                        , requestFields(
+                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
+                        )
+                        , responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
+                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
+                        )
+                ));
 
     }
 
@@ -80,7 +92,12 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().get("/times")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/times/get/all/success"));
+                .apply(document("/times/get/all/success"
+                        , responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
+                                fieldWithPath("[].startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
+                        )
+                ));
 
     }
 
@@ -139,6 +156,15 @@ class ReservationTimeDocsTest extends RestDocsTest {
                 .when().get("/times/available")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/times/get/available/success"));
+                .apply(document("/times/get/available/success"
+                        , responseFields(
+                                fieldWithPath("[].time").type(JsonFieldType.OBJECT).description("예약 시간 관련 정보"),
+                                fieldWithPath("[].isBooked").type(JsonFieldType.BOOLEAN)
+                                        .description("해당 시간 예약 여부, true면 예약된 시간")
+                        ).andWithPrefix("[].time.",
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
+                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간")
+                        )
+                ));
     }
 }

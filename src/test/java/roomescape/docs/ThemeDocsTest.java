@@ -5,12 +5,16 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.application.reservation.dto.request.ThemeRequest;
 import roomescape.application.reservation.dto.response.ThemeResponse;
 
@@ -33,7 +37,21 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().post("/themes")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .apply(document("/themes/post/success"));
+                .apply(document("/themes/post/success"
+                        , requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("테마명"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
+                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 url"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("테마 가격")
+                        )
+                        , responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("테마 식별자"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("테마명"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
+                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 url"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("테마 가격")
+                        )
+                ));
     }
 
     @Test
@@ -72,7 +90,15 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().get("/themes")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/themes/get/all/success"));
+                .apply(document("/themes/get/all/success"
+                        , responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("테마 식별자"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마명"),
+                                fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
+                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 url"),
+                                fieldWithPath("[].price").type(JsonFieldType.NUMBER).description("테마 가격")
+                        )
+                ));
     }
 
     @Test
@@ -97,7 +123,7 @@ class ThemeDocsTest extends RestDocsTest {
     void deleteFail() {
         ThemeResponse response = new ThemeResponse(1L, "테마명", "테마 설명", 10_000L, "url");
 
-        doThrow(new IllegalArgumentException("errorMessage"))
+        doThrow(new IllegalArgumentException("관련된 예약이 존재합니다."))
                 .when(themeService)
                 .deleteById(any(Long.class));
 
@@ -127,7 +153,14 @@ class ThemeDocsTest extends RestDocsTest {
                 .when().get("/themes/popular")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .apply(document("/themes/get/popular/success"));
+                .apply(document("/themes/get/popular/success"
+                        , responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("테마 식별자"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마명"),
+                                fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마에 대한 설명"),
+                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 url"),
+                                fieldWithPath("[].price").type(JsonFieldType.NUMBER).description("테마 가격")
+                        )));
     }
 
 }
