@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.dto.request.AdminReservationRequest;
+import roomescape.controller.dto.request.WaitingToReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
@@ -35,9 +36,18 @@ public class AdminController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> addAdminReservation(
-            @RequestBody @Valid AdminReservationRequest request) {
+    public ResponseEntity<ReservationResponse> addAdminReservation(@RequestBody @Valid AdminReservationRequest request) {
         ReservationResponse response = reservationService.addReservationByAdmin(request.toCreateReservationRequest());
+        return ResponseEntity.created(URI.create("/reservation/" + response.id()))
+                .body(response);
+    }
+
+    @PostMapping("/waitings/{id}")
+    public ResponseEntity<ReservationResponse> acceptReservationWaiting(@PathVariable long id,
+                                                                        @Valid @RequestBody WaitingToReservationRequest request,
+                                                                        @Auth Authentication authentication) {
+        long memberId = authentication.getId();
+        ReservationResponse response = reservationWaitingService.acceptReservationWaiting(request.toWaitingAcceptRequest(id, memberId));
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }

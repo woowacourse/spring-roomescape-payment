@@ -4,15 +4,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.exception.AccessDeniedException;
 import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.WaitingAcceptRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.time.Clock;
@@ -31,6 +36,7 @@ public class ReservationWaitingService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
     public ReservationWaitingService(ReservationWaitingRepository reservationWaitingRepository,
@@ -38,12 +44,14 @@ public class ReservationWaitingService {
                                      ReservationTimeRepository reservationTimeRepository,
                                      ThemeRepository themeRepository,
                                      MemberRepository memberRepository,
+                                     PaymentRepository paymentRepository,
                                      Clock clock) {
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
@@ -64,7 +72,7 @@ public class ReservationWaitingService {
     private Reservation getReservation(CreateReservationRequest request) {
         ReservationTime time = getTime(request.timeId());
         Theme theme = getTheme(request.themeId());
-        return reservationRepository.findByDateAndTimeAndTheme(request.date(), time, theme)
+        return reservationRepository.findByDateAndTimeAndThemeAndStatusIs(request.date(), time, theme, ReservationStatus.ACCEPTED)
                 .orElseThrow(() -> new NoSuchElementException("예약이 존재하지 않습니다."));
     }
 
@@ -96,6 +104,24 @@ public class ReservationWaitingService {
                 .ifPresent(reservationWaiting -> {
                     throw new IllegalArgumentException("현재 멤버는 이미 예약 대기 중입니다.");
                 });
+    }
+
+    @Transactional
+    public ReservationResponse acceptReservationWaiting(WaitingAcceptRequest request) {
+        ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(request.waitingId())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 대기입니다."));
+        Member member = getMember(request.memberId());
+        if (member.isNotAdmin()) {
+            throw new AccessDeniedException("관리자만 예약 대기를 확정할 수 있습니다.");
+        }
+        Reservation reservation = reservationWaiting.getReservation();
+        if (!reservation.isCanceled()) {
+            throw new IllegalArgumentException("기존 예약이 취소되어야 예약 대기를 확정할 수 있습니다.");
+        }
+        reservation.changeMember(reservationWaiting.getMember());
+        reservationWaitingRepository.delete(reservationWaiting);
+        paymentRepository.save(Payment.accountTransfer(request.accountNumber(), request.accountHolder(), request.bankName(), request.amount(), reservation));
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
