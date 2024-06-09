@@ -20,9 +20,10 @@ public class SwaggerConfig {
                         ## API 테스트는 '1. 인증 / 인가 API' 의 '/login' 을 통해 로그인 후 사용해주세요.
                                                 
                         ### 테스트시 로그인 가능한 계정 정보
-                        - 아래의 JSON 형태의 데이터를 'POST /login' 의 Request Body 에 넣어서 사용해주세요.
+                        
+                        - 아래의 JSON 형태의 데이터를 그대로 복사한 뒤 'POST /login' 의 Request Body 에 넣어서 사용해주세요.
+                        
                         - **관리자**:
-                                                
                             {
                               "email": "a@a.a",
                               "password": "a"
