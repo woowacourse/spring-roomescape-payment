@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationRequestWithPayment;
 import roomescape.infrastructure.tosspayments.TossPaymentsClient;
 import roomescape.service.ServiceBaseTest;
 

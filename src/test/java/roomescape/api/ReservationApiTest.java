@@ -20,7 +20,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
-import roomescape.dto.reservation.ReservationRequestWithPayment;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.infrastructure.tosspayments.TossPaymentsClient;
 

@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public record UserWaitingRequest(
+public record UserReservationWaitingRequest(
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         Long timeId,
         Long themeId
 ) {
 
-    public UserWaitingRequest {
+    public UserReservationWaitingRequest {
         Objects.requireNonNull(date);
         Objects.requireNonNull(timeId);
         Objects.requireNonNull(themeId);

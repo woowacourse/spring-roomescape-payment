@@ -3,8 +3,8 @@ package roomescape.service.time;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.time.ReservationTime;
-import roomescape.dto.reservationtime.ReservationTimeRequest;
-import roomescape.dto.reservationtime.ReservationTimeResponse;
+import roomescape.dto.time.ReservationTimeRequest;
+import roomescape.dto.time.ReservationTimeResponse;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.time.module.ReservationTimeValidator;
 

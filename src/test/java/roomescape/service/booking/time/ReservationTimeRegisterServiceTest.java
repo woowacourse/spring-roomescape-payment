@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
-import roomescape.dto.reservationtime.ReservationTimeRequest;
+import roomescape.dto.time.ReservationTimeRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.time.ReservationTimeRegisterService;

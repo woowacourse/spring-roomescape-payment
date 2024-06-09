@@ -16,7 +16,7 @@ import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.UserReservationRequest;
 import roomescape.dto.reservation.UserReservationResponse;
-import roomescape.dto.waiting.UserReservationWaitingRequest;
+import roomescape.dto.reservation.UserReservationWaitingRequest;
 import roomescape.service.reservation.ReservationCancelService;
 import roomescape.service.reservation.ReservationRegisterService;
 import roomescape.service.reservation.ReservationSearchService;
