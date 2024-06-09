@@ -1,3 +1,7 @@
+# ERD
+
+[링크](https://www.erdcloud.com/d/i7o7W64kLhNj9TW5m)
+
 # 기능 명세
 
 ## 1단계 - 에약 시 결제 단계 추가
@@ -23,8 +27,9 @@
 
 ## 4단계 - 문서화
 
-- [ ] ERD 작성
+- [x] ERD 작성
 - [ ] RestDocs 적용 및 StopLight로 렌더링
+- [ ] Logger 추가
 
 ## 5단계 - 리팩토링
 
