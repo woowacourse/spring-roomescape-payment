@@ -54,7 +54,7 @@ public class Reservation {
     }
 
     public void changeStatus() {
-        if (status == ReservationStatus.RESERVED) {
+        if (status.isReserved()) {
             throw new DuplicatedException("이미 결제 완료된 예약입니다.");
         }
         this.status = ReservationStatus.RESERVED;
