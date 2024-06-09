@@ -132,7 +132,7 @@ class ReservationServiceTest {
     @DisplayName("현재 날짜가 예약 당일이지만, 이미 지난 시간으로 예약을 생성하면 예외가 발생한다.")
     void beforeTimeReservationFail() {
         // given
-        LocalDateTime beforeTime = LocalDateTime.now().minusHours(1L);
+        LocalDateTime beforeTime = LocalDateTime.now().minusHours(1L).withNano(0);
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(beforeTime.toLocalTime()));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
         Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
@@ -148,7 +148,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 회원이 예약을 생성하려고 하면 예외가 발생한다.")
     void notExistMemberReservationFail() {
         // given
-        LocalDateTime beforeTime = LocalDateTime.now().minusHours(1L);
+        LocalDateTime beforeTime = LocalDateTime.now().minusDays(1L).withNano(0);
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(beforeTime.toLocalTime()));
         Theme theme = themeRepository.save(new Theme("테마명", "설명", "썸네일URL"));
         Long NotExistMemberId = 1L;

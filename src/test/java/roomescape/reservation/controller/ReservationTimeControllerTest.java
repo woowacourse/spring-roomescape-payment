@@ -237,6 +237,7 @@ public class ReservationTimeControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .port(port)
+                .header("Cookie", getAdminAccessTokenCookieByLogin("a@a.a", "a"))
                 .when().get("/times/filter?date={date}&themeId={themeId}", today.plusDays(1).toString(), theme.getId())
                 .then().log().all()
                 .statusCode(200)

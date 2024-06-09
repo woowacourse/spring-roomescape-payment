@@ -52,7 +52,7 @@ class ReservationWithPaymentServiceTest {
     void addReservationWithPayment() {
         // given
         PaymentResponse paymentInfo = new PaymentResponse("payment-key", "order-id", OffsetDateTime.now(), 10000L);
-        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1L).withNano(0);
         LocalDate date = localDateTime.toLocalDate();
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
         Member member = memberRepository.save(new Member("member", "email@email.com", "password", Role.MEMBER));
@@ -87,7 +87,7 @@ class ReservationWithPaymentServiceTest {
     void removeReservationWithPayment() {
         // given
         PaymentResponse paymentInfo = new PaymentResponse("payment-key", "order-id", OffsetDateTime.now(), 10000L);
-        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1L).withNano(0);
         LocalDate date = localDateTime.toLocalDate();
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
         Member member = memberRepository.save(new Member("member", "admin@email.com", "password", Role.ADMIN));
@@ -135,7 +135,7 @@ class ReservationWithPaymentServiceTest {
     void isPaidReservation() {
         // given
         PaymentResponse paymentInfo = new PaymentResponse("payment-key", "order-id", OffsetDateTime.now(), 10000L);
-        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1L);
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1L).withNano(0);
         LocalDate date = localDateTime.toLocalDate();
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(localDateTime.toLocalTime()));
         Member member = memberRepository.save(new Member("member", "admin@email.com", "password", Role.ADMIN));
