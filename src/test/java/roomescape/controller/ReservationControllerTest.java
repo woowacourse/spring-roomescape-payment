@@ -1,10 +1,11 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.*;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentStatus;
@@ -23,13 +24,89 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 class ReservationControllerTest extends IntegrationTestSupport {
+
+    private RequestSpecification specification;
 
     String userReservationId;
     String adminReservationId;
     int adminReservationSize;
     int userReservationSize;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        this.specification = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
+    }
+
+    @Test
+    @DisplayName("예약 목록 조회")
+    void showReservation() {
+        RestAssured.given(specification).log().all()
+                .filter(document("reservation-show"))
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .cookie("token", ADMIN_TOKEN)
+                .when().get("/admin/reservations")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("예약 추가")
+    void saveReservation() {
+        Map<String, Object> params = Map.of(
+                "memberId", 1L,
+                "date", "9999-09-09",
+                "timeId", 1L,
+                "themeId", 1L,
+                "amount", 1000,
+                "orderId", "orderId",
+                "paymentKey", "paymentKey");
+
+        RestAssured.given(specification).log().all()
+                .filter(document("reservation-save"))
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .cookie("token", ADMIN_TOKEN)
+                .body(params)
+                .when().post("/admin/reservations")
+                .then().log().all()
+                .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("예약 삭제")
+    void deleteReservation() {
+        Map<String, Object> params = Map.of(
+                "memberId", 1L,
+                "date", "9999-09-09",
+                "timeId", 1L,
+                "themeId", 1L,
+                "amount", 1000,
+                "orderId", "orderId",
+                "paymentKey", "paymentKey");
+        String createdId = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", ADMIN_TOKEN)
+                .body(params)
+                .when().post("/admin/reservations")
+                .then().log().all()
+                .statusCode(201).extract().header("location").split("/")[2];
+
+        RestAssured.given(specification).log().all()
+                .filter(document("reservation-delete"))
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .cookie("token", ADMIN_TOKEN)
+                .when().delete("/admin/reservations/" + createdId)
+                .then().log().all()
+                .statusCode(204);
+    }
 
     @DisplayName("어드민의 예약 CRUD")
     @TestFactory

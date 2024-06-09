@@ -1,0 +1,135 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+
+== 1. 회원
+:domain: member
+
+=== 조회
+==== request
+include::{snippets}/{domain}-show/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show/http-response.adoc[]
+
+=== 저장
+==== request
+include::{snippets}/{domain}-save/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-save/http-response.adoc[]
+
+=== 삭제
+==== request
+include::{snippets}/{domain}-delete/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-delete/http-response.adoc[]
+
+
+== 2. 인증
+:domain: auth
+
+=== 로그인
+==== request
+include::{snippets}/{domain}-login/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-login/http-response.adoc[]
+
+=== 로그아웃
+==== request
+include::{snippets}/{domain}-logout/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-logout/http-response.adoc[]
+
+=== 로그인 여부 확인
+==== request
+include::{snippets}/{domain}-check/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-check/http-response.adoc[]
+
+
+== 3. 예약 시간
+:domain: time
+
+=== 조회
+==== request
+include::{snippets}/{domain}-show/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show/http-response.adoc[]
+
+=== 저장
+==== request
+include::{snippets}/{domain}-save/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-save/http-response.adoc[]
+
+=== 삭제
+==== request
+include::{snippets}/{domain}-delete/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-delete/http-response.adoc[]
+
+
+== 4. 테마
+:domain: theme
+
+=== 조회
+==== request
+include::{snippets}/{domain}-show/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show/http-response.adoc[]
+
+=== 저장
+==== request
+include::{snippets}/{domain}-save/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-save/http-response.adoc[]
+
+=== 삭제
+==== request
+include::{snippets}/{domain}-delete/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-delete/http-response.adoc[]
+
+=== 인기 조회
+==== request
+include::{snippets}/{domain}-show-popular/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show-popular/http-response.adoc[]
+
+
+== 5. 예약
+:domain: reservation
+
+=== 조회
+==== request
+include::{snippets}/{domain}-show/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show/http-response.adoc[]
+
+=== 저장
+==== request
+include::{snippets}/{domain}-save/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-save/http-response.adoc[]
+
+=== 삭제
+==== request
+include::{snippets}/{domain}-delete/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-delete/http-response.adoc[]
+
+=== 검색 (필터링)
+==== request
+include::{snippets}/{domain}-filter/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-filter/http-response.adoc[]
+
+
+== 6. 대기
+:domain: waiting
+
+=== 조회
+==== request
+include::{snippets}/{domain}-show/http-request.adoc[]
+==== response
+include::{snippets}/{domain}-show/http-response.adoc[]

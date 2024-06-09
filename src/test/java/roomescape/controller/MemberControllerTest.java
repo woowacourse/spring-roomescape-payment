@@ -1,11 +1,12 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.IntegrationTestSupport;
 
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 class MemberControllerTest extends IntegrationTestSupport {
 
@@ -20,8 +23,71 @@ class MemberControllerTest extends IntegrationTestSupport {
     public static final String TEST_PASSWORD = "1234";
     public static final String TEST_NAME = "테스트";
 
+    private RequestSpecification specification;
+
     String createdId;
     int memberSize;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        this.specification = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
+    }
+
+    @Test
+    @DisplayName("회원 목록 조회")
+    void showMember() {
+        RestAssured.given(specification).log().all()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .filter(document("member-show"))
+                .cookie("token", ADMIN_TOKEN)
+                .when().get("/admin/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("회원 추가")
+    void saveMember() {
+        Map<String, String> params = Map.of(
+                "email", "ever@email.com",
+                "password", "password",
+                "name", "ever");
+        RestAssured.given(specification).log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(ContentType.JSON)
+                .filter(document("member-save"))
+                .when().post("/members")
+                .then().log().all()
+                .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("회원 삭제")
+    void deleteMember() {
+        Map<String, String> params = Map.of(
+                "email", "ever2@email.com",
+                "password", "password",
+                "name", "ever2");
+        String createdId = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/members")
+                .then().log().all()
+                .statusCode(201).extract().header("location").split("/")[2];
+
+        RestAssured.given(specification).log().all()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .filter(document("member-delete"))
+                .cookie("token", ADMIN_TOKEN)
+                .when().delete("/admin/members/" + createdId)
+                .then().log().all()
+                .statusCode(204);
+    }
 
     @DisplayName("회원 CRUD")
     @TestFactory

@@ -34,7 +34,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/error", "/login", "/signup",
                         "/members", "/themes/popular",
-                        "/css/**", "/*.ico", "/js/**", "/image/**");
+                        "/css/**", "/*.ico", "/js/**", "/image/**",
+                        "/docs");
 
         registry.addInterceptor(new CheckAdminInterceptor())
                 .order(2)

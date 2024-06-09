@@ -2,16 +2,20 @@ package roomescape;
 
 import io.restassured.RestAssured;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.infrastructure.PaymentClient;
 
 @Sql("/init.sql")
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class IntegrationTestSupport {
 

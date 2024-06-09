@@ -1,12 +1,17 @@
 plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'java'
 }
 
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
+
+configurations {
+    asciidoctorExt
+}
 
 repositories {
     mavenCentral()
@@ -25,9 +30,36 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    from file("${asciidoctor.outputDir}")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
 }
