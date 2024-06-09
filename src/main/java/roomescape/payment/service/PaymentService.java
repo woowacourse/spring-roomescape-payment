@@ -4,9 +4,8 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.BadArgumentRequestException;
-import roomescape.member.domain.Member;
-import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
@@ -15,13 +14,16 @@ import roomescape.reservation.repository.ReservationRepository;
 
 @Service
 public class PaymentService {
+    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(ReservationRepository reservationRepository,
-                          MemberRepository memberRepository,
+
+    public PaymentService(PaymentClient paymentClient,
+                          ReservationRepository reservationRepository,
                           PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
+        this.paymentClient = paymentClient;
         this.paymentRepository = paymentRepository;
     }
 
@@ -30,6 +32,7 @@ public class PaymentService {
         Reservation reservation = findReservationByReservationId(request.reservationId());
         validatePaying(reservation, memberId);
 
+        paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
         Payment payment = savePayment(request, reservation);
         return PaymentResponse.from(payment);
     }
