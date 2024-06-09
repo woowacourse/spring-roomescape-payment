@@ -122,7 +122,7 @@ class AdminReservationControllerTest extends RestClientControllerTest {
         RestAssured.given(spec).log().all()
                 .filter(document("admin-delete-reservation"))
                 .cookie("token", createAdminAccessToken())
-                .when().delete("/admin/reservations/1")
+                .when().delete("/admin/reservations/5")
                 .then().log().all()
                 .statusCode(204);
 

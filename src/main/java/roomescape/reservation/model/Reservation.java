@@ -109,6 +109,10 @@ public class Reservation {
         }
     }
 
+    public boolean isPaid() {
+        return paymentStatus.isPaid();
+    }
+
     public Long getId() {
         return id;
     }

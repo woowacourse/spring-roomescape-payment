@@ -35,7 +35,7 @@ public class PaymentHistory {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private PaymentHistoryStatus paymentStatus;
 
     @OneToOne
     private Reservation reservation;
@@ -52,13 +52,18 @@ public class PaymentHistory {
         this.paymentKey = paymentKey;
         this.approvedAt = approvedAt;
         this.totalAmount = totalAmount;
-        this.paymentStatus = PaymentStatus.DONE;
+        this.paymentStatus = PaymentHistoryStatus.DONE;
         this.reservation = reservation;
         this.member = member;
     }
 
     public boolean hasSameReservation(final Reservation other) {
         return reservation.equals(other);
+    }
+
+    public void deleteReservation() {
+        this.reservation = null;
+        this.paymentStatus = PaymentHistoryStatus.RESERVATION_CANCELED;
     }
 
     public Long getId() {
@@ -81,7 +86,7 @@ public class PaymentHistory {
         return approvedAt;
     }
 
-    public PaymentStatus getPaymentStatus() {
+    public PaymentHistoryStatus getPaymentStatus() {
         return paymentStatus;
     }
 

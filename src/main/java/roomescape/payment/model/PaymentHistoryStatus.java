@@ -1,6 +1,6 @@
 package roomescape.payment.model;
 
-public enum PaymentStatus {
+public enum PaymentHistoryStatus {
 
     DONE,
     RESERVATION_CANCELED

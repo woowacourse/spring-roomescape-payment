@@ -12,6 +12,10 @@ public enum PaymentStatus {
         this.description = description;
     }
 
+    public boolean isPaid() {
+        return DONE.equals(this);
+    }
+
     public String getDescription() {
         return description;
     }

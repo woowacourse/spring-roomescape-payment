@@ -25,6 +25,9 @@ import roomescape.member.model.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
 import roomescape.payment.infrastructure.PaymentGateway;
+import roomescape.payment.model.PaymentHistory;
+import roomescape.payment.model.PaymentHistoryStatus;
+import roomescape.payment.repository.PaymentHistoryRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationDto;
@@ -51,6 +54,9 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
 
     @MockBean
     private PaymentGateway paymentGateway;
@@ -177,9 +183,14 @@ class ReservationServiceTest {
 
         // When
         final List<ReservationDto> reservations = reservationService.getReservations();
+        final PaymentHistory paymentHistory = paymentHistoryRepository.findById(1L).orElseThrow();
 
         //then
-        assertThat(reservations).hasSize(15);
+        assertAll(
+                () -> assertThat(reservations).hasSize(15),
+                () -> assertThat(paymentHistory.getPaymentStatus()).isEqualTo(PaymentHistoryStatus.RESERVATION_CANCELED)
+        );
+
     }
 
     @DisplayName("예약 정보를 삭제하면 가장 우선 순위가 빠른 예약 대기가 예약으로 등록된다.")
