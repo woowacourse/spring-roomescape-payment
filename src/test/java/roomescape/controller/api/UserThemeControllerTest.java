@@ -15,8 +15,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.service.ThemeService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

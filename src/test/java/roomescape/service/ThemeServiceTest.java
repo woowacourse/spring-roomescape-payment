@@ -18,9 +18,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.CreateThemeResponse;
-import roomescape.controller.dto.FindThemeResponse;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.response.CreateThemeResponse;
+import roomescape.controller.dto.response.FindThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;

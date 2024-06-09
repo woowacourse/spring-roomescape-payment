@@ -1,4 +1,4 @@
-package roomescape.controller.dto;
+package roomescape.controller.dto.response;
 
 public record LoginCheckResponse(String name, String role) {
 }

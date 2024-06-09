@@ -2,9 +2,9 @@ package roomescape.service.facade;
 
 import org.springframework.stereotype.Service;
 
-import roomescape.controller.dto.CreateReservationRequest;
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.CreateUserReservationRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.response.CreateReservationResponse;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
 import roomescape.domain.reservation.payment.Payment;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;

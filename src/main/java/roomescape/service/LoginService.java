@@ -3,7 +3,7 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.global.auth.JwtManager;
 import roomescape.global.exception.AuthorizationException;

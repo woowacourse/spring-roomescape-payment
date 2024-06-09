@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.CreateThemeResponse;
-import roomescape.controller.dto.FindThemeResponse;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.response.CreateThemeResponse;
+import roomescape.controller.dto.response.FindThemeResponse;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;

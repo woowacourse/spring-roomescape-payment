@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.controller.dto.PaymentErrorMessageResponse;
+import roomescape.controller.dto.response.PaymentErrorMessageResponse;
 import roomescape.global.exception.RoomescapeException;
 
 public class TossPaymentErrorHandler implements ErrorHandler {

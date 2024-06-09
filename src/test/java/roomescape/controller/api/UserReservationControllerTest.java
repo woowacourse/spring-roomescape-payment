@@ -20,11 +20,11 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.CreateReservationRequest;
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.CreateUserReservationRequest;
-import roomescape.controller.dto.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.payment.Payment;

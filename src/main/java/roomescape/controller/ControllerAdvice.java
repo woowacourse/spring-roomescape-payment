@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import roomescape.controller.dto.ErrorMessageResponse;
+import roomescape.controller.dto.response.ErrorMessageResponse;
 import roomescape.global.exception.AuthorizationException;
 import roomescape.global.exception.RoomescapeException;
 

@@ -10,10 +10,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.CreateReservationRequest;
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.response.CreateReservationResponse;
+import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
+import roomescape.controller.dto.response.FindMyReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;

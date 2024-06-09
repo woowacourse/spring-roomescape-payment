@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.FindMemberResponse;
+import roomescape.controller.dto.response.FindMemberResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;

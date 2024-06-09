@@ -7,9 +7,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.CreateTimeResponse;
-import roomescape.controller.dto.FindTimeAndAvailabilityResponse;
-import roomescape.controller.dto.FindTimeResponse;
+import roomescape.controller.dto.response.CreateTimeResponse;
+import roomescape.controller.dto.response.FindTimeAndAvailabilityResponse;
+import roomescape.controller.dto.response.FindTimeResponse;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.global.exception.RoomescapeException;

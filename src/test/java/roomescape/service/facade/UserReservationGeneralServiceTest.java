@@ -21,8 +21,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.CreateUserReservationRequest;
+import roomescape.controller.dto.response.CreateReservationResponse;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
