@@ -13,16 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Build with Gradle
-        run: ./gradlew bootJar
+      - name: Open ssh public temporarily
+        run: sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 22
 
-      - name: Stop the services
-        run: sudo systemctl stop roomescape
-
-      - name: Copy runnable file
-        run: mkdir -p /home/ubuntu/${{ github.event.repository.name }} &&
-          cp build/libs/${{ github.event.repository.name }}-0.0.1-SNAPSHOT.jar
-          /home/ubuntu/${{ github.event.repository.name }}/run.jar
-
-      - name: Start the services
-        run: sudo systemctl start roomescape
+#      - name: Build with Gradle
+#        run: ./gradlew bootJar
+#
+#      - name: Stop the services
+#        run: sudo systemctl stop roomescape
+#
+#      - name: Copy runnable file
+#        run: mkdir -p /home/ubuntu/${{ github.event.repository.name }} &&
+#          cp build/libs/${{ github.event.repository.name }}-0.0.1-SNAPSHOT.jar
+#          /home/ubuntu/${{ github.event.repository.name }}/run.jar
+#
+#      - name: Start the services
+#        run: sudo systemctl start roomescape
