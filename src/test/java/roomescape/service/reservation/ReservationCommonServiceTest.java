@@ -13,6 +13,7 @@ import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.fixture.*;
 import roomescape.service.ServiceTest;
@@ -30,8 +31,6 @@ class ReservationCommonServiceTest extends ServiceTest {
 
     @Autowired
     private ReservationCommonService reservationCommonService;
-    @Autowired
-    private ReservationRepository reservationRepository;
 
     @DisplayName("모든 예약 내역을 조회한다.")
     @Test
@@ -153,5 +152,24 @@ class ReservationCommonServiceTest extends ServiceTest {
         assertThatThrownBy(() -> reservationCommonService.confirmReservation(reservationConfirmRequest, member.getId()))
                 .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("더이상 존재하지 않는 결제 대기 정보입니다.");
+    }
+
+    @DisplayName("결제 대기 상태의 예약을 결제 후, 예약 상태로 변경한다.")
+    @Test
+    void cannotConfirmReservationByNotOwner() {
+        //given
+        Member member = memberRepository.save(MemberFixture.createGuest());
+        Member anotherMember = memberRepository.save(MemberFixture.createGuest());
+        Theme theme = themeRepository.save(ThemeFixture.createTheme());
+        ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
+        Schedule schedule = ScheduleFixture.createFutureSchedule(time);
+        ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
+        Reservation reservation = reservationRepository.save(ReservationFixture.createPendingPayment(member, reservationDetail));
+        ReservationConfirmRequest reservationConfirmRequest = ReservationFixture.createReservationConfirmRequest(reservation);
+
+        //when & then
+        assertThatThrownBy(() -> reservationCommonService.confirmReservation(reservationConfirmRequest, anotherMember.getId()))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("본인의 예약만 결제할 수 있습니다.");
     }
 }

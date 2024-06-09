@@ -224,7 +224,6 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @Disabled
     @DisplayName("본인이 예약한 결제 대기 예약이 아닌 경우, 결제를 할 수 없다.")
     @TestFactory
     Stream<DynamicTest> payForOtherPendingPayment() {
@@ -269,9 +268,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)
                             .cookie("token", guestToken)
+                            .body(PaymentFixture.createPaymentRequest())
                             .when().post("/reservations/" + waitingId + "/payment")
                             .then().log().all()
-                            .assertThat().statusCode(200).body("message", is("본인의 예약만 결제할 수 있습니다."));
+                            .assertThat().statusCode(HttpStatus.FORBIDDEN.value()).body("message", is("본인의 예약만 결제할 수 있습니다."));
                 })
         );
     }

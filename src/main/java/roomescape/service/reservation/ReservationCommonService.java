@@ -2,12 +2,16 @@ package roomescape.service.reservation;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationDate;
+import roomescape.exception.ForbiddenException;
+import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.ReservationConfirmRequest;
@@ -22,10 +26,12 @@ import java.util.List;
 public class ReservationCommonService {
 
     private final ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
     private final PaymentService paymentService;
 
-    public ReservationCommonService(ReservationRepository reservationRepository, PaymentService paymentService) {
+    public ReservationCommonService(ReservationRepository reservationRepository, MemberRepository memberRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
+        this.memberRepository = memberRepository;
         this.paymentService = paymentService;
     }
 
@@ -78,7 +84,9 @@ public class ReservationCommonService {
 
     @Transactional
     public ReservationConfirmedResponse confirmReservation(ReservationConfirmRequest request, long memberId) {
-        Reservation reservation = getById(request.reservationId());
+        Reservation reservation = getReservationById(request.reservationId());
+        Member member = getMemberById(memberId);
+        validateAuthority(reservation, member);
         if (reservation.isPendingPayment()) {
             Payment payment = paymentService.approvePayment(request.paymentRequest());
             reservation.paid(payment);
@@ -86,8 +94,19 @@ public class ReservationCommonService {
         return new ReservationConfirmedResponse(reservation);
     }
 
-    private Reservation getById(long reservationId) {
+    private Reservation getReservationById(long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 결제 대기 정보입니다."));
+    }
+
+    private Member getMemberById(long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new InvalidMemberException("회원 정보를 찾을 수 없습니다."));
+    }
+
+    private void validateAuthority(Reservation reservation, Member member) {
+        if (!reservation.isReservationOf(member)) {
+            throw new ForbiddenException("본인의 예약만 결제할 수 있습니다.");
+        }
     }
 }
