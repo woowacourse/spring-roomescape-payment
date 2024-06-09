@@ -27,10 +27,10 @@ import roomescape.helper.domain.DomainSupplier;
 @ActiveProfiles("test")
 @ExtendWith(RestDocumentationExtension.class)
 public abstract class IntegrationTest extends DomainSupplier {
-    protected RequestSpecification spec;
-
     @LocalServerPort
-    int port;
+    private int port;
+
+    protected RequestSpecification spec;
 
     @Autowired
     protected DatabaseCleaner databaseCleaner;
@@ -43,10 +43,10 @@ public abstract class IntegrationTest extends DomainSupplier {
 
     @BeforeEach
     protected void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.spec = new RequestSpecBuilder()
+        RestAssured.port = port;
+        spec = new RequestSpecBuilder()
                 .addFilter(documentationConfiguration(restDocumentation))
                 .build();
-        RestAssured.port = port;
         databaseCleaner.execute();
         given(clock.instant()).willReturn(Instant.parse("2000-04-07T02:00:00Z"));
         given(clock.getZone()).willReturn(ZoneOffset.UTC);
