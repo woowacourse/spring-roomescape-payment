@@ -6,6 +6,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.system.auth.interceptor.AdminInterceptor;
+import roomescape.system.auth.interceptor.LoginInterceptor;
 import roomescape.system.auth.resolver.MemberIdResolver;
 
 @Configuration
@@ -13,10 +14,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final MemberIdResolver memberIdResolver;
     private final AdminInterceptor adminInterceptor;
+    private final LoginInterceptor loginInterceptor;
 
-    public WebMvcConfig(MemberIdResolver memberIdResolver, AdminInterceptor adminInterceptor) {
+    public WebMvcConfig(MemberIdResolver memberIdResolver, AdminInterceptor adminInterceptor,
+                        LoginInterceptor loginInterceptor) {
         this.memberIdResolver = memberIdResolver;
         this.adminInterceptor = adminInterceptor;
+        this.loginInterceptor = loginInterceptor;
     }
 
     @Override
@@ -27,5 +31,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor);
+        registry.addInterceptor(loginInterceptor);
     }
 }

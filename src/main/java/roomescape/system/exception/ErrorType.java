@@ -19,6 +19,7 @@ public enum ErrorType {
     NOT_EXIST_COOKIE("쿠키가 존재하지 않습니다."),
 
     // 403 Forbidden
+    LOGIN_REQUIRED("로그인이 필요한 서비스입니다."),
     PERMISSION_DOES_NOT_EXIST("접근 권한이 존재하지 않습니다."),
 
     // 404 Not Found
