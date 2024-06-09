@@ -27,6 +27,7 @@ public class PaymentClientConfiguration {
         PaymentGatewayProperty property = paymentProperties.get("toss");
         return RestClient.builder()
                 .baseUrl(property.baseUrl())
+                .requestInterceptor(paymentClientLoggingInterceptor())
                 .defaultHeader(AUTHORIZATION, encodeSecretKey(property.secretKey()))
                 .requestFactory(clientHttpRequestFactory(property.readTimeout()));
     }
@@ -39,5 +40,10 @@ public class PaymentClientConfiguration {
 
     private String encodeSecretKey(String secretKey) {
         return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+    }
+
+    @Bean
+    public PaymentClientLoggingInterceptor paymentClientLoggingInterceptor() {
+        return new PaymentClientLoggingInterceptor();
     }
 }
