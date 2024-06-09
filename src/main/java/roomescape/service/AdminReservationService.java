@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.domain.reservation.ReservationStatus.RESERVED;
+import static roomescape.domain.reservation.ReservationStatus.ADMIN_PAYMENT_RESERVED;
 import static roomescape.domain.reservation.ReservationStatus.STANDBY;
 
 import java.time.LocalDate;
@@ -55,7 +55,7 @@ public class AdminReservationService {
                 .orElseThrow(() -> new RoomescapeException("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
         LocalDateTime createdAt = LocalDateTime.now();
 
-        Reservation reservation = new Reservation(member, request.date(), createdAt, time, theme, RESERVED);
+        Reservation reservation = new Reservation(member, request.date(), createdAt, time, theme, ADMIN_PAYMENT_RESERVED);
         validateDuplication(request.date(), request.timeId(), request.themeId());
         validatePastReservation(request.date(), time);
 
