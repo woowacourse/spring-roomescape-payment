@@ -7,5 +7,7 @@ public record LoginMemberReservationResponse(long reservationId,
                                              String theme,
                                              LocalDate date,
                                              LocalTime time,
-                                             String status) {
+                                             String status,
+                                             String paymentKey,
+                                             Long amount) {
 }

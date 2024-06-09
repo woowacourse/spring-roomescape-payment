@@ -12,11 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationWaiting;
+import roomescape.domain.payment.Payment;
 import roomescape.dto.LoginMemberReservationResponse;
+import roomescape.dto.PaymentApproveRequest;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationWaitingRepository;
 import roomescape.service.finder.ReservationFinder;
@@ -30,14 +33,17 @@ public class ReservationService {
     private final ReservationWaitingRepository waitingRepository;
     private final ReservationFinder reservationFinder;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationWaitingRepository waitingRepository,
-                              ReservationFinder reservationFinder, MemberRepository memberFinder) {
+                              ReservationFinder reservationFinder, MemberRepository memberFinder,
+                              PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.reservationFinder = reservationFinder;
         this.memberRepository = memberFinder;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse save(ReservationRequest reservationRequest) {
@@ -46,7 +52,19 @@ public class ReservationService {
         beforeSave.validatePastTimeReservation();
 
         Reservation saved = reservationRepository.save(beforeSave);
+        updatePayment(saved, reservationRequest.approveRequest());
         return toResponse(saved);
+    }
+
+    private void updatePayment(Reservation saved, PaymentApproveRequest approveRequest) {
+        if (approveRequest == null) {
+            return;
+        }
+        paymentRepository.findByOrderIdAndPaymentKey(approveRequest.orderId(), approveRequest.paymentKey())
+                .ifPresent(payment -> {
+                    payment.updateReservation(saved);
+                    paymentRepository.save(payment);
+                });
     }
 
     public List<ReservationResponse> findAll() {
@@ -64,9 +82,11 @@ public class ReservationService {
     }
 
     public List<LoginMemberReservationResponse> findByMemberId(long memberId) {
-        return reservationRepository.findByMemberId(memberId)
-                .stream()
-                .map(LoginMemberReservationResponseMapper::toResponse)
+        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+        List<Payment> payments = paymentRepository.findAllByReservationIn(reservations);
+
+        return reservations.stream()
+                .map(reservation -> LoginMemberReservationResponseMapper.toResponse(reservation, payments))
                 .toList();
     }
 

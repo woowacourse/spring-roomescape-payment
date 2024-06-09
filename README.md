@@ -1,12 +1,12 @@
 # 요구사항 문서
 
 - [x] 결제 기능 추가
-  - 사용자가 결제를 해야 예약이 가능하도록 수정
-  - 결제 실패시 사용자가 실패 이유를 알 수 있어야 한다.
+    - 사용자가 결제를 해야 예약이 가능하도록 수정
+    - 결제 실패시 사용자가 실패 이유를 알 수 있어야 한다.
 
-- [ ] 내 예약 페이지에 결제 정보 추가
-  - [ ] paymentKey
-  - [ ] 결제 금액
+- [x] 내 예약 페이지에 결제 정보 추가
+    - [x] paymentKey
+    - [x] 결제 금액
 
 # API 명세
 
@@ -331,7 +331,9 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
 ### Request
 
 > GET /reservations/mine HTTP/1.1
-> cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> cookie:
+>
+token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
 > host: localhost:8080
 
 ### Response
@@ -370,7 +372,9 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
 ### Request
 
 > POST /reservations/waiting HTTP/1.1
-> cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> cookie:
+>
+token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
 > host: localhost:8080
 
 ```json
@@ -420,7 +424,9 @@ token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBR
 ### Request
 
 > GET /admin/reservations/waiting HTTP/1.1
-> cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+> cookie:
+>
+token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
 > host: localhost:8080
 
 ### Response

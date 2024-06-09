@@ -48,7 +48,7 @@ class JpaReservationTimeRepositoryTest extends DatabaseClearBeforeEachTest {
     }
 
     @Test
-    @DisplayName("ReservationTime 을 잘 지우하는지 확인한다.")
+    @DisplayName("ReservationTime 을 잘 지우는지 확인한다.")
     void delete() {
         List<ReservationTime> beforeSaveAndDelete = reservationTimeRepository.findAll();
         reservationTimeRepository.save(DEFAULT_TIME);

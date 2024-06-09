@@ -2,7 +2,9 @@ package roomescape.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import roomescape.domain.Reservation;
 import roomescape.domain.payment.Payment;
 
 public class CollectionPaymentRepository implements PaymentRepository {
@@ -20,5 +22,20 @@ public class CollectionPaymentRepository implements PaymentRepository {
         Payment saved = new Payment(atomicLong.incrementAndGet(), payment);
         payments.add(saved);
         return saved;
+    }
+
+    @Override
+    public List<Payment> findAllByReservationIn(List<Reservation> reservations) {
+        return payments.stream()
+                .filter(payment -> reservations.contains(payment.getReservation()))
+                .toList();
+    }
+
+    @Override
+    public Optional<Payment> findByOrderIdAndPaymentKey(String orderId, String paymentKey) {
+        return payments.stream()
+                .filter(payment -> payment.getOrderId().equals(orderId))
+                .filter(payment -> payment.getPaymentKey().equals(paymentKey))
+                .findFirst();
     }
 }

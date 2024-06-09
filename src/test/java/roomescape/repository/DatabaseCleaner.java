@@ -10,6 +10,8 @@ public class DatabaseCleaner {
     private JdbcTemplate jdbcTemplate;
 
     public void clean() {
+        jdbcTemplate.update("DELETE FROM payment");
+        jdbcTemplate.update("ALTER TABLE payment ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("DELETE FROM reservation_waiting");
         jdbcTemplate.update("ALTER TABLE reservation_waiting ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("DELETE FROM reservation");

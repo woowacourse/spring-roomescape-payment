@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 
@@ -52,5 +53,38 @@ public class Payment {
 
     public Reservation getReservation() {
         return reservation;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public long getAmount() {
+        return amount;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void updateReservation(Reservation reservation) {
+        this.reservation = reservation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Payment payment = (Payment) o;
+        return Objects.equals(id, payment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
