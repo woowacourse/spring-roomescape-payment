@@ -19,6 +19,7 @@ public enum ErrorCode {
     USER_NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입니다."),
 
     RESERVATION_NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "잘못된 예약 정보 입니다."),
+    RESERVATION_NOT_REGISTER_BY_RESERVED(HttpStatus.BAD_REQUEST, "확정된 예약은 대기가 불가능합니다."),
     RESERVATION_NOT_REGISTER_BY_PAST_DATE(HttpStatus.BAD_REQUEST, "지나간 날짜와 시간은 예약이 불가능합니다."),
     RESERVATION_NOT_REGISTER_BY_DUPLICATE(HttpStatus.BAD_REQUEST, "해당 시간에 동일한 테마가 예약되어있어 예약이 불가능합니다."),
     RESERVATION_NOT_WAITING_BY_PAST_DATE(HttpStatus.BAD_REQUEST, "지나간 날짜와 시간은 대기가 불가능합니다."),

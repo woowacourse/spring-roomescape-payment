@@ -4,17 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.time.ReservationTime;
 import roomescape.repository.ReservationTimeRepository;
-import roomescape.service.time.module.ReservationTimeValidator;
+import roomescape.service.time.module.TimeValidator;
 
 @Service
 @Transactional
-public class ReservationTimeDeleteService {
+public class TimeDeleteService {
 
-    private final ReservationTimeValidator timeValidator;
+    private final TimeValidator timeValidator;
     private final ReservationTimeRepository timeRepository;
 
-    public ReservationTimeDeleteService(ReservationTimeValidator timeValidator,
-                                        ReservationTimeRepository timeRepository
+    public TimeDeleteService(TimeValidator timeValidator,
+                             ReservationTimeRepository timeRepository
     ) {
         this.timeValidator = timeValidator;
         this.timeRepository = timeRepository;

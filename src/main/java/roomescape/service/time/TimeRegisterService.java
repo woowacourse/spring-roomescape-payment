@@ -6,17 +6,17 @@ import roomescape.domain.time.ReservationTime;
 import roomescape.dto.time.ReservationTimeRequest;
 import roomescape.dto.time.ReservationTimeResponse;
 import roomescape.repository.ReservationTimeRepository;
-import roomescape.service.time.module.ReservationTimeValidator;
+import roomescape.service.time.module.TimeValidator;
 
 @Service
 @Transactional
-public class ReservationTimeRegisterService {
+public class TimeRegisterService {
 
-    private final ReservationTimeValidator timeValidator;
+    private final TimeValidator timeValidator;
     private final ReservationTimeRepository timeRepository;
 
-    public ReservationTimeRegisterService(ReservationTimeValidator timeValidator,
-                                          ReservationTimeRepository timeRepository
+    public TimeRegisterService(TimeValidator timeValidator,
+                               ReservationTimeRepository timeRepository
     ) {
         this.timeValidator = timeValidator;
         this.timeRepository = timeRepository;

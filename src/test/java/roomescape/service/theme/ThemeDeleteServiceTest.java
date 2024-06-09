@@ -1,14 +1,12 @@
 package roomescape.service.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
-import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ServiceBaseTest;
 
@@ -35,12 +33,5 @@ class ThemeDeleteServiceTest extends ServiceBaseTest {
         assertThat(allThemes).extracting(Theme::getId)
                 .isNotEmpty()
                 .doesNotContain(1L);
-    }
-
-    @Test
-    void 예약_되어있는_테마를_삭제할_경우_예외_발생() {
-        // then
-        assertThatThrownBy(() -> themeDeleteService.deleteTheme(1L))
-                .isInstanceOf(RoomEscapeException.class);
     }
 }

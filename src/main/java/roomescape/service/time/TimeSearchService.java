@@ -12,13 +12,13 @@ import roomescape.repository.ReservationTimeRepository;
 
 @Service
 @Transactional(readOnly = true)
-public class ReservationTimeSearchService {
+public class TimeSearchService {
 
     private final ReservationTimeRepository timeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeSearchService(ReservationTimeRepository timeRepository,
-                                        ReservationRepository reservationRepository
+    public TimeSearchService(ReservationTimeRepository timeRepository,
+                             ReservationRepository reservationRepository
     ) {
         this.timeRepository = timeRepository;
         this.reservationRepository = reservationRepository;

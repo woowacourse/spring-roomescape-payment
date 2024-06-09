@@ -67,8 +67,9 @@ VALUES (CURRENT_DATE() - INTERVAL '9' DAY, 3, 12, 3, 'RESERVED'),
        (CURRENT_DATE() + INTERVAL '2' DAY, 1, 1, 2, 'RESERVED'),
 
        (CURRENT_DATE() + INTERVAL '2' DAY, 1, 1, 3, 'WAITING'),
-       (CURRENT_DATE() + INTERVAL '2' DAY, 1, 1, 4, 'WAITING');
+       (CURRENT_DATE() + INTERVAL '2' DAY, 1, 1, 4, 'WAITING'),
+       (CURRENT_DATE() + INTERVAL '3' DAY, 1, 1, 2, 'PAYMENT_PENDING');
 
-INSERT INTO waiting (reservation_id, waiting_order)
-VALUES (31, 1),
-       (32, 2);
+INSERT INTO payment (payment_key, order_id, amount, reservation_id)
+VALUES ('paymentKey', 'orderId', 1000, 1),
+       ('paymentKey', 'orderId', 1000, 2);

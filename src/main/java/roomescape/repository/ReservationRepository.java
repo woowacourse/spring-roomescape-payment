@@ -33,9 +33,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @EntityGraph(attributePaths = {"member", "theme", "time"})
     Optional<Reservation> findById(Long id);
 
-    @EntityGraph(attributePaths = {"member", "theme", "time"})
-    List<Reservation> findAll();
-
     List<Reservation> findByMemberId(Long memberId);
 
     @Query("""
@@ -52,8 +49,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     List<Reservation> findByMemberOrThemeOrDateRangeAndStatus(Long memberId, Long themeId, LocalDate startDate, LocalDate endDate, Status status);
 
-    List<Reservation> findByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, Status status);
-
     List<Reservation> findByStatusEquals(Status status);
 
     @Query("""
@@ -65,8 +60,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               LIMIT 10
             """)
     List<Long> findTopThemeIdsByReservationCountsForDate(LocalDate startDate, LocalDate endDate);
-
-    int countByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, Status status);
 
     int countByDateAndTimeIdAndThemeIdAndStatusAndIdLessThan(LocalDate date, Long timeId, Long themeId, Status status, Long id);
 

@@ -1,7 +1,6 @@
 package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.TestFixture.USER_ID;
 
@@ -9,15 +8,20 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.reservation.Status;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.exception.RoomEscapeException;
+import roomescape.dto.reservation.UserReservationResponse;
+import roomescape.repository.ReservationRepository;
 import roomescape.service.ServiceBaseTest;
 
 class ReservationSearchServiceTest extends ServiceBaseTest {
 
     @Autowired
     ReservationSearchService reservationSearchService;
+
+    @Autowired
+    ReservationRepository reservationRepository;
 
     @Test
     void 단일_예약_조회() {
@@ -81,12 +85,41 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
     }
 
     @Test
-    void 존재하지_않는_id로_조회할_경우_예외_발생() {
-        // given
-        Long notExistIdToFind = reservationSearchService.findAllReservedReservations().size() + 1L;
+    void 특정_사용자의_모든_예약_조회() {
+        // when
+        List<UserReservationResponse> responses = reservationSearchService.findReservationByMemberId(3L);
 
-        // when, then
-        assertThatThrownBy(() -> reservationSearchService.findReservation(notExistIdToFind))
-                .isInstanceOf(RoomEscapeException.class);
+        // then
+        List<Long> result = responses.stream()
+                .map(response -> reservationRepository.findByIdOrThrow(response.id()).getMember().getId())
+                .toList();
+        assertThat(result).isNotEmpty().allMatch(r -> r == 3L);
+    }
+
+    @Test
+    void 특정_사용자의_모든_예약_조회시_예약_대기의_경우_대기_순서를_표시() {
+        // when
+        List<UserReservationResponse> responses = reservationSearchService.findReservationByMemberId(4L);
+
+        // then
+        UserReservationResponse result = responses.stream()
+                .filter(response -> response.id() == 32L)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(result.waitingOrder()).isEqualTo(2);
+    }
+
+    @Test
+    void 모든_예약_대기_상태의_예약을_조회() {
+        // when
+        List<ReservationResponse> responses = reservationSearchService.findAllWaitingReservations();
+
+        // then
+        List<Status> result = responses.stream()
+                .map(response -> reservationRepository.findByIdOrThrow(response.id()).getStatus())
+                .toList();
+
+        assertThat(result).isNotEmpty().allMatch(r -> r == Status.WAITING);
     }
 }

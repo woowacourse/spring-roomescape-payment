@@ -1,33 +1,23 @@
-package roomescape.service.booking.time;
+package roomescape.service.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
 import roomescape.dto.time.ReservationTimeResponse;
 import roomescape.dto.time.TimeWithAvailableResponse;
-import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
-import roomescape.service.time.ReservationTimeSearchService;
+import roomescape.service.ServiceBaseTest;
 
-@Sql("/test-data.sql")
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ReservationTimeSearchServiceTest {
+class TimeSearchServiceTest extends ServiceBaseTest {
 
     @Autowired
-    ReservationTimeSearchService reservationTimeSearchService;
+    TimeSearchService timeSearchService;
 
     @Autowired
     ReservationTimeRepository timeRepository;
@@ -35,7 +25,7 @@ class ReservationTimeSearchServiceTest {
     @Test
     void 단일_시간_조회() {
         // when
-        ReservationTimeResponse timeResponse = reservationTimeSearchService.findTime(1L);
+        ReservationTimeResponse timeResponse = timeSearchService.findTime(1L);
 
         // then
         assertAll(
@@ -47,7 +37,7 @@ class ReservationTimeSearchServiceTest {
     @Test
     void 전체_테마_조회() {
         // when
-        List<ReservationTimeResponse> allTimeResponses = reservationTimeSearchService.findAllTimes();
+        List<ReservationTimeResponse> allTimeResponses = timeSearchService.findAllTimes();
 
         // then
         assertThat(allTimeResponses).hasSize(3);
@@ -56,7 +46,7 @@ class ReservationTimeSearchServiceTest {
     @Test
     void 특정_날짜와_테마에_예약가능_여부가_포함된_시간대를_조회() {
         // when
-        List<TimeWithAvailableResponse> timesWithAvailable = reservationTimeSearchService.findAvailableTimes(
+        List<TimeWithAvailableResponse> timesWithAvailable = timeSearchService.findAvailableTimes(
                 LocalDate.now().plusDays(1), 1L);
 
         // then
@@ -72,15 +62,5 @@ class ReservationTimeSearchServiceTest {
                     }
                 })
         );
-    }
-
-    @Test
-    void 존재하지_않는_id로_조회할_경우_예외_발생() {
-        // given
-        Long notExistIdToFind = reservationTimeSearchService.findAllTimes().size() + 1L;
-
-        // when, then
-        assertThatThrownBy(() -> reservationTimeSearchService.findTime(notExistIdToFind))
-                .isInstanceOf(RoomEscapeException.class);
     }
 }

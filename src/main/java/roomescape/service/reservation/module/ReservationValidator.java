@@ -51,19 +51,19 @@ public class ReservationValidator {
         validateReservationAvailability(reservation);
     }
 
-    public void validateWaitingStatus(Reservation reservation) {
-        if (!reservation.isWaiting()) {
+    public void validatePaymentPendingStatus(Reservation reservation) {
+        if (!reservation.isPaymentPending()) {
             throw new RoomEscapeException(
-                    ErrorCode.RESERVATION_NOT_WAITING_STATUS,
+                    ErrorCode.RESERVATION_NOT_PAYMENT_PENDING_STATUS,
                     "예약 정보 = " + reservation
             );
         }
     }
 
-    public void validatePaymentPendingStatus(Reservation reservation) {
-        if (!reservation.isPaymentPending()) {
+    private void validateWaitingStatus(Reservation reservation) {
+        if (!reservation.isWaiting()) {
             throw new RoomEscapeException(
-                    ErrorCode.RESERVATION_NOT_PAYMENT_PENDING_STATUS,
+                    ErrorCode.RESERVATION_NOT_WAITING_STATUS,
                     "예약 정보 = " + reservation
             );
         }
@@ -82,9 +82,9 @@ public class ReservationValidator {
 
     private void validateWaitingReservation(Reservation reservation) {
         if (reservation.isReserved()) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 확정된 예약은 대기가 불가능합니다.",
-                    new Throwable("reservation_id : " + reservation.getId())
+            throw new RoomEscapeException(
+                    ErrorCode.RESERVATION_NOT_REGISTER_BY_RESERVED,
+                    "reservation_id = " + reservation.getId()
             );
         }
     }

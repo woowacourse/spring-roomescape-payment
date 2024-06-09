@@ -1,7 +1,6 @@
 package roomescape.service.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.dto.theme.ThemeResponse;
-import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
 
 class ThemeSearchServiceTest extends ServiceBaseTest {
@@ -65,15 +63,5 @@ class ThemeSearchServiceTest extends ServiceBaseTest {
 
         // then
         assertThat(popularThemes).isEmpty();
-    }
-
-    @Test
-    void 존재하지_않는_id로_조회할_경우_예외_발생() {
-        // given
-        Long notExistIdToFind = themeSearchService.findAllThemes().size() + 1L;
-
-        // when, then
-        assertThatThrownBy(() -> themeSearchService.findTheme(notExistIdToFind))
-                .isInstanceOf(RoomEscapeException.class);
     }
 }

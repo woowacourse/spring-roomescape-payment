@@ -9,12 +9,12 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 
 @Component
-public class ReservationTimeValidator {
+public class TimeValidator {
 
     private final ReservationTimeRepository timeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeValidator(ReservationTimeRepository timeRepository, ReservationRepository reservationRepository) {
+    public TimeValidator(ReservationTimeRepository timeRepository, ReservationRepository reservationRepository) {
         this.timeRepository = timeRepository;
         this.reservationRepository = reservationRepository;
     }

@@ -1,6 +1,7 @@
 package roomescape.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.TestFixture.USER_ID;
 
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.Status;
+import roomescape.exception.RoomEscapeException;
 
 @Sql("/test-data.sql")
 class ReservationRepositoryTest extends RepositoryBaseTest {
@@ -36,12 +39,10 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
     }
 
     @Test
-    void 모든_예약_조회() {
-        // when
-        List<Reservation> allReservations = reservationRepository.findAll();
-
-        // then
-        assertThat(allReservations).hasSize(32);
+    void 존재하지_않는_id로_조회시_예외_발생() {
+        // when, then
+        assertThatThrownBy(() -> reservationRepository.findByIdOrThrow(1000L))
+                .isInstanceOf(RoomEscapeException.class);
     }
 
     @Test
@@ -55,55 +56,45 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
     }
 
     @Test
-    void 주어진_멤버_또는_테마_또는_기간에_해당하는_모든_예약_조회시_모든_항목_제공() {
+    void 주어진_멤버_또는_테마_또는_기간_또는_상태에_해당하는_모든_예약_조회시_모든_항목_제공() {
         // given
         LocalDate startDate = LocalDate.now().minusDays(3);
         LocalDate endDate = LocalDate.now().minusDays(1);
 
         // when
         List<Reservation> findByAllFilter = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
-                USER_ID, 1L, startDate, endDate);
+                USER_ID, 1L, startDate, endDate, Status.RESERVED);
 
         // then
         assertThat(findByAllFilter).isNotEmpty()
                 .allMatch(r -> r.getMember().getId().equals(USER_ID) &&
                         r.getTheme().getId().equals(1L) &&
-                        (!r.getDate().isBefore(startDate) && !r.getDate().isAfter(endDate))
+                        (!r.getDate().isBefore(startDate) && !r.getDate().isAfter(endDate)) &&
+                        r.getStatus() == Status.RESERVED
                 );
-    }
-
-    @Test
-    void 주어진_예약의_멤버정보를_제외하고_동일한_조건에_해당하는_모든_예약_조회() {
-        // given
-        Reservation reservation = reservationRepository.findById(30L).orElseThrow();
-
-        // when
-        List<Reservation> reservationsBySameConditions = reservationRepository.findByDateAndTimeIdAndThemeIdAndStatus(
-                reservation.getDate(),
-                reservation.getTime().getId(),
-                reservation.getTheme().getId(),
-                reservation.getStatus()
-        );
-
-        //then
-        assertThat(reservationsBySameConditions)
-                .isNotNull()
-                .isNotEmpty()
-                .allMatch(res -> res.getDate().equals(reservation.getDate()) &&
-                        res.getTime().getId().equals(reservation.getTime().getId()) &&
-                        res.getTheme().getId().equals(reservation.getTheme().getId()) &&
-                        res.getStatus().equals(reservation.getStatus()));
     }
 
     @Test
     void 주어진_멤버_또는_테마_또는_기간에_해당하는_모든_예약_조회시_멤버와_테마_제공() {
         // when
-        List<Reservation> findByMemberAndTheme = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
-                USER_ID, 1L, null, null);
+        List<Reservation> reservations = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
+                USER_ID, 1L, null, null, Status.RESERVED);
 
         // then
-        assertThat(findByMemberAndTheme).isNotEmpty()
-                .allMatch(r -> r.getMember().getId().equals(USER_ID) && r.getTheme().getId().equals(1L));
+        assertThat(reservations).isNotEmpty()
+                .allMatch(r -> r.getMember().getId().equals(USER_ID) &&
+                        r.getTheme().getId().equals(1L) &&
+                        r.getStatus() == Status.RESERVED
+                );
+    }
+
+    @Test
+    void 주어진_상태와_동일한_예약을_모두_조회() {
+        // when
+        List<Reservation> reservations = reservationRepository.findByStatusEquals(Status.WAITING);
+
+        // then
+        assertThat(reservations).isNotEmpty().allMatch(r -> r.getStatus() == Status.WAITING);
     }
 
     @Test
@@ -126,17 +117,12 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
     }
 
     @Test
-    void 주어진_예약의_멤버정보를_제외하고_동일한_조건에_해당하는_예약의_수를_조회() {
+    void 주어진_예약과_동일한_조건_및_상태의_예약_중에_몇번쨰_순서인지_확인() {
         // given
-        Reservation reservation = reservationRepository.findById(31L).orElseThrow();
+        Reservation reservation = reservationRepository.findById(32L).orElseThrow();
 
         // when
-        int result = reservationRepository.countByDateAndTimeIdAndThemeIdAndStatus(
-                reservation.getDate(),
-                reservation.getTime().getId(),
-                reservation.getTheme().getId(),
-                reservation.getStatus()
-        );
+        int result = reservationRepository.findReservationOrder(reservation);
 
         // then
         assertThat(result).isEqualTo(2);
@@ -165,6 +151,16 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
         // when
         boolean result = reservationRepository.existsByDateAndTimeIdAndThemeId(
                 LocalDate.now().minusDays(1), 1L, 1L);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void 주어진_날짜_시간_테마_상태와_일치하는_예약이_있는지_확인() {
+        // when
+        boolean result = reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
+                LocalDate.now().minusDays(1), 1L, 1L, Status.RESERVED);
 
         // then
         assertThat(result).isTrue();

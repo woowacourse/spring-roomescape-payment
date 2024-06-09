@@ -1,7 +1,6 @@
-package roomescape.service.booking.time;
+package roomescape.service.time;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -9,15 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.time.ReservationTime;
-import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.time.ReservationTimeDeleteService;
 
-class ReservationTimeDeleteServiceTest extends ServiceBaseTest {
+class TimeDeleteServiceTest extends ServiceBaseTest {
 
     @Autowired
-    ReservationTimeDeleteService reservationTimeDeleteService;
+    TimeDeleteService timeDeleteService;
 
     @Autowired
     ReservationTimeRepository timeRepository;
@@ -30,19 +27,12 @@ class ReservationTimeDeleteServiceTest extends ServiceBaseTest {
         timeRepository.save(new ReservationTime(LocalTime.now().plusHours(1)));
 
         // when
-        reservationTimeDeleteService.deleteTime(1L);
+        timeDeleteService.deleteTime(1L);
 
         // when
         List<ReservationTime> allTimes = timeRepository.findAll();
         assertThat(allTimes).extracting(ReservationTime::getId)
                 .isNotEmpty()
                 .doesNotContain(1L);
-    }
-
-    @Test
-    void 예약이_존재하는_시간대를_삭제할_경우_예외_발생() {
-        // then
-        assertThatThrownBy(() -> reservationTimeDeleteService.deleteTime(1L))
-                .isInstanceOf(RoomEscapeException.class);
     }
 }

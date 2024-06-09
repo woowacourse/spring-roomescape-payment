@@ -15,21 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.time.ReservationTimeRequest;
 import roomescape.dto.time.ReservationTimeResponse;
 import roomescape.dto.time.TimeWithAvailableResponse;
-import roomescape.service.time.ReservationTimeDeleteService;
-import roomescape.service.time.ReservationTimeRegisterService;
-import roomescape.service.time.ReservationTimeSearchService;
+import roomescape.service.time.TimeDeleteService;
+import roomescape.service.time.TimeRegisterService;
+import roomescape.service.time.TimeSearchService;
 
 @RestController
 @RequestMapping("/times")
 class ReservationTimeController {
 
-    private final ReservationTimeRegisterService registerService;
-    private final ReservationTimeSearchService searchService;
-    private final ReservationTimeDeleteService deleteService;
+    private final TimeRegisterService registerService;
+    private final TimeSearchService searchService;
+    private final TimeDeleteService deleteService;
 
-    public ReservationTimeController(ReservationTimeRegisterService registerService,
-                                     ReservationTimeSearchService searchService,
-                                     ReservationTimeDeleteService deleteService
+    public ReservationTimeController(TimeRegisterService registerService,
+                                     TimeSearchService searchService,
+                                     TimeDeleteService deleteService
     ) {
         this.registerService = registerService;
         this.searchService = searchService;
