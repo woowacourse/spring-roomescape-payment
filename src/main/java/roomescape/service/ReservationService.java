@@ -177,7 +177,7 @@ public class ReservationService {
     public void validateReservationsAuthority(long id, LoginMemberRequest loginMemberRequest) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
-        if (! reservation.isMemberIdOf(loginMemberRequest.id())) {
+        if (!reservation.isMemberIdOf(loginMemberRequest.id())) {
             throw new RoomescapeException(RoomescapeExceptionType.NOT_MEMBERS_RESERVATION);
         }
     }

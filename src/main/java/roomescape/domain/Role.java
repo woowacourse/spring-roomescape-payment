@@ -1,9 +1,11 @@
 package roomescape.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Arrays;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.RoomescapeExceptionType;
 
+@Schema(description = "회원 등급", example = "role1")
 public enum Role {
     ADMIN("role1"),
     USER("role2");
