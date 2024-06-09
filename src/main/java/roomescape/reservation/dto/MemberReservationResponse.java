@@ -30,6 +30,22 @@ public record MemberReservationResponse(
                                      String theme,
                                      LocalDate date,
                                      LocalTime time,
+                                     String status) {
+        this(reservationId,
+                theme,
+                date,
+                time,
+                status,
+                null,
+                null,
+                null
+        );
+    }
+
+    public MemberReservationResponse(Long reservationId,
+                                     String theme,
+                                     LocalDate date,
+                                     LocalTime time,
                                      String status,
                                      Long rank) {
         this(reservationId,

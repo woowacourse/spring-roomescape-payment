@@ -52,7 +52,7 @@ function render(data) {
             };
             cancelCell.appendChild(cancelButton);
 
-            if (status === '결제 대기') {
+            if (status === '결제대기') {
                 payButton.textContent = '결제';
                 payButton.onclick = function () {
                     //requestDelete(item.reservationId).then(() => window.location.reload());

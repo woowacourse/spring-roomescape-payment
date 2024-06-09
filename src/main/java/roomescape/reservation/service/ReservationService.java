@@ -15,10 +15,12 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.PaymentCancelRequest;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.domain.PaymentMatcher;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPending;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationWaiting;
 import roomescape.reservation.domain.Status;
@@ -34,6 +36,8 @@ import roomescape.time.domain.ReservationTimeRepository;
 
 @Service
 public class ReservationService {
+
+    private static final String DEFAULT_CANCEL_REASON = "단순 변심";
 
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
@@ -83,12 +87,13 @@ public class ReservationService {
     }
 
     public List<MemberReservationResponse> findAllByMemberId(Long memberId) {
-        List<MemberReservationResponse> memberReservationRespons = new ArrayList<>();
+        List<MemberReservationResponse> memberReservationResponse = new ArrayList<>();
 
-        findAllMembersReservedReservation(memberReservationRespons, memberId);
-        findAllMembersWaitingReservation(memberReservationRespons, memberId);
+        findAllMembersReservedReservation(memberReservationResponse, memberId);
+        findAllMembersPendingReservation(memberReservationResponse, memberId);
+        findAllMembersWaitingReservation(memberReservationResponse, memberId);
 
-        return memberReservationRespons;
+        return memberReservationResponse;
     }
 
     private void findAllMembersReservedReservation(List<MemberReservationResponse> responses, Long memberId) {
@@ -106,6 +111,21 @@ public class ReservationService {
                             payment.getPaymentKey(),
                             payment.getOrderId(),
                             payment.getAmount()
+                    )
+            );
+        }
+    }
+
+    private void findAllMembersPendingReservation(List<MemberReservationResponse> responses, Long memberId) {
+        List<ReservationPending> reservations = reservationRepository.findAllReservationPendingByMemberId(memberId);
+        for (ReservationPending reservation : reservations) {
+            responses.add(
+                    new MemberReservationResponse(
+                            reservation.getId(),
+                            reservation.getTheme().getName(),
+                            reservation.getDate(),
+                            reservation.getTime().getStartAt(),
+                            reservation.getStatus().getValue()
                     )
             );
         }
@@ -224,6 +244,10 @@ public class ReservationService {
         Reservation reservationForDelete = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
         if (reservationForDelete.isReserved()) {
+            Payment paymentForCancel = paymentRepository.findByReservationId(id)
+                    .orElseThrow(() -> new NoSuchRecordException("해당하는 결제 정보가 존재하지 않습니다 ID: " + id));
+            PaymentCancelRequest request = new PaymentCancelRequest(paymentForCancel.getPaymentKey());
+            tossPaymentClient.cancelPayments(request, DEFAULT_CANCEL_REASON);
             updateWaitingReservationStatus(reservationForDelete);
         }
         reservationRepository.deleteById(id);
@@ -235,6 +259,6 @@ public class ReservationService {
                 reservationForDelete.getTime().getId(),
                 reservationForDelete.getTheme().getId(),
                 Status.WAITING
-        ).ifPresent(value -> value.updateStatus(Status.RESERVED));
+        ).ifPresent(value -> value.updateStatus(Status.PENDING));
     }
 }
