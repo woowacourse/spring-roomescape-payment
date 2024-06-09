@@ -1,4 +1,4 @@
-= Coonect API Document
+= API Document
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
