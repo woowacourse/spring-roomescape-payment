@@ -7,15 +7,19 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.config.ObjectMapperConfig;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import io.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import roomescape.application.auth.TokenManager;
@@ -26,6 +30,7 @@ import roomescape.application.reservation.ReservationLookupService;
 import roomescape.application.reservation.ReservationService;
 import roomescape.application.reservation.ReservationTimeService;
 import roomescape.application.reservation.ThemeService;
+import roomescape.config.LocalDateTimeFormatConfig;
 import roomescape.domain.member.Role;
 import roomescape.exception.UnAuthorizedException;
 import roomescape.presentation.auth.AuthController;
@@ -53,7 +58,7 @@ import roomescape.presentation.view.ClientController;
         ClientController.class
 })
 @ExtendWith(RestDocumentationExtension.class)
-@AutoConfigureRestDocs
+@Import(LocalDateTimeFormatConfig.class)
 public abstract class RestDocsTest {
 
     protected static final String COOKIE_NAME = "token";
@@ -76,26 +81,33 @@ public abstract class RestDocsTest {
     protected TokenManager tokenManager;
     @MockBean
     private CredentialContext context;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     protected MockMvcRequestSpecification restDocs;
 
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        restDocs = RestAssuredMockMvc.given()
-                .mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                        .apply(documentationConfiguration(restDocumentation)
-                                .operationPreprocessors()
-                                .withRequestDefaults(prettyPrint()
-                                        , modifyUris()
-                                                .scheme("https")
-                                                .host("docs.roomescape.com")
-                                                .removePort()
+    public void setUp(WebApplicationContext webApplicationContext,
+                      RestDocumentationContextProvider restDocumentation
+    ) {
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint()
+                                , modifyUris()
+                                        .scheme("https")
+                                        .host("docs.roomescape.com")
+                                        .removePort())
+                        .withResponseDefaults(prettyPrint()))
+                .build();
 
-                                )
-                                .withResponseDefaults(prettyPrint()))
-                        .build())
-                .log().all();
+        RestAssuredMockMvc.config = RestAssuredMockMvc.config()
+                .objectMapperConfig(new ObjectMapperConfig()
+                        .jackson2ObjectMapperFactory((cls, charset) -> objectMapper));
 
+        restDocs = RestAssuredMockMvc
+                .given().mockMvc(mockMvc).log().all();
     }
 
     protected String getAdminToken(Long id, String name) {
