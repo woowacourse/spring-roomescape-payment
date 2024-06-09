@@ -39,6 +39,6 @@ create table if not exists waiting (
     member_id bigint,
     theme_id bigint,
     time_id bigint,
-    status varchar(255) check (status in ('WAITING')),
+    status varchar(255) check (status in ('WAITING', 'PENDING')),
     primary key (id)
 );

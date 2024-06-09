@@ -4,6 +4,7 @@ public enum ReservationStatus {
 
     BOOKING("예약"),
     WAITING("예약 대기"),
+    PENDING("결제 대기")
     ;
 
     private final String message;

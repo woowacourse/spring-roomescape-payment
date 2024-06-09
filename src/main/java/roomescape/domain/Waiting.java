@@ -72,4 +72,8 @@ public class Waiting {
     public ReservationStatus getStatus() {
         return status;
     }
+
+    public void toPending() {
+        status = ReservationStatus.PENDING;
+    }
 }

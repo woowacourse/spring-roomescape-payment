@@ -118,18 +118,10 @@ public class ReservationService {
     }
 
     private void updateWaitingToReservation(final Reservation reservation) {
-
         Optional<Waiting> firstWaiting = waitingRepository
                 .findFirstByDateAndTimeAndTheme(reservation.getDate(), reservation.getTime(), reservation.getTheme());
 
-        // TODO: waiting에서 예약으로 갈 때 결제 어떻게 할지?
-        firstWaiting.ifPresent(waiting -> {
-            Reservation newReservation = Reservation
-                    .createNewBooking(waiting.getMember(), reservation.getDate(), reservation.getTime(),
-                            reservation.getTheme(), "notPayed");
-            waitingRepository.delete(waiting);
-            reservationRepository.save(newReservation);
-        });
+        firstWaiting.ifPresent(Waiting::toPending);
     }
 
     private void validate(LocalDate date, TimeSlot timeSlot, Theme theme, Member member) {
