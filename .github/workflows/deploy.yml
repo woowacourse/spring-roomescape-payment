@@ -14,7 +14,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Establish ssh reverse tunneling
-        run: nohup ssh -f -N -R 2222:localhost:22 root:YghHome1@ca.iptime.org
+        run: |
+          sudo apt-get install sshpass -y
+          nohup sshpass -p 'YghHome1!' ssh -f -N -R 2222:localhost:22 root@ca.iptime.org
 
 #      - name: Build with Gradle
 #        run: ./gradlew bootJar
