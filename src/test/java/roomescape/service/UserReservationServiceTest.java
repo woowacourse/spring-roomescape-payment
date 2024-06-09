@@ -22,9 +22,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.response.FindMyReservationResponse;
+import roomescape.controller.dto.response.MyReservationResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
@@ -81,7 +81,7 @@ class UserReservationServiceTest {
         @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
         @Test
         void save() {
-            CreateReservationResponse saved = userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId), paymentId);
+            ReservationResponse saved = userReservationService.reserve(new CreateReservationRequest(userId, date, timeId, themeId), paymentId);
             assertThat(saved.id()).isEqualTo(1L);
         }
 
@@ -151,7 +151,7 @@ class UserReservationServiceTest {
         @DisplayName("성공: 예약 대기")
         @Test
         void standby() {
-            CreateReservationResponse saved = userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
+            ReservationResponse saved = userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
@@ -188,13 +188,13 @@ class UserReservationServiceTest {
             userReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-02"), timeId, themeId), paymentId);
             userReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-03"), timeId, themeId), paymentId);
 
-            List<FindMyReservationResponse> reservations = userReservationService.findMyReservationsWithRank(userId);
+            List<MyReservationResponse> reservations = userReservationService.findMyReservationsWithRank(userId);
             assertAll(
                     () -> assertThat(reservations)
-                            .extracting(FindMyReservationResponse::id)
+                            .extracting(response -> response.reservation().id())
                             .containsExactly(2L, 3L, 4L),
                     () -> assertThat(reservations)
-                            .extracting(FindMyReservationResponse::rank)
+                            .extracting(MyReservationResponse::rank)
                             .containsExactly(1L, 0L, 0L)
             );
         }

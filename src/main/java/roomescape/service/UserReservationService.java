@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.response.FindMyReservationResponse;
+import roomescape.controller.dto.response.MyReservationResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -50,7 +50,7 @@ public class UserReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse reserve(CreateReservationRequest request, Long paymentId) {
+    public ReservationResponse reserve(CreateReservationRequest request, Long paymentId) {
         validateDuplication(request.date(), request.timeId(), request.themeId());
         return savePaymentReserved(
                 request.memberId(), request.date(), request.timeId(), request.themeId(), paymentId);
@@ -63,7 +63,7 @@ public class UserReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse standby(Long memberId, CreateUserReservationStandbyRequest request) {
+    public ReservationResponse standby(Long memberId, CreateUserReservationStandbyRequest request) {
         validateAlreadyBookedByMember(memberId, request.date(), request.timeId(), request.themeId());
         return saveStandBy(memberId, request.date(), request.timeId(), request.themeId());
     }
@@ -75,7 +75,7 @@ public class UserReservationService {
         }
     }
 
-    private CreateReservationResponse savePaymentReserved(Long memberId, LocalDate date, Long timeId,
+    private ReservationResponse savePaymentReserved(Long memberId, LocalDate date, Long timeId,
                                                           Long themeId, Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RoomescapeException("결제되지 않았습니다."));
@@ -83,11 +83,11 @@ public class UserReservationService {
         return save(memberId, date, timeId, themeId, payment, PAYMENT_RESERVED);
     }
 
-    private CreateReservationResponse saveStandBy(Long memberId, LocalDate date, Long timeId, Long themeId) {
+    private ReservationResponse saveStandBy(Long memberId, LocalDate date, Long timeId, Long themeId) {
         return save(memberId, date, timeId, themeId, null, STANDBY);
     }
 
-    private CreateReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
+    private ReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
                                            Payment payment, ReservationStatus status) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
@@ -100,7 +100,7 @@ public class UserReservationService {
         Reservation reservation = new Reservation(member, date, createdAt, time, theme, payment, status);
         validatePastReservation(date, time);
 
-        return CreateReservationResponse.from(reservationRepository.save(reservation));
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     private void validatePastReservation(LocalDate date, ReservationTime time) {
@@ -134,12 +134,12 @@ public class UserReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindMyReservationResponse> findMyReservationsWithRank(Long memberId) {
+    public List<MyReservationResponse> findMyReservationsWithRank(Long memberId) {
         List<ReservationWithRank> reservations =
                 reservationRepository.findReservationsWithRankByMemberId(memberId);
 
         return reservations.stream()
-                .map(data -> FindMyReservationResponse.from(data.reservation(), data.rank()))
+                .map(data -> MyReservationResponse.from(data.reservation(), data.rank()))
                 .toList();
     }
 }

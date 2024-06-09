@@ -21,8 +21,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.ReservationTime;
@@ -95,7 +95,7 @@ class UserReservationGeneralServiceTest {
         @Test
         void save() {
             CreateUserReservationRequest request = new CreateUserReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
-            CreateReservationResponse saved = reservationFacadeService.reserve(userId, request);
+            ReservationResponse saved = reservationFacadeService.reserve(userId, request);
             assertThat(saved.id()).isEqualTo(1L);
         }
 

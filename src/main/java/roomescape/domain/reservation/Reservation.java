@@ -3,6 +3,7 @@ package roomescape.domain.reservation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -109,8 +110,11 @@ public class Reservation {
         return member;
     }
 
-    public Payment getPayment() {
-        return payment;
+    public Optional<Payment> getPayment() {
+        if(payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment);
     }
 
     public ReservationStatus getStatus() {

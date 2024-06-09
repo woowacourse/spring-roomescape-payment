@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationRequest;
 import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.response.FindMyReservationResponse;
+import roomescape.controller.dto.response.MyReservationResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
 import roomescape.service.UserReservationService;
@@ -35,28 +35,28 @@ public class UserReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<FindMyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
-        List<FindMyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
+    public ResponseEntity<List<MyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
+        List<MyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<CreateReservationResponse> save(
+    public ResponseEntity<ReservationResponse> save(
             @Valid @RequestBody CreateUserReservationRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationGeneralService.reserve(member.getId(), request);
+        ReservationResponse response = reservationGeneralService.reserve(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
 
     @PostMapping("/standby")
-    public ResponseEntity<CreateReservationResponse> standby(
+    public ResponseEntity<ReservationResponse> standby(
             @Valid @RequestBody CreateUserReservationStandbyRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationService.standby(member.getId(), request);
+        ReservationResponse response = reservationService.standby(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);

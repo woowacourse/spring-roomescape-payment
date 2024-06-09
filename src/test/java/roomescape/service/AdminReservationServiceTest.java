@@ -21,10 +21,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.response.FindReservationResponse;
-import roomescape.controller.dto.response.FindReservationStandbyResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.controller.dto.request.SearchReservationFilterRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -80,7 +78,7 @@ class AdminReservationServiceTest {
         @DisplayName("성공: 예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
         @Test
         void save() {
-            CreateReservationResponse saved = adminReservationService.reserve(
+            ReservationResponse saved = adminReservationService.reserve(
                     new CreateReservationRequest(userId, date, timeId, themeId));
             assertThat(saved.id()).isEqualTo(1L);
         }
@@ -159,7 +157,7 @@ class AdminReservationServiceTest {
             adminReservationService.deleteById(2L);
 
             assertThat(adminReservationService.findAllReserved())
-                    .extracting(FindReservationResponse::id)
+                    .extracting(ReservationResponse::id)
                     .containsExactly(1L, 3L);
         }
     }
@@ -189,7 +187,7 @@ class AdminReservationServiceTest {
             adminReservationService.reserve(new CreateReservationRequest(adminId, LocalDate.parse("2060-01-03"), timeId, themeId));
 
             assertThat(adminReservationService.findAllReserved())
-                    .extracting(FindReservationResponse::id)
+                    .extracting(ReservationResponse::id)
                     .containsExactly(1L, 2L, 3L);
         }
     }
@@ -204,7 +202,7 @@ class AdminReservationServiceTest {
             userReservationService.standby(userId, new CreateUserReservationStandbyRequest(date, timeId, themeId));
 
             assertThat(adminReservationService.findAllStandby())
-                    .extracting(FindReservationStandbyResponse::id)
+                    .extracting(ReservationResponse::id)
                     .containsExactly(2L);
         }
     }
@@ -222,11 +220,11 @@ class AdminReservationServiceTest {
             adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-05"), 1L, 1L));
             adminReservationService.reserve(new CreateReservationRequest(userId, LocalDate.parse("2060-01-06"), 1L, 2L));
 
-            List<FindReservationResponse> reservations = adminReservationService.findAllByFilter(
+            List<ReservationResponse> reservations = adminReservationService.findAllByFilter(
                     new SearchReservationFilterRequest(2L, userId, LocalDate.parse("2060-01-01"), LocalDate.parse("2060-01-06")));
 
             assertThat(reservations)
-                    .extracting(FindReservationResponse::id)
+                    .extracting(ReservationResponse::id)
                     .containsExactly(4L, 6L);
         }
     }

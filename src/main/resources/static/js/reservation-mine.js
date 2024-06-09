@@ -15,11 +15,12 @@ function render(data) {
     data.forEach(item => {
         const row = tableBody.insertRow();
 
-        const theme = item.theme;
-        const date = item.date;
-        const time = item.time;
+        const theme = item.reservation.theme.name;
+        const date = item.reservation.date;
+        const time = item.reservation.time.startAt;
         const rank = item.rank;
-        const status = item.status !== 'STANDBY' ? '예약' : rank + '번째 예약대기';
+        const status = item.reservation.status !== 'STANDBY' ? '예약' : rank + '번째 예약대기';
+        const payment = item.reservation.payment;
 
         row.insertCell(0).textContent = theme;
         row.insertCell(1).textContent = date;
@@ -37,9 +38,9 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
-            if (item.existsPayment) {
-                row.insertCell(5).textContent = item.paymentKey;
-                row.insertCell(6).textContent = item.amount;
+            if (payment.isExists) {
+                row.insertCell(5).textContent = payment.paymentKey;
+                row.insertCell(6).textContent = payment.amount;
             }
         }
     });

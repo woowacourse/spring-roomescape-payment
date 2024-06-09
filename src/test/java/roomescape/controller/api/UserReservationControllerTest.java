@@ -107,10 +107,10 @@ class UserReservationControllerTest {
                 .then().log().all()
                 .statusCode(201)
                 .body("id", is(1))
-                .body("memberName", is("러너덕"))
+                .body("member.name", is("러너덕"))
                 .body("date", is("2060-01-01"))
-                .body("time", is("10:00"))
-                .body("themeName", is("t1"));
+                .body("time.startAt", is("10:00"))
+                .body("theme.name", is("t1"));
     }
 
     @DisplayName("성공: 예약대기 추가 -> 201")
@@ -129,10 +129,10 @@ class UserReservationControllerTest {
                 .then().log().all()
                 .statusCode(201)
                 .body("id", is(2))
-                .body("memberName", is("러너덕"))
+                .body("member.name", is("러너덕"))
                 .body("date", is("2060-01-01"))
-                .body("time", is("10:00"))
-                .body("themeName", is("t1"));
+                .body("time.startAt", is("10:00"))
+                .body("theme.name", is("t1"));
     }
 
     @DisplayName("성공: 예약대기 삭제 -> 204")
@@ -241,8 +241,8 @@ class UserReservationControllerTest {
                 .when().get("/reservations/mine")
                 .then().log().all()
                 .statusCode(200)
-                .body("id", contains(1, 3))
-                .body("status", contains("PAYMENT_RESERVED", "STANDBY"))
+                .body("reservation.id", contains(1, 3))
+                .body("reservation.status", contains("PAYMENT_RESERVED", "STANDBY"))
                 .body("rank", contains(0, 1));
     }
 }

@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
-import roomescape.controller.dto.response.FindReservationResponse;
-import roomescape.controller.dto.response.FindReservationStandbyResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.controller.dto.request.SearchReservationFilterRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
@@ -45,7 +43,7 @@ public class AdminReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse reserve(CreateReservationRequest request) {
+    public ReservationResponse reserve(CreateReservationRequest request) {
         Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
@@ -58,7 +56,7 @@ public class AdminReservationService {
         validateDuplication(request.date(), request.timeId(), request.themeId());
         validatePastReservation(request.date(), time);
 
-        return CreateReservationResponse.from(reservationRepository.save(reservation));
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     private void validateDuplication(LocalDate date, Long timeId, Long themeId) {
@@ -102,23 +100,23 @@ public class AdminReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindReservationResponse> findAllReserved() {
+    public List<ReservationResponse> findAllReserved() {
         List<Reservation> reservations = reservationRepository.findAllByStatusNotOrderByDateAscTimeStartAtAsc(STANDBY);
         return reservations.stream()
-                .map(FindReservationResponse::from)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<FindReservationStandbyResponse> findAllStandby() {
+    public List<ReservationResponse> findAllStandby() {
         List<Reservation> reservations = reservationRepository.findAllByStatusOrderByDateAscTimeStartAtAsc(STANDBY);
         return reservations.stream()
-                .map(FindReservationStandbyResponse::from)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<FindReservationResponse> findAllByFilter(SearchReservationFilterRequest request) {
+    public List<ReservationResponse> findAllByFilter(SearchReservationFilterRequest request) {
 
         if (request.dateFrom().isAfter(request.dateTo())) {
             throw new RoomescapeException("날짜 조회 범위가 올바르지 않습니다.");
@@ -127,7 +125,7 @@ public class AdminReservationService {
                 reservationRepository.findAllByThemeIdAndMemberIdAndDateIsBetweenOrderByDateAscTimeStartAtAsc(
                         request.themeId(), request.memberId(), request.dateFrom(), request.dateTo());
         return reservations.stream()
-                .map(FindReservationResponse::from)
+                .map(ReservationResponse::from)
                 .toList();
     }
 }

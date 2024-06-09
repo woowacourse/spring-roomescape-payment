@@ -3,8 +3,8 @@ package roomescape.service.facade;
 import org.springframework.stereotype.Service;
 
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
 import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.reservation.payment.Payment;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
@@ -20,7 +20,7 @@ public class UserReservationGeneralService {
         this.paymentService = paymentService;
     }
 
-    public CreateReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
+    public ReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(), request.paymentKey());
         Payment payment = paymentService.pay(paymentRequest);
         return userReservationService.reserve(CreateReservationRequest.to(memberId, request), payment.getId());

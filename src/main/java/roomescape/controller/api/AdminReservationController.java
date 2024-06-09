@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.controller.dto.request.CreateReservationRequest;
-import roomescape.controller.dto.response.CreateReservationResponse;
-import roomescape.controller.dto.response.FindReservationResponse;
-import roomescape.controller.dto.response.FindReservationStandbyResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.controller.dto.request.SearchReservationFilterRequest;
 import roomescape.service.AdminReservationService;
 
@@ -31,26 +29,26 @@ public class AdminReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FindReservationResponse>> findAll() {
-        List<FindReservationResponse> response = adminReservationService.findAllReserved();
+    public ResponseEntity<List<ReservationResponse>> findAll() {
+        List<ReservationResponse> response = adminReservationService.findAllReserved();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<FindReservationResponse>> find(SearchReservationFilterRequest request) {
-        List<FindReservationResponse> response = adminReservationService.findAllByFilter(request);
+    public ResponseEntity<List<ReservationResponse>> find(SearchReservationFilterRequest request) {
+        List<ReservationResponse> response = adminReservationService.findAllByFilter(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/standby")
-    public ResponseEntity<List<FindReservationStandbyResponse>> findAllStandby() {
-        List<FindReservationStandbyResponse> response = adminReservationService.findAllStandby();
+    public ResponseEntity<List<ReservationResponse>> findAllStandby() {
+        List<ReservationResponse> response = adminReservationService.findAllStandby();
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<CreateReservationResponse> save(@Valid @RequestBody CreateReservationRequest request) {
-        CreateReservationResponse response = adminReservationService.reserve(request);
+    public ResponseEntity<ReservationResponse> save(@Valid @RequestBody CreateReservationRequest request) {
+        ReservationResponse response = adminReservationService.reserve(request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
