@@ -1,5 +1,7 @@
 package roomescape.web.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -21,6 +23,7 @@ import roomescape.web.controller.request.SearchCondition;
 import roomescape.web.controller.response.AdminReservationResponse;
 import roomescape.web.controller.response.MemberReservationResponse;
 
+@Tag(name = "Admin-Reservation", description = "운영자 예약 API")
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
@@ -34,6 +37,7 @@ public class AdminReservationController {
         this.reservationAndWaitingService = reservationAndWaitingService;
     }
 
+    @Operation(summary = "예약 생성", description = "예약을 생성합니다.")
     @PostMapping
     public ResponseEntity<AdminReservationResponse> reserve(
             @Valid @RequestBody AdminReservationRequest adminReservationRequest) {
@@ -46,6 +50,7 @@ public class AdminReservationController {
                 .body(adminReservationResponse);
     }
 
+    @Operation(summary = "조건으로 예약 조회", description = "회원id, 테마id, 시작일, 종료일로 예약을 조회합니다.")
     @GetMapping("/search")
     public ResponseEntity<List<MemberReservationResponse>> getSearchedReservations(SearchCondition searchCondition) {
         AdminSearchedReservationAppRequest appRequest = AdminSearchedReservationAppRequest.from(searchCondition);
@@ -59,6 +64,7 @@ public class AdminReservationController {
         return ResponseEntity.ok().body(webResponse);
     }
 
+    @Operation(summary = "예약 삭제", description = "예약 id로 예약을 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBy(@PathVariable Long id) {
         reservationAndWaitingService.deleteReservation(id);

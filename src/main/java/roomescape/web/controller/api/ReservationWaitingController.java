@@ -1,5 +1,7 @@
 package roomescape.web.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -20,6 +22,7 @@ import roomescape.web.controller.request.ReservationWaitingRequest;
 import roomescape.web.controller.response.ReservationWaitingResponse;
 import roomescape.web.controller.response.ReservationWaitingWithRankResponse;
 
+@Tag(name = "Reservation-Waiting", description = "예약 대기 API")
 @Controller
 @RequestMapping("/reservation-waitings")
 public class ReservationWaitingController {
@@ -30,6 +33,7 @@ public class ReservationWaitingController {
         this.reservationWaitingService = reservationWaitingService;
     }
 
+    @Operation(summary = "예약 대기 추가", description = "로그인한 회원이 예약 대기를 추가합니다.")
     @PostMapping
     public ResponseEntity<ReservationWaitingResponse> save(@Valid @RequestBody ReservationWaitingRequest request,
                                                            @Valid @Auth LoginMember loginMember) {
@@ -43,6 +47,8 @@ public class ReservationWaitingController {
                 .body(waitingWebResponse);
     }
 
+    @Operation(summary = "내 예약 대기 조회",
+            description = "로그인한 회원의 id로 저장된 예약 대기와 대기 순서를 모두 조회합니다.")
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationWaitingWithRankResponse>> findMyWaitingWithRank(
             @Valid @Auth LoginMember loginMember) {
@@ -55,6 +61,7 @@ public class ReservationWaitingController {
         return ResponseEntity.ok(waitingWithRankWebResponses);
     }
 
+    @Operation(summary = "예약 대기 삭제", description = "로그인한 회원의 id와 예약 대기 id로 예약 대기를 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@Valid @Auth LoginMember loginMember, @PathVariable Long id) {
         reservationWaitingService.deleteMemberWaiting(loginMember.id(), id);
