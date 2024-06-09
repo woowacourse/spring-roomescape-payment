@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.reservation.persistence.ReservationStatusPersistConverter;
+import roomescape.reservation.infrastructure.ReservationStatusPersistConverter;
 
 import java.time.LocalDate;
 
