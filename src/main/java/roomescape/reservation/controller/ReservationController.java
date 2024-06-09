@@ -27,6 +27,7 @@ import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
 import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
@@ -167,6 +168,23 @@ public class ReservationController {
                     paymentRequest.paymentKey());
             throw e;
         }
+    }
+
+    @Admin
+    @PostMapping("/reservations/admin")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "관리자 예약 추가", description = "관리자가 직접 예약을 추가합니다. 추가된 예약은 결제 대기 상태로 지정됩니다.", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
+                    headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1"))),
+            @ApiResponse(responseCode = "409", description = "예약이 이미 존재합니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<ReservationResponse> saveReservationByAdmin(
+            @Valid @RequestBody AdminReservationRequest adminReservationRequest,
+            HttpServletResponse response
+    ) {
+        ReservationResponse reservationResponse = reservationService.addReservationByAdmin(adminReservationRequest);
+        return getCreatedReservationResponse(reservationResponse, response);
     }
 
     @Admin

@@ -14,6 +14,7 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSearchSpecification;
+import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.WaitingRequest;
 import roomescape.reservation.dto.response.MyReservationsResponse;
@@ -80,10 +81,21 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    public ReservationResponse addReservationByAdmin(AdminReservationRequest request) {
+        validateIsReservationExist(request.themeId(), request.timeId(), request.date());
+        return addReservationWithoutPayment(request.themeId(), request.timeId(), request.date(),
+                request.memberId(), ReservationStatus.CONFIRMED_PAYMENT_REQUIRED);
+    }
+
     public ReservationResponse addWaiting(WaitingRequest request, Long memberId) {
         validateMemberAlreadyReserve(request.themeId(), request.timeId(), request.date(), memberId);
-        Reservation reservation = getReservationForSave(request.timeId(), request.themeId(), request.date(), memberId,
+        return addReservationWithoutPayment(request.themeId(), request.timeId(), request.date(), memberId,
                 ReservationStatus.WAITING);
+    }
+
+    private ReservationResponse addReservationWithoutPayment(Long themeId, Long timeId, LocalDate date, Long memberId,
+                                                             ReservationStatus status) {
+        Reservation reservation = getReservationForSave(timeId, themeId, date, memberId, status);
         Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.from(saved);
     }
