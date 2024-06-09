@@ -7,6 +7,8 @@ import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.service.dto.request.PaymentRequest;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class PaymentService {
 
@@ -23,9 +25,16 @@ public class PaymentService {
     }
 
     @Transactional
-    public void deletePaymentById(Long id) {
-        Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다."));
+    public Payment deleteByReservation(Reservation reservation) {
+        Payment payment = paymentRepository.findByReservation(reservation)
+                .orElseThrow(() -> new NoSuchElementException("결제 정보가 존재하지 않습니다."));
         paymentRepository.delete(payment);
+        return payment;
+    }
+
+    @Transactional
+    public void rollbackDelete(Payment payment) {
+        Payment newPayment = payment.copy();
+        paymentRepository.save(newPayment);
     }
 }

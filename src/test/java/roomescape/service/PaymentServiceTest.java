@@ -23,6 +23,7 @@ import roomescape.support.fixture.ReservationTimeFixture;
 import roomescape.support.fixture.ThemeFixture;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -72,21 +73,32 @@ class PaymentServiceTest extends BaseServiceTest {
     }
 
     @Test
-    @DisplayName("결제를 삭제한다.")
+    @DisplayName("예약으로 결제를 삭제한다.")
     void deletePaymentById() {
         Payment payment = paymentRepository.save(PaymentFixture.create(reservation));
         long id = payment.getId();
 
-        paymentService.deletePaymentById(id);
+        paymentService.deleteByReservation(reservation);
 
         assertThat(paymentRepository.findById(id)).isEmpty();
     }
 
     @Test
-    @DisplayName("존재하지 않은 결제일 경우 예외가 발생한다.")
+    @DisplayName("예약으로 결제를 삭제할 때 결제가 존재하지 않을 경우 예외가 발생한다.")
     void deletePaymentByIdFailWhenNotExist() {
-        assertThatThrownBy(() -> paymentService.deletePaymentById(1L))
-                .isExactlyInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> paymentService.deleteByReservation(reservation))
+                .isExactlyInstanceOf(NoSuchElementException.class)
                 .hasMessageContaining("결제 정보가 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("결제를 삭제한 후 롤백한다.")
+    void rollbackDelete() {
+        Payment payment = paymentRepository.save(PaymentFixture.create(reservation));
+        paymentService.deleteByReservation(reservation);
+
+        paymentService.rollbackDelete(payment);
+
+        assertThat(paymentRepository.findAll()).hasSize(1);
     }
 }
