@@ -1,0 +1,36 @@
+=== 멤버
+
+==== 회원가입
+
+===== curl
+
+include::{snippets}/member/signup/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/member/signup/http-request.adoc[]
+
+include::{snippets}/member/signup/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/member/signup/http-response.adoc[]
+
+include::{snippets}/member/signup/response-fields.adoc[]
+
+==== 모든 회원 조회
+
+===== curl
+
+include::{snippets}/member/findAll/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/member/findAll/http-request.adoc[]
+
+===== response
+
+include::{snippets}/member/findAll/http-response.adoc[]
+
+include::{snippets}/member/findAll/response-fields.adoc[]
+
