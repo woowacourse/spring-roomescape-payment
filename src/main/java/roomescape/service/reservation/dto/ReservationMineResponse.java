@@ -45,15 +45,16 @@ public class ReservationMineResponse {
                     payment.getPaymentKey(),
                     payment.getAmount()
             );
+        } else {
+            return new ReservationMineResponse(reservation.getId(),
+                    reservation.getTheme().getName().getName(),
+                    reservation.getDate(),
+                    reservation.getTime().getStartAt(),
+                    PAYMENT_WAITING_MESSAGE,
+                    "",
+                    reservation.getTheme().getPrice()
+            );
         }
-        return new ReservationMineResponse(reservation.getId(),
-                reservation.getTheme().getName().getName(),
-                reservation.getDate(),
-                reservation.getTime().getStartAt(),
-                PAYMENT_WAITING_MESSAGE,
-                "",
-                0
-        );
     }
 
     public ReservationMineResponse(ReservationWaitingWithRank waitingWithRank) {
@@ -63,7 +64,7 @@ public class ReservationMineResponse {
                 waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
                 String.format(WAITING_MESSAGE, waitingWithRank.getRank()),
                 "",
-                0
+                waitingWithRank.getWaiting().getReservation().getTheme().getPrice()
         );
     }
 

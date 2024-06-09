@@ -7,6 +7,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
@@ -38,6 +39,7 @@ import static roomescape.domain.reservation.ReservationRepository.Specs.hasEndDa
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasMemberId;
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasStartDate;
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasThemeId;
+import static roomescape.domain.reservation.ReservationRepository.Specs.notStatus;
 
 @Service
 @Transactional
@@ -107,6 +109,17 @@ public class ReservationService {
         paymentService.confirmPayment(paymentConfirmInput, savedReservation);
 
         return new ReservationResponse(savedReservation);
+    }
+
+    public ReservationResponse payReservation(
+            Long reservationId, PaymentConfirmInput paymentConfirmInput, Member member) {
+        Reservation reservation = reservationRepository.findByIdAndMember(reservationId, member)
+                .orElseThrow(ReservationAuthorityNotExistException::new);
+        reservation.changeStatusToBooked();
+
+        paymentService.confirmPayment(paymentConfirmInput, reservation);
+
+        return new ReservationResponse(reservation);
     }
 
     public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {

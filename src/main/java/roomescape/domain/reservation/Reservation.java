@@ -61,6 +61,14 @@ public class Reservation {
         return this.status == ReservationStatus.PAYMENT_WAITING;
     }
 
+    public boolean isCancelStatus() {
+        return this.status == ReservationStatus.CANCELED;
+    }
+
+    public void changeStatusToBooked() {
+        this.status = ReservationStatus.BOOKED;
+    }
+
     public boolean isPast(LocalDateTime now) {
         return info.isPast(now);
     }

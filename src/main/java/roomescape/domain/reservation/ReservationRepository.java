@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import roomescape.domain.member.Member;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.reservation.NotFoundReservationException;
@@ -85,6 +86,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                     return builder.conjunction();
                 }
                 return builder.lessThanOrEqualTo(root.get("info").get("date"), dateTo);
+            };
+        }
+
+        static Specification<Reservation> notStatus(ReservationStatus status) {
+            return (root, query, builder) -> {
+                if (status == null) {
+                    return builder.conjunction();
+                }
+                return builder.notEqual(root.get("status"), status);
             };
         }
     }

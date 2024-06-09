@@ -21,6 +21,7 @@ function render(data) {
         const status = item.status;
         const paymentKey = item.paymentKey;
         const amount = item.amount;
+        const reservationId = item.reservationId;
 
         row.insertCell(index++).textContent = theme;
         row.insertCell(index++).textContent = date;
@@ -35,15 +36,33 @@ function render(data) {
             paymentButton.textContent = '결제';
             paymentButton.className = 'btn btn-primary';
             paymentButton.onclick = function () {
-                // TODO: Toss 결제창 열리게 만들기
+                window.location.href = `/payment?reservationId=${reservationId}&amount=${amount}`;
             }
             paymentCell.appendChild(paymentButton);
         }
-        if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+        if (status === '예약') {
+            row.insertCell(index++).textContent = '';
+        } else if (status === '취소') {
+            const removeCell = row.insertCell(index++);
+            const removeButton = document.createElement('button');
+            removeButton.textContent = '삭제';
+            removeButton.className = 'btn btn-danger';
+
+            removeButton.onclick = function () {
+                if (confirm("삭제시 기록을 복구할 수 없습니다. 그래도 삭제하시겠습니까?")) {
+                    requestDeleteReservation(item.reservationId).then(() => window.location.reload());
+                } else {
+                    // 삭제 취소
+                }
+            };
+            removeCell.appendChild(removeButton);
+        } else { // 예약 대기 상태
+            // 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             const cancelCell = row.insertCell(index++);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
+            // 앞 예약자가 예약을 취소해서 결제 대기 상태가 되었을 때
             if (status === '결제 대기') {
                 cancelButton.onclick = function () {
                     requestDeleteReservation(item.reservationId).then(() => window.location.reload());
@@ -54,8 +73,6 @@ function render(data) {
                 };
             }
             cancelCell.appendChild(cancelButton);
-        } else { // 예약 완료 상태일 때
-            row.insertCell(index++).textContent = '';
         }
     });
 }
@@ -71,7 +88,7 @@ function requestDeleteWaiting(id) {
 }
 
 function requestDeleteReservation(id) {
-    const endpoint = `/reservations/${id}`;
+    const endpoint = `/reservations/${id}/remove`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {

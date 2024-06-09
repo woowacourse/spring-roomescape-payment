@@ -21,6 +21,7 @@ import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
+import roomescape.service.reservation.dto.ReservationPaymentRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationSaveInput;
@@ -66,6 +67,18 @@ public class ReservationController {
 
         ReservationResponse response = reservationService.saveReservationWithPayment(
                 reservationSaveInput, paymentConfirmInput, member);
+        return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
+    }
+
+    @RoleAllowed
+    @PostMapping("/reservations/{reservationId}/payment")
+    public ResponseEntity<ReservationResponse> payReservation(@PathVariable Long reservationId,
+                                                              @RequestBody @Valid ReservationPaymentRequest request,
+                                                              @LoginMember Member member) {
+        PaymentConfirmInput paymentConfirmInput = request.toPaymentConfirmInput();
+
+        ReservationResponse response = reservationService.payReservation(
+                reservationId, paymentConfirmInput, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
