@@ -69,9 +69,3 @@ VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 1, 'RESERVED'),
        (DATEADD('DAY', 1, CURRENT_DATE), 1, 1, 4, 'WAITING'),
        (DATEADD('DAY', 2, CURRENT_DATE), 1, 1, 1, 'RESERVED'),
        (DATEADD('DAY', 2, CURRENT_DATE), 1, 1, 2, 'WAITING');
-
-INSERT INTO waiting (reservation_id, waiting_order) VALUES
-    (18, 1),
-    (19, 2),
-    (20, 3),
-    (22, 1);

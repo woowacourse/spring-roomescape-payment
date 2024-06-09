@@ -37,7 +37,7 @@ class GlobalExceptionHandler {
     private final Logger logger;
 
     private GlobalExceptionHandler() {
-        logger = Logger.getLogger(getClass().getName());
+        this.logger = Logger.getLogger(getClass().getName());
     }
 
     @ExceptionHandler(value = TossClientException.class)

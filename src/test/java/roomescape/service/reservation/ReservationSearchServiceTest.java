@@ -1,4 +1,4 @@
-package roomescape.service.booking.reservation;
+package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,7 +13,6 @@ import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.RoomEscapeException;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.booking.reservation.module.ReservationSearchService;
 
 class ReservationSearchServiceTest extends ServiceBaseTest {
 
@@ -38,7 +37,7 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
     @Test
     void 전체_예약_조회() {
         // when
-        List<ReservationResponse> allReservationResponses = reservationSearchService.findAllReservations();
+        List<ReservationResponse> allReservationResponses = reservationSearchService.findAllReservedReservations();
 
         // then
         assertThat(allReservationResponses).hasSize(32);
@@ -84,7 +83,7 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
     @Test
     void 존재하지_않는_id로_조회할_경우_예외_발생() {
         // given
-        Long notExistIdToFind = reservationSearchService.findAllReservations().size() + 1L;
+        Long notExistIdToFind = reservationSearchService.findAllReservedReservations().size() + 1L;
 
         // when, then
         assertThatThrownBy(() -> reservationSearchService.findReservation(notExistIdToFind))

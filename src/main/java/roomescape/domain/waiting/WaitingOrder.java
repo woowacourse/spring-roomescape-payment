@@ -1,34 +1,31 @@
 package roomescape.domain.waiting;
 
-import jakarta.persistence.Embeddable;
-
-@Embeddable
 public class WaitingOrder {
 
     private static final int MIN_ORDER = 1;
 
-    private int waitingOrder;
+    private int value;
 
     protected WaitingOrder() {
     }
 
-    public WaitingOrder(int waitingOrder) {
-        validateWaitingOrder(waitingOrder);
-        this.waitingOrder = waitingOrder;
+    public WaitingOrder(int value) {
+        validateWaitingOrder(value);
+        this.value = value;
     }
 
     public void decreaseWaitingOrderByOne() {
-        if (waitingOrder > MIN_ORDER) {
-            waitingOrder--;
+        if (value > MIN_ORDER) {
+            value--;
         }
     }
 
     public boolean isFirstOrder() {
-        return waitingOrder == MIN_ORDER;
+        return value == MIN_ORDER;
     }
 
     public boolean isWaitingOrderGreaterThan(int waitingOrderToCompare) {
-        return waitingOrder > waitingOrderToCompare;
+        return value > waitingOrderToCompare;
     }
 
     private void validateWaitingOrder(int order) {
@@ -39,7 +36,7 @@ public class WaitingOrder {
         }
     }
 
-    public int getWaitingOrder() {
-        return waitingOrder;
+    public int getValue() {
+        return value;
     }
 }

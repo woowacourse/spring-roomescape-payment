@@ -61,7 +61,7 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
         LocalDate endDate = LocalDate.now().minusDays(1);
 
         // when
-        List<Reservation> findByAllFilter = reservationRepository.findByMemberOrThemeOrDateRange(
+        List<Reservation> findByAllFilter = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
                 USER_ID, 1L, startDate, endDate);
 
         // then
@@ -98,7 +98,7 @@ class ReservationRepositoryTest extends RepositoryBaseTest {
     @Test
     void 주어진_멤버_또는_테마_또는_기간에_해당하는_모든_예약_조회시_멤버와_테마_제공() {
         // when
-        List<Reservation> findByMemberAndTheme = reservationRepository.findByMemberOrThemeOrDateRange(
+        List<Reservation> findByMemberAndTheme = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
                 USER_ID, 1L, null, null);
 
         // then

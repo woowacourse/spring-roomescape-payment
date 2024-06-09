@@ -14,7 +14,6 @@ import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.WaitingRepository;
 import roomescape.service.ServiceBaseTest;
 
 class WaitingRegisterServiceTest extends ServiceBaseTest {

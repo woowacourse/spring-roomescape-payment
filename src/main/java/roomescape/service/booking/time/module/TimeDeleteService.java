@@ -16,7 +16,8 @@ public class TimeDeleteService {
     private final ReservationRepository reservationRepository;
 
     public TimeDeleteService(ReservationTimeRepository reservationTimeRepository,
-                             ReservationRepository reservationRepository) {
+                             ReservationRepository reservationRepository
+    ) {
         this.timeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
@@ -30,7 +31,7 @@ public class TimeDeleteService {
     private void validateDeletable(ReservationTime reservationTime) {
         if (reservationRepository.existsByTimeId(reservationTime.getId())) {
             throw new RoomEscapeException(
-                    ErrorCode.RESERVATION_NOT_DELETE_BY_EXIST_TIME,
+                    ErrorCode.TIME_NOT_DELETE_BY_EXIST_TIME,
                     "예약 시간 = " + reservationTime.getStartAt()
             );
         }

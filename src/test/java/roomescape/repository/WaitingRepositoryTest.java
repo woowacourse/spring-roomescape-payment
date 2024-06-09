@@ -19,6 +19,6 @@ class WaitingRepositoryTest extends RepositoryBaseTest{
         Waiting waiting = waitingRepository.findByReservationId(31L).orElseThrow();
 
         // then
-        assertThat(waiting.getReservation().getId()).isEqualTo(31L);
+        assertThat(waiting.getReservationId().getId()).isEqualTo(31L);
     }
 }

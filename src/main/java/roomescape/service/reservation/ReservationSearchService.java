@@ -1,26 +1,27 @@
-package roomescape.service.booking.reservation.module;
+package roomescape.service.reservation;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.waiting.Waiting;
+import roomescape.domain.reservation.Status;
 import roomescape.dto.reservation.ReservationFilter;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.UserReservationResponse;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.WaitingRepository;
 
 @Service
 @Transactional(readOnly = true)
 public class ReservationSearchService {
 
     private final ReservationRepository reservationRepository;
-    private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationSearchService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+    public ReservationSearchService(ReservationRepository reservationRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse findReservation(Long reservationId) {
@@ -28,19 +29,20 @@ public class ReservationSearchService {
         return ReservationResponse.from(reservation);
     }
 
-    public List<ReservationResponse> findAllReservations() {
-        return reservationRepository.findAll()
+    public List<ReservationResponse> findAllReservedReservations() {
+        return reservationRepository.findByStatusEquals(Status.RESERVED)
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
     public List<ReservationResponse> findReservationsByFilter(ReservationFilter filter) {
-        List<Reservation> reservations = reservationRepository.findByMemberOrThemeOrDateRange(
+        List<Reservation> reservations = reservationRepository.findByMemberOrThemeOrDateRangeAndStatus(
                 filter.member(),
                 filter.theme(),
                 filter.dateFrom(),
-                filter.dateTo()
+                filter.dateTo(),
+                Status.RESERVED
         );
 
         return reservations.stream()
@@ -55,12 +57,24 @@ public class ReservationSearchService {
                 .toList();
     }
 
+    public List<ReservationResponse> findAllWaitingReservations() {
+        return reservationRepository.findByStatusEquals(Status.WAITING)
+                .stream()
+                .map(ReservationResponse::from)
+                .toList();
+    }
+
     private UserReservationResponse createUserReservationResponse(Reservation reservation) {
-        if (reservation.isReserved()) {
+        if (reservation.isReserved() && paymentRepository.existsByReservationId(reservation.getId())) {
+            Payment payment = paymentRepository.findByReservationIdOrThrow(reservation.getId());
+            return UserReservationResponse.createByContainPayment(reservation, payment);
+        }
+
+        if (reservation.isReserved() || reservation.isPaymentPending()) {
             return UserReservationResponse.create(reservation);
         }
 
-        Waiting waiting = waitingRepository.findByReservationIdOrThrow(reservation.getId());
-        return UserReservationResponse.createByWaiting(waiting);
+        int reservationOrder = reservationRepository.findReservationOrder(reservation);
+        return UserReservationResponse.createByContainWaitingOrder(reservation, reservationOrder);
     }
 }

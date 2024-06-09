@@ -20,7 +20,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
-import roomescape.dto.reservation.UserReservationRequest;
+import roomescape.dto.reservation.ReservationRequestWithPayment;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.infrastructure.tosspayments.TossPaymentsClient;
 
@@ -41,9 +41,9 @@ class ReservationApiTest extends ApiBaseTest {
         String userAccessToken = cookieByUserLogin.getValue();
         String userId = jwtProvider.getSubject(userAccessToken);
 
-        UserReservationRequest userReservationRequest = createUserReservationRequest();
+        ReservationRequestWithPayment reservationRequestWithPayment = createUserReservationRequest();
 
-        PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
+        PaymentRequest paymentRequest = reservationRequestWithPayment.toPaymentRequest();
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
         Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
 
@@ -52,15 +52,15 @@ class ReservationApiTest extends ApiBaseTest {
                 .port(port)
                 .contentType(ContentType.JSON)
                 .cookie(cookieByUserLogin)
-                .body(userReservationRequest)
+                .body(reservationRequestWithPayment)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)
                 .header("Location", "/reservations/33")
                 .body("id", equalTo(33))
-                .body("date", equalTo(userReservationRequest.date().toString()))
-                .body("time.id", equalTo(userReservationRequest.timeId().intValue()))
-                .body("theme.id", equalTo(userReservationRequest.themeId().intValue()))
+                .body("date", equalTo(reservationRequestWithPayment.date().toString()))
+                .body("time.id", equalTo(reservationRequestWithPayment.timeId().intValue()))
+                .body("theme.id", equalTo(reservationRequestWithPayment.themeId().intValue()))
                 .body("member.id", equalTo(Integer.parseInt(userId)));
     }
 
@@ -149,8 +149,8 @@ class ReservationApiTest extends ApiBaseTest {
                 .statusCode(204);
     }
 
-    private UserReservationRequest createUserReservationRequest() {
-        return new UserReservationRequest(
+    private ReservationRequestWithPayment createUserReservationRequest() {
+        return new ReservationRequestWithPayment(
                 LocalDate.now().plusDays(10),
                 1L,
                 1L,

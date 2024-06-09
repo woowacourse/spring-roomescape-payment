@@ -23,10 +23,10 @@ class WaitingOrderTest extends BaseTest {
 
         // when
         waitingOrder.decreaseWaitingOrderByOne();
-        int waitingOrder1 = waitingOrder.getWaitingOrder();
+        int waitingOrder1 = waitingOrder.getValue();
 
         waitingOrder.decreaseWaitingOrderByOne();
-        int waitingOrder2 = waitingOrder.getWaitingOrder();
+        int waitingOrder2 = waitingOrder.getValue();
 
         // then
         assertAll(

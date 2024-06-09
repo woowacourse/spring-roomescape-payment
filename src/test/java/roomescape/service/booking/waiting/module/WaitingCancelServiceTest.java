@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.waiting.Waiting;
-import roomescape.repository.WaitingRepository;
 import roomescape.service.ServiceBaseTest;
 
 class WaitingCancelServiceTest extends ServiceBaseTest {

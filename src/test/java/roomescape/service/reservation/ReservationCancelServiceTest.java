@@ -1,4 +1,4 @@
-package roomescape.service.booking.reservation;
+package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,9 +12,7 @@ import roomescape.domain.reservation.Status;
 import roomescape.domain.waiting.Waiting;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.WaitingRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.booking.reservation.module.ReservationCancelService;
 
 class ReservationCancelServiceTest extends ServiceBaseTest {
 
@@ -30,7 +28,7 @@ class ReservationCancelServiceTest extends ServiceBaseTest {
     @Test
     void 예약_취소() {
         // when
-        reservationCancelService.deleteReservation(1L);
+        reservationCancelService.cancelReservation(1L);
 
         // when
         List<Reservation> allReservations = reservationRepository.findAll();
@@ -42,7 +40,7 @@ class ReservationCancelServiceTest extends ServiceBaseTest {
     @Test
     void 예약_취소후_대기_에약이_있을_경우_예약_상태로_자동_변경() {
         // when
-        reservationCancelService.deleteReservation(30L);
+        reservationCancelService.cancelReservation(30L);
 
         // when
         Reservation reservation = reservationRepository.findById(31L).orElseThrow();
@@ -61,7 +59,7 @@ class ReservationCancelServiceTest extends ServiceBaseTest {
         Long notExistIdToFind = reservationRepository.findAll().size() + 1L;
 
         // when, then
-        assertThatThrownBy(() -> reservationCancelService.deleteReservation(notExistIdToFind))
+        assertThatThrownBy(() -> reservationCancelService.cancelReservation(notExistIdToFind))
                 .isInstanceOf(RoomEscapeException.class);
     }
 }

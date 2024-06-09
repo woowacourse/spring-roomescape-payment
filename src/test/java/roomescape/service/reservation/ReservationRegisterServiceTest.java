@@ -1,4 +1,4 @@
-package roomescape.service.booking.reservation;
+package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,7 +17,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.booking.reservation.module.ReservationRegisterService;
 
 class ReservationRegisterServiceTest extends ServiceBaseTest {
 

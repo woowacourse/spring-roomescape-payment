@@ -1,6 +1,7 @@
 package roomescape.dto.reservation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import roomescape.dto.payment.PaymentRequest;
@@ -11,7 +12,7 @@ public record UserReservationRequest(
         Long themeId,
         String paymentKey,
         String orderId,
-        int amount,
+        BigDecimal amount,
         String paymentType
 ) {
 
