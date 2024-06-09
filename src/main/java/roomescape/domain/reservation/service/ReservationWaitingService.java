@@ -150,7 +150,7 @@ public class ReservationWaitingService {
 
         validateReservationWaiting(reservationWaitingWithOrder);
         final SaveReservationRequest saveReservationRequest = convertSaveReservationRequest(request, reservationWaitingWithOrder);
-        final ReservationDto reservationDto = reservationService.saveReservation(saveReservationRequest);
+        final ReservationDto reservationDto = reservationService.saveReservationWithPaymentConfirm(saveReservationRequest);
         deleteReservationWaiting(reservationWaitingWithOrder.getReservationWaiting().getId());
 
         return reservationDto;

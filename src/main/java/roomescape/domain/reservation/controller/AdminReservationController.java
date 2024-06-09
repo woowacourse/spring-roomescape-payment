@@ -12,7 +12,7 @@ import roomescape.domain.reservation.dto.ReservationDto;
 import roomescape.domain.reservation.dto.ReservationResponse;
 import roomescape.domain.reservation.dto.ReservationTimeDto;
 import roomescape.domain.reservation.dto.ReservationTimeResponse;
-import roomescape.domain.reservation.dto.SaveReservationRequest;
+import roomescape.domain.reservation.dto.SaveAdminReservationRequest;
 import roomescape.domain.reservation.dto.SaveReservationTimeRequest;
 import roomescape.domain.reservation.dto.SaveThemeRequest;
 import roomescape.domain.reservation.dto.SearchReservationsRequest;
@@ -59,7 +59,7 @@ public class AdminReservationController {
     }
 
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> saveReservation(@RequestBody final SaveReservationRequest request) {
+    public ResponseEntity<ReservationResponse> saveReservation(@RequestBody final SaveAdminReservationRequest request) {
         final ReservationDto savedReservation = reservationService.saveReservation(request);
         return ResponseEntity.created(URI.create("/reservations/" + savedReservation.id()))
                 .body(ReservationResponse.from(savedReservation));

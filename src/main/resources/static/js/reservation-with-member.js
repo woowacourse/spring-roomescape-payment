@@ -1,6 +1,6 @@
 let isEditing = false;
 const RESERVATION_API_ENDPOINT = '/admin/reservations';
-const TIME_API_ENDPOINT = '/times';
+const TIME_API_ENDPOINT = '/admin/times';
 const THEME_API_ENDPOINT = '/themes';
 const MEMBER_API_ENDPOINT = '/admin/members';
 const timesOptions = [];
@@ -209,10 +209,24 @@ function applyFilter(event) {
 }
 
 function requestCreate(reservation) {
+  const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
+  const orderIdPrefix = "kelly_daon";
+  const orderId = orderIdPrefix + generateRandomString();
+  const paymentKey = "admin_payment_" + generateRandomString();
+  const adminReservationRequest = {
+    date: reservation.date,
+    memberId: reservation.memberId,
+    timeId: reservation.timeId,
+    themeId: reservation.themeId,
+    orderId,
+    orderName: "관리자 방탈출 주문",
+    amount: 15000,
+    paymentKey
+  }
   const requestOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(reservation)
+    body: JSON.stringify(adminReservationRequest)
   };
 
   return fetch('/admin/reservations', requestOptions)

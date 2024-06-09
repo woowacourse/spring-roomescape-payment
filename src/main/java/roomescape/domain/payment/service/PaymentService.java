@@ -10,6 +10,7 @@ import roomescape.domain.payment.model.PaymentHistory;
 import roomescape.domain.payment.pg.PaymentGateway;
 import roomescape.domain.payment.repository.PaymentCredentialRepository;
 import roomescape.domain.payment.repository.PaymentHistoryRepository;
+import roomescape.domain.reservation.dto.SavePaymentHistoryRequest;
 import roomescape.domain.reservation.model.Reservation;
 
 import java.util.NoSuchElementException;
@@ -65,5 +66,9 @@ public class PaymentService {
         final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
                 .orElseThrow(() -> new NoSuchElementException("해당 예약에 대한 결제 정보가 없습니다."));
         paymentHistory.cancelPayment();
+    }
+
+    public void savePaymentHistory(final SavePaymentHistoryRequest request) {
+        paymentHistoryRepository.save(request.toPaymentHistory());
     }
 }

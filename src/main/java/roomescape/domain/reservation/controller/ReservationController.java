@@ -38,7 +38,7 @@ public class ReservationController {
             @RequestBody final SaveReservationRequest request,
             @Authenticated final AuthenticatedMember authenticatedMember
     ) {
-        final ReservationDto savedReservation = reservationService.saveReservation(
+        final ReservationDto savedReservation = reservationService.saveReservationWithPaymentConfirm(
                 request.setMemberId(authenticatedMember.id()));
         final ReservationResponse response = ReservationResponse.from(savedReservation);
 

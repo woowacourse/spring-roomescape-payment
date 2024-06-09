@@ -48,7 +48,7 @@ class ReservationServiceTest {
 
     @DisplayName("예약 정보를 저장한다.")
     @Test
-    void saveReservationTest() {
+    void saveReservationWithPaymentConfirmTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
@@ -62,7 +62,7 @@ class ReservationServiceTest {
         );
 
         // When
-        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
+        final ReservationDto reservation = reservationService.saveReservationWithPaymentConfirm(saveReservationRequest);
 
         // Then
         final List<ReservationDto> reservations = reservationService.getReservations();
@@ -77,7 +77,7 @@ class ReservationServiceTest {
 
     @DisplayName("저장하려는 예약 시간이 존재하지 않는다면 예외를 발생시킨다.")
     @Test
-    void throwExceptionWhenSaveReservationWithNotExistReservationTimeTest() {
+    void throwExceptionWhenSaveReservationWithNotExistReservationWithPaymentTimeTest() {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now(),
@@ -90,37 +90,9 @@ class ReservationServiceTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservationWithPaymentConfirm(saveReservationRequest))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("해당 id의 예약 시간이 존재하지 않습니다.");
-    }
-
-    @DisplayName("예약 정보를 삭제한다.")
-    @Test
-    void deleteReservationTest() {
-        // When
-        reservationService.deleteReservation(1L);
-
-        // When & Then
-        final List<ReservationDto> reservations = reservationService.getReservations();
-        assertThat(reservations).hasSize(15);
-    }
-
-    @DisplayName("예약 정보를 삭제하면 가장 우선 순위가 빠른 예약 대기가 예약으로 등록된다.")
-    @Test
-    void changeWaitingToReservationWhenDeleteReservationTest() {
-        // When
-        final ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(1L).get();
-        reservationService.deleteReservation(13L);
-        final Reservation newReservation = reservationRepository.findById(17L).get();
-
-        // Then
-        assertAll(
-                () -> assertThat(reservationWaiting.getTheme().getId()).isEqualTo(newReservation.getTheme().getId()),
-                () -> assertThat(reservationWaiting.getMember().getId()).isEqualTo(newReservation.getMember().getId()),
-                () -> assertThat(reservationWaiting.getDate().getValue()).isEqualTo(newReservation.getDate().getValue()),
-                () -> assertThat(reservationWaiting.getTime().getStartAt()).isEqualTo(newReservation.getTime().getStartAt())
-        );
     }
 
     @DisplayName("현재 보다 이전 날짜/시간의 예약 정보를 저장하려고 하면 예외가 발생한다.")
@@ -138,7 +110,7 @@ class ReservationServiceTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservationWithPaymentConfirm(saveReservationRequest))
                 .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
     }
@@ -158,7 +130,7 @@ class ReservationServiceTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservationWithPaymentConfirm(saveReservationRequest))
                 .isInstanceOf(InvalidReserveInputException.class)
                 .hasMessage("이미 해당 날짜/시간의 테마 예약이 있습니다.");
     }
