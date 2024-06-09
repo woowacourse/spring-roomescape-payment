@@ -63,7 +63,7 @@ class ReservationControllerTest extends AbstractControllerTest {
     @DisplayName("예약을 검색한다.")
     @Test
     void should_search_reservations() {
-        RestDocumentationFilter description = document("admin-reservation-success-get",
+        RestDocumentationFilter description = document("admin-reservations-success-get",
                 requiredCookie,
                 queryParameters(
                         parameterWithName("themeId").description("검색할 테마 Id"),

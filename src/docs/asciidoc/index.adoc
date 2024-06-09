@@ -5,19 +5,23 @@
 
 == 관리자 예약 기능
 
-=== `관리자 예약` 조회
+=== `관리자 예약` 검색
 
-관리자가 예약을 조회합니다
+관리자가 예약을 검색합니다
 
 ==== Request
 
 ===== Cookies
 
-include::{snippets}/admin-reservation-success-get/request-cookies.adoc[]
+include::{snippets}/admin-reservations-success-get/request-cookies.adoc[]
 
 ===== Fields
 
 N/A
+
+===== Query Parameters
+
+include::{snippets}/admin-reservations-success-get/query-parameters.adoc[]
 
 ===== Path Parameters
 
@@ -25,21 +29,21 @@ N/A
 
 ===== Curl Request
 
-include::{snippets}/admin-reservation-success-get/curl-request.adoc[]
+include::{snippets}/admin-reservations-success-get/curl-request.adoc[]
 
 ===== Http Request
 
-include::{snippets}/admin-reservation-success-get/http-request.adoc[]
+include::{snippets}/admin-reservations-success-get/http-request.adoc[]
 
 ==== Response
 
 ===== Fields
 
-include::{snippets}/admin-reservation-success-get/response-fields.adoc[]
+include::{snippets}/admin-reservations-success-get/response-fields.adoc[]
 
 ===== Http Response
 
-include::{snippets}/admin-reservation-success-get/http-response.adoc[]
+include::{snippets}/admin-reservations-success-get/http-response.adoc[]
 
 === `관리자 예약` 등록
 
@@ -56,6 +60,10 @@ include::{snippets}/admin-reservations-success-post/request-cookies.adoc[]
 ===== Fields
 
 include::{snippets}/admin-reservations-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
 
 ===== Path Parameters
 
@@ -95,6 +103,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -130,6 +142,10 @@ N/A
 ===== Fields
 
 include::{snippets}/themes-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
 
 ===== Path Parameters
 
@@ -169,6 +185,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 include::{snippets}/themes-success-delete/path-parameters.adoc[]
@@ -202,6 +222,10 @@ include::{snippets}/themes-success-delete/http-response.adoc[]
 N/A
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
@@ -243,6 +267,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -279,6 +307,10 @@ N/A
 
 include::{snippets}/times-success-post/request-fields.adoc[]
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -314,6 +346,10 @@ include::{snippets}/times-success-post/http-response.adoc[]
 N/A
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
@@ -355,6 +391,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -390,6 +430,10 @@ N/A
 ===== Fields
 
 include::{snippets}/members-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
 
 ===== Path Parameters
 
@@ -427,6 +471,10 @@ N/A
 
 include::{snippets}/login-success-post/request-fields.adoc[]
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -460,6 +508,10 @@ include::{snippets}/login-success-post/http-response.adoc[]
 include::{snippets}/login-check-success-get/request-cookies.adoc[]
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
@@ -501,6 +553,10 @@ include::{snippets}/logout-success-post/request-cookies.adoc[]
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -523,8 +579,6 @@ N/A
 
 include::{snippets}/logout-success-post/http-response.adoc[]
 
-== 회원 예약 기능
-
 === `회원 예약` 조회
 
 로그인 한 회원의 예약을 조회합니다
@@ -536,6 +590,10 @@ include::{snippets}/logout-success-post/http-response.adoc[]
 include::{snippets}/reservations-mine-success-get/request-cookies.adoc[]
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
@@ -561,6 +619,8 @@ include::{snippets}/reservations-mine-success-get/response-fields.adoc[]
 
 include::{snippets}/reservations-mine-success-get/http-response.adoc[]
 
+== 회원 예약 기능
+
 === `회원 예약` 등록
 
 로그인 한 회원의 예약을 등록합니다
@@ -574,6 +634,10 @@ include::{snippets}/reservations-success-post/request-cookies.adoc[]
 ===== Fields
 
 include::{snippets}/reservations-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
 
 ===== Path Parameters
 
@@ -597,8 +661,6 @@ include::{snippets}/reservations-success-post/response-fields.adoc[]
 
 include::{snippets}/reservations-success-post/http-response.adoc[]
 
-== 회원 예약 대기 기능
-
 === `회원 예약 대기` 삭제
 
 로그인 한 회원의 예약 대기를 삭제합니다
@@ -610,6 +672,10 @@ include::{snippets}/reservations-success-post/http-response.adoc[]
 N/A
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
@@ -651,6 +717,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -686,6 +756,10 @@ N/A
 ===== Fields
 
 N/A
+
+===== Query Parameters
+
+include::{snippets}/times-reserved-success-get/query-parameters.adoc[]
 
 ===== Path Parameters
 
@@ -725,6 +799,10 @@ N/A
 
 N/A
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -761,6 +839,10 @@ include::{snippets}/waiting-success-post/request-cookies.adoc[]
 
 include::{snippets}/waiting-success-post/request-fields.adoc[]
 
+===== Query Parameters
+
+N/A
+
 ===== Path Parameters
 
 N/A
@@ -794,6 +876,10 @@ include::{snippets}/waiting-success-post/http-response.adoc[]
 N/A
 
 ===== Fields
+
+N/A
+
+===== Query Parameters
 
 N/A
 
