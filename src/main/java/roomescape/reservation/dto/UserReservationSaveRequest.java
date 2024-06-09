@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import roomescape.member.domain.Member;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -34,7 +34,7 @@ public record UserReservationSaveRequest(
         return new Reservation(member, date, theme, reservationTime, reservationStatus);
     }
 
-    public PaymentRequest extractPaymentRequest() {
-        return new PaymentRequest(orderId, amount, paymentKey);
+    public TossPaymentRequest extractPaymentRequest() {
+        return new TossPaymentRequest(orderId, amount, paymentKey);
     }
 }

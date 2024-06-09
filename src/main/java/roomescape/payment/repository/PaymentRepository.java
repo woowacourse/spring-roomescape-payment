@@ -9,4 +9,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByPaymentKey(String paymentKey);
 
     Optional<Payment> findByReservationId(Long reservationId);
+
+    default Payment fetchByPaymentKey(String paymentKey) {
+        return findByPaymentKey(paymentKey).orElseThrow(RuntimeException::new);
+    }
 }

@@ -10,8 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.TossPaymentCancelResponse;
+import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentErrorHandler;
 import roomescape.reservation.dto.ReservationCancelReason;
@@ -35,11 +35,11 @@ public class TossPaymentClient {
                 .build();
     }
 
-    public TossPaymentResponse requestPayment(PaymentRequest paymentRequest) {
+    public TossPaymentResponse requestPayment(TossPaymentRequest tossPaymentRequest) {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
                 .body(TossPaymentResponse.class);

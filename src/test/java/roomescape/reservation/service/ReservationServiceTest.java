@@ -31,8 +31,8 @@ import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.PaymentStatus;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentSaveResponse;
+import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.exception.PaymentFailException;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
@@ -86,10 +86,10 @@ class ReservationServiceTest {
         UserReservationSaveRequest userReservationSaveRequest =
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
-        PaymentRequest paymentRequest = new PaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
+        TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(ORDER_ID, BigDecimal.valueOf(1000), PAYMENT_KEY);
         PaymentSaveResponse paymentSaveResponse = new PaymentSaveResponse(PAYMENT_KEY, PaymentStatus.PAID, BigDecimal.valueOf(1000));
         doReturn(paymentSaveResponse).when(paymentService)
-                .payForReservation(paymentRequest, userReservationSaveRequest.toEntity(kaki, horrorTheme, hour10, ReservationStatus.SUCCESS));
+                .payForReservation(tossPaymentRequest, userReservationSaveRequest.toEntity(kaki, horrorTheme, hour10, ReservationStatus.SUCCESS));
 
         ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
@@ -107,7 +107,7 @@ class ReservationServiceTest {
         UserReservationSaveRequest userReservationSaveRequest =
                 new UserReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId(), PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
-        doThrow(PaymentFailException.class).when(paymentService).payForReservation(any(PaymentRequest.class), any(Reservation.class));
+        doThrow(PaymentFailException.class).when(paymentService).payForReservation(any(TossPaymentRequest.class), any(Reservation.class));
 
         assertThatThrownBy(() -> reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS))
                 .isInstanceOf(PaymentFailException.class);

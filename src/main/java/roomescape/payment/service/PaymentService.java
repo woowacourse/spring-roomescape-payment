@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentSaveResponse;
 import roomescape.payment.dto.TossPaymentCancelResponse;
+import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
@@ -24,12 +24,12 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public PaymentSaveResponse payForReservation(@Valid PaymentRequest paymentRequest, Reservation reservation) {
-        paymentRepository.findByPaymentKey(paymentRequest.paymentKey())
+    public PaymentSaveResponse payForReservation(@Valid TossPaymentRequest tossPaymentRequest, Reservation reservation) {
+        paymentRepository.findByPaymentKey(tossPaymentRequest.paymentKey())
                 .ifPresent(payment -> {
                     throw new IllegalArgumentException("결제 완료된 예약 입니다.");
                 });
-        TossPaymentResponse tossPaymentResponse = tossPaymentClient.requestPayment(paymentRequest);
+        TossPaymentResponse tossPaymentResponse = tossPaymentClient.requestPayment(tossPaymentRequest);
         Payment savedPayment = paymentRepository.save(tossPaymentResponse.from(reservation));
 
         return PaymentSaveResponse.toResponse(savedPayment);

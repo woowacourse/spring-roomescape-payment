@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import org.hibernate.validator.constraints.Range;
 
-public record PaymentRequest(
+public record TossPaymentRequest(
         @NotNull
         String orderId,
 
