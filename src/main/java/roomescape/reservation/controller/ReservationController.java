@@ -59,7 +59,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/payment")
-    public ResponseEntity<MyReservationResponse> createPaymentWithPendingReservation(
+    public ResponseEntity<MyReservationResponse> createPaymentForReservation(
             @PathVariable Long id,
             @RequestBody ReservationPaymentRequest request,
             LoggedInMember member) {
