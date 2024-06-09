@@ -7,6 +7,7 @@ import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.*;
 import roomescape.domain.reservation.*;
+import roomescape.exception.customexception.api.AbstractApiException;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.*;
 import roomescape.service.dto.response.ReservationResponse;
@@ -56,7 +57,7 @@ public class ReservationService {
             paymentService.pay(paymentApproveRequest, savedReservation);
 
             return new ReservationResponse(savedReservation);
-        } catch (RoomEscapeBusinessException | DataAccessException exception) {
+        } catch (AbstractApiException | RoomEscapeBusinessException | DataAccessException exception) {
             paymentService.cancel(new PaymentCancelRequest(userReservationSaveRequest.paymentKey(), "예약이 정상적으로 처리되지 않음"));
             throw new RoomEscapeBusinessException(exception.getMessage());
         }
