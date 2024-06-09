@@ -5,16 +5,16 @@ import java.time.LocalDate;
 import roomescape.payment.dto.request.PaymentRequest;
 
 public record ReservationRequest(
-    @NotNull(message = "예약 날짜는 null일 수 없습니다.")
-    LocalDate date,
-    @NotNull(message = "예약 요청의 timeId는 null일 수 없습니다.")
-    Long timeId,
-    @NotNull(message = "예약 요청의 themeId는 null일 수 없습니다.")
-    Long themeId,
-    String paymentKey,
-    String orderId,
-    Long amount,
-    String paymentType
+        @NotNull(message = "예약 날짜는 null일 수 없습니다.")
+        LocalDate date,
+        @NotNull(message = "예약 요청의 timeId는 null일 수 없습니다.")
+        Long timeId,
+        @NotNull(message = "예약 요청의 themeId는 null일 수 없습니다.")
+        Long themeId,
+        String paymentKey,
+        String orderId,
+        Long amount,
+        String paymentType
 ) {
 
     public PaymentRequest getPaymentRequest() {
