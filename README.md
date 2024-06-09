@@ -1,6 +1,6 @@
-# ERD
+# [ERD](https://www.erdcloud.com/d/i7o7W64kLhNj9TW5m)
 
-[링크](https://www.erdcloud.com/d/i7o7W64kLhNj9TW5m)
+<img width="1218" src="https://github.com/ChooSeoyeon/spring-roomescape-payment/assets/83302344/d46b96ef-b589-433c-90dd-5294d3f499f6">
 
 # 기능 명세
 
