@@ -63,6 +63,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationWaiting> findAllReservationWaitingByMemberId(Long memberId);
 
     @Query("""
+            SELECT new roomescape.reservation.domain.ReservationPending(r1.id,
+                                                                            r1.member,
+                                                                            r1.date.value,
+                                                                            r1.time,
+                                                                            r1.theme,
+                                                                            r1.status,
+                                                                            r1.createdAt)
+            FROM Reservation AS r1
+            WHERE r1.status = 'PENDING'
+                AND r1.member.id = :memberId
+            ORDER BY r1.createdAt ASC
+            """)
+    List<ReservationPending> findAllReservationPendingByMemberId(Long memberId);
+
+    @Query("""
             SELECT new roomescape.reservation.domain.ReservationWaiting(r.id,
                                                                         r.member,
                                                                         r.date.value,
