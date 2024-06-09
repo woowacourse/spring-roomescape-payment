@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.fixture.MemberFixture;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationSlotFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
@@ -33,7 +34,7 @@ class ReservationRepositoryTest {
 
         //when
         ReservationSlot reservationSlot = slotRepository.save(nextDayReservationSlot);
-        Reservation beforeSaveReservation = new Reservation(MemberFixture.getMemberTacan(), reservationSlot);
+        Reservation beforeSaveReservation = new Reservation(MemberFixture.getMemberTacan(), reservationSlot, PaymentFixture.getPayment());
         Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
 
         //then
@@ -45,7 +46,7 @@ class ReservationRepositoryTest {
     void addWaitingReservation() {
         //given
         ReservationSlot reservedSlot = ReservationSlotFixture.getReservationSlot1();
-        Reservation reservation = new Reservation(MemberFixture.getMemberTacan(), reservedSlot);
+        Reservation reservation = new Reservation(MemberFixture.getMemberTacan(), reservedSlot, PaymentFixture.getPayment());
 
         //when
         Reservation savedReservation = reservationRepository.save(reservation);

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -13,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.domain.Member;
@@ -62,7 +61,7 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("예약 생성에 성공한다.")
     @Test
     void create() {
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        BDDMockito.doReturn(PaymentFixture.getPayment())
                 .when(paymentWithRestClient)
                 .confirm(any());
 
@@ -82,7 +81,7 @@ class ReservationServiceTest extends ServiceTest {
 
         reservationSlotRepository.save(new ReservationSlot(LocalDate.parse(date), time, theme));
 
-        ReservationResponse reservationResponse = reservationService.reserve(reservationPaymentRequest, getMemberTacan().getId());
+        ReservationResponse reservationResponse = reservationService.createReservation(reservationPaymentRequest, getMemberTacan().getId());
         //then
         assertAll(() -> assertThat(reservationResponse.date()).isEqualTo(date),
                 () -> assertThat(reservationResponse.time().id()).isEqualTo(time.getId()),
@@ -92,10 +91,10 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("결제가 실패했을 경우 예약이 생성되지 않는다.")
     @Test
     void notCreateReservationWithPaymentFailure() {
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 0L, "test", "test", "test"))
+
+        BDDMockito.doReturn(PaymentFixture.getWrongPayment())
                 .when(paymentWithRestClient)
                 .confirm(any());
-
         String date = "2100-04-18";
         ReservationTime time = reservationTimeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
@@ -114,7 +113,7 @@ class ReservationServiceTest extends ServiceTest {
 
         //then
         assertAll(
-                () -> assertThatThrownBy(() -> reservationService.reserve(reservationPaymentRequest, getMemberTacan().getId()))
+                () -> assertThatThrownBy(() -> reservationService.createReservation(reservationPaymentRequest, getMemberTacan().getId()))
                         .isInstanceOf(BadRequestException.class),
                 () -> assertThat(reservationRepository.findAll().size()).isEqualTo(2)
         );
@@ -131,10 +130,10 @@ class ReservationServiceTest extends ServiceTest {
         ReservationSlot reservationSlot2 = reservationSlotRepository.save(getNextDayReservationSlot(time, theme2));
 
         Member memberChoco = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot1));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot1, PaymentFixture.getPayment()));
 
         Member memberClover = memberRepository.save(getMemberClover());
-        reservationRepository.save(new Reservation(memberClover, reservationSlot2));
+        reservationRepository.save(new Reservation(memberClover, reservationSlot2, PaymentFixture.getPayment()));
 
         //when
         List<ReservationResponse> reservations = reservationService.findReservations(
@@ -157,10 +156,10 @@ class ReservationServiceTest extends ServiceTest {
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
 
         Member memberChoco = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot, PaymentFixture.getPayment()));
 
         Member memberClover = memberRepository.save(getMemberClover());
-        reservationRepository.save(new Reservation(memberClover, reservationSlot));
+        reservationRepository.save(new Reservation(memberClover, reservationSlot, PaymentFixture.getPayment()));
 
         //when
         List<ReservationResponse> reservations = reservationService.findReservations(
@@ -184,8 +183,8 @@ class ReservationServiceTest extends ServiceTest {
         ReservationSlot reservationSlot2 = reservationSlotRepository.save(getNextDayReservationSlot(time, theme2));
 
         Member memberChoco = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot1));
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot2));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot1, PaymentFixture.getPayment()));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot2, PaymentFixture.getPayment()));
 
         //when
         List<ReservationResponse> reservations = reservationService.findReservations(
@@ -209,8 +208,8 @@ class ReservationServiceTest extends ServiceTest {
         ReservationSlot reservationSlot2 = reservationSlotRepository.save(getNextDayReservationSlot(time, theme2));
 
         Member memberChoco = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot1));
-        reservationRepository.save(new Reservation(memberChoco, reservationSlot2));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot1, PaymentFixture.getPayment()));
+        reservationRepository.save(new Reservation(memberChoco, reservationSlot2, PaymentFixture.getPayment()));
 
         //when
         List<ReservationResponse> reservations = reservationService.findReservations(
@@ -233,7 +232,7 @@ class ReservationServiceTest extends ServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Member member = memberRepository.save(getMemberChoco());
         Reservation reservation = reservationRepository.save(
-                new Reservation(member, reservationSlot));
+                new Reservation(member, reservationSlot, PaymentFixture.getPayment()));
 
         //when
         reservationService.deleteReservation(AuthInfo.of(member), reservation.getId());
@@ -252,13 +251,13 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTime time = reservationTimeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
-        reservationRepository.save(new Reservation(member, reservationSlot));
+        reservationRepository.save(new Reservation(member, reservationSlot, PaymentFixture.getPayment()));
 
         ReservationRequest reservationRequest = new ReservationRequest(reservationSlot.getDate().toString(), time.getId(),
                 theme.getId());
 
         //when & then
-        assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, member.getId()))
+        assertThatThrownBy(() -> reservationService.createAdminReservation(reservationRequest, member.getId()))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -270,7 +269,7 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTime time = reservationTimeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
-        reservationRepository.save(new Reservation(member, reservationSlot));
+        reservationRepository.save(new Reservation(member, reservationSlot, PaymentFixture.getPayment()));
 
         //when
         reservationService.delete(reservationSlot.getId());
@@ -291,9 +290,10 @@ class ReservationServiceTest extends ServiceTest {
         Theme theme2 = themeRepository.save(getTheme2());
         ReservationSlot reservationSlot1 = reservationSlotRepository.save(getNextDayReservationSlot(time, theme1));
         ReservationSlot reservationSlot2 = reservationSlotRepository.save(getNextDayReservationSlot(time, theme2));
+        Payment payment = PaymentFixture.getPayment();
 
-        reservationRepository.save(new Reservation(member, reservationSlot1));
-        reservationRepository.save(new Reservation(member, reservationSlot2));
+        reservationRepository.save(new Reservation(member, reservationSlot1, payment));
+        reservationRepository.save(new Reservation(member, reservationSlot2, payment));
 
         //when
         List<ReservationWithStatus> myReservations = reservationService.findReservations(AuthInfo.of(member));
@@ -314,14 +314,14 @@ class ReservationServiceTest extends ServiceTest {
         Member tacan = getMemberTacan();
 
         reservationSlotRepository.save(reservationSlot);
-        reservationRepository.save(new Reservation(choco, reservationSlot));
+        reservationRepository.save(new Reservation(choco, reservationSlot, PaymentFixture.getPayment()));
 
         //when
-        reservationService.createReservation(new ReservationRequest(
+        reservationService.createAdminReservation(new ReservationRequest(
                 reservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
                 reservationSlot.getTime().getId(),
-                reservationSlot.getTheme().getId(
-                )), tacan.getId());
+                reservationSlot.getTheme().getId()),
+                tacan.getId());
         List<Reservation> allByMember = reservationRepository.findAllByMember(tacan);
         Reservation addedReservation = allByMember
                 .stream()

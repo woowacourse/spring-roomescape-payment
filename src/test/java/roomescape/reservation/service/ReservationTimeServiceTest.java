@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
+import roomescape.fixture.PaymentFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
@@ -121,7 +122,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         Theme theme = themeRepository.save(getTheme1());
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
         Member member = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(member, reservationSlot));
+        reservationRepository.save(new Reservation(member, reservationSlot, PaymentFixture.getPayment()));
 
         //when
         List<AvailableTimeResponse> availableTimes

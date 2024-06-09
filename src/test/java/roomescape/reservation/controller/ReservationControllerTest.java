@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
+import roomescape.fixture.PaymentFixture;
 import roomescape.global.restclient.PaymentWithRestClient;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.controller.dto.*;
@@ -59,7 +60,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void create() {
         //given
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        BDDMockito.doReturn(PaymentFixture.getPayment())
                 .when(paymentWithRestClient)
                 .confirm(any());
 
@@ -93,7 +94,7 @@ class ReservationControllerTest extends ControllerTest {
                 new ReservationTimeRequest("11:00"));
         ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
 
-        ReservationResponse reservationResponse = reservationService.createReservation(
+        ReservationResponse reservationResponse = reservationService.createAdminReservation(
                 new ReservationRequest(
                         LocalDate.now().plusDays(10).toString(),
                         reservationTimeResponse.id(),

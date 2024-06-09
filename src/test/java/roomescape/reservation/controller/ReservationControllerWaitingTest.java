@@ -1,7 +1,11 @@
 package roomescape.reservation.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static roomescape.fixture.MemberFixture.getMemberTacan;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,18 +13,13 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.service.TokenProvider;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.global.restclient.PaymentWithRestClient;
-import roomescape.reservation.controller.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.util.ControllerTest;
-
-import java.time.format.DateTimeFormatter;
-
-import static org.mockito.ArgumentMatchers.any;
-import static roomescape.fixture.MemberFixture.getMemberTacan;
 
 class ReservationControllerWaitingTest extends ControllerTest {
 
@@ -35,7 +34,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @BeforeEach
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        BDDMockito.doReturn(PaymentFixture.getPayment())
                 .when(paymentWithRestClient)
                 .confirm(any());
     }
