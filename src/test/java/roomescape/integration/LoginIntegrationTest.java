@@ -26,12 +26,12 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("로그인 API")
     class Login {
-        Map<String, String> params = new HashMap<>();
-        Member member;
-        List<FieldDescriptor> loginRequest = List.of(
+        List<FieldDescriptor> loginRequestDescriptors = List.of(
                 fieldWithPath("password").description("비밀번호"),
                 fieldWithPath("email").description("이메일")
         );
+        Map<String, String> params = new HashMap<>();
+        Member member;
 
         @BeforeEach
         void setUp() {
@@ -46,7 +46,7 @@ class LoginIntegrationTest extends IntegrationTest {
             RestAssured.given(spec).log().all()
                     .filter(document(
                             "login-success",
-                            requestFields(loginRequest)
+                            requestFields(loginRequestDescriptors)
                     ))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(params)
@@ -73,7 +73,7 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("인증 정보 조회 API")
     class LoginCheck {
-        List<FieldDescriptor> loginCheckResponse = List.of(
+        List<FieldDescriptor> loginCheckResponseDescriptors = List.of(
                 fieldWithPath("name").description("현재 로그인한 사용자 이름")
         );
 
@@ -87,7 +87,7 @@ class LoginIntegrationTest extends IntegrationTest {
             LoginCheckResponse response = RestAssured.given(spec).log().all()
                     .filter(document(
                             "login-check-success",
-                            responseFields(loginCheckResponse)
+                            responseFields(loginCheckResponseDescriptors)
                     ))
                     .cookies(cookieProvider.createUserCookies())
                     .when().get("/login/check")
@@ -135,6 +135,18 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("회원가입 API")
     class Signup {
+        List<FieldDescriptor> signupRequestDescriptors = List.of(
+                fieldWithPath("email").description("이메일"),
+                fieldWithPath("password").description("비밀번호"),
+                fieldWithPath("name").description("이름")
+        );
+        List<FieldDescriptor> signupResponseDescriptors = List.of(
+                fieldWithPath("id").description("사용자 id"),
+                fieldWithPath("name").description("이름"),
+                fieldWithPath("email").description("이메일"),
+                fieldWithPath("role").description("역할")
+        );
+
         @Test
         void 일반유저_권한으로_회원가입을_할_수_있다() {
             Map<String, String> params = new HashMap<>();
@@ -142,7 +154,12 @@ class LoginIntegrationTest extends IntegrationTest {
             params.put("password", "1234567890");
             params.put("name", "사용자");
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document(
+                            "signup-success",
+                            requestFields(signupRequestDescriptors),
+                            responseFields(signupResponseDescriptors)
+                    ))
                     .contentType(ContentType.JSON)
                     .body(params)
                     .when().post("/signup")

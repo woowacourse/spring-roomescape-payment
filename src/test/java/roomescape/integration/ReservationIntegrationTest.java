@@ -3,16 +3,25 @@ package roomescape.integration;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.request.ParameterDescriptor;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.payment.PaymentType;
@@ -31,6 +40,25 @@ class ReservationIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("예약 목록 조회 API")
     class FindAllReservation {
+        List<ParameterDescriptor> reservationFindAllQueryParameterDescriptors = List.of(
+                parameterWithName("memberId").description("회원 id").optional(),
+                parameterWithName("themeId").description("테마 id").optional(),
+                parameterWithName("dateFrom").description("시작 날짜").optional(),
+                parameterWithName("dateTo").description("종료 날짜").optional()
+        );
+        List<FieldDescriptor> reservationFindAllResponseDescriptors = List.of(
+                fieldWithPath("reservations.[].id").description("예약 id"),
+                fieldWithPath("reservations.[].member.id").description("회원 id"),
+                fieldWithPath("reservations.[].member.name").description("회원 이름"),
+                fieldWithPath("reservations.[].member.email").description("회원 이메일"),
+                fieldWithPath("reservations.[].date").description("날짜"),
+                fieldWithPath("reservations.[].time.id").description("예약 시간 id"),
+                fieldWithPath("reservations.[].time.startAt").description("예약 시작 시간"),
+                fieldWithPath("reservations.[].theme.id").description("테마 id"),
+                fieldWithPath("reservations.[].theme.name").description("테마 이름"),
+                fieldWithPath("reservations.[].theme.description").description("테마 설명"),
+                fieldWithPath("reservations.[].theme.thumbnail").description("테마 썸네일 url")
+        );
         Theme firstTheme;
         Member user;
 
@@ -48,7 +76,26 @@ class ReservationIntegrationTest extends IntegrationTest {
         }
 
         @Test
-        void 예약_목록을_조회할_수_있다() {
+        void 예약_목록을_예약자와_테마와_기간별로_필터링해_조회할_수_있다() {
+            RestAssured.given(spec).log().all()
+                    .filter(document(
+                            "reservation-find-all-success",
+                            queryParameters(reservationFindAllQueryParameterDescriptors),
+                            responseFields(reservationFindAllResponseDescriptors)
+                    ))
+                    .cookies(cookieProvider.createAdminCookies())
+                    .when().get(String.format(
+                            "/reservations?memberId=%s&themeId=%s&dateFrom=2000-04-01&dateTo=2000-04-07",
+                            user.getId(),
+                            firstTheme.getId())
+                    )
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("reservations.size()", is(1));
+        }
+
+        @Test
+        void 필터링_없이_전체_예약_목록을_조회할_수_있다() {
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
                     .when().get("/reservations")

@@ -5,3 +5,7 @@
 == 인증
 
 include::login.adoc[]
+
+== 회원
+
+include::member.adoc[]
