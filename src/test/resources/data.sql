@@ -47,6 +47,7 @@ VALUES (2, '2034-05-08', 1, 2, 'success', 1000),
        (2, '2034-05-11', 2, 9, 'success', 1000),
        (2, '2034-05-11', 1, 10, 'success', 1000),
        (2, '2034-05-11', 2, 10, 'success', 1000),
+       (2, '2024-06-08', 2, 10, 'success', 1000),
        (1, '2024-05-22', 2, 10, 'success', 1000);
 
 INSERT INTO reservation (member_id, date, time_id, theme_id, amount)

@@ -39,7 +39,8 @@ public class TestFixture {
     public static final String THEME_ANIME_NAME = "포켓몬";
     public static final String THEME_ANIME_DESCRIPTION = "매우 귀엽습니다.";
     public static final String THEME_ANIME_THUMBNAIL = "https://i.pinimg.com/474x/b3/aa/d7/b3aad752a5fbda932dd37015bca3047f.jpg";
-    public static final String PAYMENT_KEY = "dummy";
+    public static final String ORDER_ID = "dummyOrderId";
+    public static final String PAYMENT_KEY = "dummyPrimaryKey";
     public static final int AMOUNT = 1000;
 
     public static Member ADMIN() {

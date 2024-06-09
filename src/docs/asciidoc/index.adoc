@@ -1,0 +1,116 @@
+= 방탈출 관리 API
+:toc: left
+:toclevels: 1
+:source-highlighter: highlightjs
+
+== 로그인
+
+operation::login[]
+
+=== 개인정보 조회
+
+operation::login/check[]
+
+== 로그아웃
+
+operation::logout[]
+
+== 예약
+
+=== 관리자
+
+==== 생성
+
+operation::reservation/admin/create/success[]
+
+==== 조건별 예약 조회
+
+operation::reservation/admin/findByCondition[]
+
+=== 사용자
+
+==== 생성
+
+operation::reservation/create/success[]
+
+include::{snippets}/reservation/create/success/response-fields.adoc[]
+
+==== 삭제
+
+operation::reservation/delete/success[]
+
+==== 조회
+
+operation::reservation/findAll[]
+
+==== 내 예약 조회
+
+operation::reservation/findMine[]
+
+==== 결제
+
+operation::reservation/update/pay[]
+
+== 테마
+
+=== 관리자
+
+==== 생성
+
+operation::theme/admin/create[]
+
+==== 삭제
+
+operation::theme/admin/delete/success[]
+
+==== 전체 조회
+
+operation::theme/admin/find/all[]
+
+==== 인기 조회
+
+operation::theme/admin/find/popular[]
+
+== 시간
+
+=== 관리자
+
+==== 생성
+
+request
+
+operation::time/admin/create[]
+
+==== 삭제
+
+operation::time/admin/delete/success[]
+
+==== 전체 조회
+
+operation::time/admin/find/all[]
+
+== 대기
+
+=== 관리자
+
+==== 승인
+
+operation::waiting/admin/approve[]
+
+==== 거절
+
+operation::waiting/admin/deny[]
+
+==== 전체 조회
+
+operation::waiting/admin/findAll[]
+
+=== 사용자
+
+==== 취소
+
+operation::waiting/cancel[]
+
+==== 조회
+
+operation::waiting/get[]

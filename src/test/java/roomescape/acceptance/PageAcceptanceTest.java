@@ -1,11 +1,14 @@
 package roomescape.acceptance;
 
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static roomescape.FieldDescriptorFixture.tokenCookieDescriptor;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
 
@@ -17,10 +20,14 @@ class PageAcceptanceTest extends AcceptanceTest {
     void respondOkWhenAdminAccessAdminPage(final String adminPath) {
         final String accessToken = getAccessToken(ADMIN_EMAIL);
 
-        RestAssured.given().log().all()
+        given(spec)
+                .filter(document("template/admin",
+                        requestCookies(tokenCookieDescriptor)
+                ))
                 .cookie("token", accessToken)
-                .when().get(adminPath)
-                .then().log().all()
+                .when()
+                .get(adminPath)
+                .then()
                 .statusCode(200)
                 .body(containsString("<!DOCTYPE html>"));
     }
@@ -31,10 +38,14 @@ class PageAcceptanceTest extends AcceptanceTest {
     void respondForbiddenWhenMemberAccessAdminPage(final String adminPath) {
         final String accessToken = getAccessToken(MEMBER_CAT_EMAIL);
 
-        RestAssured.given().log().all()
+        given(spec)
+                .filter(document("template/admin",
+                        requestCookies(tokenCookieDescriptor)
+                ))
                 .cookie("token", accessToken)
-                .when().get(adminPath)
-                .then().log().all()
+                .when()
+                .get(adminPath)
+                .then()
                 .statusCode(403);
     }
 
@@ -42,9 +53,10 @@ class PageAcceptanceTest extends AcceptanceTest {
     @ValueSource(strings = {"/", "/reservation", "/login"})
     @DisplayName("사용자가 사용자 페이지에 접근하면 200을 응답한다.")
     void respondOkWhenMemberAccessMemberPage(String path) {
-        RestAssured.given().log().all()
-                .when().get(path)
-                .then().log().all()
+        given(spec)
+                .when()
+                .get(path)
+                .then()
                 .statusCode(200)
                 .body(containsString("<!DOCTYPE html>"));
     }
