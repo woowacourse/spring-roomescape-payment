@@ -149,7 +149,7 @@ class WaitingControllerTest extends BaseControllerTest {
                         requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다."))
                 ))
                 .cookie("token", token)
-                .when().delete("/waitings/" + savedWaiting.getId())
+                .when().delete("/waitings/{id}", savedWaiting.getId())
                 .then().log().all()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
