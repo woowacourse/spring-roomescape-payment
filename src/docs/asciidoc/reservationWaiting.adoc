@@ -1,0 +1,35 @@
+=== 예약 대기
+
+==== 예약 대기 생성
+
+===== curl
+
+include::{snippets}/reservationWaiting/create/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/reservationWaiting/create/http-request.adoc[]
+
+include::{snippets}/reservationWaiting/create/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/reservationWaiting/create/http-response.adoc[]
+
+include::{snippets}/reservationWaiting/create/response-fields.adoc[]
+
+==== 예약 대기 삭제
+
+===== curl
+
+include::{snippets}/reservationWaiting/delete/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/reservationWaiting/delete/http-request.adoc[]
+
+include::{snippets}/reservationWaiting/delete/path-parameters.adoc[]
+
+===== response
+
+include::{snippets}/reservationWaiting/delete/http-response.adoc[]
