@@ -2,6 +2,7 @@ package roomescape.fixture;
 
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
@@ -16,6 +17,10 @@ import java.time.LocalDate;
 public class ReservationFixture {
     public static Reservation createReserved(Member member, ReservationDetail reservationDetail) {
         return new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+    }
+
+    public static Reservation createReserved(Member member, ReservationDetail reservationDetail, Payment payment) {
+        return new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment);
     }
 
     public static Reservation createPendingPayment(Member member, ReservationDetail reservationDetail) {

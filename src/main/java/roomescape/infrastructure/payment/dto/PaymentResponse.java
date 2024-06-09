@@ -6,13 +6,12 @@ public record PaymentResponse(
         Long totalAmount,
         String paymentKey,
         String orderId,
-        String status,
         String requestedAt,
         String approvedAt
 ) {
 
     public static PaymentResponse empty() {
-        return new PaymentResponse(0L, "", "", "", "", "");
+        return new PaymentResponse(0L, "", "", "", "");
     }
 
     public Payment toPayment() {

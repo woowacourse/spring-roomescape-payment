@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.dto.ReservationWithRank;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.ReservationTime;
@@ -66,7 +66,7 @@ class ReservationCommonServiceTest extends ServiceTest {
         assertThatNoException().isThrownBy(() -> reservationCommonService.findByCondition(reservationFilterRequest));
     }
 
-    @DisplayName("id로 예약을 삭제한다.")
+    @DisplayName("id로 예약 결제를 취소 후 삭제한다.")
     @Test
     void deleteReservationById() {
         //given
@@ -91,7 +91,8 @@ class ReservationCommonServiceTest extends ServiceTest {
         ReservationTime time = reservationTimeRepository.save(TimeFixture.createTime());
         Schedule schedule = ScheduleFixture.createFutureSchedule(time);
         ReservationDetail reservationDetail = reservationDetailRepository.save(ReservationDetailFixture.create(theme, schedule));
-        Reservation reservation = reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail));
+        Payment payment = paymentRepository.save(PaymentFixture.create());
+        Reservation reservation = reservationRepository.save(ReservationFixture.createReserved(member, reservationDetail, payment));
         reservationRepository.save(WaitingFixture.create(anotherMember, reservationDetail));
 
         //when

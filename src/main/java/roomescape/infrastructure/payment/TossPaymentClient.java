@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.dto.PaymentCancelRequest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
@@ -49,14 +50,22 @@ public class TossPaymentClient implements PaymentClient {
     public Payment approve(PaymentRequest request) {
         String authorizations = getEncodedKey();
         PaymentResponse response = Optional.ofNullable(restClient.post()
-                .uri("/v1/payments/confirm")
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, authorizations)
-                .body(request)
-                .retrieve()
-                .body(PaymentResponse.class))
+                        .uri("/v1/payments/confirm")
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, authorizations)
+                        .body(request)
+                        .retrieve()
+                        .body(PaymentResponse.class))
                 .orElseGet(PaymentResponse::empty);
         return response.toPayment();
+    }
+
+    @Override
+    public void cancel(PaymentCancelRequest request) {
+        String authorizations = getEncodedKey();
+        restClient.post()
+                        .uri("/v1/payments/" + request.paymentKey() + "/cancel")
+                        .header(HttpHeaders.AUTHORIZATION, authorizations);
     }
 
     private String getEncodedKey() {

@@ -65,6 +65,9 @@ public class ReservationCommonService {
 
     private void deleteIfAvailable(Reservation reservation) {
         validatePastReservation(reservation);
+        if (reservation.isReserved()) {
+            paymentService.cancelPayment(reservation.getPayment());
+        }
         reservationRepository.deleteById(reservation.getId());
     }
 

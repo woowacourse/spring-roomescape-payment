@@ -400,6 +400,7 @@ host: localhost:8080
 - uri: /admin/reservations/{id}
   - path variable
     - id: 예약 정보 식별자
+- description: 결제 취소가 완료되어야만 예약이 취소된다.
 - response
   - 존재하는 id로 삭제 요청
     ```
