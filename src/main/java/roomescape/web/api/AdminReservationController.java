@@ -22,7 +22,7 @@ import roomescape.domain.member.Member;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminReservationController {
+public class AdminReservationController implements AdminReservationControllerDocs {
     private final ReservationService reservationService;
     private final CancelService cancelService;
 

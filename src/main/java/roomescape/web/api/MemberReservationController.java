@@ -21,7 +21,7 @@ import roomescape.domain.member.Member;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberReservationController {
+public class MemberReservationController implements MemberReservationControllerDocs {
     private final ReservationService reservationService;
     private final CancelService cancelService;
 

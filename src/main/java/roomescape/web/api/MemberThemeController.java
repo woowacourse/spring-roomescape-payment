@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.policy.WeeklyRankingPolicy;
 import roomescape.application.ThemeService;
 import roomescape.application.dto.response.theme.ThemeResponse;
+import roomescape.application.policy.WeeklyRankingPolicy;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberThemeController {
+public class MemberThemeController implements MemberThemeControllerDocs {
     private final ThemeService themeService;
 
     @GetMapping("/themes")

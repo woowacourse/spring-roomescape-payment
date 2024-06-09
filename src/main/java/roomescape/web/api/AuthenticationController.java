@@ -17,7 +17,7 @@ import roomescape.application.security.JwtProvider;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AuthenticationController implements AuthenticationControllerDocs {
     private static final String TOKEN_COOKIE_KEY_NAME = "token";
 
     private final MemberService memberService;

@@ -15,7 +15,7 @@ import roomescape.application.dto.response.time.ReservationTimeResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminReservationTimeController {
+public class AdminReservationTimeController implements AdminReservationTimeControllerDocs {
     private final ReservationTimeService reservationTimeService;
 
     @PostMapping("/admin/times")
