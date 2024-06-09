@@ -11,7 +11,7 @@ public class FakePaymentClient implements PaymentClient {
     @Override
     public void pay(PaymentConfirmRequest paymentConfirmRequest) {
         if (PAYMENT_ERROR_KEY.equals(paymentConfirmRequest.paymentKey())) {
-            throw new PaymentServerException("Payment error 발생"); // todo PaymentException
+            throw new PaymentServerException("Payment error 발생");
         }
     }
 

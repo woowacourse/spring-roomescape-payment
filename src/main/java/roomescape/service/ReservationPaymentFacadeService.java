@@ -3,6 +3,7 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
+import roomescape.exception.PaymentException;
 import roomescape.service.dto.request.PaymentCancelRequest;
 import roomescape.service.dto.request.ReservationCancelRequest;
 import roomescape.service.dto.request.ReservationCreateRequest;
@@ -28,7 +29,7 @@ public class ReservationPaymentFacadeService {
         try {
             paymentClient.pay(request.toPaymentConfirmRequest());
             return ReservationResponse.from(reservation);
-        } catch (RuntimeException e) { // todo PaymentException
+        } catch (PaymentException e) {
             paymentService.deleteByReservation(reservation);
             reservationManageService.delete(reservation);
             throw e;
@@ -47,7 +48,7 @@ public class ReservationPaymentFacadeService {
     private void invokeClient(PaymentCancelRequest request, Reservation cenceledReservation, Payment deletedPayment) {
         try {
             paymentClient.cancel(request);
-        } catch (RuntimeException e) { // todo PaymentException
+        } catch (PaymentException e) {
             reservationManageService.rollbackCancellation(cenceledReservation);
             paymentService.rollbackDelete(deletedPayment);
             throw e;

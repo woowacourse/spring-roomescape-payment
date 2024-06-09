@@ -2,7 +2,7 @@ package roomescape.exception;
 
 import org.springframework.http.HttpStatusCode;
 
-public class PaymentClientException extends RuntimeException {
+public class PaymentClientException extends PaymentException {
 
     private final HttpStatusCode statusCode;
 
