@@ -1,0 +1,105 @@
+= 방탈출 API 명세
+
+== 관리자 API
+
+=== 관리자 예약 저장
+
+operation::admin-save-reservation[snippets='http-request,http-response']
+
+=== 관리자 예약 시간 저장
+
+operation::admin-save-reservation-time[snippets='http-request,http-response']
+
+=== 관리자 테마 저장
+
+operation::admin-save-theme[snippets='http-request,http-response']
+
+=== 관리자 예약 삭제
+
+operation::admin-delete-reservation[snippets='http-request,http-response']
+
+=== 관리자 예약 시간 삭제
+
+operation::admin-delete-reservation-time[snippets='http-request,http-response']
+
+=== 관리자 테마 삭제
+
+operation::admin-delete-theme[snippets='http-request,http-response']
+
+=== 관리자 모든 예약 조회
+
+operation::admin-findAll-reservations[snippets='http-request,http-response']
+
+=== 관리자 예약 필터링 조회
+
+operation::admin-search-reservations[snippets='http-request,http-response']
+
+== 회원 API
+
+=== 회원 생성
+
+operation::create-member[snippets='http-request,http-response']
+
+=== 모든 회원 정보 조회
+
+operation::findAll-members[snippets='http-request,http-response']
+
+== 예약 API
+
+=== 예약 저장
+
+operation::save-reservation[snippets='http-request,http-response']
+
+=== 모든 예약 대기 조회
+
+operation::findAll-waiting-reservations[snippets='http-request,http-response']
+
+=== 내 예약 조회
+
+operation::find-All-my-reservations[snippets='http-request,http-response']
+
+=== 이용 가능 예약 시간 조회
+
+operation::findAll-available-times[snippets='http-request,http-response']
+
+== 예약 대기 API
+
+=== 내 예약 대기 조회
+
+operation::findAll-my-waiting-reservations[snippets='http-request,http-response']
+
+=== 예약 대기 저장
+
+operation::save-waiting-reservation[snippets='http-request,http-response']
+
+== 예약 시간 API
+
+=== 모든 예약 시간 조회
+
+operation::findAll-reservation-time[snippets='http-request,http-response']
+
+== 테마 API
+
+=== 인기 테마 조회
+
+operation::findAll-popular-themes[snippets='http-request,http-response']
+
+=== 모든 테마 조회
+
+operation::findAll-themes[snippets='http-request,http-response']
+
+== 인증 API
+
+=== 로그인 검증
+
+operation::login-check[snippets='http-request,http-response']
+
+=== 로그아웃
+
+operation::logout[snippets='http-request,http-response,httpie-request']
+
+== 결제 API
+
+=== 결제 신용 정보 저장
+
+operation::save-payment-credentials[snippets='http-request,http-response,']
