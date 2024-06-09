@@ -10,13 +10,13 @@ public enum ErrorType {
     HAS_RESERVATION_OR_WAITING("같은 테마에 대한 예약(대기)는 한 번만 가능합니다."),
 
     // 401 Unauthorized
-    EXPIRED_TOKEN("만료된 JWT 토큰입니다."),
+    EXPIRED_TOKEN("토큰이 만료되었습니다. 다시 로그인 해주세요."),
     UNSUPPORTED_TOKEN("지원하지 않는 JWT 토큰입니다."),
     MALFORMED_TOKEN("형식이 맞지 않는 JWT 토큰입니다."),
     INVALID_SIGNATURE_TOKEN("잘못된 JWT 토큰 Signature 입니다."),
     ILLEGAL_TOKEN("JWT 토큰의 Claim 이 비어있습니다."),
     INVALID_TOKEN("JWT 토큰이 존재하지 않거나 유효하지 않습니다."),
-    NOT_EXIST_COOKIE("쿠키가 존재하지 않습니다."),
+    NOT_EXIST_COOKIE("쿠키가 존재하지 않습니다. 로그인이 필요한 서비스입니다."),
 
     // 403 Forbidden
     LOGIN_REQUIRED("로그인이 필요한 서비스입니다."),
