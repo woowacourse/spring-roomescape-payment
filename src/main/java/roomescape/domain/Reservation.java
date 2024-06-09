@@ -46,7 +46,8 @@ public class Reservation {
             LocalDate date,
             ReservationTime time,
             Theme theme,
-            ReservationStatus status
+            ReservationStatus status,
+            Payment payment
     ) {
         validateMember(reservationMember);
         validateDate(date);
@@ -59,6 +60,7 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.status = status;
+        this.payment = payment;
     }
 
     private void validateMember(Member reservationMember) {
