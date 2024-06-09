@@ -17,7 +17,7 @@ import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
 import roomescape.service.ReservationPaymentFacadeService;
-import roomescape.service.ReservationService;
+import roomescape.service.ReservationQueryService;
 import roomescape.service.dto.request.ReservationCancelRequest;
 import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
@@ -31,12 +31,13 @@ import java.util.List;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private final ReservationService reservationService;
     private final ReservationPaymentFacadeService reservationPaymentFacadeService;
+    private final ReservationQueryService reservationQueryService;
 
-    public ReservationController(ReservationService reservationService, ReservationPaymentFacadeService reservationPaymentFacadeService) {
-        this.reservationService = reservationService;
+    public ReservationController(ReservationPaymentFacadeService reservationPaymentFacadeService,
+                                 ReservationQueryService reservationQueryService) {
         this.reservationPaymentFacadeService = reservationPaymentFacadeService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @GetMapping
@@ -44,20 +45,18 @@ public class ReservationController {
                                                                          @RequestParam(required = false) Long themeId,
                                                                          @RequestParam(required = false) LocalDate dateFrom,
                                                                          @RequestParam(required = false) LocalDate dateTo) {
-        List<ReservationResponse> reservationResponses = reservationService
-                .getReservationsByConditions(memberId, themeId, dateFrom, dateTo);
-        return new ApiResponses<>(reservationResponses);
+        List<ReservationResponse> responses = reservationQueryService.getReservationsByConditions(memberId, themeId, dateFrom, dateTo);
+        return new ApiResponses<>(responses);
     }
 
     @GetMapping("/mine")
     public ApiResponses<PersonalReservationResponse> getMyReservations(@Auth Authentication authentication) {
-        List<PersonalReservationResponse> reservationResponses = reservationService
-                .getReservationsByMemberId(authentication.getId());
-        return new ApiResponses<>(reservationResponses);
+        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(authentication.getId());
+        return new ApiResponses<>(responses);
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid ReservationRequest request,
+    public ResponseEntity<ReservationResponse> addReservation(@Valid @RequestBody ReservationRequest request,
                                                               @Auth Authentication authentication) {
         long memberId = authentication.getId();
         ReservationCreateRequest reservationCreateRequest = request.toReservationCreateRequest(memberId);

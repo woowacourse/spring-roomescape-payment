@@ -14,7 +14,6 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.ReservationCreateRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.MemberFixture;
@@ -26,13 +25,10 @@ import roomescape.support.fixture.ThemeFixture;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class ReservationServiceTest extends BaseServiceTest {
+class ReservationQueryServiceTest extends BaseServiceTest {
 
     @Autowired
-    private ReservationService reservationService;
-
+    private ReservationQueryService reservationQueryService;
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -68,7 +64,7 @@ class ReservationServiceTest extends BaseServiceTest {
         reservationRepository.save(ReservationFixture.create("2024-04-10", member, time, theme));
         reservationRepository.save(ReservationFixture.create("2024-04-11", member, time, theme));
 
-        List<ReservationResponse> responses = reservationService.getReservationsByConditions(
+        List<ReservationResponse> responses = reservationQueryService.getReservationsByConditions(
                 member.getId(),
                 theme.getId(),
                 LocalDate.of(2024, 4, 9),
@@ -83,45 +79,6 @@ class ReservationServiceTest extends BaseServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 추가한다.")
-    void addReservation() {
-        ReservationCreateRequest request = ReservationFixture.createValidRequest(member.getId(), time.getId(), theme.getId());
-
-        Reservation reservation = reservationService.addReservation(request);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(reservation.getDate()).isEqualTo(request.date());
-            softly.assertThat(reservation.getMember().getName()).isEqualTo(member.getName());
-            softly.assertThat(reservation.getTheme().getRawName()).isEqualTo(theme.getRawName());
-            softly.assertThat(reservation.getTime().getStartAt()).isEqualTo(time.getStartAt());
-        });
-    }
-
-    @Test
-    @DisplayName("예약을 삭제하면 취소 상태가 된다.")
-    void deleteReservationById() {
-        Reservation reservation = reservationRepository.save(ReservationFixture.create(member, time, theme));
-        long id = reservation.getId();
-
-        Reservation canceledReservation = reservationService.cancel(id);
-
-        assertThat(canceledReservation.isCanceled()).isTrue();
-    }
-
-    @Test
-    @DisplayName("삭제한 예약을 롤백하면 다시 확정 상태가 된다.")
-    void rollbackReservationById() {
-        Reservation reservation = reservationRepository.save(ReservationFixture.create(member, time, theme));
-        long id = reservation.getId();
-        reservationService.cancel(id);
-
-        reservationService.rollbackCancellation(reservation);
-
-        Reservation rollbackedReservation = reservationRepository.findById(id).orElseThrow();
-        assertThat(rollbackedReservation.isCanceled()).isFalse();
-    }
-
-    @Test
     @DisplayName("나의 예약들을 조회한다.")
     void getReservationsByMemberId() {
         Reservation reservation1 = reservationRepository.save(ReservationFixture.create("2024-04-09", member, time, theme));
@@ -131,7 +88,7 @@ class ReservationServiceTest extends BaseServiceTest {
         Reservation reservation3 = reservationRepository.save(ReservationFixture.create("2024-04-11", member, time, theme));
         paymentRepository.save(PaymentFixture.create(reservation3));
 
-        List<PersonalReservationResponse> responses = reservationService.getReservationsByMemberId(member.getId());
+        List<PersonalReservationResponse> responses = reservationQueryService.getMyReservations(member.getId());
 
         SoftAssertions.assertSoftly(
                 softly -> {

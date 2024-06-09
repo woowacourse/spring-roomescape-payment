@@ -10,33 +10,33 @@ import roomescape.service.dto.response.ReservationResponse;
 
 @Service
 public class ReservationPaymentFacadeService {
-    private final ReservationService reservationService;
+    private final ReservationManageService reservationManageService;
     private final PaymentService paymentService;
     private final PaymentClient paymentClient;
 
-    public ReservationPaymentFacadeService(ReservationService reservationService,
+    public ReservationPaymentFacadeService(ReservationManageService reservationManageService,
                                            PaymentService paymentService,
                                            PaymentClient paymentClient) {
-        this.reservationService = reservationService;
+        this.reservationManageService = reservationManageService;
         this.paymentService = paymentService;
         this.paymentClient = paymentClient;
     }
 
     public ReservationResponse addReservation(ReservationCreateRequest request) {
-        Reservation reservation = reservationService.addReservation(request);
+        Reservation reservation = reservationManageService.addReservation(request);
         paymentService.addPayment(request.toPaymentCreateRequest(reservation));
         try {
             paymentClient.pay(request.toPaymentConfirmRequest());
             return ReservationResponse.from(reservation);
         } catch (RuntimeException e) { // todo PaymentException
             paymentService.deleteByReservation(reservation);
-            reservationService.delete(reservation);
+            reservationManageService.delete(reservation);
             throw e;
         }
     }
 
     public void cancelReservation(ReservationCancelRequest request) {
-        Reservation canceledReservation = reservationService.cancel(request.id());
+        Reservation canceledReservation = reservationManageService.cancel(request.id());
         Payment deletedPayment = paymentService.deleteByReservation(canceledReservation);
         if (deletedPayment.isNotAccountTransfer()) {
             PaymentCancelRequest paymentCancelRequest = request.toPaymentCancelRequest(deletedPayment.getPaymentKey());
@@ -48,7 +48,7 @@ public class ReservationPaymentFacadeService {
         try {
             paymentClient.cancel(request);
         } catch (RuntimeException e) { // todo PaymentException
-            reservationService.rollbackCancellation(cenceledReservation);
+            reservationManageService.rollbackCancellation(cenceledReservation);
             paymentService.rollbackDelete(deletedPayment);
             throw e;
         }

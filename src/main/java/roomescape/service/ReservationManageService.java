@@ -4,102 +4,65 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
-import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
-import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
-import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.service.dto.request.ReservationCreateRequest;
-import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
-@Transactional(readOnly = true)
-public class ReservationService { // todo cqrs
+public class ReservationManageService {
 
     private final ReservationRepository reservationRepository;
-    private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
-    public ReservationService(
+    public ReservationManageService(
             ReservationRepository reservationRepository,
-            ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentRepository paymentRepository,
             Clock clock
     ) {
         this.reservationRepository = reservationRepository;
-        this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
-    public List<ReservationResponse> getReservationsByConditions(
-            Long memberId,
-            Long themeId,
-            LocalDate dateFrom,
-            LocalDate dateTo
-    ) {
-        List<Reservation> reservations = reservationRepository
-                .findAllByConditions(memberId, themeId, dateFrom, dateTo);
-
-        return reservations.stream()
-                .map(ReservationResponse::from)
-                .toList();
-    }
-
     @Transactional
-    public ReservationResponse addReservationByAdmin(ReservationCreateRequest reservationCreateRequest) {
-        Reservation reservation = createValidatedReservation(reservationCreateRequest);
+    public ReservationResponse addReservationByAdmin(ReservationCreateRequest request) {
+        Reservation reservation = createValidatedReservation(request);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 
     @Transactional
-    public Reservation addReservation(ReservationCreateRequest reservationCreateRequest) {
-        Reservation reservation = createValidatedReservation(reservationCreateRequest);
+    public Reservation addReservation(ReservationCreateRequest request) {
+        Reservation reservation = createValidatedReservation(request);
         return reservationRepository.save(reservation);
     }
 
-    private Reservation createValidatedReservation(ReservationCreateRequest reservationCreateRequest) {
-        Reservation reservation = getReservation(reservationCreateRequest);
-        reservation.validateFutureReservation(LocalDateTime.now(clock));
-        validateDuplicatedReservation(reservation);
-        return reservation;
-    }
-
-    private Reservation getReservation(ReservationCreateRequest request) {
+    private Reservation createValidatedReservation(ReservationCreateRequest request) {
         Member member = getMember(request.memberId());
         ReservationTime reservationTime = getTime(request.timeId());
         Theme theme = getTheme(request.themeId());
-        return request.toReservation(reservationTime, theme, member);
+        Reservation reservation = request.toReservation(reservationTime, theme, member);
+        reservation.validateFutureReservation(LocalDateTime.now(clock));
+        validateDuplicatedReservation(reservation);
+        return reservation;
     }
 
     private Member getMember(long memberId) {
@@ -132,7 +95,7 @@ public class ReservationService { // todo cqrs
     }
 
     @Transactional
-    public Reservation cancel(Long id) { // todo 이름 변경
+    public Reservation cancel(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약입니다."));
         reservation.cancel();
@@ -143,21 +106,5 @@ public class ReservationService { // todo cqrs
     public void rollbackCancellation(Reservation reservation) {
         reservationRepository.findById(reservation.getId())
                 .ifPresent(Reservation::accept);
-    }
-
-    public List<PersonalReservationResponse> getReservationsByMemberId(long memberId) { // todo refactor
-        Member member = getMember(memberId);
-        List<Reservation> reservations = reservationRepository.findAllByMemberAndStatusIs(member, ReservationStatus.ACCEPTED);
-        Map<Long, Payment> reservationPayments = paymentRepository.findAllByReservationIn(reservations)
-                .stream()
-                .collect(Collectors.toMap(Payment::getReservationId, Function.identity()));
-        List<WaitingWithRank> waitingWithRanks = reservationWaitingRepository.findAllWithRankByMember(member);
-
-        return Stream.concat(
-                        reservations.stream().map(r -> PersonalReservationResponse.from(r, reservationPayments.get(r.getId()))),
-                        waitingWithRanks.stream().map(PersonalReservationResponse::from))
-                .sorted(Comparator.comparing(PersonalReservationResponse::date)
-                        .thenComparing(PersonalReservationResponse::time))
-                .toList();
     }
 }

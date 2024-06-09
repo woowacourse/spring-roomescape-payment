@@ -16,7 +16,7 @@ import roomescape.controller.dto.request.WaitingToReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
-import roomescape.service.ReservationService;
+import roomescape.service.ReservationManageService;
 import roomescape.service.ReservationWaitingService;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -27,17 +27,17 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final ReservationService reservationService;
+    private final ReservationManageService reservationManageService;
     private final ReservationWaitingService reservationWaitingService;
 
-    public AdminController(ReservationService reservationService, ReservationWaitingService reservationWaitingService) {
-        this.reservationService = reservationService;
+    public AdminController(ReservationManageService reservationManageService, ReservationWaitingService reservationWaitingService) {
+        this.reservationManageService = reservationManageService;
         this.reservationWaitingService = reservationWaitingService;
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addAdminReservation(@RequestBody @Valid AdminReservationRequest request) {
-        ReservationResponse response = reservationService.addReservationByAdmin(request.toCreateReservationRequest());
+        ReservationResponse response = reservationManageService.addReservationByAdmin(request.toCreateReservationRequest());
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }
