@@ -25,7 +25,7 @@ public abstract class Payment {
         READY, DONE
     }
 
-     Payment(State state) {
+    protected Payment(State state) {
         this.state = state;
     }
 

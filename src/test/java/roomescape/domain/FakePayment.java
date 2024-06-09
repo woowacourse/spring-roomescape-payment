@@ -3,6 +3,7 @@ package roomescape.domain;
 import static roomescape.api.TossPaymentExceptionType.INVALID_REQUEST;
 
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 public class FakePayment implements PaymentClient {
@@ -14,11 +15,11 @@ public class FakePayment implements PaymentClient {
     );
 
     @Override
-    public Payment pay(PaymentRequest paymentRequest) {
+    public PaymentResponse pay(PaymentRequest paymentRequest) {
         if (CORRECT_REQ.paymentKey().equals(paymentRequest.paymentKey())
                 && CORRECT_REQ.orderId().equals(paymentRequest.orderId())
                 && CORRECT_REQ.amount() == paymentRequest.amount()) {
-            return new Payed(paymentRequest.paymentKey(),
+            return new PaymentResponse(paymentRequest.paymentKey(),
                     paymentRequest.orderId(),
                     paymentRequest.amount());
         }

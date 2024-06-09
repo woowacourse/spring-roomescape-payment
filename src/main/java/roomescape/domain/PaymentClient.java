@@ -1,9 +1,10 @@
 package roomescape.domain;
 
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.PaymentResponse;
 import roomescape.exception.PaymentException;
 
 public interface PaymentClient {
 
-    Payment pay(PaymentRequest paymentRequest) throws PaymentException;
+    PaymentResponse pay(PaymentRequest paymentRequest) throws PaymentException;
 }

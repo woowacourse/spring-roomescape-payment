@@ -1,9 +1,11 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.domain.Payed;
 import roomescape.domain.Payment;
 import roomescape.domain.PaymentClient;
 import roomescape.dto.PaymentRequest;
+import roomescape.dto.PaymentResponse;
 import roomescape.repository.PaymentRepository;
 
 @Service
@@ -20,8 +22,11 @@ public class PaymentService {
     }
 
     public Payment pay(long reservationId, PaymentRequest paymentRequest) {
-        Payment payment = paymentClient.pay(paymentRequest);
-        reservationService.pay(reservationId, payment);
-        return paymentRepository.save(payment);
+        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
+        Payment payed = paymentRepository.save(new Payed(paymentResponse.paymentKey(),
+                paymentResponse.orderId(),
+                paymentResponse.totalAmount()));
+        reservationService.pay(reservationId, payed);
+        return payed;
     }
 }
