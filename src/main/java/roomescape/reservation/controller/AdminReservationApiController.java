@@ -13,21 +13,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.MultipleResponses;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
-import roomescape.reservation.service.AdminReservationService;
+import roomescape.reservation.service.ReservationService;
 
 @Tag(name = "관리자용 API", description = "방탈출 관리자용 API 입니다.")
 @RestController
 @RequestMapping("/admin")
 public class AdminReservationApiController {
 
-    private final AdminReservationService adminReservationService;
+    private final ReservationService reservationService;
 
-    public AdminReservationApiController(AdminReservationService adminReservationService) {
-        this.adminReservationService = adminReservationService;
+    public AdminReservationApiController(ReservationService reservationService) {
+        this.reservationService = reservationService;
     }
 
     @Operation(summary = "관리자 예약 추가 API", description = "관리자가 회원의 예약을 추가 합니다.")
@@ -35,7 +36,8 @@ public class AdminReservationApiController {
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody AdminReservationSaveRequest adminReservationSaveRequest
     ) {
-        ReservationResponse reservationResponse = adminReservationService.save(adminReservationSaveRequest);
+        ReservationResponse reservationResponse
+                = reservationService.saveAdminPageReservation(adminReservationSaveRequest, ReservationStatus.SUCCESS);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
@@ -46,7 +48,7 @@ public class AdminReservationApiController {
     public ResponseEntity<MultipleResponses<ReservationResponse>> findAllBySearchCond(
             @Valid @ModelAttribute ReservationSearchConditionRequest reservationSearchConditionRequest
     ) {
-        List<ReservationResponse> reservationResponses = adminReservationService.findAllBySearchCondition(
+        List<ReservationResponse> reservationResponses = reservationService.findAllBySearchCondition(
                 reservationSearchConditionRequest);
 
         return ResponseEntity.ok(new MultipleResponses<>(reservationResponses));
@@ -55,7 +57,7 @@ public class AdminReservationApiController {
     @Operation(summary = "예약 대기 조회 API", description = "대기 상태의 예약들을 조회 합니다.")
     @GetMapping("/reservations/waiting")
     public ResponseEntity<MultipleResponses<ReservationWaitingResponse>> findWaitingReservations() {
-        List<ReservationWaitingResponse> waitingReservations = adminReservationService.findWaitingReservations();
+        List<ReservationWaitingResponse> waitingReservations = reservationService.findWaitingReservations();
 
         return ResponseEntity.ok(new MultipleResponses<>(waitingReservations));
     }

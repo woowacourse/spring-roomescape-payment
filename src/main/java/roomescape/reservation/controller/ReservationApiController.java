@@ -61,7 +61,7 @@ public class ReservationApiController {
             @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        ReservationResponse reservationResponse = reservationService.saveUserPageReservation(userReservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
@@ -73,7 +73,7 @@ public class ReservationApiController {
             @Valid @RequestBody UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.save(userReservationSaveRequest, loginMember, ReservationStatus.WAIT);
+        ReservationResponse reservationResponse = reservationService.saveUserPageReservation(userReservationSaveRequest, loginMember, ReservationStatus.WAIT);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

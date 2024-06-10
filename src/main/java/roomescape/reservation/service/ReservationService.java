@@ -14,9 +14,12 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
+import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationCancelReason;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.ReservationSearchConditionRequest;
+import roomescape.reservation.dto.ReservationWaitingResponse;
 import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -46,7 +49,7 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    public ReservationResponse save(
+    public ReservationResponse saveUserPageReservation(
             UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember,
             ReservationStatus status
@@ -55,8 +58,7 @@ public class ReservationService {
         Theme theme = themeRepository.fetchById(userReservationSaveRequest.themeId());
         Member member = memberRepository.fetchById(loginMember.id());
         Reservation reservation = userReservationSaveRequest.toEntity(member, theme, reservationTime, status);
-        validateReservation(loginMember, reservation);
-
+        validateReservation(loginMember.id(), reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
         if (status.isSuccess()) {
             paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
@@ -65,7 +67,21 @@ public class ReservationService {
         return ReservationResponse.toResponse(savedReservation);
     }
 
-    private void validateReservation(LoginMember loginMember, Reservation reservation) {
+    public ReservationResponse saveAdminPageReservation(
+            AdminReservationSaveRequest adminReservationSaveRequest,
+            ReservationStatus status
+    ) {
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(adminReservationSaveRequest.timeId());
+        Theme theme = themeRepository.fetchById(adminReservationSaveRequest.themeId());
+        Member memberToReservation = memberRepository.fetchById(adminReservationSaveRequest.memberId());
+        Reservation reservation = adminReservationSaveRequest.toEntity(memberToReservation, theme, reservationTime, status);
+        validateReservation(adminReservationSaveRequest.memberId(), reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return ReservationResponse.toResponse(savedReservation);
+    }
+
+    private void validateReservation(Long memberId, Reservation reservation) {
         if (reservation.getStatus().isSuccess()) {
             if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
                     reservation.getTheme(),
@@ -79,7 +95,7 @@ public class ReservationService {
 
         if (reservation.getStatus().isWait()) {
             List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(
-                    loginMember.id(),
+                    memberId,
                     reservation.getTheme(),
                     reservation.getDate(),
                     reservation.getStartAt()
@@ -114,6 +130,28 @@ public class ReservationService {
 
         return reservationRepository.findAllMemberReservationWithPayment(loginMember.id(), LocalDate.now()).stream()
                 .map(reservation -> MemberReservationResponse.toResponse(reservation, waitings.findMemberRank(reservation, loginMember.id())))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> findAllBySearchCondition(ReservationSearchConditionRequest request) {
+        return reservationRepository.findAllByThemeIdAndMemberIdAndDateBetweenOrderByDateAscTimeStartAtAscCreatedAtAsc(
+                        request.themeId(),
+                        request.memberId(),
+                        request.dateFrom(),
+                        request.dateTo()
+                ).stream()
+                .map(ReservationResponse::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationWaitingResponse> findWaitingReservations() {
+        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT,
+                LocalDate.now());
+
+        return waitingReservations.stream()
+                .map(ReservationWaitingResponse::toResponse)
                 .toList();
     }
 
