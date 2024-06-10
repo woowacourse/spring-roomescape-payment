@@ -124,30 +124,5 @@ class TossPaymentClientTest {
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("clientStatusCode", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-//    //    @Disabled
-//    @Test
-//    void 타임아웃시_예외_발생() {
-//        // given
-//
-//        String errorResponse = """
-//                {
-//                  "code": "NOT_FOUND_PAYMENT",
-//                  "message": "존재하지 않는 결제 입니다."
-//                }
-//                """;
-//
-//        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-//                .andRespond(withException(new ResourceAccessException("요청 시간을 초과하였습니다.")).body(errorResponse).contentType(MediaType.APPLICATION_JSON));
-////                .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
-//
-//        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000),
-//                "paymentType");
-//
-//        // when && then
-//        assertThatThrownBy(() -> tossPaymentClient.confirm(paymentRequest))
-//                .isInstanceOf(PaymentException.class)
-//                .hasMessage("요청 시간을 초과하였습니다.");
-//    }
 }
 
