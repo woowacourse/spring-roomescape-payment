@@ -58,8 +58,8 @@ asciidoctor {
 }
 
 bootJar {
-    dependsOn asciidoctor // (1)
-    from("${asciidoctor.outputDir}") { // (2)
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
         into 'static/docs'
     }
 }
