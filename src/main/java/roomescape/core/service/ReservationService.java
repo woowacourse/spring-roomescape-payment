@@ -137,33 +137,24 @@ public class ReservationService {
 
     private MyReservationResponse getMyReservationResponseWithPayment(final Reservation reservation,
                                                                       final PaymentResponse paymentResponse) {
-        if (reservation.getStatus().equals(Status.BOOKED)) {
-            return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
-                    reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                    reservation.getStatus().getValue(), paymentResponse.getPaymentKey(), paymentResponse.getAmount());
+        if (reservation.isBooked()) {
+            return MyReservationResponse.ofReservation(reservation, paymentResponse.getPaymentKey(),
+                    paymentResponse.getAmount());
         }
-        return MyReservationResponse.ofReservationWaiting(reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                reservation.getStatus().getValue(), paymentResponse.getPaymentKey(),
-                paymentResponse.getAmount(), findRankByCreateAt(reservation));
-    }
-
-    private MyReservationResponse getReservationResponseWithoutPayment(Reservation reservation) {
-        if (reservation.getStatus().equals(Status.BOOKED)) {
-            return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
-                    reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                    reservation.getStatus().getValue(), "NOT_PAID", 0L);
-        }
-        return MyReservationResponse.ofReservationWaiting(reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                reservation.getStatus().getValue(), "NOT_PAID", 0L, findRankByCreateAt(reservation));
+        return MyReservationResponse.ofReservationWaiting(reservation, findRankByCreateAt(reservation),
+                paymentResponse.getPaymentKey(), paymentResponse.getAmount());
     }
 
     private Integer findRankByCreateAt(final Reservation reservation) {
         return reservationRepository.countByCreateAtRank(reservation.getDate(), reservation.getReservationTime(),
                 reservation.getTheme(), reservation.getCreateAt());
+    }
+
+    private MyReservationResponse getReservationResponseWithoutPayment(Reservation reservation) {
+        if (reservation.isBooked()) {
+            return MyReservationResponse.ofReservation(reservation);
+        }
+        return MyReservationResponse.ofReservationWaiting(reservation, findRankByCreateAt(reservation));
     }
 
     @Transactional
