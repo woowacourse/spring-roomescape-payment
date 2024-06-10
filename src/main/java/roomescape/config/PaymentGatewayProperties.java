@@ -5,7 +5,6 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Set;
 
 @ConfigurationProperties(prefix = "payment")
 public class PaymentGatewayProperties {
@@ -13,10 +12,6 @@ public class PaymentGatewayProperties {
 
     public PaymentGatewayProperties(Map<String, Gateway> gateways) {
         this.gateways = gateways;
-    }
-
-    public Set<Map.Entry<String, Gateway>> getGateways() {
-        return gateways.entrySet();
     }
 
     public Gateway getGateway(String gatewayName) {
