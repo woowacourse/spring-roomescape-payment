@@ -74,7 +74,7 @@ class PaymentServiceTest {
         ReservationTime time = reservationTimeRepository.save(VALID_RESERVATION_TIME);
         String date = LocalDate.now().plusMonths(1).toString();
         Reservation reservation = reservationRepository.save(new Reservation(member, new ReservationDate(date), time, theme));
-        paymentRepository.save(new Payment(reservation, "paymentKey", "orderId", theme.getPrice()));
+        paymentRepository.save(new Payment(reservation, "paymentKey", "orderId"));
         PaymentSaveDto paymentSaveDto = new PaymentSaveDto(member.getId(), reservation.getId(), "paymentKey", "orderId", theme.getPrice());
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "orderId", theme.getPrice());
         when(paymentManager.approve(paymentApproveDto))

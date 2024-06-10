@@ -52,10 +52,18 @@ public class ReservationService {
     @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         Reservation reservation = saveReservation(reservationSaveDto);
+        validatePaymentAmount(reservation, paymentApproveDto.amount());
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
         savePayment(reservation, paymentDto);
 
         return new ReservationDto(reservation);
+    }
+
+    private void validatePaymentAmount(Reservation reservation, Long amount) {
+        boolean isValidAmount = reservation.isPriceEqual(amount);
+        if (!isValidAmount) {
+            throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
+        }
     }
 
     private Reservation saveReservation(ReservationSaveDto reservationSaveDto) {
@@ -71,7 +79,7 @@ public class ReservationService {
     }
 
     private void savePayment(Reservation reservation, PaymentDto paymentDto) {
-        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
+        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId());
         Payment savedPayment = savePayment(payment);
         reservation.setPayment(savedPayment);
     }

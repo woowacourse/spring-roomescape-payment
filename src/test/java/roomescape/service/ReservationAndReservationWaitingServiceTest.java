@@ -76,7 +76,7 @@ class ReservationAndReservationWaitingServiceTest {
     @DisplayName("결제가 있는 예약 삭제 시 결제도 함께 삭제한다.")
     void deleteReservationAndPayment() {
         Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
-        Payment payment = paymentRepository.save(new Payment(reservation, "paymentKey", "orderId", 1000L));
+        Payment payment = paymentRepository.save(new Payment(reservation, "paymentKey", "orderId"));
         doNothing().when(paymentManager).cancel(payment.getPaymentKey(), new PaymentCancelDto("cancel"));
 
         reservationAndWaitingService.deleteReservation(reservation.getId());

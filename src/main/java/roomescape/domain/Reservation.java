@@ -108,6 +108,10 @@ public class Reservation {
         return payment;
     }
 
+    public Long getPrice() {
+        return theme.getPrice();
+    }
+
     public void setPayment(Payment payment) {
         if (payment == null) {
             throw new IllegalArgumentException("Payment가 비어 있습니다.");

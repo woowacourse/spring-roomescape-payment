@@ -39,7 +39,7 @@ public class PaymentService {
 
     private Payment approveAndSavePayment(PaymentApproveDto paymentApproveDto, Reservation reservation) {
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
+        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId());
 
         return savePayment(payment);
     }
