@@ -63,9 +63,16 @@ function render(data) {
     const theme = item.theme;
     const date = item.date;
     const time = item.time;
-    const status = item.reservationStatus.status === '예약'
-        ? item.reservationStatus.status
-        : (item.reservationStatus.rank + '번째 ' + item.reservationStatus.status);
+    let status = '';
+
+    if (item.reservationStatus.status === '예약') {
+      status = item.reservationStatus.status;
+    } else if (item.reservationStatus.rank !== 0) {
+      status = item.reservationStatus.rank + '번째 '
+          + item.reservationStatus.status
+    } else {
+      status = '결제 가능';
+    }
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
@@ -85,7 +92,7 @@ function render(data) {
             () => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
-      if (item.reservationStatus.rank === 1) {
+      if (item.reservationStatus.rank === 0) {
         const paymentCell = row.insertCell(5);
         const paymentButton = document.createElement('button');
         paymentButton.textContent = '결제';
