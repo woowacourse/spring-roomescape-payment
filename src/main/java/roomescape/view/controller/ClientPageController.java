@@ -21,6 +21,6 @@ public class ClientPageController {
     @LoginRequired
     @GetMapping("/reservation-mine")
     public String showReservationMinePage() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }
