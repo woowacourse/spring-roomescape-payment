@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -14,6 +16,7 @@ import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "관리자 예약 API", description = "관리자 예약 관련 API")
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
@@ -23,6 +26,7 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
+    @Operation(summary = "관리자 예약 생성 API")
     @PostMapping
     public ResponseEntity<CreateReservationResponse> createReservationByAdmin(
             @Valid @RequestBody CreateReservationByAdminRequest createReservationByAdminRequest) {
@@ -31,6 +35,7 @@ public class AdminReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + createReservationResponse.id())).body(createReservationResponse);
     }
 
+    @Operation(summary = "관리자 예약 조회 API")
     @GetMapping
     public ResponseEntity<List<FindAdminReservationResponse>> getReservationsByAdmin() {
         return ResponseEntity.ok(reservationService.getReservations());

@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -22,6 +24,7 @@ import roomescape.reservation.dto.response.FindReservationResponse;
 import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "예약 API", description = "예약 관련 API")
 @RestController
 @RequestMapping
 public class ReservationController {
@@ -32,6 +35,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @Operation(summary = "예약 생성 API")
     @PostMapping("/reservations")
     public ResponseEntity<CreateReservationResponse> createReservation(
             @AuthenticationPrincipal AuthInfo authInfo,
@@ -42,17 +46,20 @@ public class ReservationController {
                 .body(createReservationResponse);
     }
 
+    @Operation(summary = "예약 조회 API")
     @GetMapping("/reservations/{id}")
     public ResponseEntity<FindReservationResponse> getReservation(@PathVariable final Long id) {
         return ResponseEntity.ok(reservationService.getReservation(id));
     }
 
+    @Operation(summary = "예약 시간 조회 API")
     @GetMapping("/reservations/times")
     public ResponseEntity<List<FindAvailableTimesResponse>> getAvailableTimes(@RequestParam LocalDate date,
                                                                               @RequestParam Long themeId) {
         return ResponseEntity.ok(reservationService.getAvailableTimes(date, themeId));
     }
 
+    @Operation(summary = "예약 검색 API")
     @GetMapping("/reservations/search")
     public ResponseEntity<List<FindReservationResponse>> searchBy(@RequestParam(required = false) Long themeId,
                                                                   @RequestParam(required = false) Long memberId,
@@ -61,6 +68,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.searchBy(themeId, memberId, dateFrom, dateTo));
     }
 
+    @Operation(summary = "예약 삭제 API")
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> cancelReservation(@AuthenticationPrincipal AuthInfo authInfo,
                                                   @PathVariable Long id) {
@@ -68,6 +76,7 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "사용자 예약 목록 조회 API")
     @GetMapping("/members/reservations")
     public ResponseEntity<List<FindReservationWithPaymentResponse>> getReservations(
             @AuthenticationPrincipal AuthInfo authInfo) {

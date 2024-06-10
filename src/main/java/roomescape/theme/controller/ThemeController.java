@@ -1,5 +1,7 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -19,6 +21,7 @@ import roomescape.theme.dto.response.FindPopularThemesResponse;
 import roomescape.theme.dto.response.FindThemeResponse;
 import roomescape.theme.service.ThemeService;
 
+@Tag(name = "테마 API", description = "테마 관련 API")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
@@ -29,22 +32,26 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "테마 생성 API")
     @PostMapping
     public ResponseEntity<CreateThemeResponse> createTheme(@Valid @RequestBody CreateThemeRequest createThemeRequest) {
         CreateThemeResponse createThemeResponse = themeService.createTheme(createThemeRequest);
         return ResponseEntity.created(URI.create("/themes/" + createThemeResponse.id())).body(createThemeResponse);
     }
 
+    @Operation(summary = "테마 목록 조회 API")
     @GetMapping
     public ResponseEntity<List<FindThemeResponse>> getThemes() {
          return ResponseEntity.ok(themeService.getThemes());
     }
 
+    @Operation(summary = "인기 테마 조회 API")
     @GetMapping("/popular")
     public ResponseEntity<List<FindPopularThemesResponse>> getPopularThemes(@PageableDefault Pageable pageable) {
         return ResponseEntity.ok(themeService.getPopularThemes(pageable));
     }
 
+    @Operation(summary = "테마 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable Long id) {
         themeService.deleteById(id);
