@@ -93,22 +93,6 @@ public class Reservation extends BaseEntity implements Comparable<Reservation> {
         return duration.contains(date);
     }
 
-    public boolean hasSameId(long id) {
-        return this.id == id;
-    }
-
-    public boolean isReservationTimeOf(long id) {
-        return this.time.isIdOf(id);
-    }
-
-    public boolean isDateOf(LocalDate date) {
-        return this.date.equals(date);
-    }
-
-    public boolean isThemeOf(long id) {
-        return this.theme.isIdOf(id);
-    }
-
     public boolean isSameReservation(Reservation beforeSave) {
         return this.getLocalDateTime().equals(beforeSave.getLocalDateTime())
                 && this.isSameTheme(beforeSave);
