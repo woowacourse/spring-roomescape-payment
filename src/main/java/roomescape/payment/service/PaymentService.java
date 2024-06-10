@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.PaymentSaveFailureException;
 import roomescape.payment.controller.dto.response.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
@@ -11,7 +12,6 @@ import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
 
 @Service
-@Transactional(readOnly = true)
 public class PaymentService {
 
     private final TossPaymentClient tossPaymentClient;
@@ -22,7 +22,6 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Transactional
     public Payment confirm(PaymentConfirmRequest confirmRequest, Reservation reservation) {
         PaymentConfirmResponse confirmResponse = tossPaymentClient.confirmPayment(confirmRequest);
         Payment payment = new Payment(
@@ -31,8 +30,11 @@ public class PaymentService {
                 confirmResponse.totalAmount(),
                 reservation
         );
-
-        return paymentRepository.save(payment);
+        try {
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            throw new PaymentSaveFailureException(e.getMessage());
+        }
     }
 
     @Transactional
@@ -40,6 +42,7 @@ public class PaymentService {
         paymentRepository.deleteByReservationId(reservationId);
     }
 
+    @Transactional(readOnly = true)
     public List<PaymentResponse> findAll() {
         return paymentRepository.findAll()
                 .stream()
