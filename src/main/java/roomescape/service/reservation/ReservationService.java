@@ -17,6 +17,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
+import roomescape.exception.reservation.NonRemovableStatusReservationException;
 import roomescape.exception.reservation.ReservationAuthorityNotExistException;
 import roomescape.service.payment.PaymentService;
 import roomescape.service.payment.dto.PaymentConfirmInput;
@@ -112,17 +113,6 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
-    public ReservationResponse payReservation(
-            Long reservationId, PaymentConfirmInput paymentConfirmInput, Member member) {
-        Reservation reservation = reservationRepository.findByIdAndMember(reservationId, member)
-                .orElseThrow(ReservationAuthorityNotExistException::new);
-        reservation.changeStatusToBooked();
-
-        paymentService.confirmPayment(paymentConfirmInput, reservation);
-
-        return new ReservationResponse(reservation);
-    }
-
     public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
         return new ReservationResponse(savedReservation);
@@ -136,6 +126,17 @@ public class ReservationService {
         validateDateTimeReservation(reservation);
 
         return reservationRepository.save(reservation);
+    }
+
+    public ReservationResponse payReservation(
+            Long reservationId, PaymentConfirmInput paymentConfirmInput, Member member) {
+        Reservation reservation = reservationRepository.findByIdAndMember(reservationId, member)
+                .orElseThrow(ReservationAuthorityNotExistException::new);
+        reservation.changeStatusToBooked();
+
+        paymentService.confirmPayment(paymentConfirmInput, reservation);
+
+        return new ReservationResponse(reservation);
     }
 
     private void validateDuplicateReservation(Reservation reservation) {
@@ -152,7 +153,7 @@ public class ReservationService {
 
     public void cancelReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
-        validateReservationMember(reservation, member);
+        validateReservationAuthority(reservation, member);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
                 waiting -> updateWaitingToReservationAndDeleteWaiting(reservation, waiting),
@@ -163,7 +164,8 @@ public class ReservationService {
 
     public void deleteReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
-        validateReservationMember(reservation, member);
+        validateReservationStatusForDelete(reservation);
+        validateReservationAuthority(reservation, member);
 
         if (!reservation.isPaymentWaitingStatus()) {
             paymentService.deleteReservationPayment(reservation);
@@ -171,7 +173,13 @@ public class ReservationService {
         reservationRepository.delete(reservation);
     }
 
-    private void validateReservationMember(Reservation reservation, Member member) {
+    private void validateReservationStatusForDelete(Reservation reservation) {
+        if (!reservation.isCancelStatus() || !reservation.isPaymentWaitingStatus()) {
+            throw new NonRemovableStatusReservationException();
+        }
+    }
+
+    private void validateReservationAuthority(Reservation reservation, Member member) {
         if (member.isAdmin()) {
             return;
         }

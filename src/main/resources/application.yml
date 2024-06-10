@@ -23,3 +23,7 @@ payment:
   base-url: https://api.tosspayments.com/v1/payments
   confirm-endpoint: /confirm
   cancel-endpoint: /%s/cancel
+
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html

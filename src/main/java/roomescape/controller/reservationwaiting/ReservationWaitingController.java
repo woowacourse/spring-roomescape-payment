@@ -1,5 +1,7 @@
 package roomescape.controller.reservationwaiting;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +21,7 @@ import roomescape.service.reservationwaiting.dto.ReservationWaitingResponse;
 
 import java.net.URI;
 
+@Tag(name = "Reservation Waiting")
 @RestController
 public class ReservationWaitingController {
     private final ReservationWaitingService reservationWaitingService;
@@ -29,6 +32,7 @@ public class ReservationWaitingController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @GetMapping("/reservations/waitings")
+    @Operation(summary = "[관리자] 전체 예약 대기 정보 조회", description = "모든 예약 대기 정보를 조회한다.")
     public ResponseEntity<ReservationWaitingListResponse> findAllReservationWaiting() {
         ReservationWaitingListResponse response = reservationWaitingService.findAllReservationWaiting();
         return ResponseEntity.ok().body(response);
@@ -36,6 +40,7 @@ public class ReservationWaitingController {
 
     @RoleAllowed
     @PostMapping("/reservations/waitings")
+    @Operation(summary = "[회원] 예약 대기 추가", description = "예약 대기를 수행한다.")
     public ResponseEntity<ReservationWaitingResponse> saveReservationWaiting(
             @RequestBody ReservationWaitingRequest request, @LoginMember Member member) {
         ReservationWaitingResponse response = reservationWaitingService.saveReservationWaiting(request, member);
@@ -44,6 +49,7 @@ public class ReservationWaitingController {
 
     @RoleAllowed
     @DeleteMapping("/reservations/{reservationId}/waitings")
+    @Operation(summary = "[회원] 예약 대기 삭제", description = "자신의 예약 대기를 삭제한다.")
     public ResponseEntity<Void> deleteReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
             @LoginMember Member member) {
@@ -51,8 +57,10 @@ public class ReservationWaitingController {
         return ResponseEntity.noContent().build();
     }
 
+    // TODO: deleteReservation 과 하나로 통합
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/admin/reservations/waitings/{waitingId}")
+    @Operation(summary = "[관리자] 예약 대기 삭제", description = "예약 대기를 삭제한다.")
     public ResponseEntity<Void> deleteAdminReservation(
             @PathVariable @NotNull(message = "waitingId 값이 null일 수 없습니다.") Long waitingId) {
         reservationWaitingService.deleteAdminReservationWaiting(waitingId);
