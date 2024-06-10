@@ -41,7 +41,7 @@ import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.ReservationTimeRepository;
 import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
-import roomescape.support.fake.FakePayment;
+import roomescape.support.mock.FakePayment;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,

@@ -1,4 +1,4 @@
-package roomescape.support.fake;
+package roomescape.support.mock;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

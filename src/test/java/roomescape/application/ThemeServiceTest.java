@@ -38,7 +38,7 @@ import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.ReservationTimeRepository;
 import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
-import roomescape.support.fake.FakeRankingPolicy;
+import roomescape.support.mock.FakeRankingPolicy;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,
