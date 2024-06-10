@@ -2,6 +2,8 @@ package roomescape.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ public class ConfigPropertiesTest {
         assertThat(tossPaymentConfigProperties.secret()).isEqualTo("test");
         assertThat(tossPaymentConfigProperties.baseUri()).isEqualTo("http://localhost");
         assertThat(tossPaymentConfigProperties.confirmUri()).isEqualTo("/confirm");
-        assertThat(tossPaymentConfigProperties.connectTimeout()).isEqualTo(30);
-        assertThat(tossPaymentConfigProperties.readTimeout()).isEqualTo(30);
+        assertThat(tossPaymentConfigProperties.connectTimeout()).isEqualTo(Duration.ofSeconds(30));
+        assertThat(tossPaymentConfigProperties.readTimeout()).isEqualTo(Duration.ofSeconds(30));
     }
 }

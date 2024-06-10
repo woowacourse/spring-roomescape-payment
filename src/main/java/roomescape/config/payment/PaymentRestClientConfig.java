@@ -1,7 +1,6 @@
 package roomescape.config.payment;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
@@ -43,8 +42,8 @@ public class PaymentRestClientConfig {
 
     private ClientHttpRequestFactory tossRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofSeconds(tossProperties.connectTimeout()));
-        factory.setReadTimeout(Duration.ofSeconds(tossProperties.readTimeout()));
+        factory.setConnectTimeout(tossProperties.connectTimeout());
+        factory.setReadTimeout(tossProperties.readTimeout());
         return factory;
     }
 

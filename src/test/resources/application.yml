@@ -1,25 +1,30 @@
 spring:
+  datasource:
+    url: jdbc:h2:mem:database
   h2:
     console:
       enabled: true
       path: /h2-console
-  datasource:
-    url: jdbc:h2:mem:database
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
-    defer-datasource-initialization: true
+    show-sql: true
 
-security:
-  jwt:
-    token:
-      secret-key: pumExiFixehC65FymaHwN/FDue8U48AO
-      expire-length: 3600000
+roomescape:
+  payment:
+    confirm-uri: &confirm-uri /confirm
+  rest-client:
+    connect-timeout: &connect-timeout 30s
+    read-timeout: &read-timeout 30s
+  security:
+    expiration: 3600s
+    secret: pumExiFixehC65FymaHwN/FDue8U48AO
 
 payment:
   toss:
-    secret: test
     base-uri: http://localhost
-    confirm-uri: /confirm
-    connect-timeout: 30
-    read-timeout: 30
+    confirm-uri: *confirm-uri
+    connect-timeout: *connect-timeout
+    read-timeout: *read-timeout
+    secret: test

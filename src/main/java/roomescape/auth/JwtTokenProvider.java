@@ -1,6 +1,8 @@
 package roomescape.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -14,15 +16,23 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${security.jwt.token.secret-key}")
+    @Value("${roomescape.security.secret}")
     private String secretKey;
 
-    @Value("${security.jwt.token.expire-length}")
-    private long validityInMilliseconds;
+    @Value("${roomescape.security.expiration}")
+    private Duration expiration;
+
+    protected JwtTokenProvider() {}
+
+    public JwtTokenProvider(String secretKey, Duration expiration) {
+        this.secretKey = secretKey;
+        this.expiration = expiration;
+    }
 
     public String createToken(final long memberId) {
-        final Date now = new Date();
-        final Date expiration = new Date(now.getTime() + validityInMilliseconds);
+        final Instant now = Instant.now();
+        final Instant after = now.plus(expiration);
+        final Date expiration = Date.from(after);
         return Jwts.builder()
                 .subject(String.valueOf(memberId))
                 .expiration(expiration)
