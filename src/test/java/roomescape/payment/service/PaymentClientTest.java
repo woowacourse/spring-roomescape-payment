@@ -79,6 +79,52 @@ class PaymentClientTest {
                 .isInstanceOf(PaymentUnauthorizedException.class);
     }
 
+    @DisplayName("환불되었을 경우 정상 처리한다.")
+    @Test
+    void refundPaymentTest() {
+        String paymentKey = "testPaymentKey";
+        mockRestServiceServer.expect(requestTo("/testPaymentKey/cancel"))
+                .andRespond(withSuccess());
+
+        assertThatCode(() -> paymentClient.refundPayment(paymentKey)).doesNotThrowAnyException();
+    }
+
+    @DisplayName("환불 오류가 발생한 경우 예외를 던진다.")
+    @Test
+    void refundPaymentTest_whenNotConfirmed() {
+        String paymentKey = "testPaymentKey";
+        String errorResponse = """
+                {
+                  "code": "NOT_FOUND_PAYMENT",
+                  "message": "존재하지 않는 결제 입니다."
+                }
+                """;
+
+        mockRestServiceServer.expect(requestTo("/testPaymentKey/cancel"))
+                .andRespond(withBadRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
+
+        assertThatThrownBy(() -> paymentClient.refundPayment(paymentKey))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("존재하지 않는 결제 입니다.");
+    }
+
+    @DisplayName("환불시 인증오류 발생한 경우 예외를 던진다.")
+    @Test
+    void refundPaymentTest_whenUnauthorized() {
+        String paymentKey = "testPaymentKey";
+        String errorResponse = """
+                {
+                  "code": "UNAUTHORIZED_KEY",
+                  "message": "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."
+                }
+                """;
+        mockRestServiceServer.expect(requestTo("/testPaymentKey/cancel"))
+                .andRespond(withUnauthorizedRequest().body(errorResponse).contentType(MediaType.APPLICATION_JSON));
+
+        assertThatThrownBy(() -> paymentClient.refundPayment(paymentKey))
+                .isInstanceOf(PaymentUnauthorizedException.class);
+    }
+
     @TestConfiguration
     static class TestConfig {
         @Bean

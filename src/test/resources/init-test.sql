@@ -74,3 +74,6 @@ INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (5, 4, '2024-05-18 09:00:00.000');
 INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (5, 5, '2024-05-19 09:00:00.000');
+
+INSERT INTO payment (member_id, schedule_id, payment_key, amount, status)
+VALUES (2, 5, 'test_key', 1000.00, 'PAID');
