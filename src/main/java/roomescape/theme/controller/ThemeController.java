@@ -1,5 +1,6 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import roomescape.theme.dto.ThemeCreateRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 
+@Tag(name = "테마 API", description = "테마 API 입니다.")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {

@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "관리자 API", description = "관리자 예약 API 입니다.")
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {

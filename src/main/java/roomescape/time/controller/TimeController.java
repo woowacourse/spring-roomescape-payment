@@ -1,6 +1,7 @@
 package roomescape.time.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,7 @@ import roomescape.time.dto.TimeCreateRequest;
 import roomescape.time.dto.TimeResponse;
 import roomescape.time.service.TimeService;
 
+@Tag(name = "시간 API", description = "예약 시간 API 입니다.")
 @RestController
 @RequestMapping("/times")
 public class TimeController {

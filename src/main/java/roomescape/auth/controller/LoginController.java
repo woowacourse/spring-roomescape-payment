@@ -1,5 +1,6 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.dto.LoginResponse;
 import roomescape.auth.service.AuthService;
 
+@Tag(name = "유저 API", description = "유저 로그 API 입니다.")
 @RestController
 public class LoginController {
 
