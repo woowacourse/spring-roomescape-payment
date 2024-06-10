@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminPageController {
     @GetMapping
     public String loadAdminPage() {
-        return "/admin/index";
+        return "admin/index";
     }
 
     @GetMapping("/reservation")
     public String loadReservationPage() {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @GetMapping("/waiting")
     public String loadWaitingPage() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 
     @GetMapping("/time")
