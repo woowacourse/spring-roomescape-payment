@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.common.exception.PaymentException;
+import roomescape.common.exception.TossPaymentException;
 import roomescape.payment.config.PaymentConfig;
 import roomescape.payment.service.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
@@ -81,7 +81,7 @@ class TossPaymentClientTest {
                 .andRespond(withBadRequest().body(objectMapper.writeValueAsString(expectedResponse)));
 
         assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentException.class);
+                .isInstanceOf(TossPaymentException.class);
         mockServer.verify();
     }
 }

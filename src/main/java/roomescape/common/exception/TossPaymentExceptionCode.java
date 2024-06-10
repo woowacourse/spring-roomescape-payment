@@ -3,7 +3,7 @@ package roomescape.common.exception;
 import java.util.Arrays;
 import org.springframework.http.HttpStatus;
 
-public enum PaymentExceptionCode {
+public enum TossPaymentExceptionCode {
     ALREADY_PROCESSED_PAYMENT(org.springframework.http.HttpStatus.BAD_REQUEST, "이미 처리된 결제 입니다."),
     EXCEED_MAX_CARD_INSTALLMENT_PLAN(HttpStatus.BAD_REQUEST, "설정 가능한 최대 할부 개월 수를 초과했습니다."),
     NOT_ALLOWED_POINT_USE(HttpStatus.BAD_REQUEST, "포인트 사용이 불가한 카드로 카드 포인트 결제에 실패했습니다."),
@@ -33,14 +33,14 @@ public enum PaymentExceptionCode {
     private final HttpStatus httpStatus;
     private final String message;
 
-    PaymentExceptionCode(HttpStatus httpStatus, String message) {
+    TossPaymentExceptionCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public static PaymentExceptionCode from(String code) {
+    public static TossPaymentExceptionCode from(String code) {
         return Arrays.stream(values())
-                .filter(paymentExceptionCode -> paymentExceptionCode.name().equals(code))
+                .filter(tossPaymentExceptionCode -> tossPaymentExceptionCode.name().equals(code))
                 .findFirst()
                 .orElse(INTERNAL_SERVER_ERROR);
     }

@@ -2,11 +2,11 @@ package roomescape.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class PaymentException extends RuntimeException {
+public class TossPaymentException extends RuntimeException {
 
     private final HttpStatus status;
 
-    public PaymentException(PaymentExceptionCode exceptionCode) {
+    public TossPaymentException(TossPaymentExceptionCode exceptionCode) {
         super(exceptionCode.getMessage());
         status = exceptionCode.getHttpStatus();
     }

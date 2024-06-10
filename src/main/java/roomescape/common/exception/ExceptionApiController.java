@@ -45,11 +45,18 @@ public class ExceptionApiController {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ProblemDetail> paymentExceptionHandler(PaymentException exception) {
+    @ExceptionHandler(TossPaymentException.class)
+    public ResponseEntity<ProblemDetail> tossPaymentExceptionHandler(TossPaymentException exception) {
         log.error("[PaymentException]", exception);
 
         return createErrorResponse(exception.getStatus(), exception.getMessage());
+    }
+
+    @ExceptionHandler(PaymentSaveFailureException.class)
+    public ResponseEntity<ProblemDetail> paymentSaveFailureExceptionHandler(PaymentSaveFailureException exception) {
+        log.error("[PaymentSaveFailureException]", exception);
+
+        return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러입니다.");
     }
 
     @ExceptionHandler(Exception.class)

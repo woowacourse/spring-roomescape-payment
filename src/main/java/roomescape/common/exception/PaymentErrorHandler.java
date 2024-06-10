@@ -23,8 +23,8 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
         log.error("토스 결제 중 에러 발생 : {}", errorResponse);
-        PaymentExceptionCode translatedExceptionCode = PaymentExceptionCode.from(errorResponse.code());
+        TossPaymentExceptionCode translatedExceptionCode = TossPaymentExceptionCode.from(errorResponse.code());
 
-        throw new PaymentException(translatedExceptionCode);
+        throw new TossPaymentException(translatedExceptionCode);
     }
 }
