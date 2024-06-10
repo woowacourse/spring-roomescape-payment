@@ -1,0 +1,222 @@
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Member API
+
+=== 로그인
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/login/http-request.adoc[]
+include::{snippets}/member-rest-docs-test/login/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/login/http-response.adoc[]
+
+=== 로그인한 회원 정보 조회
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/my-info/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/my-info/http-response.adoc[]
+include::{snippets}/member-rest-docs-test/my-info/response-fields.adoc[]
+
+=== 전체 회원 조회
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/all-members/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/all-members/http-response.adoc[]
+include::{snippets}/member-rest-docs-test/all-members/response-fields.adoc[]
+
+== Reservation API
+
+=== 예약 등록
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/save-reservation/http-request.adoc[]
+include::{snippets}/reservation-rest-docs-test/save-reservation/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/save-reservation/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/save-reservation/response-fields.adoc[]
+
+=== 전체 예약 조회
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/response-fields.adoc[]
+
+=== 내 예약 조회
+
+==== Reqeust
+
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/response-fields.adoc[]
+
+=== 예약 삭제
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/reservation-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/delete/http-response.adoc[]
+
+== Theme API
+
+=== 테마 등록
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/save/http-request.adoc[]
+include::{snippets}/theme-rest-docs-test/save/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/save/http-response.adoc[]
+include::{snippets}/theme-rest-docs-test/save/response-fields.adoc[]
+
+=== 인기 테마 조회
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/http-response.adoc[]
+include::{snippets}/theme-rest-docs-test/find-and-order-by-popularity/response-fields.adoc[]
+
+=== 테마 삭제
+
+==== Request
+
+include::{snippets}/theme-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/theme-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/theme-rest-docs-test/delete/http-response.adoc[]
+
+== Time API
+
+=== 시간 등록
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/save/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/save/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/save/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/save/response-fields.adoc[]
+
+=== 전체 시간 조회
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/find-all/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/find-all/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-all/response-fields.adoc[]
+
+=== 예약 가능 시간 조회 (날짜 및 테마 id 기준)
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/response-fields.adoc[]
+
+=== 시간 삭제
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/delete/http-response.adoc[]
+
+== Payment API
+
+=== 결제 승인
+
+==== Request
+
+include::{snippets}/payment-rest-docs-test/save-payment/http-request.adoc[]
+include::{snippets}/payment-rest-docs-test/save-payment/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/payment-rest-docs-test/save-payment/http-response.adoc[]
+include::{snippets}/payment-rest-docs-test/save-payment/response-fields.adoc[]
+
+== Admin API
+
+=== 관리자 예약 등록
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/save-reservation/http-request.adoc[]
+include::{snippets}/admin-rest-docs-test/save-reservation/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/save-reservation/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/save-reservation/response-fields.adoc[]
+
+=== 예약 검색
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/search/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/search/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/search/response-fields.adoc[]
+
+=== 대기 예약 검색
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/response-fields.adoc[]

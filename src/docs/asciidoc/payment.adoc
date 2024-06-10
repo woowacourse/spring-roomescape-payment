@@ -1,10 +1,3 @@
-= API Document
-:doctype: book
-:icons: font
-:source-highlighter: highlightjs
-:toc: left
-:toclevels: 2
-
 == Payment API
 
 === 결제 승인
