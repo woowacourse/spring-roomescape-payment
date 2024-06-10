@@ -1,6 +1,8 @@
 package roomescape.registration.domain.reservation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import roomescape.payment.domain.Payment;
+import roomescape.registration.domain.reservation.domain.Reservation;
 
 import java.time.LocalDate;
 
@@ -27,4 +29,8 @@ public record ReservationRequest(
 
         @Schema(description = "결제 금액", example = "55000")
         Integer amount) {
+
+        public Payment toPayment(Reservation reservation) {
+                return new Payment(paymentKey, orderId, reservation);
+        }
 }

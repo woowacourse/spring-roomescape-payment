@@ -2,6 +2,7 @@ package roomescape.payment.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.TossPaymentClient;
 import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
 import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
@@ -26,13 +27,14 @@ public class PaymentService {
         this.tossPaymentClient = tossPaymentClient;
     }
 
+    @Transactional
     public void sendConfirmRequestAndSavePayment(ReservationRequest reservationRequest, Reservation reservation) {
+        Payment payment = reservationRequest.toPayment(reservation);
+        paymentRepository.save(payment);
+
         PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
         PaymentConfirmationFromTossDto paymentConfirmationFromTossDto = tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto);
         validateConfirmationStatus(paymentConfirmationFromTossDto);
-        Payment payment = paymentConfirmationFromTossDto.toPayment(reservation);
-
-        paymentRepository.save(payment);
     }
 
     private void validateConfirmationStatus(PaymentConfirmationFromTossDto paymentConfirmationFromTossDto) {
