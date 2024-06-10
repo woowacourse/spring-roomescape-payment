@@ -28,7 +28,5 @@ public class FakePaymentClient implements PaymentClient {
         if (payment.getPaymentKey().equals(INVALID_PAYMENT_KEY)) {
             throw new PaymentClientException("잘못된 요청입니다");
         }
-
-        // do nothing
     }
 }
