@@ -9,7 +9,6 @@ echo "\\n==== Start Deploy ====\\n"
 
 echo "${GREEN}> Git Pull${ENDCOLOR}"
 
-cd $PROJECT_NAME
 git pull origin step2
 
 echo "${GREEN}> Build Project${ENDCOLOR}"
