@@ -20,17 +20,13 @@ public record ReservationDetailResponse(
 
     public static ReservationDetailResponse from(Waiting waiting) {
         Reservation reservation = waiting.getReservation();
-        return new ReservationDetailResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getReservationTime().getStartAt(),
-                String.format(getStatusName(reservation.getStatus()), waiting.getRank()),
-                null,
-                null);
+        return toReservationDetailResponse(reservation, String.format(getStatusName(reservation.getStatus()), waiting.getRank()));
     }
 
     public static ReservationDetailResponse of(Reservation reservation, Payment payment) {
+        if (reservation.isWaitingForPaymentStatus()) {
+            return toReservationDetailResponse(reservation, getStatusName(reservation.getStatus()));
+        }
         return new ReservationDetailResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
@@ -41,10 +37,22 @@ public record ReservationDetailResponse(
                 payment.getTotalAmount());
     }
 
+    private static ReservationDetailResponse toReservationDetailResponse(Reservation reservation, String status) {
+        return new ReservationDetailResponse(
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getReservationTime().getStartAt(),
+                status,
+                null,
+                null);
+    }
+
     private static String getStatusName(ReservationStatus status) {
         return switch (status) {
             case BOOKED -> "예약";
             case WAITING -> "%d번째 예약대기";
+            case WAITING_FOR_PAYMENT -> "결제 대기";
         };
     }
 }

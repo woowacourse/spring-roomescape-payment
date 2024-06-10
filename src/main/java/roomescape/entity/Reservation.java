@@ -118,8 +118,12 @@ public class Reservation extends BaseEntity implements Comparable<Reservation> {
         return this.theme.equals(reservation.theme);
     }
 
+    public boolean isWaitingForPaymentStatus() {
+        return status.isWaitingForPayment();
+    }
+
     public void confirm() {
-        this.status = ReservationStatus.BOOKED;
+        this.status = ReservationStatus.WAITING_FOR_PAYMENT;
     }
 
     @Override

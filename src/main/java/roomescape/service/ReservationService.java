@@ -97,7 +97,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllReservations() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.BOOKED);
+        List<Reservation> reservations = reservationRepository.findAllByStatusNot(ReservationStatus.WAITING);
         return toReservationResponses(reservations);
     }
 
@@ -127,8 +127,8 @@ public class ReservationService {
         List<Reservation> waitingReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.WAITING);
         List<Waiting> waitings = getWaitings(waitingReservations);
 
-        List<Reservation> bookedReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.BOOKED);
-        return toReservationDetailResponses(bookedReservations, waitings);
+        List<Reservation> reservations = reservationRepository.findAllByMemberIdAndStatusNot(memberId, ReservationStatus.WAITING);
+        return toReservationDetailResponses(reservations, waitings);
     }
 
     private List<ReservationDetailResponse> toReservationDetailResponses(List<Reservation> bookedReservations, List<Waiting> waitings) {
