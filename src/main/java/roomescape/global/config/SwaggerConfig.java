@@ -6,8 +6,10 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import roomescape.global.util.OperationCustomizerWithEnums;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -35,4 +37,11 @@ public class SwaggerConfig {
                 .components(components);
     }
 
+    @Bean
+    public GroupedOpenApi groupedOpenApi() {
+        return GroupedOpenApi.builder()
+                .group("group")
+                .addOperationCustomizer(new OperationCustomizerWithEnums())
+                .build();
+    }
 }
