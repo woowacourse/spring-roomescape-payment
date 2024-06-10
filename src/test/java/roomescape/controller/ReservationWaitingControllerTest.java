@@ -1,50 +1,58 @@
-package roomescape.acceptance;
+package roomescape.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static roomescape.fixture.MemberFixture.MEMBER_ARU;
-import static roomescape.fixture.MemberFixture.MEMBER_PK;
-import static roomescape.fixture.ThemeFixture.TEST_THEME;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.restdocs.cookies.CookieDescriptor;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
+import roomescape.application.auth.dto.TokenPayload;
 import roomescape.application.reservation.dto.request.ReservationRequest;
+import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationWaitingResponse;
+import roomescape.domain.member.Role;
+import roomescape.exception.reservation.DuplicatedReservationException;
 
-class ReservationWaitingAcceptanceTest extends AcceptanceTest {
+class ReservationWaitingControllerTest extends ControllerTest {
+
+    @BeforeEach
+    void setUp() {
+        BDDMockito.given(tokenManager.extract(anyString()))
+                .willReturn(new TokenPayload(1L, "아루", Role.MEMBER));
+    }
 
     @Test
     @DisplayName("이미 예약된 곳에 대기한다.")
     void enqueueWaitList() {
-        long aruId = fixture.registerMember(MEMBER_ARU.registerRequest()).id();
-        fixture.registerMember(MEMBER_PK.registerRequest());
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        LocalDate date = LocalDate.of(2024, 12, 25);
-
-        String aruToken = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
-        String pkToken = fixture.loginAndGetToken(MEMBER_PK.loginRequest());
-        fixture.createReservation(aruToken, new ReservationRequest(aruId, themeId, date, timeId));
-
+        BDDMockito.given(reservationService.enqueueWaitingList(any(ReservationRequest.class)))
+                .willReturn(new ReservationWaitingResponse(
+                        new ReservationResponse(1L, "아루", "테마", LocalDate.of(2024, 6, 12), LocalTime.of(10, 0)),
+                        2
+                ));
         String request = """
                 {
-                    "themeId": %d,
-                    "date": "%s",
-                    "timeId": %d
+                    "themeId": 1,
+                    "date": "2024-06-12",
+                    "timeId": 3
                 }
-                """.formatted(themeId, date, timeId);
+                """;
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("인증 토큰")
@@ -65,7 +73,7 @@ class ReservationWaitingAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("waitingCount").description("대기자 수")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-waiting-enqueue",
                 requestCookies(cookieDescriptors),
                 requestFields(requestFieldDescriptors),
@@ -73,33 +81,28 @@ class ReservationWaitingAcceptanceTest extends AcceptanceTest {
         );
 
         givenWithSpec().log().all()
-                .cookie("token", pkToken)
+                .cookie("token", "auth-token")
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
                 .body(request)
                 .when().post("/reservations/queue")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(200);
     }
 
     @Test
     @DisplayName("이미 예약한 곳에 대기할 수 없다.")
     void duplicateWaiting() {
-        long aruId = fixture.registerMember(MEMBER_ARU.registerRequest()).id();
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        LocalDate date = LocalDate.of(2024, 12, 25);
-
-        String aruToken = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
-        fixture.createReservation(aruToken, new ReservationRequest(aruId, themeId, date, timeId));
+        BDDMockito.given(reservationService.enqueueWaitingList(any(ReservationRequest.class)))
+                .willThrow(DuplicatedReservationException.class);
         String request = """
                 {
-                    "themeId": %d,
-                    "date": "%s",
-                    "timeId": %d
+                    "themeId": 1,
+                    "date": "2024-06-12",
+                    "timeId": 3
                 }
-                """.formatted(themeId, date, timeId);
+                """;
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("인증 토큰")
@@ -111,38 +114,29 @@ class ReservationWaitingAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("timeId").description("예약 시간 ID")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-waiting-enqueue-already-reserved",
                 requestCookies(cookieDescriptors),
                 requestFields(requestFieldDescriptors)
         );
 
         givenWithSpec().log().all()
-                .cookie("token", aruToken)
+                .cookie("token", "auth-token")
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
                 .body(request)
                 .when().post("/reservations/queue")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(400);
     }
 
     @Test
     @DisplayName("예약 대기를 취소한다.")
     void dequeueWaitList() {
-        long aruId = fixture.registerMember(MEMBER_ARU.registerRequest()).id();
-        fixture.registerMember(MEMBER_PK.registerRequest());
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        LocalDate date = LocalDate.of(2024, 12, 25);
-
-        String aruToken = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
-        String pkToken = fixture.loginAndGetToken(MEMBER_PK.loginRequest());
-        fixture.createReservation(aruToken, new ReservationRequest(aruId, themeId, date, timeId));
-        ReservationWaitingResponse response =
-                fixture.enqueueWaitList(pkToken, new ReservationRequest(themeId, date, timeId));
-        long waitingId = response.reservation().id();
+        BDDMockito.doNothing()
+                .when(reservationService)
+                .cancelWaitingList(anyLong(), anyLong());
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("인증 토큰")
@@ -152,20 +146,20 @@ class ReservationWaitingAcceptanceTest extends AcceptanceTest {
                 parameterWithName("id").description("예약 대기 ID")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-waiting-dequeue",
                 requestCookies(cookieDescriptors),
                 pathParameters(pathParameterDescriptors)
         );
 
         givenWithSpec().log().all()
-                .cookie("token", pkToken)
+                .cookie("token", "auth-token")
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
-                .pathParam("id", waitingId)
+                .pathParam("id", 1L)
                 .when().delete("/reservations/queue/{id}")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(204);
     }
 }

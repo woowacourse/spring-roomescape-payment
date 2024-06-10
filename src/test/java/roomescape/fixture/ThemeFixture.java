@@ -1,6 +1,7 @@
 package roomescape.fixture;
 
 import roomescape.application.reservation.dto.request.ThemeRequest;
+import roomescape.application.reservation.dto.response.ThemeResponse;
 import roomescape.domain.reservation.Theme;
 
 public enum ThemeFixture {
@@ -30,5 +31,9 @@ public enum ThemeFixture {
 
     public ThemeRequest request() {
         return new ThemeRequest(name, description, thumbnail, price);
+    }
+
+    public ThemeResponse responseWithId(long id) {
+        return new ThemeResponse(id, name, description, price, thumbnail);
     }
 }

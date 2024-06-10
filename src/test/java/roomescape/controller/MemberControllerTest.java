@@ -1,32 +1,34 @@
-package roomescape.acceptance;
+package roomescape.controller;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static roomescape.fixture.MemberFixture.MEMBER_ARU;
-import static roomescape.fixture.MemberFixture.MEMBER_PK;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.BDDMockito;
 import org.springframework.restdocs.cookies.CookieDescriptor;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
-import roomescape.application.member.MemberService;
+import roomescape.application.member.dto.request.MemberRegisterRequest;
+import roomescape.application.member.dto.response.MemberResponse;
 
-class MemberAcceptanceTest extends AcceptanceTest {
+class MemberControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("사용자가 회원가입한다.")
     void register() {
+        BDDMockito.given(memberService.register(any(MemberRegisterRequest.class)))
+                .willReturn(new MemberResponse(1L, "아루"));
+
         String request = """
                 {
                     "name": "아루",
@@ -46,10 +48,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("name").description("이름")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "member-register",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
                 requestFields(requestFieldDescriptors),
                 responseFields(responseFieldDescriptors)
         );
@@ -58,17 +58,18 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 .body(request)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
                 .when().post("/members")
                 .then().log().all()
-                .assertThat()
+                .apply(handler)
                 .statusCode(200);
     }
 
     @Test
     @DisplayName("이미 존재하는 이메일로 회원가입할 수 없다.")
     void duplicatedEmailTest() {
-        fixture.registerMember(MEMBER_ARU.registerRequest());
+        BDDMockito.given(memberService.register(any(MemberRegisterRequest.class)))
+                .willThrow(new IllegalArgumentException("이미 가입된 이메일입니다."));
+
         String request = """
                 {
                     "name": "아루",
@@ -83,7 +84,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("password").description("비밀번호")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "member-register-duplicated-email",
                 preprocessRequest(prettyPrint()),
                 requestFields(requestFieldDescriptors)
@@ -93,18 +94,21 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 .body(request)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
                 .when().post("/members")
                 .then().log().all()
-                .assertThat()
+                .apply(handler)
                 .statusCode(400);
     }
 
     @Test
     @DisplayName("관리자가 모든 회원을 조회한다.")
     void findAllMembers() {
-        fixture.registerMember(MEMBER_ARU.registerRequest());
-        fixture.registerMember(MEMBER_PK.registerRequest());
+        List<MemberResponse> response = List.of(
+                new MemberResponse(1L, "아루"),
+                new MemberResponse(2L, "비밥")
+        );
+        BDDMockito.given(memberService.findAll())
+                .willReturn(response);
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -115,7 +119,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("[].name").description("이름")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "member-find-all",
                 requestCookies(cookieDescriptors),
                 responseFields(responseFieldDescriptors)
@@ -123,12 +127,10 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
         givenWithSpec().log().all()
                 .accept(APPLICATION_JSON_VALUE)
-                .cookie("token", fixture.getAdminToken())
-                .filter(docsFilter)
+                .cookie("token", "admin-token")
                 .when().get("/members")
                 .then().log().all()
-                .assertThat()
-                .statusCode(200)
-                .body("size()", equalTo(2));
+                .apply(handler)
+                .statusCode(200);
     }
 }

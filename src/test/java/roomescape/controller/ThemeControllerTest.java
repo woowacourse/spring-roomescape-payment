@@ -1,33 +1,38 @@
-package roomescape.acceptance;
+package roomescape.controller;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.fixture.ThemeFixture.SPACE_THEME;
 import static roomescape.fixture.ThemeFixture.SPOOKY_THEME;
 import static roomescape.fixture.ThemeFixture.TEST_THEME;
 
 import io.restassured.http.ContentType;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.restdocs.cookies.CookieDescriptor;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import roomescape.application.reservation.dto.request.ThemeRequest;
+import roomescape.application.reservation.dto.response.ThemeResponse;
 
-class ThemeAcceptanceTest extends AcceptanceTest {
+class ThemeControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("관리자가 테마를 생성한다.")
     void createThemeTest() {
         ThemeRequest request = TEST_THEME.request();
+        BDDMockito.given(themeService.create(any(ThemeRequest.class)))
+                .willReturn(TEST_THEME.responseWithId(1L));
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -40,27 +45,31 @@ class ThemeAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("price").description("가격")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "theme-create",
                 requestCookies(cookieDescriptors),
                 requestFields(requestFieldDescriptors)
         );
 
         givenWithSpec().log().all()
-                .cookie("token", fixture.getAdminToken())
+                .cookie("token", "admin-token")
                 .contentType(ContentType.JSON)
                 .body(request)
-                .filter(docsFilter)
                 .when().post("/themes")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(201);
     }
 
     @Test
     @DisplayName("테마 목록을 조회한다.")
     void findAllThemesTest() {
-        fixture.createTheme(SPOOKY_THEME.request());
-        fixture.createTheme(SPACE_THEME.request());
+        List<ThemeResponse> responses = List.of(
+                SPOOKY_THEME.responseWithId(1L),
+                SPACE_THEME.responseWithId(2L)
+        );
+        BDDMockito.given(themeService.findAll())
+                .willReturn(responses);
 
         FieldDescriptor[] responseFieldDescriptors = {
                 fieldWithPath("[].id").description("ID"),
@@ -70,24 +79,25 @@ class ThemeAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("[].price").description("가격")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "theme-find-all",
                 responseFields(responseFieldDescriptors)
         );
 
         givenWithSpec().log().all()
                 .accept(ContentType.JSON)
-                .filter(docsFilter)
                 .when().get("/themes")
                 .then().log().all()
-                .statusCode(200)
-                .body("size()", equalTo(2));
+                .apply(handler)
+                .statusCode(200);
     }
 
     @Test
     @DisplayName("관리자가 테마를 삭제한다.")
     void deleteThemeTest() {
-        long themeId = fixture.createTheme(SPACE_THEME.request()).id();
+        BDDMockito.doNothing()
+                .when(themeService)
+                .deleteById(1L);
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -97,18 +107,18 @@ class ThemeAcceptanceTest extends AcceptanceTest {
                 parameterWithName("id").description("테마 ID")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "theme-delete",
                 requestCookies(cookieDescriptors),
                 pathParameters(pathParameterDescriptors)
         );
 
         givenWithSpec().log().all()
-                .cookie("token", fixture.getAdminToken())
-                .pathParam("id", themeId)
-                .filter(docsFilter)
+                .cookie("token", "admin-token")
+                .pathParam("id", 1L)
                 .when().delete("/themes/{id}")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(204);
     }
 }

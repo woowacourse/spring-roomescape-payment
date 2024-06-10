@@ -1,42 +1,55 @@
-package roomescape.acceptance;
+package roomescape.controller;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static roomescape.fixture.MemberFixture.MEMBER_ARU;
-import static roomescape.fixture.MemberFixture.MEMBER_PK;
-import static roomescape.fixture.ThemeFixture.TEST_THEME;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.restdocs.cookies.CookieDescriptor;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
+import roomescape.application.auth.dto.TokenPayload;
+import roomescape.application.reservation.dto.request.ReservationFilterRequest;
 import roomescape.application.reservation.dto.request.ReservationRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
+import roomescape.domain.member.Role;
 
-class AdminReservationAcceptanceTest extends AcceptanceTest {
+class AdminReservationControllerTest extends ControllerTest {
+
+    @BeforeEach
+    void setUp() {
+        BDDMockito.doNothing()
+                .when(credentialContext)
+                .validatePermission(Role.ADMIN);
+        BDDMockito.given(tokenManager.extract(anyString()))
+                .willReturn(new TokenPayload(1L, "어드민", Role.ADMIN));
+    }
 
     @Test
     @DisplayName("관리자가 예약을 추가한다.")
     void createReservationByAdmin() {
-        long memberId = fixture.registerMember(MEMBER_ARU.registerRequest()).id();
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        String adminToken = fixture.getAdminToken();
-
         LocalDate date = LocalDate.of(2024, 6, 1);
-        ReservationRequest request = new ReservationRequest(memberId, themeId, date, timeId);
+        ReservationRequest request = new ReservationRequest(1L, 1L, date, 3L);
+
+        BDDMockito.given(reservationService.bookReservationWithoutPurchase(request))
+                .willReturn(new ReservationResponse(1L, "아루", "테마", date, LocalTime.of(10, 0)));
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -57,7 +70,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("startAt").description("시작 시간")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-create",
                 requestCookies(cookieDescriptors),
                 requestFields(requestFieldDescriptor),
@@ -65,37 +78,25 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
         );
 
         givenWithSpec().log().all()
-                .cookie("token", adminToken)
+                .cookie("token", "admin-token")
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
                 .body(request)
                 .when().post("/admin/reservations")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(201);
     }
 
     @Test
     @DisplayName("관리자가 예약을 필터링해 조회한다.")
     void reservationFilter() {
-        long aruId = fixture.registerMember(MEMBER_ARU.registerRequest()).id();
-        long pkId = fixture.registerMember(MEMBER_PK.registerRequest()).id();
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long tenAmId = fixture.createReservationTime(10, 0).id();
-        long elevenAmId = fixture.createReservationTime(11, 0).id();
-        String aruToken = fixture.loginAndGetToken(MEMBER_ARU.loginRequest());
-        String pkToken = fixture.loginAndGetToken(MEMBER_PK.loginRequest());
-        fixture.createReservation(aruToken, new ReservationRequest(
-                aruId, themeId, LocalDate.of(2024, 6, 1), tenAmId
-        ));
-        fixture.createReservation(aruToken, new ReservationRequest(
-                aruId, themeId, LocalDate.of(2024, 6, 2), tenAmId
-        ));
-        fixture.createReservation(pkToken, new ReservationRequest(
-                pkId, themeId, LocalDate.of(2024, 6, 1), elevenAmId
-        ));
-
-        String adminToken = fixture.getAdminToken();
+        List<ReservationResponse> responses = List.of(
+                new ReservationResponse(1L, "아루", "테마 1", LocalDate.of(2024, 6, 1), LocalTime.of(10, 0)),
+                new ReservationResponse(2L, "아루", "테마 2", LocalDate.of(2024, 6, 2), LocalTime.of(13, 0))
+        );
+        BDDMockito.given(reservationLookupService.findByFilter(any(ReservationFilterRequest.class)))
+                .willReturn(responses);
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -116,7 +117,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
                 fieldWithPath("[].startAt").description("시작 시간")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-filter",
                 requestCookies(cookieDescriptors),
                 queryParameters(parameterDescriptors),
@@ -124,31 +125,24 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
         );
 
         givenWithSpec().log().all()
-                .cookie("token", adminToken)
+                .cookie("token", "admin-token")
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .filter(docsFilter)
-                .queryParam("memberId", aruId)
+                .queryParam("memberId", 1L)
                 .queryParam("startDate", "2024-06-01")
-                .queryParam("endDate", "2024-06-01")
+                .queryParam("endDate", "2024-06-02")
                 .when().get("/admin/reservations")
                 .then().log().all()
-                .assertThat()
-                .statusCode(200)
-                .body("size()", equalTo(1));
+                .apply(handler)
+                .statusCode(200);
     }
 
     @Test
     @DisplayName("관리자가 예약을 삭제한다.")
     void deleteReservation() {
-        long themeId = fixture.createTheme(TEST_THEME.request()).id();
-        long timeId = fixture.createReservationTime(10, 0).id();
-        fixture.registerMember(MEMBER_ARU.registerRequest());
-        String token = fixture.getAdminToken();
-        ReservationResponse response = fixture.createReservation(
-                token,
-                new ReservationRequest(themeId, LocalDate.of(2024, 12, 25), timeId)
-        );
+        BDDMockito.doNothing()
+                .when(reservationService)
+                .cancelReservation(anyLong(), anyLong());
 
         CookieDescriptor[] cookieDescriptors = {
                 cookieWithName("token").description("어드민 토큰")
@@ -158,18 +152,18 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
                 parameterWithName("id").description("예약 ID")
         };
 
-        RestDocumentationFilter docsFilter = document(
+        RestDocumentationResultHandler handler = document(
                 "reservation-delete",
                 requestCookies(cookieDescriptors),
                 pathParameters(parameterDescriptors)
         );
 
         givenWithSpec().log().all()
-                .cookie("token", token)
-                .pathParam("id", response.id())
-                .filter(docsFilter)
+                .cookie("token", "admin-token")
+                .pathParam("id", 1L)
                 .when().delete("/reservations/{id}")
                 .then().log().all()
+                .apply(handler)
                 .statusCode(204);
     }
 }
