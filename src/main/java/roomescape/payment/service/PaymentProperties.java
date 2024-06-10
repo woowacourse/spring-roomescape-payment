@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 public class PaymentProperties {
     private int connectionTimeout;
     private int readTimeout;
+    private String baseUrl;
+    private String authorizationPrefix;
     private String secretKey;
 
     public int getConnectionTimeout() {
@@ -16,6 +18,14 @@ public class PaymentProperties {
 
     public int getReadTimeout() {
         return readTimeout;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public String getAuthorizationPrefix() {
+        return authorizationPrefix;
     }
 
     public String getSecretKey() {
@@ -28,6 +38,14 @@ public class PaymentProperties {
 
     public void setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public void setAuthorizationPrefix(String authorizationPrefix) {
+        this.authorizationPrefix = authorizationPrefix;
     }
 
     public void setSecretKey(String secretKey) {
