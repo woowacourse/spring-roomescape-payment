@@ -55,7 +55,11 @@ function render(data) {
       */
       row.insertCell(4).textContent = '';
       row.insertCell(5).textContent = item.payment.amount;
-      row.insertCell(6).textContent = item.payment.createdAt;
+      if(item.payment.createdAt == null) {
+        row.insertCell(6).textContent = '결제 대기 중';
+      } else {
+        row.insertCell(6).textContent = item.payment.createdAt;
+      }
     }
   });
 }
