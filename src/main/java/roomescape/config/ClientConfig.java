@@ -54,14 +54,14 @@ public class ClientConfig {
     }
 
     private void logRequest(HttpRequest request, byte[] body) {
-        log.error("[토스 api 요청 정보] HTTP method: {}, URL: {}", request.getMethod(), request.getURI());
+        log.info("[토스 api 요청 정보] HTTP method: {}, URL: {}", request.getMethod(), request.getURI());
         if (request.getMethod().equals(HttpMethod.POST)) {
-            log.error("[토스 api 사용자 요청] body: {}", new String(body, StandardCharsets.UTF_8));
+            log.info("[토스 api 사용자 요청] body: {}", new String(body, StandardCharsets.UTF_8));
         }
     }
 
     private void logResponse(ClientHttpResponse response) throws IOException {
-        log.error("[토스 api 예외 상태코드] code: {}", response.getStatusCode());
+        log.info("[토스 api 상태코드] code: {}", response.getStatusCode());
     }
 }
 
