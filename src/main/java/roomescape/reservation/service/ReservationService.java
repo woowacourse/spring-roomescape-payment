@@ -14,11 +14,11 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentMatcher;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.PaymentCancelRequest;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
-import roomescape.payment.domain.PaymentMatcher;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationPending;
 import roomescape.reservation.domain.ReservationRepository;
@@ -28,6 +28,7 @@ import roomescape.reservation.domain.WaitingRankCalculator;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
@@ -260,5 +261,36 @@ public class ReservationService {
                 reservationForDelete.getTheme().getId(),
                 Status.WAITING
         ).ifPresent(value -> value.updateStatus(Status.PENDING));
+    }
+
+    @Transactional
+    public MemberReservationResponse payForPendingReservation(Long memberId, ReservationPaymentRequest request) {
+        Reservation reservationForPay = reservationRepository.findByIdAndMemberId(request.reservationId(), memberId)
+                .orElseThrow(
+                        () -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + request.reservationId())
+                );
+
+        PaymentConfirmRequest paymentConfirmRequest = request.extractPaymentConfirmRequest();
+        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        Payment payment = new Payment(
+                request.reservationId(),
+                memberId,
+                paymentConfirmResponse.paymentKey(),
+                paymentConfirmResponse.orderId(),
+                paymentConfirmResponse.totalAmount()
+        );
+
+        paymentRepository.save(payment);
+        reservationForPay.updateStatus(Status.RESERVED);
+        return new MemberReservationResponse(
+                reservationForPay.getId(),
+                reservationForPay.getTheme().getName(),
+                reservationForPay.getDate(),
+                reservationForPay.getTime().getStartAt(),
+                reservationForPay.getStatus().getValue(),
+                payment.getPaymentKey(),
+                payment.getOrderId(),
+                payment.getAmount()
+        );
     }
 }

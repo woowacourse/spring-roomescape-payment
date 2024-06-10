@@ -17,6 +17,7 @@ import roomescape.auth.dto.Accessor;
 import roomescape.reservation.dto.MemberReservationAddRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
@@ -74,6 +75,15 @@ public class ReservationController {
                 memberReservationAddRequest);
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);
+    }
+
+    @PostMapping("/reservations/payment")
+    public ResponseEntity<MemberReservationResponse> paymentForPending(
+            @Authenticated Accessor accessor,
+            @Valid @RequestBody ReservationPaymentRequest request
+    ) {
+        MemberReservationResponse response = reservationService.payForPendingReservation(accessor.id(), request);
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/reservations/{id}")
