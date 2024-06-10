@@ -43,7 +43,7 @@ dependencies {
 }
 
 ext {
-    snippetsDir = file('build/generated-snippets')
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 test {
@@ -55,6 +55,10 @@ asciidoctor {
     inputs.dir snippetsDir
     configurations 'asciidoctorExt'
     dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
 }
 
 bootJar {
