@@ -12,8 +12,8 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("커머스 프로젝트 API")
-                        .description("상품을 등록하고, 상품을 장바구니에 담는 기능을 제공합니다.")
+                        .title("방탈출 예약 API")
+                        .description("방탈출 예약 및 대기를 하는 API 입니다.")
                         .version("1.0.0"));
     }
 }
