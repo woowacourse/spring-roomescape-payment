@@ -91,4 +91,17 @@ public interface ThemeControllerSwagger {
             }
     )
     ResponseEntity<Void> deleteTheme(long themeId);
+
+    @Operation(
+            summary = "아이디로 테마 조회",
+            description = "지정된 테마 ID를 가진 테마를 조회합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "테마가 성공적으로 조회되었습니다.",
+                            content = @Content(schema = @Schema(implementation = ThemeResponse.class))
+                    )
+            }
+    )
+    ResponseEntity<ThemeResponse> getThemeById(long themeId);
 }

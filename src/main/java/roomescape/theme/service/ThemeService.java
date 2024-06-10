@@ -46,6 +46,14 @@ public class ThemeService {
                 .toList();
     }
 
+    public ThemeResponse findTheme(Long themeId) {
+        Theme theme = themeRepository.findById(themeId).orElseThrow(
+                () -> new RoomEscapeException(ThemeExceptionCode.FOUND_THEME_IS_NULL_EXCEPTION)
+        );
+
+        return ThemeResponse.fromTheme(theme);
+    }
+
     public List<ThemeResponse> findThemes() {
         List<Theme> themes = themeRepository.findAll();
         return themes.stream()

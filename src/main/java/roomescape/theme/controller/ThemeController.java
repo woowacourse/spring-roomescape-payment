@@ -60,4 +60,12 @@ public class ThemeController implements ThemeControllerSwagger {
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    @Override
+    @GetMapping("/{id}")
+    public ResponseEntity<ThemeResponse> getThemeById(@PathVariable("id") long themeId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(themeService.findTheme(themeId));
+    }
 }
