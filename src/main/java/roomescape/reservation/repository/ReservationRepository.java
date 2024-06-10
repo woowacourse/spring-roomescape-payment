@@ -36,6 +36,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             left join fetch Payment p on p.reservationId = r.id
             where m.id = :memberId
             and r.status <> 'CANCEL'
+            and r.status <> 'PENDING'
             and r.date >= :date
             order by r.date, rt.startAt, r.createdAt
              """)

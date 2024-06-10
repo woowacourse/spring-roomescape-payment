@@ -74,7 +74,7 @@ class ReservationServiceTest {
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), 11L);
 
-        assertThatThrownBy(() -> reservationService.saveReservationSuccess(reservationSaveRequest, loginMember))
+        assertThatThrownBy(() -> reservationService.saveReservationPending(reservationSaveRequest, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -88,10 +88,10 @@ class ReservationServiceTest {
         memberRepository.save(KAKI);
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
+        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(loginMember.id(), TODAY, horrorTheme.getId(), hour10.getId());
+        reservationService.saveReservationSuccessByAdmin(reservationSaveRequest);
 
-        assertThatThrownBy(() -> reservationService.saveReservationSuccess(reservationSaveRequest, loginMember))
+        assertThatThrownBy(() -> reservationService.saveReservationPending(reservationSaveRequest, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -123,7 +123,8 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
+        ReservationResponse response = reservationService.saveReservationPending(reservationSaveRequest, loginMember);
+        reservationService.confirmReservation(response.id());
 
         assertThatThrownBy(() -> reservationService.saveReservationWaiting(reservationSaveRequest, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -198,7 +199,8 @@ class ReservationServiceTest {
 
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, horrorTheme.getId(), hour10.getId());
-        ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
+        ReservationResponse reservationResponse = reservationService.saveReservationPending(reservationSaveRequest, loginMember);
+        reservationService.confirmReservation(reservationResponse.id());
 
         assertThatThrownBy(() -> reservationService.cancelReservationById(reservationResponse.id()))
                 .isInstanceOf(IllegalArgumentException.class);

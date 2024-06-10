@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.MultipleResponses;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.ReservationPaymentManager;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -25,12 +24,12 @@ import roomescape.reservation.service.ReservationService;
 @RequestMapping("/reservations")
 public class ReservationApiController {
 
+    private final ReservationPaymentManager reservationPaymentManager;
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationApiController(ReservationPaymentManager reservationPaymentManager, ReservationService reservationService) {
+        this.reservationPaymentManager = reservationPaymentManager;
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @GetMapping("/mine")
@@ -45,8 +44,8 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = reservationService.saveReservationSuccess(reservationSaveRequest, loginMember);
-        paymentService.pay(PaymentRequest.from(reservationSaveRequest), reservationResponse.id());
+        ReservationResponse reservationResponse = reservationPaymentManager.saveReservationByUser(reservationSaveRequest,
+                loginMember);
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
@@ -65,8 +64,7 @@ public class ReservationApiController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> cancelReservation(@PathVariable("id") Long id) {
-        paymentService.cancel(reservationService.findById(id));
-        reservationService.cancelReservationById(id);
+        reservationPaymentManager.cancelReservation(id);
 
         return ResponseEntity.ok().build();
     }

@@ -42,15 +42,25 @@ public class ReservationService {
         this.memberRepository = memberRepository;
     }
 
-    public ReservationResponse saveReservationSuccess(
+    public ReservationResponse saveReservationPending(
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(), ReservationStatus.SUCCESS);
-        validateDuplicatedReservationSuccess(reservation);
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Reservation pendingReservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(),
+                ReservationStatus.PENDING);
+        validateDuplicatedReservationSuccess(pendingReservation);
+        Reservation savedReservation = reservationRepository.save(pendingReservation);
 
         return ReservationResponse.toResponse(savedReservation);
+    }
+
+    public void rollBackPendingReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new IllegalStateException("결제 대기중인 예약이 아닙니다.");
+        }
+        reservationRepository.deleteById(id);
     }
 
     public ReservationResponse saveReservationSuccessByAdmin(ReservationSaveRequest reservationSaveRequest) {
@@ -70,6 +80,16 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return ReservationResponse.toResponse(savedReservation);
+    }
+
+    public ReservationResponse confirmReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new IllegalStateException("결제 대기중인 예약이 아닙니다.");
+        }
+        reservation.updateStatus(ReservationStatus.SUCCESS);
+        return ReservationResponse.toResponse(reservation);
     }
 
     private Reservation createValidatedReservationOfStatus(
@@ -93,7 +113,7 @@ public class ReservationService {
         boolean existsReservation = reservationRepository.existsByDateAndTimeStartAtAndStatus(
                 reservation.getDate(),
                 reservation.getStartAt(),
-                reservation.getStatus()
+                ReservationStatus.SUCCESS
         );
 
         if (existsReservation) {
