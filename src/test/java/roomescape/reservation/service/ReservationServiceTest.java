@@ -34,7 +34,7 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
-import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
@@ -72,11 +72,11 @@ class ReservationServiceTest {
         Theme horror = themeRepository.save(HORROR_THEME);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        ReservationPaymentRequest saveRequest = new ReservationPaymentRequest(
+        ReservationPaymentSaveRequest saveRequest = new ReservationPaymentSaveRequest(
                 jojo.getId(), TODAY, horror.getId(), 1L, "paymentKey", "orderId", 1000L
         );
 
-        assertThatThrownBy(() -> reservationService.save(saveRequest))
+        assertThatThrownBy(() -> reservationService.saveWithPayment(saveRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

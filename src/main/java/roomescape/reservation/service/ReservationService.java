@@ -13,7 +13,7 @@ import roomescape.reservation.controller.dto.response.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,7 +37,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse save(ReservationPaymentRequest request) {
+    public ReservationResponse saveWithPayment(ReservationPaymentSaveRequest request) {
         ReservationSaveRequest reservationSaveRequest = ReservationSaveRequest.from(request);
         Reservation savedReservation = createReservation(reservationSaveRequest);
         paymentService.confirm(PaymentConfirmRequest.from(request), savedReservation);
@@ -46,7 +46,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveByAdmin(ReservationSaveRequest saveRequest) {
+    public ReservationResponse saveWithoutPayment(ReservationSaveRequest saveRequest) {
         Reservation savedReservation = createReservation(saveRequest);
         return ReservationResponse.toResponse(savedReservation);
     }

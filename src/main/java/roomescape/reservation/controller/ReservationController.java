@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.dto.ResourcesResponse;
-import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.controller.dto.response.MemberReservationResponse;
 import roomescape.reservation.controller.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
-import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 @RestController
 public class ReservationController {
@@ -60,11 +59,11 @@ public class ReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> save(
-            @Valid @RequestBody ReservationPaymentSaveRequest saveRequest,
+            @Valid @RequestBody roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest saveRequest,
             LoginMember loginMember
     ) {
-        ReservationPaymentRequest request = ReservationPaymentRequest.of(saveRequest, loginMember);
-        ReservationResponse response = reservationService.save(request);
+        ReservationPaymentSaveRequest request = ReservationPaymentSaveRequest.of(saveRequest, loginMember);
+        ReservationResponse response = reservationService.saveWithPayment(request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);

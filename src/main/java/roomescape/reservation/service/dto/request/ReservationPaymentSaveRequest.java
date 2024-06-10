@@ -2,9 +2,8 @@ package roomescape.reservation.service.dto.request;
 
 import java.time.LocalDate;
 import roomescape.auth.dto.LoginMember;
-import roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest;
 
-public record ReservationPaymentRequest(
+public record ReservationPaymentSaveRequest(
         long memberId,
         LocalDate date,
         long themeId,
@@ -13,8 +12,9 @@ public record ReservationPaymentRequest(
         String orderId,
         long amount
 ) {
-    public static ReservationPaymentRequest of(ReservationPaymentSaveRequest saveRequest, LoginMember loginMember) {
-        return new ReservationPaymentRequest(
+    public static ReservationPaymentSaveRequest of(
+            roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest saveRequest, LoginMember loginMember) {
+        return new ReservationPaymentSaveRequest(
                 loginMember.id(),
                 saveRequest.date(),
                 saveRequest.themeId(),

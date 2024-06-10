@@ -1,6 +1,6 @@
 package roomescape.payment.service.dto.request;
 
-import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 public record PaymentConfirmRequest(
         String paymentKey,
@@ -8,7 +8,7 @@ public record PaymentConfirmRequest(
         long amount
 ) {
 
-    public static PaymentConfirmRequest from(ReservationPaymentRequest request) {
+    public static PaymentConfirmRequest from(ReservationPaymentSaveRequest request) {
         return new PaymentConfirmRequest(request.paymentKey(), request.orderId(), request.amount());
     }
 }
