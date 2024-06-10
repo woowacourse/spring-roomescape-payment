@@ -46,7 +46,7 @@ class AuthenticationControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
-                .when().post("/members")
+                .when().post("/signup")
                 .then().log().all()
                 .statusCode(201);
     }
