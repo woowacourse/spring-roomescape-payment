@@ -26,6 +26,7 @@ import roomescape.service.reservation.dto.ReservationWaitingResponse;
 
 @Service
 public class ReservationWaitingService {
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
@@ -35,10 +36,10 @@ public class ReservationWaitingService {
     private final PaymentRepository paymentRepository;
 
     public ReservationWaitingService(ReservationTimeRepository reservationTimeRepository,
-                                     ThemeRepository themeRepository, MemberRepository memberRepository,
-                                     ReservationWaitingRepository reservationWaitingRepository,
-                                     ReservationRepository reservationRepository, PaymentRestClient paymentRestClient,
-                                     PaymentRepository paymentRepository) {
+            ThemeRepository themeRepository, MemberRepository memberRepository,
+            ReservationWaitingRepository reservationWaitingRepository,
+            ReservationRepository reservationRepository, PaymentRestClient paymentRestClient,
+            PaymentRepository paymentRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
@@ -68,7 +69,8 @@ public class ReservationWaitingService {
     }
 
     public List<ReservationWaitingResponse> findAll() {
-        return reservationWaitingRepository.findAll().stream()
+        return reservationWaitingRepository.findAll()
+                .stream()
                 .map(ReservationWaitingResponse::new)
                 .toList();
     }
@@ -89,7 +91,7 @@ public class ReservationWaitingService {
     }
 
     private void validate(ReservationDate date, ReservationTime reservationTime, Theme theme, Member member,
-                          Schedule schedule) {
+            Schedule schedule) {
         if (date.isToday()) {
             throw new InvalidReservationException("방문 당일에는 예약 대기를 등록할 수 없습니다.");
         }
@@ -110,9 +112,14 @@ public class ReservationWaitingService {
         reservationWaitingRepository.findById(waitingId)
                 .ifPresent(waiting -> {
                     waiting.checkCancelAuthority(memberId);
-                    paymentRestClient.cancel(waiting.getPayment());
-                });
+                    cancelAndRefund(waitingId, waiting);}
+                );
+    }
+
+    private void cancelAndRefund(long waitingId, ReservationWaiting waiting) {
+        paymentRestClient.cancel(waiting.getPayment());
         deleteById(waitingId);
+        paymentRepository.delete(waiting.getPayment());
     }
 
     @Scheduled(cron = "${resetwaiting.schedule.cron}")
@@ -120,4 +127,5 @@ public class ReservationWaitingService {
         List<ReservationWaiting> waitingOfToday = reservationWaitingRepository.findBySchedule_Date(LocalDate.now());
         waitingOfToday.forEach(w -> deleteById(w.getId()));
     }
+
 }

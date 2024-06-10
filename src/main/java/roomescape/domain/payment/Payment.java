@@ -29,6 +29,10 @@ public class Payment {
         this.amount = amount;
     }
 
+    public boolean isPaidByAdmin() {
+        return paymentKey.equals("ADMIN");
+    }
+
     public Long getId() {
         return id;
     }

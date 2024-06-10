@@ -57,6 +57,9 @@ public class PaymentRestClient {
 
     public void cancel(Payment payment) {
         try {
+            if (payment.isPaidByAdmin()) {
+                return;
+            }
             restClient.post()
                     .uri("/" + payment.getPaymentKey() + CANCEL_ENDPOINT)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
