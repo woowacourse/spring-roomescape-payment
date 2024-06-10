@@ -1,40 +1,40 @@
 package roomescape.document;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import roomescape.controller.ReservationController;
+import roomescape.controller.AdminController;
 import roomescape.document.config.RestDocsSupport;
-import roomescape.dto.MyReservationResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
-import roomescape.dto.service.ReservationPaymentWithRankResponse;
-import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.service.ReservationService;
 
-@WebMvcTest(ReservationController.class)
-public class ReservationRestDocsTest extends RestDocsSupport {
+@WebMvcTest(AdminController.class)
+public class AdminRestDocsTest extends RestDocsSupport {
 
     @MockBean
     private ReservationService reservationService;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        given(adminCheckInterceptor.preHandle(any(), any(), any()))
+                .willReturn(true);
+    }
 
     @Test
     public void saveReservation() throws Exception {
@@ -44,9 +44,8 @@ public class ReservationRestDocsTest extends RestDocsSupport {
         given(reservationService.save(any()))
                 .willReturn(response);
 
-        mockMvc.perform(post("/reservations")
+        mockMvc.perform(post("/admin/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("memberId", "1")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andDo(restDocs.document(
@@ -74,15 +73,19 @@ public class ReservationRestDocsTest extends RestDocsSupport {
     }
 
     @Test
-    public void findAllReservations() throws Exception {
+    public void search() throws Exception {
         List<ReservationResponse> response = List.of(
                 ReservationResponse.from(ReservationFixture.DEFAULT_RESERVATION),
                 ReservationResponse.from(ReservationFixture.DEFAULT_RESERVATION)
         );
-        given(reservationService.findAll())
+        given(reservationService.findByMemberAndThemeBetweenDates(any()))
                 .willReturn(response);
 
-        mockMvc.perform(get("/reservations"))
+        mockMvc.perform(get("/admin/reservations")
+                        .param("memberId", "1")
+                        .param("themeId", "1")
+                        .param("start", "2024-06-01")
+                        .param("end", "2024-06-10"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         responseFields(
@@ -103,52 +106,30 @@ public class ReservationRestDocsTest extends RestDocsSupport {
     }
 
     @Test
-    public void findLoginMemberReservations() throws Exception {
-        List<MyReservationResponse> response = List.of(
-                MyReservationResponse.from(new ReservationPaymentWithRankResponse(
-                        ReservationFixture.DEFAULT_RESERVATION,
-                        PaymentFixture.DEFAULT_PAYMENT,
-                        1L
-                )),
-                MyReservationResponse.from(new ReservationPaymentWithRankResponse(
-                        ReservationFixture.DEFAULT_RESERVATION,
-                        PaymentFixture.DEFAULT_PAYMENT,
-                        1L
-                ))
+    public void findAllPendingReservations() throws Exception {
+        List<ReservationResponse> response = List.of(
+                ReservationResponse.from(ReservationFixture.DEFAULT_RESERVATION),
+                ReservationResponse.from(ReservationFixture.DEFAULT_RESERVATION)
         );
-        given(reservationService.findByMemberId(anyLong()))
+        given(reservationService.findByStatusPending())
                 .willReturn(response);
 
-        // TODO: argmuent resolver
-        mockMvc.perform(get("/reservations/mine")
-                        .param("memberId", "1"))
+        mockMvc.perform(get("/admin/reservations/waiting"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         responseFields(
                                 fieldWithPath("[].id").description("예약 id"),
-                                fieldWithPath("[].theme").description("예약 테마 이름"),
+                                fieldWithPath("[].name").description("예약 회원 이름"),
                                 fieldWithPath("[].date").description("예약 날짜"),
-                                fieldWithPath("[].time").description("예약 시간"),
-                                fieldWithPath("[].status").description("예약 상태"),    // TODO: enum 문서화 방법 찾아보기
-                                fieldWithPath("[].paymentKey").description("paymentKey"),
-                                fieldWithPath("[].amount").description("결제 금액")
-                        )
-                ));
-    }
-
-    @Test
-    public void delete() throws Exception {
-        doNothing().when(reservationService)
-                .delete(anyLong(), anyLong());
-
-        // TODO: argmuent resolver
-        mockMvc.perform(RestDocumentationRequestBuilders.delete(
-                                "/reservations/{reservationId}", ReservationFixture.DEFAULT_RESERVATION.getId())
-                        .param("memberId", "1"))
-                .andExpect(status().isNoContent())
-                .andDo(restDocs.document(
-                        pathParameters(
-                                parameterWithName("reservationId").description("삭제할 예약의 id")
+                                fieldWithPath("[].time").description("예약 시간 정보"),
+                                fieldWithPath("[].time.id").description("예약 시간 id"),
+                                fieldWithPath("[].time.startAt").description("예약 시간"),
+                                fieldWithPath("[].theme").description("예약 테마 정보"),
+                                fieldWithPath("[].theme.id").description("예약 테마 id"),
+                                fieldWithPath("[].theme.name").description("예약 테마 이름"),
+                                fieldWithPath("[].theme.description").description("예약 테마 설명"),
+                                fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 URL"),
+                                fieldWithPath("[].status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
                         )
                 ));
     }

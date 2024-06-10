@@ -18,7 +18,7 @@ public class ReservationFixture {
             .date(LocalDate.now().plusDays(1))
             .time(DEFAULT_TIME)
             .theme(DEFAULT_THEME)
-            .status(ReservationStatus.RESERVED_UNPAID)
+            .status(ReservationStatus.PENDING)
             .build();
 
     public static final ReservationRequest DEFAULT_REQUEST = new ReservationRequest(

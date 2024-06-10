@@ -32,12 +32,11 @@ public class RestDocsSupport {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    // TODO: 없앨 방법 찾아보기
     @MockBean
-    private AuthArgumentResolver authArgumentResolver;
+    protected AuthArgumentResolver authArgumentResolver;
 
     @MockBean
-    private AdminCheckInterceptor adminCheckInterceptor;
+    protected AdminCheckInterceptor adminCheckInterceptor;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
