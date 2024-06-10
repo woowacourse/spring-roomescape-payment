@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.Fixture;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -49,6 +51,8 @@ class ReservationServiceTest extends ServiceTestBase {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
@@ -171,11 +175,12 @@ class ReservationServiceTest extends ServiceTestBase {
         theme = themeRepository.save(Fixture.theme);
         member = memberRepository.save(Fixture.member);
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.today), reservationTime);
+        Payment payment = paymentRepository.save(new Payment("test_order-id1", "test_pay-key1", 0));
 
         reservationRepository.save(
-                new Reservation(member, schedule, theme, ReservationStatus.RESERVED)
+                new Reservation(member, schedule, theme, payment, ReservationStatus.RESERVED)
         );
-        reservationWaitingRepository.save(new ReservationWaiting(member, theme, schedule));
+        reservationWaitingRepository.save(new ReservationWaiting(member, theme, schedule, payment));
 
         // when
         List<MemberReservationResponse> reservations = reservationService.findReservationsOf(member.getId());
