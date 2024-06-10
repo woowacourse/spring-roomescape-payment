@@ -9,11 +9,11 @@ VALUES ('15:00:00'),
        ('17:00:00');
 
 INSERT INTO member(name, email, password, role)
-VALUES ('스티치', 'lxxjn0@test.com', '123', 'MEMBER'),
-       ('파랑', 'parang@test.com', '123', 'MEMBER'),
-       ('마크', 'mark@test.com', '123', 'MEMBER'),
-       ('메이슨', 'mason@test.com', '123', 'MEMBER'),
-       ('어드민', 'admin@test.com', '123', 'ADMIN');
+VALUES ('스티치', 'lxxjn0@test.com', '123456', 'MEMBER'),
+       ('파랑', 'parang@test.com', '123456', 'MEMBER'),
+       ('마크', 'mark@test.com', '123456', 'MEMBER'),
+       ('메이슨', 'mason@test.com', '123456', 'MEMBER'),
+       ('어드민', 'admin@test.com', '123456', 'ADMIN');
 
 
 INSERT INTO reservation(member_id, date, time_id, theme_id, status, created_at)
