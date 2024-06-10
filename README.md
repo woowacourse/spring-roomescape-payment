@@ -66,3 +66,12 @@
 - [x] 어드민 예약 기능 변경
   - [x] 어드민이 예약을 할 경우, '어드민 결제' 상태로 예약되도록 변경
   - [x] 어드민이 예약을 취소할 경우, 결제 금액이 환불되도록 추가
+
+## 3단계 (배포)
+
+- 배포 링크 : http://43.201.97.88:8080
+
+## 4단계 (명세서 작성)
+
+- API 명세서 링크 : https://documenter.getpostman.com/view/21358571/2sA3XLEPUC
+- ERD 링크 : https://dbdiagram.io/d/roomescape-payment-6666297e9713410b0524bb50
