@@ -1,5 +1,6 @@
 package roomescape.reservationtime.domain;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationTimeExceptionCode;
 
+@Tag(name = "예약 시간 엔티티", description = "예약 시간 관련 정보 관리 & 예외처리")
 @Entity
 public class ReservationTime {
 

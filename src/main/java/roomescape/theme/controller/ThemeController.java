@@ -1,5 +1,6 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 
+@Tag(name = "테마 컨트롤러", description = "사용자 요청에 따른 테마 생성, 테마 불러오기 등 컨트롤러 수행")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {

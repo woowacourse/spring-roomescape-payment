@@ -1,5 +1,6 @@
 package roomescape.theme.domain;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import roomescape.vo.Name;
 
+@Tag(name = "테마 엔티티", description = "테마 관련 정보 관리")
 @Entity
 public class Theme {
 
