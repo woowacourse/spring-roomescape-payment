@@ -3,7 +3,6 @@ package roomescape.dto.response.reservation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import roomescape.domain.reservation.CanceledReservation;
-import roomescape.domain.reservation.Status;
 import roomescape.dto.response.member.MemberResponse;
 import roomescape.dto.response.theme.ThemeResponse;
 
@@ -26,13 +25,9 @@ public record CanceledReservationWebResponse(
                 canceledReservation.getDate(),
                 ReservationTimeResponse.from(canceledReservation.getTime()),
                 ThemeResponse.from(canceledReservation.getTheme()),
-                getPrintStatus(canceledReservation.getStatus()),
+                canceledReservation.getStatus().getValue(),
                 paymentKey,
                 totalAmount
         );
-    }
-
-    private static String getPrintStatus(Status status) {
-        return status.getValue();
     }
 }
