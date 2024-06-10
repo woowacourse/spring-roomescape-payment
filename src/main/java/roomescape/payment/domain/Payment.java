@@ -1,6 +1,7 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,8 +25,10 @@ public class Payment {
     private Long id;
     @Embedded
     private PaymentKey paymentKey;
+    @Column(nullable = false)
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
     @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
