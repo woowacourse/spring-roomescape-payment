@@ -1,4 +1,4 @@
-package roomescape.common;
+package roomescape.common.config;
 
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,12 @@ import roomescape.auth.core.AuthorizationManager;
 import roomescape.auth.core.token.TokenProvider;
 
 @Configuration
-public class WebMvcConfiguration implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthorizationManager authorizationManager;
     private final TokenProvider tokenProvider;
 
-    public WebMvcConfiguration(final AuthorizationManager authorizationManager, final TokenProvider tokenProvider) {
+    public WebMvcConfig(final AuthorizationManager authorizationManager, final TokenProvider tokenProvider) {
         this.authorizationManager = authorizationManager;
         this.tokenProvider = tokenProvider;
     }

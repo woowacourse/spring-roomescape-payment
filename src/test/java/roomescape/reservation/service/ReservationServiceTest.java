@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.common.PaymentClientConfiguration;
+import roomescape.common.config.PaymentClientConfig;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
@@ -49,7 +49,7 @@ import roomescape.waiting.service.WaitingService;
         WaitingService.class,
         FakePaymentClient.class,
         PaymentService.class,
-        PaymentClientConfiguration.class})
+        PaymentClientConfig.class})
 @EnableConfigurationProperties({PaymentProperties.class})
 class ReservationServiceTest {
 
