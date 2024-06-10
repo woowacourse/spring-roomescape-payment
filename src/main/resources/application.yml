@@ -21,3 +21,17 @@ security:
   toss-pay:
     secret_key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
+# swagger
+springdoc:
+  api-docs:
+    path: /api-docs # API 문서 생성 경로
+  swagger-ui:
+    path: /swagger-ui.html # Swagger-ui 경로
+    enabled: true
+    groups-order: desc
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

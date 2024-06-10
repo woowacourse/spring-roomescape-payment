@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.net.URI;
@@ -25,6 +26,7 @@ import roomescape.reservation.controller.dto.ReservationWithStatus;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingReservationService;
 
+@Tag(name = "Reservation", description = "Reservation API")
 @RestController
 public class ReservationController {
 

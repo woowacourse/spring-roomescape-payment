@@ -1,5 +1,6 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import roomescape.auth.handler.RequestHandler;
 import roomescape.auth.handler.ResponseHandler;
 import roomescape.auth.service.AuthService;
 
+@Tag(name = "Auth", description = "Auth API")
 @RestController
 public class AuthController {
 
