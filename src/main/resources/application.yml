@@ -13,7 +13,7 @@ spring:
         format_sql: true
 
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     defer-datasource-initialization: true
 
 jwt:

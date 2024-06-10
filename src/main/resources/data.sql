@@ -1,6 +1,6 @@
 INSERT INTO reservation_time(start_at)
-VALUES ('10:00:00'),
-       ('19:00:00');
+VALUES ('10:00'),
+       ('19:00');
 
 INSERT INTO theme(name, description, thumbnail)
 VALUES ('레벨2 탈출', '우테코 레벨2 탈출기!', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
