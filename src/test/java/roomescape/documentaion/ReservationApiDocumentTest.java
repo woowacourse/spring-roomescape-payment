@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.payment.application.PaymentConfirmRequest;
-import roomescape.payment.application.PaymentQueryService;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.application.BookingManageService;
@@ -57,7 +57,7 @@ class ReservationApiDocumentTest extends DocumentTest {
     private final BookingManageService bookingManageService = Mockito.mock(BookingManageService.class);
     private final WaitingManageService waitingManageService = Mockito.mock(WaitingManageService.class);
     private final WaitingQueryService waitingQueryService = Mockito.mock(WaitingQueryService.class);
-    private final PaymentQueryService paymentQueryService = Mockito.mock(PaymentQueryService.class);
+    private final PaymentService paymentService = Mockito.mock(PaymentService.class);
     private final ReservationTimeService reservationTimeService = Mockito.mock(ReservationTimeService.class);
     private final ThemeService themeService = Mockito.mock(ThemeService.class);
 
@@ -148,7 +148,7 @@ class ReservationApiDocumentTest extends DocumentTest {
                 .willReturn(List.of(expectedReservation));
         BDDMockito.given(waitingQueryService.findAllWithPreviousCountByMember(any()))
                 .willReturn(List.of(expectedWaitingReservation));
-        BDDMockito.given(paymentQueryService.findAllInPaymentProducts(any()))
+        BDDMockito.given(paymentService.findAllInPaymentProducts(any()))
                 .willReturn(List.of(expectedPayment));
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/reservations/mine").contentType(MediaType.APPLICATION_JSON))
@@ -201,7 +201,7 @@ class ReservationApiDocumentTest extends DocumentTest {
                 waitingQueryService,
                 reservationTimeService,
                 themeService,
-                paymentQueryService
+                paymentService
         );
     }
 }

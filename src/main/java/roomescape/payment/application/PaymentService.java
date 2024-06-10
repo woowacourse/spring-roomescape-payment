@@ -10,6 +10,8 @@ import roomescape.payment.pg.TossPaymentsClient;
 import roomescape.payment.pg.TossPaymentsConfirmRequest;
 import roomescape.payment.pg.TossPaymentsPayment;
 
+import java.util.List;
+
 @Service
 public class PaymentService {
     private final TossPaymentsClient client;
@@ -36,5 +38,9 @@ public class PaymentService {
         }
 
         return new Payment(request.getPaymentKey(), request.getOrderId(), request.getAmount(), product);
+    }
+
+    public List<Payment> findAllInPaymentProducts(List<PaymentProduct> products) {
+        return paymentRepository.findAllByPaymentProductIsIn(products);
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.PaymentQueryService;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.application.BookingQueryService;
@@ -45,7 +45,7 @@ public class ReservationController {
     private final WaitingQueryService waitingQueryService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
-    private final PaymentQueryService paymentQueryService;
+    private final PaymentService paymentService;
 
     public ReservationController(BookingQueryService bookingQueryService,
                                  @Qualifier("waitingManageService") ReservationManageService waitingScheduler,
@@ -53,14 +53,14 @@ public class ReservationController {
                                  WaitingQueryService waitingQueryService,
                                  ReservationTimeService reservationTimeService,
                                  ThemeService themeService,
-                                 PaymentQueryService paymentQueryService) {
+                                 PaymentService paymentService) {
         this.bookingQueryService = bookingQueryService;
         this.waitingScheduler = waitingScheduler;
         this.bookingScheduler = bookingScheduler;
         this.waitingQueryService = waitingQueryService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
-        this.paymentQueryService = paymentQueryService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
@@ -106,7 +106,7 @@ public class ReservationController {
         List<PaymentProduct> paymentProducts = reservations.stream()
                 .map(it -> new PaymentProduct(it.getId()))
                 .toList();
-        List<Payment> payments = paymentQueryService.findAllInPaymentProducts(paymentProducts);
+        List<Payment> payments = paymentService.findAllInPaymentProducts(paymentProducts);
         Map<Long, Payment> paymentMap = payments.stream()
                 .collect(Collectors.toMap(Payment::getPaymentProductId, identity()));
 

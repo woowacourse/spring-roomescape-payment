@@ -21,7 +21,7 @@ import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentConfirmRequest;
-import roomescape.payment.application.PaymentQueryService;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.pg.TossPaymentsClient;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
@@ -96,7 +96,7 @@ class ReservationControllerTest extends ControllerTest {
     private TossPaymentsClient tossPaymentsClient;
 
     @MockBean
-    private PaymentQueryService paymentQueryService;
+    private PaymentService paymentService;
 
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
