@@ -19,6 +19,7 @@ import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.request.PaymentApproveDto;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -111,14 +112,12 @@ public class ReservationService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationDto> findAll() {
         return reservationRepository.findAll().stream()
                 .map(ReservationDto::new)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationDto> findAllSearched(AdminSearchedReservationDto request) {
         Specification<Reservation> reservationSpecification = new ReservationSpecification().generate(request);
         List<Reservation> searchedReservations = reservationRepository.findAll(reservationSpecification);
@@ -128,7 +127,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationDto> findByMemberId(Long id) {
         return reservationRepository.findAllByMemberId(id)
                 .stream()
