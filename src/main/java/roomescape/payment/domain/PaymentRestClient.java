@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
 import roomescape.payment.dto.PaymentCreateRequest;
@@ -50,7 +49,7 @@ public class PaymentRestClient {
                             handleErrorMessage(response)
                     ))
                     .body(RestClientPaymentApproveResponse.class);
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR, e);
         }
@@ -67,7 +66,7 @@ public class PaymentRestClient {
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (request, response) -> handleErrorMessage(response))
                     .toBodilessEntity();
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR, e);
         }
