@@ -40,7 +40,7 @@ public class ReservationController {
 
     @SwaggerOk(summary = "전체 예약 조회")
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationResponse>> findAllByReservation() {
+    public ResponseEntity<List<ReservationResponse>> findAllReservations() {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
@@ -68,7 +68,7 @@ public class ReservationController {
     @SwaggerNoContent(summary = "예약 삭제")
     @SwaggerNotFound
     @DeleteMapping("/reservations/{reservationId}")
-    public ResponseEntity<Void> deleteByReservation(@PathVariable long reservationId) {
+    public ResponseEntity<Void> deleteReservation(@PathVariable long reservationId) {
         reservationService.deleteById(reservationId);
         return ResponseEntity.noContent().build();
     }
@@ -76,7 +76,7 @@ public class ReservationController {
     @SwaggerNoContent(summary = "예약 대기 삭제")
     @SwaggerNotFound
     @DeleteMapping("/waitings/{reservationWaitingId}")
-    public ResponseEntity<Void> deleteByReservationWaiting(@PathVariable long reservationWaitingId) {
+    public ResponseEntity<Void> deleteReservationWaiting(@PathVariable long reservationWaitingId) {
         reservationWaitingService.deleteById(reservationWaitingId);
         return ResponseEntity.noContent().build();
     }
