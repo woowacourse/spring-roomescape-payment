@@ -16,10 +16,10 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -33,11 +33,11 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("회원별 예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findReservationsAndWaitingsByMember() {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
-        saveWaitReservationAsDateNow();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveWaitReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -52,10 +52,10 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("테마 아이디, 회원 아이디, 기간 조건 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAllBySearchCond() {
-        saveAdminMember();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
+        memberJdbcUtil.saveAdminMember();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
 
         String yesterday = LocalDate.now().minusDays(1).toString();
         String tomorrow = LocalDate.now().plusDays(1).toString();
@@ -77,10 +77,10 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약을 성공적으로 제거하면 204 응답을 받는다.")
     @Test
     void delete() {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

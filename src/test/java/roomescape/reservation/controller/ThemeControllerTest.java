@@ -51,8 +51,8 @@ class ThemeControllerTest extends ControllerTest {
                 "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
         Theme sf = new Theme(new ThemeName("SF"), new Description("미래"),
                 "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
-        saveTheme(horror);
-        saveTheme(sf);
+        themeJdbcUtil.saveTheme(horror);
+        themeJdbcUtil.saveTheme(sf);
 
         RestAssured.given(spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

@@ -1,10 +1,11 @@
-package roomescape.common.config;
+package roomescape.common.util;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DatabaseCleaner {
+
     private final JdbcTemplate jdbcTemplate;
 
     public DatabaseCleaner(final JdbcTemplate jdbcTemplate) {

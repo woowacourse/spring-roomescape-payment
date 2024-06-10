@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.dto.LoginRequest;
-import roomescape.common.config.DatabaseCleaner;
+import roomescape.common.util.DatabaseCleaner;
 import roomescape.member.dto.MemberSignUpRequest;
 import roomescape.member.service.MemberService;
 

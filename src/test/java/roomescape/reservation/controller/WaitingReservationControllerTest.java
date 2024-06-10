@@ -43,10 +43,10 @@ class WaitingReservationControllerTest extends ControllerTest {
     @DisplayName("예약 대기 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveWaitReservationAsDateNow();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveWaitReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -62,11 +62,11 @@ class WaitingReservationControllerTest extends ControllerTest {
     @DisplayName("회원이 예약 대기를 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
     @Test
     void saveMemberWaitingReservation() throws JsonProcessingException {
-        saveMember(MEMBER_JOJO);
-        saveMember(MEMBER_KAKI);
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
+        memberJdbcUtil.saveMember(MEMBER_JOJO);
+        memberJdbcUtil.saveMember(MEMBER_KAKI);
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
 
         WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
         String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
@@ -110,10 +110,10 @@ class WaitingReservationControllerTest extends ControllerTest {
     @DisplayName("예약 대기를 성공적으로 승인하면 204 응답을 받는다.")
     @Test
     void approveReservation() {
-        saveMember(MEMBER_KAKI);
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveWaitReservationAsDateNow();
+        memberJdbcUtil.saveMember(MEMBER_KAKI);
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveWaitReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

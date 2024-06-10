@@ -62,9 +62,9 @@ class ReservationSaveControllerTest extends ControllerTest {
     @DisplayName("회원이 예약을 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
     @Test
     void saveMemberReservation() throws Exception {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
 
         ReservationPaymentSaveRequest reservationPaymentSaveRequest = new ReservationPaymentSaveRequest(
                 LocalDate.now(),

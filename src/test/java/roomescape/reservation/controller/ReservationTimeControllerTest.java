@@ -49,13 +49,13 @@ class ReservationTimeControllerTest extends ControllerTest {
     @DisplayName("예약 가능한 시간 조회 성공 시 200응답을 받는다.")
     @Test
     void findAvailableTimes() {
-        saveAdminMember();
-        saveThemeAsHorror();
-        saveReservationTime(new ReservationTime(LocalTime.parse("10:00")));
-        saveReservationTime(new ReservationTime(LocalTime.parse("11:00")));
-        saveReservationTime(new ReservationTime(LocalTime.parse("12:00")));
+        memberJdbcUtil.saveAdminMember();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTime(new ReservationTime(LocalTime.parse("10:00")));
+        reservationTimeJdbcUtil.saveReservationTime(new ReservationTime(LocalTime.parse("11:00")));
+        reservationTimeJdbcUtil.saveReservationTime(new ReservationTime(LocalTime.parse("12:00")));
 
-        saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
 
         RestAssured.given(spec)
                 .param("date", LocalDate.now().toString())

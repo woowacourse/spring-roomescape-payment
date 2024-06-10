@@ -15,11 +15,11 @@ class PaymentControllerTest extends ControllerTest {
     @DisplayName("결제 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {
-        saveMemberAsKaki();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
-        savePayment();
+        memberJdbcUtil.saveMemberAsKaki();
+        themeJdbcUtil.saveThemeAsHorror();
+        reservationTimeJdbcUtil.saveReservationTimeAsTen();
+        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        paymentJdbcUtil.savePayment();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
