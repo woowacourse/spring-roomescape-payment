@@ -1,0 +1,50 @@
+
+---
+spring:
+  datasource:
+    url: jdbc:h2:mem:database;MODE=MySQL
+    driverClassName: org.h2.Driver
+    hibernate:
+      ddl-auto: validate
+    defer-datasource-initialization: true
+  jpa:
+    open-in-view: false
+
+logging:
+  level:
+    root: WARN
+    roomescape: WARN
+
+dataloader:
+  enable: false
+
+security:
+  jwt:
+    token:
+      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
+      expire-length: 3600000
+
+  payment:
+    toss:
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      host-name: https://api.tosspayments.com
+
+springdoc:
+  swagger-ui:
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+    defaultModelsExpandDepth: 2
+    defaultModelExpandDepth: 2
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+  model-and-view-allowed: true
+  paths-to-match:
+    - /**
+
