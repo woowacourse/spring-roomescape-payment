@@ -1,0 +1,27 @@
+= 로그인 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 로그인
+=== Request
+include::{snippets}/auth-controller-test/login-test/http-request.adoc[]
+include::{snippets}/auth-controller-test/login-test/request-fields.adoc[]
+=== Response
+include::{snippets}/auth-controller-test/login-test/http-response.adoc[]
+=== Response(wrong email)
+include::{snippets}/auth-controller-test/login-fail-with-unknown-email/http-response.adoc[]
+=== Response(wrong password)
+include::{snippets}/auth-controller-test/login-fail-with-invalid-password/http-response.adoc[]
+
+== 로그인 확인
+=== Request
+include::{snippets}/auth-controller-test/login-check-test/http-request.adoc[]
+=== Response
+include::{snippets}/auth-controller-test/login-check-test/http-response.adoc[]
+=== Response(wrong token)
+include::{snippets}/auth-controller-test/login-check-with-invalid-token-test/response-body.adoc[]
+=== Response(expired token)
+include::{snippets}/auth-controller-test/login-check-with-expired-token-test/response-body.adoc[]

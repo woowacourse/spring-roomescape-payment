@@ -1,0 +1,57 @@
+= 어드민 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 예약 생성(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/save-reservation-for-admin-test/http-request.adoc[]
+include::{snippets}/admin-reservation-controller-test/save-reservation-for-admin-test/request-fields.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/save-reservation-for-admin-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/save-reservation-include-member-id-who-not-admin-test/http-response.adoc[]
+
+== 예약 삭제(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/delete-reservation-test/http-request.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/delete-reservation-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/delete-reservation-who-not-admin-test/http-response.adoc[]
+
+== 예약 시간 생성(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/save-reservation-time-test/http-request.adoc[]
+include::{snippets}/admin-reservation-controller-test/save-reservation-time-test/request-fields.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/save-reservation-time-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/save-reservation-time-who-not-admin-test/http-response.adoc[]
+
+== 예약 시간 삭제(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/delete-reservation-time-test/http-request.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/delete-reservation-time-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/delete-reservation-who-not-admin-test/http-response.adoc[]
+
+== 테마 생성(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/save-theme-test/http-request.adoc[]
+include::{snippets}/admin-reservation-controller-test/save-theme-test/request-fields.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/save-theme-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/save-theme-who-not-admin-test/http-response.adoc[]
+
+== 테마 삭제(어드민)
+=== Request
+include::{snippets}/admin-reservation-controller-test/delete-theme-test/http-request.adoc[]
+=== Response
+include::{snippets}/admin-reservation-controller-test/delete-theme-test/http-response.adoc[]
+=== Response(not admin)
+include::{snippets}/admin-reservation-controller-test/delete-theme-who-not-admin-test/http-response.adoc[]

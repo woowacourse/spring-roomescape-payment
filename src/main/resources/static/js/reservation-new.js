@@ -141,7 +141,7 @@ function saveRow(event) {
     timeId: timeSelect.value
   };
 
-  requestCreate(reservation)
+  requestCreate()
     .then(() => {
       location.reload();
     })

@@ -13,7 +13,7 @@ class MemberTest {
         // Given
         final MemberRole memberRole = MemberRole.USER;
         final String password = "password";
-        final String name = "켈리";
+        final String name = "kelly";
         final String email = "kelly6bf@gmail.com";
         final Member memberWithoutId = Member.createMemberWithoutId(memberRole, password, name, email);
 

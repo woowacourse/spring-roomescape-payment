@@ -6,7 +6,7 @@ VALUES ('ADMIN', 'N6UX5zCeUl/v6khTHKEmTRG/qLZNyrirpjySbDj+Tc0=', '관리자', 'a
 INSERT INTO member (role, password, name, email)
 VALUES ('USER', 'c7c8DLfgOv4RFWUd7q9VDn1684F5dTghVOXoAzrc1GA=', '일반 회원', 'user@mail.com'); /** userPw1234! */
 INSERT INTO member (role, password, name, email)
-VALUES ('USER', 'c7c8DLfgOv4RFWUd7q9VDn1684F5dTghVOXoAzrc1GA=', '켈리', 'kelly@mail.com'); /** userPw1234! */
+VALUES ('USER', 'c7c8DLfgOv4RFWUd7q9VDn1684F5dTghVOXoAzrc1GA=', 'kelly', 'kelly@mail.com'); /** userPw1234! */
 INSERT INTO member (role, password, name, email)
 VALUES ('USER', 'c7c8DLfgOv4RFWUd7q9VDn1684F5dTghVOXoAzrc1GA=', '테바', 'teva@mail.com'); /** userPw1234! */
 INSERT INTO member (role, password, name, email)
