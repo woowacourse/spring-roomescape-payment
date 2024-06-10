@@ -47,6 +47,14 @@ public class Payment {
         this.reservation = reservation;
     }
 
+    public void cancel() {
+        status = PaymentStatus.CANCELED;
+    }
+
+    public boolean isCancelStatus() {
+        return this.status == PaymentStatus.CANCELED;
+    }
+
     public Long getId() {
         return id;
     }
@@ -81,9 +89,5 @@ public class Payment {
 
     public Reservation getReservation() {
         return reservation;
-    }
-
-    public void cancel() {
-        status = PaymentStatus.CANCELED;
     }
 }

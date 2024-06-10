@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
@@ -22,6 +23,7 @@ import roomescape.service.reservation.dto.ReservationSaveInput;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -165,6 +167,77 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Nested
+    @DisplayName("예약 취소")
+    class CancelReservation {
+        Member member;
+        Reservation reservation;
+
+        @BeforeEach
+        void setUp() {
+            ReservationTime time = timeFixture.createFutureTime();
+            Theme theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
+        }
+
+        @Test
+        void 예약_id와_예약자_id로_예약을_취소할_수_있다() {
+            reservationService.cancelReservation(reservation.getId(), member);
+            Payment payment = paymentFixture.findByReservation(reservation).get();
+            Reservation canceldReservation = reservationFixture.findAllReservation().stream()
+                    .filter(r -> r.equals(reservation))
+                    .findAny()
+                    .get();
+
+            assertThat(canceldReservation.isCancelStatus()).isTrue();
+            assertThat(payment.isCancelStatus()).isTrue();
+        }
+
+        @Test
+        void 존재하지_않는_예약_id로_예약_취소_시_예외가_발생한다() {
+            long wrongReservationId = 10L;
+
+            assertThatThrownBy(() -> reservationService.cancelReservation(wrongReservationId, member))
+                    .isInstanceOf(NotFoundReservationException.class);
+        }
+
+        @Test
+        void 예약자가_아닌_사용자_id로_예약_취소_시_예외가_발생한다() {
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
+
+            assertThatThrownBy(() -> reservationService.cancelReservation(reservation.getId(), anotherMember))
+                    .isInstanceOf(ReservationAuthorityNotExistException.class);
+        }
+
+        @Test
+        void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
+            paymentClient.cancelPayment(any());
+
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
+            waitingFixture.createWaiting(reservation, anotherMember);
+            reservationService.cancelReservation(reservation.getId(), member);
+
+            Optional<Reservation> paymentWaitingReservation = reservationFixture.findAllReservation().stream()
+                    .filter(Reservation::isPaymentWaitingStatus)
+                    .findAny();
+            Optional<Reservation> canceledReservation = reservationFixture.findAllReservation().stream()
+                    .filter(Reservation::isCancelStatus)
+                    .findAny();
+
+            assertThat(canceledReservation).isNotEmpty();
+            assertThat(canceledReservation.get().getMember()).isEqualTo(reservation.getMember());
+
+            assertThat(paymentWaitingReservation).isNotEmpty();
+            assertThat(paymentWaitingReservation.get().getMember()).isEqualTo(anotherMember);
+
+            List<ReservationWaiting> waitings = waitingFixture.findAllWaiting();
+            assertThat(waitings)
+                    .isEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("예약 삭제")
     class DeleteReservation {
         Member member;
@@ -180,50 +253,24 @@ class ReservationServiceTest extends ServiceTest {
         }
 
         @Test
-        void 예약_id와_예약자_id로_예약_대기가_존재하지_않는_예약을_삭제할_수_있다() {
-            reservationService.cancelReservation(reservation.getId(), member);
+        void 예약_id와_예약자_id로_예약을_삭제할_수_있다() {
+            reservationService.deleteReservation(reservation.getId(), member);
 
-            List<Reservation> reservations = reservationFixture.findAllReservation();
-            assertThat(reservations)
-                    .isEmpty();
-        }
+            Optional<Reservation> deletedReservation = reservationFixture.findAllReservation().stream()
+                    .filter(r -> r.equals(reservation))
+                    .findAny();
+            Optional<Payment> deletedPayment = paymentFixture.findByReservation(reservation);
 
-        @Test
-        void 존재하지_않는_예약_id로_예약_삭제_시_예외가_발생한다() {
-            long wrongReservationId = 10L;
-
-            assertThatThrownBy(() -> reservationService.cancelReservation(wrongReservationId, member))
-                    .isInstanceOf(NotFoundReservationException.class);
+            assertThat(deletedReservation).isEmpty();
+            assertThat(deletedPayment).isEmpty();
         }
 
         @Test
         void 예약자가_아닌_사용자_id로_예약_삭제_시_예외가_발생한다() {
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
-            assertThatThrownBy(() -> reservationService.cancelReservation(reservation.getId(), anotherMember))
+            assertThatThrownBy(() -> reservationService.deleteReservation(reservation.getId(), anotherMember))
                     .isInstanceOf(ReservationAuthorityNotExistException.class);
-        }
-
-        @Test
-        void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
-            paymentClient.cancelPayment(any());
-
-            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
-            waitingFixture.createWaiting(reservation, anotherMember);
-            reservationService.cancelReservation(reservation.getId(), member);
-
-            List<Reservation> reservations = reservationFixture.findAllReservation();
-            List<ReservationWaiting> waitings = waitingFixture.findAllWaiting();
-            assertThat(reservations)
-                    .isNotEmpty()
-                    .first()
-                    .satisfies(reservation -> {
-                        assertThat(reservation).isEqualTo(this.reservation);
-                        assertThat(reservation.getMember()).isEqualTo(anotherMember);
-                        assertThat(reservation.isPaymentWaitingStatus()).isTrue();
-                    });
-            assertThat(waitings)
-                    .isEmpty();
         }
     }
 }

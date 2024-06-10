@@ -8,6 +8,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.service.payment.PaymentStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Component
 public class PaymentFixture {
@@ -18,5 +19,9 @@ public class PaymentFixture {
         Payment payment = new Payment("paymentKey", "orderId", 0, "orderName",
                 ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE, reservation);
         return paymentRepository.save(payment);
+    }
+
+    public Optional<Payment> findByReservation(Reservation reservation) {
+        return paymentRepository.findByReservation(reservation);
     }
 }
