@@ -35,6 +35,10 @@ public class Payment {
         this.reservation = reservation;
     }
 
+    public boolean isReservation(final Reservation reservation) {
+        return this.reservation.getId().equals(reservation.getId());
+    }
+
     public Long getId() {
         return id;
     }

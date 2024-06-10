@@ -1,11 +1,10 @@
 package roomescape.service.booking.reservation.module;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.dto.payment.PaymentResponse;
-import roomescape.exception.RoomEscapeException;
 import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.repository.PaymentRepository;
 
@@ -28,16 +27,7 @@ public class PaymentService {
         return paymentRepository.save(rawPayment);
     }
 
-    public PaymentResponse findPaymentByReservation(final Reservation reservation) {
-        Payment payment = findByReservation(reservation);
-        return PaymentResponse.from(payment);
-    }
-
-    private Payment findByReservation(final Reservation reservation) {
-        return paymentRepository.findByReservation(reservation)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "예약정보와 일치하는 결제 정보가 존재하지 않습니다.",
-                        "reservation_id : " + reservation.getId()
-                ));
+    public List<Payment> findPaymentByReservationIds(final List<Long> reservedReservationIds) {
+        return paymentRepository.findByReservation_IdIn(reservedReservationIds);
     }
 }

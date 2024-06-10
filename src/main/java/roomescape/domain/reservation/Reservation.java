@@ -58,10 +58,6 @@ public class Reservation {
         return status == Status.RESERVED;
     }
 
-    public boolean isPending() {
-        return status == Status.PENDING;
-    }
-
     public boolean isWaiting() {
         return this.status == Status.WAITING;
     }
