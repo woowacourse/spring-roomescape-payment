@@ -29,6 +29,6 @@ public class UserPageController {
     @Operation(summary = "로그인 페이지", description = "로그인 페이지를 조회합니다.")
     @GetMapping("/login")
     public String loginView() {
-        return "/login";
+        return "login";
     }
 }
