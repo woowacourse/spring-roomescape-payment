@@ -31,17 +31,25 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("결제 승인 실패: 존재하지 않는 예약입니다. (id: %d)", reservationId)));
         validatePayment(paymentSaveDto, reservation);
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto(paymentSaveDto.paymentKey(), paymentSaveDto.orderId(), paymentSaveDto.amount());
-        Payment payment = approveAndSavePayment(paymentApproveDto, reservation);
+        PaymentDto paymentDto = approvePayment(paymentSaveDto);
+        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId());
+        Payment savedPayment = savePayment(payment);
 
-        return PaymentDto.from(payment);
+        return PaymentDto.from(savedPayment);
     }
 
-    private Payment approveAndSavePayment(PaymentApproveDto paymentApproveDto, Reservation reservation) {
-        PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId());
+    private PaymentDto approvePayment(PaymentSaveDto paymentSaveDto) {
+        PaymentApproveDto paymentApproveDto = new PaymentApproveDto(paymentSaveDto.paymentKey(), paymentSaveDto.orderId(), paymentSaveDto.amount());
+        return paymentManager.approve(paymentApproveDto);
+    }
 
-        return savePayment(payment);
+    private Payment savePayment(Payment payment) {
+        try {
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            paymentManager.cancel(payment.getPaymentKey(), new PaymentCancelDto("결제 정보 저장 중 오류가 발생했습니다."));
+            throw e;
+        }
     }
 
     private void validatePayment(PaymentSaveDto paymentSaveDto, Reservation reservation) {
@@ -68,15 +76,6 @@ public class PaymentService {
         boolean isValidAmount = reservation.isPriceEqual(amount);
         if (!isValidAmount) {
             throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
-        }
-    }
-
-    private Payment savePayment(Payment payment) {
-        try {
-            return paymentRepository.save(payment);
-        } catch (Exception e) {
-            paymentManager.cancel(payment.getPaymentKey(), new PaymentCancelDto("결제 정보 저장 중 오류가 발생했습니다."));
-            throw e;
         }
     }
 }
