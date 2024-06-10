@@ -20,7 +20,7 @@ import roomescape.service.reservation.ReservationRegisterService;
 import roomescape.service.reservation.ReservationSearchService;
 import roomescape.service.reservation.WaitingApproveService;
 
-@Tag(name = "관리자 예약 관리")
+@Tag(name = "예약 관리_관리자용")
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {

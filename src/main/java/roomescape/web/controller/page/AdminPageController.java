@@ -26,7 +26,7 @@ class AdminPageController {
     @Operation(summary = "예약 대기 관리 페이지", description = "대기중인 예약을 관리하는 페이지를 반환한다.")
     @GetMapping("/waiting")
     public String waiting() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 
     @Operation(summary = "시간 관리 페이지", description = "예약 시간을 관리하는 페이지를 반환한다.")
