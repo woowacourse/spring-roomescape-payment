@@ -10,4 +10,9 @@ public class UserPageController {
     public String reservationMine() {
         return "reservation-mine";
     }
+
+    @GetMapping("/reservation/payment")
+    public String reservationPayment() {
+        return "reservation-payment";
+    }
 }
