@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 import roomescape.global.entity.BaseEntity;
 import roomescape.payment.domain.EasyPayType;
@@ -21,7 +21,7 @@ public class Payment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     private Reservation reservation;
     @Column(unique = true)
     private String paymentKey;
