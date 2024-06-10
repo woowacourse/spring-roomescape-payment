@@ -1,33 +1,5 @@
-server:
-  servlet:
-    encoding:
-      force-response: true
-
-spring:
-  profiles:
-    default: local
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  datasource:
-    url: jdbc:h2:mem:database
-  jpa:
-    defer-datasource-initialization: true
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        default_batch_fetch_size: 500
-        jdbc:
-          time_zone: Asia/Seoul
-
 security:
   jwt:
     token:
       secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
       expire-length: 3600000
-
-logging-module:
-  version: 0.0.4
