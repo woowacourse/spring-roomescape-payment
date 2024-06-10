@@ -23,9 +23,8 @@ public interface MemberReservationRepository extends JpaRepository<MemberReserva
                     AND (:themeId IS NULL OR th.id = :themeId) 
                     AND :startDate <= r.date 
                     AND r.date <= :endDate
-                    AND mr.reservationStatus = :status
             """)
-    List<MemberReservation> findBy(Long memberId, Long themeId, ReservationStatus status, LocalDate startDate,
+    List<MemberReservation> findBy(Long memberId, Long themeId, LocalDate startDate,
                                    LocalDate endDate);
 
     List<MemberReservation> findByMemberId(long memberId);

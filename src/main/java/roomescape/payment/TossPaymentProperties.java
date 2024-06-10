@@ -13,11 +13,15 @@ public class TossPaymentProperties {
 
     private final String cancelPath;
 
-    public TossPaymentProperties(String secretKey, String baseUrl, String confirmPath, String cancelPath) {
+    private final String inquiryPath;
+
+    public TossPaymentProperties(String secretKey, String baseUrl, String confirmPath, String cancelPath,
+                                 String inquiryPath) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl;
         this.confirmPath = confirmPath;
         this.cancelPath = cancelPath;
+        this.inquiryPath = inquiryPath;
     }
 
     public String getSecretKey() {
@@ -30,5 +34,9 @@ public class TossPaymentProperties {
 
     public String getCancelUrl() {
         return baseUrl + cancelPath;
+    }
+
+    public String getInquiryUrl() {
+        return baseUrl + inquiryPath;
     }
 }

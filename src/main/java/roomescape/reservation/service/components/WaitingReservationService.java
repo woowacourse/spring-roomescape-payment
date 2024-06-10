@@ -1,4 +1,4 @@
-package roomescape.reservation.service.services;
+package roomescape.reservation.service.components;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class WaitingReservationService {
         }
     }
 
-    public List<ReservationResponse> getWaiting() {
+    public List<ReservationResponse> findAllWaiting() {
         return memberReservationRepository.findAllByReservationStatus(ReservationStatus.PENDING)
                 .stream()
                 .map(ReservationResponse::from)

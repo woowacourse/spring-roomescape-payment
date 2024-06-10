@@ -1,0 +1,26 @@
+=== 예약 생성
+operation::reservations/create/success[snippets='curl-request,request-fields']
+==== 성공
+operation::reservations/create/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| COMMON-003 | 올바르지 않은 데이터 요청입니다.| 지나간 날짜와 시간에 대한 예약 생성할 경우
+|===
+
+=== 예약 조회
+operation::reservations/find/success[snippets='curl-request']
+==== 성공
+operation::reservations/find/success[snippets='http-request,http-response']
+
+=== 예약 삭제
+operation::reservations/delete/success[snippets='curl-request']
+==== 성공
+operation::reservations/delete/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| RESERVATION-005 | 예약자가 아닙니다. | 타인의 예약 삭제할 경우
+| COMMON-003 | 올바르지 않은 데이터 요청입니다." | 지나간 날짜와 시간에 대한 예약 생성할 경우
+| RESERVATION-005 | 예약자가 아닙니다. | 타인의 예약 삭제할 경우
+|===

@@ -7,10 +7,12 @@ public enum ErrorType {
     MEMBER_NOT_FOUND("AUTH-001", "해당 유저를 찾을 수 없습니다."),
     INVALID_TOKEN("AUTH-002", "유효하지 않은 토큰입니다."),
     TOKEN_PAYLOAD_EXTRACTION_FAILURE("AUTH-003", "토큰 페이로드 추출에 실패했습니다"),
+    INVALID_PASSWORD("AUTH-004", "비밀번호가 일치하지 않습니다."),
 
     MISSING_REQUIRED_VALUE_ERROR("COMMON-001", "필수 요청값이 누락되었습니다."),
     NOT_ALLOWED_PERMISSION_ERROR("COMMON-002", "허용되지 않은 권한입니다."),
     INVALID_REQUEST_ERROR("COMMON-003", "올바르지 않은 데이터 요청입니다."),
+    NETWORK_ERROR("COMMON-004", "네트워크 처리에서 문제가 발생했습니다."),
 
     NAME_FORMAT_ERROR("USER-001", "올바르지 않은 이름 입력 양식입니다."),
     EMAIL_FORMAT_ERROR("USER-002", "올바르지 않은 이메일 입력 양식입니다."),
@@ -26,6 +28,8 @@ public enum ErrorType {
     THEME_NOT_FOUND("THEME-001", "해당 ID에 대응되는 테마가 없습니다."),
 
     RESERVATION_TIME_NOT_FOUND("RESERVATION-TIME-001", "해당 ID에 대응되는 예약 시간이 없습니다."),
+
+    PAYMENT_ERROR("PAYMENT-001", "결제 도중 문제가 발생했습니다."),
 
     UNEXPECTED_SERVER_ERROR("SERVER-001", "서버 관리자에게 문의하세요.");
 

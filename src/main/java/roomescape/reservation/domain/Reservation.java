@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -57,6 +58,10 @@ public class Reservation {
         if (date == null || time == null) {
             throw new BadRequestException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
         }
+    }
+
+    public BigDecimal getPrice() {
+        return theme.getPrice();
     }
 
     public Long getId() {

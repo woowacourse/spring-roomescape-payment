@@ -22,7 +22,7 @@ public class Email {
         this.address = address;
     }
 
-    public Email() {
+    protected Email() {
     }
 
     public void validate(String email) {

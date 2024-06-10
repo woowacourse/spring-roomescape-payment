@@ -1,4 +1,4 @@
-package roomescape.reservation.service.services;
+package roomescape.reservation.service.components;
 
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import roomescape.exception.ErrorType;
 import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -34,16 +35,20 @@ public class ReservationCommonService {
 
     private final MemberReservationRepository memberReservationRepository;
 
+    private final PaymentRepository paymentRepository;
+
     public ReservationCommonService(ReservationRepository reservationRepository,
                                     ReservationTimeRepository reservationTimeRepository,
                                     ThemeRepository themeRepository,
                                     MemberRepository memberRepository,
-                                    MemberReservationRepository memberReservationRepository) {
+                                    MemberReservationRepository memberReservationRepository,
+                                    PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.memberReservationRepository = memberReservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public void validateDuplicatedReservation(Reservation reservation, Member member) {
@@ -62,6 +67,7 @@ public class ReservationCommonService {
         if (!memberReservation.canDelete(member)) {
             throw new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER);
         }
+        paymentRepository.deleteByMemberReservationId(memberReservation.getId());
         memberReservationRepository.deleteById(memberReservation.getId());
     }
 
@@ -96,6 +102,13 @@ public class ReservationCommonService {
                 .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
     }
 
+    public Reservation getReservation(LocalDate date, long timeId, long themeId) {
+        ReservationTime time = getReservationTime(timeId);
+        Theme theme = getTheme(themeId);
+        return reservationRepository.findReservationByDateAndTimeAndTheme(date, time, theme)
+                .orElseGet(() -> reservationRepository.save(new Reservation(date, time, theme)));
+    }
+
     public MemberReservation getMemberReservation(long memberReservationId) {
         return memberReservationRepository.findById(memberReservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_RESERVATION_NOT_FOUND));
@@ -112,7 +125,8 @@ public class ReservationCommonService {
         validateDuplicatedReservation(reservation, member);
 
         if (isReservationConfirmed(reservation)) {
-            return new MemberReservation(member, reservation, ReservationStatus.PENDING);
+            return memberReservationRepository.save(
+                    new MemberReservation(member, reservation, ReservationStatus.PENDING));
         }
 
         return memberReservationRepository.save(new MemberReservation(member, reservation, ReservationStatus.APPROVED));

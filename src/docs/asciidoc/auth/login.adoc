@@ -1,0 +1,25 @@
+=== 로그인
+operation::login/success[snippets='curl-request,request-fields']
+==== 성공
+operation::login/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| AUTH-004 | 비밀번호가 일치하지 않습니다. | 비밀번호가 다를 경우
+|===
+
+=== 로그인 사용 검증
+operation::login/check/success[snippets='curl-request']
+==== 성공
+operation::login/check/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| AUTH-002 | 유효하지 않은 토큰입니다. | 유효하지 않는 토큰일 경우
+|===
+
+=== 로그아웃
+operation::logout/success[snippets='curl-request']
+==== 성공
+operation::logout/success[snippets='http-request,http-response']
+

@@ -21,6 +21,8 @@ public class CookieResponseHandler implements ResponseHandler {
     @Override
     public void expire(HttpServletResponse response) {
         Cookie cookie = new Cookie(SESSION_KEY, null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }

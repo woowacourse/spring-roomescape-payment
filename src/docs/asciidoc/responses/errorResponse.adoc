@@ -1,0 +1,11 @@
+[source,json]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 100
+
+{
+  "code" : "RESERVATION-004",
+  "message" : "예약이 존재하여 삭제할 수 없습니다."
+}
+----

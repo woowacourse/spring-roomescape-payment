@@ -46,6 +46,7 @@ payment:
     base-url: https://dev-api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true
@@ -95,6 +96,7 @@ payment:
     base-url: https://dev-api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true
@@ -105,13 +107,6 @@ spring:
   config:
     activate:
       on-profile: prod
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  datasource:
-    url: jdbc:h2:mem:database;MODE=MySQL
-    driverClassName: org.h2.Driver
   jpa:
     show-sql: true
     hibernate:
@@ -119,7 +114,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+      show-sql: true
+  datasource:
+    url: ${DATABASE_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${USERNAME}
+    password: ${PASSWORD}
+  sql:
+    init:
+      mode: always
 
 logging:
   level:
@@ -135,15 +139,16 @@ logging:
 security:
   jwt:
     token:
-      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
-      expire-length: 3600000
+      secret-key: ${JWT_SECRET_KEY}
+      expire-length: ${JWT_EXPIRE_LENGTH}
 
 payment:
   toss:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com/v1
     confirm-path: /payments/confirm
     cancel-path: /payments/%s/cancel
+    inquiry-path: /payments/%s
 
 dataloader:
   enable: true

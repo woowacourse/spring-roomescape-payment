@@ -1,16 +1,20 @@
 package roomescape.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static roomescape.fixture.DateFixture.getNextDay;
 
-import jakarta.servlet.http.Cookie;
+import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -18,9 +22,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ErrorType;
+import roomescape.exception.NotFoundException;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.reservation.controller.dto.ThemeResponse;
@@ -31,7 +39,7 @@ class AdminControllerTest extends ControllerTest {
 
     @DisplayName("예약 목록 조회 시, 200을 반환한다.")
     @Test
-    void getReservations() throws Exception {
+    void getReservations() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -48,16 +56,18 @@ class AdminControllerTest extends ControllerTest {
                 .findMemberReservations(any());
 
         //then
-        mockMvc.perform(
-                get("/reservations")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().get("/api/v1/reservations")
+                .then().log().all()
+                .apply(document("admin-reservations/find/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("관리자 예약 생성 시, 201을 반환한다.")
     @Test
-    void create() throws Exception {
+    void create() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -73,27 +83,58 @@ class AdminControllerTest extends ControllerTest {
         params.put("date", "2099-08-05");
         params.put("timeId", reservationTimeResponse.id());
         params.put("themeId", themeResponse.id());
-        params.put("paymentKey", "payemnt-key");
-        params.put("orderId", "orderId-123");
-        params.put("amount", 15000L);
 
         //when
         doReturn(reservationResponse)
                 .when(reservationApplicationService)
-                .createMemberReservation(any());
+                .createMemberReservation(any(AdminMemberReservationRequest.class));
 
         //then
-        mockMvc.perform(
-                post("/admin/reservations")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isCreated());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .body(params)
+                .when().post("/api/v1/admin/reservations")
+                .then().log().all()
+                .apply(document("admin-reservations/create/success",
+                        requestFields(
+                                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("사용자 식별자"),
+                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
+                                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
+                                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("테마 식별자")
+                        )))
+                .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @DisplayName("존재하지 않는 시간, 멤버, 테마 생성 시, 404를 반환한다.")
+    @Test
+    void invalidTimeId() {
+        //given
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberId", 1);
+        params.put("date", "2099-08-05");
+        params.put("timeId", 999999999);
+        params.put("themeId", 2);
+
+        //when
+        doThrow(new NotFoundException(ErrorType.RESERVATION_TIME_NOT_FOUND))
+                .when(reservationApplicationService)
+                .createMemberReservation(any(AdminMemberReservationRequest.class));
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .body(params)
+                .when().post("/api/v1/admin/reservations")
+                .then().log().all()
+                .apply(document("admin-reservations/create/fail/invalid-parameter"))
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("관리자 예약 삭제 시, 204를 반환한다.")
     @Test
-    void deleteTest() throws Exception {
+    void deleteTest() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -110,18 +151,38 @@ class AdminControllerTest extends ControllerTest {
                 .delete(isA(Long.class));
 
         //then
-        mockMvc.perform(
-                delete(String.format(
-                        String.format("/admin/reservations/%d", reservationResponse.memberReservationId())))
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .delete(String.format("/api/v1/admin/reservations/%d", reservationResponse.memberReservationId()))
+                .then().log().all()
+                .apply(document("admin-reservations/delete/success"))
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
+    @DisplayName("관리자 예약 삭제 시 예약이 존재하지 않을 경우, 404를 반환한다.")
+    @Test
+    void delete_notReservationId() {
+        //given & when
+        doThrow(new NotFoundException(ErrorType.NOT_A_WAITING_RESERVATION))
+                .when(reservationApplicationService)
+                .delete(anyLong());
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .delete(String.format("/api/v1/admin/reservations/%d", 9999999))
+                .then().log().all()
+                .apply(document("admin-reservations/delete/reservation-not-found"))
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
 
     @DisplayName("대기 예약을 승인할 경우, 200을 반환한다.")
     @Test
-    void approveWaiting() throws Exception {
+    void approveWaiting() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -137,16 +198,39 @@ class AdminControllerTest extends ControllerTest {
                 .approveWaiting(isA(AuthInfo.class), isA(Long.class));
 
         //when & then
-        mockMvc.perform(
-                post(String.format("/admin/reservations/%d/waiting/approve", waitingResponse.memberReservationId()))
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/approve",
+                        waitingResponse.memberReservationId()))
+                .then().log().all()
+                .apply(document("approve/change/success"))
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @DisplayName("예약 승인 시, 대기하는 예약이 아닐 경우 400을 반환한다.")
+    @Test
+    void approveNotWaitingReservationException() {
+        //given & when
+        doThrow(new BadRequestException(ErrorType.NOT_A_WAITING_RESERVATION))
+                .when(reservationApplicationService)
+                .approveWaiting(any(), anyLong());
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/approve", 1))
+                .then().log().all()
+                .apply(document("approve/change/fail/not-waiting"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("대기 예약을 거절할 경우, 200을 반환한다.")
     @Test
-    void denyWaiting() throws Exception {
+    void denyWaiting() {
         //given
         MemberResponse memberResponse = new MemberResponse(1L, "초코칩");
         ReservationTimeResponse reservationTimeResponse = new ReservationTimeResponse(2L, LocalTime.NOON);
@@ -163,10 +247,33 @@ class AdminControllerTest extends ControllerTest {
                 .approveWaiting(isA(AuthInfo.class), isA(Long.class));
 
         //when & then
-        mockMvc.perform(
-                post(String.format("/admin/reservations/%d/waiting/deny", waitingResponse.memberReservationId()))
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny",
+                        waitingResponse.memberReservationId()))
+                .then().log().all()
+                .apply(document("deny/change/success"))
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @DisplayName("예약 거절 시, 대기하는 예약이 아닐 경우 400을 반환한다.")
+    @Test
+    void denyNotWaitingReservationException() {
+        //given & when
+        doThrow(new BadRequestException(ErrorType.NOT_A_WAITING_RESERVATION))
+                .when(reservationApplicationService)
+                .denyWaiting(any(), anyLong());
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when()
+                .patch(String.format("/api/v1/admin/reservations/%d/waiting/deny", 1))
+                .then().log().all()
+                .apply(document("deny/change/fail/not-waiting"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

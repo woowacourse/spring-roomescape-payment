@@ -27,8 +27,8 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.service.services.MemberReservationService;
-import roomescape.reservation.service.services.WaitingReservationService;
+import roomescape.reservation.service.components.MemberReservationService;
+import roomescape.reservation.service.components.WaitingReservationService;
 import roomescape.util.ServiceTest;
 
 @DisplayName("예약 대기 로직 테스트")
@@ -87,7 +87,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         memberReservationRepository.save(new MemberReservation(memberEden, reservation, ReservationStatus.PENDING));
 
         //when
-        List<ReservationResponse> waiting = waitingReservationService.getWaiting();
+        List<ReservationResponse> waiting = waitingReservationService.findAllWaiting();
 
         //then
         assertThat(waiting).hasSize(2);

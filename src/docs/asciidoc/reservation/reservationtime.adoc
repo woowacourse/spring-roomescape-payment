@@ -1,0 +1,30 @@
+=== 생성
+operation::times/create/success[snippets='curl-request,request-fields']
+==== 성공
+operation::times/create/success[snippets='http-request,http-response']
+
+=== 조회
+operation::times/find/success[snippets='curl-request']
+==== 성공
+operation::times/find/success[snippets='http-request,http-response']
+
+=== 삭제
+operation::times/delete/success[snippets='curl-request']
+==== 성공
+operation::times/delete/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| RESERVATION-004 | 예약이 존재하여 삭제할 수 없습니다. | 예약 시간을 갖는 예약이 존재하는 경우
+|===
+
+=== 가능한 시간 조회
+operation::available-times/find/success[snippets='curl-request']
+==== 성공
+operation::available-times/find/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| COMMON-003 | 올바르지 않은 데이터 요청입니다. | 조회하는 날짜가 과거인 경우
+| THEME-001 | 해당 ID에 대응되는 테마가 없습니다. | 테마가 존재하지 않는 경우
+|===

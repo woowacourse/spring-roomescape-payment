@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -35,6 +37,8 @@ public class DataLoader implements ApplicationRunner {
 
     private final MemberReservationRepository memberReservationRepository;
 
+    private final PaymentRepository paymentRepository;
+
 
     @Value("${dataloader.enable}")
     private boolean enableDataloader;
@@ -43,12 +47,14 @@ public class DataLoader implements ApplicationRunner {
                       ReservationTimeRepository timeRepository,
                       ReservationRepository reservationRepository,
                       MemberRepository memberRepository,
-                      MemberReservationRepository memberReservationRepository) {
+                      MemberReservationRepository memberReservationRepository,
+                      PaymentRepository paymentRepository) {
         this.themeRepository = themeRepository;
         this.timeRepository = timeRepository;
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.memberReservationRepository = memberReservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -136,30 +142,6 @@ public class DataLoader implements ApplicationRunner {
         Member member4 = memberRepository.save(
                 new Member("관리자", "admin@roomescape.com",
                         "$2a$10$5xUHgA2/scLa/9YzqkCrXuAoIwLYiZTif8F8QrjuFfSFRgsUdJYhC", Role.ADMIN));
-
-        MemberReservation memberReservation1 = memberReservationRepository.save(
-                new MemberReservation(member1, reservation1, ReservationStatus.APPROVED));
-        MemberReservation memberReservation2 = memberReservationRepository.save(
-                new MemberReservation(member1, reservation3, ReservationStatus.APPROVED));
-        MemberReservation memberReservation3 = memberReservationRepository.save(
-                new MemberReservation(member1, reservation7, ReservationStatus.APPROVED));
-        MemberReservation memberReservation4 = memberReservationRepository.save(
-                new MemberReservation(member2, reservation2, ReservationStatus.APPROVED));
-        MemberReservation memberReservation5 = memberReservationRepository.save(
-                new MemberReservation(member2, reservation4, ReservationStatus.APPROVED));
-        MemberReservation memberReservation6 = memberReservationRepository.save(
-                new MemberReservation(member2, reservation8, ReservationStatus.APPROVED));
-        MemberReservation memberReservation8 = memberReservationRepository.save(
-                new MemberReservation(member3, reservation5, ReservationStatus.APPROVED));
-        MemberReservation memberReservation9 = memberReservationRepository.save(
-                new MemberReservation(member3, reservation6, ReservationStatus.APPROVED));
-
-        MemberReservation memberReservation10 = memberReservationRepository.save(
-                new MemberReservation(member1, reservation4, ReservationStatus.PENDING));
-        MemberReservation memberReservation11 = memberReservationRepository.save(
-                new MemberReservation(member2, reservation6, ReservationStatus.PENDING));
-        MemberReservation memberReservation12 = memberReservationRepository.save(
-                new MemberReservation(member1, reservation6, ReservationStatus.PENDING));
     }
 
 }

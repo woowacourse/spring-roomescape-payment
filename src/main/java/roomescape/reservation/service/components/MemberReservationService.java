@@ -1,4 +1,4 @@
-package roomescape.reservation.service.services;
+package roomescape.reservation.service.components;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,6 @@ import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.WaitingResponse;
 import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.service.dto.MyReservationInfo;
@@ -33,7 +32,6 @@ public class MemberReservationService {
         return memberReservationRepository.findBy(
                         request.getMemberId(),
                         request.getThemeId(),
-                        ReservationStatus.APPROVED,
                         request.getStartDate(),
                         request.getEndDate())
                 .stream()
@@ -55,14 +53,14 @@ public class MemberReservationService {
                 memberReservation.getReservation().getThemeName(),
                 memberReservation.getReservation().getDate(),
                 memberReservation.getReservation().getTimeValue(),
-                new WaitingResponse(memberReservation.getReservationStatus(), rank));
+                new WaitingResponse(memberReservation.getReservationStatus(), rank),
+                memberReservation.getPrice());
     }
 
     @Transactional
     public void updateStatus(Reservation reservation) {
-        memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation).ifPresent(
-                MemberReservation::notPaid
-        );
+        memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation)
+                .ifPresent(MemberReservation::notPaid);
     }
 
     @Transactional

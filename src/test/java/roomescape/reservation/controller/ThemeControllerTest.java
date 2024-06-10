@@ -5,12 +5,14 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
-import jakarta.servlet.http.Cookie;
+import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,9 +22,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.NotFoundException;
 import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.util.ControllerTest;
 
@@ -31,7 +35,7 @@ class ThemeControllerTest extends ControllerTest {
 
     @DisplayName("테마 생성 시, 201을 반환한다.")
     @Test
-    void create() throws Exception {
+    void create() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -47,17 +51,25 @@ class ThemeControllerTest extends ControllerTest {
                 .create(any());
 
         //then
-        mockMvc.perform(
-                post("/themes")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isCreated());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .body(params)
+                .when().post("/api/v1/themes")
+                .then().log().all()
+                .apply(document("themes/create/success",
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("테마 이름"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("테마 설명"),
+                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일 이미지 url"),
+                                fieldWithPath("price").type(JsonFieldType.STRING).description("테마 가격")
+                        )))
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     @DisplayName("테마 조회 시, 200을 반환한다.")
     @Test
-    void findAll() throws Exception {
+    void findAll() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -67,16 +79,18 @@ class ThemeControllerTest extends ControllerTest {
                 .findAllThemes();
 
         //then
-        mockMvc.perform(
-                get("/themes")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().get("/api/v1/themes")
+                .then().log().all()
+                .apply(document("themes/find/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("테마 삭제 시, 204를 반환한다.")
     @Test
-    void deleteTest() throws Exception {
+    void deleteTest() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -86,16 +100,18 @@ class ThemeControllerTest extends ControllerTest {
                 .delete(isA(Long.class));
 
         //then
-        mockMvc.perform(
-                delete("/themes/" + themeResponse.id())
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().delete("/api/v1/themes/" + themeResponse.id())
+                .then().log().all()
+                .apply(document("themes/delete/success"))
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("예약이 있는 시간 삭제 시, 400을 반환한다.")
     @Test
-    void delete_WithReservationTime() throws Exception {
+    void delete_WithReservationTime() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -105,16 +121,39 @@ class ThemeControllerTest extends ControllerTest {
                 .delete(isA(Long.class));
 
         //then
-        mockMvc.perform(
-                delete("/themes/" + themeResponse.id())
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isBadRequest());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().delete("/api/v1/themes/" + themeResponse.id())
+                .then().log().all()
+                .apply(document("themes/delete/fail/reservation-exist"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("존재하지 않는 테마 삭제 시, 404를 반환한다.")
+    @Test
+    void delete_invalidThemeId() {
+        //given
+        ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
+
+        //when
+        doThrow(new NotFoundException(ErrorType.THEME_NOT_FOUND))
+                .when(themeService)
+                .delete(isA(Long.class));
+
+        //then
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .when().delete("/api/v1/themes/" + themeResponse.id())
+                .then().log().all()
+                .apply(document("themes/delete/fail/theme-not-found"))
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("인기 테마 조회 시, 200을 반환한다.")
     @Test
-    void getAvailable() throws Exception {
+    void getPopular() {
         //given
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일", BigDecimal.valueOf(10000));
 
@@ -124,17 +163,19 @@ class ThemeControllerTest extends ControllerTest {
                 .findPopularThemes(isA(LocalDate.class), isA(LocalDate.class), isA(Integer.class));
 
         //then
-        mockMvc.perform(
-                get("/themes/popular")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().get("/api/v1/themes/popular")
+                .then().log().all()
+                .apply(document("popular-themes/find/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("테마 생성 시, 잘못된 테마 이름 형식에 대해 400을 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"", "      "})
-    void create_Invalid_Name(String name) throws Exception {
+    void create_Invalid_Name(String name) {
         //given
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
@@ -147,18 +188,20 @@ class ThemeControllerTest extends ControllerTest {
                 .create(any());
 
         //then
-        mockMvc.perform(
-                post("/themes")
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-        ).andExpect(status().isBadRequest());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .body(params)
+                .when().post("/api/v1/themes")
+                .then().log().all()
+                .apply(document("themes/create/fail/invalid-name"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("적절하지 않은 limit에 대해 400을 반환한다.")
     @ParameterizedTest
     @ValueSource(ints = {0, -1, 100})
-    void invalidLimit(int limit) throws Exception {
+    void invalidLimit(int limit) {
         //given
         String startDate = "2024-05-03";
         String endDate = "2024-05-06";
@@ -169,10 +212,14 @@ class ThemeControllerTest extends ControllerTest {
                 .create(any());
 
         //then
-        mockMvc.perform(
-                get(String.format("/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate, limit))
-                        .cookie(new Cookie("token", adminToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isBadRequest());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when()
+                .get(String.format("/api/v1/themes/popular?startDate=%s&endDate=%s&limit=%s", startDate, endDate,
+                        limit))
+                .then().log().all()
+                .apply(document("popular-themes/find/fail/invalid-limit"))
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

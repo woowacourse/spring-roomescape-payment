@@ -19,15 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import roomescape.exception.ExceptionResponse;
+import roomescape.exception.PaymentException;
 import roomescape.global.entity.Price;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.payment.exception.PaymentException;
-import roomescape.payment.service.dto.PaymentErrorResponse;
 import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -46,10 +45,13 @@ class PaymentServiceTest extends ServiceTest {
     Member memberChoco;
     Reservation reservation;
     MemberReservation memberReservation;
+
     @Autowired
     private PaymentService paymentService;
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -93,7 +95,7 @@ class PaymentServiceTest extends ServiceTest {
     void throw_exception() {
         //given
         doThrow(new PaymentException(
-                new PaymentErrorResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
+                new ExceptionResponse("NOT_FOUND_PAYMENT", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.")))
                 .when(paymentClient).confirm(any());
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000L), "MC45NTg4ODYxMzA5MTAz",
                 "tgen_20240528172021mxEG4");
@@ -101,5 +103,22 @@ class PaymentServiceTest extends ServiceTest {
         //when&then
         assertThatThrownBy(() -> paymentService.pay(paymentRequest, memberReservation))
                 .isInstanceOf(PaymentException.class);
+    }
+
+    @DisplayName("결제 환불에 성공한다.")
+    @Test
+    void refund() {
+        //given
+        String paymentKey = "paymentKey";
+        PaymentType paymentType = PaymentType.CARD;
+        Price price = new Price(BigDecimal.valueOf(10000));
+        paymentRepository.save(new Payment(paymentKey, paymentType, price, memberReservation));
+
+        //when
+        paymentService.refund(memberReservation.getId());
+
+        //then
+        Optional<Payment> payment = paymentRepository.findByPaymentKey(paymentKey);
+        assertThat(payment.isPresent()).isFalse();
     }
 }

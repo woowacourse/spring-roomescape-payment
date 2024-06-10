@@ -24,8 +24,8 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.service.components.MemberReservationService;
 import roomescape.reservation.service.dto.MyReservationInfo;
-import roomescape.reservation.service.services.MemberReservationService;
 import roomescape.util.ServiceTest;
 
 @DisplayName("사용자 예약 로직 테스트")
@@ -155,7 +155,7 @@ class MemberReservationServiceTest extends ServiceTest {
 
         //then
         assertThat(
-                memberReservationRepository.findBy(null, null, ReservationStatus.NOT_PAID, LocalDate.now(),
+                memberReservationRepository.findBy(null, null, LocalDate.now(),
                         LocalDate.now().plusDays(1))).hasSize(1);
     }
 

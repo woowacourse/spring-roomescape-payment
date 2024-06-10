@@ -33,9 +33,12 @@ public class AuthService {
     public void authenticate(LoginRequest loginRequest) {
         Member member = memberRepository.findMemberByEmailAddress(loginRequest.email())
                 .orElseThrow(() -> new AuthenticationException(ErrorType.MEMBER_NOT_FOUND));
+        validatePassword(loginRequest, member);
+    }
 
+    private void validatePassword(LoginRequest loginRequest, Member member) {
         if (!passwordEncoder.matches(loginRequest.password(), member.getPassword())) {
-            throw new AuthenticationException(ErrorType.SECURITY_EXCEPTION);
+            throw new AuthenticationException(ErrorType.INVALID_PASSWORD);
         }
     }
 

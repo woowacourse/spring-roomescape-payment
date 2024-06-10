@@ -1,12 +1,11 @@
 package roomescape.reservation.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
-import jakarta.servlet.http.Cookie;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import roomescape.util.ControllerTest;
 
 @DisplayName("예약 페이지 테스트")
@@ -14,33 +13,39 @@ class ReservationPageControllerTest extends ControllerTest {
 
     @DisplayName("기본 페이지 조회 시, 200을 반환한다.")
     @Test
-    void adminMainPage() throws Exception {
+    void adminMainPage() {
         //given & when & then
-        mockMvc.perform(
-                get("/")
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .when().get("/")
+                .then().log().all()
+                .apply(document("main/page/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("예약 페이지 조회 시, 200을 반환한다.")
     @Test
-    void getAdminReservationPage() throws Exception {
+    void getAdminReservationPage() {
         //given & when & then
-        mockMvc.perform(
-                get("/reservation")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().get("/reservation")
+                .then().log().all()
+                .apply(document("reservation/page/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("나의 예약 페이지 조회 시, 200을 반환한다.")
     @Test
-    void getAdminReservationTimePage() throws Exception {
+    void getAdminReservationTimePage() {
         //given & when & then
-        mockMvc.perform(
-                get("/reservation-mine")
-                        .cookie(new Cookie("token", memberToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        restDocs
+                .contentType(ContentType.JSON)
+                .cookie("token", memberToken)
+                .when().get("/reservation-mine")
+                .then().log().all()
+                .apply(document("my/page/success"))
+                .statusCode(HttpStatus.OK.value());
     }
 }

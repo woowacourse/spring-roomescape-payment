@@ -1,9 +1,12 @@
 package roomescape.reservation.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
+import roomescape.member.controller.AdminMemberReservationRequest;
 import roomescape.member.domain.Member;
 import roomescape.payment.service.PaymentService;
 import roomescape.payment.service.dto.PaymentRequest;
@@ -11,12 +14,12 @@ import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
+import roomescape.reservation.service.components.MemberReservationService;
+import roomescape.reservation.service.components.ReservationCommonService;
+import roomescape.reservation.service.components.WaitingReservationService;
 import roomescape.reservation.service.dto.MemberReservationCreate;
 import roomescape.reservation.service.dto.MyReservationInfo;
 import roomescape.reservation.service.dto.WaitingCreate;
-import roomescape.reservation.service.services.MemberReservationService;
-import roomescape.reservation.service.services.ReservationCommonService;
-import roomescape.reservation.service.services.WaitingReservationService;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,6 +30,7 @@ public class ReservationApplicationService {
     private final MemberReservationService memberReservationService;
 
     private final WaitingReservationService waitingReservationService;
+
     private final PaymentService paymentService;
 
     public ReservationApplicationService(ReservationCommonService reservationCommonService,
@@ -59,10 +63,8 @@ public class ReservationApplicationService {
 
         memberReservation.approve();
 
-        paymentService.pay(
-                new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
-                        reservationPaymentRequest.paymentKey()), memberReservation);
-
+        paymentService.pay(new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
+                reservationPaymentRequest.paymentKey()), memberReservation);
         return ReservationResponse.from(memberReservation);
     }
 
@@ -70,9 +72,15 @@ public class ReservationApplicationService {
     public ReservationResponse createMemberReservation(MemberReservationCreate memberReservationCreate) {
         MemberReservation memberReservation = reservationCommonService.create(
                 memberReservationCreate.toReservationCreate());
-        paymentService.pay(
-                new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
-                        memberReservationCreate.paymentKey()), memberReservation);
+        paymentService.pay(new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
+                memberReservationCreate.paymentKey()), memberReservation);
+        return ReservationResponse.from(memberReservation);
+    }
+
+    @Transactional
+    public ReservationResponse createMemberReservation(AdminMemberReservationRequest reservationRequest) {
+        MemberReservation memberReservation = reservationCommonService.create(reservationRequest.toReservationCreate());
+        memberReservation.notPaid();
         return ReservationResponse.from(memberReservation);
     }
 
@@ -80,6 +88,7 @@ public class ReservationApplicationService {
     public void deleteMemberReservation(AuthInfo authInfo, long memberReservationId) {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
+        paymentService.refund(memberReservationId);
         reservationCommonService.delete(member, memberReservation);
         memberReservationService.updateStatus(memberReservation.getReservation());
     }
@@ -89,8 +98,8 @@ public class ReservationApplicationService {
         memberReservationService.delete(reservationId);
     }
 
-    public List<ReservationResponse> getWaiting() {
-        return waitingReservationService.getWaiting();
+    public List<ReservationResponse> findAllWaiting() {
+        return waitingReservationService.findAllWaiting();
     }
 
     @Transactional
@@ -104,9 +113,7 @@ public class ReservationApplicationService {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
         waitingReservationService.validateWaitingReservation(memberReservation);
-
         reservationCommonService.delete(member, memberReservation);
-        paymentService.refund(memberReservationId);
     }
 
     @Transactional
@@ -121,6 +128,11 @@ public class ReservationApplicationService {
         Member member = reservationCommonService.getMember(authInfo.getId());
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         waitingReservationService.denyWaiting(member, memberReservation);
+    }
+
+    @Transactional
+    public BigDecimal findPrice(LocalDate date, long themeId, long timeId) {
+        return reservationCommonService.getReservation(date, timeId, themeId).getPrice();
     }
 }
 

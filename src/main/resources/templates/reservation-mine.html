@@ -6,6 +6,7 @@
     <title>방탈출 어드민</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/reservation.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/toss-style.css">
     <script src="https://js.tosspayments.com/v1/payment-widget"></script>
@@ -55,6 +56,7 @@
             <th>날짜</th>
             <th>시간</th>
             <th>상태</th>
+            <th>결제금액</th>
             <th></th>
         </tr>
         </thead>
@@ -63,13 +65,27 @@
     </table>
 </div>
 
-<!-- 결제창 ui -->
-<div class="wrapper w-100">
-    <div class="max-w-540 w-100">
-        <div id="payment-method" class="w-100"></div>
-        <div id="agreement" class="w-100"></div>
+<div class="payment-modal-back">
+    <!-- 모달 뒷 배경 영역-->
+    <div class="payment-modal">
+        <!-- 결제창 ui -->
+        <div class="wrapper w-100">
+            <div class="max-w-540 w-100">
+                <div id="payment-method" class="w-100"></div>
+                <div id="agreement" class="w-100"></div>
+                <div class="btn-wrapper w-100">
+                    <button id="reserve-button" class="btn primary w-100">예약하기</button>
+                    <button id="close-modal" class="btn btn-secondary w-100 mt-2">닫기</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- 로딩 오버레이 -->
+<div class="loading-overlay" id="loading-overlay"></div>
+<!-- 로딩 스피너 -->
+<div class="loading-spinner" id="loading-spinner"></div>
 
 <script src="/js/user-scripts.js"></script>
 <script src="/js/reservation-mine.js"></script>

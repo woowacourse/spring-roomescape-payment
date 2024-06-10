@@ -1,0 +1,49 @@
+= 방탈출 API 명세
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectnums:
+:docinfo: shared-head
+
+= v1.0.0
+== 공통
+include::domain/role.adoc[]
+include::domain/paymentStatus.adoc[]
+include::domain/paymentType.adoc[]
+include::domain/reservationStatus.adoc[]
+
+
+== 응답 형식
+=== 에러 코드
+include::domain/errorType.adoc[]
+
+=== 성공 예시
+include::responses/successResponse.adoc[]
+
+=== 공통 에러 예시
+include::responses/errorResponse.adoc[]
+
+=== 올바르지 않은 데이터 요청 에러 예시
+include::responses/methodArguementNotValidResponse.adoc[]
+
+== 사용자
+include::auth/login.adoc[]
+include::auth/signup.adoc[]
+
+== 예약
+include::reservation/reservation.adoc[]
+include::reservation/waiting.adoc[]
+
+== 예약 시간
+include::reservation/reservationtime.adoc[]
+
+== 테마
+include::reservation/theme.adoc[]
+
+== 관리자
+include::admin/admin.adoc[]
+
+

@@ -1,0 +1,11 @@
+=== 회원가입
+operation::member/create/success[snippets='curl-request,request-fields']
+==== 성공
+operation::member/create/success[snippets='http-request,http-response']
+==== 실패
+|===
+| 에러 코드 | 메시지 | 설명
+| USER-003 | 중복된 이메일입니다. | 중복된 이메일일 경우
+| USER-002 | 올바르지 않은 이메일 입력 양식입니다.| 이메일 형식이 잘못되었을 경우
+| COMMON-003 | 올바르지 않은 데이터 요청입니다. | 비밀번호가 최소 8자 이상, 하나 이상의 대문자, 소문자, 숫자, 특수 문자를 포함하지 않을 경우
+|===

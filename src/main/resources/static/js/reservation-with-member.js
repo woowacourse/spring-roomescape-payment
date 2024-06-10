@@ -1,8 +1,8 @@
 let isEditing = false;
-const RESERVATION_API_ENDPOINT = '/reservations';
-const TIME_API_ENDPOINT = '/times';
-const THEME_API_ENDPOINT = '/themes';
-const MEMBER_API_ENDPOINT = '/admin/members';
+const RESERVATION_API_ENDPOINT = '/api/v1/reservations';
+const TIME_API_ENDPOINT = '/api/v1/times';
+const THEME_API_ENDPOINT = '/api/v1/themes';
+const MEMBER_API_ENDPOINT = '/api/v1/admin/members';
 const timesOptions = [];
 const themesOptions = [];
 const membersOptions = [];
@@ -192,7 +192,7 @@ function applyFilter(event) {
   const dateFrom = document.getElementById('date-from').value;
   const dateTo = document.getElementById('date-to').value;
 
-  const url = `/reservations?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`;
+  const url = `/api/v1/reservations?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`;
 
   fetch(url, { // 예약 검색 API 호출
     method: 'GET',
@@ -213,7 +213,7 @@ function requestCreate(reservation) {
     body: JSON.stringify(reservation)
   };
 
-  return fetch('/admin/reservations', requestOptions)
+  return fetch('/api/v1/admin/reservations', requestOptions)
       .then(response => {
         if (response.status !== 201) {
           return response.json().then(errorResponse => {
