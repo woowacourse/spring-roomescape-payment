@@ -41,18 +41,6 @@ public record ReservationDetailResponse(
                 payment.getTotalAmount());
     }
 
-    public static ReservationDetailResponse of(Waiting waiting, Payment payment) {
-        Reservation reservation = waiting.getReservation();
-        return new ReservationDetailResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getReservationTime().getStartAt(),
-                String.format(getStatusName(reservation.getStatus()), waiting.getRank()),
-                payment.getPaymentKey(),
-                payment.getTotalAmount());
-    }
-
     private static String getStatusName(ReservationStatus status) {
         return switch (status) {
             case BOOKED -> "예약";
