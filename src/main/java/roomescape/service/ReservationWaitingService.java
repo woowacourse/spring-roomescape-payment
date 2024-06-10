@@ -74,16 +74,16 @@ public class ReservationWaitingService {
     }
 
     private void validateNotDuplicated(ReservationWaiting waiting) {
-        Long memberId = waiting.getMember().getId();
+        Member member = waiting.getMember();
         ReservationDate date = waiting.getDate();
-        Long timeId = waiting.getTime().getId();
-        Long themeId = waiting.getTheme().getId();
-        boolean isWaitingExist = reservationWaitingRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(memberId, date, timeId, themeId);
+        ReservationTime time = waiting.getTime();
+        Theme theme = waiting.getTheme();
+        boolean isWaitingExist = reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, date, time, theme);
 
         if (isWaitingExist) {
             throw new IllegalArgumentException(String.format(
                     "동일한 사용자의 중복된 예약 대기를 생성할 수 없습니다. {date: %s, timeId: %d, themeId: %d}",
-                    date.getDate(), timeId, themeId));
+                    date.getDate(), time.getId(), theme.getId()));
         }
     }
 
@@ -123,9 +123,8 @@ public class ReservationWaitingService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("존재하지 않는 예약입니다. (id: %d)", reservationId)));
         ReservationDate date = reservation.getDate();
-        Long timeId = reservation.getTime().getId();
-        Long themeId = reservation.getTheme().getId();
-
-        return reservationWaitingRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId);
+        ReservationTime time = reservation.getTime();
+        Theme theme = reservation.getTheme();
+        return reservationWaitingRepository.existsByDateAndTimeAndTheme(date, time, theme);
     }
 }

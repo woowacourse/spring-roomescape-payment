@@ -3,9 +3,7 @@ package roomescape.domain.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationWaiting;
-import roomescape.domain.ReservationWaitingWithRank;
+import roomescape.domain.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +11,9 @@ import java.util.Optional;
 @Repository
 public interface ReservationWaitingRepository extends JpaRepository<ReservationWaiting, Long> {
 
-    boolean existsByMemberIdAndDateAndTimeIdAndThemeId(Long memberId, ReservationDate date, Long timeId, Long themeId);
+    boolean existsByMemberAndDateAndTimeAndTheme(Member member, ReservationDate date, ReservationTime time, Theme theme);
 
-    boolean existsByDateAndTimeIdAndThemeId(ReservationDate date, Long timeId, Long themeId);
+    boolean existsByDateAndTimeAndTheme(ReservationDate date, ReservationTime time, Theme theme);
 
     @Query("""
             SELECT new roomescape.domain.ReservationWaitingWithRank(
