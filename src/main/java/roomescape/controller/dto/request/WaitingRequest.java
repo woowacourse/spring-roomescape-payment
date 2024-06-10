@@ -21,6 +21,6 @@ public record WaitingRequest(
 ) {
 
     public WaitingCreateRequest toWaitingCreateRequest(Member member) {
-        return new WaitingCreateRequest(date, themeId, timeId, member);
+        return new WaitingCreateRequest(date, timeId, themeId, member);
     }
 }
