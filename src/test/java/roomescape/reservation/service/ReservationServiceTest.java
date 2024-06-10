@@ -2,10 +2,12 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -106,11 +108,17 @@ class ReservationServiceTest {
                 new Reservation(member, LocalDate.now(), theme, time, Status.WAITING));
         Reservation reservation2 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
+        Payment payment = paymentRepository.save(new Payment("a", 10000, reservation2));
 
         reservationService.delete(reservation2.getId());
         Reservation findReservation = reservationRepository.findById(reservation1.getId()).get();
 
-        assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS);
+        Optional<Payment> findPayment = paymentRepository.findByReservationId(reservation2.getId());
+
+        assertAll(
+                () -> assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS),
+                () -> assertThat(findPayment.isEmpty()).isTrue()
+        );
     }
 }
 
