@@ -1,21 +1,23 @@
-== 로그인
+== 인증
 
-=== 로그인 성공
+=== 로그인
+
 operation::login-controller-test/should_include_cookie_when_login_request_success[snippets='http-request,http-response']
 
 
-=== 로그인 실패 (존재하지 않는 이메일)
+==== 로그인 실패 (존재하지 않는 이메일)
+
 operation::login-controller-test/should_handle_login_request_with_no_exist_email[snippets='http-request,http-response']
 
+==== 로그인 실패 (잘못된 비밀번호)
 
-=== 로그인 실패 (잘못된 비밀번호)
 operation::login-controller-test/should_handle_login_request_with_wrong_password[snippets='http-request,http-response']
 
-
 === 로그 아웃
+
 operation::login-controller-test/should_expire_cookie_when_logout_requested[snippets='http-request,http-response']
 
-
 === 로그인 확인
+
 operation::login-controller-test/should_return_name_when_login_check_status_is_valid[snippets='http-request,http-response']
 
