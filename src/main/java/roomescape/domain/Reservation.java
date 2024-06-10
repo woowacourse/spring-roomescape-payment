@@ -26,23 +26,28 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false)
+    private Payment payment;
+
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
 
     protected Reservation() {
     }
 
-    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme, ReservationStatus status) {
+    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme, Payment payment, ReservationStatus status) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
         this.status = status;
     }
 
-    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme, Payment payment) {
+        return new Reservation(null, member, date, time, theme, payment, ReservationStatus.BOOKING);
     }
 
     public Long getId() {
@@ -63,6 +68,10 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     public ReservationStatus getStatus() {

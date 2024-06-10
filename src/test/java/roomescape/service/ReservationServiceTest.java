@@ -10,7 +10,6 @@ import roomescape.domain.*;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.MemberReservationRequest;import roomescape.dto.response.ReservationResponse;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.TimeSlotRepository;
 
 import java.time.LocalDate;
 
@@ -48,18 +47,19 @@ class ReservationServiceTest {
         Member mockMember = ADMIN_MEMBER;
         TimeSlot mockTimeSlot = TIME_ONE;
         Theme mockTheme = THEME_ONE;
+        Payment payment = new Payment(1L, "paymentKey", "orderId", 1000L);
 
         MemberReservationRequest reservationRequest =
                 new MemberReservationRequest(LocalDate.now().plusDays(1), 1L, 1L, "paymentKey", "orderId", 1L);
         LoginMember loginMember = new LoginMember(1L);
-        Reservation reservation = new Reservation(1L, mockMember, LocalDate.now().plusDays(1), mockTimeSlot, mockTheme, ReservationStatus.BOOKING);
+        Reservation reservation = new Reservation(1L, mockMember, LocalDate.now().plusDays(1), mockTimeSlot, mockTheme, payment, ReservationStatus.BOOKING);
 
 
         when(memberService.findMemberById(anyLong())).thenReturn(mockMember);
         when(timeService.findTimeSlotById(anyLong())).thenReturn(mockTimeSlot);
         when(themeService.findThemeById(anyLong())).thenReturn(mockTheme);
         when(reservationRepository.existsByDateAndTimeAndThemeAndMember(any(), any(), any(), any())).thenReturn(false);
-        doNothing().when(paymentService).payment(any(MemberReservationRequest.class));
+        when(paymentService.payment(any())).thenReturn(1L);
         when(reservationRepository.save(any())).thenReturn(reservation);
 
         ReservationResponse response = reservationService.createByClient(reservationRequest, loginMember);

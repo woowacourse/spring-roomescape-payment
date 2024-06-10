@@ -24,13 +24,13 @@ class ReservationRepositoryTest {
     @Test
     void findAllByMemberOrderByDateAsc() {
         //given, when
-        List<Reservation> reservations = reservationRepository.findAllByMemberOrderByDateAsc(ADMIN_MEMBER);
+        List<Reservation> reservations = reservationRepository.findAllByMemberOrderByDateAsc(USER_MEMBER);
 
         //then
         assertAll(
-                () -> assertThat(reservations).hasSize(3),
-                () -> assertThat(reservations.get(0).getDate()).isEqualTo("2024-05-02"),
-                () -> assertThat(reservations.get(2).getDate()).isEqualTo("2024-06-02")
+                () -> assertThat(reservations).hasSize(4),
+                () -> assertThat(reservations.get(0).getDate()).isEqualTo("2024-05-31"),
+                () -> assertThat(reservations.get(3).getDate()).isEqualTo("2099-04-30")
         );
     }
 

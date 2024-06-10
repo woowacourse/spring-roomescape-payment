@@ -1,8 +1,14 @@
 package roomescape.dto;
 
+import roomescape.domain.*;
+
 public record PaymentInfo(Long amount, String orderId, String paymentKey) {
     public PaymentInfo{
         isValid(amount, orderId, paymentKey);
+    }
+
+    public Payment toEntity() {
+        return new Payment(null, paymentKey, orderId, amount);
     }
 
     private void isValid(Long amount, String orderId, String paymentKey) {

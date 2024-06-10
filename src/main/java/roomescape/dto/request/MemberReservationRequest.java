@@ -12,7 +12,7 @@ public record MemberReservationRequest(LocalDate date, Long timeId, Long themeId
     }
 
     public Reservation toEntity(Member member, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+        return new Reservation(null, member, date, time, theme, null, ReservationStatus.BOOKING);
     }
 
     private void isValid(LocalDate date, Long timeId, Long themeId, String paymentKey, String orderId, Long amount) {

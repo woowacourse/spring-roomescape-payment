@@ -10,7 +10,9 @@ public record ReservationMineResponse(long id,
                                       String theme,
                                       LocalDate date,
                                       @JsonFormat(pattern = "HH:mm") LocalTime time,
-                                      String status) {
+                                      String status,
+                                      String paymentKey,
+                                      long amount) {
 
     public static ReservationMineResponse from(Reservation reservation) {
         return new ReservationMineResponse(
@@ -18,7 +20,9 @@ public record ReservationMineResponse(long id,
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                reservation.getStatus().getMessage()
+                reservation.getStatus().getMessage(),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
@@ -28,7 +32,9 @@ public record ReservationMineResponse(long id,
                 waiting.getWaiting().getTheme().getName(),
                 waiting.getWaiting().getDate(),
                 waiting.getWaiting().getTime().getStartAt(),
-                waiting.getWaiting().getStatus().createStatusMessage(waiting.getRank())
+                waiting.getWaiting().getStatus().createStatusMessage(waiting.getRank()),
+                null,
+                0L
         );
     }
 }
