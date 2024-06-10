@@ -1,12 +1,9 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.REQUIRED_LOGIN;
-import static roomescape.exception.ExceptionType.WRONG_PASSWORD;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Email;
 import roomescape.domain.Member;
@@ -17,10 +14,15 @@ import roomescape.dto.LoginRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 
+import java.util.Map;
+
+import static roomescape.exception.ExceptionType.*;
+
 @Service
 public class LoginService {
     private final MemberRepository memberRepository;
     private final JwtGenerator jwtGenerator;
+    private final Logger logger = LogManager.getLogger(LoginService.class);
 
     public LoginService(MemberRepository memberRepository, JwtGenerator jwtGenerator) {
         this.memberRepository = memberRepository;
@@ -50,6 +52,7 @@ public class LoginService {
                     Role.findByValue(claims.get("role", String.class))
             );
         } catch (ExpiredJwtException e) {
+            logger.debug(e.getMessage(), e);
             throw new RoomescapeException(REQUIRED_LOGIN);
         }
     }

@@ -1,5 +1,7 @@
 package roomescape.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentService paymentService;
+    private final Logger logger = LogManager.getLogger(ReservationService.class);
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
@@ -66,6 +69,7 @@ public class ReservationService {
             Reservation savedReservation = reservationRepository.save(reservation);
             response = ReservationResponse.from(savedReservation);
         } catch (Exception e) {
+            logger.debug(e.getMessage(), e);
             paymentService.cancel(new CancelPayment(payment, new CancelReason("서버 오류")));
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 이후 로직 처리 중 에러");
         }
