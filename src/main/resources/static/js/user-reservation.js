@@ -169,7 +169,7 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+async function onReservationButtonClick(event, paymentWidget) {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
@@ -184,24 +184,35 @@ function onReservationButtonClick(event, paymentWidget) {
 
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
+
+    const selectedThemePrice = await requestRead(THEME_API_ENDPOINT + "/" + selectedThemeId)
+        .then(data => {
+          return data.price;
+        })
+        .catch(error => {
+          console.error("Error fetching theme data:", error);
+          return null;
+        });
+
     /*
     TODO: [1단계]
           - orderIdPrefix 를 자신만의 prefix로 변경
     */
     // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
     // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+    paymentWidget.renderPaymentMethods().updateAmount(selectedThemePrice);
     const orderIdPrefix = "SANCHO";
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
       orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
+      amount: selectedThemePrice,
     }).then(function (data) {
-      console.debug(data);
       fetchReservationPayment(data, reservationData);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+      console.debug(error);
+      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
     });
 
   } else {
