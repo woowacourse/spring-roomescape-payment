@@ -1,0 +1,7 @@
+== 예약 시간
+
+=== 모든 시간 조회
+operation::times/show-all-times[snippets = "curl-request,http-request,http-response,response-fields"]
+
+=== 예약 시간을 날짜와 테마에 따른 예약 여부와 조회
+operation::times/show-all-times-with-booked-status[snippets = "curl-request,http-request,http-response,response-fields"]

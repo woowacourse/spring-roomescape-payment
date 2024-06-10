@@ -1,0 +1,13 @@
+== 사용자
+
+=== 회원가입
+operation::member/do-signup[snippets="curl-request,http-request,request-fields,http-response,response-fields"]
+
+=== 로그인
+operation::member/do-login[snippets="curl-request,http-request,request-fields,http-response,response-cookies"]
+
+=== 회원 정보 확인
+operation::member/check-member-status[snippets="curl-request,http-request,request-cookies,http-response,response-fields"]
+
+=== 로그아웃
+operation::member/do-logout[snippets="curl-request,http-request,request-cookies,http-response"]

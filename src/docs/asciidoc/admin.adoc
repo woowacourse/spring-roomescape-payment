@@ -1,0 +1,22 @@
+== 관리자
+
+=== 특정 사용자의 예약 추가
+operation::admin/register-reservation[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 예약 삭제
+operation::admin/delete-reservation[snippets="curl-request,http-request,request-cookies,path-parameters,http-response"]
+
+=== 테마 추가
+operation::admin/register-theme[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 테마 삭제
+operation::admin/delete-theme[snippets="curl-request,http-request,request-cookies,path-parameters,http-response"]
+
+=== 시간 추가
+operation::admin/register-time[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 시간 삭제
+operation::admin/delete-time[snippets="curl-request,http-request,request-cookies,path-parameters,http-response"]
+
+=== 예약 대기 삭제
+operation::admin/delete-waiting[snippets="curl-request,http-request,request-cookies,path-parameters,http-response"]

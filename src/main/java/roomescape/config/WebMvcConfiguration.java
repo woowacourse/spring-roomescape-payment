@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -14,6 +15,8 @@ import roomescape.infrastructure.LoginMemberArgumentResolver;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+    public static final int REST_CLIENT_READ_TIMEOUT = 3;
+
     private final LoginMemberArgumentResolver loginMemberArgumentResolver;
     private final AuthorizationHandlerInterceptor authorizationHandlerInterceptor;
 
@@ -35,9 +38,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    @Profile("!test")
     public RestClient restClient() {
         final JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
-        factory.setReadTimeout(Duration.ofSeconds(5));
+        factory.setReadTimeout(Duration.ofSeconds(REST_CLIENT_READ_TIMEOUT));
 
         return RestClient.builder()
                 .requestFactory(factory)

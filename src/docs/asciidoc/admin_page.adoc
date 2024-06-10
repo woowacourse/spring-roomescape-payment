@@ -1,0 +1,16 @@
+== 관리자 페이지
+
+=== 메인 페이지
+operation::admin/admin-page-access[snippets="curl-request,http-request,request-cookies,http-response"]
+
+=== 예약 페이지
+operation::admin/reservation-management-page-access[snippets="curl-request,http-request,request-cookies,http-response"]
+
+=== 테마 페이지
+operation::admin/theme-management-page-access[snippets="curl-request,http-request,request-cookies,http-response"]
+
+=== 시간 페이지
+operation::admin/time-management-page-access[snippets="curl-request,http-request,request-cookies,http-response"]
+
+=== 예약 대기 페이지
+operation::admin/waiting-management-page-access[snippets="curl-request,http-request,request-cookies,http-response"]

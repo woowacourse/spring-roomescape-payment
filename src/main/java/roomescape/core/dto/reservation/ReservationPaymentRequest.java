@@ -22,14 +22,14 @@ public class ReservationPaymentRequest {
     private String orderId;
 
     @NotNull(message = "결제 금액은 null일 수 없습니다.")
-    private Integer amount;
+    private Long amount;
 
     public ReservationPaymentRequest() {
     }
 
     public ReservationPaymentRequest(final String date, final Long timeId, final Long themeId,
                                      final String paymentKey, final String orderId,
-                                     final Integer amount) {
+                                     final Long amount) {
         this.date = date;
         this.timeId = timeId;
         this.themeId = themeId;
@@ -58,7 +58,7 @@ public class ReservationPaymentRequest {
         return orderId;
     }
 
-    public Integer getAmount() {
+    public Long getAmount() {
         return amount;
     }
 }

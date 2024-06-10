@@ -1,0 +1,16 @@
+== 사용자 페이지
+
+=== 메인 페이지
+operation::member/go-to-main-page[snippets="curl-request,http-request,http-response"]
+
+=== 회원 가입 페이지
+operation::member/go-to-signup-page[snippets="curl-request,http-request,http-response"]
+
+=== 로그인 페이지
+operation::member/go-to-login-page[snippets="curl-request,http-request,http-response"]
+
+=== 방탈출 예약 페이지
+operation::member/go-to-reservation-page[snippets="curl-request,http-request,http-response"]
+
+=== 나의 예약 목록 페이지
+operation::member/go-to-my-reservation-page[snippets="curl-request,http-request,request-cookies,http-response"]

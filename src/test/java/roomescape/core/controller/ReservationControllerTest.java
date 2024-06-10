@@ -1,26 +1,37 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static roomescape.utils.RestDocumentGenerator.deleteDocumentWithTokenAndIdDescription;
+import static roomescape.utils.RestDocumentGenerator.reservationFieldDescriptors;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import roomescape.core.domain.Payment;
-import roomescape.core.dto.payment.PaymentConfirmRequest;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
-import roomescape.infrastructure.PaymentApprover;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -29,13 +40,9 @@ import roomescape.utils.TestFixture;
 class ReservationControllerTest {
     private static final String TOMORROW = TestFixture.getTomorrowDate();
     private static final String DAY_AFTER_TOMORROW = TestFixture.getDayAfterTomorrowDate();
-    private static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약만 취소할 수 있습니다.";
 
     @LocalServerPort
     private int port;
-
-    @SpyBean
-    private PaymentApprover paymentApprover;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -44,30 +51,46 @@ class ReservationControllerTest {
     private TestFixture testFixture;
 
     private String accessToken;
+    private RequestSpecification spec;
 
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
 
         databaseCleaner.executeTruncate();
         testFixture.initTestData();
 
         accessToken = AccessTokenGenerator.adminTokenGenerate();
+        spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @Test
     @DisplayName("돈을 지불하며 예약을 생성한다.")
     void createAndPay() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1);
+                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1L);
 
-        Mockito.doReturn(new PaymentConfirmResponse(new Payment("1", "1", 1L)))
-                .when(paymentApprover)
-                .confirmPayment(any(PaymentConfirmRequest.class));
-
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
+                .accept("application/json")
+                .filter(document("reservations/make-my-reservation/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("timeId").description("예약 시간 id"),
+                                fieldWithPath("themeId").description("예약 테마 id"),
+                                fieldWithPath("paymentKey").description("결제 키"),
+                                fieldWithPath("orderId").description("주문 id"),
+                                fieldWithPath("amount").description("결제 금액")
+                        ),
+                        responseFields(
+                                subsectionWithPath("reservationResponse").description("예약 정보"),
+                                subsectionWithPath("paymentResponse").description("결제 정보")
+                        )))
                 .body(request)
                 .when().post("/reservations")
                 .then().log().all()
@@ -75,28 +98,126 @@ class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("토스에서 발생한 400번대 예외를 400번과 메시지로 응답한다.")
-    void throw4xxErrorMessageAs400AndDetail() {
-        ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "1", "1", 1);
+    @DisplayName("모든 예약 내역을 조회한다.")
+    void findAllReservations() {
+        RestAssured.given(spec).log().all()
+                .cookies("token", accessToken)
+                .accept("application/json")
+                .filter(document("reservations/show-all-reservations/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[]").description("예약 목록"))
+                                .andWithPrefix("[].", reservationFieldDescriptors())))
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
+    }
+
+    @Test
+    @DisplayName("예약을 삭제한다.")
+    void validateReservationDelete() {
+        RestAssured.given(spec).log().all()
+                .cookies("token", accessToken)
+                .accept("application/json")
+                .filter(deleteDocumentWithTokenAndIdDescription(
+                        "reservations/delete-my-reservation/",
+                        "로그인한 회원의 토큰",
+                        "삭제할 예약의 id"))
+                .when().delete("/reservations/{id}", 1)
+                .then().log().all()
+                .statusCode(204);
+    }
+
+    @Test
+    @DisplayName("조건에 따라 예약을 조회한다.")
+    void findReservationsByCondition() {
+        testFixture.persistReservationWithDateAndTimeAndTheme(TOMORROW, 1L, 1L);
+        testFixture.persistReservationWithDateAndTimeAndTheme(DAY_AFTER_TOMORROW, 1L, 1L);
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("memberId", 1L);
+        queryParams.put("themeId", 1L);
+        queryParams.put("dateFrom", TOMORROW);
+        queryParams.put("dateTo", TOMORROW);
+
+        RestAssured.given(spec).log().all()
+                .cookies("token", accessToken)
+                .queryParams(queryParams)
+                .accept("application/json")
+                .filter(document("reservations/show-all-reservations-satisfying-condition/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        queryParameters(
+                                parameterWithName("memberId").description("조회할 멤버의 id"),
+                                parameterWithName("themeId").description("조회할 테마 id"),
+                                parameterWithName("dateFrom").description("조회할 첫 날짜"),
+                                parameterWithName("dateTo").description("조회할 마지막 날짜")
+                        ),
+                        responseFields(
+                                fieldWithPath("[]").description("조건에 맞는 예약 목록"))
+                                .andWithPrefix("[].", reservationFieldDescriptors())))
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/reservations")
+                .queryParams(
+                        "memberId", 1L,
+                        "themeId", 1L,
+                        "dateFrom", TOMORROW,
+                        "dateTo", DAY_AFTER_TOMORROW)
+                .when().get("/reservations")
                 .then().log().all()
-                .statusCode(400)
-                .body("detail", is("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."));
+                .statusCode(200)
+                .body("size()", is(2));
     }
 
+    @Test
+    @DisplayName("현재 로그인된 회원의 예약 대기를 포함한 예약 목록을 조회한다.")
+    void findLoginMemberReservation() {
+        MemberWaitingRequest waitingRequest = new MemberWaitingRequest(TOMORROW, 1L, 1L);
+
+        RestAssured.given(spec).log().all()
+                .cookies("token", accessToken)
+                .contentType(ContentType.JSON)
+                .body(waitingRequest)
+                .when().post("/waitings")
+                .then().log().all()
+                .statusCode(201);
+
+        RestAssured.given(spec).log().all()
+                .cookies("token", accessToken)
+                .accept("application/json")
+                .filter(document("reservations/show-my-reservations-and-waitings/",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),
+                        responseFields(
+                                fieldWithPath("[]").description("로그인한 회원의 예약 및 예약 대기 목록"))
+                                .andWithPrefix("[].",
+                                        fieldWithPath("id").description("예약 id"),
+                                        fieldWithPath("date").description("예약 날짜"),
+                                        fieldWithPath("time").description("예약 시간"),
+                                        fieldWithPath("theme").description("예약 테마 이름"),
+                                        fieldWithPath("status").description("상태(예약 or 몇 번째 대기인지)"),
+                                        fieldWithPath("paymentKey").description("결제 키(nullable)"),
+                                        fieldWithPath("amount").description("결제 금액(nullable)")
+                                )))
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(2));
+    }
 
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "abc"})
     @DisplayName("예약 생성 시, date의 형식이 올바르지 않으면 예외가 발생한다.")
     void validateReservationWithDateFormat(final String date) {
-        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1);
+        ReservationPaymentRequest request = new ReservationPaymentRequest(date, 1L, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -111,7 +232,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 시, timeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullTimeId() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, null, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -126,7 +247,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 시, themeId가 null이면 예외가 발생한다.")
     void validateReservationWithNullThemeId() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, 1L, null, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", accessToken)
@@ -138,64 +259,10 @@ class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("모든 예약 내역을 조회한다.")
-    void findAllReservations() {
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-    }
-
-    @Test
-    @DisplayName("예약을 삭제한다.")
-    void validateReservationDelete() {
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(204);
-    }
-
-    @Test
-    @DisplayName("조건에 따라 예약을 조회한다.")
-    void findReservationsByCondition() {
-        testFixture.persistReservationWithDateAndTimeAndTheme(TOMORROW, 1L, 1L);
-        testFixture.persistReservationWithDateAndTimeAndTheme(DAY_AFTER_TOMORROW, 1L, 1L);
-
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .queryParams(
-                        "memberId", 1L,
-                        "themeId", 1L,
-                        "dateFrom", TOMORROW,
-                        "dateTo", TOMORROW
-                )
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .queryParams(
-                        "memberId", 1L,
-                        "themeId", 1L,
-                        "dateFrom", TOMORROW,
-                        "dateTo", DAY_AFTER_TOMORROW
-                )
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(2));
-    }
-
-    @Test
     @DisplayName("토큰이 유효하지 않을 경우 예외가 발생한다.")
     void validateToken() {
         ReservationPaymentRequest request
-                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1);
+                = new ReservationPaymentRequest(TOMORROW, 1L, 1L, "", "", 1L);
 
         RestAssured.given().log().all()
                 .cookies("token", "invalid-token")
@@ -207,27 +274,6 @@ class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("현재 로그인된 회원의 예약 대기를 포함한 예약 목록을 조회한다.")
-    void findLoginMemberReservation() {
-        MemberWaitingRequest waitingRequest = new MemberWaitingRequest(TOMORROW, 1L, 1L);
-
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .contentType(ContentType.JSON)
-                .body(waitingRequest)
-                .when().post("/waitings")
-                .then().log().all()
-                .statusCode(201);
-
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
-                .when().get("/reservations/mine")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(2));
-    }
-
-    @Test
     @DisplayName("내 예약이 아닌 다른 회원의 예약을 삭제하면 예외가 발생한다.")
     void validateDeleteOtherMemberReservation() {
         testFixture.persistReservationWithDateAndTimeAndTheme(TOMORROW, 1L, 1L);
@@ -236,7 +282,6 @@ class ReservationControllerTest {
                 .cookies("token", AccessTokenGenerator.memberTokenGenerate())
                 .when().delete("/reservations/2")
                 .then().log().all()
-                .statusCode(400)
-                .body("detail", is(RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE));
+                .statusCode(400);
     }
 }

@@ -3,19 +3,12 @@ package roomescape.core.dto.member;
 import roomescape.core.domain.Member;
 
 public class MemberResponse {
-    private Long id;
-    private String name;
-
-    public MemberResponse() {
-    }
+    private final Long id;
+    private final String name;
 
     public MemberResponse(final Member member) {
-        this(member.getId(), member.getName());
-    }
-
-    public MemberResponse(final Long id, final String name) {
-        this.id = id;
-        this.name = name;
+        this.id = member.getId();
+        this.name = member.getName();
     }
 
     public Long getId() {

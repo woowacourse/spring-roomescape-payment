@@ -34,7 +34,7 @@ public class ThemeService {
         validateDuplicatedName(theme);
         final Theme savedTheme = themeRepository.save(theme);
 
-        return new ThemeResponse(savedTheme.getId(), theme);
+        return new ThemeResponse(savedTheme);
     }
 
     private void validateDuplicatedName(final Theme theme) {

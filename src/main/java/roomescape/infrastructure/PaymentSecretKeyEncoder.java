@@ -2,11 +2,13 @@ package roomescape.infrastructure;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentSecretKeyEncoder {
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${secret.key.payment}")
+    private String WIDGET_SECRET_KEY;
 
     public String getEncodedSecretKey() {
         final Base64.Encoder encoder = Base64.getEncoder();
