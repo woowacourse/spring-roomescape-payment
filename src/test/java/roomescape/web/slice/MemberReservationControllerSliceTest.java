@@ -56,7 +56,7 @@ import roomescape.web.api.MemberReservationController;
 import roomescape.web.config.AdminHandlerInterceptor;
 import roomescape.web.config.LoginMemberArgumentResolver;
 
-@AutoConfigureRestDocs(uriScheme = "https", uriHost = "docs.api.com")
+@AutoConfigureRestDocs(outputDir = "build/generated-snippets", uriScheme = "https", uriHost = "docs.api.com")
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(MemberReservationController.class)
 class MemberReservationControllerSliceTest {

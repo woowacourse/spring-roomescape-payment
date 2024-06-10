@@ -29,7 +29,7 @@ import roomescape.web.api.MemberController;
 import roomescape.web.config.AdminHandlerInterceptor;
 import roomescape.web.config.LoginMemberArgumentResolver;
 
-@AutoConfigureRestDocs(uriScheme = "https", uriHost = "docs.api.com")
+@AutoConfigureRestDocs(outputDir = "build/generated-snippets", uriScheme = "https", uriHost = "docs.api.com")
 @WebMvcTest(MemberController.class)
 public class MemberControllerSliceTest {
 
