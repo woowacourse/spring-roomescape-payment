@@ -186,7 +186,7 @@ class WaitingServiceTest {
         waitingService.approveReservationWaiting(waiting.getId());
 
         // then
-        assertThat(waiting.getStatus()).isEqualTo(ReservationStatus.RESERVED);
+        assertThat(waiting.getStatus()).isEqualTo(ReservationStatus.PAYMENT_PENDING);
     }
 
     @Test

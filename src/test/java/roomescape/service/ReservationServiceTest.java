@@ -9,8 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.TestFixture;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -50,6 +52,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -180,40 +185,18 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 삭제한다.")
-    void delete() {
-        // given
-        final Long existingId = 1L;
-        given(reservationRepository.existsById(existingId)).willReturn(true);
-
-        // when & then
-        assertThatCode(() -> reservationService.deleteReservation(existingId))
-                .doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("삭제하려는 예약이 존재하지 않는 경우 예외가 발생한다.")
-    void throwExceptionWhenDeleteNotExistingReservation() {
-        // given
-        final Long notExistingId = 1L;
-        given(reservationRepository.existsById(notExistingId)).willThrow(RoomescapeException.class);
-
-        // when & then
-        assertThatThrownBy(() -> reservationService.deleteReservation(notExistingId))
-                .isInstanceOf(RoomescapeException.class);
-    }
-
-    @Test
     @DisplayName("특정 사용자의 예약 및 예약 대기 목록을 조회한다.")
-    void findMyReservations2() {
+    void findMyReservationsAndWaitings() {
         // given
         final LoginMember loginMember = new LoginMember(1L, MEMBER_TENNY_NAME, MEMBER_TENNY_EMAIL, Role.MEMBER);
         final Reservation memberReservation = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
         final Reservation memberWaiting = new Reservation(4L, MEMBER_TENNY(), DATE_MAY_NINTH,
                 RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
-        given(reservationRepository.findByMemberId(loginMember.id()))
-                .willReturn(List.of(memberReservation, memberWaiting));
+        final Payment reservationPayment = new Payment(memberReservation, PAYMENT_KEY, ORDER_ID, AMOUNT, PaymentStatus.PAID);
+
+        given(reservationRepository.findByMemberId(loginMember.id())).willReturn(List.of(memberReservation, memberWaiting));
+        given(paymentRepository.findByReservationAndStatus(memberReservation, PaymentStatus.PAID)).willReturn(Optional.of(reservationPayment));
         given(reservationRepository.countByDateAndThemeIdAndTimeIdAndStatusAndIdLessThan(
                 memberReservation.getDate(), memberReservation.getTheme().getId(),
                 memberReservation.getTime().getId(), memberReservation.getStatus(), memberReservation.getId()))
@@ -231,8 +214,12 @@ class ReservationServiceTest {
                 () -> assertThat(actual).hasSize(2),
                 () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED.getValue()),
                 () -> assertThat(actual.get(0).getRank()).isEqualTo(1L),
+                () -> assertThat(actual.get(0).getPaymentKey()).isEqualTo(PAYMENT_KEY),
+                () -> assertThat(actual.get(0).getAmount()).isEqualTo(AMOUNT),
                 () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING.getValue()),
-                () -> assertThat(actual.get(1).getRank()).isEqualTo(2L)
+                () -> assertThat(actual.get(1).getRank()).isEqualTo(2L),
+                () -> assertThat(actual.get(1).getPaymentKey()).isNull(),
+                () -> assertThat(actual.get(1).getAmount()).isNull()
         );
     }
 }

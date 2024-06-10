@@ -52,12 +52,20 @@ public class Reservation {
         this.status = status;
     }
 
-    public void toReserved() {
-        this.status = ReservationStatus.RESERVED;
+    public void changeStatus(final ReservationStatus status) {
+        this.status = status;
     }
 
     public boolean isReserved() {
         return this.status == ReservationStatus.RESERVED;
+    }
+
+    public boolean isWaiting() {
+        return this.status == ReservationStatus.WAITING;
+    }
+
+    public boolean isNotReservedBy(final Long memberId) {
+        return !Objects.equals(memberId, this.member.getId());
     }
 
     public Long getId() {

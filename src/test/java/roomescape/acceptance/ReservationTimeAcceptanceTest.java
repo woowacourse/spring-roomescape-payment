@@ -2,8 +2,11 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.TestFixture.START_AT_SIX;
+import static roomescape.config.ApiDocumentUtils.getDocumentRequest;
+import static roomescape.config.ApiDocumentUtils.getDocumentResponse;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -43,7 +46,7 @@ class ReservationTimeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("예약 시간 목록을 성공적으로 조회하면 200을 응답한다.")
     void respondOkWhenFindReservationTimes() {
-        final JsonPath jsonPath = assertGetResponse("/times", 200)
+        final JsonPath jsonPath = assertGetResponse("/times", 200, "times/retrieve")
                 .extract().response().jsonPath();
 
         assertThat(jsonPath.getString("startAt[0]")).isEqualTo("13:00");
@@ -71,7 +74,8 @@ class ReservationTimeAcceptanceTest extends AcceptanceTest {
         final String date = DATE_MAY_EIGHTH.toString();
         final Long themeId = saveTheme();
 
-        final JsonPath jsonPath = RestAssured.given().log().all()
+        final JsonPath jsonPath = RestAssured.given(this.specification).log().all()
+                .filter(document("times/retrieve-available-times", getDocumentRequest(), getDocumentResponse()))
                 .queryParam("date", date)
                 .queryParam("themeId", themeId)
                 .when().get("/times/available")

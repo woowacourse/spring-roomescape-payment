@@ -7,13 +7,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
 import roomescape.component.TossPaymentClient;
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.payment.PaymentDto;
+import roomescape.exception.RoomescapeException;
 import roomescape.exception.TossPaymentsException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -21,8 +23,10 @@ import roomescape.repository.ReservationRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.willDoNothing;
 import static roomescape.TestFixture.*;
 import static roomescape.TestFixture.THEME_HORROR;
 import static roomescape.exception.RoomescapeExceptionCode.DATABASE_SAVE_ERROR;
@@ -118,5 +122,94 @@ class PaymentServiceTest {
         then(paymentClient).should(times(1)).confirm(paymentDto);
         then(paymentRepository).should(times(1)).save(any(Payment.class));
         then(paymentClient).should(times(1)).cancel(paymentDto, errorMessage);
+    }
+
+    @Test
+    @DisplayName("결제를 생성한다.")
+    void createPayment() {
+        // given
+        final Long reservationId = 1L;
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
+        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+
+        // when
+        paymentService.createPayment(reservationId);
+
+        // then
+        then(reservationRepository).should().findById(reservationId);
+        then(paymentRepository).should().save(any(Payment.class));
+    }
+
+    @Test
+    @DisplayName("Id에 해당하는 예약을 결제한다.")
+    void payForReservation() {
+        // given
+        final Long reservationId = 1L;
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.PAYMENT_PENDING);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
+        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+        willDoNothing().given(paymentClient).confirm(paymentDto);
+        given(paymentRepository.save(payment)).willReturn(payment);
+
+        // when
+        paymentService.payForReservation(paymentDto, reservationId, member.getId());
+
+        // then
+        then(paymentClient).should().confirm(paymentDto);
+        then(reservationRepository).should().findById(reservationId);
+        then(paymentRepository).should().save(any(Payment.class));
+    }
+
+    @Test
+    @DisplayName("Id에 해당하는 예약 결제 시, 예약자 Id가 불일치 하면 예외가 발생한다.")
+    void throwExceptionWhenPayForReservationWithInvalidMemberId() {
+        // given
+        final Long reservationId = 1L;
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.PAYMENT_PENDING);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment payment = paymentDto.toPayment(reservation, PaymentStatus.PAID);
+        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+        willDoNothing().given(paymentClient).confirm(paymentDto);
+        given(paymentRepository.save(payment)).willReturn(payment);
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.payForReservation(paymentDto, reservationId, 0L))
+                .isInstanceOf(RoomescapeException.class);
+        then(reservationRepository).should().findById(reservationId);
+    }
+    
+    @Test
+    @DisplayName("결제를 취소한다.")
+    void cancelPayment() {
+        // given
+        final Member member = MEMBER_TENNY(1L);
+        final LocalDate date = DATE_MAY_EIGHTH;
+        final ReservationTime time = RESERVATION_TIME_SIX(1L);
+        final Theme theme = THEME_HORROR(1L);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.PAYMENT_PENDING);
+        final PaymentDto paymentDto = new PaymentDto(PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final Payment payment = new Payment(reservation, PAYMENT_KEY, ORDER_ID, AMOUNT, PaymentStatus.PAID);
+        given(paymentRepository.findByReservationAndStatus(reservation, PaymentStatus.PAID)).willReturn(Optional.of(payment));
+
+        // when
+        paymentService.cancelPayment(reservation);
+
+        // then
+        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.CANCELED);
+        then(paymentRepository).should().findByReservationAndStatus(reservation, PaymentStatus.PAID);
+        then(paymentClient).should().cancel(paymentDto, "고객 변심");
     }
 }

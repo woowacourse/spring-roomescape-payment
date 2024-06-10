@@ -33,7 +33,7 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     void respondOkWhenFindThemes() {
         saveTheme();
 
-        final JsonPath jsonPath = assertGetResponse("/themes", 200)
+        final JsonPath jsonPath = assertGetResponse("/themes", 200, "themes/retrieve")
                 .extract().response().jsonPath();
 
         assertAll(() -> {
@@ -48,7 +48,7 @@ class ThemeAcceptanceTest extends AcceptanceTest {
     void respondOkWhenFindPopularThemes() {
         saveTheme();
 
-        final JsonPath jsonPath = assertGetResponse("/themes/popular", 200)
+        final JsonPath jsonPath = assertGetResponse("/themes/popular", 200, "themes/retrieve-popular")
                 .extract().response().jsonPath();
 
         assertAll(() -> {

@@ -6,11 +6,13 @@ import org.springframework.http.HttpStatusCode;
 public enum RoomescapeExceptionCode {
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약입니다."),
     RESERVATION_TIME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 시간입니다."),
     WAITING_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 대기입니다."),
     THEME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 테마입니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 결제 건입니다."),
     WAITING_FOR_NO_RESERVATION(HttpStatus.BAD_REQUEST, "예약이 없는 건에는 예약 대기를 할 수 없습니다."),
     WAITING_FOR_MY_RESERVATION(HttpStatus.BAD_REQUEST, "이미 예약한 건에는 예약 대기를 할 수 없습니다."),
     WAITING_DUPLICATED(HttpStatus.BAD_REQUEST, "중복된 예약 대기를 할 수 없습니다."),

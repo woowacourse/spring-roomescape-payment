@@ -27,7 +27,7 @@ public class PaymentConfig {
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(30L));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(3L));
         requestFactory.setReadTimeout(Duration.ofSeconds(30L));
         return requestFactory;
     }

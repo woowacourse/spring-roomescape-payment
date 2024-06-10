@@ -24,7 +24,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final ReservationResponse response = assertPostResponseWithToken(
-                request, MEMBER_TENNY_EMAIL, "/reservations", 201)
+                request, MEMBER_TENNY_EMAIL, "/reservations", 201, "reservations/user-create")
                 .extract().as(ReservationResponse.class);
 
         assertAll(() -> {
@@ -43,7 +43,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final AdminReservationSaveRequest request = new AdminReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId);
 
         final ReservationResponse response = assertPostResponseWithToken(
-                request, ADMIN_EMAIL, "/admin/reservations", 201)
+                request, ADMIN_EMAIL, "/admin/reservations", 201, "reservations/admin-create")
                 .extract().as(ReservationResponse.class);
 
         assertAll(() -> {
@@ -62,7 +62,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final ReservationSaveRequest request
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
-        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
+        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404, "reservations/create-fail-not-exists-time");
     }
 
     @Test
@@ -73,7 +73,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final ReservationSaveRequest request
                 = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
-        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
+        assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404, "reservations/create-fail-not-exists-theme");
     }
 
     @Test
@@ -83,7 +83,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final Long themeId = saveTheme();
         saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
 
-        final JsonPath jsonPath = assertGetResponse("/reservations", 200)
+        final JsonPath jsonPath = assertGetResponse("/reservations", 200, "reservations/retrieve")
                 .extract().response().jsonPath();
 
         assertAll(() -> {
