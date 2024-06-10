@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConnectionTest {
 
-    public static final String TEST_DATABASE_NAME = "testtest";
+    public static final String TEST_DATABASE_NAME = "test-test";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
