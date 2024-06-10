@@ -92,7 +92,7 @@ public class ReservationService {
     }
 
     public List<MemberMyReservationResponse> findMyReservation(Long memberId) {
-        Stream<MemberMyReservationResponse> reservedReservationWithPaymentResponses = reservationRepository.findAllReservedWithPaymentByMemberId(
+        Stream<MemberMyReservationResponse> reservedReservationWithPaymentResponses = reservationRepository.findAllNotWaitingReservationWithPaymentByMemberId(
                         memberId)
                 .stream()
                 .map(MemberMyReservationResponse::new);
@@ -196,6 +196,6 @@ public class ReservationService {
                 reservationForDelete.getTime().getId(),
                 reservationForDelete.getTheme().getId(),
                 Status.WAITING
-        ).ifPresent(value -> value.updateStatus(Status.RESERVED));
+        ).ifPresent(value -> value.updateStatus(Status.PAYMENT_WAITING));
     }
 }

@@ -77,9 +77,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             FROM Reservation AS r
             LEFT JOIN Payment AS p
             ON r.id = p.reservationId
-            WHERE r.member.id = :memberId AND r.status = 'RESERVED'
+            WHERE r.member.id = :memberId AND r.status != 'WAITING'
             """)
-    List<ReservationWithPayment> findAllReservedWithPaymentByMemberId(Long memberId);
+    List<ReservationWithPayment> findAllNotWaitingReservationWithPaymentByMemberId(Long memberId);
 
     Optional<Reservation> findFirstByDateValueAndTimeIdAndThemeIdAndStatus(LocalDate date,
                                                                            Long timeId,
