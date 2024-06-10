@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.common.domain.AuditedEntity;
 import roomescape.member.domain.Member;
 
 @Entity
@@ -44,15 +45,11 @@ public class Reservation extends AuditedEntity {
     }
 
     public Reservation(Member member, LocalDate date, Theme theme, ReservationTime time, ReservationStatus status) {
-        validateLastDate(date);
-        this.member = member;
-        this.date = date;
-        this.theme = theme;
-        this.time = time;
-        this.status = status;
+        this(null, member, date, theme, time, status);
     }
 
     public Reservation(Long id, Member member, LocalDate date, Theme theme, ReservationTime time, ReservationStatus status) {
+        validateLastDate(date);
         this.id = id;
         this.member = member;
         this.date = date;
@@ -113,9 +110,5 @@ public class Reservation extends AuditedEntity {
 
     public ReservationStatus getStatus() {
         return status;
-    }
-
-    public String getStatusDisplayName() {
-        return status.getDisplayName();
     }
 }

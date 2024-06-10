@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import roomescape.common.exception.EntityNotExistException;
 import roomescape.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -68,7 +69,7 @@ class ReservationTimeServiceTest {
     @Test
     void findByIdExceptionTest() {
         assertThatThrownBy(() -> reservationTimeService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(EntityNotExistException.class);
     }
 
     @DisplayName("예약 가능한 시간을 조회한다.")

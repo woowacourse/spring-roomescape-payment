@@ -10,8 +10,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentCancelResponse;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentErrorHandler;
+import roomescape.reservation.dto.ReservationCancelReason;
 
 @Component
 public class TossPaymentClient {
@@ -32,14 +35,24 @@ public class TossPaymentClient {
                 .build();
     }
 
-    public void requestPayment(PaymentRequest paymentRequest) {
-        restClient.post()
+    public TossPaymentResponse requestPayment(TossPaymentRequest tossPaymentRequest) {
+        return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(new PaymentErrorHandler())
-                .toBodilessEntity();
+                .body(TossPaymentResponse.class);
+    }
+
+    public TossPaymentCancelResponse requestPaymentCancel(String paymentKey, ReservationCancelReason cancelReason) {
+        return restClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cancelReason)
+                .retrieve()
+                .onStatus(new PaymentErrorHandler())
+                .body(TossPaymentCancelResponse.class);
     }
 
     private String createAuthorizations() {

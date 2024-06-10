@@ -30,8 +30,7 @@ public class ThemeService {
 
     @Transactional(readOnly = true)
     public ThemeResponse findById(Long id) {
-        Theme theme = themeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+        Theme theme = themeRepository.fetchById(id);
 
         return ThemeResponse.toResponse(theme);
     }

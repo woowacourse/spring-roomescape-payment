@@ -7,18 +7,20 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossPaymentCancelResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
+import roomescape.reservation.dto.AdminReservationSaveRequest;
 import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.ReservationCancelReason;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.reservation.dto.ReservationSearchConditionRequest;
 import roomescape.reservation.dto.ReservationWaitingResponse;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -47,76 +49,66 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    public ReservationResponse saveReservationSuccess(
-            ReservationSaveRequest reservationSaveRequest,
-            LoginMember loginMember
-    ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
-        validateDuplicatedReservationSuccess(reservation);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        if (loginMember.role().isUser()) {
-            paymentService.pay(PaymentRequest.from(reservationSaveRequest));
-        }
-
-        return ReservationResponse.toResponse(savedReservation);
-    }
-
-    public ReservationResponse saveReservationWaiting(
-            ReservationSaveRequest reservationSaveRequest,
-            LoginMember loginMember
-    ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
-        validateDuplicatedReservationWaiting(reservation, loginMember);
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return ReservationResponse.toResponse(savedReservation);
-    }
-
-    private Reservation createValidatedReservationOfStatus(
-            ReservationSaveRequest reservationSaveRequest,
+    public ReservationResponse saveUserPageReservation(
+            UserReservationSaveRequest userReservationSaveRequest,
             LoginMember loginMember,
-            ReservationStatus reservationStatus
+            ReservationStatus status
     ) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(reservationSaveRequest.getTimeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약 시간입니다."));
-
-        Theme theme = themeRepository.findById(reservationSaveRequest.getThemeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
-
-        Member member = memberRepository.findById(loginMember.id())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
-        return reservationSaveRequest.toReservation(member, theme, reservationTime, reservationStatus);
-    }
-
-    private void validateDuplicatedReservationSuccess(Reservation reservation) {
-        boolean existsReservation = reservationRepository.existsByDateAndTimeStartAtAndStatus(
-                reservation.getDate(),
-                reservation.getStartAt(),
-                reservation.getStatus()
-        );
-
-        if (existsReservation) {
-            throw new IllegalArgumentException("중복된 예약이 있습니다.");
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(userReservationSaveRequest.timeId());
+        Theme theme = themeRepository.fetchById(userReservationSaveRequest.themeId());
+        Member member = memberRepository.fetchById(loginMember.id());
+        Reservation reservation = userReservationSaveRequest.toEntity(member, theme, reservationTime, status);
+        validateReservation(loginMember.id(), reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        if (status.isSuccess()) {
+            paymentService.payForReservation(userReservationSaveRequest.extractPaymentRequest(), savedReservation);
         }
+
+        return ReservationResponse.toResponse(savedReservation);
     }
 
-    private void validateDuplicatedReservationWaiting(Reservation reservation, LoginMember loginMember) {
-        List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndDateAndTimeStartAt(
-                loginMember.id(),
-                reservation.getDate(),
-                reservation.getStartAt()
-        );
+    public ReservationResponse saveAdminPageReservation(
+            AdminReservationSaveRequest adminReservationSaveRequest,
+            ReservationStatus status
+    ) {
+        ReservationTime reservationTime = reservationTimeRepository.fetchById(adminReservationSaveRequest.timeId());
+        Theme theme = themeRepository.fetchById(adminReservationSaveRequest.themeId());
+        Member memberToReservation = memberRepository.fetchById(adminReservationSaveRequest.memberId());
+        Reservation reservation = adminReservationSaveRequest.toEntity(memberToReservation, theme, reservationTime, status);
+        validateReservation(adminReservationSaveRequest.memberId(), reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
 
-        if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(ReservationStatus.WAIT)) {
-            throw new IllegalArgumentException("예약이 완료되었거나, 대기 상태로 등록된 예약입니다.");
+        return ReservationResponse.toResponse(savedReservation);
+    }
+
+    private void validateReservation(Long memberId, Reservation reservation) {
+        if (reservation.getStatus().isSuccess()) {
+            if (reservationRepository.existsByThemeAndDateAndTimeStartAtAndStatus(
+                    reservation.getTheme(),
+                    reservation.getDate(),
+                    reservation.getStartAt(),
+                    reservation.getStatus()
+            )) {
+                throw new IllegalArgumentException("중복된 예약이 있습니다.");
+            }
+        }
+
+        if (reservation.getStatus().isWait()) {
+            List<ReservationStatus> reservationStatuses = reservationRepository.findStatusesByMemberIdAndThemeAndDateAndTimeStartAt(
+                    memberId,
+                    reservation.getTheme(),
+                    reservation.getDate(),
+                    reservation.getStartAt()
+            );
+            if (reservationStatuses.contains(ReservationStatus.SUCCESS) || reservationStatuses.contains(ReservationStatus.WAIT)) {
+                throw new IllegalArgumentException("예약이 완료되었거나, 대기 상태로 등록된 예약입니다.");
+            }
         }
     }
 
     @Transactional(readOnly = true)
     public ReservationResponse findById(Long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        Reservation reservation = reservationRepository.fetchById(id);
 
         return ReservationResponse.toResponse(reservation);
     }
@@ -136,19 +128,8 @@ public class ReservationService {
 
         Waitings waitings = new Waitings(waitingReservations);
 
-        return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
-                .map(reservation -> MemberReservationResponse.toResponse(
-                        reservation,
-                        waitings.findMemberRank(reservation, loginMember.id())
-                )).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReservationWaitingResponse> findWaitingReservations() {
-        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT, LocalDate.now());
-
-        return waitingReservations.stream()
-                .map(ReservationWaitingResponse::toResponse)
+        return reservationRepository.findAllMemberReservationWithPayment(loginMember.id(), LocalDate.now()).stream()
+                .map(reservation -> MemberReservationResponse.toResponse(reservation, waitings.findMemberRank(reservation, loginMember.id())))
                 .toList();
     }
 
@@ -164,18 +145,28 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ReservationWaitingResponse> findWaitingReservations() {
+        List<Reservation> waitingReservations = reservationRepository.findAllByStatusFromDate(ReservationStatus.WAIT,
+                LocalDate.now());
+
+        return waitingReservations.stream()
+                .map(ReservationWaitingResponse::toResponse)
+                .toList();
+    }
+
     public void delete(Long id) {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelById(Long id) {
+    public TossPaymentCancelResponse cancelById(Long id, ReservationCancelReason reservationCancelReason) {
         Reservation canceledReservation = getCanceledReservation(id);
         updateFirstWaitingReservation(canceledReservation);
+        return paymentService.cancel(id, reservationCancelReason);
     }
 
     private Reservation getCanceledReservation(Long id) {
-        Reservation successReservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        Reservation successReservation = reservationRepository.fetchById(id);
 
         if (successReservation.getDate().equals(LocalDate.now())) {
             throw new IllegalArgumentException("당일 예약은 취소할 수 없습니다.");
@@ -190,6 +181,6 @@ public class ReservationService {
                 canceledReservation.getDate(),
                 canceledReservation.getTime().getId(),
                 canceledReservation.getTheme().getId()
-        ).ifPresent(reservation -> reservation.updateStatus(ReservationStatus.SUCCESS));
+        ).ifPresent(reservation -> reservation.updateStatus(ReservationStatus.PAYMENT_PENDING));
     }
 }

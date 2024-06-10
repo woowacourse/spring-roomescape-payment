@@ -45,6 +45,7 @@ public class ApiControllerAdvice {
         LOGGER.error("서버 에러 : {}", exception.getMessage(), exception);
 
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), exception.getMessage()));
+                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                        "서버 에러입니다. 고객 센터에 문의 해주세요."));
     }
 }

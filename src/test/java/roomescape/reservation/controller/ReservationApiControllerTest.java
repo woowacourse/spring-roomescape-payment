@@ -1,21 +1,22 @@
 package roomescape.reservation.controller;
 
-import static org.mockito.Mockito.doNothing;
+import static roomescape.util.Fixture.ORDER_ID;
+import static roomescape.util.Fixture.PAYMENT_KEY;
 import static roomescape.util.Fixture.TODAY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
-import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
-import roomescape.reservation.dto.ReservationSaveRequest;
+import roomescape.reservation.dto.UserReservationSaveRequest;
 import roomescape.util.CookieUtils;
 
 class ReservationApiControllerTest extends IntegrationTest {
@@ -57,15 +58,13 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationSaveRequest reservationSaveRequest
-                = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
-
-        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        UserReservationSaveRequest userReservationSaveRequest
+                = new UserReservationSaveRequest(TODAY, 1L, 1L, PAYMENT_KEY, ORDER_ID, BigDecimal.valueOf(1000));
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(reservationSaveRequest))
+                .body(objectMapper.writeValueAsString(userReservationSaveRequest))
                 .accept(ContentType.JSON)
                 .when()
                 .post("/reservations")
@@ -81,12 +80,13 @@ class ReservationApiControllerTest extends IntegrationTest {
         saveThemeAsHorror();
         saveReservationTimeAsTen();
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, 1L, 1L);
+        UserReservationSaveRequest userReservationSaveRequest
+                = new UserReservationSaveRequest(TODAY, 1L, 1L, null, null, null);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(reservationSaveRequest))
+                .body(objectMapper.writeValueAsString(userReservationSaveRequest))
                 .accept(ContentType.JSON)
                 .when()
                 .post("/reservations/waiting")
