@@ -1,5 +1,6 @@
 package roomescape.controller.theme;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,22 +28,26 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "테마 생성")
     @PostMapping
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeSaveRequest request) {
         final Theme theme = request.toModel();
         return ResponseEntity.status(HttpStatus.CREATED).body(themeService.create(theme));
     }
 
+    @Operation(summary = "테마 목록")
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> findAll() {
         return ResponseEntity.ok(themeService.findAll());
     }
 
+    @Operation(summary = "인기 테마 목록", description = "최근 7일간 인기 테마목록 10개를 불러옵니다.")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> findAllPopular() {
         return ResponseEntity.ok(themeService.findPopularThemes());
     }
 
+    @Operation(summary = "테마 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable final Long id) {
         themeService.deleteById(id);
