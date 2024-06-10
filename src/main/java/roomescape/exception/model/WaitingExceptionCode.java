@@ -1,8 +1,10 @@
 package roomescape.exception.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "예약 대기 예외 코드", description = "예약 대기 과정에서 발생할 수 있는 예외 코드 모음")
 public enum WaitingExceptionCode implements ExceptionCode {
 
     WAITING_NOT_EXIST_EXCEPTION(HttpStatus.BAD_REQUEST, "예약 대기가 존재하지 않습니다."),

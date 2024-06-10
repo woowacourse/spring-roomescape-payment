@@ -1,8 +1,10 @@
 package roomescape.auth.exception;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "쿠키 예외", description = "쿠키와 관련된 예외 코드를 보관한다.")
 public enum CookieException implements ExceptionCode {
 
     COOKIE_IS_NULL_EXCEPTION(HttpStatus.UNAUTHORIZED, "쿠키가 비어있습니다."),

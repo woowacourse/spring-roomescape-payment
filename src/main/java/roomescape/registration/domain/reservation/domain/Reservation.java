@@ -1,5 +1,6 @@
 package roomescape.registration.domain.reservation.domain;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +14,7 @@ import roomescape.member.domain.Member;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
+@Tag(name = "예약 엔티티", description = "예약시 필요한 정보를 관리한다. 예약 생성시 특정 정보에 대해 예외처리를 진행한다.")
 @Entity
 public class Reservation {
 

@@ -1,5 +1,6 @@
 package roomescape.registration.domain.waiting.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import roomescape.registration.domain.waiting.dto.WaitingRequest;
 import roomescape.registration.domain.waiting.dto.WaitingResponse;
 import roomescape.registration.domain.waiting.service.WaitingService;
 
+@Tag(name = "예약 대기 컨트롤러", description = "사용자의 요청을 받아 예약 대기 신청, 예약 대기 삭제 등을 수행한다.")
 @RestController
 public class WaitingController {
 

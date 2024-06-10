@@ -1,5 +1,6 @@
 package roomescape.registration.domain.reservation.service;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -28,6 +29,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
+@Tag(name = "예약 서비스", description = "예약 저장, 필터링 된 예약 정보 반환 등 예약과 관련된 로직을 수행한다.")
 @Transactional
 @Service
 public class ReservationService {

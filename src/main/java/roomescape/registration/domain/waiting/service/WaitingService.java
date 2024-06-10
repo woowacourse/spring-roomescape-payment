@@ -1,5 +1,6 @@
 package roomescape.registration.domain.waiting.service;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import roomescape.registration.domain.waiting.dto.WaitingResponse;
 import roomescape.registration.domain.waiting.repository.WaitingRepository;
 import roomescape.registration.dto.RegistrationDto;
 
+@Tag(name = "예약 대기 서비스", description = "예약 대기 저장, 예약 대기 검색 등 예약 대기와 관련된 로직을 수행한다.")
 @Service
 public class WaitingService {
 

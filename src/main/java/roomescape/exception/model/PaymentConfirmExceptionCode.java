@@ -1,8 +1,10 @@
 package roomescape.exception.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "결제 승인 예외 코드", description = "결제 승인 과정에서 발생하는 예외 모음")
 public enum PaymentConfirmExceptionCode implements ExceptionCode {
 
     FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 완료되지 않았어요. 다시 시도해주세요."),

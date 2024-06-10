@@ -1,5 +1,6 @@
 package roomescape.registration.dto;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -10,6 +11,7 @@ import roomescape.registration.domain.reservation.dto.ReservationDto;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.domain.WaitingWithRank;
 
+@Tag(name = "등록 정보 반환", description = "사용자에게 예약과 예약 대기 정보를 응답한다.")
 public record RegistrationInfoResponse(
         long id,
         String themeName,

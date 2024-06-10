@@ -1,5 +1,6 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.domain.waiting.service.WaitingService;
 import roomescape.registration.dto.RegistrationInfoResponse;
 
+@Tag(name = "멤버 컨트롤러", description = "모든 사용자를 반환하거나 특정 사용자의 예약 내역을 반환한다.")
 @RestController
 public class MemberController {
 

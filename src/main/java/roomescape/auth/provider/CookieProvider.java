@@ -1,5 +1,6 @@
 package roomescape.auth.provider;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import java.util.Arrays;
 import org.springframework.http.ResponseCookie;
@@ -7,6 +8,7 @@ import roomescape.auth.domain.Token;
 import roomescape.auth.exception.CookieException;
 import roomescape.exception.RoomEscapeException;
 
+@Tag(name = "쿠키 제공자", description = "토큰을 사용해 쿠키를 만든다. 특정 이름의 쿠키를 찾아 해당 쿠키의 값을 반환한다.")
 public class CookieProvider {
 
     private static final String TOKEN_NAME = "token";

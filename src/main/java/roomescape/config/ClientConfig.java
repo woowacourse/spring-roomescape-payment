@@ -1,6 +1,7 @@
 package roomescape.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.client.payment.PaymentClient;
 import roomescape.util.LoggerUtil;
 
+@Tag(name = "결제 요청 Client를 위한 설정", description = "결제 요청 Client가 실행될 수 있게 설정하고 요청, 응답 로그를 남긴다.")
 @Configuration
 public class ClientConfig {
 

@@ -1,5 +1,6 @@
 package roomescape.infra;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import roomescape.exception.model.MemberExceptionCode;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.service.MemberService;
 
+@Tag(name = "멤버 역할 인터셉터", description = "사용자 요청을 가로채서 사용자 역할이 올바른지 확인한다.")
 @Component
 public class MemberRoleInterceptor implements HandlerInterceptor {
 

@@ -1,5 +1,6 @@
 package roomescape.registration.domain.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilit
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.dto.RegistrationDto;
 
+@Tag(name = "예약 컨트롤러", description = "예약을 저장 또는 삭제하고, 모든 예약 정보를 반환하고, 특정 시간대에 존재하는 예약을 반환한다.")
 @RequestMapping("/reservations")
 @RestController
 public class ReservationController {

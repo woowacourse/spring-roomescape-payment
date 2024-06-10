@@ -5,6 +5,7 @@ import static roomescape.exception.model.PaymentConfirmExceptionCode.FAILED_PAYM
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,7 @@ import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
 import roomescape.util.LoggerUtil;
 
+@Tag(name = "외부 api에 결제를 요청하는 Client", description = "토스 결제 api에 결제 승인을 요청하고 승인시 결제 정보와 관련된 응답을 받고, 미 승인시 에러 객체를 반환한다.")
 public class PaymentClient {
 
     private static final Logger log = LoggerUtil.getLogger(PaymentClient.class);

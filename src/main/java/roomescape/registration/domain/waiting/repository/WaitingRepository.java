@@ -1,5 +1,6 @@
 package roomescape.registration.domain.waiting.repository;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import roomescape.registration.domain.waiting.domain.Waiting;
 import roomescape.registration.domain.waiting.domain.WaitingWithRank;
 
+@Tag(name = "예약 레포지토리", description = "예약 대기 DB를 활용해 대기 순서, 대기 삭제 등을 수행한다.")
 public interface WaitingRepository extends CrudRepository<Waiting, Long> {
 
     List<Waiting> findAll();

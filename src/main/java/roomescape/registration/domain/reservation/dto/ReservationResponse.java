@@ -1,9 +1,11 @@
 package roomescape.registration.domain.reservation.dto;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
+@Tag(name = "예약 응답", description = "사용자에게 보여줄 예약 정보를 응답한다.")
 public record ReservationResponse(
         long id,
         String memberName,

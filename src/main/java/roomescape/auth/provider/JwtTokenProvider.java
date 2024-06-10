@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -16,6 +17,7 @@ import roomescape.auth.exception.TokenException;
 import roomescape.auth.provider.model.TokenProvider;
 import roomescape.exception.RoomEscapeException;
 
+@Tag(name = "jwt 토큰 제공자 구현체", description = "secretKey를 사용해 토큰을 암호화한다. 토큰 파싱 결과를 반환한다.")
 @Component
 public class JwtTokenProvider implements TokenProvider {
 

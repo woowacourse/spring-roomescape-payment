@@ -1,5 +1,6 @@
 package roomescape.registration.domain.waiting.domain;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import org.springframework.data.annotation.CreatedDate;
 import roomescape.member.domain.Member;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
+@Tag(name = "예약 대기 엔티티", description = "예약 대기에 필요한 정보를 관리한다. 예약 대기는 예약 id와 대기를 신청한 멤버 id를 갖고 있다.")
 @Entity
 public class Waiting {
 

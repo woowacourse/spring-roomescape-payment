@@ -1,8 +1,10 @@
 package roomescape.exception.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "멤버 예외 코드", description = "사용자 정보와 관련된 예외 코드 모음")
 public enum MemberExceptionCode implements ExceptionCode {
 
     ILLEGAL_EMAIL_FORM_EXCEPTION(HttpStatus.BAD_REQUEST, "이메일 형식이 맞지 않습니다."),

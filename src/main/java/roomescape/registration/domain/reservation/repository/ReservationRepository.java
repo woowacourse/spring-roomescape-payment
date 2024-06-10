@@ -1,10 +1,12 @@
 package roomescape.registration.domain.reservation.repository;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
 
+@Tag(name = "예약 레포지토리", description = "예약 DB 정보를 제어하여 특정 값을 반환한다.")
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findAllByOrderByDateAscReservationTimeAsc();
