@@ -18,3 +18,36 @@ include::{snippets}/reservation-rest-docs-test/save-reservation/request-fields.a
 
 include::{snippets}/reservation-rest-docs-test/save-reservation/http-response.adoc[]
 include::{snippets}/reservation-rest-docs-test/save-reservation/response-fields.adoc[]
+
+=== 전체 예약 조회
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/find-all-reservations/response-fields.adoc[]
+
+=== 내 예약 조회
+
+==== Reqeust
+
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/find-login-member-reservations/response-fields.adoc[]
+
+=== 예약 삭제
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/reservation-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/delete/http-response.adoc[]
