@@ -1,41 +1,13 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  datasource:
-    url: jdbc:h2:mem:database
-    driverClassName: org.h2.Driver
+  profiles:
+    active: local
   jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
     open-in-view: false
-
-logging:
-  level:
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: TRACE
-      springframework:
-        transaction:
-          interceptor: TRACE
-
-security:
-  jwt:
-    secret-key: abcdefghijklmnopqrstuvwxyz0123456789
-    expiration-time: 3600000 # 1 hour
 
 payment:
   gateways:
     toss:
       uri: https://api.tosspayments.com/v1/payments
-      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      secret-key: ${TOSS_SECRET_KEY}
       connect-timeout: 5s
       read-timeout: 30s
