@@ -2,6 +2,7 @@ package roomescape.reservation.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,5 +92,66 @@ class ReservationTest {
         boolean actual = reservation.isPaid();
 
         assertThat(actual).isFalse();
+    }
+
+    @DisplayName("예약이 생성되고 결제가 안된 경우, 환불이 불가능하다.")
+    @Test
+    void canRefund_whenCreated() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+
+        boolean actual = reservation.canRefund();
+
+        assertThat(actual).isFalse();
+    }
+
+    @DisplayName("예약이 완료되었을 경우, 환불이 가능하다.")
+    @Test
+    void canRefund_whenCompletePaying() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+        reservation.completePaying();
+
+        boolean actual = reservation.canRefund();
+
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("예약자가 서로 다른지 알 수 있다.")
+    @Test
+    void isDifferentMemberTest_whenDifferentMember() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+        reservation.completePaying();
+
+        boolean actual = reservation.isDifferentMember(2L);
+
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("예약자가 서로 같은지 알 수 있다.")
+    @Test
+    void isDifferentMemberTest_whenSameMember() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+        reservation.completePaying();
+
+        boolean actual = reservation.isDifferentMember(1L);
+
+        assertThat(actual).isFalse();
+    }
+
+    @DisplayName("다른 멤버로 예약을 재확정할 수 있다.")
+    @Test
+    void reconfirmReservationTest() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+        Member newMember = new Member(2L, "브리", "bri@abc.com");
+
+        reservation.reconfirmReservation(newMember);
+
+        assertAll(
+                () -> assertThat(reservation.getMember()).isEqualTo(newMember),
+                () -> assertThat(reservation.isPaid()).isFalse());
     }
 }

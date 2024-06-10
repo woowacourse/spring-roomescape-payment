@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Schedule;
 import roomescape.theme.domain.Theme;
@@ -61,6 +62,30 @@ class PaymentTest {
     void isPaidTest_whenPaymentIsCompleted() {
         Payment payment = new Payment("pay_12345", amount, member, schedule);
 
-        assertThat(payment.isPaid()).isTrue();
+        boolean actual = payment.isPaid();
+
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("결제가 완료된 상태임을 확인한다.")
+    @Test
+    void isPaidTest_whenPaymentIsRefund() {
+        Payment payment = new Payment("pay_12345", amount, member, schedule);
+        payment.completeRefund();
+
+        boolean actual = payment.isPaid();
+
+        assertThat(actual).isFalse();
+    }
+
+    @DisplayName("이미 환불된 결제를 환불하면, 예외를 발생시킨다..")
+    @Test
+    void completeRefundTest_whenPaymentIsRefunded() {
+        Payment payment = new Payment("pay_12345", amount, member, schedule);
+        payment.completeRefund();
+
+        assertThatThrownBy(() -> payment.completeRefund())
+                .isInstanceOf(BadArgumentRequestException.class)
+                .hasMessage("이미 환불된 결제입니다.");
     }
 }

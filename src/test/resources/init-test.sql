@@ -1,6 +1,8 @@
 DELETE
 FROM waiting;
 DELETE
+FROM payment;
+DELETE
 FROM reservation;
 DELETE
 FROM schedule;
@@ -11,6 +13,8 @@ FROM theme;
 DELETE
 FROM member;
 ALTER TABLE waiting
+    ALTER COLUMN id RESTART;
+ALTER TABLE payment
     ALTER COLUMN id RESTART;
 ALTER TABLE reservation
     ALTER COLUMN id RESTART;

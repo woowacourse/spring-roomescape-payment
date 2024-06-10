@@ -20,6 +20,7 @@ import roomescape.reservation.domain.Schedule;
 
 @Entity
 public class Payment {
+    private static final PaymentStatus DEFAULT_STATUS = PaymentStatus.PAID;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +42,16 @@ public class Payment {
         this.id = null;
         this.amount = Objects.requireNonNull(amount);
         this.paymentKey = new PaymentKey(paymentKey);
-        this.status = PaymentStatus.PAID;
+        this.status = DEFAULT_STATUS;
+        this.member = Objects.requireNonNull(member);
+        this.schedule = Objects.requireNonNull(schedule);
+    }
+
+    public Payment(Long id, String paymentKey, BigDecimal amount, Member member, Schedule schedule) {
+        this.id = id;
+        this.amount = Objects.requireNonNull(amount);
+        this.paymentKey = new PaymentKey(paymentKey);
+        this.status = DEFAULT_STATUS;
         this.member = Objects.requireNonNull(member);
         this.schedule = Objects.requireNonNull(schedule);
     }
@@ -90,8 +100,10 @@ public class Payment {
             return false;
         }
         Payment payment = (Payment) object;
-        return Objects.equals(id, payment.id) && Objects.equals(paymentKey, payment.paymentKey)
-                && Objects.equals(member, payment.member) && Objects.equals(schedule, payment.schedule);
+        return Objects.equals(id, payment.id)
+                && Objects.equals(paymentKey, payment.paymentKey)
+                && Objects.equals(member, payment.member)
+                && Objects.equals(schedule, payment.schedule);
     }
 
     @Override
