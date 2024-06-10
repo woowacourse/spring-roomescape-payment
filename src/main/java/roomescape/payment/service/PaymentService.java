@@ -47,7 +47,8 @@ public class PaymentService {
     }
 
     public Payment findByReservation(Long reservationId) {
-        return paymentRepository.findByReservationId(reservationId);
+        return paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 결제 내역이 없습니다."));
     }
 
     public void deleteByReservationId(Long reservationId) {

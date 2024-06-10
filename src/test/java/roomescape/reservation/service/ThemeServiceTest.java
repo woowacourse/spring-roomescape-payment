@@ -86,7 +86,7 @@ class ThemeServiceTest {
     @Test
     @DisplayName("테마 아이디로 조회 시 존재하지 않는 아이디면 예외가 발생한다.")
     void findByIdExceptionTest() {
-        assertThatThrownBy(() -> themeService.findById(1L))
+        assertThatThrownBy(() -> themeService.findById(100L))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
