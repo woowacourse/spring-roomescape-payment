@@ -1,21 +1,15 @@
 package roomescape.document;
 
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.controller.MemberController;
 import roomescape.document.config.RestDocsSupport;
 import roomescape.dto.LoginRequest;
 import roomescape.dto.MemberInfo;
 import roomescape.fixture.MemberFixture;
-import roomescape.infra.AuthArgumentResolver;
 import roomescape.service.MemberService;
 import roomescape.service.TokenService;
 

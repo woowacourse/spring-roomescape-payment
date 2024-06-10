@@ -1,0 +1,20 @@
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Reservation API
+
+=== 예약 등록
+
+==== Request
+
+include::{snippets}/reservation-rest-docs-test/save-reservation/http-request.adoc[]
+include::{snippets}/reservation-rest-docs-test/save-reservation/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-rest-docs-test/save-reservation/http-response.adoc[]
+include::{snippets}/reservation-rest-docs-test/save-reservation/response-fields.adoc[]
