@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS member
 
 CREATE TABLE IF NOT EXISTS theme
 (
-    id          BIGINT       NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    thumbnail   VARCHAR(255) NOT NULL,
+    id          BIGINT        NOT NULL AUTO_INCREMENT,
+    name        VARCHAR(255)  NOT NULL,
+    description VARCHAR(1024) NOT NULL,
+    thumbnail   VARCHAR(255)  NOT NULL,
     PRIMARY KEY (id)
 );
 
