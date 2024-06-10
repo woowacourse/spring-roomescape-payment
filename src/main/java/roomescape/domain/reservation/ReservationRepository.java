@@ -26,7 +26,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
                 ON p.reservation.id = r.id
             WHERE r.member.id = :memberId
             """)
-    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId); // TODO: 쿼리 개선점 있는지 생각 필요
+    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId);
 
     @Query("""
             SELECT r

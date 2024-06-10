@@ -91,7 +91,7 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
             reservation = reservationFixture.createFutureReservation(reservationTime, theme, admin);
             user = memberFixture.createUserMember();
             params = new HashMap<>();
-            params.put("themeId", theme.getId().toString()); // TODO: requestDTO로 대체
+            params.put("themeId", theme.getId().toString());
             params.put("timeId", reservationTime.getId().toString());
         }
 
@@ -220,7 +220,7 @@ public class ReservationWaitingIntegrationTest extends IntegrationTest {
                     .cookies(cookieProvider.createAdminCookies())
                     .when().delete("/reservations/{reservationId}/waitings", reservation.getId())
                     .then().log().all()
-                    .statusCode(404); // TODO: 400으로 변경하기
+                    .statusCode(404);
         }
     }
 

@@ -20,6 +20,6 @@ public record PaymentConfirmOutput(
         PaymentMethod findMethod = PaymentMethod.findByDescription(method);
         PaymentInfo info = new PaymentInfo(
                 paymentKey, type, orderId, orderName, currency, findMethod, totalAmount, status);
-        return new ReservationPayment(info, reservation); // TODO: 도메인 간 embeddable 생성 방식 통일하기
+        return new ReservationPayment(info, reservation);
     }
 }
