@@ -450,7 +450,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 Content-Type: application/json
 Host: localhost:8081
 Content-Length: 27
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkyMywiaWF0IjoxNzE3OTM4MzIzfQ.SkIu_VJKS9M9BE6oqpOIFeFeDD7ccaoA05-2W7kkXJU
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM1MywiaWF0IjoxNzE4MDAxNzUzfQ.pyKtkp55WMiQZnS4VI3CbUqJ-c9JlxXIhjHhB87GwCA
 
 {
   "startAt" : "10:00"
@@ -505,9 +505,37 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 </div>
 <div class="sect3">
 <h4 id="_예약_시간_생성_response_fields">Response fields</h4>
-<div class="paragraph">
-<p>Snippet response-fields not found for operation::saveTime</p>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">저장된 시간 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">저장된 시간</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>booked</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 여부</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -518,7 +546,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTk1MCwiaWF0IjoxNzE3OTM4MzUwfQ.pJaVzUhicb8TVTzI0l9QH4N0h1K2QzOcdD5IKyq1NYY</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM4MSwiaWF0IjoxNzE4MDAxNzgxfQ.yPVW1I37cTfaqP6HwrX7XrNZ9BUXIJgYJBj7zOtK5qw</code></pre>
 </div>
 </div>
 </div>
@@ -529,7 +557,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Sun, 09 Jun 2024 13:05:50 GMT
+Date: Mon, 10 Jun 2024 06:43:00 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 212
@@ -591,7 +619,7 @@ Content-Length: 212
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /times/6 HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkyMywiaWF0IjoxNzE3OTM4MzIzfQ.SkIu_VJKS9M9BE6oqpOIFeFeDD7ccaoA05-2W7kkXJU</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM1MywiaWF0IjoxNzE4MDAxNzUzfQ.pyKtkp55WMiQZnS4VI3CbUqJ-c9JlxXIhjHhB87GwCA</code></pre>
 </div>
 </div>
 </div>
@@ -616,12 +644,6 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_예약_시간_삭제_path_parameters">Path parameters</h4>
-<div class="paragraph">
-<p>Snippet path-parameters not found for operation::deleteTime</p>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_예약_시간_삭제_실패">예약 시간 삭제 실패</h3>
@@ -631,7 +653,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /times/6 HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkyMywiaWF0IjoxNzE3OTM4MzIzfQ.SkIu_VJKS9M9BE6oqpOIFeFeDD7ccaoA05-2W7kkXJU</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM1MywiaWF0IjoxNzE4MDAxNzUzfQ.pyKtkp55WMiQZnS4VI3CbUqJ-c9JlxXIhjHhB87GwCA</code></pre>
 </div>
 </div>
 </div>
@@ -656,18 +678,12 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_예약_시간_삭제_실패_path_parameters">Path parameters</h4>
-<div class="paragraph">
-<p>Snippet path-parameters not found for operation::deleteTimeFail</p>
-</div>
-</div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-09 22:05:05 +0900
+Last updated 2024-06-10 15:36:43 +0900
 </div>
 </div>
 </body>

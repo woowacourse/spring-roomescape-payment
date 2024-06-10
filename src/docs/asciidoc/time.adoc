@@ -8,8 +8,8 @@ operation::getTimes[snippets="http-request,http-response,response-fields"]
 
 === 예약 시간 삭제
 
-operation::deleteTime[snippets="http-request,request-cookies,path-parameters"]
+operation::deleteTime[snippets="http-request,request-cookies"]
 
 === 예약 시간 삭제 실패
 
-operation::deleteTimeFail[snippets="http-request,request-cookies,path-parameters"]
+operation::deleteTimeFail[snippets="http-request,request-cookies"]

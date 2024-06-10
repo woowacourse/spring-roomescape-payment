@@ -8,8 +8,8 @@ operation::getThemes[snippets="http-request,http-response,response-fields"]
 
 === 테마 삭제
 
-operation::deleteTheme[snippets="http-request,request-cookies,path-parameters"]
+operation::deleteTheme[snippets="http-request,request-cookies"]
 
 === 테마 삭제 실패
 
-operation::deleteThemeFail[snippets="http-request,request-cookies,path-parameters"]
+operation::deleteThemeFail[snippets="http-request,request-cookies"]

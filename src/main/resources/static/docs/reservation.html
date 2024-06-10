@@ -448,7 +448,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkyMSwiaWF0IjoxNzE3OTM4MzIxfQ.OuXXAZn6W7pII2vViDhHfiQCDhkiUT5veFewsuyRvMk</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM1MSwiaWF0IjoxNzE4MDAxNzUxfQ.kcvhZy5vcYOuGltjVDJblUU0u7jhqL_va0a2PCwUrJo</code></pre>
 </div>
 </div>
 </div>
@@ -474,19 +474,13 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 </table>
 </div>
 <div class="sect3">
-<h4 id="_예약_조회_request_fields">Request fields</h4>
-<div class="paragraph">
-<p>Snippet request-fields not found for operation::getReservations</p>
-</div>
-</div>
-<div class="sect3">
 <h4 id="_예약_조회_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Sun, 09 Jun 2024 13:05:21 GMT
+Date: Mon, 10 Jun 2024 06:42:32 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 1724
@@ -496,7 +490,7 @@ Content-Length: 1724
   "member" : {
     "name" : "레디"
   },
-  "date" : "2024-06-06",
+  "date" : "2024-06-07",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -510,7 +504,7 @@ Content-Length: 1724
   "member" : {
     "name" : "레디"
   },
-  "date" : "2024-06-08",
+  "date" : "2024-06-09",
   "time" : {
     "id" : 2,
     "startAt" : "16:00",
@@ -524,7 +518,7 @@ Content-Length: 1724
   "member" : {
     "name" : "레디"
   },
-  "date" : "2024-06-10",
+  "date" : "2024-06-11",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -538,7 +532,7 @@ Content-Length: 1724
   "member" : {
     "name" : "재즈"
   },
-  "date" : "2024-06-07",
+  "date" : "2024-06-08",
   "time" : {
     "id" : 3,
     "startAt" : "17:00",
@@ -552,7 +546,7 @@ Content-Length: 1724
   "member" : {
     "name" : "재즈"
   },
-  "date" : "2024-06-08",
+  "date" : "2024-06-09",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -566,7 +560,7 @@ Content-Length: 1724
   "member" : {
     "name" : "재즈"
   },
-  "date" : "2024-06-13",
+  "date" : "2024-06-14",
   "time" : {
     "id" : 4,
     "startAt" : "18:00",
@@ -580,7 +574,7 @@ Content-Length: 1724
   "member" : {
     "name" : "제제"
   },
-  "date" : "2024-06-02",
+  "date" : "2024-06-03",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -594,7 +588,7 @@ Content-Length: 1724
   "member" : {
     "name" : "제제"
   },
-  "date" : "2024-06-12",
+  "date" : "2024-06-13",
   "time" : {
     "id" : 4,
     "startAt" : "18:00",
@@ -672,12 +666,12 @@ Content-Length: 1724
 Content-Type: application/json
 Host: localhost:8081
 Content-Length: 86
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkzMiwiaWF0IjoxNzE3OTM4MzMyfQ.tbwzOJQ5R3C_otG7y5SX9Q9Onbn2RAIJYUUcQolwMtk
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM2MywiaWF0IjoxNzE4MDAxNzYzfQ.jE0bA0Zzc6iqr27YThZh-3xq5aJI3R6RX9lO0LDn3ow
 
 {
   "memberId" : 1,
   "themeId" : 1,
-  "date" : [ 2024, 6, 10 ],
+  "date" : [ 2024, 6, 11 ],
   "timeId" : 1
 }</code></pre>
 </div>
@@ -751,7 +745,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 Location: /reservations/9
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Sun, 09 Jun 2024 13:05:32 GMT
+Date: Mon, 10 Jun 2024 06:42:42 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 211
@@ -761,7 +755,7 @@ Content-Length: 211
   "member" : {
     "name" : "레디"
   },
-  "date" : "2024-06-10",
+  "date" : "2024-06-11",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -772,12 +766,6 @@ Content-Length: 211
   }
 }</code></pre>
 </div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_어드민이_예약_생성_response_fields">Response fields</h4>
-<div class="paragraph">
-<p>Snippet response-fields not found for operation::adminSaveReservation</p>
 </div>
 </div>
 </div>
@@ -791,12 +779,12 @@ Content-Length: 211
 Content-Type: application/json
 Host: localhost:8081
 Content-Length: 191
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE3OTQxOTM5LCJpYXQiOjE3MTc5MzgzMzl9.79eiR0XuRDqL7yDIT4VmLAmFBkcejyLZOnOb2GNyncI
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzE4MDA1MzY5LCJpYXQiOjE3MTgwMDE3Njl9.ZlWKAeMV79J4ossnu7MVvDPBIv6vOaADlVB_6RzLcRQ
 
 {
   "memberId" : 2,
   "themeId" : 2,
-  "date" : [ 2024, 6, 12 ],
+  "date" : [ 2024, 6, 13 ],
   "timeId" : 1,
   "paymentKey" : "tgen_20240529194618t4hG2",
   "orderId" : "MC4wMzc1NDM4Njg4NTE1",
@@ -834,7 +822,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi7KCc7KCcIiwic3ViIjoiMyIsInJvbGUiO
 Location: /reservations/9
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Sun, 09 Jun 2024 13:05:39 GMT
+Date: Mon, 10 Jun 2024 06:42:48 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 214
@@ -844,7 +832,7 @@ Content-Length: 214
   "member" : {
     "name" : "제제"
   },
-  "date" : "2024-06-12",
+  "date" : "2024-06-13",
   "time" : {
     "id" : 1,
     "startAt" : "15:00",
@@ -857,12 +845,6 @@ Content-Length: 214
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_유저가_예약_생성_response_fields">Response fields</h4>
-<div class="paragraph">
-<p>Snippet response-fields not found for operation::userSaveReservation</p>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_자신의_예약_취소">자신의 예약 취소</h3>
@@ -872,7 +854,7 @@ Content-Length: 214
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admin/reservations/9 HTTP/1.1
 Host: localhost:8081
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxNzk0MTkyMSwiaWF0IjoxNzE3OTM4MzIxfQ.OuXXAZn6W7pII2vViDhHfiQCDhkiUT5veFewsuyRvMk</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxODAwNTM1MSwiaWF0IjoxNzE4MDAxNzUxfQ.kcvhZy5vcYOuGltjVDJblUU0u7jhqL_va0a2PCwUrJo</code></pre>
 </div>
 </div>
 </div>
@@ -898,17 +880,11 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoi66CI65SUIiwic3ViIjoiMSIsInJvbGUiO
 </table>
 </div>
 <div class="sect3">
-<h4 id="_자신의_예약_취소_path_parameters">Path parameters</h4>
-<div class="paragraph">
-<p>Snippet path-parameters not found for operation::deleteReservation</p>
-</div>
-</div>
-<div class="sect3">
 <h4 id="_자신의_예약_취소_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Sun, 09 Jun 2024 13:05:22 GMT
+Date: Mon, 10 Jun 2024 06:42:33 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -919,7 +895,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-09 22:05:05 +0900
+Last updated 2024-06-10 15:42:03 +0900
 </div>
 </div>
 </body>

@@ -62,6 +62,11 @@ public enum DocumentFilter {
             requestCookies(cookieWithName("token").description("시간을 생성하는 어드민의 토큰")),
             requestFields(
                     fieldWithPath("startAt").description("저장할 시간")
+            ),
+            responseFields(
+                    fieldWithPath("id").description("저장된 시간 ID"),
+                    fieldWithPath("startAt").description("저장된 시간"),
+                    fieldWithPath("booked").description("예약 여부")
             )
     ),
     SAVE_THEME("saveTheme",
@@ -70,6 +75,12 @@ public enum DocumentFilter {
                     fieldWithPath("name").description("저장할 테마 이름"),
                     fieldWithPath("description").description("저장할 테마 설명"),
                     fieldWithPath("thumbnail").description("저장할 테마 썸네일")
+            ),
+            responseFields(
+                    fieldWithPath("id").description("저장된 테마 ID"),
+                    fieldWithPath("name").description("저장된 테마 이름"),
+                    fieldWithPath("description").description("저장된 테마 설명"),
+                    fieldWithPath("thumbnail").description("저장된 테마 썸네일")
             )
     ),
     GET_RESERVATIONS("getReservations",
