@@ -36,7 +36,7 @@ function render(data) {
         row.dataset.memberId = item.member.id;
 
         const actionCell = row.insertCell(row.cells.length);
-        actionCell.appendChild(createActionButton('삭제', 'btn-danger', deleteRow));
+        actionCell.appendChild(createActionButton('취소', 'btn-danger', cancelRow));
     });
 }
 
@@ -177,12 +177,12 @@ function saveRow(event) {
     isEditing = false;  // isEditing 값을 false로 설정
 }
 
-function deleteRow(event) {
+function cancelRow(event) {
     const row = event.target.closest('tr');
     const reservationId = row.cells[0].textContent;
     const memberId = row.dataset.memberId;
 
-    requestDelete(reservationId, memberId)
+    requestCancel(reservationId, memberId)
         .then(() => row.remove())
         .catch(error => console.error('Error:', error));
 }
@@ -227,12 +227,12 @@ function requestCreate(reservation) {
         });
 }
 
-function requestDelete(reservationId, memberId) {
+function requestCancel(reservationId, memberId) {
     const requestOptions = {
         method: 'DELETE',
     };
 
-    return fetch(`${RESERVATION_API_ENDPOINT}/${reservationId}`, requestOptions)
+    return fetch(`${RESERVATION_API_ENDPOINT}/${reservationId}/cancel`, requestOptions)
         .then(response => {
             if (response.status !== 204) throw new Error('Delete failed');
         });

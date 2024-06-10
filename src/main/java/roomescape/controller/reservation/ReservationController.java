@@ -92,9 +92,8 @@ public class ReservationController {
         return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
     }
 
-    // TODO: /reservations/{reservationId}/cancel로 변경
     @RoleAllowed
-    @DeleteMapping("/reservations/{reservationId}")
+    @DeleteMapping("/reservations/{reservationId}/cancel")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
             @LoginMember Member member) {
@@ -102,9 +101,8 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: /reservations/{reservationId} 로 변경
     @RoleAllowed
-    @DeleteMapping("/reservations/{reservationId}/remove")
+    @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
             @LoginMember Member member) {

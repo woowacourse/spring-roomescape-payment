@@ -49,7 +49,7 @@ function render(data) {
             removeButton.className = 'btn btn-danger';
 
             removeButton.onclick = function () {
-                if (confirm("삭제시 기록을 복구할 수 없습니다. 그래도 삭제하시겠습니까?")) {
+                if (confirm("삭제 시 기록을 복구할 수 없습니다. 그래도 삭제하시겠습니까?")) {
                     requestDeleteReservation(item.reservationId).then(() => window.location.reload());
                 } else {
                     // 삭제 취소
@@ -88,7 +88,7 @@ function requestDeleteWaiting(id) {
 }
 
 function requestDeleteReservation(id) {
-    const endpoint = `/reservations/${id}/remove`;
+    const endpoint = `/reservations/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {
