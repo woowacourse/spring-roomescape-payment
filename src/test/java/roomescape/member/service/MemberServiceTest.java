@@ -1,35 +1,39 @@
 package roomescape.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
+import io.restassured.RestAssured;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.member.domain.Member;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.member.dto.MemberResponse;
-import roomescape.member.repository.MemberRepository;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class MemberServiceTest {
-    @Mock
-    private MemberRepository memberRepository;
-    @InjectMocks
+    @LocalServerPort
+    private int port;
+    @Autowired
     private MemberService memberService;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @DisplayName("멤버를 모두 조회할 수 있다.")
     @Test
     void findMembersTest() {
-        given(memberRepository.findAll()).willReturn(List.of(
-                new Member(1L, "브리", "bri@abc.com"),
-                new Member(2L, "브라운", "brown@abc.com")));
         List<MemberResponse> expected = List.of(
-                new MemberResponse(1L, "브리"),
-                new MemberResponse(2L, "브라운"));
+                new MemberResponse(1L, "관리자"),
+                new MemberResponse(2L, "브라운"),
+                new MemberResponse(3L, "브리"),
+                new MemberResponse(4L, "오리"));
 
         List<MemberResponse> actual = memberService.findMembers();
 

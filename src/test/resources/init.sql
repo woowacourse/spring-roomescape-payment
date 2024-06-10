@@ -4,6 +4,7 @@ TRUNCATE TABLE reservation;
 TRUNCATE TABLE reservation_time;
 TRUNCATE TABLE theme;
 TRUNCATE TABLE member;
+TRUNCATE TABLE payment;
 SET referential_integrity TRUE;
 
 ALTER TABLE waiting
@@ -15,6 +16,8 @@ ALTER TABLE reservation_time
 ALTER TABLE theme
     ALTER COLUMN id RESTART;
 ALTER TABLE member
+    ALTER COLUMN id RESTART;
+ALTER TABLE payment
     ALTER COLUMN id RESTART;
 
 INSERT INTO member(name, email, role, password)
