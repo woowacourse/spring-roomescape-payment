@@ -52,9 +52,9 @@ public class ReservationService {
     public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
         Reservation reservation = saveReservation(reservationSaveDto);
         PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
-        Payment payment = savePayment(reservation, paymentDto);
+        savePayment(reservation, paymentDto);
 
-        return new ReservationDto(reservation.withPayment(payment));
+        return new ReservationDto(reservation);
     }
 
     private Reservation saveReservation(ReservationSaveDto reservationSaveDto) {
@@ -69,9 +69,10 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    private Payment savePayment(Reservation reservation, PaymentDto paymentDto) {
+    private void savePayment(Reservation reservation, PaymentDto paymentDto) {
         Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId(), paymentDto.totalAmount());
-        return savePayment(payment);
+        Payment savedPayment = savePayment(payment);
+        reservation.setPayment(savedPayment);
     }
 
     private Payment savePayment(Payment payment) {

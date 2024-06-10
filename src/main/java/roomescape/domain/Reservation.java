@@ -84,10 +84,6 @@ public class Reservation {
         return theme.isPriceEqual(price);
     }
 
-    public Reservation withPayment(Payment payment) {
-        return new Reservation(id, member, date, time, theme, payment);
-    }
-
     public Long getId() {
         return id;
     }
@@ -110,5 +106,12 @@ public class Reservation {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        if (payment == null) {
+            throw new IllegalArgumentException("Payment가 비어 있습니다.");
+        }
+        this.payment = payment;
     }
 }
