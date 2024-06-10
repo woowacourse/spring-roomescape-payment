@@ -70,7 +70,8 @@ class ReservationControllerTest extends RestClientControllerTest {
                 "paymentKey"
         );
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-reservation-non-exist-reservation-time"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAdminAccessToken())
                 .body(saveReservationRequest)
@@ -92,7 +93,8 @@ class ReservationControllerTest extends RestClientControllerTest {
                 "paymentKey"
         );
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-reservation-past-date"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAdminAccessToken())
                 .body(saveReservationRequest)

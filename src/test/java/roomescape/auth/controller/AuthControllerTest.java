@@ -27,7 +27,8 @@ class AuthControllerTest extends RestClientControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When && Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("login-success"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -45,7 +46,8 @@ class AuthControllerTest extends RestClientControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-not-exist-id"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -63,7 +65,8 @@ class AuthControllerTest extends RestClientControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-not-exist-pw"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -99,7 +102,8 @@ class AuthControllerTest extends RestClientControllerTest {
         final String accessToken = tokenProvider.createToken(memberId, role);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-member"))
                 .cookie("token", accessToken)
                 .when().get("/login/check")
                 .then().log().all()
@@ -111,7 +115,8 @@ class AuthControllerTest extends RestClientControllerTest {
     @Test
     void loginCheckWithInvalidCookie() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-cookie"))
                 .cookie("invalid-cookie", "그냥 좀 해주면 안되요?ㅋ")
                 .when().get("/login/check")
                 .then().log().all()
@@ -123,7 +128,8 @@ class AuthControllerTest extends RestClientControllerTest {
     @Test
     void loginCheckWithoutCookie() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-non-contains-token"))
                 .when().get("/login/check")
                 .then().log().all()
                 .statusCode(401)
@@ -134,7 +140,8 @@ class AuthControllerTest extends RestClientControllerTest {
     @Test
     void loginCheckWithInvalidTokenTest() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-token"))
                 .cookie("token", "invalid-token")
                 .when().get("/login/check")
                 .then().log().all()
@@ -151,7 +158,8 @@ class AuthControllerTest extends RestClientControllerTest {
                                     "mLgs2dqD9oCOUtleHtpcmf4tTw39bC9pmqFaUBPQZy9ADPsgRXEu3qhLS8qqs3UiV6MPmP_03FaZHX8UrieK4A";
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-expired-token"))
                 .cookie("token", expiredToken)
                 .when().get("/login/check")
                 .then().log().all()

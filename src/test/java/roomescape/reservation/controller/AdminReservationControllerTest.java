@@ -106,7 +106,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
                 "paymentKey"
         );
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-save-reservation-without-admin-role"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createUserAccessToken())
                 .body(saveReservationRequest)
@@ -139,7 +140,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
     @DisplayName("관리자가 아닌 클라이언트가 예약 정보를 삭제하려고 하면 에러 코드가 응답된다.")
     @Test
     void deleteReservationWhoNotAdminTest() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-delete-reservation-without-admin-role"))
                 .cookie("token", createUserAccessToken())
                 .when().delete("/admin/reservations/1")
                 .then().log().all()
@@ -170,7 +172,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
         final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(
                 LocalTime.of(12, 15));
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-save-reservation-time-without-admin-role"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createUserAccessToken())
                 .body(saveReservationTimeRequest)
@@ -205,7 +208,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
     @DisplayName("관리자가 아닌 클라이언트가 예약 시간 정보를 삭제하려고 하면 예외를 발생시킨다.")
     @Test
     void deleteReservationTimeWhoNotAdminTest() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-delete-reservation-time-without-admin-role"))
                 .cookie("token", createUserAccessToken())
                 .when().delete("/admin/times/2")
                 .then().log().all()
@@ -242,7 +246,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
                 "방방 사진"
         );
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-save-theme-without-admin-role"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createUserAccessToken())
                 .body(saveThemeRequest)
@@ -255,7 +260,6 @@ class AdminReservationControllerTest extends RestClientControllerTest {
     @DisplayName("테마 정보를 삭제한다.")
     @Test
     void deleteThemeTest() {
-        // 예약 시간 정보 삭제
         RestAssured.given(spec).log().all()
                 .filter(document("admin-delete-theme"))
                 .cookie("token", createAdminAccessToken())
@@ -263,7 +267,6 @@ class AdminReservationControllerTest extends RestClientControllerTest {
                 .then().log().all()
                 .statusCode(204);
 
-        // 예약 시간 정보 조회
         final List<ThemeResponse> themes = RestAssured.given().log().all()
                 .cookie("token", createAdminAccessToken())
                 .when().get("/themes")
@@ -277,8 +280,8 @@ class AdminReservationControllerTest extends RestClientControllerTest {
     @DisplayName("관리자가 아닌 클라이언트가 테마 정보를 삭제하려고 하면 예외를 발생시킨다.")
     @Test
     void deleteThemeWhoNotAdminTest() {
-        // 예약 시간 정보 삭제
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-admin-delete-theme-without-admin-role"))
                 .cookie("token", createUserAccessToken())
                 .when().delete("/admin/themes/7")
                 .then().log().all()

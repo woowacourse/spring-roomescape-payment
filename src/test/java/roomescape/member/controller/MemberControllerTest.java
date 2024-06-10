@@ -48,6 +48,23 @@ class MemberControllerTest extends RestClientControllerTest {
                 .statusCode(200);
     }
 
+    @DisplayName("이메일 형식이 아닌 경우 예외가 발생한다.")
+    @Test
+    void failCreateMemberNotEmailFormat() throws JsonProcessingException {
+        final SaveMemberRequest request =
+                new SaveMemberRequest("testcmo", "testPwtest!", "name", MemberRole.USER);
+        String requestBody = objectMapper.writeValueAsString(request);
+
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-create-member-invalid-email"))
+                .cookie("token", createAdminAccessToken())
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when().post("/members")
+                .then().log().all()
+                .statusCode(400);
+    }
+
     private String createAdminAccessToken() {
         return tokenProvider.createToken(1L, MemberRole.ADMIN);
     }

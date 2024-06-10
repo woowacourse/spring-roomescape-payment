@@ -74,7 +74,8 @@ class ReservationWaitingControllerTest extends RestClientControllerTest {
                 LocalDate.now(), 1L, 1L, 2L);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-waiting-reservation-non-exist-reservation"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .body(saveReservationWaitingRequest)
@@ -92,7 +93,8 @@ class ReservationWaitingControllerTest extends RestClientControllerTest {
                 LocalDate.now().plusDays(6), 2L, 3L, 8L);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-waiting-reservation-already-exist"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .body(saveReservationWaitingRequest)
