@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TossPaymentsConfirmRequest {
-    private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9-_]+$");
+    private static final Pattern ORDER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9-_]+$");
     private static final int MIN_ORDER_ID_LENGTH = 6;
     private static final int MAX_ORDER_ID_LENGTH = 64;
     private static final int MAX_PAYMENT_KEY_LENGTH = 200;
@@ -47,7 +47,7 @@ public class TossPaymentsConfirmRequest {
     }
 
     private void validateOrderIdPattern(String orderId) {
-        Matcher matcher = PATTERN.matcher(orderId);
+        Matcher matcher = ORDER_ID_PATTERN.matcher(orderId);
         if (!matcher.matches()) {
             throw new ViolationException("orderId는 영문 대소문자, 숫자, 특수문자 -, _로 이루어져야 합니다.");
         }
