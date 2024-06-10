@@ -37,7 +37,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/css/**", "/js/**", "/images/**", "/fonts/**", "/*.ico",
                         "/image/default-profile.png",
-                        "/", "/popular-themes", "/login", "/signup", "/members"
+                        "/", "/popular-themes", "/login", "/signup", "/members",
+                        "/swagger-ui/**","/v3/**"
                 );
 
         registry.addInterceptor(new AdminCheckInterceptor(tokenProvider))

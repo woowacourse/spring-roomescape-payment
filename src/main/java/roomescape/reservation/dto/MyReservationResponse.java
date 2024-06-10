@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.reservation.model.Payment;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.WaitingWithRank;
@@ -13,7 +14,9 @@ public record MyReservationResponse(
         Long id,
         String theme,
         LocalDate date,
-        @JsonFormat(pattern = "HH:mm") LocalTime time,
+        @JsonFormat(pattern = "HH:mm")
+        @Schema(type = "string", example = "14:30", pattern = "HH:mm")
+        LocalTime time,
         String status,
         String paymentKey,
         Long amount
