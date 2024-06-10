@@ -50,8 +50,8 @@ public class WaitingService {
         waitingCancelService.cancelWaiting(waitingId);
     }
 
-    public List<WaitingResponse> findPaymentByReservationIds(final List<Long> waitingReservationIds) {
-        return waitingSearchService.findPaymentByReservationIds(waitingReservationIds).stream()
+    public List<WaitingResponse> findWaitingByReservationIds(final List<Long> waitingReservationIds) {
+        return waitingSearchService.findWaitingByReservationIds(waitingReservationIds).stream()
                 .map(WaitingResponse::from)
                 .toList();
     }

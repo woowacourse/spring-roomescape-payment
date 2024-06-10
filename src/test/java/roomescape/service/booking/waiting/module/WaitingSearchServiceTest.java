@@ -28,4 +28,13 @@ class WaitingSearchServiceTest {
         //then
         assertThat(allWaitingReservations).hasSize(2);
     }
+
+    @Test
+    void 예약_id에_해당하는_대기_조회() {
+        // when
+        List<Waiting> waitings = waitingSearchService.findWaitingByReservationIds(List.of(2L, 3L));
+
+        // then
+        assertThat(waitings).hasSize(2);
+    }
 }

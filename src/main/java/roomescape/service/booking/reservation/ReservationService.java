@@ -107,7 +107,7 @@ public class ReservationService {
     private List<UserReservationPaymentResponse> getWaitingReservations(final List<Reservation> reservations) {
         List<Reservation> waitingReservations = new Reservations(reservations).filterStatus(Status.WAITING);
         List<Long> waitingReservationIds = new Reservations(waitingReservations).getIds();
-        List<WaitingResponse> waitings = waitingService.findPaymentByReservationIds(waitingReservationIds);
+        List<WaitingResponse> waitings = waitingService.findWaitingByReservationIds(waitingReservationIds);
 
         return UserReservationPaymentResponse.fromWaitings(waitings);
     }

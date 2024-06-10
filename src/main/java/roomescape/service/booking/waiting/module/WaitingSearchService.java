@@ -25,7 +25,7 @@ public class WaitingSearchService {
         return ReservationResponse.from(waiting.getReservation());
     }
 
-    public List<Waiting> findPaymentByReservationIds(final List<Long> reservationIds) {
-        return waitingRepository.findByReservation_IdIn(reservationIds);
+    public List<Waiting> findWaitingByReservationIds(final List<Long> reservationIds) {
+        return waitingRepository.findByReservationIdIn(reservationIds);
     }
 }
