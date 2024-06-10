@@ -23,3 +23,6 @@ INSERT INTO waiting (reservation_id, member_id, created_at)
 VALUES (1, 2, '2024-05-27T13:45:30'),
        (2, 1, '2024-05-27T14:00:00'),
        (2, 3, '2024-05-28T12:12:12');
+
+INSERT INTO payment (reservation_id, payment_key, type, order_id, order_name, status, requested_at, approved_at, total_amount, method, cancels)
+VALUES (2, 'test paymentKey', 'test type', 'test orderId', 'test orderName', 'test status', 'test requestedAt', 'test approvedAt', 1000, 'test method', 'test cancels');
