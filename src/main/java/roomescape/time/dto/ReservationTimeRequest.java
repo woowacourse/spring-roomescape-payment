@@ -2,9 +2,12 @@ package roomescape.time.dto;
 
 import java.time.LocalTime;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.time.entity.ReservationTime;
 
-public record ReservationTimeRequest(LocalTime startAt) {
+@Schema(description = "예약 시간 요청")
+public record ReservationTimeRequest(
+        @Schema(description = "예약 시간", defaultValue = "23:00") LocalTime startAt) {
     public ReservationTime toReservationTime() {
         return new ReservationTime(startAt);
     }
