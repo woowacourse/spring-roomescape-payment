@@ -1,0 +1,442 @@
+= 방탈출 API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 회원 가입
+
+=== HTTP Request
+
+include::{snippets}/signup/http-request.adoc[]
+
+=== Request Fields
+
+include::{snippets}/signup/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/signup/http-response.adoc[]
+
+== 로그인
+
+=== HTTP Request
+
+include::{snippets}/login/http-request.adoc[]
+
+=== Request Fields
+
+include::{snippets}/login/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/login/http-response.adoc[]
+
+== 로그아웃
+
+=== HTTP Request
+
+include::{snippets}/logout/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/logout/http-response.adoc[]
+
+== 로그인 체크
+
+=== HTTP Request
+
+include::{snippets}/login/check/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/saveTheme/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/login/check/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/login/check/response-fields.adoc[]
+
+== 테마 생성
+
+=== HTTP Request
+
+include::{snippets}/admin/saveTheme/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/saveTheme/request-headers.adoc[]
+
+=== Request Fields
+
+include::{snippets}/admin/saveTheme/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/saveTheme/http-response.adoc[]
+
+=== Response Header
+
+include::{snippets}/admin/saveTheme/response-headers.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/saveTheme/response-fields.adoc[]
+
+== 테마 삭제
+
+=== HTTP Request
+
+include::{snippets}/admin/deleteTheme/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/deleteTheme/request-headers.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/admin/deleteTheme/path-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/deleteTheme/http-response.adoc[]
+
+== 모든 테마 조회
+
+=== HTTP Request
+
+include::{snippets}/themes/findAll/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/themes/findAll/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/themes/findAll/response-fields.adoc[]
+
+== 인기 테마 조회
+
+=== HTTP Request
+
+include::{snippets}/themes/findPopularThemes/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/themes/findPopularThemes/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/themes/findPopularThemes/response-fields.adoc[]
+
+== 예약 시간 생성
+
+=== HTTP Request
+
+include::{snippets}/admin/saveReservationTime/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/saveReservationTime/request-headers.adoc[]
+
+=== Request Fields
+
+include::{snippets}/admin/saveReservationTime/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/saveReservationTime/http-response.adoc[]
+
+=== Response Header
+
+include::{snippets}/admin/saveReservationTime/response-headers.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/saveReservationTime/response-fields.adoc[]
+
+== 예약 시간 삭제
+
+=== HTTP Request
+
+include::{snippets}/admin/deleteReservationTime/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/deleteReservationTime/request-headers.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/admin/deleteReservationTime/path-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/deleteReservationTime/http-response.adoc[]
+
+== 모든 예약 시간 조회
+
+=== HTTP Request
+
+include::{snippets}/times/findAllTimes/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/times/findAllTimes/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/times/findAllTimes/response-fields.adoc[]
+
+== 특정 날짜와 테마의 예약 시간 및 예약 여부 조회
+
+=== HTTP Request
+
+include::{snippets}/times/findAllAvailableTimes/http-request.adoc[]
+
+=== Request Parameters
+
+include::{snippets}/times/findAllAvailableTimes/query-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/times/findAllAvailableTimes/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/times/findAllAvailableTimes/response-fields.adoc[]
+
+== 어드민 예약 생성
+
+=== HTTP Request
+
+include::{snippets}/admin/makeReservation/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/makeReservation/request-headers.adoc[]
+
+=== Request Fields
+
+include::{snippets}/admin/makeReservation/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/makeReservation/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/makeReservation/response-fields.adoc[]
+
+=== Response Header
+
+include::{snippets}/admin/makeReservation/response-headers.adoc[]
+
+== 어드민 예약 취소
+
+=== HTTP Request
+
+include::{snippets}/admin/cancelReservation/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/cancelReservation/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/cancelReservation/http-response.adoc[]
+
+== 어드민 예약 대기 취소
+
+=== HTTP Request
+
+include::{snippets}/admin/cancelWaiting/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/cancelWaiting/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/cancelWaiting/http-response.adoc[]
+
+== 어드민 모든 예약 조회
+
+=== HTTP Request
+
+include::{snippets}/admin/findAllReservations/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/findAllReservations/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/findAllReservations/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/findAllReservations/response-fields.adoc[]
+
+== 어드민 모든 예약 대기 조회
+
+=== HTTP Request
+
+include::{snippets}/admin/findAllWaitings/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/findAllWaitings/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/findAllWaitings/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/findAllWaitings/response-fields.adoc[]
+
+== 어드민 예약 검색
+
+=== HTTP Request
+
+include::{snippets}/admin/searchAllReservations/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/searchAllReservations/request-headers.adoc[]
+
+=== Request Parameters
+
+include::{snippets}/admin/searchAllReservations/query-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/searchAllReservations/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/searchAllReservations/response-fields.adoc[]
+
+== 회원 예약 생성
+
+=== HTTP Request
+
+include::{snippets}/member/makeReservation/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/member/makeReservation/request-headers.adoc[]
+
+=== Request Fields
+
+include::{snippets}/member/makeReservation/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/member/makeReservation/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/member/makeReservation/response-fields.adoc[]
+
+=== Response Header
+
+include::{snippets}/member/makeReservation/response-headers.adoc[]
+
+== 회원 예약 취소
+
+=== HTTP Request
+
+include::{snippets}/member/cancelReservation/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/member/cancelReservation/request-headers.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/member/cancelReservation/path-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/member/cancelReservation/http-response.adoc[]
+
+== 회원 예약 대기 취소
+
+=== HTTP Request
+
+include::{snippets}/member/cancelWaiting/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/member/cancelWaiting/request-headers.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/member/cancelWaiting/path-parameters.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/member/cancelWaiting/http-response.adoc[]
+
+== 회원 자신의 예약 조회
+
+=== HTTP Request
+
+include::{snippets}/member/findAllMyReservations/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/member/findAllMyReservations/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/member/findAllMyReservations/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/member/findAllMyReservations/response-fields.adoc[]
+
+== 예약 결제
+
+=== HTTP Request
+
+include::{snippets}/member/paymentForPending/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/member/paymentForPending/request-headers.adoc[]
+
+=== Request Fields
+
+include::{snippets}/member/paymentForPending/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/member/paymentForPending/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/member/paymentForPending/response-fields.adoc[]
+
+== 모든 멤버 정보 조회
+
+=== HTTP Request
+
+include::{snippets}/admin/findAllMembers/http-request.adoc[]
+
+=== Request Header
+
+include::{snippets}/admin/findAllMembers/request-headers.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/admin/findAllMembers/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/admin/findAllMembers/response-fields.adoc[]
