@@ -75,7 +75,7 @@ class PaymentRestClientTest {
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when & then
-        assertThatCode(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatCode(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .doesNotThrowAnyException();
     }
 
@@ -100,7 +100,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("하루 결제 가능 금액을 초과했습니다.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())
@@ -124,7 +124,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())
@@ -177,7 +177,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())

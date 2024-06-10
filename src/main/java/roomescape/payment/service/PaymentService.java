@@ -26,7 +26,7 @@ public class PaymentService {
 
     public void approvePayment(PaymentCreateRequest paymentCreateRequest) {
         RestClientPaymentApproveResponse restClientPaymentApproveResponse =
-                restClient.approvePayment(paymentCreateRequest);
+                restClient.approvePayment(paymentCreateRequest.createRestClientPaymentApproveRequest());
         paymentRepository.save(restClientPaymentApproveResponse.createPayment(paymentCreateRequest.reservation()));
     }
 

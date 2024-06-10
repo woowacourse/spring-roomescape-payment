@@ -12,8 +12,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import roomescape.advice.exception.ExceptionTitle;
 import roomescape.advice.exception.RoomEscapeException;
-import roomescape.payment.dto.PaymentCreateRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
+import roomescape.payment.dto.RestClientPaymentApproveRequest;
 import roomescape.payment.dto.RestClientPaymentApproveResponse;
 import roomescape.payment.dto.RestClientPaymentCancelRequest;
 
@@ -36,14 +36,14 @@ public class PaymentRestClient {
         this.secretKey = new String(Base64.getEncoder().encode((secretKey + ":").getBytes(StandardCharsets.UTF_8)));
     }
 
-    public RestClientPaymentApproveResponse approvePayment(PaymentCreateRequest paymentCreateRequest) {
+    public RestClientPaymentApproveResponse approvePayment(RestClientPaymentApproveRequest restClientPaymentApproveRequest) {
         String authorizations = BASIC + secretKey;
         try {
             return restClient.post()
                     .uri("/v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(paymentCreateRequest.createRestClientPaymentApproveRequest())
+                    .body(restClientPaymentApproveRequest)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, ((request, response) ->
                             handleErrorMessage(response)

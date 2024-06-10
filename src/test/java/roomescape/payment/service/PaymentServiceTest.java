@@ -51,7 +51,7 @@ class PaymentServiceTest {
                 "paymentKey", "orderId", BigDecimal.valueOf(1000), ZonedDateTime.now()
         );
 
-        when(paymentRestClient.approvePayment(paymentCreateRequest))
+        when(paymentRestClient.approvePayment(paymentCreateRequest.createRestClientPaymentApproveRequest()))
                 .thenReturn(response);
 
         assertThatCode(() -> paymentService.approvePayment(paymentCreateRequest))
