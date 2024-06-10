@@ -256,12 +256,13 @@ async function fetchPayment(paymentData, inputReservationId) {
             if (response.status === 201) {
                 response.json().then(successBody => {
                     console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                    window.alert("결제가 완료되었습니다.");
                     window.location.reload();
                 });
             } else {
                 return response.json().then(errorBody => {
                     console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                    window.alert("마이 페이지에서 재결제 해주세요.");
+                    window.alert("결제가 실패했습니다. 마이 페이지에서 재결제 해주세요.");
                 });
             }
         }).catch(error => {
