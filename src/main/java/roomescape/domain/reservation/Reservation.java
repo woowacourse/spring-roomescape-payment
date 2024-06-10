@@ -110,7 +110,7 @@ public class Reservation {
     }
 
     public Optional<Payment> getPayment() {
-        if(payment == null) {
+        if (payment == null) {
             return Optional.empty();
         }
         return Optional.of(payment);

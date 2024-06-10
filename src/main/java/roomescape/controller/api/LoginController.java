@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import roomescape.controller.dto.response.LoginCheckResponse;
 import roomescape.controller.dto.request.LoginRequest;
+import roomescape.controller.dto.response.LoginCheckResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
 import roomescape.service.LoginService;

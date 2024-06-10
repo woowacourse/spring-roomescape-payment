@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.controller.dto.request.CreateThemeRequest;
 import roomescape.controller.dto.response.ThemeResponse;
-import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;

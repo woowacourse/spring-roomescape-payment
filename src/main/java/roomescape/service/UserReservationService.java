@@ -15,10 +15,10 @@ import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.response.MyReservationResponse;
 import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.reservation.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
@@ -76,7 +76,7 @@ public class UserReservationService {
     }
 
     private ReservationResponse savePaymentReserved(Long memberId, LocalDate date, Long timeId,
-                                                          Long themeId, Long paymentId) {
+                                                    Long themeId, Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RoomescapeException("결제되지 않았습니다."));
 
@@ -88,7 +88,7 @@ public class UserReservationService {
     }
 
     private ReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
-                                           Payment payment, ReservationStatus status) {
+                                     Payment payment, ReservationStatus status) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
         ReservationTime time = reservationTimeRepository.findById(timeId)
