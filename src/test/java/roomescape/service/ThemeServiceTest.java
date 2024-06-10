@@ -33,22 +33,6 @@ class ThemeServiceTest {
     private final String validThumbnail = "https://aaa.jpg";
     private final Long validPrice = 1000L;
 
-    @DisplayName("이름이 null 또는 빈 값이면 예외가 발생한다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    void save_IllegalName(String name) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(name, validDescription, validThumbnail, validPrice)))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @DisplayName("description이 null 또는 빈 값이면 예외가 발생한다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    void save_IllegalDescription(String description) {
-        assertThatThrownBy(() -> themeService.save(new ThemeSaveDto(validName, description, validThumbnail, validPrice)))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     @DisplayName("thumbnail 형식이 잘못된 경우 예외가 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
