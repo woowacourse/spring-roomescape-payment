@@ -9,7 +9,7 @@ public class MyReservationResponse {
     private String paymentKey;
     private Long amount;
 
-    public MyReservationResponse(final Long reservationId, final String theme, final String date, final String time,
+    private MyReservationResponse(final Long reservationId, final String theme, final String date, final String time,
                                  final String status, final String paymentKey, final Long amount) {
         this.reservationId = reservationId;
         this.theme = theme;
