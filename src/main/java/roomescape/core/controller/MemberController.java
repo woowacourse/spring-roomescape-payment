@@ -44,7 +44,12 @@ public class MemberController {
         return "login";
     }
 
-    @Operation(summary = "로그인 요청", description = "로그인에 성공하면 토큰을 헤더에 반환합니다.")
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+
+    @Operation(summary = "로그인 요청", description = "로그인에 성공하면 토큰을 쿠키에 반환합니다.")
     @PostMapping("/login")
     public ResponseEntity<Void> loginProcess(@RequestBody final TokenRequest request,
                                              final HttpServletResponse response) {
@@ -55,6 +60,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "로그인 확인", description = "로그인 API 실행이 선행되어야 합니다.")
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> checkLogin(final HttpServletRequest request) {
         final Cookie[] cookies = request.getCookies();
@@ -64,17 +70,13 @@ public class MemberController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "로그아웃", description = "로그인 API 실행이 선행되어야 합니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpServletResponse response) {
         final Cookie cookie = cookieService.createEmptyCookie();
         response.addCookie(cookie);
 
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/signup")
-    public String signup() {
-        return "signup";
     }
 
     @Operation(summary = "회원가입")

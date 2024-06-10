@@ -1,6 +1,8 @@
 package roomescape.core.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -31,10 +33,11 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @Operation(summary = "로그인 한 회원의 예약 생성")
+    @Operation(summary = "로그인 한 회원의 예약 생성", security = {@SecurityRequirement(name = "bearer-key")})
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
-            @Valid @RequestBody MemberReservationRequest memberReservationRequest, LoginMember loginMember) {
+            @Valid @RequestBody MemberReservationRequest memberReservationRequest,
+            @Parameter(hidden = true) LoginMember loginMember) {
         ReservationResponse reservationResponse = reservationService.create(memberReservationRequest, loginMember);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.getId()))
                 .body(reservationResponse);
@@ -64,9 +67,10 @@ public class ReservationController {
         );
     }
 
-    @Operation(summary = "로그인 한 회원의 모든 예약 조회")
+    @Operation(summary = "로그인 한 회원의 모든 예약 조회", security = {@SecurityRequirement(name = "bearer-key")})
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(final LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(
+            @Parameter(hidden = true) final LoginMember loginMember) {
         return ResponseEntity.ok(reservationService.findAllByMember(loginMember));
     }
 
