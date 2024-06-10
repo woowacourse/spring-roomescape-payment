@@ -114,7 +114,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse approvePaymentWaiting(long id, ReservationInformRequest reservationRequest) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow();
-        reservation.setStatus(Status.RESERVATION);
+        reservation.approve();
         PaymentRequest paymentRequest = new PaymentRequest(
                 reservationRequest.orderId(),
                 reservationRequest.amount(),

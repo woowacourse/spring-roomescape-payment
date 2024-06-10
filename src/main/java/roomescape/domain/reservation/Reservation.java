@@ -61,8 +61,8 @@ public class Reservation {
         return new CanceledReservation(member, date, time, theme, status);
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void approve() {
+        this.status = Status.RESERVATION;
     }
 
     public Long getId() {
