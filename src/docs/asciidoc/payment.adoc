@@ -1,0 +1,20 @@
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Payment API
+
+=== 결제 승인
+
+==== Request
+
+include::{snippets}/payment-rest-docs-test/save-payment/http-request.adoc[]
+include::{snippets}/payment-rest-docs-test/save-payment/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/payment-rest-docs-test/save-payment/http-response.adoc[]
+include::{snippets}/payment-rest-docs-test/save-payment/response-fields.adoc[]
