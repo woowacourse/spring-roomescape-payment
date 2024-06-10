@@ -25,6 +25,3 @@ include::reservation-time.adoc[]
 == 테마
 
 include::theme.adoc[]
-
-
-
