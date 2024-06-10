@@ -2,7 +2,6 @@ package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import roomescape.dto.*;
 import roomescape.service.PaymentService;
@@ -21,7 +20,6 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @Transactional
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Authenticated LoginMemberRequest loginMemberRequest,
