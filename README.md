@@ -30,7 +30,7 @@
 - [x] 테마 검색 기능 추가
 
 - [x] 자신의 예약 목록 조회 기능 추가
-  - [ ] 결제 정보 조회 기능 추가
+  - [x] 결제 정보 조회 기능 추가
 
 - [x] 예약 대기 생성/조회/삭제 기능 추가
 
@@ -427,33 +427,81 @@ content-type: application/json
 
 ``` json
 [
-  {
-    "reservationId": 1,
-    "theme": "테마1",
-    "date": "2024-03-01",
-    "time": "10:00",
-    "status": "예약",
-    "paymentKey": "paymentKey1",
-    "amount": 1000
-  },
-  {
-    "reservationId": 2,
-    "theme": "테마2",
-    "date": "2024-03-01",
-    "time": "12:00",
-    "status": "예약",
-    "paymentKey": "paymentKey2",
-    "amount": 1000
-  },
-  {
-    "reservationId": 3,
-    "theme": "테마3",
-    "date": "2024-03-01",
-    "time": "14:00",
-    "status": "예약",
-    "paymentKey": "paymentKey3",
-    "amount": 1000
-  }
+    {
+        "reservationDetailResponse": {
+            "reservationId": 1,
+            "theme": "테마 1",
+            "date": "2024-06-07",
+            "time": "12:00",
+            "status": "예약"
+        },
+        "paymentResponse": {
+            "orderName": "Payment for reservation 1",
+            "paymentKey": "PK_001",
+            "totalAmount": 5000.00,
+            "approvedAt": "2024-06-10 08:52:06.627704+09"
+        }
+    },
+    {
+        "reservationDetailResponse": {
+            "reservationId": 5,
+            "theme": "테마 1",
+            "date": "2024-06-07",
+            "time": "14:00",
+            "status": "예약"
+        },
+        "paymentResponse": {
+            "orderName": "Payment for reservation 5",
+            "paymentKey": "PK_005",
+            "totalAmount": 5000.00,
+            "approvedAt": "2024-06-10 08:52:06.629178+09"
+        }
+    },
+    {
+        "reservationDetailResponse": {
+            "reservationId": 6,
+            "theme": "테마 2",
+            "date": "2024-06-07",
+            "time": "15:00",
+            "status": "예약"
+        },
+        "paymentResponse": {
+            "orderName": "Payment for reservation 6",
+            "paymentKey": "PK_006",
+            "totalAmount": 7000.00,
+            "approvedAt": "2024-06-10 08:52:06.629497+09"
+        }
+    },
+    {
+        "reservationDetailResponse": {
+            "reservationId": 7,
+            "theme": "테마 3",
+            "date": "2024-06-07",
+            "time": "12:00",
+            "status": "예약"
+        },
+        "paymentResponse": {
+            "orderName": "Payment for reservation 7",
+            "paymentKey": "PK_007",
+            "totalAmount": 4500.00,
+            "approvedAt": "2024-06-10 08:52:06.629821+09"
+        }
+    },
+    {
+        "reservationDetailResponse": {
+            "reservationId": 8,
+            "theme": "테마 1",
+            "date": "2024-06-08",
+            "time": "12:00",
+            "status": "예약"
+        },
+        "paymentResponse": {
+            "orderName": "Payment for reservation 8",
+            "paymentKey": "PK_008",
+            "totalAmount": 5000.00,
+            "approvedAt": "2024-06-10 08:52:06.630132+09"
+        }
+    }
 ]
 ```
 

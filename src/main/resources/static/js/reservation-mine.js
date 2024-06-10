@@ -15,10 +15,11 @@ function render(data) {
     data.forEach(item => {
         const row = tableBody.insertRow();
 
-        const theme = item.theme;
-        const date = item.date;
-        const time = item.time;
-        const status = item.status;
+
+        const theme = item.reservationDetailResponse.theme;
+        const date = item.reservationDetailResponse.date;
+        const time = item.reservationDetailResponse.time;
+        const status = item.reservationDetailResponse.status;
 
         row.insertCell(0).textContent = theme;
         row.insertCell(1).textContent = date;
@@ -36,8 +37,8 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
-            row.insertCell(5).textContent = item.paymentKey;
-            row.insertCell(6).textContent = item.amount;
+            row.insertCell(5).textContent = item.paymentResponse.paymentKey;
+            row.insertCell(6).textContent = item.paymentResponse.totalAmount;
         }
     });
 }

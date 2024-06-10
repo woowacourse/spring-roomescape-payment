@@ -11,9 +11,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import static roomescape.fixture.PaymentFixture.PAYMENT_REQUEST;
-import static roomescape.fixture.PaymentFixture.PAYMENT_RESPONSE;
+import static roomescape.fixture.PaymentFixture.PAYMENT_INFO;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,10 +58,9 @@ class TossPaymentClientTest {
                 .expect(requestTo(url + endPoint))
                 .andExpect(content().json(objectMapper.writeValueAsString(PAYMENT_REQUEST)))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(PAYMENT_RESPONSE), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(objectMapper.writeValueAsString(PAYMENT_INFO), MediaType.APPLICATION_JSON));
 
-
-        assertThat(tossPaymentClient.payment(PAYMENT_REQUEST)).isEqualTo(PAYMENT_RESPONSE);
+        assertThat(tossPaymentClient.payment(PAYMENT_REQUEST)).isEqualTo(PAYMENT_INFO);
         mockServer.verify();
     }
 
@@ -69,7 +69,7 @@ class TossPaymentClientTest {
     void failPayment() throws IOException {
         String endPoint = "/v1/payments/confirm";
         String errorMessage = "적합하지 않은 paymentKey입니다.";
-        PaymentRequest invalidPaymentRequest = new PaymentRequest("invalid", "invalidOrderId", 1000);
+        PaymentRequest invalidPaymentRequest = new PaymentRequest("invalid", "invalidOrderId", BigDecimal.valueOf(1000));
 
         mockServer
                 .expect(requestTo(url + endPoint))

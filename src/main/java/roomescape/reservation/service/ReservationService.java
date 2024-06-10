@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,8 @@ import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.PaymentInfo;
+import roomescape.reservation.domain.ReservationConfirmedEvent;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
@@ -39,20 +42,26 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository,
+                              ApplicationEventPublisher eventPublisher) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
-    public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
-
+    public ReservationResponse save(
+            LoginMember loginMember,
+            ReservationRequest reservationRequest,
+            PaymentInfo paymentInfo
+    ) {
         Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED);
 
         Reservations reservations = new Reservations(reservationRepository.findAll());
@@ -63,6 +72,7 @@ public class ReservationService {
                     reservationRequest.themeId(),
                     reservationRequest.timeId());
         }
+        eventPublisher.publishEvent(new ReservationConfirmedEvent(reservation, paymentInfo));
 
         return ReservationResponse.from(reservationRepository.save(reservation));
     }

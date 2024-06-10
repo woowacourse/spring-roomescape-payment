@@ -10,7 +10,7 @@ import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_WAITIN
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
-import static roomescape.fixture.PaymentFixture.PAYMENT_REQUEST;
+import static roomescape.fixture.PaymentFixture.PAYMENT_INFO;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;
@@ -41,7 +41,6 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
-import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -84,7 +83,8 @@ class ReservationServiceTest {
                         LocalDate.now().plusDays(1),
                         DEFAULT_THEME.getId(),
                         DEFAULT_RESERVATION_TIME.getId()
-                ));
+                ),
+                PAYMENT_INFO);
 
         //then
         assertAll(
@@ -102,7 +102,8 @@ class ReservationServiceTest {
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
                         DEFAULT_THEME.getId(),
-                        DEFAULT_RESERVATION_TIME.getId())))
+                        DEFAULT_RESERVATION_TIME.getId()),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
     }
@@ -115,7 +116,8 @@ class ReservationServiceTest {
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
                         2L,
-                        DEFAULT_THEME.getId())))
+                        DEFAULT_THEME.getId()),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
     }
@@ -128,7 +130,8 @@ class ReservationServiceTest {
                 new ReservationRequest(
                         LocalDate.now().plusDays(1),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        2L)))
+                        2L),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
     }
@@ -291,7 +294,8 @@ class ReservationServiceTest {
                     new ReservationRequest(
                             defaultDate,
                             DEFAULT_RESERVATION_TIME.getId(),
-                            DEFAULT_THEME.getId())))
+                            DEFAULT_THEME.getId()),
+                    PAYMENT_INFO))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(DUPLICATE_RESERVATION.getMessage());
         }

@@ -18,7 +18,7 @@ import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.auth.annotation.Authenticated;
 import roomescape.member.domain.LoginMember;
 import roomescape.application.service.ReservationApplicationService;
-import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
@@ -98,7 +98,7 @@ public class ReservationController {
     }
 
     @GetMapping("/member/reservation")
-    public List<ReservationDetailResponse> findMemberReservations(@Authenticated LoginMember loginMember) {
-        return reservationService.findAllByMemberId(loginMember.getId());
+    public List<ReservationPaymentDetail> findMemberReservations(@Authenticated LoginMember loginMember) {
+        return reservationApplicationService.reservationPaymentDetails(loginMember.getId());
     }
 }

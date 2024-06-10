@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import roomescape.payment.config.PaymentClientResponseErrorHandler;
+import roomescape.payment.domain.PaymentInfo;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -37,18 +37,18 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse payment(PaymentRequest paymentRequest) {
+    public PaymentInfo payment(PaymentRequest paymentRequest) {
         String requestId = UUID.randomUUID().toString();
         log.info("RequestID: {}, URI: {}, RequestBody:{} ", requestId, APPROVE_PAYMENT_URI, paymentRequest);
-        PaymentResponse paymentResponse = restClient.post()
+        PaymentInfo paymentInfo = restClient.post()
                 .uri(APPROVE_PAYMENT_URI)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
                 .header("Request-ID", requestId)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(paymentClientResponseErrorHandler)
-                .body(PaymentResponse.class);
-        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentResponse);
-        return paymentResponse;
+                .body(PaymentInfo.class);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentInfo);
+        return paymentInfo;
     }
 }
