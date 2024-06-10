@@ -75,7 +75,7 @@ class ReservationControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .accept("application/json")
-                .filter(document("reservations/mine/post/",
+                .filter(document("reservations/make-my-reservation/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),
@@ -103,7 +103,7 @@ class ReservationControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("reservations/get/",
+                .filter(document("reservations/show-all-reservations/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
@@ -122,7 +122,7 @@ class ReservationControllerTest {
                 .cookies("token", accessToken)
                 .accept("application/json")
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "reservations/delete/",
+                        "reservations/delete-my-reservation/",
                         "로그인한 회원의 토큰",
                         "삭제할 예약의 id"))
                 .when().delete("/reservations/{id}", 1)
@@ -145,7 +145,7 @@ class ReservationControllerTest {
                 .cookies("token", accessToken)
                 .queryParams(queryParams)
                 .accept("application/json")
-                .filter(document("reservations/filter/get",
+                .filter(document("reservations/show-all-reservations-satisfying-condition/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         queryParameters(
@@ -191,7 +191,7 @@ class ReservationControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("reservations/mine/get/",
+                .filter(document("reservations/show-my-reservations-and-waitings/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("로그인한 회원의 토큰")),

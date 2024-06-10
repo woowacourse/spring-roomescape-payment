@@ -1,10 +1,10 @@
 == 예약 대기
 
 === 예약 대기 조회
-operation::waitings/get[snippets = "http-request,http-response,response-fields"]
+operation::waitings/show-all-waitings[snippets = "curl-request,http-request,http-response,response-fields"]
 
 === 자신의 예약 대기 추가
-operation::waitings/post[snippets = "http-request,request-cookies,request-fields,http-response,response-fields"]
+operation::waitings/make-my-waiting[snippets = "curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
 
 === 자신의 예약 대기 삭제
-operation::waitings/delete[snippets = "http-request,request-cookies,path-parameters,http-response"]
+operation::waitings/delete-my-waiting[snippets = "curl-request,http-request,request-cookies,path-parameters,http-response"]

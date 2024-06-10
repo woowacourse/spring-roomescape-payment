@@ -35,7 +35,7 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/admin/", "어드민 토큰"))
+                .filter(documentWithTokenDescription("admin/admin-page-access/", "어드민 토큰"))
                 .when().get("/admin")
                 .then().log().all()
                 .statusCode(200);
@@ -47,7 +47,8 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/admin/reservation/", "어드민 토큰"))
+                .filter(documentWithTokenDescription("admin/reservation-management-page-access/",
+                        "어드민 토큰"))
                 .when().get("/admin/reservation")
                 .then().log().all()
                 .statusCode(200);
@@ -59,7 +60,8 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/admin/time/", "어드민 토큰"))
+                .filter(documentWithTokenDescription("admin/time-management-page-access/",
+                        "어드민 토큰"))
                 .when().get("/admin/time")
                 .then().log().all()
                 .statusCode(200);
@@ -71,7 +73,8 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/admin/theme/", "어드민 토큰"))
+                .filter(documentWithTokenDescription("admin/theme-management-page-access/",
+                        "어드민 토큰"))
                 .when().get("/admin/theme")
                 .then().log().all()
                 .statusCode(200);
@@ -83,7 +86,8 @@ class AdminViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/admin/waiting/", "어드민 토큰"))
+                .filter(documentWithTokenDescription("admin/waiting-management-page-access/",
+                        "어드민 토큰"))
                 .when().get("/admin/waiting")
                 .then().log().all()
                 .statusCode(200);

@@ -1,4 +1,4 @@
-= Spring REST Docs Test
+= 방탈출 API 문서
 :doctype: book
 :source-highlighter: highlightjs
 :toc: left

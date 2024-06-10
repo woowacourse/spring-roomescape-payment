@@ -63,7 +63,7 @@ class ReservationTimeControllerTest {
 
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("times/get/",
+                .filter(document("times/show-all-times/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
@@ -82,7 +82,7 @@ class ReservationTimeControllerTest {
 
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("times/with-book-status/get/",
+                .filter(document("times/show-all-times-with-booked-status/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         queryParameters(

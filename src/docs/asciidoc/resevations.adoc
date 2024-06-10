@@ -1,16 +1,16 @@
 == 예약
 
 === 자신의 예약 생성
-operation::reservations/mine/post[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+operation::reservations/make-my-reservation[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
 
 === 자신의 예약 및 예약 대기 조회
-operation::reservations/mine/get[snippets="http-request,request-cookies,http-response,response-fields"]
+operation::reservations/show-my-reservations-and-waitings[snippets="curl-request,http-request,request-cookies,http-response,response-fields"]
 
 === 모든 예약 조회
-operation::reservations/get[snippets="http-request,http-response,response-fields"]
+operation::reservations/show-all-reservations[snippets="curl-request,http-request,http-response,response-fields"]
 
 === 특정 조건을 만족하는 모든 예약 조회
-operation::reservations/filter/get[snippets="http-request,query-parameters,http-response,response-fields"]
+operation::reservations/show-all-reservations-satisfying-condition[snippets="curl-request,http-request,query-parameters,http-response,response-fields"]
 
 === 자신의 예약 삭제
-operation::reservations/delete[snippets="http-request,request-cookies,path-parameters,http-response"]
+operation::reservations/delete-my-reservation[snippets="curl-request,http-request,request-cookies,path-parameters,http-response"]

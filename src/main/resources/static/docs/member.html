@@ -446,13 +446,28 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_회원가입">회원가입</h3>
 <div class="sect3">
+<h4 id="_회원가입_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/members' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+  "email" : "hello@email.com",
+  "password" : "password",
+  "name" : "test"
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_회원가입_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /members HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:53844
+Host: localhost:64665
 Content-Length: 83
 
 {
@@ -505,7 +520,7 @@ Content-Length: 83
 Location: /members/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 36
@@ -550,13 +565,27 @@ Content-Length: 36
 <div class="sect2">
 <h3 id="_로그인">로그인</h3>
 <div class="sect3">
+<h4 id="_로그인_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/login' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+  "email" : "test@email.com",
+  "password" : "password"
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_로그인_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /login HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:53844
+Host: localhost:64665
 Content-Length: 62
 
 {
@@ -600,8 +629,8 @@ Content-Length: 62
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I; Path=/; HttpOnly
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OCwiZXhwIjoxNzE4MDEzNDc4fQ.paSrluze-V3Xw4LY_gkaF1zF_aF1Y_bXDSrqCnFpOmc; Path=/; HttpOnly
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -632,13 +661,23 @@ Connection: keep-alive</code></pre>
 <div class="sect2">
 <h3 id="_회원_정보_확인">회원 정보 확인</h3>
 <div class="sect3">
+<h4 id="_회원_정보_확인_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/login/check' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_회원_정보_확인_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login/check HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -670,7 +709,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 38
@@ -715,14 +754,25 @@ Content-Length: 38
 <div class="sect2">
 <h3 id="_로그아웃">로그아웃</h3>
 <div class="sect3">
+<h4 id="_로그아웃_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/logout' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_로그아웃_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /logout HTTP/1.1
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -753,7 +803,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Set-Cookie: token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -766,7 +816,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 15:22:08 +0900
+Last updated 2024-06-10 17:48:00 +0900
 </div>
 </div>
 </body>

@@ -54,7 +54,7 @@ class ThemeControllerTest {
     void findAllThemes() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("themes/get/",
+                .filter(document("themes/show-all-themes/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
@@ -73,7 +73,7 @@ class ThemeControllerTest {
         createReservations();
 
         RestAssured.given(spec).log().all()
-                .filter(document("themes/popular/get/",
+                .filter(document("themes/show-all-themes-in-popular-order/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(

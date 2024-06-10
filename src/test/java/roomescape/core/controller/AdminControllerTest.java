@@ -71,7 +71,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .accept("application/json")
-                .filter(document("admin/times/post/",
+                .filter(document("admin/register-time/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("어드민 토큰")),
@@ -93,7 +93,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .accept("application/json")
-                .filter(document("admin/themes/post/",
+                .filter(document("admin/register-theme/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("어드민 토큰")),
@@ -119,7 +119,7 @@ class AdminControllerTest {
                 .contentType(ContentType.JSON)
                 .body(request)
                 .accept("application/json")
-                .filter(document("admin/reservations/post",
+                .filter(document("admin/register-reservation/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("어드민 토큰")),
@@ -143,7 +143,7 @@ class AdminControllerTest {
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "admin/times/delete",
+                        "admin/delete-time/",
                         "어드민 토큰",
                         "삭제할 예약 시간의 id"))
                 .when().delete("/admin/times/{id}", 1)
@@ -159,7 +159,7 @@ class AdminControllerTest {
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "admin/themes/delete/",
+                        "admin/delete-theme/",
                         "어드민 토큰",
                         "삭제할 예약 대기의 id"))
                 .when().delete("/admin/themes/{id}", 1)
@@ -174,7 +174,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .accept("application/json")
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "admin/reservations/delete/",
+                        "admin/delete-reservation/",
                         "어드민 토큰",
                         "삭제할 예약의 id"))
                 .when().delete("/admin/reservations/{id}", 1)
@@ -189,7 +189,7 @@ class AdminControllerTest {
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
                 .accept(ContentType.JSON)
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "admin/waitings/delete/",
+                        "admin/delete-waiting/",
                         "어드민 토큰",
                         "삭제할 예약 대기의 id"))
                 .when().delete("/admin/waitings/{id}", 1)

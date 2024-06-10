@@ -31,11 +31,22 @@ public class MemberViewControllerTest {
     }
 
     @Test
+    @DisplayName("메인 페이지로 이동한다.")
+    void moveToMainPage() {
+        RestAssured.given(spec).log().all()
+                .accept("application/json, text/html")
+                .filter(prettyPrintDocument("member/go-to-main-page/"))
+                .when().get("/")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @Test
     @DisplayName("예약 페이지로 이동한다.")
     void moveToReservationPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(prettyPrintDocument("page/reservation/"))
+                .filter(prettyPrintDocument("member/go-to-reservation-page/"))
                 .when().get("/reservation")
                 .then().log().all()
                 .statusCode(200);
@@ -46,7 +57,7 @@ public class MemberViewControllerTest {
     void moveToLoginPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(prettyPrintDocument("page/login/"))
+                .filter(prettyPrintDocument("member/go-to-login-page/"))
                 .when().get("/login")
                 .then().log().all()
                 .statusCode(200);
@@ -58,7 +69,7 @@ public class MemberViewControllerTest {
     void moveToSignupPage() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(prettyPrintDocument("page/signup/"))
+                .filter(prettyPrintDocument("member/go-to-signup-page/"))
                 .when().get("/signup")
                 .then().log().all()
                 .statusCode(200);
@@ -78,7 +89,8 @@ public class MemberViewControllerTest {
         RestAssured.given(spec).log().all()
                 .cookie("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("page/reservation-mine/", "로그인한 회원의 토큰"))
+                .filter(documentWithTokenDescription("member/go-to-my-reservation-page/",
+                        "로그인한 회원의 토큰"))
                 .when().get("/reservation-mine")
                 .then().log().all()
                 .statusCode(200);

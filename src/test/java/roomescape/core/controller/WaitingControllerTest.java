@@ -66,7 +66,7 @@ class WaitingControllerTest {
                 .contentType(ContentType.JSON)
                 .body(request)
                 .accept("application/json")
-                .filter(document("waitings/post/",
+                .filter(document("waitings/make-my-waiting/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("예약 대기를 생성할 멤버의 토큰")),
@@ -97,7 +97,7 @@ class WaitingControllerTest {
         RestAssured.given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("waitings/get/",
+                .filter(document("waitings/show-all-waitings/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(
@@ -127,7 +127,7 @@ class WaitingControllerTest {
                 .cookies("token", accessToken)
                 .accept("application/json")
                 .filter(deleteDocumentWithTokenAndIdDescription(
-                        "waitings/delete/",
+                        "waitings/delete-my-waiting/",
                         "예약 대기를 삭제할 멤버의 토큰",
                         "삭제할 대기 시간의 id"))
                 .when().delete("/waitings/{id}", 1)

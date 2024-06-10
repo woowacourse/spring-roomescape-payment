@@ -446,13 +446,23 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_예약_대기_조회">예약 대기 조회</h3>
 <div class="sect3">
+<h4 id="_예약_대기_조회_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/waitings' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MSwiZXhwIjoxNzE4MDEzNDgxfQ.1UyWV_27E7VChDvnBd0SeY0PfqKC_KwmMJ_joJkTOOQ'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_예약_대기_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /waitings HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MSwiZXhwIjoxNzE4MDEzNDgxfQ.1UyWV_27E7VChDvnBd0SeY0PfqKC_KwmMJ_joJkTOOQ</code></pre>
 </div>
 </div>
 </div>
@@ -463,7 +473,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:06 GMT
+Date: Mon, 10 Jun 2024 08:58:00 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
@@ -474,10 +484,10 @@ Content-Length: 302
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-08",
+  "date" : "2024-06-11",
   "time" : {
     "id" : 1,
-    "startAt" : "15:52"
+    "startAt" : "17:59"
   },
   "theme" : {
     "id" : 1,
@@ -542,18 +552,34 @@ Content-Length: 302
 <div class="sect2">
 <h3 id="_자신의_예약_대기_추가">자신의 예약 대기 추가</h3>
 <div class="sect3">
+<h4 id="_자신의_예약_대기_추가_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/waitings' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA' \
+    -d '{
+  "date" : "2024-06-11",
+  "timeId" : 1,
+  "themeId" : 1
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_자신의_예약_대기_추가_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /waitings HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:53844
+Host: localhost:64665
 Content-Length: 64
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA
 
 {
-  "date" : "2024-06-08",
+  "date" : "2024-06-11",
   "timeId" : 1,
   "themeId" : 1
 }</code></pre>
@@ -623,7 +649,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /waitings/1
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:06 GMT
+Date: Mon, 10 Jun 2024 08:58:00 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 298
@@ -634,10 +660,10 @@ Content-Length: 298
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-08",
+  "date" : "2024-06-11",
   "time" : {
     "id" : 1,
-    "startAt" : "15:52"
+    "startAt" : "17:59"
   },
   "theme" : {
     "id" : 1,
@@ -697,13 +723,23 @@ Content-Length: 298
 <div class="sect2">
 <h3 id="_자신의_예약_대기_삭제">자신의 예약 대기 삭제</h3>
 <div class="sect3">
+<h4 id="_자신의_예약_대기_삭제_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/waitings/1' -i -X DELETE \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_자신의_예약_대기_삭제_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /waitings/1 HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA</code></pre>
 </div>
 </div>
 </div>
@@ -755,7 +791,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Fri, 07 Jun 2024 06:51:06 GMT
+Date: Mon, 10 Jun 2024 08:58:00 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -768,7 +804,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 15:05:40 +0900
+Last updated 2024-06-10 17:52:33 +0900
 </div>
 </div>
 </body>

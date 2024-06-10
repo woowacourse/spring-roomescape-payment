@@ -446,18 +446,37 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_자신의_예약_생성">자신의 예약 생성</h3>
 <div class="sect3">
+<h4 id="_자신의_예약_생성_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservations' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA' \
+    -d '{
+  "date" : "2024-06-11",
+  "timeId" : 1,
+  "themeId" : 1,
+  "paymentKey" : "1",
+  "orderId" : "1",
+  "amount" : 1
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_자신의_예약_생성_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /reservations HTTP/1.1
 Accept: application/json
 Content-Type: application/json
-Host: localhost:53844
+Host: localhost:64665
 Content-Length: 124
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA
 
 {
-  "date" : "2024-06-08",
+  "date" : "2024-06-11",
   "timeId" : 1,
   "themeId" : 1,
   "paymentKey" : "1",
@@ -545,7 +564,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Location: /reservations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:05 GMT
+Date: Mon, 10 Jun 2024 08:57:59 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 480
@@ -553,14 +572,14 @@ Content-Length: 480
 {
   "reservationResponse" : {
     "id" : 2,
-    "date" : "2024-06-08",
+    "date" : "2024-06-11",
     "member" : {
       "id" : 1,
       "name" : "리건"
     },
     "time" : {
       "id" : 1,
-      "startAt" : "15:52"
+      "startAt" : "17:59"
     },
     "theme" : {
       "id" : 1,
@@ -612,13 +631,23 @@ Content-Length: 480
 <div class="sect2">
 <h3 id="_자신의_예약_및_예약_대기_조회">자신의 예약 및 예약 대기 조회</h3>
 <div class="sect3">
+<h4 id="_자신의_예약_및_예약_대기_조회_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservations/mine' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_자신의_예약_및_예약_대기_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations/mine HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NiwiZXhwIjoxNzE3NzQ2NjY2fQ.nO-iG8GJ8Q7v9CZ6CuYSayxwssfc3OeW6F99YfGaIvc</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg4MCwiZXhwIjoxNzE4MDEzNDgwfQ.v27Af9_E2AgYeLNTF8c_S8gKN0dADDIWAqgQNnAjGaA</code></pre>
 </div>
 </div>
 </div>
@@ -650,7 +679,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:05 GMT
+Date: Mon, 10 Jun 2024 08:57:59 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 329
@@ -658,16 +687,16 @@ Content-Length: 329
 [ {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-07",
-  "time" : "15:52",
+  "date" : "2024-06-10",
+  "time" : "17:58",
   "status" : "예약",
   "paymentKey" : null,
   "amount" : null
 }, {
   "id" : 1,
   "theme" : "테마",
-  "date" : "2024-06-08",
-  "time" : "15:52",
+  "date" : "2024-06-11",
+  "time" : "17:58",
   "status" : "1번째 예약 대기",
   "paymentKey" : null,
   "amount" : null
@@ -738,13 +767,23 @@ Content-Length: 329
 <div class="sect2">
 <h3 id="_모든_예약_조회">모든 예약 조회</h3>
 <div class="sect3">
+<h4 id="_모든_예약_조회_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservations' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_모든_예약_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs</code></pre>
 </div>
 </div>
 </div>
@@ -755,21 +794,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:05 GMT
+Date: Mon, 10 Jun 2024 08:57:59 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 1,
-  "date" : "2024-06-07",
+  "date" : "2024-06-10",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "15:52"
+    "startAt" : "17:58"
   },
   "theme" : {
     "id" : 1,
@@ -834,13 +873,23 @@ Content-Length: 302
 <div class="sect2">
 <h3 id="_특정_조건을_만족하는_모든_예약_조회">특정 조건을 만족하는 모든 예약 조회</h3>
 <div class="sect3">
+<h4 id="_특정_조건을_만족하는_모든_예약_조회_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservations?dateTo=2024-06-11&amp;themeId=1&amp;dateFrom=2024-06-11&amp;memberId=1' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_특정_조건을_만족하는_모든_예약_조회_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations?dateTo=2024-06-08&amp;themeId=1&amp;dateFrom=2024-06-08&amp;memberId=1 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations?dateTo=2024-06-11&amp;themeId=1&amp;dateFrom=2024-06-11&amp;memberId=1 HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs</code></pre>
 </div>
 </div>
 </div>
@@ -884,21 +933,21 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 302
 
 [ {
   "id" : 2,
-  "date" : "2024-06-08",
+  "date" : "2024-06-11",
   "member" : {
     "id" : 1,
     "name" : "리건"
   },
   "time" : {
     "id" : 1,
-    "startAt" : "15:52"
+    "startAt" : "17:58"
   },
   "theme" : {
     "id" : 1,
@@ -963,13 +1012,23 @@ Content-Length: 302
 <div class="sect2">
 <h3 id="_자신의_예약_삭제">자신의 예약 삭제</h3>
 <div class="sect3">
+<h4 id="_자신의_예약_삭제_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservations/1' -i -X DELETE \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_자신의_예약_삭제_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /reservations/1 HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OSwiZXhwIjoxNzE4MDEzNDc5fQ.n9BOoUV79n7QOeffr6tV806KtGeczdX4p4fD1kq-PBs</code></pre>
 </div>
 </div>
 </div>
@@ -1021,7 +1080,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Fri, 07 Jun 2024 06:51:05 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -1034,7 +1093,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 15:11:43 +0900
+Last updated 2024-06-10 17:52:05 +0900
 </div>
 </div>
 </body>

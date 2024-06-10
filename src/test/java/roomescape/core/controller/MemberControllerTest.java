@@ -64,7 +64,7 @@ class MemberControllerTest {
         RestAssured.given(spec).log().all()
                 .contentType("application/json")
                 .accept("application/json")
-                .filter(document("login/post/",
+                .filter(document("member/do-login/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestFields(
@@ -93,7 +93,7 @@ class MemberControllerTest {
                 .given(spec).log().all()
                 .cookies("token", accessToken)
                 .accept("application/json")
-                .filter(document("login/check/get/",
+                .filter(document("member/check-member-status/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestCookies(cookieWithName("token").description("로그인한 유저의 토큰")),
@@ -119,7 +119,7 @@ class MemberControllerTest {
         RestAssured.given(spec).log().all()
                 .cookie("token", accessToken)
                 .accept("application/json")
-                .filter(documentWithTokenDescription("logout/post/", "로그인한 유저의 토큰"))
+                .filter(documentWithTokenDescription("member/do-logout/", "로그인한 유저의 토큰"))
                 .when().post("/logout")
                 .then().log().all()
                 .statusCode(200);
@@ -134,7 +134,7 @@ class MemberControllerTest {
                 .contentType("application/json")
                 .body(request)
                 .accept("application/json")
-                .filter(document("members/post/",
+                .filter(document("member/do-signup/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestFields(
@@ -153,7 +153,7 @@ class MemberControllerTest {
     void findMembers() {
         RestAssured.given(spec).log().all()
                 .accept("application/json")
-                .filter(document("login/get/",
+                .filter(document("member/find-all-members/",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         responseFields(

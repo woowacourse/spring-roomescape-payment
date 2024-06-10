@@ -446,12 +446,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_메인_페이지">메인 페이지</h3>
 <div class="sect3">
+<h4 id="_메인_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/' -i -X GET \
+    -H 'Accept: application/json, text/html'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_메인_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login HTTP/1.1
-Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:56178</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET / HTTP/1.1
+Accept: application/json, text/html
+Host: localhost:64665</code></pre>
 </div>
 </div>
 </div>
@@ -463,17 +472,17 @@ Host: localhost:56178</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Sun, 02 Jun 2024 06:36:59 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
-Content-Length: 2630
+Content-Length: 2186
 
 &lt;!DOCTYPE html&gt;
 &lt;html lang="ko"&gt;
 &lt;head&gt;
   &lt;meta charset="UTF-8"&gt;
   &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-  &lt;title&gt;Login&lt;/title&gt;
+  &lt;title&gt;방탈출 예약 페이지&lt;/title&gt;
   &lt;!-- Bootstrap CSS --&gt;
   &lt;link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"&gt;
   &lt;link rel="stylesheet" href="/css/style.css"&gt;
@@ -513,23 +522,15 @@ Content-Length: 2630
   &lt;/div&gt;
 &lt;/nav&gt;
 
-&lt;div class="content-container" style="width: 300px;"&gt;
-  &lt;h2 class="content-container-title"&gt;Login&lt;/h2&gt;
-  &lt;form id="login-form"&gt;
-    &lt;div class="form-group"&gt;
-      &lt;input type="email" class="form-control" id="email" placeholder="Email" required&gt;
-    &lt;/div&gt;
-    &lt;div class="form-group"&gt;
-      &lt;input type="password" class="form-control" id="password" placeholder="Password" required&gt;
-    &lt;/div&gt;
-    &lt;div class="d-flex justify-content-between"&gt;
-      &lt;button type="button" class="btn btn-outline-custom" onclick="signup()"&gt;Sign Up&lt;/button&gt;
-      &lt;button type="button" class="btn btn-custom" onclick="login()"&gt;Login&lt;/button&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
+&lt;div class="content-container"&gt;
+  &lt;h2 class="content-container-title"&gt;인기 테마&lt;/h2&gt;
+  &lt;ul class="list-unstyled" id="theme-ranking"&gt;
+  &lt;/ul&gt;
 &lt;/div&gt;
 
 &lt;script src="/js/user-scripts.js"&gt;&lt;/script&gt;
+
+&lt;script src="/js/ranking.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
 </div>
@@ -539,12 +540,21 @@ Content-Length: 2630
 <div class="sect2">
 <h3 id="_회원_가입_페이지">회원 가입 페이지</h3>
 <div class="sect3">
+<h4 id="_회원_가입_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/signup' -i -X GET \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_회원_가입_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /signup HTTP/1.1
 Accept: application/json
-Host: localhost:53844</code></pre>
+Host: localhost:64665</code></pre>
 </div>
 </div>
 </div>
@@ -556,7 +566,7 @@ Host: localhost:53844</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2727
@@ -635,12 +645,21 @@ Content-Length: 2727
 <div class="sect2">
 <h3 id="_로그인_페이지">로그인 페이지</h3>
 <div class="sect3">
+<h4 id="_로그인_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/login' -i -X GET \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_로그인_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login HTTP/1.1
 Accept: application/json
-Host: localhost:53844</code></pre>
+Host: localhost:64665</code></pre>
 </div>
 </div>
 </div>
@@ -652,7 +671,7 @@ Host: localhost:53844</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2630
@@ -728,12 +747,21 @@ Content-Length: 2630
 <div class="sect2">
 <h3 id="_방탈출_예약_페이지">방탈출 예약 페이지</h3>
 <div class="sect3">
+<h4 id="_방탈출_예약_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservation' -i -X GET \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_방탈출_예약_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservation HTTP/1.1
 Accept: application/json
-Host: localhost:53844</code></pre>
+Host: localhost:64665</code></pre>
 </div>
 </div>
 </div>
@@ -745,7 +773,7 @@ Host: localhost:53844</code></pre>
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 4097
@@ -856,13 +884,23 @@ Content-Length: 4097
 <div class="sect2">
 <h3 id="_나의_예약_목록_페이지">나의 예약 목록 페이지</h3>
 <div class="sect3">
+<h4 id="_나의_예약_목록_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/reservation-mine' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OCwiZXhwIjoxNzE4MDEzNDc4fQ.paSrluze-V3Xw4LY_gkaF1zF_aF1Y_bXDSrqCnFpOmc'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_나의_예약_목록_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservation-mine HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NSwiZXhwIjoxNzE3NzQ2NjY1fQ.u4JUOOGRO63DWW1HJAw5DX8MiNjgj_Vgi4YWSjRX87I</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3OCwiZXhwIjoxNzE4MDEzNDc4fQ.paSrluze-V3Xw4LY_gkaF1zF_aF1Y_bXDSrqCnFpOmc</code></pre>
 </div>
 </div>
 </div>
@@ -895,7 +933,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:04 GMT
+Date: Mon, 10 Jun 2024 08:57:58 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2712
@@ -979,7 +1017,7 @@ Content-Length: 2712
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 15:41:21 +0900
+Last updated 2024-06-10 17:51:28 +0900
 </div>
 </div>
 </body>

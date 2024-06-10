@@ -446,13 +446,23 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_메인_페이지">메인 페이지</h3>
 <div class="sect3">
+<h4 id="_메인_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/admin' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_메인_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -485,7 +495,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2363
@@ -558,13 +568,23 @@ Content-Length: 2363
 <div class="sect2">
 <h3 id="_예약_페이지">예약 페이지</h3>
 <div class="sect3">
+<h4 id="_예약_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/admin/reservation' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_예약_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin/reservation HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -597,7 +617,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 4040
@@ -718,13 +738,23 @@ Content-Length: 4040
 <div class="sect2">
 <h3 id="_테마_페이지">테마 페이지</h3>
 <div class="sect3">
+<h4 id="_테마_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/admin/theme' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NiwiZXhwIjoxNzE4MDEzNDc2fQ.wgaAtwJL2dkAX__kGYI-AP514mqwhjcXSQf0nnnq58c'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_테마_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin/theme HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2MywiZXhwIjoxNzE3NzQ2NjYzfQ.YBV02K1j_yaBJZsQD8yXQQ2uzW8cZNL2IJt39H4LxEU</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NiwiZXhwIjoxNzE4MDEzNDc2fQ.wgaAtwJL2dkAX__kGYI-AP514mqwhjcXSQf0nnnq58c</code></pre>
 </div>
 </div>
 </div>
@@ -757,7 +787,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:56 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2877
@@ -849,13 +879,23 @@ Content-Length: 2877
 <div class="sect2">
 <h3 id="_시간_페이지">시간 페이지</h3>
 <div class="sect3">
+<h4 id="_시간_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/admin/time' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_시간_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin/time HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -888,7 +928,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2805
@@ -978,13 +1018,23 @@ Content-Length: 2805
 <div class="sect2">
 <h3 id="_예약_대기_페이지">예약 대기 페이지</h3>
 <div class="sect3">
+<h4 id="_예약_대기_페이지_curl_request">Curl request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:64665/admin/waiting' -i -X GET \
+    -H 'Accept: application/json' \
+    --cookie 'token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_예약_대기_페이지_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /admin/waiting HTTP/1.1
 Accept: application/json
-Host: localhost:53844
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxNzc0MzA2NCwiZXhwIjoxNzE3NzQ2NjY0fQ.7Zoag2PCSSy8iCVANeQ8h3e8q9ocNkG5WFFFW7Gs8ms</code></pre>
+Host: localhost:64665
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODAwOTg3NywiZXhwIjoxNzE4MDEzNDc3fQ.1TgrYDQH-yBQm9ffpPqh1xkVOlEc-5U0fv_MSAxZOuA</code></pre>
 </div>
 </div>
 </div>
@@ -1017,7 +1067,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:51:03 GMT
+Date: Mon, 10 Jun 2024 08:57:57 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 2796
@@ -1109,7 +1159,7 @@ Content-Length: 2796
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-03 16:31:10 +0900
+Last updated 2024-06-10 17:47:17 +0900
 </div>
 </div>
 </body>
