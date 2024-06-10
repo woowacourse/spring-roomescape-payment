@@ -1,5 +1,6 @@
 package roomescape.controller.auth;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ public class AuthController {
         this.cookieProvider = cookieProvider;
     }
 
+    @Operation(summary = "로그인", description = "로그인 하고 인증 정보를 받습니다.")
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody final TokenRequest request, final HttpServletResponse response) {
         final TokenResponse tokenResponse = memberService.createToken(request);
@@ -37,6 +39,7 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
+    @Operation(summary = "유저 인증", description = "주어진 인증정보로 유저를 불러옵니다.")
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> findMemberInfo(final HttpServletRequest request) {
         final String accessToken = cookieProvider.extractToken(request.getCookies());
@@ -44,6 +47,7 @@ public class AuthController {
         return ResponseEntity.ok(memberResponse);
     }
 
+    @Operation(summary = "로그아웃", description = "인증정보를 초기화 합니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpServletResponse response) {
         response.addCookie(cookieProvider.expireCookie());
