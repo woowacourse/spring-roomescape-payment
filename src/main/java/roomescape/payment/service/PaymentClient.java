@@ -1,7 +1,5 @@
 package roomescape.payment.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +18,6 @@ import roomescape.payment.exception.RestClientTimeOutException;
 public class PaymentClient {
     private final RestClient restClient;
     private final String authorizationKey;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     public PaymentClient(RestClient restClient, String authorizationKey) {
         this.restClient = restClient;
@@ -37,12 +34,8 @@ public class PaymentClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
-            log.error("PaymentService Confirm Response Error, paymentKey = {}, orderId = {}",
-                    request.paymentKey(), request.orderId(), exception);
             handleClientException(exception);
         } catch (ResourceAccessException exception) {
-            log.error("PaymentService Confirm Timeout Error, paymentKey = {}, orderId = {}",
-                    request.paymentKey(), request.orderId(), exception);
             throw new RestClientTimeOutException(exception);
         }
     }
@@ -57,10 +50,8 @@ public class PaymentClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
-            log.error("PaymentService Refund Error, paymentKey = {}", paymentKey, exception);
             handleClientException(exception);
         } catch (ResourceAccessException exception) {
-            log.error("PaymentService Refund Timeout Error, paymentKey = {}", paymentKey, exception);
             throw new RestClientTimeOutException(exception);
         }
     }
