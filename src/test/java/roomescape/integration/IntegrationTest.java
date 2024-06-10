@@ -1,6 +1,8 @@
 package roomescape.integration;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
@@ -45,7 +47,20 @@ public abstract class IntegrationTest extends DomainSupplier {
     protected void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
         spec = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
+                .addFilter(documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint(), modifyHeaders()
+                                .remove("Host")
+                                .remove("Content-Length")
+                        )
+                        .withResponseDefaults(prettyPrint(), modifyHeaders()
+                                .remove("Transfer-Encoding")
+                                .remove("Keep-Alive")
+                                .remove("Date")
+                                .remove("Connection")
+                                .remove("Content-Length")
+                        )
+                )
                 .build();
         databaseCleaner.execute();
         given(clock.instant()).willReturn(Instant.parse("2000-04-07T02:00:00Z"));
