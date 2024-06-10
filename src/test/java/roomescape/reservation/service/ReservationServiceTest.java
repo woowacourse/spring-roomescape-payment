@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.member.fixture.MemberFixture.MEMBER_ID_1;
+import static roomescape.payment.fixture.PaymentFixture.PAYMENT_1;
 import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_PAYMENT_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
@@ -27,6 +28,10 @@ import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.MemberReservationResponse;
@@ -51,6 +56,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @Mock
     private TossPaymentClient tossPaymentClient;
@@ -81,6 +89,10 @@ class ReservationServiceTest {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.of(THEME_1));
+        when(paymentRepository.save(any(Payment.class))).thenReturn(PAYMENT_1);
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L));
 
         ReservationResponse savedReservation = reservationService.saveMemberReservation(1L,
                 RESERVATION_PAYMENT_REQUEST_1);

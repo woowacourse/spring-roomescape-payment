@@ -41,7 +41,7 @@ class AuthServiceTest {
         when(memberRepository.findByEmail(any(String.class))).thenReturn(Optional.of(MemberFixture.MEMBER_ID_1));
         when(jwtTokenProvider.createToken(any(Member.class))).thenReturn(DUMMY_TOKEN);
 
-        LoginRequest request = new LoginRequest("lxxjn0@test.com", "123");
+        LoginRequest request = new LoginRequest("lxxjn0@test.com", "123456");
         assertThat(authService.login(request).getAccessToken()).isNotNull();
     }
 
@@ -49,7 +49,7 @@ class AuthServiceTest {
     @Test
     void should_throw_exception_when_email_not_exist() {
         when(memberRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
-        LoginRequest request = new LoginRequest("noSignedUp@gmail.com", "123");
+        LoginRequest request = new LoginRequest("noSignedUp@gmail.com", "123456");
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(NoSuchRecordException.class);
@@ -59,7 +59,7 @@ class AuthServiceTest {
     @Test
     void should_throw_exception_when_password_is_incorrect() {
         when(memberRepository.findByEmail(any(String.class))).thenReturn(Optional.of(MemberFixture.MEMBER_ID_1));
-        LoginRequest request = new LoginRequest("aa@gmail.com", "1234");
+        LoginRequest request = new LoginRequest("aa@gmail.com", "1234567");
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(WrongPasswordException.class);

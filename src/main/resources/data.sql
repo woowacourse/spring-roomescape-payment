@@ -23,4 +23,11 @@ VALUES (1, TIMESTAMPADD(DAY, -1, NOW()), '1', '1', 'RESERVED', TIMESTAMPADD(DAY,
        (3, TIMESTAMPADD(DAY, -2, NOW()), '1', '2', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW())),
        (2, TIMESTAMPADD(DAY, -2, NOW()), '2', '2', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW()));
 
+INSERT INTO payment(reservation_id, member_id, payment_key, order_id, amount)
+VALUES (1, 1, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (2, 2, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (3, 1, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (4, 3, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (5, 2, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000);
+
 
