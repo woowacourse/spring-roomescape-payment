@@ -16,7 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static roomescape.web.ApiDocumentUtils.getDocumentRequest;
 import static roomescape.web.ApiDocumentUtils.getDocumentResponse;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +62,11 @@ class AuthenticationControllerSliceTest {
     @MockBean
     private LoginMemberArgumentResolver resolver;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+            .configure(JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @BeforeEach
     public void setMockMvc(RestDocumentationContextProvider restDocumentation) {

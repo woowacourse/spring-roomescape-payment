@@ -17,7 +17,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static roomescape.web.ApiDocumentUtils.getDocumentRequest;
 import static roomescape.web.ApiDocumentUtils.getDocumentResponse;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,12 +57,16 @@ public class AdminThemeControllerSliceTest {
     private LoginMemberArgumentResolver resolver;
 
     private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+            .registerModule(new JavaTimeModule())
+            .configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
+            .configure(JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @DisplayName("테마 저장")
     @Test
     void saveTheme() throws Exception {
-        ThemeRequest request = new ThemeRequest("테마 이름", "설명", "썸네일.jpg");
+        ThemeRequest request = new ThemeRequest("테마이름", "설명", "썸네일.jpg");
         ThemeResponse response = new ThemeResponse(1L, "테마 이름", "설명", "썸네일.jpg");
 
         given(interceptor.preHandle(any(), any(), any())).willReturn(true);
@@ -67,7 +75,7 @@ public class AdminThemeControllerSliceTest {
         ResultActions result = mockMvc.perform(post("/admin/themes")
                 .header(HttpHeaders.COOKIE, "token=adminToken")
                 .contentType("application/json")
-                .content(objectMapper.writeValueAsBytes(request)));
+                .content(objectMapper.writeValueAsString(request)));
 
         result.andExpect(status().isCreated())
                 .andDo(document("/admin/saveTheme",
