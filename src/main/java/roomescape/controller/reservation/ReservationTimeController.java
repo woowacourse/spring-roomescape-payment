@@ -1,5 +1,6 @@
 package roomescape.controller.reservation;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import roomescape.dto.reservation.ReservationTimeSaveRequest;
 
 import java.util.List;
 
+@Tag(name = "예약시각 API")
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {

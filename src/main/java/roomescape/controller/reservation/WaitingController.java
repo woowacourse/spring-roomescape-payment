@@ -1,5 +1,6 @@
 package roomescape.controller.reservation;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +25,7 @@ import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.WaitingService;
 
+@Tag(name = "예약대기 API(공용)")
 @RestController
 @RequestMapping("/waiting")
 public class WaitingController {
