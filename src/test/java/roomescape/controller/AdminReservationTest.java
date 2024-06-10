@@ -92,7 +92,7 @@ class AdminReservationTest {
                 .statusCode(204);
     }
 
-    @DisplayName("선예약이 취소될 경우 가장 첫 번째 예약 대기가 예약 단계로 넘어간다.")
+    @DisplayName("선예약이 취소될 경우 가장 첫 번째 예약 대기가 결제 대기 단계로 넘어간다.")
     @Test
     void given_when_cancelReservation_then_firstWaitingBecomesNewReservation() {
         RestAssured.given().log().all()
@@ -105,13 +105,13 @@ class AdminReservationTest {
                 .cookies(TOKEN, accessToken)
                 .when().get("/reservations")
                 .then().log().all()
-                .body("size()", is(RESERVATION_COUNT));
+                .body("size()", is(RESERVATION_COUNT - 1));
 
         RestAssured.given().log().all()
                 .cookies(TOKEN, accessToken)
                 .when().get("admin/waitings")
                 .then().log().all()
-                .body("size()", is(WAITING_COUNT - 1));
+                .body("size()", is(WAITING_COUNT));
     }
 
     @DisplayName("등록되지 않은 시간으로 예약하는 경우 400 오류를 반환한다.")
