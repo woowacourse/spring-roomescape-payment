@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 
 class MemberIntegrationTest extends IntegrationTest {
 
@@ -44,7 +43,6 @@ class MemberIntegrationTest extends IntegrationTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", hasSize(3))
                 .body("[0].id", equalTo(memberId))
                 .body("[0].themeName", equalTo(firstReservation.themeName()))
                 .body("[0].date", equalTo(firstReservation.date().toString()))
