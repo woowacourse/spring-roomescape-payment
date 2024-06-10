@@ -93,10 +93,10 @@ class ReservationRegisterServiceTest extends ServiceBaseTest {
     void 관리자_계정은_결제_없이_예약_등록() {
         // given
         ReservationRequest reservationRequest = new ReservationRequest(
-                LocalDate.now().plusDays(2), 1L, 1L, 5L);
+                LocalDate.now().plusDays(10), 1L, 1L, 5L);
 
         // when
-        ReservationResponse response = reservationRegisterService.registerWaitingReservation(reservationRequest);
+        ReservationResponse response = reservationRegisterService.registerReservationByAdmin(reservationRequest);
 
         // then
         Reservation reservation = reservationRepository.findByIdOrThrow(response.id());
@@ -114,7 +114,7 @@ class ReservationRegisterServiceTest extends ServiceBaseTest {
         Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
 
         // when
-        ReservationResponse response = reservationRegisterService.requestPaymentByPaymentPending(3L, paymentRequest);
+        ReservationResponse response = reservationRegisterService.requestPaymentByPaymentPending(33L, paymentRequest);
 
         // then
         Reservation reservation = reservationRepository.findByIdOrThrow(response.id());

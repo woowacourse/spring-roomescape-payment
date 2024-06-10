@@ -39,12 +39,12 @@ class ReservationSearchServiceTest extends ServiceBaseTest {
     }
 
     @Test
-    void 전체_예약_조회() {
+    void 전체_확정_예약_조회() {
         // when
         List<ReservationResponse> allReservationResponses = reservationSearchService.findAllReservedReservations();
 
         // then
-        assertThat(allReservationResponses).hasSize(32);
+        assertThat(allReservationResponses).hasSize(30);
     }
 
     @Test

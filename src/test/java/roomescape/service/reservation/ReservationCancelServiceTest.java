@@ -32,19 +32,19 @@ class ReservationCancelServiceTest extends ServiceBaseTest {
     @Test
     void 예약_취소() {
         // when
-        reservationCancelService.cancelReservation(1L);
+        reservationCancelService.cancelReservation(30L);
 
         // when
         List<Reservation> allReservations = reservationRepository.findAll();
         assertThat(allReservations).extracting(Reservation::getId)
                 .isNotEmpty()
-                .doesNotContain(1L);
+                .doesNotContain(30L);
     }
 
     @Test
     void 결제된_예약을_취소할_경우_자동_결제_취소() {
         // given
-        Payment payment = paymentRepository.findByReservationIdOrThrow(1L);
+        Payment payment = paymentRepository.findByReservationIdOrThrow(30L);
 
         PaymentCancelRequest cancelRequest = new PaymentCancelRequest(payment.getPaymentKey(), "취소 사유");
         Mockito.doNothing().when(tossPaymentsClient).requestPaymentCancel(cancelRequest);

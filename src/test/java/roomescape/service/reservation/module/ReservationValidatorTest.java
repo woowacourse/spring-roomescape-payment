@@ -46,7 +46,7 @@ class ReservationValidatorTest extends ServiceBaseTest {
     void 지나간_날짜로_예약을_등록할_경우_예외_발생() {
         // given
         Reservation reservation = new Reservation(
-                LocalDate.now().plusDays(1),
+                LocalDate.now().minusDays(1),
                 timeRepository.findByIdOrThrow(1L),
                 themeRepository.findByIdOrThrow(10L),
                 memberRepository.findByIdOrThrow(USER_ID),
@@ -73,7 +73,7 @@ class ReservationValidatorTest extends ServiceBaseTest {
     void 지나간_날짜로_대기_예약을_등록할_경우_예외_발생() {
         // given
         Reservation reservation = new Reservation(
-                LocalDate.now().plusDays(1),
+                LocalDate.now().minusDays(1),
                 timeRepository.findByIdOrThrow(1L),
                 themeRepository.findByIdOrThrow(10L),
                 memberRepository.findByIdOrThrow(USER_ID),
