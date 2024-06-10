@@ -71,12 +71,12 @@ public class ReservationWaitingService {
                 .orElseThrow(() -> new NoSuchElementException("예약이 존재하지 않습니다."));
     }
 
-    private ReservationTime getTime(long timeId) {
+    private ReservationTime getTime(Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 시간입니다."));
     }
 
-    private Theme getTheme(long themeId) {
+    private Theme getTheme(Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 테마입니다."));
     }
