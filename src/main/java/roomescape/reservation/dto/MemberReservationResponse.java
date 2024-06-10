@@ -54,8 +54,8 @@ public record MemberReservationResponse(
                 time,
                 rank + "번째 " + status,
                 null,
+                null,
                 null
-                ,null
         );
     }
 }

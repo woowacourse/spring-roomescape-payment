@@ -1,8 +1,6 @@
 package roomescape.auth.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,9 +36,6 @@ public class AuthController {
     }
 
     @Operation(summary = "사용자 로그인 확인 API", description = "사용자의 로그인 상태를 확인합니다.")
-    @ApiResponses(value = {
-
-    })
     @GetMapping("/login/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(@Authenticated Accessor accessor) {
         return ResponseEntity.ok().body(authService.checkLogin(accessor));
