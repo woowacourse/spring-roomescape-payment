@@ -165,7 +165,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
         validateReservationMember(reservation, member);
 
-        paymentService.deleteReservationPayment(reservation);
+        if (!reservation.isPaymentWaitingStatus()) {
+            paymentService.deleteReservationPayment(reservation);
+        }
         reservationRepository.delete(reservation);
     }
 
