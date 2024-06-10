@@ -1,5 +1,7 @@
 package roomescape.config.payment;
 
+import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
+
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -30,9 +32,14 @@ public class TossPaymentResponseErrorHandler implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(final ClientHttpResponse response) throws IOException {
-        var errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
-        logger.error(errorResponse.toString());
-        throw new RoomescapeException(TossPaymentErrorCode.from(errorResponse));
+    public void handleError(final ClientHttpResponse response) {
+        try {
+            var errorResponse = objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
+            logger.error(errorResponse.toString());
+            throw new RoomescapeException(TossPaymentErrorCode.from(errorResponse));
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new RoomescapeException(INTERNAL_SERVER_ERROR);
+        }
     }
 }
