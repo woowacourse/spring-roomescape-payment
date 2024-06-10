@@ -49,6 +49,8 @@ public class PaymentRestClient {
                             handleErrorMessage(response)
                     ))
                     .body(RestClientPaymentApproveResponse.class);
+        } catch (RoomEscapeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR, e);
@@ -66,6 +68,8 @@ public class PaymentRestClient {
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (request, response) -> handleErrorMessage(response))
                     .toBodilessEntity();
+        } catch (RoomEscapeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR, e);
