@@ -10,6 +10,7 @@ include::api-auth.adoc[]
 include::api-member.adoc[]
 
 include::api-theme.adoc[]
+
 include::api-waiting.adoc[]
 include::api-reservation-mine.adoc[]
 

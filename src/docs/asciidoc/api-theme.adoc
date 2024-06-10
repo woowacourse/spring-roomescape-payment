@@ -1,10 +1,8 @@
 :path_all_themes: theme/all-themes
 :path_popular_theme: theme/popular-themes
 
-:path_create_theme: theme/create-theme
 :path_create_theme_admin: theme/create-theme/admin
 
-:path_delete_theme: theme/delete-theme
 :path_delete_theme_admin: theme/delete-theme/admin
 
 
@@ -37,59 +35,6 @@ include::{snippets}/{path_popular_theme}/response-body.adoc[]
 
 ==== 응답 파라미터
 include::{snippets}/{path_popular_theme}/response-fields.adoc[]
-
-
-
-== 테마 추가 API
-테마를 추가합니다.
-
-=== 요청
-include::{snippets}/{path_create_theme}/http-request.adoc[]
-
-==== 요청 헤더
-로그인 시 응답받은 쿠키 값을 설정합니다.
-include::{snippets}/{path_create_theme}/request-cookies.adoc[]
-
-==== 요청 바디
-include::{snippets}/{path_create_theme}/request-body.adoc[]
-include::{snippets}/{path_create_theme}/request-fields.adoc[]
-
-=== 응답
-include::{snippets}/{path_create_theme}/http-response.adoc[]
-
-==== 응답 바디
-include::{snippets}/{path_create_theme}/response-body.adoc[]
-include::{snippets}/{path_create_theme}/response-fields.adoc[]
-
-=== 에러 메시지
-이미 존재하는 테마이름을 추가하려 하면 에러 메시지를 응답한다.
-include::{snippets}/{path_create_theme}/exception/already-exist/response-body.adoc[]
-include::{snippets}/{path_create_theme}/exception/already-exist/response-fields.adoc[]
-
-
-
-== 테마 삭제 API
-테마를 삭제합니다.
-
-=== 요청
-include::{snippets}/{path_delete_theme}/http-request.adoc[]
-
-==== 요청 헤더
-로그인 시 응답받은 쿠키 값을 설정합니다.
-include::{snippets}/{path_delete_theme}/request-cookies.adoc[]
-
-
-=== 응답
-include::{snippets}/{path_delete_theme}/http-response.adoc[]
-
-=== 에러 메시지
-존재하지 않는 테마를 삭제하면 에러 메시지가 응답한다.
-include::{snippets}/{path_delete_theme}/exception/not-exist/response-body.adoc[]
-include::{snippets}/{path_delete_theme}/exception/not-exist/response-fields.adoc[]
-
-이미 사용중인 테마를 삭제하면 에러 메시지가 응답한다.
-include::{snippets}/{path_delete_theme}/exception/already-exist/response-body.adoc[]
-include::{snippets}/{path_delete_theme}/exception/already-exist/response-fields.adoc[]
 
 
 
@@ -143,5 +88,3 @@ include::{snippets}/{path_delete_theme_admin}/exception/not-exist/response-field
 이미 사용중인 테마를 삭제하면 에러 메시지가 응답한다.
 include::{snippets}/{path_delete_theme_admin}/exception/already-exist/response-body.adoc[]
 include::{snippets}/{path_delete_theme_admin}/exception/already-exist/response-fields.adoc[]
-
-
