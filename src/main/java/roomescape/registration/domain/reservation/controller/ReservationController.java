@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
-import roomescape.client.payment.PaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.PaymentService;
+import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
@@ -26,30 +27,38 @@ import roomescape.registration.dto.RegistrationDto;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentClient paymentClient) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
-                                                               @LoginMemberId long id) {
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        paymentClient.sendPaymentConfirmToToss(paymentConfirmToTossDto);
+                                                               @LoginMemberId long memberId) {
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = TossPaymentConfirmRequest.from(reservationRequest);
 
-        RegistrationDto registrationDto = RegistrationDto.of(reservationRequest, id);
-        ReservationResponse reservationResponse = reservationService.addReservation(registrationDto);
+        RegistrationDto registrationDto = new RegistrationDto(
+                reservationRequest.date(),
+                reservationRequest.themeId(),
+                reservationRequest.timeId(),
+                memberId
+        );
+
+        Reservation reservation = reservationService.addReservation(registrationDto);
+        paymentService.confirmPayment(tossPaymentConfirmRequest, reservation);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(reservationResponse);
+                .body(ReservationResponse.from(reservation));
     }
 
     @GetMapping
     public List<ReservationResponse> reservaionList() {
-        return reservationService.findReservations();
+        return reservationService.findReservations().stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 
     @GetMapping("/{themeId}")

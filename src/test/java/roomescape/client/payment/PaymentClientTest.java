@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.config.ClientConfig;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;
@@ -44,13 +44,13 @@ class PaymentClientTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private PaymentConfirmToTossDto request;
+    private TossPaymentConfirmRequest request;
 
     private String jsonRequest;
 
     @BeforeEach
     void setPaymentRequest() throws JsonProcessingException {
-        request = new PaymentConfirmToTossDto(
+        request = new TossPaymentConfirmRequest(
                 "테스트 주문 id",
                 new BigDecimal("1000"),
                 "테스트 결제 key"

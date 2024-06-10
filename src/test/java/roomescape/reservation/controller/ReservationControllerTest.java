@@ -24,7 +24,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.model.ControllerTest;
 import roomescape.registration.domain.reservation.controller.ReservationController;
 import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.dto.ReservationResponse;
+import roomescape.registration.domain.reservation.dto.ReservationDto;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -60,7 +60,7 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약 정보를 잘 불러오는지 확인한다.")
     void findAllReservations() throws Exception {
         when(reservationService.findReservations())
-                .thenReturn(List.of(ReservationResponse.from(reservation)));
+                .thenReturn(List.of(ReservationDto.from(reservation)));
 
         mockMvc.perform(get("/reservations"))
                 .andDo(print())

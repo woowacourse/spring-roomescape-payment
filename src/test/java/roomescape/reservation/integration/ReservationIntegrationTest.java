@@ -15,7 +15,7 @@ import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
 import roomescape.client.payment.PaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
@@ -32,8 +32,8 @@ class ReservationIntegrationTest extends IntegrationTest {
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 1L,
                 "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = TossPaymentConfirmRequest.from(reservationRequest);
+        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(tossPaymentConfirmRequest);
 
         int id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -69,8 +69,8 @@ class ReservationIntegrationTest extends IntegrationTest {
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
         ReservationRequest reservationRequest = new ReservationRequest(TODAY.plusDays(1), 1L, 0L,
                 "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(paymentConfirmToTossDto);
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = TossPaymentConfirmRequest.from(reservationRequest);
+        willDoNothing().given(paymentClient).sendPaymentConfirmToToss(tossPaymentConfirmRequest);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

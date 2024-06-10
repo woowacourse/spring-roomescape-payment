@@ -16,4 +16,11 @@ public record ReservationResponse(
                 reservation.getTheme().getName(), reservation.getDate(),
                 reservation.getReservationTime().getStartAt());
     }
+
+    public static ReservationResponse from(ReservationDto reservationdto) {
+        return new ReservationResponse(reservationdto.id(), reservationdto.memberName(),
+                reservationdto.themeName(), reservationdto.date(),
+                reservationdto.startAt());
+    }
+
 }

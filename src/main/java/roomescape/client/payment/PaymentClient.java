@@ -15,7 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.TossPaymentConfirmRequest;
+import roomescape.client.payment.dto.TossPaymentConfirmResponse;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;
 import roomescape.exception.global.GlobalExceptionCode;
@@ -36,23 +37,23 @@ public class PaymentClient {
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public void sendPaymentConfirmToToss(PaymentConfirmToTossDto paymentConfirmToTossDto) {
+    public TossPaymentConfirmResponse sendPaymentConfirmToToss(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         String authorizations = "Basic " + encodedSecretKey;
 
         try {
-            restClient.post()
+            return restClient.post()
                     .uri("https://api.tosspayments.com/v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(paymentConfirmToTossDto)
+                    .body(tossPaymentConfirmRequest)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, (request, response) ->
-                        throwConvertedCustomException(response)
+                            throwConvertedCustomException(response)
                     )
                     .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
                         throw new PaymentConfirmException(GlobalExceptionCode.INTERNAL_SERVER_ERROR);
                     })
-                    .toBodilessEntity();
+                    .body(TossPaymentConfirmResponse.class);
         } catch (RestClientResponseException e) {
             log.error("[토스 결제 api 실패] message: {}, body: {}", e.getMessage(), e.getResponseBodyAsString(),
                     e.getCause());

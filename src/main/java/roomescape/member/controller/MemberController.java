@@ -5,11 +5,15 @@ import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
+import roomescape.exception.PaymentConfirmException;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.service.MemberService;
+import roomescape.payment.Payment;
+import roomescape.payment.PaymentService;
+import roomescape.registration.domain.reservation.dto.ReservationDto;
 import roomescape.registration.domain.reservation.service.ReservationService;
 import roomescape.registration.domain.waiting.service.WaitingService;
-import roomescape.registration.dto.RegistrationInfoDto;
+import roomescape.registration.dto.RegistrationInfoResponse;
 
 @RestController
 public class MemberController {
@@ -17,12 +21,14 @@ public class MemberController {
     private final MemberService memberService;
     private final ReservationService reservationService;
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
 
     public MemberController(MemberService memberService, ReservationService reservationService,
-                            WaitingService waitingService) {
+                            WaitingService waitingService, PaymentService paymentService) {
         this.memberService = memberService;
         this.reservationService = reservationService;
         this.waitingService = waitingService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/members")
@@ -31,15 +37,22 @@ public class MemberController {
     }
 
     @GetMapping("/member/registrations")
-    public List<RegistrationInfoDto> memberReservationList(@LoginMemberId long memberId) {
-        List<RegistrationInfoDto> reservationsOfMember = reservationService.findMemberReservations(memberId)
-                .stream()
-                .map((RegistrationInfoDto::from))
+    public List<RegistrationInfoResponse> memberReservationList(@LoginMemberId long memberId) {
+        List<ReservationDto> reservationInfo = reservationService.findMemberReservations(memberId);
+        List<RegistrationInfoResponse> reservationsOfMember = reservationInfo.stream()
+                .map(reservationDto -> {
+                    try {
+                        Payment payment = paymentService.findPaymentByReservationId(reservationDto.id());
+                        return RegistrationInfoResponse.of(reservationDto, payment);
+                    } catch (PaymentConfirmException e) {
+                        return RegistrationInfoResponse.of(reservationDto);
+                    }
+                })
                 .toList();
 
-        List<RegistrationInfoDto> waitingsOfMember = waitingService.findMemberWaitingWithRank(memberId)
+        List<RegistrationInfoResponse> waitingsOfMember = waitingService.findMemberWaitingWithRank(memberId)
                 .stream()
-                .map((RegistrationInfoDto::from))
+                .map(RegistrationInfoResponse::from)
                 .toList();
 
         return Stream.concat(reservationsOfMember.stream(), waitingsOfMember.stream())

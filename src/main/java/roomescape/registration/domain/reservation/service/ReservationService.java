@@ -17,7 +17,7 @@ import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.dto.ReservationResponse;
+import roomescape.registration.domain.reservation.dto.ReservationDto;
 import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
 import roomescape.registration.domain.waiting.domain.Waiting;
@@ -28,6 +28,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
+@Transactional
 @Service
 public class ReservationService {
 
@@ -47,7 +48,7 @@ public class ReservationService {
         this.waitingRepository = waitingRepository;
     }
 
-    public ReservationResponse addReservation(RegistrationDto registrationDto) {
+    public Reservation addReservation(RegistrationDto registrationDto) {
         ReservationTime time = reservationTimeRepository.findById(registrationDto.timeId())
                 .orElseThrow(() -> new RoomEscapeException(ReservationTimeExceptionCode.FOUND_TIME_IS_NULL_EXCEPTION));
         Theme theme = themeRepository.findById(registrationDto.themeId())
@@ -56,12 +57,12 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomEscapeException(ThemeExceptionCode.FOUND_MEMBER_IS_NULL_EXCEPTION));
 
         validateDateAndTimeWhenSave(registrationDto.date(), time);
-        Reservation saveReservation = new Reservation(registrationDto.date(), time, theme, member);
+        Reservation unsavedReservation = new Reservation(registrationDto.date(), time, theme, member);
 
-        return ReservationResponse.from(reservationRepository.save(saveReservation));
+        return reservationRepository.save(unsavedReservation);
     }
 
-    public void addAdminReservation(AdminReservationRequest adminReservationRequest) {
+    public Reservation addAdminReservation(AdminReservationRequest adminReservationRequest) {
         ReservationTime time = reservationTimeRepository.findById(adminReservationRequest.timeId())
                 .orElseThrow(() -> new RoomEscapeException(ReservationTimeExceptionCode.FOUND_TIME_IS_NULL_EXCEPTION));
         Theme theme = themeRepository.findById(adminReservationRequest.themeId())
@@ -70,15 +71,16 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomEscapeException(MemberExceptionCode.MEMBER_NOT_EXIST_EXCEPTION));
 
         validateDateAndTimeWhenSave(adminReservationRequest.date(), time);
-        Reservation saveReservation = new Reservation(adminReservationRequest.date(), time, theme, member);
-        ReservationResponse.from(reservationRepository.save(saveReservation));
+        Reservation unsavedReservation = new Reservation(adminReservationRequest.date(), time, theme, member);
+
+        return reservationRepository.save(unsavedReservation);
     }
 
-    public List<ReservationResponse> findReservations() {
+    public List<ReservationDto> findReservations() {
         List<Reservation> reservations = reservationRepository.findAllByOrderByDateAscReservationTimeAsc();
 
         return reservations.stream()
-                .map(ReservationResponse::from)
+                .map(ReservationDto::from)
                 .toList();
     }
 
@@ -92,20 +94,20 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationResponse> findFilteredReservations(ReservationFilterRequest reservationFilterRequest) {
+    public List<ReservationDto> findFilteredReservations(ReservationFilterRequest reservationFilterRequest) {
         FilterInfo filterInfo = reservationFilterRequest.toFilterInfo();
 
         return reservationRepository.findAllByMemberIdAndThemeIdAndDateBetween(filterInfo.getMemberId(),
                         filterInfo.getThemeId(), filterInfo.getFromDate(), filterInfo.getToDate()).stream()
-                .map(ReservationResponse::from)
+                .map(ReservationDto::from)
                 .toList();
     }
 
-    public List<ReservationResponse> findMemberReservations(long id) {
+    public List<ReservationDto> findMemberReservations(long id) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
 
         return reservations.stream()
-                .map(ReservationResponse::from)
+                .map(ReservationDto::from)
                 .toList();
     }
 
