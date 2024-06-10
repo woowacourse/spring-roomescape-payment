@@ -30,5 +30,6 @@ client:
   read-timeout-second: 30
 
 payment:
-  base-url: https://api.tosspayments.com
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  toss:
+    base-url: https://api.tosspayments.com
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

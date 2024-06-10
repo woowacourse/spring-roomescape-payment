@@ -1,7 +1,7 @@
 package roomescape.config;
 
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,16 +9,22 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
+@EnableConfigurationProperties(ClientProperties.class)
 public class ClientConfig {
 
+    private final Duration connectionTimeoutSecond;
+    private final Duration readTimeoutSecond;
+
+    public ClientConfig(ClientProperties properties) {
+        this.connectionTimeoutSecond = Duration.ofSeconds(properties.connectionTimeoutSecond());
+        this.readTimeoutSecond = Duration.ofSeconds(properties.readTimeoutSecond());
+    }
+
     @Bean
-    public RestClient restClient(
-            @Value("${client.connection-timeout-second}") int connectionTimeoutSecond,
-            @Value("${client.read-timeout-second}") int readTimeoutSecond
-    ) {
+    public RestClient restClient() {
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofSeconds(connectionTimeoutSecond))
-                .setReadTimeout(Duration.ofSeconds(readTimeoutSecond))
+                .setConnectTimeout(connectionTimeoutSecond)
+                .setReadTimeout(readTimeoutSecond)
                 .build();
 
         return RestClient.builder(restTemplate)

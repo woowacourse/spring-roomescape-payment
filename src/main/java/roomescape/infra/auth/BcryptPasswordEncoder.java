@@ -1,4 +1,4 @@
-package roomescape.infra;
+package roomescape.infra.auth;
 
 import org.mindrot.jbcrypt.BCrypt;
 import roomescape.application.PasswordEncoder;

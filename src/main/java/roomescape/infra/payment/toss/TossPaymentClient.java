@@ -2,7 +2,7 @@ package roomescape.infra.payment.toss;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -12,21 +12,21 @@ import roomescape.application.dto.request.PaymentConfirmApiRequest;
 import roomescape.application.dto.response.PaymentConfirmApiResponse;
 
 @Component
+@EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentClient implements PaymentClient {
 
-    private final String encodedSecretKey;
     private final RestClient restClient;
+    private final String encodedSecretKey;
     private final TossPaymentConfirmErrorHandler errorHandler;
 
     public TossPaymentClient(
-            @Value("${payment.base-url}") String paymentBaseUrl,
-            @Value("${payment.secret-key}") String secretKey,
+            TossPaymentProperties properties,
             RestClient restClient,
             TossPaymentConfirmErrorHandler errorHandler
     ) {
-        this.encodedSecretKey = encodeSecretKey(secretKey);
+        this.restClient = restClient.mutate().baseUrl(properties.baseUrl()).build();
+        this.encodedSecretKey = encodeSecretKey(properties.secretKey());
         this.errorHandler = errorHandler;
-        this.restClient = restClient.mutate().baseUrl(paymentBaseUrl).build();
     }
 
     @Override
