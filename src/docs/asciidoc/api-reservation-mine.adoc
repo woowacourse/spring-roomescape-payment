@@ -66,4 +66,4 @@ include::{snippets}/{path_create_reservation_exception}/http-response.adoc[]
 === 응답 바디
 include::{snippets}/{path_create_reservation_exception}/response-body.adoc[]
 include::{snippets}/{path_create_reservation_exception}/response-fields.adoc[]
-q
+
