@@ -12,13 +12,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TokenProvider {
     private static final String COOKIE_NAME = "token";
-    private static final String secretKey = "secretkeyofspringroomescapewaitingmissionstep1";
     private static final long validityInMilliseconds = 3600 * 1000L;
+
+    @Value("${secret.key.token}")
+    private String secretKey;
 
     public String createToken(final String payload, final String role) {
         Date now = new Date();

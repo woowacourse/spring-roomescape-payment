@@ -29,6 +29,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-gson:0.11.2'
 
     runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
