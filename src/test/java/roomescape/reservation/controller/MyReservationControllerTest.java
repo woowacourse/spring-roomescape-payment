@@ -47,7 +47,7 @@ class MyReservationControllerTest extends SpringBootTestBase {
 
         int size = RestAssured.given().log().all()
                 .cookies(loginMemberCookies)
-                .when().get("/my/reservaitons")
+                .when().get("/my/reservations")
                 .then().log().all()
                 .statusCode(200).extract()
                 .jsonPath().getInt("size()");
