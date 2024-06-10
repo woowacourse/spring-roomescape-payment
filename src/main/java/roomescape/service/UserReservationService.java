@@ -6,6 +6,7 @@ import static roomescape.domain.reservation.ReservationStatus.STANDBY;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.dto.CreateReservationResponse;
@@ -13,6 +14,7 @@ import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
 import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -129,7 +131,12 @@ public class UserReservationService {
         List<MyReservationDto> data = reservationRepository.findReservationsWithRankByMemberId(memberId);
 
         return data.stream()
-            .map(d -> FindMyReservationResponse.from(d.reservation(), d.rank(), d.paymentInfo()))
+            .map(d -> FindMyReservationResponse.from(
+                d.reservation(),
+                d.rank(),
+                Optional.ofNullable(d.paymentInfo())
+                    .orElse(new PaymentInfo(null, null, null, d.reservation()))
+            ))
             .toList();
     }
 

@@ -198,13 +198,13 @@ class UserReservationControllerTest {
             .willReturn(List.of(
                 new FindMyReservationResponse(
                     1L, "루터회관 탈출하기", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"),
-                    "RESERVED", 0L, "tgen_202406081920558t506", 1000, "간편결제"),
+                    "RESERVED", 0L, "tgen_202406081920558t506", 1000L, "간편결제"),
                 new FindMyReservationResponse(
                     2L, "우리집 탈출하기", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"),
-                    "RESERVED", 0L, "tgen_202406081921365GeO6", 1000, "간편결제"),
+                    "RESERVED", 0L, "tgen_202406081921365GeO6", 1000L, "간편결제"),
                 new FindMyReservationResponse(
                     3L, "교도소 탈출하기", LocalDate.parse("2060-01-03"), LocalTime.parse("12:00"),
-                    "STANDBY", 2L, "tgen_20240608192207aaQt3", 1000, "간편결제")
+                    "STANDBY", 2L, "tgen_20240608192207aaQt3", 1000L, "간편결제")
             ));
 
         mockMvc.perform(get("/reservations/mine"))
