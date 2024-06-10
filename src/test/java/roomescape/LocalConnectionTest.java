@@ -34,9 +34,17 @@ class LocalConnectionTest {
         try (final Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             assertThat(connection).isNotNull();
             assertThat(connection.getCatalog()).isEqualTo("DATABASE");
-            assertThat(connection.getMetaData().getTables(null, null, "RESERVATION", null).next()).isTrue();
+            assertTableExists(connection, "RESERVATION");
+            assertTableExists(connection, "RESERVATION_TIME");
+            assertTableExists(connection, "THEME");
+            assertTableExists(connection, "MEMBER");
+            assertTableExists(connection, "PAYMENT");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void assertTableExists(final Connection connection, String tableName) throws SQLException {
+        assertThat(connection.getMetaData().getTables(null, null, tableName, null).next()).isTrue();
     }
 }
