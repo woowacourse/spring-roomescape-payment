@@ -20,6 +20,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             WHERE p.memberId = :memberId
             """)
     List<Payment> findAllByMemberId(Long memberId);
-
-    boolean existsByReservationId(Long reservationId);
 }
