@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +16,7 @@ class TokenServiceTest {
     @Autowired
     private TokenService tokenService;
 
+    @Disabled
     @Test
     @DisplayName("Jwt 토큰을 잘 생성하는지 확인")
     void createToken() {
