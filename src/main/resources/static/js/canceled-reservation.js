@@ -27,6 +27,8 @@ function render(data) {
         row.insertCell(3).textContent = item.date;
         row.insertCell(4).textContent = item.time.startAt;
         row.insertCell(5).textContent = item.status;
+        row.insertCell(6).textContent = item.paymentKey;
+        row.insertCell(7).textContent = item.totalAmount;
     });
 }
 

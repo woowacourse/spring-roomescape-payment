@@ -1,6 +1,5 @@
 package roomescape.domain.payment;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,10 +9,9 @@ import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.domain.reservation.CanceledReservation;
-import roomescape.domain.reservation.Reservation;
 
 @Entity
-public class Payment {
+public class CanceledPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,21 +21,17 @@ public class Payment {
     private String orderId;
     @Column(nullable = false)
     private BigDecimal totalAmount;
-    @OneToOne(optional = false, cascade = CascadeType.REMOVE)
-    private Reservation reservation;
+    @OneToOne(optional = false)
+    private CanceledReservation canceledReservation;
 
-    protected Payment() {
+    protected CanceledPayment() {
     }
 
-    public Payment(String paymentKey, String orderId, BigDecimal totalAmount, Reservation reservation) {
+    public CanceledPayment(String paymentKey, String orderId, BigDecimal totalAmount, CanceledReservation canceledReservation) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
-        this.reservation = reservation;
-    }
-
-    public CanceledPayment canceled(CanceledReservation canceledReservation) {
-        return new CanceledPayment(paymentKey, orderId, totalAmount, canceledReservation);
+        this.canceledReservation = canceledReservation;
     }
 
     public Long getId() {
@@ -56,8 +50,8 @@ public class Payment {
         return totalAmount;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public CanceledReservation getCanceledReservation() {
+        return canceledReservation;
     }
 
     @Override
@@ -68,8 +62,8 @@ public class Payment {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment payment = (Payment) o;
-        return Objects.equals(id, payment.id);
+        CanceledPayment canceledPayment = (CanceledPayment) o;
+        return Objects.equals(id, canceledPayment.id);
     }
 
     @Override

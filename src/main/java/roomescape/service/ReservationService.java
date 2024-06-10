@@ -2,10 +2,8 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.CanceledReservation;
 import roomescape.domain.reservation.CanceledReservationRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -17,27 +15,29 @@ import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.CanceledReservationResponse;
+import roomescape.dto.response.reservation.CanceledReservationWebResponse;
 import roomescape.dto.response.reservation.MyReservationWebResponse;
 import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
-import roomescape.exception.RoomescapeException;
 
 @Service
 public class ReservationService {
     private final PaymentService paymentService;
     private final ReservationCreateService reservationCreateService;
+    private final ReservationDeleteService reservationDeleteService;
     private final ReservationRepository reservationRepository;
     private final CanceledReservationRepository canceledReservationRepository;
 
     public ReservationService(
             PaymentService paymentService,
             ReservationCreateService reservationCreateService,
+            ReservationDeleteService reservationDeleteService,
             ReservationRepository reservationRepository,
             CanceledReservationRepository canceledReservationRepository
     ) {
         this.paymentService = paymentService;
         this.reservationCreateService = reservationCreateService;
+        this.reservationDeleteService = reservationDeleteService;
         this.reservationRepository = reservationRepository;
         this.canceledReservationRepository = canceledReservationRepository;
     }
@@ -70,28 +70,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteById(long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
-                        String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
-        reservationRepository.deleteById(reservation.getId());
-        canceledReservationRepository.save(reservation.canceled());
-        updateWaitingToReservation(reservation);
-    }
-
-    private void updateWaitingToReservation(Reservation reservation) {
-        if (isWaitingUpdatableToReservation(reservation)) {
-            reservationRepository.findFirstByDateAndTimeIdAndThemeIdAndStatus(
-                    reservation.getDate(), reservation.getTime().getId(), reservation.getTheme().getId(), Status.WAITING
-            ).ifPresent(Reservation::changePaymentWaiting);
-        }
-    }
-
-    private boolean isWaitingUpdatableToReservation(Reservation reservation) {
-        return reservation.getStatus() == Status.RESERVATION &&
-                reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
-                        reservation.getDate(), reservation.getTime().getId(),
-                        reservation.getTheme().getId(), Status.WAITING
-                );
+        reservationDeleteService.deleteById(id);
     }
 
     public List<ReservationResponse> findAllByStatus(Status status) {
@@ -149,9 +128,12 @@ public class ReservationService {
         return ReservationInformResponse.from(reservationRepository.findById(id).orElseThrow());
     }
 
-    public List<CanceledReservationResponse> findAllCanceledReservation() {
-        return canceledReservationRepository.findAll().stream()
-                .map(CanceledReservationResponse::from)
+    public List<CanceledReservationWebResponse> findAllCanceledReservation() {
+        return canceledReservationRepository.findAllCanceledReservationInform().stream()
+                .map(canceledReservationResponse -> CanceledReservationWebResponse.of(
+                        canceledReservationResponse.canceledReservation(),
+                        canceledReservationResponse.paymentKey(),
+                        canceledReservationResponse.totalAmount()))
                 .toList();
     }
 }
