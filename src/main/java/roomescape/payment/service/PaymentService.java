@@ -30,7 +30,7 @@ public class PaymentService {
 
     public void refund(long memberReservationId) {
         Payment payment = paymentRepository.findByMemberReservationId(memberReservationId)
-                .orElseThrow((() -> new RoomescapeException(ErrorType.MEMBER_RESERVATION_NOT_FOUND)));
+                .orElseThrow((() -> new RoomescapeException(ErrorType.PAYMENT_NOT_FOUND)));
 
         paymentClient.cancel(payment.getPaymentKey());
         paymentRepository.delete(payment);

@@ -80,6 +80,7 @@ public class ReservationApplicationService {
     public void deleteMemberReservation(AuthInfo authInfo, long memberReservationId) {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
+        paymentService.refund(memberReservationId);
         reservationCommonService.delete(member, memberReservation);
         memberReservationService.updateStatus(memberReservation.getReservation());
     }
@@ -106,7 +107,6 @@ public class ReservationApplicationService {
         waitingReservationService.validateWaitingReservation(memberReservation);
 
         reservationCommonService.delete(member, memberReservation);
-        paymentService.refund(memberReservationId);
     }
 
     @Transactional

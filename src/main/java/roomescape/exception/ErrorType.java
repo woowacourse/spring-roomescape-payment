@@ -2,6 +2,7 @@ package roomescape.exception;
 
 public enum ErrorType {
     PAYMENT_SERVER_FAILED("Payment-001", "결제 진행중 서버측 오류가 발생했습니다.",500),
+    PAYMENT_NOT_FOUND("Payment-002","해당 내역에 대한 결제가 없습니다.",400),
     SECURITY_EXCEPTION("SECURITY-001", "로그인이 필요합니다.",401),
 
     MEMBER_NOT_FOUND("AUTH-001", "해당 유저를 찾을 수 없습니다.",401),
