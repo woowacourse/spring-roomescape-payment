@@ -14,12 +14,57 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public GroupedOpenApi groupedOpenApi() {
-        String[] paths = {"/**"};
-
+    public GroupedOpenApi allApi() {
         return GroupedOpenApi.builder()
-                .group("방탈출")
-                .pathsToMatch(paths)
+                .group("ALL")
+                .pathsToMatch("/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi reservationApi() {
+        return GroupedOpenApi.builder()
+                .group("예약")
+                .pathsToMatch("/reservations/**", "/admin/reservations/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi waitingApi() {
+        return GroupedOpenApi.builder()
+                .group("예약대기")
+                .pathsToMatch("/waiting/**", "/admin/waitings/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi themeApi() {
+        return GroupedOpenApi.builder()
+                .group("테마")
+                .pathsToMatch("/themes/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi memberApi() {
+        return GroupedOpenApi.builder()
+                .group("멤버")
+                .pathsToMatch("/members/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi reservationTimeApi() {
+        return GroupedOpenApi.builder()
+                .group("예약시각")
+                .pathsToMatch("/times/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi loginApi() {
+        return GroupedOpenApi.builder()
+                .group("로그인")
+                .packagesToScan("roomescape.controller.auth")
                 .build();
     }
 }
