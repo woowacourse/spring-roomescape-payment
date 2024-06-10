@@ -15,6 +15,8 @@ import roomescape.infrastructure.LoginMemberArgumentResolver;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+    public static final int REST_CLIENT_READ_TIMEOUT = 3;
+
     private final LoginMemberArgumentResolver loginMemberArgumentResolver;
     private final AuthorizationHandlerInterceptor authorizationHandlerInterceptor;
 
@@ -39,7 +41,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Profile("!test")
     public RestClient restClient() {
         final JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
-        factory.setReadTimeout(Duration.ofSeconds(3));
+        factory.setReadTimeout(Duration.ofSeconds(REST_CLIENT_READ_TIMEOUT));
 
         return RestClient.builder()
                 .requestFactory(factory)

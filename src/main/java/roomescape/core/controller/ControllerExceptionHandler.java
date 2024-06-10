@@ -1,6 +1,8 @@
 package roomescape.core.controller;
 
 import io.jsonwebtoken.JwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -8,14 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.ResourceAccessException;
 import roomescape.core.dto.exception.ExceptionResponse;
 import roomescape.exception.PaymentException;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
-
-    public static final String REQUEST_TIMEOUT_EXCEPTION_MESSAGE = "요청 시간이 만료되었습니다. 다시 요청해주세요.";
+    private static final Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(
@@ -58,16 +58,9 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ProblemDetail> handleResourceAccessException(
-            final ResourceAccessException exception) {
-        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.REQUEST_TIMEOUT,
-                        REQUEST_TIMEOUT_EXCEPTION_MESSAGE));
-    }
-
-    @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleRuntimeException(final RuntimeException exception) {
-        System.out.println(exception.getMessage());
+        log.error("예기치 못한 오류 class : {}, message : {}",
+                exception.getClass().toGenericString(), exception.getMessage());
         return ResponseEntity.internalServerError()
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
                         "서버에 문제가 있습니다. 잠시 후 다시 시도해주세요."));
