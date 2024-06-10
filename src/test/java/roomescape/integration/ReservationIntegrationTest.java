@@ -318,7 +318,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         }
 
         @Test
-        void 예약_id로_결제대기_예약을_삭제할_수_있다() {
+        void 예약_id로_결제_대기_예약을_삭제할_수_있다() {
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
                     .when().delete("/reservations/" + reservation.getId())

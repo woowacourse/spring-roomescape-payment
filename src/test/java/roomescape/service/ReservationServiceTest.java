@@ -241,35 +241,39 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("예약 삭제")
     class DeleteReservation {
         Member member;
-        Reservation reservation;
+        Reservation paymentWaitingReservation;
+        Reservation canceledReservation;
 
         @BeforeEach
         void setUp() {
             ReservationTime time = timeFixture.createFutureTime();
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
-            paymentFixture.createPayment(reservation);
+            paymentWaitingReservation = reservationFixture.createPaymentWaitingReservation(time, theme, member);
+            canceledReservation = reservationFixture.createCanceledReservation(time, theme, member);
+            paymentFixture.createPayment(canceledReservation);
         }
 
         @Test
-        void 예약_id와_예약자_id로_예약을_삭제할_수_있다() {
-            reservationService.deleteReservation(reservation.getId(), member);
+        void 예약_id와_예약자_id로_취소_또는_결제_대기_상태의_예약을_삭제할_수_있다() {
+            paymentClient.cancelPayment(any());
 
-            Optional<Reservation> deletedReservation = reservationFixture.findAllReservation().stream()
-                    .filter(r -> r.equals(reservation))
-                    .findAny();
-            Optional<Payment> deletedPayment = paymentFixture.findByReservation(reservation);
+            reservationService.deleteReservation(paymentWaitingReservation.getId(), member);
+            reservationService.deleteReservation(canceledReservation.getId(), member);
 
-            assertThat(deletedReservation).isEmpty();
-            assertThat(deletedPayment).isEmpty();
+            List<Reservation> deletedReservations = reservationFixture.findAllReservation().stream()
+                    .filter(r -> r.equals(paymentWaitingReservation))
+                    .filter(r -> r.equals(canceledReservation))
+                    .toList();
+
+            assertThat(deletedReservations).isEmpty();
         }
 
         @Test
         void 예약자가_아닌_사용자_id로_예약_삭제_시_예외가_발생한다() {
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
-            assertThatThrownBy(() -> reservationService.deleteReservation(reservation.getId(), anotherMember))
+            assertThatThrownBy(() -> reservationService.deleteReservation(paymentWaitingReservation.getId(), anotherMember))
                     .isInstanceOf(ReservationAuthorityNotExistException.class);
         }
     }

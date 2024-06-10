@@ -174,9 +174,10 @@ public class ReservationService {
     }
 
     private void validateReservationStatusForDelete(Reservation reservation) {
-        if (!reservation.isCancelStatus() || !reservation.isPaymentWaitingStatus()) {
-            throw new NonRemovableStatusReservationException();
+        if (reservation.isCancelStatus() || reservation.isPaymentWaitingStatus()) {
+            return;
         }
+        throw new NonRemovableStatusReservationException();
     }
 
     private void validateReservationAuthority(Reservation reservation, Member member) {

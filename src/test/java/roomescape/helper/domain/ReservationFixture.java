@@ -32,6 +32,11 @@ public class ReservationFixture {
         return reservationRepository.save(reservation);
     }
 
+    public Reservation createCanceledReservation(ReservationTime time, Theme theme, Member member) {
+        Reservation reservation = new Reservation(LocalDate.of(2000, 4, 8), time, theme, member, ReservationStatus.CANCELED);
+        return reservationRepository.save(reservation);
+    }
+
     public List<Reservation> findAllReservation() {
         return reservationRepository.findAll();
     }
