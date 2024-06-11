@@ -33,4 +33,9 @@ public class PaymentService {
                 .orElseThrow(() -> new RoomescapeException(HttpStatus.BAD_REQUEST, "결제 내역이 존재하지 않습니다."));
         payment.refund();
     }
+
+    public Payment findByReservation(Reservation reservation) {
+        return paymentRepository.findFirstByReservation(reservation)
+                .orElseGet(() -> new Payment(reservation, null, null));
+    }
 }

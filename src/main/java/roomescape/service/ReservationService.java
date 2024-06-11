@@ -137,10 +137,10 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<MyReservationResponse> findMyReservations(Long memberId) {
         Stream<MyReservationResponse> reservationResponses =
-                reservationWaitingRepository.findReservationWaitWithRankByMemberId(memberId).stream()
-                .map(MyReservationResponse::from);
-        Stream<MyReservationResponse> reservationWaitingResponses =
                 reservationRepository.findAllByMemberIdAndStatusIn(memberId, ReservationStatus.getActiveStatuses()).stream()
+                .map(reservation -> MyReservationResponse.from(reservation, paymentService.findByReservation(reservation)));
+        Stream<MyReservationResponse> reservationWaitingResponses =
+                reservationWaitingRepository.findReservationWaitWithRankByMemberId(memberId).stream()
                 .map(MyReservationResponse::from);
         return Stream.concat(reservationResponses, reservationWaitingResponses)
                 .sorted(Comparator.comparing(reservation -> LocalDateTime.of(reservation.date(), reservation.time())))

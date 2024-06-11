@@ -33,8 +33,6 @@ public class Reservation {
     private Theme theme;
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
-    @OneToOne(mappedBy = "reservation")
-    private Payment payment;
 
     protected Reservation() {
     }
@@ -87,13 +85,6 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
-    }
-
-    public Payment getPayment() {
-        if (payment == null || status.isPaymentWaiting()) {
-            return new Payment(this, null, null);
-        }
-        return payment;
     }
 
     @Override

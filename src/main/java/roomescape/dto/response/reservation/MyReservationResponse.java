@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
@@ -18,15 +19,15 @@ public record MyReservationResponse(
         String paymentKey,
         BigDecimal amount
 ) {
-    public static MyReservationResponse from(Reservation reservation) {
+    public static MyReservationResponse from(Reservation reservation, Payment payment) {
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 reservation.getStatus().getValue(),
-                reservation.getPayment().getPaymentKey(),
-                reservation.getPayment().getTotalAmount()
+                payment.getPaymentKey(),
+                payment.getTotalAmount()
         );
     }
 
