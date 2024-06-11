@@ -58,8 +58,6 @@ public class ReservationService {
     }
 
     public Reservation saveReservation(final SaveReservationRequest request) {
-        Payment payment = paymentService.requestTossPayment(request.toPaymentRequest());
-
         final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
         final Theme theme = themeRepository.findById(request.themeId())
@@ -70,6 +68,8 @@ public class ReservationService {
         final Reservation reservation = request.toReservation(reservationTime, theme, member);
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
+
+        Payment payment = paymentService.requestTossPayment(request.toPaymentRequest());
         reservation.updatePayment(payment);
         return reservationRepository.save(reservation);
     }
