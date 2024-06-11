@@ -4,6 +4,7 @@ TRUNCATE TABLE reservation RESTART IDENTITY;
 TRUNCATE TABLE reservation_time RESTART IDENTITY;
 TRUNCATE TABLE theme RESTART IDENTITY;
 TRUNCATE TABLE member RESTART IDENTITY;
+TRUNCATE TABLE payment RESTART IDENTITY;
 SET REFERENTIAL_INTEGRITY TRUE;
 
 INSERT INTO member(name, email, password, role)
@@ -25,3 +26,9 @@ VALUES (CURRENT_DATE() - INTERVAL '1' DAY, 1, 1, 1, 'RESERVED'),
        (CURRENT_DATE() + INTERVAL '1' DAY, 1, 1, 1, 'RESERVED'),
        (CURRENT_DATE() + INTERVAL '1' DAY, 2, 1, 1, 'RESERVED'),
        (CURRENT_DATE() + INTERVAL '2' DAY, 2, 1, 1, 'RESERVED');
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('oderId1','paymentKey1', 1000, 1),
+       ('oderId2','paymentKey2', 1000, 2),
+       ('oderId3','paymentKey3', 1000, 3),
+       ('oderId4','paymentKey4', 1000, 4);

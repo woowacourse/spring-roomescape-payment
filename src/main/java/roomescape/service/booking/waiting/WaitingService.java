@@ -2,6 +2,8 @@ package roomescape.service.booking.waiting;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.waiting.WaitingResponse;
@@ -25,20 +27,34 @@ public class WaitingService {
         this.waitingCancelService = waitingCancelService;
     }
 
+    @Transactional
     public ReservationResponse resisterWaiting(ReservationRequest request) {
-        Long id = waitingRegisterService.registerWaiting(request);
-        return waitingSearchService.findReservationWaiting(id);
+        Waiting waiting = waitingRegisterService.registerWaiting(request);
+        return waitingSearchService.findReservationWaiting(waiting);
     }
 
     public List<WaitingResponse> findAllWaitingReservations() {
-        return waitingSearchService.findAllWaitingReservations();
-    }
-    
-    public void cancelWaitingForUser(Long reservationId) {
-        waitingCancelService.cancelWaitingForUser(reservationId);
+        return waitingSearchService.findAllWaitingReservations()
+                .stream()
+                .map(WaitingResponse::from)
+                .toList();
     }
 
+    @Transactional
+    public void cancelWaitingForUser(Long reservationId) {
+        Waiting waiting = waitingSearchService.findWaitingByReservationId(reservationId);
+        waitingCancelService.cancelWaiting(waiting);
+    }
+
+    @Transactional
     public void cancelWaiting(Long waitingId) {
-        waitingCancelService.cancelWaiting(waitingId);
+        Waiting waiting = waitingSearchService.findWaitingById(waitingId);
+        waitingCancelService.cancelWaiting(waiting);
+    }
+
+    public List<WaitingResponse> findWaitingByReservationIds(final List<Long> waitingReservationIds) {
+        return waitingSearchService.findWaitingByReservationIds(waitingReservationIds).stream()
+                .map(WaitingResponse::from)
+                .toList();
     }
 }

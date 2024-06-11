@@ -37,26 +37,29 @@ public class Reservation {
     protected Reservation() {
     }
 
-    public Reservation(LocalDate date, ReservationTime reservationTime, Theme theme, Member member, Status status) {
-        this(null, date, reservationTime, theme, member, status);
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime reservationTime, Theme theme, Member member,
-                       Status status) {
-        this.id = id;
+    public Reservation(final LocalDate date, final ReservationTime time, final Theme theme, final Member member,
+                       final Status status) {
         this.date = date;
-        this.time = reservationTime;
+        this.time = time;
         this.theme = theme;
         this.member = member;
         this.status = status;
     }
 
-    public void changeStatusToReserve() {
-        status = Status.RESERVED;
+    public void changeToPending() {
+        this.status = Status.PENDING;
+    }
+
+    public void delete() {
+        this.status = Status.DELETE;
     }
 
     public boolean isReserved() {
         return status == Status.RESERVED;
+    }
+
+    public boolean isWaiting() {
+        return this.status == Status.WAITING;
     }
 
     public Long getId() {
@@ -81,16 +84,5 @@ public class Reservation {
 
     public Status getStatus() {
         return status;
-    }
-
-    @Override
-    public String toString() {
-        return "Reservation{" +
-                "id=" + id +
-                ", date=" + date +
-                ", time=" + time +
-                ", theme=" + theme +
-                ", member=" + member +
-                '}';
     }
 }

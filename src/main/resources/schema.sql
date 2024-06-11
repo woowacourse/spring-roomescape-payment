@@ -19,15 +19,24 @@ CREATE TABLE IF NOT EXISTS reservation_time (
 );
 
 CREATE TABLE IF NOT EXISTS reservation (
+       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       date DATE NOT NULL,
+       time_id BIGINT,
+       theme_id BIGINT,
+       member_id BIGINT,
+       status VARCHAR(255) NOT NULL CHECK (status IN ('RESERVED', 'WAITING', 'PENDING', 'DELETE')),
+       FOREIGN KEY (time_id) REFERENCES reservation_time(id),
+       FOREIGN KEY (theme_id) REFERENCES theme(id),
+       FOREIGN KEY (member_id) REFERENCES member(id)
+);
+
+CREATE TABLE  IF NOT EXISTS payment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    date DATE NOT NULL,
-    time_id BIGINT,
-    theme_id BIGINT,
-    member_id BIGINT,
-    status VARCHAR(255) NOT NULL CHECK (status IN ('RESERVED', 'WAITING')),
-    FOREIGN KEY (time_id) REFERENCES reservation_time(id),
-    FOREIGN KEY (theme_id) REFERENCES theme(id),
-    FOREIGN KEY (member_id) REFERENCES member(id)
+    order_id VARCHAR(255),
+    payment_key VARCHAR(255),
+    amount NUMERIC,
+    reservation_id BIGINT,
+    FOREIGN KEY (reservation_id) REFERENCES reservation(id)
 );
 
 CREATE TABLE  IF NOT EXISTS waiting (

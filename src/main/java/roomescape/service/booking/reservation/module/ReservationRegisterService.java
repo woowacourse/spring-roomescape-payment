@@ -18,7 +18,6 @@ import roomescape.repository.ThemeRepository;
 import roomescape.util.DateUtil;
 
 @Service
-@Transactional
 public class ReservationRegisterService {
 
     private final ReservationRepository reservationRepository;
@@ -37,10 +36,11 @@ public class ReservationRegisterService {
         this.memberRepository = memberRepository;
     }
 
-    public Long registerReservation(ReservationRequest request) {
+    @Transactional
+    public Reservation registerReservation(ReservationRequest request) {
         Reservation reservation = convertReservation(request);
         validateReservationAvailability(reservation);
-        return reservationRepository.save(reservation).getId();
+        return reservationRepository.save(reservation);
     }
 
     private Reservation convertReservation(ReservationRequest request) {

@@ -1,6 +1,5 @@
 package roomescape.dto.waiting;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.domain.reservation.Reservation;
@@ -11,17 +10,19 @@ public record WaitingResponse(
         String member,
         String theme,
         LocalDate date,
-        @JsonFormat(pattern = "HH-mm") LocalTime startAt
+        LocalTime startAt,
+        int order
 ) {
 
     public static WaitingResponse from(Waiting waiting) {
         Reservation reservation = waiting.getReservation();
         return new WaitingResponse(
-                waiting.getId(),
+                reservation.getId(),
                 reservation.getMember().getName(),
                 reservation.getTheme().getThemeName(),
                 reservation.getDate(),
-                reservation.getTime().getStartAt()
+                reservation.getTime().getStartAt(),
+                waiting.getWaitingOrderValue()
         );
     }
 }

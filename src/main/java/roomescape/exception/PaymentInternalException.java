@@ -2,14 +2,14 @@ package roomescape.exception;
 
 public class PaymentInternalException extends RuntimeException {
 
-    private final String exceptionClass;
+    private final Exception exception;
 
-    public PaymentInternalException(final String exceptionClass, final String message) {
+    public PaymentInternalException(final Exception exception, final String message) {
         super(message);
-        this.exceptionClass = exceptionClass;
+        this.exception = exception;
     }
 
-    public String getExceptionClass() {
-        return exceptionClass;
+    public Exception getException() {
+        return exception;
     }
 }

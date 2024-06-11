@@ -25,6 +25,7 @@ import roomescape.service.booking.reservation.module.ReservationCancelService;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ReservationCancelServiceTest {
 
+
     @Autowired
     ReservationCancelService reservationCancelService;
 
@@ -36,28 +37,26 @@ class ReservationCancelServiceTest {
 
     @Test
     void 예약_취소() {
-        //when
+        // when
         reservationCancelService.deleteReservation(1L);
 
-        //when
-        List<Reservation> allReservations = reservationRepository.findAll();
-        assertThat(allReservations).extracting(Reservation::getId)
-                .isNotEmpty()
-                .doesNotContain(1L);
+        // then
+        Reservation deletedReservation = reservationRepository.findById(1L).orElseThrow();
+        assertThat(deletedReservation.getStatus()).isEqualTo(Status.DELETE);
     }
 
     @Sql("/waiting-test-data.sql")
     @Test
     void 예약_취소후_대기_에약이_있을_경우_예약_상태로_자동_변경() {
-        //when
+        // when
         reservationCancelService.deleteReservation(1L);
 
         //when
-        Reservation reservation = reservationRepository.findById(2L).orElseThrow();
+        Reservation firstWaiting = reservationRepository.findById(2L).orElseThrow();
         List<Waiting> allWaiting = waitingRepository.findAll();
 
         assertAll(
-                () -> assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED),
+                () -> assertThat(firstWaiting.getStatus()).isEqualTo(Status.PENDING),
                 () -> assertThat(allWaiting).hasSize(1)
                         .extracting(Waiting::getWaitingOrderValue).containsOnly(1)
         );

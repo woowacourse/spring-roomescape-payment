@@ -10,7 +10,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
 @Service
-@Transactional
 public class WaitingCancelService {
 
     private final WaitingRepository waitingRepository;
@@ -21,17 +20,13 @@ public class WaitingCancelService {
         this.reservationRepository = reservationRepository;
     }
 
-    public void cancelWaitingForUser(Long reservationId) {
-        Waiting waiting = findWaitingByReservationId(reservationId);
-        cancelWaiting(waiting.getId());
-    }
-
-    public void cancelWaiting(Long waitingId) {
-        Waiting waiting = findWaitingById(waitingId);
+    @Transactional
+    public void cancelWaiting(Waiting waiting) {
         Reservation reservation = waiting.getReservation();
 
-        List<Reservation> waitingReservations = findWaitingReservationBySameConditions(reservation);
-        adjustWaitingOrder(waitingReservations, waiting.getWaitingOrderValue());
+        List<Reservation> waitings = findWaitingReservationBySameConditions(reservation);
+        adjustWaitingOrder(waitings, waiting.getWaitingOrderValue());
+
         waitingRepository.delete(waiting);
         reservationRepository.delete(reservation);
     }
@@ -45,9 +40,9 @@ public class WaitingCancelService {
         );
     }
 
-    private void adjustWaitingOrder(List<Reservation> reservationsToAdjust, int waitingOrderToDelete) {
-        for (Reservation reservation : reservationsToAdjust) {
-            Waiting waiting = findWaitingByReservationId(reservation.getId());
+    private void adjustWaitingOrder(List<Reservation> waitingsToAdjust, int waitingOrderToDelete) {
+        for (Reservation waitingReservation : waitingsToAdjust) {
+            Waiting waiting = findWaitingByReservationId(waitingReservation.getId());
             if (waiting.isWaitingOrderGreaterThan(waitingOrderToDelete)) {
                 waiting.decreaseWaitingOrderByOne();
             }
@@ -59,14 +54,6 @@ public class WaitingCancelService {
                 .orElseThrow(() -> new RoomEscapeException(
                         "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
                         "reservation_id : " + reservationId
-                ));
-    }
-
-    private Waiting findWaitingById(Long waitingId) {
-        return waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "예약 대기 정보가 존재하지 않습니다.",
-                        "waiting_id : " + waitingId
                 ));
     }
 }

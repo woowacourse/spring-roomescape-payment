@@ -42,14 +42,12 @@ class WaitingRegisterServiceTest {
                 LocalDate.now().plusDays(1), 1L, 1L, 4L);
 
         //when
-        Long reservationId = waitingRegisterService.registerWaiting(reservationRequest);
+        Waiting waiting = waitingRegisterService.registerWaiting(reservationRequest);
 
         //then
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-        Waiting waiting = waitingRepository.findByReservationId(reservationId).orElseThrow();
+        Reservation reservation = reservationRepository.findById(waiting.getReservation().getId()).orElseThrow();
 
         assertAll(
-                () -> assertThat(reservation.getId()).isEqualTo(reservationId),
                 () -> assertThat(reservation.getDate()).isEqualTo(reservationRequest.date()),
                 () -> assertThat(reservation.getTime().getId()).isEqualTo(reservationRequest.timeId()),
                 () -> assertThat(reservation.getMember().getId()).isEqualTo(reservationRequest.memberId()),

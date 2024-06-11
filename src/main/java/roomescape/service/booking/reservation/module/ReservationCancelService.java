@@ -11,23 +11,30 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
 @Service
-@Transactional
 public class ReservationCancelService {
 
+    private final ReservationSearchService reservationSearchService;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationCancelService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+    public ReservationCancelService(final ReservationSearchService reservationSearchService,
+                                    ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+        this.reservationSearchService = reservationSearchService;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
     }
 
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = findReservationById(reservationId);
+    @Transactional
+    public void deleteReservation(Reservation reservation) {
         List<Reservation> waitingReservations = findWaitingReservation(reservation);
-
-        reservationRepository.delete(reservation);
+        reservation.delete();
         adjustWaitingOrder(waitingReservations);
+    }
+
+    @Transactional
+    public void deleteReservation(final Long id) {
+        Reservation reservation = reservationSearchService.findReservationById(id);
+        deleteReservation(reservation);
     }
 
     private List<Reservation> findWaitingReservation(Reservation reservation) {
@@ -43,21 +50,13 @@ public class ReservationCancelService {
         for (Reservation reservation : reservationsToAdjust) {
             Waiting waiting = findWaitingByReservationId(reservation.getId());
             if (waiting.isFirstOrder()) {
-                reservation.changeStatusToReserve();
+                reservation.changeToPending();
                 waitingRepository.delete(waiting);
             }
             if (!waiting.isFirstOrder()) {
                 waiting.decreaseWaitingOrderByOne();
             }
         }
-    }
-
-    private Reservation findReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "잘못된 예약 정보 입니다.",
-                        "reservation_id : " + reservationId
-                ));
     }
 
     private Waiting findWaitingByReservationId(Long reservationId) {

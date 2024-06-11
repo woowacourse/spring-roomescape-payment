@@ -70,8 +70,29 @@ VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 1, 'RESERVED'),
        (DATEADD('DAY', 2, CURRENT_DATE), 1, 1, 1, 'RESERVED'),
        (DATEADD('DAY', 2, CURRENT_DATE), 1, 1, 2, 'WAITING');
 
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('oderId1','paymentKey1', 1000, 1),
+       ('oderId2','paymentKey2', 1000, 2),
+       ('oderId3','paymentKey3', 1000, 3),
+       ('oderId4','paymentKey4', 1000, 4),
+       ('oderId5','paymentKey5', 1000, 5),
+       ('oderId6','paymentKey6', 1000, 6),
+       ('oderId7','paymentKey7', 1000, 7),
+       ('oderId8','paymentKey8', 1000, 8),
+       ('oderId9','paymentKey9', 1000, 9),
+       ('oderId10','paymentKey10', 1000, 10),
+       ('oderId11','paymentKey11', 1000, 11),
+       ('oderId12','paymentKey12', 1000, 12),
+       ('oderId13','paymentKey13', 1000, 13),
+       ('oderId14','paymentKey14', 1000, 14),
+       ('oderId15','paymentKey15', 1000, 15),
+       ('oderId16','paymentKey16', 1000, 16),
+       ('oderId17','paymentKey17', 1000, 17),
+       ('oderId18','paymentKey18', 1000, 18);
+
 INSERT INTO waiting (reservation_id, waiting_order) VALUES
     (18, 1),
     (19, 2),
     (20, 3),
     (22, 1);
+

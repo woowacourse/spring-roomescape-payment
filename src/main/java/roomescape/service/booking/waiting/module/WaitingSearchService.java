@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.waiting.WaitingResponse;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.WaitingRepository;
 
@@ -19,23 +18,31 @@ public class WaitingSearchService {
         this.waitingRepository = waitingRepository;
     }
 
-    public List<WaitingResponse> findAllWaitingReservations() {
-        return waitingRepository.findAll()
-                .stream()
-                .map(WaitingResponse::from)
-                .toList();
+    public List<Waiting> findAllWaitingReservations() {
+        return waitingRepository.findAll();
     }
 
-    public ReservationResponse findReservationWaiting(final Long waitingId) {
-        Waiting waiting = findWaitingById(waitingId);
+    public ReservationResponse findReservationWaiting(final Waiting waiting) {
         return ReservationResponse.from(waiting.getReservation());
     }
 
-    private Waiting findWaitingById(final Long waitingId) {
+    public List<Waiting> findWaitingByReservationIds(final List<Long> reservationIds) {
+        return waitingRepository.findByReservationIdIn(reservationIds);
+    }
+
+    public Waiting findWaitingById(Long waitingId) {
         return waitingRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomEscapeException(
-                        "잘못된 예약 대기 정보 입니다.",
+                        "예약 대기 정보가 존재하지 않습니다.",
                         "waiting_id : " + waitingId
+                ));
+    }
+
+    public Waiting findWaitingByReservationId(Long reservationId) {
+        return waitingRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
+                        "reservation_id : " + reservationId
                 ));
     }
 }
