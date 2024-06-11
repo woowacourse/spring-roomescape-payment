@@ -44,6 +44,7 @@ public class Reservation {
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "예약 상태는 비어있을 수 없습니다.")
+    @Column(nullable = false)
     private ReservationStatus status;
 
     public Reservation() {

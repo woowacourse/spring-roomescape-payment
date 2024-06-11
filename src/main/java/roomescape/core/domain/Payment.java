@@ -28,18 +28,22 @@ public class Payment {
     private Member member;
 
     @NotNull(message = "paymentKey는 비어있을 수 없습니다.")
+    @Column(nullable = false)
     private String paymentKey;
 
     @NotNull(message = "orderId는 비어있을 수 없습니다.")
+    @Column(nullable = false)
     private String orderId;
 
     @Min(0)
     @Max(Integer.MAX_VALUE)
     @NotNull(message = "결제 금액은 비어있을 수 없습니다.")
+    @Column(nullable = false)
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "결제 상태는 비어있을 수 없습니다.")
+    @Column(nullable = false)
     private PaymentStatus status;
 
     public Payment() {
