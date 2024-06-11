@@ -36,9 +36,25 @@ public class RoomescapeControllerAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         LOGGER.error(exception.getMessage(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "값을 변환하는 중 오류가 발생했습니다.");
+
+        String problem = extractProblemFromExceptionMessage(exception.getMessage());
+
+        if (problem == null) {
+            problem = "값을 변환하는 중 오류가 발생했습니다.";
+        }
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, problem);
         problemDetail.setTitle("요청을 변환할 수 없습니다.");
         return problemDetail;
+    }
+
+    private String extractProblemFromExceptionMessage(String message) {
+        if (message != null) {
+            int index = message.indexOf("problem:");
+            if (index != -1) {
+                return message.substring(index + "problem:".length()).trim();
+            }
+        }
+        return null;
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
