@@ -23,7 +23,8 @@ public class ReservationFactory {
     private final Clock clock;
 
     public ReservationFactory(
-            ReservationRepository reservationRepository, ReservationWaitingRepository reservationWaitingRepository,
+            ReservationRepository reservationRepository,
+            ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
