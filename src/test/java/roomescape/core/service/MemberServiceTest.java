@@ -44,7 +44,7 @@ class MemberServiceTest {
 
         final TokenResponse response = memberService.createToken(request);
 
-        assertThat(tokenProvider.getPayload(response.getAccessToken())).isEqualTo(TestFixture.getAdminEmail());
+        assertThat(tokenProvider.getPayload(response.accessToken())).isEqualTo(TestFixture.getAdminEmail());
     }
 
     @Test
@@ -52,7 +52,7 @@ class MemberServiceTest {
     void findMemberByToken() {
         final TokenRequest request = new TokenRequest(TestFixture.getAdminEmail(), TestFixture.getPassword());
         final TokenResponse tokenResponse = memberService.createToken(request);
-        final String token = tokenResponse.getAccessToken();
+        final String token = tokenResponse.accessToken();
 
         final MemberResponse response = memberService.findMemberByToken(token);
 
@@ -64,7 +64,7 @@ class MemberServiceTest {
     void findLoginMemberByToken() {
         final TokenRequest request = new TokenRequest(TestFixture.getAdminEmail(), TestFixture.getPassword());
         final TokenResponse tokenResponse = memberService.createToken(request);
-        final String token = tokenResponse.getAccessToken();
+        final String token = tokenResponse.accessToken();
 
         final LoginMember response = memberService.findLoginMemberByToken(token);
 

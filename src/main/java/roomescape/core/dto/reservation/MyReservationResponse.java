@@ -9,25 +9,8 @@ import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.domain.WaitingWithRank;
 
-public class MyReservationResponse {
-    private final Long id;
-    private final String theme;
-    private final String date;
-    private final String time;
-    private final String status;
-    private final String paymentKey;
-    private final Integer amount;
-
-    public MyReservationResponse(final Long id, final String theme, final String date, final String time,
-                                 final String status, final String paymentKey, final Integer amount) {
-        this.id = id;
-        this.theme = theme;
-        this.date = date;
-        this.time = time;
-        this.status = status;
-        this.paymentKey = paymentKey;
-        this.amount = amount;
-    }
+public record MyReservationResponse(Long id, String theme, String date, String time, String status, String paymentKey,
+                                    Integer amount) {
 
     public static MyReservationResponse from(final WaitingWithRank waitingWithRank) {
         final Waiting waiting = waitingWithRank.getWaiting();
@@ -56,33 +39,5 @@ public class MyReservationResponse {
 
         return new MyReservationResponse(reservation.getId(), theme.getName(), reservation.getDateString(),
                 time.getStartAtString(), status, null, null);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTheme() {
-        return theme;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public Integer getAmount() {
-        return amount;
     }
 }

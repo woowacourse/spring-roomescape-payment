@@ -9,7 +9,7 @@ public class CookieService {
     protected static final String TOKEN_NOT_EXISTS_EXCEPTION_MESSAGE = "토큰이 존재하지 않습니다.";
 
     public Cookie createCookie(final TokenResponse tokenResponse) {
-        final Cookie cookie = new Cookie(COOKIE_NAME, tokenResponse.getAccessToken());
+        final Cookie cookie = new Cookie(COOKIE_NAME, tokenResponse.accessToken());
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         return cookie;
