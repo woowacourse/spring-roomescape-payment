@@ -1,4 +1,4 @@
-package roomescape.domain;
+package roomescape.domain.reservation.theme;
 
 import jakarta.persistence.Embeddable;
 

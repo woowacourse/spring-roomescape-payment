@@ -5,8 +5,13 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.domain.*;
+import roomescape.domain.member.*;
 import roomescape.domain.repository.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.ReservationWaiting;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.web.controller.request.ReservationWaitingRequest;
 

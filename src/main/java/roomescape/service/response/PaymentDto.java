@@ -1,6 +1,6 @@
 package roomescape.service.response;
 
-import roomescape.domain.Payment;
+import roomescape.domain.payment.Payment;
 
 public record PaymentDto(Long id, String paymentKey, String orderId, Long totalAmount) {
 

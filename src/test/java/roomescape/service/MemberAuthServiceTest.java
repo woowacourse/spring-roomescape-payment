@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.*;
+import roomescape.domain.member.*;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.service.request.MemberSignUpDto;
 import roomescape.service.response.MemberDto;

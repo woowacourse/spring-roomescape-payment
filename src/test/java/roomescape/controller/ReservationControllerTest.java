@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
-import roomescape.domain.MemberRole;
+import roomescape.domain.member.MemberRole;
 import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.response.PaymentDto;
 import roomescape.web.controller.request.MemberReservationRequest;

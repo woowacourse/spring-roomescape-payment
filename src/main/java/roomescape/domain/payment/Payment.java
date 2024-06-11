@@ -1,7 +1,8 @@
-package roomescape.domain;
+package roomescape.domain.payment;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
+import roomescape.domain.reservation.Reservation;
 
 @Entity
 public class Payment {

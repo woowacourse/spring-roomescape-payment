@@ -1,7 +1,7 @@
 package roomescape.service.response;
 
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationWaitingWithRank;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationWaitingWithRank;
 
 public record ReservationWaitingWithRankDto(
         Long id,

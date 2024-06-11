@@ -2,9 +2,9 @@ package roomescape.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import roomescape.domain.Member;
-import roomescape.domain.MemberEmail;
-import roomescape.domain.MemberPassword;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberEmail;
+import roomescape.domain.member.MemberPassword;
 
 import java.util.Optional;
 

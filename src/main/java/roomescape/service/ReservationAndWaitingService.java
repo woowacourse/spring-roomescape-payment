@@ -2,10 +2,13 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.*;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.repository.PaymentRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationWaitingRepository;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationWaiting;
 import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.request.PaymentCancelDto;
 

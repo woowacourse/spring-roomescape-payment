@@ -1,7 +1,7 @@
 package roomescape.service.response;
 
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
 
 public record ReservationDto(
         Long id,

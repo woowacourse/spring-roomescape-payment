@@ -2,7 +2,7 @@ package roomescape.service;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import roomescape.domain.Theme;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.service.exception.ReservationExistsException;

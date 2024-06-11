@@ -1,14 +1,14 @@
 package roomescape;
 
-import roomescape.domain.Member;
-import roomescape.domain.MemberEmail;
-import roomescape.domain.MemberName;
-import roomescape.domain.MemberPassword;
-import roomescape.domain.MemberRole;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberEmail;
+import roomescape.domain.member.MemberName;
+import roomescape.domain.member.MemberPassword;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.theme.Theme;
 
 public class Fixture {
 

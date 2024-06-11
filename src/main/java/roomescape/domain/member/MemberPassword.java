@@ -1,4 +1,4 @@
-package roomescape.domain;
+package roomescape.domain.member;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Embeddable;

@@ -3,8 +3,8 @@ package roomescape.domain.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
 
 import java.util.List;
 import java.util.Optional;
