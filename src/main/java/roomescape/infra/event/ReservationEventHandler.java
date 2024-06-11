@@ -42,7 +42,7 @@ public class ReservationEventHandler {
     private void pendingNextReservation(Reservation canceledReservation) {
         reservationRepository.findNextWaiting(canceledReservation.getDetail())
                 .ifPresent(reservation -> {
-                    moveToPending(reservation);
+                    changeStatusToPending(reservation);
                     eventPublisher.publishTimeoutEvent(reservation);
                 });
     }
@@ -52,7 +52,7 @@ public class ReservationEventHandler {
         reservationRepository.save(reservation);
     }
 
-    private void moveToPending(Reservation reservation) {
+    private void changeStatusToPending(Reservation reservation) {
         reservation.toPending();
         reservationRepository.save(reservation);
     }
