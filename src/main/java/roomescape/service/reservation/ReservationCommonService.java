@@ -57,10 +57,7 @@ public class ReservationCommonService {
     @Transactional
     public void deleteById(long id) {
         reservationRepository.findById(id)
-                .ifPresent(reservation -> {
-                    cancelReservation(reservation);
-                    updateToReserved(reservation);
-                });
+                .ifPresent(this::cancelReservation);
     }
 
     private void cancelReservation(Reservation reservation) {
@@ -69,6 +66,7 @@ public class ReservationCommonService {
             paymentService.cancelPayment(reservation.getPayment());
         }
         reservationRepository.deleteById(reservation.getId());
+        updateToReserved(reservation);
     }
 
     private void validatePastReservation(Reservation reservation) {
