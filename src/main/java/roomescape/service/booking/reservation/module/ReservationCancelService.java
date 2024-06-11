@@ -24,6 +24,7 @@ public class ReservationCancelService {
         this.waitingRepository = waitingRepository;
     }
 
+    @Transactional
     public void deleteReservation(Reservation reservation) {
         List<Reservation> waitingReservations = findWaitingReservation(reservation);
         reservation.delete();

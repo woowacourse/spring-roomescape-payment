@@ -4,22 +4,18 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
-import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.exception.RoomEscapeException;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.WaitingRepository;
 
 @Service
 public class ReservationSearchService {
 
     private final ReservationRepository reservationRepository;
-    private final WaitingRepository waitingRepository;
 
-    public ReservationSearchService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
+    public ReservationSearchService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
     }
 
     public ReservationResponse findReservation(Long reservationId) {
@@ -55,14 +51,6 @@ public class ReservationSearchService {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(
                         "잘못된 예약 정보 입니다.",
-                        "reservation_id : " + reservationId
-                ));
-    }
-
-    public Waiting findWaitingByReservationId(Long reservationId) {
-        return waitingRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new RoomEscapeException(
-                        "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
                         "reservation_id : " + reservationId
                 ));
     }

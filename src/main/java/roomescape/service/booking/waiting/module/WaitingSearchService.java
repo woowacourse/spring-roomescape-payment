@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.waiting.Waiting;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.exception.RoomEscapeException;
 import roomescape.repository.WaitingRepository;
 
 @Service
@@ -27,5 +28,21 @@ public class WaitingSearchService {
 
     public List<Waiting> findWaitingByReservationIds(final List<Long> reservationIds) {
         return waitingRepository.findByReservationIdIn(reservationIds);
+    }
+
+    public Waiting findWaitingById(Long waitingId) {
+        return waitingRepository.findById(waitingId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 대기 정보가 존재하지 않습니다.",
+                        "waiting_id : " + waitingId
+                ));
+    }
+
+    public Waiting findWaitingByReservationId(Long reservationId) {
+        return waitingRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new RoomEscapeException(
+                        "예약 정보와 일치하는 대기 정보가 존재하지 않습니다.",
+                        "reservation_id : " + reservationId
+                ));
     }
 }

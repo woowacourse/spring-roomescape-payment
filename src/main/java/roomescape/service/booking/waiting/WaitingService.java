@@ -42,12 +42,14 @@ public class WaitingService {
 
     @Transactional
     public void cancelWaitingForUser(Long reservationId) {
-        waitingCancelService.cancelWaitingForUser(reservationId);
+        Waiting waiting = waitingSearchService.findWaitingByReservationId(reservationId);
+        waitingCancelService.cancelWaiting(waiting);
     }
 
     @Transactional
     public void cancelWaiting(Long waitingId) {
-        waitingCancelService.cancelWaiting(waitingId);
+        Waiting waiting = waitingSearchService.findWaitingById(waitingId);
+        waitingCancelService.cancelWaiting(waiting);
     }
 
     public List<WaitingResponse> findWaitingByReservationIds(final List<Long> waitingReservationIds) {
