@@ -23,7 +23,7 @@ class MemberIntegrationTest extends IntegrationTest {
     void memberList() {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .when().get("/members")
+                .when().get("/admin/members")
                 .then().log().all()
                 .statusCode(200);
     }

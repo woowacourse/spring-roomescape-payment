@@ -27,7 +27,7 @@ public class MemberController implements MemberControllerSwagger {
     }
 
     @Override
-    @GetMapping("/members")
+    @GetMapping("/admin/members")
     public List<MemberResponse> memberIdList() {
         return memberService.findMembersId();
     }
