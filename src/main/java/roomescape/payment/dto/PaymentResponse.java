@@ -19,4 +19,8 @@ public record PaymentResponse(
     public static PaymentResponse from(Payment payment) {
         return new PaymentResponse(payment.getOrderName(), payment.getPaymentKey(), payment.getAmount(), payment.getApprovedAt());
     }
+
+    public static PaymentResponse nothing() {
+        return new PaymentResponse(null, null, null, null);
+    }
 }

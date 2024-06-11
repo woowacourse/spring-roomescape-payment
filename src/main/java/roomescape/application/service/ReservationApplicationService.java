@@ -58,7 +58,8 @@ public class ReservationApplicationService {
         List<ReservationPaymentDetail> paymentDetails = new ArrayList<>();
         for (ReservationDetailResponse reservationDetailResponse : allByMemberId) {
             paymentRepository.findByReservationId(reservationDetailResponse.reservationId())
-                    .ifPresent(payment -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment))));
+                    .ifPresentOrElse(payment -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment))),
+                            () -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.nothing())));
         }
         return paymentDetails;
     }
