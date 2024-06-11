@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
+import roomescape.config.swagger.ApiErrorResponse;
+import roomescape.config.swagger.ApiSuccessResponse;
 import roomescape.config.swagger.SwaggerAuthToken;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -29,11 +31,15 @@ public class ReservationController {
     }
 
     @GetMapping
+    @ApiSuccessResponse.Ok("전체 예약 조회")
     public List<ReservationResponse> findAllReservations() {
         return reservationService.findAll();
     }
 
     @PostMapping
+    @ApiSuccessResponse.Created("예약 생성")
+    @ApiErrorResponse.BadRequest
+    @ApiErrorResponse.ThirdPartyApiError
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid ReservationRequest reservationRequest,
             @LoginMemberId @SwaggerAuthToken long memberId
@@ -44,6 +50,8 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiSuccessResponse.NoContent("id를 통해 예약 삭제")
+    @ApiErrorResponse.ThirdPartyApiError
     public ResponseEntity<Void> deleteReservation(
             @PathVariable("id") long reservationId,
             @LoginMemberId @SwaggerAuthToken long memberId

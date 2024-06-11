@@ -33,8 +33,7 @@ logging:
 springdoc:
   swagger-ui:
     path: /api-docs
-    groups-order: desc
     tags-sorter: alpha
-    operations-sorter: method
+    operations-sorter: alpha
 
 apiVersion: 0.0.1

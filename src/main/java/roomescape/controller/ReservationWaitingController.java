@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
+import roomescape.config.swagger.ApiErrorResponse;
+import roomescape.config.swagger.ApiSuccessResponse;
 import roomescape.config.swagger.SwaggerAuthToken;
 import roomescape.service.reservation.ReservationWaitingService;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -27,6 +29,9 @@ public class ReservationWaitingController {
     }
 
     @PostMapping
+    @ApiSuccessResponse.Created("예약 대기 등록")
+    @ApiErrorResponse.BadRequest
+    @ApiErrorResponse.ThirdPartyApiError
     public ResponseEntity<ReservationWaitingResponse> createReservationWaiting(
             @RequestBody @Valid ReservationRequest waitingRequest,
             @LoginMemberId @SwaggerAuthToken long memberId
@@ -37,6 +42,8 @@ public class ReservationWaitingController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiSuccessResponse.NoContent("id를 통해 예약 대기 등록 취소")
+    @ApiErrorResponse.ThirdPartyApiError
     public ResponseEntity<Void> deleteReservationWaiting(
             @PathVariable("id") long waitingId,
             @LoginMemberId @SwaggerAuthToken long memberId
