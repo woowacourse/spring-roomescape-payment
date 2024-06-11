@@ -31,7 +31,7 @@ jobs:
           echo "Server stopped."
 
       - name: Move to project directory
-        run: cd spring-roomescape-payment
+        run: cd /home/ubuntu/actions-runner/_work/spring-roomescape-payment
 
       - name: Remove test codes
         run: rm -rf src/test
