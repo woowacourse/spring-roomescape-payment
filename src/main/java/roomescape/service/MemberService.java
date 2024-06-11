@@ -2,8 +2,8 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.request.MemberLoginRequest;
-import roomescape.controller.request.RegisterRequest;
+import roomescape.request.MemberLoginRequest;
+import roomescape.request.RegisterRequest;
 import roomescape.exception.AuthenticationException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;

@@ -1,4 +1,4 @@
-package roomescape.controller.request;
+package roomescape.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

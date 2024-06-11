@@ -2,14 +2,14 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.request.ReservationTimeRequest;
-import roomescape.controller.response.IsReservedTimeResponse;
+import roomescape.request.ReservationTimeRequest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.ReservationTime;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.response.IsReservedTimeResponse;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

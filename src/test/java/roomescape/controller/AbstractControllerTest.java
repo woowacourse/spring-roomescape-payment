@@ -11,7 +11,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.cookies.RequestCookiesSnippet;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.BaseTest;
-import roomescape.controller.request.MemberLoginRequest;
+import roomescape.request.MemberLoginRequest;
 
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;

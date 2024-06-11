@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.controller.request.ThemeRequest;
+import roomescape.request.ThemeRequest;
 import roomescape.model.Theme;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;

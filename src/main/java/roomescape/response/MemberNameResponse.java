@@ -1,4 +1,4 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 public record MemberNameResponse(String name) {
 }

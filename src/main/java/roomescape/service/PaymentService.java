@@ -1,8 +1,8 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.controller.request.PaymentRequest;
-import roomescape.controller.request.ReservationRequest;
+import roomescape.request.PaymentRequest;
+import roomescape.request.ReservationRequest;
 import roomescape.exception.PaymentException;
 import roomescape.model.Payment;
 import roomescape.service.httpclient.TossPaymentClient;

@@ -1,6 +1,6 @@
 package roomescape.service.fixture;
 
-import roomescape.controller.request.AdminReservationRequest;
+import roomescape.request.AdminReservationRequest;
 
 import java.time.LocalDate;
 

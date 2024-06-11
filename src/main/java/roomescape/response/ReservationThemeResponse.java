@@ -1,4 +1,4 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 import roomescape.model.Theme;
 

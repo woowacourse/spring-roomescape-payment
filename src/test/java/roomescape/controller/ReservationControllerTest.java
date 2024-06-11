@@ -11,8 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
-import roomescape.controller.request.AdminReservationRequest;
-import roomescape.controller.request.ReservationRequest;
+import roomescape.request.AdminReservationRequest;
+import roomescape.request.ReservationRequest;
 import roomescape.service.PaymentService;
 import roomescape.service.fixture.PaymentFixture;
 

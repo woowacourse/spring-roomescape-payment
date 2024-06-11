@@ -2,7 +2,7 @@ package roomescape.service.httpclient;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import roomescape.controller.request.PaymentRequest;
+import roomescape.request.PaymentRequest;
 import roomescape.model.Payment;
 
 public class TossPaymentRestClient extends TossPaymentClient {

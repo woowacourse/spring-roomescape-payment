@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
-import roomescape.controller.request.WaitingRequest;
+import roomescape.request.WaitingRequest;
 
 import java.time.LocalDate;
 

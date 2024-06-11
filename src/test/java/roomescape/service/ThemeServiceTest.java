@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.BaseTest;
-import roomescape.controller.request.ThemeRequest;
+import roomescape.request.ThemeRequest;
 import roomescape.model.Theme;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package roomescape.service.fixture;
 
-import roomescape.controller.request.WaitingRequest;
+import roomescape.request.WaitingRequest;
 
 import java.time.LocalDate;
 

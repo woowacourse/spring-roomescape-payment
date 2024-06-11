@@ -1,7 +1,7 @@
 package roomescape.service.httpclient;
 
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.controller.request.PaymentRequest;
+import roomescape.request.PaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.model.Payment;
 

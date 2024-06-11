@@ -1,4 +1,4 @@
-package roomescape.controller.request;
+package roomescape.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.annotation.Nonnull;

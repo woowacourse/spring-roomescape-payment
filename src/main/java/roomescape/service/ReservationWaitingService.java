@@ -2,7 +2,6 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.response.MemberReservationResponse;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;
 import roomescape.model.Reservation;
@@ -12,6 +11,7 @@ import roomescape.model.Waiting;
 import roomescape.model.WaitingWithRank;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.response.MemberReservationResponse;
 
 import java.time.LocalDate;
 import java.util.List;

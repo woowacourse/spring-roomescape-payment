@@ -2,7 +2,7 @@ package roomescape.service.httpclient;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import roomescape.controller.request.PaymentRequest;
+import roomescape.request.PaymentRequest;
 import roomescape.model.Payment;
 
 @Component

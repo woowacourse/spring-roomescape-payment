@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.request.MemberLoginRequest;
+import roomescape.request.RegisterRequest;
 import roomescape.annotation.AuthenticationPrincipal;
-import roomescape.controller.request.MemberLoginRequest;
-import roomescape.controller.request.RegisterRequest;
-import roomescape.controller.response.MemberNameResponse;
-import roomescape.controller.response.MemberResponse;
 import roomescape.model.Member;
+import roomescape.response.MemberNameResponse;
+import roomescape.response.MemberResponse;
 import roomescape.service.AuthService;
 import roomescape.service.MemberService;
 

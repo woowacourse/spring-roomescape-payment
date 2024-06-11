@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
-import roomescape.controller.request.MemberLoginRequest;
-import roomescape.controller.request.RegisterRequest;
+import roomescape.request.MemberLoginRequest;
+import roomescape.request.RegisterRequest;
 import roomescape.model.Member;
 
 import static org.assertj.core.api.Assertions.assertThat;

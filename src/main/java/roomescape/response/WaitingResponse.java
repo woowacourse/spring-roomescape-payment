@@ -1,10 +1,10 @@
-package roomescape.controller.response;
+package roomescape.response;
 
-import roomescape.model.Reservation;
+import roomescape.model.Waiting;
 
 import java.time.LocalDate;
 
-public class ReservationResponse {
+public class WaitingResponse {
 
     private Long id;
     private String name;
@@ -12,15 +12,15 @@ public class ReservationResponse {
     private ReservationTimeResponse time;
     private ReservationThemeResponse theme;
 
-    private ReservationResponse() {
+    private WaitingResponse() {
     }
 
-    public ReservationResponse(Reservation reservation) {
-        this.id = reservation.getId();
-        this.name = reservation.getMember().getName();
-        this.date = reservation.getDate();
-        this.time = ReservationTimeResponse.of(reservation.getTime());
-        this.theme = ReservationThemeResponse.of(reservation.getTheme());
+    public WaitingResponse(Waiting waiting) {
+        this.id = waiting.getId();
+        this.name = waiting.getMember().getName();
+        this.date = waiting.getDate();
+        this.time = ReservationTimeResponse.of(waiting.getTime());
+        this.theme = ReservationThemeResponse.of(waiting.getTheme());
     }
 
     public Long getId() {

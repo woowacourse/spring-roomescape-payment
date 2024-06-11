@@ -1,20 +1,17 @@
-package roomescape.controller.request;
+package roomescape.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public record ReservationRequest(
+public record WaitingRequest(
         @Nonnull
-        @JsonFormat(pattern = "yyyy-MM-dd")
+        @DateTimeFormat
         LocalDate date,
         @Positive(message = "[ERROR] timeId의 값이 1보다 작을 수 없습니다.")
         long timeId,
         @Positive(message = "[ERROR] themeId의 값이 1보다 작을 수 없습니다.")
-        long themeId,
-        String orderId,
-        String paymentKey,
-        long amount) {
+        long themeId) {
 }

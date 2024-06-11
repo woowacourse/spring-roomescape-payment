@@ -4,14 +4,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.request.ReservationTimeRequest;
 import roomescape.BaseTest;
-import roomescape.controller.request.ReservationTimeRequest;
-import roomescape.controller.response.IsReservedTimeResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.ReservationTime;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.response.IsReservedTimeResponse;
 
 import java.time.LocalTime;
 import java.util.List;

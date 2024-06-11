@@ -1,4 +1,4 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import roomescape.model.Reservation;

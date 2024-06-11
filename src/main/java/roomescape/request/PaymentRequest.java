@@ -1,4 +1,4 @@
-package roomescape.controller.request;
+package roomescape.request;
 
 import jakarta.annotation.Nonnull;
 
