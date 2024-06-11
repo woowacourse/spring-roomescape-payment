@@ -2,7 +2,6 @@ spring:
   profiles:
     active:
       - dev
-      - default
 
     group:
       dev:
