@@ -71,7 +71,7 @@ public class ReservationService {
         } catch (Exception e) {
             logger.debug(e.getMessage(), e);
             paymentService.cancel(new CancelPayment(payment, new CancelReason("서버 오류")));
-            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 이후 로직 처리 중 에러");
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "예약에 실패했습니다. 다시 시도해주세요.");
         }
         return response;
     }
@@ -158,10 +158,9 @@ public class ReservationService {
         }
         reservationRepository.delete(requestedReservation);
 
-        if (isAdminReservation(requestedReservation)) {
-            return;
+        if (isPaidReservation(requestedReservation)) {
+            paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("예약 취소")));
         }
-        paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("예약 취소")));
     }
 
     @Transactional
@@ -177,13 +176,12 @@ public class ReservationService {
         }
         reservationRepository.deleteById(id);
 
-        if (isAdminReservation(requestedReservation)) {
-            return;
+        if (isPaidReservation(requestedReservation)) {
+            paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("관리자의 대기 취소")));
         }
-        paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("관리자의 대기 취소")));
     }
 
-    private static boolean isAdminReservation(Reservation requestedReservation) {
+    private static boolean isPaidReservation(Reservation requestedReservation) {
         return requestedReservation.getPayment() == null;
     }
 
