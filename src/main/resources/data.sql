@@ -9,8 +9,6 @@ INSERT INTO member(name, email, password, role) VALUES('리니', 'lini@email.com
 INSERT INTO member(name, email, password, role) VALUES('페드로', 'pedro@email.com', 'pedro123', 'GUEST');
 INSERT INTO member(name, email, password, role) VALUES('제이', 'junho@email.com', 'junho123', 'GUEST');
 
--- RUNSCRIPT FROM 'classpath:insert-admin-payment.sql';
-
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 1, 'RESERVED');
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', -7, CURRENT_DATE), 1, 2, 1, 'RESERVED');
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', -6, CURRENT_DATE), 1, 3, 1, 'RESERVED');
