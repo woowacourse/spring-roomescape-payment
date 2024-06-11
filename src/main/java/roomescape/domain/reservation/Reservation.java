@@ -32,18 +32,18 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Theme theme;
     @Enumerated(value = EnumType.STRING)
-    private Status status;
+    private ReservationStatus status;
     @OneToOne(mappedBy = "reservation")
     private Payment payment;
 
     protected Reservation() {
     }
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
         this(null, member, date, time, theme, status);
     }
 
-    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
+    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
         if (date == null) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약 날짜는 필수입니다.");
         }
@@ -75,7 +75,7 @@ public class Reservation {
         return theme;
     }
 
-    public Status getStatus() {
+    public ReservationStatus getStatus() {
         return status;
     }
 

@@ -44,7 +44,7 @@ public class ReservationFactory {
         validateRequestDateAfterCurrentTime(dateTime);
         validateUniqueReservation(date, timeId, themeId);
         validateAlreadyWaiting(date, timeId, themeId, memberId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), Status.RESERVATION);
+        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), ReservationStatus.RESERVATION);
     }
 
     public ReservationWaiting createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {

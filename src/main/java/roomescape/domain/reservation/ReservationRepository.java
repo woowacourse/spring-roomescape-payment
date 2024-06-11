@@ -40,7 +40,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             r.member.id = :memberId and
             :dateFrom <= r.date and
             r.date <= :dateTo and
-            r.status = roomescape.domain.reservation.Status.RESERVATION
+            r.status = "RESERVATION"
             """)
     List<Reservation> findByCriteria(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo);
 }

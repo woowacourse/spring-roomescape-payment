@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationFactory;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.Status;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.dto.payment.PaymentRequest;
@@ -105,7 +105,7 @@ public class ReservationService {
                         reservationWaiting.getDate(),
                         reservationWaiting.getTime(),
                         reservationWaiting.getTheme(),
-                        Status.PAYMENT_WAITING
+                        ReservationStatus.PAYMENT_WAITING
                 )
         );
         reservationWaitingRepository.delete(reservationWaiting);
