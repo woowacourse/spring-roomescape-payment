@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
 import roomescape.model.Member;
 import roomescape.model.Role;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static roomescape.model.Role.ADMIN;
 import static roomescape.model.Role.MEMBER;
 
-class AuthServiceTest {
+class AuthServiceTest extends BaseTest {
 
     private FakeJwtTokenProvider jwtTokenProvider = new FakeJwtTokenProvider();
     private AuthService authService = new AuthService(jwtTokenProvider);

@@ -3,8 +3,8 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.BaseTest;
 import roomescape.controller.request.ThemeRequest;
 import roomescape.model.Theme;
 
@@ -13,9 +13,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
-class ThemeServiceTest {
+class ThemeServiceTest extends BaseTest {
 
     private ThemeService themeService;
 

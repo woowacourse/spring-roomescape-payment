@@ -3,8 +3,8 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.BaseTest;
 import roomescape.controller.request.ReservationTimeRequest;
 import roomescape.controller.response.IsReservedTimeResponse;
 import roomescape.exception.BadRequestException;
@@ -21,9 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
-class ReservationTimeServiceTest {
+class ReservationTimeServiceTest extends BaseTest {
 
     private ReservationTimeRepository reservationTimeRepository;
     private ReservationTimeService reservationTimeService;

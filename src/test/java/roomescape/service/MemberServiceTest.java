@@ -3,8 +3,8 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.BaseTest;
 import roomescape.controller.request.MemberLoginRequest;
 import roomescape.exception.AuthenticationException;
 import roomescape.exception.NotFoundException;
@@ -15,9 +15,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
-class MemberServiceTest {
+class MemberServiceTest extends BaseTest {
 
     private MemberService memberService;
 

@@ -4,12 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import roomescape.BaseTest;
 import roomescape.exception.PaymentException;
 import roomescape.model.Payment;
 import roomescape.service.fixture.JsonResponseFixture;
@@ -23,9 +23,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = "/initialize_table.sql")
-class PaymentServiceTest {
+class PaymentServiceTest extends BaseTest {
 
     private PaymentService paymentService;
     private RestTemplate restTemplate;

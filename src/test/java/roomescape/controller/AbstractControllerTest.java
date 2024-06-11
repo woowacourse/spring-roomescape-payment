@@ -6,13 +6,11 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.cookies.RequestCookiesSnippet;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.BaseTest;
 import roomescape.controller.request.MemberLoginRequest;
 
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
@@ -21,18 +19,13 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 
 @Sql({"/initialize_table.sql", "/controller_test_data.sql"})
 @ExtendWith(RestDocumentationExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public abstract class AbstractControllerTest {
+public abstract class AbstractControllerTest extends BaseTest {
     protected RequestSpecification spec;
     protected RequestCookiesSnippet requiredCookie = requestCookies(cookieWithName("token").description("POST /login 를 통해 획득한 jwt 값"));
 
-    @LocalServerPort
-    private int port;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
-        RestAssured.port = port;
         this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation))
                 .build();
     }
