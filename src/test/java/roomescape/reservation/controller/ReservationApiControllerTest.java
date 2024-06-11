@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
 import roomescape.exception.PaymentFailException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.service.PaymentService;
@@ -64,9 +65,13 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
 
         PaymentResponse paymentResponse = new PaymentResponse("testKey", new BigDecimal("1000"));
-        doReturn(paymentResponse).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
+
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doReturn(paymentResponse).when(paymentService).confirm(payment);
 
         RestAssured.given(spec).log().all()
                 .filter(CREATE_RESERVATION_BY_USER.getFilter())
@@ -90,7 +95,11 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
+
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doThrow(PaymentFailException.class).when(paymentService).confirm(payment);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

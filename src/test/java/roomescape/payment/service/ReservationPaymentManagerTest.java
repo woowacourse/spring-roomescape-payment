@@ -17,9 +17,9 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.config.DatabaseCleaner;
 import roomescape.config.IntegrationTest;
 import roomescape.exception.PaymentFailException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationResponse;
@@ -33,9 +33,6 @@ class ReservationPaymentManagerTest extends IntegrationTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @MockBean
     private PaymentService paymentService;
@@ -58,9 +55,12 @@ class ReservationPaymentManagerTest extends IntegrationTest {
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(loginMember.id(), TODAY, 1L, 1L, "testKey", "testId", 1000);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
 
         PaymentResponse paymentResponse = new PaymentResponse("testKey", new BigDecimal("1000"));
-        doReturn(paymentResponse).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doReturn(paymentResponse).when(paymentService).confirm(payment);
 
         ReservationResponse reservationResponse = manager.saveReservationByUser(reservationSaveRequest, loginMember);
         Reservation reservation = reservationRepository.findById(reservationResponse.id())
@@ -79,8 +79,11 @@ class ReservationPaymentManagerTest extends IntegrationTest {
         LoginMember loginMember = LOGIN_MEMBER_KAKI;
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(loginMember.id(), TODAY, 1L, 1L, "testKey", "testId", 1000);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
 
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest), 1L);
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doThrow(PaymentFailException.class).when(paymentService).confirm(payment);
 
         try {
             manager.saveReservationByUser(reservationSaveRequest, loginMember);
