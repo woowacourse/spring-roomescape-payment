@@ -21,6 +21,6 @@ public record PaymentConfirmRequest(
     }
 
     public Payment createPayment() {
-        return new Payment(reservationId, memberId, paymentKey, amount);
+        return new Payment(reservationId, memberId, orderId, paymentKey, amount);
     }
 }
