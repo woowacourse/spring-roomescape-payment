@@ -56,13 +56,13 @@ public class ReservationService {
         return toResponse(saved);
     }
 
-    private void updatePayment(Reservation saved, PaymentApproveRequest approveRequest) {
+    private void updatePayment(Reservation reservation, PaymentApproveRequest approveRequest) {
         if (approveRequest == null) {
             return;
         }
         paymentRepository.findByOrderIdAndPaymentKey(approveRequest.orderId(), approveRequest.paymentKey())
                 .ifPresent(payment -> {
-                    payment.updateReservation(saved);
+                    payment.updateReservation(reservation);
                     paymentRepository.save(payment);
                 });
     }
