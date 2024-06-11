@@ -1,4 +1,12 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      force-response: true
+
 spring:
+  profiles:
+    default: prod
   h2:
     console:
       enabled: true
@@ -11,8 +19,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    hibernate:
-      ddl-auto: create-drop
+
 security:
   jwt:
     token:
