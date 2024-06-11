@@ -11,7 +11,7 @@ import roomescape.domain.payment.service.PaymentService;
 import roomescape.domain.reservation.dto.ReservationDto;
 import roomescape.domain.reservation.dto.ReservationWithPaymentHistoryDto;
 import roomescape.domain.reservation.dto.SaveAdminReservationRequest;
-import roomescape.domain.reservation.dto.SavePaymentHistoryRequest;
+import roomescape.domain.reservation.dto.PaymentHistoryDto;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.dto.SearchReservationsParams;
 import roomescape.domain.reservation.dto.SearchReservationsRequest;
@@ -88,8 +88,8 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservation.getTime());
         validateReservationDuplicated(reservation);
 
-        final SavePaymentHistoryRequest savePaymentHistoryRequest = convertPaymentHistoryRequest(request, reservation);
-        paymentService.savePaymentHistory(savePaymentHistoryRequest);
+        final PaymentHistoryDto paymentHistoryDto = convertPaymentHistoryRequest(request, reservation);
+        paymentService.savePaymentHistory(paymentHistoryDto);
 
         return ReservationDto.from(reservationRepository.save(reservation));
     }
@@ -128,8 +128,8 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
     }
 
-    private SavePaymentHistoryRequest convertPaymentHistoryRequest(final SaveAdminReservationRequest request, final Reservation reservation) {
-        return new SavePaymentHistoryRequest(
+    private PaymentHistoryDto convertPaymentHistoryRequest(final SaveAdminReservationRequest request, final Reservation reservation) {
+        return new PaymentHistoryDto(
                 request.orderId(),
                 PaymentStatus.DONE,
                 request.orderName(),

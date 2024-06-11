@@ -6,7 +6,7 @@ import roomescape.domain.reservation.model.Reservation;
 
 import java.time.LocalDateTime;
 
-public record SavePaymentHistoryRequest(
+public record PaymentHistoryDto(
         String orderId,
         PaymentStatus paymentStatus,
         String orderName,

@@ -10,7 +10,7 @@ import roomescape.domain.payment.model.PaymentHistory;
 import roomescape.domain.payment.pg.PaymentGateway;
 import roomescape.domain.payment.repository.PaymentCredentialRepository;
 import roomescape.domain.payment.repository.PaymentHistoryRepository;
-import roomescape.domain.reservation.dto.SavePaymentHistoryRequest;
+import roomescape.domain.reservation.dto.PaymentHistoryDto;
 import roomescape.domain.reservation.model.Reservation;
 
 import java.util.NoSuchElementException;
@@ -73,7 +73,7 @@ public class PaymentService {
         return paymentHistory;
     }
 
-    public void savePaymentHistory(final SavePaymentHistoryRequest request) {
+    public void savePaymentHistory(final PaymentHistoryDto request) {
         paymentHistoryRepository.save(request.toModel());
     }
 }
