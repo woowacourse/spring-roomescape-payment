@@ -44,11 +44,12 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @IntegrationTest
-class ReservationIntegrationTest {
+class ReservationIntegrationTest extends RestDocsConfiguration {
 
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -88,7 +89,7 @@ class ReservationIntegrationTest {
     private String getTokenByLogin(final Member member) {
         Member loginMember = memberRepository.save(member);
         return RestAssured
-                .given().log().all()
+                .given(this.spec).log().all()
                 .body(new LoginRequest(loginMember.getEmail().getEmail(), loginMember.getPassword()))
                 .contentType(ContentType.JSON)
                 .when().post("/login")
@@ -97,7 +98,7 @@ class ReservationIntegrationTest {
 
     @Test
     @DisplayName("방탈출 예약 생성 성공")
-    void createReservationTime() {
+    void createReservation() {
         // given
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
@@ -107,7 +108,7 @@ class ReservationIntegrationTest {
                 1L, 1L, "paymentKey", "orderId", 100_000L);
 
         // when & then
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -119,12 +120,13 @@ class ReservationIntegrationTest {
 
     @Test
     @DisplayName("방탈출 예약 생성 실패: 결제 실패 시, 결제 및 예약 정보 모두 저장되지 않음")
-    void createReservationTime_WhenPaymentClientException() {
+    void createReservation_WhenPaymentClientException() {
         // given
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
 
-        CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(LocalDate.parse("2099-11-30"), 1L, 1L,
+        CreateMyReservationRequest createMyReservationRequest = new CreateMyReservationRequest(
+                LocalDate.parse("2099-11-30"), 1L, 1L,
                 "failPayment", "orderId", 100L);
 
         // stub
@@ -132,7 +134,7 @@ class ReservationIntegrationTest {
                 .thenThrow(new ClientException("결제 오류입니다. 같은 문제가 반복된다면 문의해주세요."));
 
         // when
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createMyReservationRequest)
@@ -147,14 +149,14 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 날짜 형식")
-    void createReservationTime_WhenDimeIsInvalidType() {
+    @DisplayName("방탈출 예약 생성 실패: 날짜 형식")
+    void createReservation_WhenDateIsInvalidType() {
         Map<String, Object> params = new HashMap<>();
         params.put("date", "asdf-11-30");
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(params)
@@ -166,13 +168,13 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 날짜 과거")
-    void createReservationTime_WhenDimeIsPast() {
+    @DisplayName("방탈출 예약 생성 실패: 날짜 과거")
+    void createReservation_WhenDateIsPast() {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2000-11-30"),
                 1L, 1L, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -184,12 +186,12 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 날짜 없음")
-    void createReservationTime_WhenDimeIsNull() {
+    @DisplayName("방탈출 예약 생성 실패: 날짜 없음")
+    void createReservation_WhenDateIsNull() {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(null, 1L, 1L, "paymentKey",
                 "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -202,13 +204,13 @@ class ReservationIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, -1})
-    @DisplayName("방탈출 예약 생성 살패: 시간 식별자 형식")
-    void createReservationTime_WhenTimeIsInvalidType(Long timeId) {
+    @DisplayName("방탈출 예약 생성 실패: 시간 식별자 형식")
+    void createReservation_WhenTimeIsInvalidType(Long timeId) {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2024-11-30"),
                 timeId, 1L, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -220,13 +222,13 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 시간 null")
-    void createReservationTime_WhenTimeIsPast() {
+    @DisplayName("방탈출 예약 생성 실패: 시간 null")
+    void createReservation_WhenTimeIsNull() {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2024-11-30"),
                 null, 1L, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -238,14 +240,14 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 시간 없음")
+    @DisplayName("방탈출 예약 생성 실패: 시간 없음")
     void createReservation_WhenTimeNotExist() {
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2024-11-30"),
                 1L, 1L, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -258,13 +260,13 @@ class ReservationIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, -1})
-    @DisplayName("방탈출 예약 생성 살패: 테마 식별자 형식")
-    void createReservationTime_WhenThemeIdIsInvalidType(Long themeId) {
+    @DisplayName("방탈출 예약 생성 실패: 테마 식별자 형식")
+    void createReservation_WhenThemeIdIsInvalidType(Long themeId) {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2024-11-30"),
                 1L, themeId, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -276,13 +278,13 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 테마 null")
+    @DisplayName("방탈출 예약 생성 실패: 테마 null")
     void createReservation_WhenThemeIsNull() {
         CreateMyReservationRequest createReservationRequest = new CreateMyReservationRequest(
                 LocalDate.parse("2024-11-30"),
                 1L, null, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -294,7 +296,7 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 테마 없음")
+    @DisplayName("방탈출 예약 생성 실패: 테마 없음")
     void createReservation_WhenThemeNotExist() {
         reservationTimeRepository.save(new ReservationTime(LocalTime.parse("20:00")));
 
@@ -302,7 +304,7 @@ class ReservationIntegrationTest {
                 LocalDate.parse("2024-11-30"),
                 1L, 1L, "paymentKey", "orderId", 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -314,7 +316,7 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("방탈출 예약 생성 살패: 중복 예약")
+    @DisplayName("방탈출 예약 생성 실패: 중복 예약")
     void createReservation_WhenTimeAndDateAndThemeExist() {
         Member member = memberRepository.save(new Member("롸키", Role.USER, "loki@naver.com", "loki"));
         ReservationTime reservationTime = reservationTimeRepository.save(
@@ -327,7 +329,7 @@ class ReservationIntegrationTest {
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(), "paymentKey", "orderId",
                 100_000L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(new Member("몰리", Role.USER, "login@naver.com", "hihi")))
                 .body(createReservationRequest)
@@ -348,7 +350,7 @@ class ReservationIntegrationTest {
         Reservation reservation = reservationRepository.save(
                 new Reservation(member, LocalDate.parse("2024-11-23"), reservationTime, theme));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/reservations/" + reservation.getId())
                 .then().log().all()
@@ -362,7 +364,7 @@ class ReservationIntegrationTest {
     @Test
     @DisplayName("방탈출 예약 조회 실패: 예약 없음")
     void getReservation_WhenTimeNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/reservations/1")
                 .then().log().all()
@@ -384,7 +386,8 @@ class ReservationIntegrationTest {
         reservationRepository.save(new Reservation(member, LocalDate.parse("2024-11-23"), reservationTime1, theme));
         reservationRepository.save(new Reservation(member, LocalDate.parse("2024-12-23"), reservationTime1, theme));
 
-        List<FindAvailableTimesResponse> findAvailableTimesResponses = RestAssured.given().log().all()
+        List<FindAvailableTimesResponse> findAvailableTimesResponses = RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/reservations/times?date=2024-11-23&themeId=1")
                 .then().log().all()
@@ -414,7 +417,8 @@ class ReservationIntegrationTest {
         Reservation reservation3 = reservationRepository.save(
                 new Reservation(member, LocalDate.parse("2025-01-23"), reservationTime1, theme));
 
-        List<FindReservationResponse> findReservationResponses = RestAssured.given().log().all()
+        List<FindReservationResponse> findReservationResponses = RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/reservations/search?memberId=1&themeId=1&dateFrom=2024-12-23&dateTo=2025-01-23")
                 .then().log().all()
@@ -440,7 +444,7 @@ class ReservationIntegrationTest {
 
         String token = getTokenByLogin(new Member("파랑", Role.ADMIN, "admin@naver.com", "hihi"));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().delete("/reservations/" + reservation.getId())
@@ -448,7 +452,7 @@ class ReservationIntegrationTest {
 
                 .statusCode(204);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().get("/reservations/1")
@@ -472,14 +476,14 @@ class ReservationIntegrationTest {
         String token = getTokenByLogin(new Member("파랑", Role.ADMIN, "admin@naver.com", "hihi"));
 
         // when & then
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().delete("/reservations/" + reservation.getId())
                 .then().log().all()
                 .statusCode(204);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().get("/reservations/" + reservation.getId())
@@ -487,7 +491,7 @@ class ReservationIntegrationTest {
 
                 .statusCode(200);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().get("/reservations/" + reservation.getId())
@@ -510,7 +514,8 @@ class ReservationIntegrationTest {
         Reservation reservation3 = reservationRepository.save(
                 ReservationFixture.getOneWithMemberTimeTheme(member2, reservationTime, themes.get(2)));
 
-        List<FindReservationWithPaymentResponse> findReservationResponses = RestAssured.given().log().all()
+        List<FindReservationWithPaymentResponse> findReservationResponses = RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member1))
                 .when().get("/members/reservations")
