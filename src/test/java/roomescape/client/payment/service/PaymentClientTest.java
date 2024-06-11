@@ -1,4 +1,4 @@
-package roomescape.client.payment;
+package roomescape.client.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
+import roomescape.client.payment.service.PaymentClient;
 import roomescape.config.ClientConfig;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.TossPaymentExceptionResponse;

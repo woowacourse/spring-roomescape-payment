@@ -1,4 +1,4 @@
-package roomescape.client.payment;
+package roomescape.client.payment.service;
 
 import static roomescape.exception.model.PaymentConfirmExceptionCode.FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING;
 

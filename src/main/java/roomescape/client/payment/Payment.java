@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.client.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import roomescape.client.payment.dto.PaymentCancelDto;
 import roomescape.client.payment.dto.TossPaymentConfirmResponse;
 import roomescape.registration.domain.reservation.domain.Reservation;
 

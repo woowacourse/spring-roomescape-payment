@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
-import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.service.PaymentClient;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;

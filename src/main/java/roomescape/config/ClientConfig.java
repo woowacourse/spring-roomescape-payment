@@ -14,7 +14,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.service.PaymentClient;
 import roomescape.util.LoggerUtil;
 
 @Tag(name = "결제 요청 Client를 위한 설정", description = "결제 요청 Client가 실행될 수 있게 설정하고 요청, 응답 로그를 남긴다.")

@@ -23,7 +23,7 @@ import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.PaymentRepository;
+import roomescape.client.payment.PaymentRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationDto;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;

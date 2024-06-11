@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.payment.Payment;
+import roomescape.client.payment.Payment;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.domain.ReservationStatus;
 import roomescape.registration.domain.reservation.dto.ReservationDto;

@@ -1,9 +1,11 @@
-package roomescape.payment;
+package roomescape.client.payment.service;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.Payment;
+import roomescape.client.payment.PaymentRepository;
+import roomescape.client.payment.service.PaymentClient;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.client.payment.dto.TossPaymentConfirmResponse;
 import roomescape.exception.PaymentConfirmException;

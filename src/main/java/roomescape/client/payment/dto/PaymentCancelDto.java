@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.client.payment.dto;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
