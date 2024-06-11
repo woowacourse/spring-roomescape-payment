@@ -30,7 +30,7 @@ public record MyReservationResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                "예약",
+                reservation.getStatusDescription(),
                 payment.getPaymentKey(),
                 payment.getAmount()
         );
@@ -42,7 +42,7 @@ public record MyReservationResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                "예약",
+                reservation.getStatusDescription(),
                 null,
                 null
         );
@@ -54,7 +54,7 @@ public record MyReservationResponse(
                 waitingReservation.getReservation().getTheme().getName(),
                 waitingReservation.getReservation().getDate(),
                 waitingReservation.getReservation().getTime().getStartAt(),
-                (waitingReservation.calculateOrder()) + "번째 예약대기",
+                waitingReservation.getStatusDescription(),
                 null,
                 null
         );

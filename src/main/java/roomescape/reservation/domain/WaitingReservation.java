@@ -11,7 +11,11 @@ public class WaitingReservation {
         this.previousCount = previousCount;
     }
 
-    public long calculateOrder() {
+    public String getStatusDescription() {
+        return String.format(reservation.getStatusDescription(), calculateOrder());
+    }
+
+    private long calculateOrder() {
         return previousCount + MAX_RESERVATION_NUMBER_IN_TIME_SLOT;
     }
 

@@ -12,17 +12,16 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 class WaitingReservationTest {
     @Test
-    @DisplayName("예약 대기 순서를 계산한다.")
+    @DisplayName("예약 대기 순서를 포함한 상태 이름을 반환한다.")
     void calculateOrder() {
         // given
         WaitingReservation waitingReservation = new WaitingReservation(
                 MIA_RESERVATION(new ReservationTime(MIA_RESERVATION_TIME), WOOTECO_THEME(), USER_MIA(), WAITING), 1);
 
         // when
-        long order = waitingReservation.calculateOrder();
+        String result = waitingReservation.getStatusDescription();
 
         // then
-        assertThat(order).isEqualTo(2);
+        assertThat(result).isEqualTo("2번째 예약대기");
     }
-
 }

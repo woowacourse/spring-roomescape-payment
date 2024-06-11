@@ -5,13 +5,15 @@ import roomescape.global.exception.ViolationException;
 import java.util.Arrays;
 
 public enum ReservationStatus {
-    BOOKING("BOOKING"),
-    WAITING("WAITING");
+    BOOKING("BOOKING", "예약"),
+    WAITING("WAITING", "%d번째 예약대기");
 
     private final String identifier;
+    private final String description;
 
-    ReservationStatus(String identifier) {
+    ReservationStatus(String identifier, String description) {
         this.identifier = identifier;
+        this.description = description;
     }
 
     public static ReservationStatus from(String identifier) {
@@ -31,5 +33,9 @@ public enum ReservationStatus {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

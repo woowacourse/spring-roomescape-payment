@@ -113,4 +113,8 @@ public class Reservation {
     public ReservationStatus getStatus() {
         return status;
     }
+
+    public String getStatusDescription() {
+        return status.getDescription();
+    }
 }
