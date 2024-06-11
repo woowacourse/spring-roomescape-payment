@@ -47,8 +47,10 @@ public class Payment {
         this.reservation = reservation;
     }
 
-    public void cancel() {
-        status = PaymentStatus.CANCELED;
+    public void cancel(ZonedDateTime requestedAt, ZonedDateTime approvedAt, PaymentStatus status) {
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
+        this.status = status;
     }
 
     public boolean isCancelStatus() {

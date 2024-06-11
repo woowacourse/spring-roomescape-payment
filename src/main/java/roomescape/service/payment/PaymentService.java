@@ -6,6 +6,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.exception.payment.NotFoundPaymentException;
+import roomescape.service.payment.dto.PaymentCancelOutput;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
@@ -32,8 +33,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findByReservation(reservation)
                 .orElseThrow(NotFoundPaymentException::new);
 
-        paymentClient.cancelPayment(payment);
-        payment.cancel();
+        PaymentCancelOutput cancelOutput = paymentClient.cancelPayment(payment);
+        payment.cancel(cancelOutput.requestedAt(), cancelOutput.approvedAt(), cancelOutput.status());
     }
 
     public void deleteReservationPayment(Reservation reservation) {
