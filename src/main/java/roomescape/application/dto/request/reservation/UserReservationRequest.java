@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import roomescape.application.dto.request.payment.PaymentRequest;
 
-@Schema(name = "사용자 예약 정보")
+@Schema(name = "사용자 예약 요청 정보")
 public record UserReservationRequest(
         @Schema(description = "예약 날짜", example = "2024-10-10")
         @Future(message = "과거에 대한 예약은 할 수 없습니다.")

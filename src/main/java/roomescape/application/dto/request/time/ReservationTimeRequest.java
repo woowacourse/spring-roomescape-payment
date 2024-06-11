@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import roomescape.domain.reservationdetail.ReservationTime;
 
-@Schema(name = "예약 시간 정보")
+@Schema(name = "예약 시간 요청 정보")
 public record ReservationTimeRequest(
         @Schema(description = "예약 시간", example = "10:00")
         @NotNull(message = "시간은 빈값을 허용하지 않습니다.")

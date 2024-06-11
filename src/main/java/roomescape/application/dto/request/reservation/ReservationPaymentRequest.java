@@ -3,7 +3,7 @@ package roomescape.application.dto.request.reservation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.application.dto.request.payment.PaymentRequest;
 
-@Schema(name = "예약 결제 정보")
+@Schema(name = "예약 결제 요청 정보")
 public record ReservationPaymentRequest(
         @Schema(description = "예약 ID", example = "1")
         Long reservationId,

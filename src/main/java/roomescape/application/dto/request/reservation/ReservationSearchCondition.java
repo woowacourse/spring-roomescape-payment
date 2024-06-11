@@ -15,11 +15,11 @@ public record ReservationSearchCondition(
         @NotNull(message = "종료일은 비어있을 수 없습니다.")
         LocalDate end,
 
-        @Schema(description = "예약자명", example = "망쵸")
+        @Schema(description = "예약자 ID", example = "1")
         @Positive(message = "예약자명은 비어있을 수 없습니다.")
         Long memberId,
 
-        @Schema(description = "예약 시간 ID", example = "1")
+        @Schema(description = "테마 ID", example = "1")
         @Positive(message = "테마명은 비어있을 수 없습니다.")
         Long themeId
 ) {

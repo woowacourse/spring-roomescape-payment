@@ -2,7 +2,7 @@ package roomescape.application.dto.request.payment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "결제 정보")
+@Schema(name = "결제 요청 정보")
 public record PaymentRequest(
         @Schema(description = "결제 금액", example = "10000")
         Long amount,
