@@ -25,7 +25,7 @@ public class MemberReservationResponse {
         this.time = reservation.getTime().getStartAt();
         this.status = "예약";
         this.paymentkey = reservation.getPayment().getPaymentKey();
-        this.amount = reservation.getPayment().getTotalAmount();
+        this.amount = reservation.getPayment().getAmount().longValue();
     }
 
     public MemberReservationResponse(WaitingWithRank waitingWithRank) {

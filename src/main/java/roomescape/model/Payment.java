@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Embeddable;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
 public class Payment {
@@ -11,21 +13,21 @@ public class Payment {
     private String paymentKey;
 
     @ColumnDefault("0")
-    private Long totalAmount;
+    private BigDecimal amount;
 
     public Payment() {
     }
 
-    public Payment(final Long totalAmount, final String paymentKey) {
-        this.totalAmount = totalAmount;
+    public Payment(String paymentKey, Long amount) {
         this.paymentKey = paymentKey;
-    }
-
-    public Long getTotalAmount() {
-        return totalAmount;
+        this.amount = BigDecimal.valueOf(amount);
     }
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
     }
 }

@@ -1,14 +1,14 @@
 package roomescape.service.httpclient;
 
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.request.PaymentRequest;
 import roomescape.exception.PaymentException;
-import roomescape.model.Payment;
+import roomescape.request.PaymentRequest;
+import roomescape.response.PaymentResponse;
 
 public abstract class TossPaymentClient {
     protected static final String CONFIRM_URI = "/confirm";
 
-    public Payment confirm(PaymentRequest paymentRequest) {
+    public PaymentResponse confirm(PaymentRequest paymentRequest) {
         try {
             return request(paymentRequest);
         } catch (ResourceAccessException e) {
@@ -16,5 +16,5 @@ public abstract class TossPaymentClient {
         }
     }
 
-    protected abstract Payment request(final PaymentRequest paymentRequest);
+    protected abstract PaymentResponse request(final PaymentRequest paymentRequest);
 }
