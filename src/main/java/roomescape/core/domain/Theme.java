@@ -20,7 +20,7 @@ public class Theme {
 
     private String thumbnail;
 
-    public Theme() {
+    protected Theme() {
     }
 
     public Theme(final String name, final String description, final String thumbnail) {

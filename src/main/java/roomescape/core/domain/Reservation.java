@@ -47,7 +47,7 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus status;
 
-    public Reservation() {
+    protected Reservation() {
     }
 
     public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,

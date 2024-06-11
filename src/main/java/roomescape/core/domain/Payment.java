@@ -1,5 +1,6 @@
 package roomescape.core.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,7 +47,7 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(final Reservation reservation, final Member member, final String paymentKey, final String orderId,
@@ -65,6 +66,10 @@ public class Payment {
         this.status = status;
     }
 
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
+    }
+
     public Long getId() {
         return id;
     }
@@ -77,23 +82,19 @@ public class Payment {
         return member;
     }
 
-    public @NotNull(message = "paymentKey는 비어있을 수 없습니다.") String getPaymentKey() {
+    public String getPaymentKey() {
         return paymentKey;
     }
 
-    public @NotNull(message = "orderId는 비어있을 수 없습니다.") String getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public @Min(0) @Max(Integer.MAX_VALUE) @NotNull(message = "결제 금액은 비어있을 수 없습니다.") Integer getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public @NotNull(message = "결제 상태는 비어있을 수 없습니다.") PaymentStatus getStatus() {
+    public PaymentStatus getStatus() {
         return status;
-    }
-
-    public void cancel() {
-        this.status = PaymentStatus.CANCELED;
     }
 }
