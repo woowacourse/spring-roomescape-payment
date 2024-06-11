@@ -10,6 +10,7 @@ import roomescape.BasicAcceptanceTest;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.dto.request.reservation.AdminReservationRequest;
+import roomescape.exception.NotFoundException;
 import roomescape.exception.RoomescapeException;
 
 class ReservationCreateServiceTest extends BasicAcceptanceTest {
@@ -27,7 +28,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
         );
 
         assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 예약 시간입니다.");
     }
 
@@ -39,7 +40,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
         );
 
         assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 테마입니다.");
     }
 

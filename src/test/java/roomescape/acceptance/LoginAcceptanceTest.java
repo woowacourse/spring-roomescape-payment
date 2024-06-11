@@ -31,11 +31,11 @@ class LoginAcceptanceTest extends BasicAcceptanceTest {
                 dynamicTest("role이 USER인 계정으로 로그인을 한다", () -> userToken.set(
                         LoginTokenProvider.login("member@wooteco.com", "wootecoCrew6!", 200))),
                 dynamicTest("로그인한 계정의 이름을 확인한다", () -> loginCheck(userToken.get(), 200, "회원")),
-                dynamicTest("admin 페이지에 접속한다", () -> moveToAdminPage(userToken.get(), 403)),
-                dynamicTest("admin 예약 관리 페이지에 접속한다", () -> moveToReservationAdminPage(userToken.get(), 403)),
-                dynamicTest("admin 시간 관리 페이지에 접속한다", () -> moveToTimeAdminPage(userToken.get(), 403)),
-                dynamicTest("admin 테마 관리 페이지에 접속한다", () -> moveToThemeAdminPage(userToken.get(), 403)),
-                dynamicTest("admin 예약 대기 관리 페이지에 접속한다", () -> moveToWaitingAdminPage(userToken.get(), 403)),
+                dynamicTest("admin 페이지에 접속한다", () -> moveToAdminPage(userToken.get(), 401)),
+                dynamicTest("admin 예약 관리 페이지에 접속한다", () -> moveToReservationAdminPage(userToken.get(), 401)),
+                dynamicTest("admin 시간 관리 페이지에 접속한다", () -> moveToTimeAdminPage(userToken.get(), 401)),
+                dynamicTest("admin 테마 관리 페이지에 접속한다", () -> moveToThemeAdminPage(userToken.get(), 401)),
+                dynamicTest("admin 예약 대기 관리 페이지에 접속한다", () -> moveToWaitingAdminPage(userToken.get(), 401)),
                 dynamicTest("로그아웃 한다", () -> logout(200))
         );
     }

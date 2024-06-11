@@ -12,9 +12,10 @@ import roomescape.BasicAcceptanceTest;
 import roomescape.TestFixtures;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.ReservationTimeRepository;
-import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.request.reservation.ReservationTimeRequest;
+import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.response.reservation.ReservationTimeResponse;
+import roomescape.exception.NotFoundException;
 import roomescape.exception.RoomescapeException;
 
 class ReservationTimeServiceTest extends BasicAcceptanceTest {
@@ -67,7 +68,7 @@ class ReservationTimeServiceTest extends BasicAcceptanceTest {
     @Test
     void invalidNotExistTime() {
         assertThatThrownBy(() -> reservationTimeService.deleteById(99L))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 예약 시간입니다.");
     }
 

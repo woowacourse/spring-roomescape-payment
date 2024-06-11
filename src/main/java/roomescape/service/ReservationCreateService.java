@@ -2,7 +2,6 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -18,6 +17,7 @@ import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
+import roomescape.exception.NotFoundException;
 import roomescape.exception.RoomescapeException;
 
 @Service
@@ -91,41 +91,41 @@ public class ReservationCreateService {
 
     private ReservationTime getReservationTime(Long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 예약 시간입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약 시간입니다."));
     }
 
     private Theme getTheme(Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
     }
 
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
     }
 
     private void validateRequestDateAfterCurrentTime(LocalDateTime dateTime) {
         LocalDateTime currentTime = LocalDateTime.now();
         if (dateTime.isBefore(currentTime)) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "현재 시간보다 과거로 예약할 수 없습니다.");
+            throw new RoomescapeException("현재 시간보다 과거로 예약할 수 없습니다.");
         }
     }
 
     private void validateUniqueReservation(LocalDate date, Long timeId, Long themeId) {
         if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재합니다.");
+            throw new RoomescapeException("예약이 존재합니다.");
         }
     }
 
     private void validateReservationNotExist(LocalDate date, Long timeId, Long themeId) {
         if (!reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재하지 않아서 예약 대기를 할 수 없습니다.");
+            throw new RoomescapeException("예약이 존재하지 않아서 예약 대기를 할 수 없습니다.");
         }
     }
 
     private void validateIsExistMyReservation(LocalDate date, Long timeId, Long themeId, Long memberId) {
         if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(date, timeId, themeId, memberId)) {
-            throw new RoomescapeException(HttpStatus.CONFLICT, "이미 예약을 했습니다.");
+            throw new RoomescapeException("이미 예약을 했습니다.");
         }
     }
 }

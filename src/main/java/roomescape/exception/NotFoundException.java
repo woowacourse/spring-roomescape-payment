@@ -1,9 +1,9 @@
 package roomescape.exception;
 
-public class RoomescapeException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
     private final ExceptionResponse exceptionResponse;
 
-    public RoomescapeException(String message) {
+    public NotFoundException(String message) {
         super(message);
         this.exceptionResponse = new ExceptionResponse(message);
     }

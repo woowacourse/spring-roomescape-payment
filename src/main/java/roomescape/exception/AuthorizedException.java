@@ -1,9 +1,9 @@
 package roomescape.exception;
 
-public class RoomescapeException extends RuntimeException {
+public class AuthorizedException extends RuntimeException {
     private final ExceptionResponse exceptionResponse;
 
-    public RoomescapeException(String message) {
+    public AuthorizedException(String message) {
         super(message);
         this.exceptionResponse = new ExceptionResponse(message);
     }

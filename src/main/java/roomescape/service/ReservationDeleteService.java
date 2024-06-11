@@ -1,6 +1,5 @@
 package roomescape.service;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.CanceledReservation;
@@ -8,7 +7,7 @@ import roomescape.domain.reservation.CanceledReservationRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.NotFoundException;
 
 @Service
 @Transactional
@@ -30,8 +29,7 @@ public class ReservationDeleteService {
     @Transactional
     public void deleteById(long id) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
-                        String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
         CanceledReservation canceledReservation = canceledReservationRepository.save(reservation.canceled());
         paymentService.deletePayment(reservation, canceledReservation);
         reservationRepository.deleteById(reservation.getId());

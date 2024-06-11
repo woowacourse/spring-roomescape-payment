@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.HttpStatus;
 import roomescape.exception.RoomescapeException;
 
 class EmailTest {
@@ -24,8 +23,7 @@ class EmailTest {
     void createNullOrEmptyException(String email) {
         assertThatCode(() -> new Email(email))
                 .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .hasMessage("이메일은 필수 입력값 입니다.");
     }
 
     @DisplayName("이메일 형식이 올바르지 않은 경우 예외가 발생한다.")
@@ -34,8 +32,7 @@ class EmailTest {
         String email = "google.com";
         assertThatCode(() -> new Email(email))
                 .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .hasMessage("이메일 형식이 올바르지 않습니다.");
     }
 
     @DisplayName("이메일의 길이가 최소 11자 미만이거나 40자를 초과하면 예외가 발생한다.")
@@ -44,7 +41,6 @@ class EmailTest {
     void createInvalidEmailLength(String email) {
         assertThatCode(() -> new Email(email))
                 .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .hasMessageContaining("이메일의 길이는 최소 11자 이상 40자 이하만 가능합니다. 현재 이메일 길이:");
     }
 }

@@ -25,7 +25,7 @@ import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
 import roomescape.dto.response.reservation.MyReservationWebResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.NotFoundException;
 
 @Sql("/setting-big-reservation.sql")
 class ReservationServiceTest extends BasicAcceptanceTest {
@@ -73,7 +73,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     @Test
     void invalidNotExistReservation() {
         assertThatThrownBy(() -> reservationService.deleteById(99L))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage(String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", 99));
     }
 

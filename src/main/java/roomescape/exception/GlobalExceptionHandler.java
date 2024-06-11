@@ -15,9 +15,23 @@ public class GlobalExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(RoomescapeApplication.class);
 
     @ExceptionHandler
-    public ResponseEntity<RoomescapeExceptionResponse> roomescapeExceptionHandler(RoomescapeException exception) {
+    public ResponseEntity<ExceptionResponse> roomescapeExceptionHandler(RoomescapeException exception) {
         logError(exception);
-        return ResponseEntity.status(exception.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(exception.getRoomescapeExceptionResponse());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> NotFoundExceptionHandler(NotFoundException exception) {
+        logError(exception);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(exception.getRoomescapeExceptionResponse());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> AuthorizedExceptionHandler(AuthorizedException exception) {
+        logError(exception);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(exception.getRoomescapeExceptionResponse());
     }
 

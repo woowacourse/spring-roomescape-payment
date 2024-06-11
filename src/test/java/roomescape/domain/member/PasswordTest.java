@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.HttpStatus;
 import roomescape.exception.RoomescapeException;
 
 class PasswordTest {
@@ -15,7 +14,6 @@ class PasswordTest {
     void createInvalidPasswordTest(String password) {
         assertThatCode(() -> new Password(password))
                 .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .hasMessage("비밀번호는 8~20자 범위의 최소 하나의 대소문자, 숫자, 특수문자가 포함되어야 합니다.");
     }
 }

@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
-import org.springframework.http.HttpStatus;
 import roomescape.exception.RoomescapeException;
 
 @Entity
@@ -34,13 +33,13 @@ public class Member {
 
     public Member(Long id, PlayerName name, Email email, Password password, Role role) {
         if (name == null) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "이름은 필수 입력값 입니다.");
+            throw new RoomescapeException("이름은 필수 입력값 입니다.");
         }
         if (email == null) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "이메일은 필수 입력값 입니다.");
+            throw new RoomescapeException("이메일은 필수 입력값 입니다.");
         }
         if (password == null) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "비밀번호는 필수 입력값 입니다.");
+            throw new RoomescapeException("비밀번호는 필수 입력값 입니다.");
         }
         this.id = id;
         this.name = name;
