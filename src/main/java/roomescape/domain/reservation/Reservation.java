@@ -113,7 +113,7 @@ public class Reservation {
         return Optional.ofNullable(payment);
     }
 
-    public void setPayment(Payment payment) {
+    public void updatePayment(Payment payment) {
         this.payment = payment;
     }
 

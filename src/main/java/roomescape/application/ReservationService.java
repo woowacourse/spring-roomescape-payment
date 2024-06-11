@@ -45,7 +45,7 @@ public class ReservationService {
             PaymentRequest paymentRequest = request.toPaymentRequest();
             PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
             Payment payment = paymentRepository.save(paymentResponse.toPayment());
-            reservation.setPayment(payment);
+            reservation.updatePayment(payment);
         }
         return ReservationResponse.from(reservation);
     }
@@ -69,7 +69,7 @@ public class ReservationService {
         PaymentResponse paymentResponse = paymentRestClient.confirm(paymentRequest);
         Payment payment = paymentRepository.save(paymentResponse.toPayment());
 
-        reservation.setPayment(payment);
+        reservation.updatePayment(payment);
         reservation.toReserved();
         return ReservationResponse.from(reservation);
     }
