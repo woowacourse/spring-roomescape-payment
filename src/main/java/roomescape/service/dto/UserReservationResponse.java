@@ -5,54 +5,59 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.Waiting;
-import roomescape.domain.reservation.WaitingRank;
-import roomescape.domain.reservation.slot.ReservationSlot;
 
 public record UserReservationResponse(
         long id,
         String theme,
         LocalDate date,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        String paymentKey,
+        Integer amount
 ) {
 
-        public static Stream<UserReservationResponse> reservationsToResponseStream(List<Reservation> reservation) {
-                return reservation.stream()
-                        .map(UserReservationResponse::createByReservation);
+        public static Stream<UserReservationResponse> reservationsToResponseStream(List<UserBookedReservationResponse> userBookedReservationRespons, List<PaymentResponse> paymentResponses) {
+                return userBookedReservationRespons.stream()
+                        .map(bookedMember -> createByReservation(bookedMember, paymentResponses));
         }
 
-        private static UserReservationResponse createByReservation(Reservation reservation) {
-                ReservationSlot slot = reservation.getSlot();
+        private static UserReservationResponse createByReservation(
+                UserBookedReservationResponse userBookedReservationResponse, List<PaymentResponse> paymentResponses) {
+                Optional<PaymentResponse> payment = paymentResponses.stream()
+                        .filter(paymentResponse -> paymentResponse.reservationId().equals(userBookedReservationResponse.reservationId()))
+                        .findFirst();
+
                 return new UserReservationResponse(
-                        reservation.getId(),
-                        slot.getTheme().getName(),
-                        slot.getDate(),
-                        slot.getTime().getStartAt(),
-                        ReservationStatus.BOOKED.getValue(),
-                        0L
+                        userBookedReservationResponse.id(),
+                        userBookedReservationResponse.theme(),
+                        userBookedReservationResponse.date(),
+                        userBookedReservationResponse.startAt(),
+                        payment.isPresent() ?  ReservationStatus.BOOKED.getValue() : ReservationStatus.WAIT_PAYMENT.getValue(),
+                        0L,
+                        payment.isPresent() ? payment.get().paymentKey() : "",
+                        payment.isPresent() ? payment.get().amount() : 0
                 );
         }
 
-        public static Stream<UserReservationResponse> waitingsToResponseStream(List<WaitingRank> waitingRanks) {
+        public static Stream<UserReservationResponse> waitingsToResponseStream(List<WaitingRankResponse> waitingRanks) {
                 return waitingRanks.stream()
                         .map(UserReservationResponse::createByWaiting);
         }
 
-        private static UserReservationResponse createByWaiting(WaitingRank waitingRank) {
-                Waiting waiting = waitingRank.waiting();
-                ReservationSlot slot = waiting.getSlot();
+        private static UserReservationResponse createByWaiting(WaitingRankResponse waitingRank) {
                 return new UserReservationResponse(
-                        waiting.getId(),
-                        slot.getTheme().getName(),
-                        slot.getDate(),
-                        slot.getTime().getStartAt(),
+                        waitingRank.id(),
+                        waitingRank.theme(),
+                        waitingRank.date(),
+                        waitingRank.startAt(),
                         ReservationStatus.WAIT.getValue(),
-                        waitingRank.rank()
+                        waitingRank.rank(),
+                        "",
+                        0
                 );
         }
 

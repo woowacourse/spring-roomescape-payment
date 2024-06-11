@@ -50,7 +50,7 @@ class ReservationTimeControllerTest extends IntegrationTestSupport {
                             .statusCode(200).body("size()", is(timeSize + 1));
                 }),
                 dynamicTest("유효하지 않은 형식으로 시간을 추가할 수 없다.", () -> {
-                    Map<String, String> param = Map.of("startAt", "12:12:12");
+                    Map<String, String> param = Map.of("time", "12:12:12");
 
                     RestAssured.given().log().all()
                             .contentType(ContentType.JSON)

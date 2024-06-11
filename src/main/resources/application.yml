@@ -1,15 +1,15 @@
 spring:
-  h2:
-    console:
-      enabled: true
   datasource:
-    url: jdbc:h2:mem:database
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.123:3306/roomescape?serverTimezone=Asia/Seoul
+    username: root
+    password: 1q2w3e4r!
   jpa:
     defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
-        ddl-auto: create-drop
+        ddl-auto: validate
         format_sql: true
 
 security:

@@ -1,5 +1,5 @@
 let isEditing = false;
-const RESERVATION_API_ENDPOINT = '/admin/reservations';
+const RESERVATION_API_ENDPOINT = '/admin/reservations/booked';
 const TIME_API_ENDPOINT = '/admin/times';
 const THEME_API_ENDPOINT = '/admin/themes';
 const MEMBER_API_ENDPOINT = '/admin/members';
@@ -32,10 +32,11 @@ function render(data) {
           예약 목록 조회 API 응답에 맞게 적용
     */
     row.insertCell(0).textContent = item.id;              // 예약 id
-    row.insertCell(1).textContent = item.member.name;     // 사용자 name
-    row.insertCell(2).textContent = item.theme.name;      // 테마 name
+    row.insertCell(1).textContent = item.name;     // 사용자 name
+    row.insertCell(2).textContent = item.theme;      // 테마 name
     row.insertCell(3).textContent = item.date;            // date
-    row.insertCell(4).textContent = item.time.startAt;    // 예약 시간 startAt
+    row.insertCell(4).textContent = item.time;    // 예약 시간 startAt
+    row.insertCell(5).textContent = item.status;    // 예약 시간 startAt
 
     const actionCell = row.insertCell(row.cells.length);
     actionCell.appendChild(createActionButton('삭제', 'btn-danger', deleteRow));
@@ -192,7 +193,7 @@ function applyFilter(event) {
   TODO: [6단계] 예약 검색 - 조건에 따른 예약 조회 API 호출
         요청 포맷에 맞게 설정
   */
-  fetch(`/admin/reservations?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { // 예약 검색 API 호출
+  fetch(`/admin/reservations/booked?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { // 예약 검색 API 호출
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -211,7 +212,7 @@ function requestCreate(reservation) {
     body: JSON.stringify(reservation)
   };
 
-  return fetch('/admin/reservations', requestOptions)
+  return fetch('/admin/reservations/booked', requestOptions)
       .then(response => {
         if (response.status === 201) return response.json();
         throw new Error('Create failed');

@@ -10,6 +10,7 @@ import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
@@ -33,11 +34,16 @@ public class PaymentConfig {
 
     @Bean
     public RestClientCustomizer restClientCustomizer() {
-        return (restClientBuilder) -> restClientBuilder
+        return restClientBuilder -> restClientBuilder
                 .requestFactory(clientHttpRequestFactory())
                 .baseUrl("https://api.tosspayments.com")
+                .requestInterceptor(clientHttpRequestInterceptor())
                 .defaultHeader("Authorization", createAuthorizationHeader())
                 .defaultStatusHandler(responseErrorHandler());
+    }
+
+    private ClientHttpRequestInterceptor clientHttpRequestInterceptor() {
+        return new PaymentClientHttpRequestInterceptor();
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {

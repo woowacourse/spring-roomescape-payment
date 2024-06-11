@@ -4,40 +4,45 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import roomescape.domain.reservation.BookedMember;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.Waiting;
-import roomescape.domain.reservation.slot.ReservationSlot;
+import roomescape.domain.reservation.WaitingMember;
 
 public record ReservationResponse(
         Long id,
+        Long reservationId,
         MemberResponse member,
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme,
         ReservationStatus status
 ) {
 
-    public static ReservationResponse createByWaiting(Waiting waiting) {
-        ReservationSlot slot = waiting.getReservation().getSlot();
+    public static ReservationResponse createByWaiting(WaitingMember waitingMember) {
+        Reservation reservation = waitingMember.getReservation();
 
         return new ReservationResponse(
-                waiting.getId(),
-                MemberResponse.from(waiting.getMember()),
-                slot.getDate(),
-                new ReservationTimeResponse(slot.getTime()),
-                new ThemeResponse(slot.getTheme()),
+                waitingMember.getId(),
+                reservation.getId(),
+                roomescape.service.dto.MemberResponse.from(waitingMember.getMember()),
+                reservation.getDate(),
+                new ReservationTimeResponse(reservation.getTime()),
+                new ThemeResponse(reservation.getTheme()),
                 ReservationStatus.WAIT
         );
     }
 
-    public static ReservationResponse createByReservation(Reservation reservation) {
+    public static ReservationResponse createByBooked(BookedMember bookedMember) {
+        Reservation reservation = bookedMember.getReservation();
+
         return new ReservationResponse(
+                bookedMember.getId(),
                 reservation.getId(),
-                MemberResponse.from(reservation.getMember()),
-                reservation.getSlot().getDate(),
-                new ReservationTimeResponse(reservation.getSlot().getTime()),
-                new ThemeResponse(reservation.getSlot().getTheme()),
+                roomescape.service.dto.MemberResponse.from(bookedMember.getMember()),
+                reservation.getDate(),
+                new ReservationTimeResponse(reservation.getTime()),
+                new ThemeResponse(reservation.getTheme()),
                 ReservationStatus.BOOKED
         );
     }

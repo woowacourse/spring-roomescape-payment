@@ -1,7 +1,7 @@
 package roomescape.domain.reservation;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -10,90 +10,114 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import roomescape.domain.member.Member;
-import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.exception.RoomEscapeBusinessException;
 
 @Entity
-@SQLRestriction("is_deleted = false")
-@SQLDelete(sql = "UPDATE reservation SET is_deleted = true where id = ?")
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private LocalDate date;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "time_id", nullable = false)
+    private ReservationTime time;
 
-    @Embedded
-    private ReservationSlot slot;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theme_id", nullable = false)
+    private Theme theme;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Waiting> waitings = new ArrayList<>();
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookedMember bookedMember;
 
-    private boolean isDeleted = false;
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WaitingMember> waitingMembers = new ArrayList<>();
 
-    public Reservation(Member member, ReservationSlot slot) {
-        this(null, member, slot);
-    }
-
-    public Reservation(Long id, Member member, ReservationSlot slot) {
-        this.id = id;
-        this.member = member;
-        this.slot = slot;
+    public Reservation(LocalDate date, ReservationTime time, Theme theme) {
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
     }
 
     protected Reservation() {
     }
 
-    public Waiting addWaiting(Member member) {
+    public BookedMember book(Member member) {
+        validateAlreadyBooked();
+
+        this.bookedMember = new BookedMember(this, member);
+        return bookedMember;
+    }
+
+    private void validateAlreadyBooked() {
+        if (isBooked() || hasWaiting()) {
+            throw new RoomEscapeBusinessException("이미 예약한 사람이 존재합니다.");
+        }
+    }
+
+    public WaitingMember addWaiting(Member member) {
         validateDuplicated(member);
 
-        Waiting waiting = new Waiting(member, this);
-        waitings.add(waiting);
+        WaitingMember waitingMember = new WaitingMember(member, this);
+        waitingMembers.add(waitingMember);
 
-        return waiting;
+        return waitingMember;
     }
 
     private void validateDuplicated(Member member) {
-        boolean isDuplicated = waitings.stream()
+        boolean isDuplicated = waitingMembers.stream()
                 .anyMatch(waiting -> waiting.isMember(member));
 
-        if (this.member.equals(member) || isDuplicated) {
+        if (bookedMember.isMember(member) || isDuplicated) {
             throw new RoomEscapeBusinessException("중복된 예약을 할 수 없습니다.");
         }
     }
 
-    public void approveWaiting() {
+    public void cancelBooked() {
         if (hasNotWaiting()) {
-            throw new RoomEscapeBusinessException("예약 대기자가 없습니다.");
+            this.bookedMember = null;
+            return;
         }
 
-        Waiting waiting = waitings.remove(0);
-        this.member = waiting.getMember();
+        WaitingMember waitingMember = waitingMembers.remove(0);
+        this.bookedMember.changeMember(waitingMember.getMember());
     }
 
-    public boolean hasNotWaiting() {
-        return waitings.isEmpty();
+    public boolean isBooked() {
+        return bookedMember != null;
+    }
+
+    private boolean hasNotWaiting() {
+        return !hasWaiting();
+    }
+
+    private boolean hasWaiting() {
+        return !waitingMembers.isEmpty();
     }
 
     public Long getId() {
         return id;
     }
 
-    public Member getMember() {
-        return member;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public ReservationSlot getSlot() {
-        return slot;
+    public ReservationTime getTime() {
+        return time;
+    }
+
+    public Theme getTheme() {
+        return theme;
     }
 
     @Override

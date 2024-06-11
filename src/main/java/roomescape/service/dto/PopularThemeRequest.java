@@ -8,11 +8,11 @@ import java.time.LocalDate;
 
 public record PopularThemeRequest(
         @NotNull
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate startDate,
 
         @NotNull
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate endDate,
 
         @NotNull

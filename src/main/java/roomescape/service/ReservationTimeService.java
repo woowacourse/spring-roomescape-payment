@@ -4,11 +4,11 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.slot.ReservationTime;
-import roomescape.domain.reservation.slot.ReservationTimeRepository;
-import roomescape.domain.reservation.slot.Theme;
-import roomescape.domain.reservation.slot.ThemeRepository;
+import roomescape.domain.reservation.repository.ReservationRepository;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.repository.ReservationTimeRepository;
+import roomescape.domain.reservation.Theme;
+import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.service.dto.ReservationTimeBookedRequest;
 import roomescape.service.dto.ReservationTimeBookedResponse;
@@ -65,7 +65,7 @@ public class ReservationTimeService {
         Theme foundTheme = themeRepository.findById(reservationTimeBookedRequest.themeId())
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 테마입니다."));
 
-        List<ReservationTime> bookedTimes = reservationRepository.findTimesByDateAndTheme(
+        List<ReservationTime> bookedTimes = reservationRepository.findBookedTimesByDateAndTheme(
                 reservationTimeBookedRequest.date(),
                 foundTheme
         );
@@ -82,7 +82,7 @@ public class ReservationTimeService {
         ReservationTime foundTime = reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 시간입니다."));
 
-        if (reservationRepository.existsBySlot_Time(foundTime)) {
+        if (reservationRepository.existsByTime(foundTime)) {
             throw new RoomEscapeBusinessException("예약이 존재하는 시간입니다.");
         }
 

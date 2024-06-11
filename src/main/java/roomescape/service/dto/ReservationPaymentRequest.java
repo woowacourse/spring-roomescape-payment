@@ -14,7 +14,7 @@ public record ReservationPaymentRequest(
 
         @NotNull
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate date,
 
         @NotNull
@@ -35,12 +35,12 @@ public record ReservationPaymentRequest(
         this(memberId, date, timeId, themeId, null, null, null);
     }
 
-    public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(amount, orderId, paymentKey);
-    }
-
     public ReservationRequest toReservationRequest() {
         return new ReservationRequest(memberId, date, timeId, themeId);
+    }
+
+    public PaymentApproveRequest toPaymentApproveRequest(Long reservationid) {
+        return new PaymentApproveRequest(reservationid, memberId, paymentKey, orderId, amount);
     }
 }
 

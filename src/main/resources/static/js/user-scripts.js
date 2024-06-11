@@ -93,7 +93,7 @@ function login() {
 
 function signup() {
   // Redirect to signup page
-  window.location.href = '/signup';
+  window.location.href = 'signup';
 }
 
 function register(event) {
@@ -135,7 +135,7 @@ console.log(event);
       .then(data => {
         // 성공적인 응답 처리
         console.log('Signup successful:', data);
-        // window.location.href = '/login';
+        window.location.href = 'login';
       })
       .catch(error => {
         // 에러 처리

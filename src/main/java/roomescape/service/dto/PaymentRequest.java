@@ -4,8 +4,8 @@ import roomescape.exception.RoomEscapeBusinessException;
 
 public record PaymentRequest(
         Integer amount,
-        String orderId,
-        String paymentKey
+        String paymentKey,
+        String orderId
 ) {
     public PaymentRequest {
         validateAmount(amount);

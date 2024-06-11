@@ -1,5 +1,6 @@
 package roomescape.infrastructure;
 
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,27 @@ public class TossPaymentClient implements PaymentClient {
             restClient.post()
                     .uri("/v1/payments/confirm")
                     .body(request)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (PaymentException e) {
+            throw e;
+        } catch (ResourceAccessException e) {
+            logger.error(e.getMessage(), e);
+            throw new PaymentException(PaymentErrorMessage.TIME_OUT);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new PaymentException(PaymentErrorMessage.DEFAULT);
+        }
+    }
+
+    @Override
+    public void requestRefund(String paymentKey) {
+        Map<String, String> params = Map.of("cancelReason", "사장님 권한 취소");
+
+        try {
+            restClient.post()
+                    .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
+                    .body(params)
                     .retrieve()
                     .toBodilessEntity();
         } catch (PaymentException e) {

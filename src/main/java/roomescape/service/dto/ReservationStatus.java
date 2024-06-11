@@ -1,7 +1,7 @@
 package roomescape.service.dto;
 
 public enum ReservationStatus {
-    BOOKED("예약"), WAIT("예약대기");
+    BOOKED("예약"), WAIT("예약대기"), WAIT_PAYMENT("결제 대기");
 
     private final String value;
 

@@ -1,11 +1,13 @@
 package roomescape.domain.reservation.dto;
 
-import roomescape.domain.member.Member;
-import roomescape.domain.reservation.slot.ReservationSlot;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public record WaitingReadOnly(
         Long id,
-        Member member,
-        ReservationSlot slot
+        String name,
+        LocalDate date,
+        LocalTime time,
+        String theme
 ) {
 }

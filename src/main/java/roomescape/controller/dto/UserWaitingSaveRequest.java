@@ -6,12 +6,12 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
-import roomescape.service.dto.WaitingSaveRequest;
+import roomescape.service.dto.ReservationRequest;
 
 public record UserWaitingSaveRequest(
         @NotNull
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate date,
 
         @NotNull
@@ -22,7 +22,7 @@ public record UserWaitingSaveRequest(
         @Positive
         Long themeId
 ) {
-    public WaitingSaveRequest toWaitingSaveRequest(Long memberId) {
-        return new WaitingSaveRequest(memberId, date, timeId, themeId);
+    public ReservationRequest toReservationRequest(Long memberId) {
+        return new ReservationRequest(memberId, date, timeId, themeId);
     }
 }
