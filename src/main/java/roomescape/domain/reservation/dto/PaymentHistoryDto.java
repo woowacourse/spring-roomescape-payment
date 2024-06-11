@@ -7,7 +7,6 @@ import roomescape.domain.reservation.model.Reservation;
 import java.time.LocalDateTime;
 
 public record PaymentHistoryDto(
-        String orderId,
         PaymentStatus paymentStatus,
         String orderName,
         Long totalAmount,
@@ -18,7 +17,6 @@ public record PaymentHistoryDto(
 ) {
     public PaymentHistory toModel() {
         return new PaymentHistory(
-                orderId,
                 paymentStatus,
                 orderName,
                 totalAmount,

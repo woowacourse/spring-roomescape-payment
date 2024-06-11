@@ -18,9 +18,6 @@ public class PaymentHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false, unique = true)
-    private String orderId;
-
     @Column(length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
@@ -47,7 +44,6 @@ public class PaymentHistory {
     }
 
     public PaymentHistory(
-            final String orderId,
             final PaymentStatus paymentStatus,
             final String orderName,
             final Long totalAmount,
@@ -56,7 +52,6 @@ public class PaymentHistory {
             final String paymentProvider,
             final Reservation reservation
     ) {
-        this.orderId = orderId;
         this.paymentStatus = paymentStatus;
         this.orderName = orderName;
         this.totalAmount = totalAmount;
@@ -76,10 +71,6 @@ public class PaymentHistory {
 
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;
-    }
-
-    public String getOrderId() {
-        return orderId;
     }
 
     public String getOrderName() {

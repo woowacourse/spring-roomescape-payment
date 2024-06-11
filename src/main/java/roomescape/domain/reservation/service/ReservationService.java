@@ -130,7 +130,6 @@ public class ReservationService {
 
     private PaymentHistoryDto convertPaymentHistoryRequest(final SaveAdminReservationRequest request, final Reservation reservation) {
         return new PaymentHistoryDto(
-                request.orderId(),
                 PaymentStatus.DONE,
                 request.orderName(),
                 request.amount(),

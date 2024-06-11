@@ -42,7 +42,6 @@ public class PaymentConfirmResponse {
 
     public PaymentHistory toModel(final Reservation reservation) {
         return new PaymentHistory(
-                orderId,
                 PaymentStatus.valueOf(status),
                 orderName,
                 totalAmount,
