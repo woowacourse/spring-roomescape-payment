@@ -8,9 +8,9 @@ import java.time.LocalTime;
 public record BookedPaymentResponse(
         Long id,
         String name,
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate date,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         LocalTime time,
         String theme,
         String status

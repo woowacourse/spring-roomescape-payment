@@ -14,7 +14,7 @@ public record ReservationPaymentRequest(
 
         @NotNull
         @FutureOrPresent(message = "지나간 날짜의 예약을 할 수 없습니다.")
-        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate date,
 
         @NotNull
