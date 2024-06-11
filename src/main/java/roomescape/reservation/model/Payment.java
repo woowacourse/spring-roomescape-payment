@@ -20,6 +20,16 @@ public class Payment {
 
     private Long totalAmount;
 
+    public Payment() {
+    }
+
+    public Payment(String paymentKey, String orderId, String status, Long totalAmount) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.status = status;
+        this.totalAmount = totalAmount;
+    }
+
     public Long getId() {
         return id;
     }

@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -23,6 +21,7 @@ import com.google.gson.JsonParser;
 
 import roomescape.config.TossPaymentProperties;
 import roomescape.exception.PaymentException;
+import roomescape.reservation.dto.PaymentApiResponse;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.encoder.BasicAuthEncoder;
 import roomescape.reservation.model.Payment;
@@ -53,7 +52,7 @@ public class PaymentService {
     public Payment requestTossPayment(PaymentRequest paymentRequest) {
         String authorization = BasicAuthEncoder.encode(tossSecretKey);
 
-        Payment payment = tossRestClient.post()
+        PaymentApiResponse paymentApiResponse = tossRestClient.post()
                 .uri(properties.getConfirmPath())
                 .header("Authorization", authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
@@ -63,8 +62,13 @@ public class PaymentService {
                     String errorMessage = parseErrorMessage(response);
                     throw new PaymentException("결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value()));
                 })
-                .toEntity(Payment.class)
+                .toEntity(PaymentApiResponse.class)
                 .getBody();
+
+        if (paymentApiResponse == null) {
+            throw new PaymentException("응답 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Payment payment = paymentApiResponse.toEntity(paymentRequest.amount());
 
         return paymentRepository.save(payment);
     }
