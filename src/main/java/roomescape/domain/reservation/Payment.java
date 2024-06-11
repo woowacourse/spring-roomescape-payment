@@ -16,19 +16,19 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    Long id;
+    private Long id;
 
     @NotNull
     @Column(name = "order_id", unique = true)
-    String orderId;
+    private String orderId;
 
     @NotNull
     @Column(name = "amount")
-    long amount;
+    private long amount;
 
     @NotNull
     @Column(name = "payment_key")
-    String paymentKey;
+    private String paymentKey;
 
     public Payment(String orderId, long amount, String paymentKey) {
         this(null, orderId, amount, paymentKey);
