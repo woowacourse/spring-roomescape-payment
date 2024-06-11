@@ -63,9 +63,14 @@ public class PaymentService {
 
     @Transactional
     public void cancelPayment(final Reservation reservation) {
+        final PaymentHistory paymentHistory = getPaymentHistory(reservation);
+        paymentHistory.cancelPayment();
+    }
+
+    private PaymentHistory getPaymentHistory(final Reservation reservation) {
         final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
                 .orElseThrow(() -> new NoSuchElementException("해당 예약에 대한 결제 정보가 없습니다."));
-        paymentHistory.cancelPayment();
+        return paymentHistory;
     }
 
     public void savePaymentHistory(final SavePaymentHistoryRequest request) {
