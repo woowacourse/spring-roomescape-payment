@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Entity
 public class Payment {
 
@@ -14,8 +17,8 @@ public class Payment {
     private String paymentKey;
     private Long amount;
     private String orderId;
-    private String requestedAt;
-    private String approvedAt;
+    private LocalDateTime requestedAt;
+    private LocalDateTime approvedAt;
 
     public Payment() {
     }
@@ -24,8 +27,8 @@ public class Payment {
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
-        this.requestedAt = requestedAt;
-        this.approvedAt = approvedAt;
+        this.requestedAt = LocalDateTime.parse(requestedAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        this.approvedAt = LocalDateTime.parse(approvedAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public Long getId() {

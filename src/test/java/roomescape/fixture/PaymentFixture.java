@@ -9,6 +9,6 @@ public class PaymentFixture {
     }
 
     public static Payment create() {
-        return new Payment("paymentKey", 1000L, "orderId", "", "");
+        return new Payment("paymentKey", 1000L, "orderId", "2024-02-13T12:17:57+09:00", "2024-02-13T12:18:14+09:00");
     }
 }

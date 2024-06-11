@@ -11,7 +11,7 @@ public class FakePaymentClient implements PaymentClient {
 
     @Override
     public Payment approve(PaymentRequest request) {
-        return new Payment(request.paymentKey(), request.amount(), request.orderId(), "", "");
+        return new Payment(request.paymentKey(), request.amount(), request.orderId(), "2024-02-13T12:17:57+09:00", "2024-02-13T12:18:14+09:00");
     }
 
     @Override
