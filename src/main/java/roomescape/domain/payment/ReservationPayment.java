@@ -3,21 +3,18 @@ package roomescape.domain.payment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Objects;
-import roomescape.domain.reservation.Reservation;
 
 @Entity
 @Table(name = "reservation_payment")
 public class ReservationPayment {
-    private static final ReservationPayment EMPTY_INSTANCE = new ReservationPayment(null,null,null,0);
+    private static final ReservationPayment EMPTY_INSTANCE = new ReservationPayment(null, null, null, 0);
 
     @Id
     private String orderId;
 
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
 
     @Column(name = "payment_key", nullable = false)
@@ -36,7 +33,7 @@ public class ReservationPayment {
         this.amount = amount;
     }
 
-    public static ReservationPayment getEmptyInstance(){
+    public static ReservationPayment getEmptyInstance() {
         return EMPTY_INSTANCE;
     }
 
