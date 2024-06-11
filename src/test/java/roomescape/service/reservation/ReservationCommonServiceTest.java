@@ -100,7 +100,7 @@ class ReservationCommonServiceTest extends ServiceTest {
 
         //then
         List<Boolean> reservations = reservationRepository.findWithRankingByMemberId(anotherMember.getId()).stream()
-                .map(ReservationWithRank::getReservation)
+                .map(ReservationWithRank::reservation)
                 .map(Reservation::isPendingPayment)
                 .toList();
         assertThat(reservations).containsExactly(true);

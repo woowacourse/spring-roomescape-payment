@@ -86,13 +86,13 @@ class ReservationRepositoryTest {
         assertAll(
                 () -> assertThat(result).hasSize(2),
                 () -> assertThat(result.stream()
-                        .map(ReservationWithRank::getReservation)
+                        .map(ReservationWithRank::reservation)
                         .filter(Reservation::isReserved)
                         .findFirst()
                         .get()
                         .getPayment()).isNotNull(),
                 () -> assertThat(result.stream()
-                        .map(ReservationWithRank::getReservation)
+                        .map(ReservationWithRank::reservation)
                         .filter(reservation -> !reservation.isReserved())
                         .findFirst()
                         .get()
