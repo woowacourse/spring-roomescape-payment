@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Auth;
 import roomescape.dto.LoginRequest;
@@ -19,6 +20,7 @@ import roomescape.service.MemberService;
 import roomescape.service.TokenService;
 
 @RestController
+@RequestMapping(produces = "application/json")
 @Tag(name = "회원 API", description = "회원 관련 API 입니다.")
 public class MemberController {
 

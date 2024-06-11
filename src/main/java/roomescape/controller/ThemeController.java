@@ -19,7 +19,7 @@ import roomescape.dto.ThemeResponse;
 import roomescape.service.ThemeService;
 
 @RestController
-@RequestMapping("/themes")
+@RequestMapping(value = "/themes", produces = "application/json")
 @Tag(name = "테마 API", description = "테마 관련 API 입니다.")
 public class ThemeController {
 
