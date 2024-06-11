@@ -2,9 +2,11 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -14,12 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
@@ -29,11 +28,7 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.client.PaymentClient;
-import roomescape.payment.client.PaymentProperties;
-import roomescape.payment.client.PaymentRestClientConfiguration;
-import roomescape.payment.client.toss.TossPaymentClient;
 import roomescape.payment.model.PaymentInfoFromClient;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
@@ -48,29 +43,29 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.DatabaseIsolation;
-import roomescape.util.JpaRepositoryTest;
 import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
-import roomescape.waiting.service.WaitingService;
 
-@JpaRepositoryTest
+@SpringBootTest
+@ActiveProfiles("test")
 @DatabaseIsolation
-@Import({ReservationService.class,
-        PaymentService.class,
-        WaitingService.class,
-        TossPaymentClient.class,
-        PaymentRestClientConfiguration.class})
-@EnableConfigurationProperties({PaymentProperties.class})
 class ReservationServiceTest {
 
-    @MockBean private PaymentClient paymentClient;
+    @MockBean
+    private PaymentClient paymentClient;
 
-    @Autowired private ReservationService reservationService;
-    @Autowired private ReservationTimeRepository reservationTimeRepository;
-    @Autowired private ThemeRepository themeRepository;
-    @Autowired private MemberRepository memberRepository;
-    @Autowired private WaitingRepository waitingRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    @Autowired
+    private ReservationService reservationService;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private WaitingRepository waitingRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @BeforeEach
     void setUp() {
@@ -102,7 +97,7 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("회원 예약 생성 실패: 결제 오류 시 예약은 저장되지 않는다.")
-    void createReservation_ifPaymentClientError_throwException() throws JsonProcessingException {
+    void createReservation_ifPaymentClientError_throwException() {
         // given
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
@@ -119,6 +114,7 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> reservationService.createMyReservation(authInfo, createMyReservationRequest))
                 .isInstanceOf(ClientException.class);
+        assertThat(reservationRepository.count()).isEqualTo(0L);
     }
 
     @Test
@@ -341,7 +337,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("예약 취소에 따른 회원 갱신 성공")
+    @DisplayName("예약 취소에 따른 회원 갱신 성공: 갱신된 회원의 대기는 삭제")
     void cancelReservation_WhenWaitingExists() {
         // given
         Member reservationMember = memberRepository.save(MemberFixture.getOne("reservation@member.com"));
@@ -351,7 +347,7 @@ class ReservationServiceTest {
         Reservation reservation = reservationRepository.save(
                 new Reservation(reservationMember, LocalDate.parse("2024-04-10"), reservationTime, theme));
 
-        waitingRepository.save(new Waiting(reservation, waitingMember));
+        Waiting waiting = waitingRepository.save(new Waiting(reservation, waitingMember));
 
         // when
         AuthInfo authInfo = new AuthInfo(reservationMember.getId(), reservationMember.getName(),
@@ -359,7 +355,14 @@ class ReservationServiceTest {
         reservationService.deleteReservation(authInfo, reservation.getId());
 
         // then
-        assertThat(reservationRepository.getById(reservation.getId()).getMember()).isEqualTo(waitingMember);
+        assertAll(
+                () -> assertTrue(reservationRepository.findAllByMemberId(waitingMember.getId()).contains(reservation)),
+                () -> assertFalse(reservationRepository.findAllByMemberId(reservationMember.getId()).contains(reservation)),
+                () -> assertThatThrownBy(() -> waitingRepository.getById(waiting.getId()))
+                        .hasMessage("식별자 " + waiting.getId() + "에 해당하는 예약 대기가 존재하지 않습니다.")
+                        .isInstanceOf(NoSuchElementException.class)
+
+        );
     }
 
     @Test
