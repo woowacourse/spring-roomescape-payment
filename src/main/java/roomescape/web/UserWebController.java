@@ -30,4 +30,9 @@ public class UserWebController {
     public String getUserMyReservationPage() {
         return "reservation-mine";
     }
+
+    @GetMapping("/reference")
+    public String getReferencePage() {
+        return "api-docs";
+    }
 }
