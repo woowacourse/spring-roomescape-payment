@@ -2,7 +2,6 @@ package roomescape.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -18,11 +17,16 @@ import roomescape.infra.TossPaymentClient;
 @Configuration
 public class ClientConfig {
 
-    @Value("${toss.widget.secretKey}")
-    private String widgetSecretKey;
+    private final String widgetSecretKey;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    public ClientConfig(
+            @Value("${toss.widget.secretKey}") String widgetSecretKey,
+            ObjectMapper objectMapper
+    ) {
+        this.widgetSecretKey = widgetSecretKey;
+        this.objectMapper = objectMapper;
+    }
 
     @Bean
     public PaymentErrorHandler paymentErrorHandler() {
