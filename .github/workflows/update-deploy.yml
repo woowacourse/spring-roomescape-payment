@@ -15,7 +15,7 @@ jobs:
         id: check-server-on-port
         run: |
           echo "Checking if port 8080 is in use..."
-          PID=$(lsof -t -i:8080)
+          PID=$(lsof -t -i:8080 || true)
           if [ -n "$PID" ]; then
             echo "server_running=true" >> $GITHUB_ENV
             echo "PID=$PID" >> $GITHUB_ENV
