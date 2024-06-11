@@ -40,7 +40,7 @@ public class PaymentService {
         RestClient.ResponseSpec paymentRequest = restClient.post()
                 .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
-                .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
+                .body(new PaymentRequest(request.paymentKey(), request.paymentId(), request.amount()))
                 .retrieve();
         handleServerError(handleClientError(paymentRequest)).toBodilessEntity();
     }
@@ -50,7 +50,7 @@ public class PaymentService {
         RestClient.ResponseSpec paymentRequest = restClient.post()
                 .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
-                .body(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()))
+                .body(new PaymentRequest(request.paymentKey(), request.paymentId(), request.amount()))
                 .retrieve();
         handleServerError(handleClientError(paymentRequest)).toBodilessEntity();
     }
@@ -62,12 +62,12 @@ public class PaymentService {
     }
 
     public PaymentInfo addPayment(ReservationRequest request, Reservation reservation) {
-        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
+        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.paymentId(), request.amount(), reservation);
         return paymentInfoRepository.save(paymentInfo);
     }
 
     public PaymentInfo addPayment(ReservationWithPaymentRequest request, Reservation reservation) {
-        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.orderId(), request.amount(), reservation);
+        PaymentInfo paymentInfo = new PaymentInfo(request.paymentKey(), request.paymentId(), request.amount(), reservation);
         return paymentInfoRepository.save(paymentInfo);
     }
 

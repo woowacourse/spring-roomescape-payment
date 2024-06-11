@@ -69,7 +69,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "멤버 추가", description = "기입 정보에 따라 멤버를 등록합니다.")
+    @Operation(summary = "멤버 추가", description = "기입 정보에 따라 멤버를 등합니다.")
     @PostMapping("/members")
     public ResponseEntity<MemberResponse> registerMember(@RequestBody RegisterRequest registerRequest) {
         Member member = memberWriteService.register(registerRequest);

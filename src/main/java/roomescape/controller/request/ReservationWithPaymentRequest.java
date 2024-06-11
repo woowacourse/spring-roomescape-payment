@@ -12,7 +12,7 @@ public record ReservationWithPaymentRequest(
         Long reservationId,
         @NotEmpty
         @Schema(description = "결제 ID", example = "MOVINPOKE1533")
-        String orderId,
+        String paymentId,
         @NotEmpty
         @Schema(description = "결제 Key", example = "tgen_20240611152237Z1il1")
         String paymentKey,

@@ -11,7 +11,7 @@ public class PaymentInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String paymentKey;
-    private String orderId;
+    private String paymentId;
     private Long amount;
     @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
@@ -19,14 +19,14 @@ public class PaymentInfo {
     protected PaymentInfo() {
     }
 
-    public PaymentInfo(String paymentKey, String orderId, Long amount, Reservation reservation) {
-        this(null, paymentKey, orderId, amount, reservation);
+    public PaymentInfo(String paymentKey, String paymentId, Long amount, Reservation reservation) {
+        this(null, paymentKey, paymentId, amount, reservation);
     }
 
-    public PaymentInfo(Long id, String paymentKey, String orderId, Long amount, Reservation reservation) {
+    public PaymentInfo(Long id, String paymentKey, String paymentId, Long amount, Reservation reservation) {
         this.id = id;
         this.paymentKey = paymentKey;
-        this.orderId = orderId;
+        this.paymentId = paymentId;
         this.amount = amount;
         this.reservation = reservation;
     }
@@ -39,8 +39,8 @@ public class PaymentInfo {
         return paymentKey;
     }
 
-    public String getOrderId() {
-        return orderId;
+    public String getPaymentId() {
+        return paymentId;
     }
 
     public Long getAmount() {
@@ -56,12 +56,12 @@ public class PaymentInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PaymentInfo that = (PaymentInfo) o;
-        return Objects.equals(id, that.id) && Objects.equals(paymentKey, that.paymentKey) && Objects.equals(orderId, that.orderId) && Objects.equals(amount, that.amount) && Objects.equals(reservation, that.reservation);
+        return Objects.equals(id, that.id) && Objects.equals(paymentKey, that.paymentKey) && Objects.equals(paymentId, that.paymentId) && Objects.equals(amount, that.amount) && Objects.equals(reservation, that.reservation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, paymentKey, orderId, amount, reservation);
+        return Objects.hash(id, paymentKey, paymentId, amount, reservation);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class PaymentInfo {
         return "PaymentInfo{" +
                 "id=" + id +
                 ", paymentKey='" + paymentKey + '\'' +
-                ", orderId='" + orderId + '\'' +
+                ", paymentId='" + paymentId + '\'' +
                 ", amount=" + amount +
                 ", reservation=" + reservation +
                 '}';

@@ -61,7 +61,7 @@ class ReservationServiceTest {
     void should_add_reservation_times_when_give_member_request() {
         Member member = memberRepository.findById(1L).get();
 
-        ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234L);
+        ReservationRequest request = new ReservationRequest(now().plusDays(2), 1L, 1L, "paymentId", "paymentKey", 1234L);
 
         reservationWriteService.addReservation(request, member);
 
@@ -119,7 +119,7 @@ class ReservationServiceTest {
     @Test
     void should_throw_exception_when_previous_date() {
         ReservationRequest request =
-                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234L);
+                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "paymentId", "paymentKey", 1234L);
         Member member = new Member("수달", MEMBER, "otter@email.com", "1111");
 
         assertThatThrownBy(() -> reservationWriteService.addReservation(request, member))
@@ -133,7 +133,7 @@ class ReservationServiceTest {
         Member member = memberRepository.findById(1L).get();
 
         ReservationRequest request =
-                new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L, "orderId", "paymentKey", 1234L);
+                new ReservationRequest(LocalDate.now().plusDays(2), 1L, 1L, "paymentId", "paymentKey", 1234L);
 
         assertThatCode(() -> reservationWriteService.addReservation(request, member))
                 .doesNotThrowAnyException();
@@ -145,7 +145,7 @@ class ReservationServiceTest {
         LocalDate date = now().plusDays(1);
         Member member = memberRepository.findById(1L).get();
 
-        ReservationRequest request = new ReservationRequest(date, 1L, 1L, "orderId", "paymentKey", 1234L);
+        ReservationRequest request = new ReservationRequest(date, 1L, 1L, "paymentId", "paymentKey", 1234L);
         assertThatThrownBy(() -> reservationWriteService.addReservation(request, member))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
