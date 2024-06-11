@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.domain.CancelReason;
 import roomescape.domain.Payment;
 import roomescape.dto.PaymentErrorResponse;
+import roomescape.dto.TossPaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.service.PaymentClient;
 
@@ -31,12 +32,13 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void pay(Payment payment) {
+        TossPaymentRequest tossPaymentRequest = TossPaymentRequest.from(payment);
         try {
             restClient.post()
                     .uri("v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(payment)
+                    .body(tossPaymentRequest)
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -50,8 +52,9 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void cancel(Payment payment, CancelReason cancelReason) {
+        TossPaymentRequest tossPaymentRequest = TossPaymentRequest.from(payment);
         restClient.post()
-                .uri("v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
+                .uri("v1/payments/{paymentKey}/cancel", tossPaymentRequest.paymentKey())
                 .header("Authorization", authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cancelReason)
