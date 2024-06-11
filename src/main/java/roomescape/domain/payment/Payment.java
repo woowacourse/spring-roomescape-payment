@@ -21,7 +21,7 @@ public class Payment {
     private Reservation reservation;
     @Column(nullable = false)
     private String paymentKey;
-    @Column(nullable = false, columnDefinition = "bigint")
+    @Column(nullable = false, precision = 19)
     private BigDecimal totalAmount;
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus status;
