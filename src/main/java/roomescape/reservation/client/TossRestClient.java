@@ -39,7 +39,7 @@ public class TossRestClient {
     }
 
     public PaymentApiResponse confirmPayment(PaymentRequest paymentRequest) {
-        String authorization = BasicAuthEncoder.encode(tossSecretKey);
+        String authorization = BasicAuthEncoder.encode(tossSecretKey, "");
 
         return restClient.post()
                 .uri(properties.getConfirmPath())
