@@ -15,6 +15,7 @@ import roomescape.dto.PaymentApproveRequest;
 @Component
 public class PaymentClient {
     private static final String UNKNOWN_ERROR = "알 수 없는 오류가 발생했습니다.";
+    
     private final String apiUri;
     private final String approveSecretKey;
     private final RestClient restClient;
