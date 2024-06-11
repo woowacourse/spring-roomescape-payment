@@ -12,9 +12,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
-import roomescape.domain.member.Member;
 
 @Tag(name = "관리자 예약", description = "관리자 예약 API")
 interface AdminReservationControllerDocs {
@@ -74,12 +74,12 @@ interface AdminReservationControllerDocs {
     @Operation(summary = "예약 대기 취소", description = "예약 대기를 취소한다.")
     ResponseEntity<Void> cancelWaiting(
             @Parameter(description = "예약 대기 ID", example = "1") Long waitingId,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 
     @Operation(summary = "예약 취소", description = "예약을 취소한다.")
     ResponseEntity<Void> cancelReservation(
             @Parameter(description = "예약 ID", example = "1") Long reservationId,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 }

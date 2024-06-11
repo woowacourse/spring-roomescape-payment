@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.dto.request.member.LoginRequest;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.application.dto.response.member.MemberResponse;
 import roomescape.application.security.JwtProvider;
@@ -19,6 +20,11 @@ import roomescape.exception.RoomEscapeException;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
+
+    public MemberInfo getMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
+        return new MemberInfo(member.getId());
+    }
 
     public List<MemberResponse> findAllMember() {
         return memberRepository.findAll()

@@ -10,9 +10,9 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.application.MemberService;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.security.JwtProvider;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.exception.AuthenticationException;
 
 @Component
@@ -21,11 +21,11 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
     private static final String TARGET_COOKIE_NAME = "token";
 
     private final JwtProvider jwtProvider;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(Member.class);
+        return parameter.getParameterType().equals(MemberInfo.class);
     }
 
     @Override
@@ -48,9 +48,8 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
                 .orElseThrow(AuthenticationException::new);
     }
 
-    private Member getMember(String token) {
+    private MemberInfo getMember(String token) {
         Long memberId = jwtProvider.extractId(token);
-        return memberRepository.findById(memberId)
-                .orElseThrow(AuthenticationException::new);
+        return memberService.getMember(memberId);
     }
 }

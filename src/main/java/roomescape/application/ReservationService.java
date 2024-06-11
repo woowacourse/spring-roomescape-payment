@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationRequest;
@@ -41,7 +42,7 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public ReservationResponse reserve(UserReservationRequest request, Member member) {
+    public ReservationResponse reserve(UserReservationRequest request, MemberInfo member) {
         Reservation reservation = saveReservation(member.getId(), request.date(), request.timeId(), request.themeId());
         if (reservation.isPending()) {
             Payment payment = savePayment(request.toPaymentRequest(), reservation);
@@ -77,7 +78,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse payForPending(ReservationPaymentRequest request, Member member) {
+    public ReservationResponse payForPending(ReservationPaymentRequest request, MemberInfo memberInfo) {
+        Member member = memberRepository.findById(memberInfo.getId()).orElseThrow(AuthenticationException::new);
         Reservation reservation = reservationRepository.getById(request.reservationId());
         rejectIfNotOwner(reservation, member);
         Payment payment = savePayment(request.toPaymentRequest(), reservation);
@@ -106,7 +108,8 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<UserReservationResponse> findAllWithRank(Member member) {
+    public List<UserReservationResponse> findAllWithRank(MemberInfo memberInfo) {
+        Member member = memberRepository.findById(memberInfo.getId()).orElseThrow(AuthenticationException::new);
         List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(member.getId());
         return reservationWithRanks.stream()
                 .map(UserReservationResponse::from)

@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.CancelService;
 import roomescape.application.ReservationService;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
-import roomescape.domain.member.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class MemberReservationController implements MemberReservationControllerD
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> makeReservation(
             @RequestBody @Valid UserReservationRequest request,
-            Member member
+            MemberInfo member
     ) {
         ReservationResponse response = reservationService.reserve(request, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
@@ -38,14 +38,14 @@ public class MemberReservationController implements MemberReservationControllerD
     @PostMapping("/reservations/payment")
     public ResponseEntity<ReservationResponse> paymentForPending(
             @RequestBody ReservationPaymentRequest request,
-            Member member
+            MemberInfo member
     ) {
         ReservationResponse response = reservationService.payForPending(request, member);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(Member member) {
+    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(MemberInfo member) {
         List<UserReservationResponse> response = reservationService.findAllWithRank(member);
         return ResponseEntity.ok(response);
     }
@@ -53,7 +53,7 @@ public class MemberReservationController implements MemberReservationControllerD
     @DeleteMapping("/waitings/{idWaiting}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable(value = "idWaiting") Long waitingId,
-            Member member
+            MemberInfo member
     ) {
         cancelService.cancelReservation(waitingId, member);
         return ResponseEntity.noContent().build();
@@ -62,7 +62,7 @@ public class MemberReservationController implements MemberReservationControllerD
     @DeleteMapping("/reservations/{idReservation}")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable(value = "idReservation") Long reservationId,
-            Member member
+            MemberInfo member
     ) {
         cancelService.cancelReservation(reservationId, member);
         return ResponseEntity.noContent().build();

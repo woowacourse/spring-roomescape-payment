@@ -10,11 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.application.dto.response.reservation.UserReservationResponse;
-import roomescape.domain.member.Member;
 
 @Tag(name = "사용자 예약", description = "사용자 예약 API")
 interface MemberReservationControllerDocs {
@@ -39,7 +39,7 @@ interface MemberReservationControllerDocs {
     })
     ResponseEntity<ReservationResponse> makeReservation(
             @Valid UserReservationRequest request,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 
     @Operation(summary = "결제하기", description = "사용자가 결제 방탈출을 결제한다.")
@@ -71,7 +71,7 @@ interface MemberReservationControllerDocs {
     })
     ResponseEntity<ReservationResponse> paymentForPending(
             @Valid ReservationPaymentRequest request,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 
     @Operation(summary = "내 예약 목록 조회", description = "사용자가 예약한 방탈출 목록을 조회한다.")
@@ -81,7 +81,7 @@ interface MemberReservationControllerDocs {
                     description = "내 예약 목록 조회 성공"
             )
     })
-    ResponseEntity<List<UserReservationResponse>> findAllMyReservations(@Parameter(hidden = true) Member member);
+    ResponseEntity<List<UserReservationResponse>> findAllMyReservations(@Parameter(hidden = true) MemberInfo member);
 
     @Operation(summary = "예약 대기 취소하기", description = "사용자가 예약 대기 중인 방탈출을 취소한다.")
     @ApiResponses({
@@ -103,7 +103,7 @@ interface MemberReservationControllerDocs {
     })
     ResponseEntity<Void> cancelWaiting(
             @Parameter(description = "예약 대기 ID", example = "1") Long waitingId,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 
     @Operation(summary = "예약 취소하기", description = "사용자가 예약 중인 방탈출을 취소한다.")
@@ -126,6 +126,6 @@ interface MemberReservationControllerDocs {
     })
     ResponseEntity<Void> cancelReservation(
             @Parameter(description = "예약 ID", example = "1") Long reservationId,
-            @Parameter(hidden = true) Member member
+            @Parameter(hidden = true) MemberInfo member
     );
 }

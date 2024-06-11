@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.domain.event.TimeoutEventPublisher;
@@ -54,6 +55,8 @@ class CancelServiceTest extends BaseServiceTest {
 
     private Member user;
     private Member admin;
+    private MemberInfo userInfo;
+    private MemberInfo adminInfo;
     private ReservationTime time;
     private ReservationDetail detail;
     private Theme theme;
@@ -62,6 +65,8 @@ class CancelServiceTest extends BaseServiceTest {
     void setUp() {
         user = memberRepository.save(MemberFixture.user());
         admin = memberRepository.save(MemberFixture.admin());
+        userInfo = new MemberInfo(user.getId());
+        adminInfo = new MemberInfo(admin.getId());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
         detail = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
@@ -75,7 +80,7 @@ class CancelServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.save(new Reservation(user, detail, Status.RESERVED));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), user);
+        cancelService.cancelReservation(reservation.getId(), userInfo);
 
         // then
         Reservation canceledReservation = reservationRepository.getById(reservation.getId());
@@ -94,10 +99,10 @@ class CancelServiceTest extends BaseServiceTest {
                 "asdsds",
                 "asddsdsa",
                 "dsadsdsa");
-        ReservationResponse reserve = reservationService.reserve(request, user);
+        ReservationResponse reserve = reservationService.reserve(request, userInfo);
 
         // when
-        cancelService.cancelReservation(reserve.id(), user);
+        cancelService.cancelReservation(reserve.id(), userInfo);
 
         // then
         Mockito.verify(paymentClient, Mockito.times(1))
@@ -112,7 +117,7 @@ class CancelServiceTest extends BaseServiceTest {
         Reservation nextReservation = reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), admin);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
         Reservation waitingReservation = reservationRepository.getById(nextReservation.getId());
@@ -127,7 +132,7 @@ class CancelServiceTest extends BaseServiceTest {
         reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), admin);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(1))
@@ -141,7 +146,7 @@ class CancelServiceTest extends BaseServiceTest {
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), admin);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(0))
