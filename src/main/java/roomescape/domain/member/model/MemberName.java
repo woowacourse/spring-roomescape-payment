@@ -30,6 +30,13 @@ public class MemberName {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MemberName{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
     public String getValue() {
         return name;
     }

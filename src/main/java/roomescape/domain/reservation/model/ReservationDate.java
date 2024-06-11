@@ -26,6 +26,13 @@ public class ReservationDate {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ReservationDate{" +
+                "date=" + date +
+                '}';
+    }
+
     public LocalDate getValue() {
         return date;
     }

@@ -64,6 +64,16 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
+    @Override
+    public String toString() {
+        return "Theme{" +
+                "description=" + description +
+                ", id=" + id +
+                ", name=" + name +
+                ", thumbnail=" + thumbnail +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }

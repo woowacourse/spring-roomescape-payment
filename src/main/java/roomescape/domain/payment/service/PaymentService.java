@@ -69,7 +69,7 @@ public class PaymentService {
 
     private PaymentHistory getPaymentHistory(final Reservation reservation) {
         final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
-                .orElseThrow(() -> new NoSuchElementException("해당 예약에 대한 결제 정보가 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 예약에 대한 결제 정보가 없습니다. " + reservation));
         return paymentHistory;
     }
 

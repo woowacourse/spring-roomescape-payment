@@ -103,6 +103,18 @@ public class Reservation {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "date=" + date +
+                ", id=" + id +
+                ", time=" + time +
+                ", theme=" + theme +
+                ", member=" + member +
+                ", status=" + status +
+                '}';
+    }
+
     public void cancel() {
         this.status = ReservationStatus.CANCEL;
     }

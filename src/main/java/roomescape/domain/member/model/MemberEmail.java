@@ -35,6 +35,13 @@ public class MemberEmail {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MemberEmail{" +
+                "email='" + email + '\'' +
+                '}';
+    }
+
     public String getValue() {
         return email;
     }

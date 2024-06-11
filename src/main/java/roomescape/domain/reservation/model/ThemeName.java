@@ -31,6 +31,13 @@ public class ThemeName {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ThemeName{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
     public String getValue() {
         return name;
     }

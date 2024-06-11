@@ -77,6 +77,17 @@ public class Member {
         this.email = email;
     }
 
+    @Override
+    public String toString() {
+        return "Member{" +
+                "email=" + email +
+                ", id=" + id +
+                ", role=" + role +
+                ", name=" + name +
+                ", password=" + password +
+                '}';
+    }
+
     public MemberEmail getEmail() {
         return email;
     }

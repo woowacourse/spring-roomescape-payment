@@ -31,6 +31,13 @@ public class ThemeThumbnail {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ThemeThumbnail{" +
+                "thumbnail='" + thumbnail + '\'' +
+                '}';
+    }
+
     public String getValue() {
         return thumbnail;
     }
