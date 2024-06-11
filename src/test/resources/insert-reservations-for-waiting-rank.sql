@@ -8,15 +8,13 @@ INSERT INTO member(name, email, password, role) VALUES('페드로', 'pedro@email
 INSERT INTO member(name, email, password, role) VALUES('리니', 'lini@email.com', 'lini123', 'MEMBER');
 INSERT INTO member(name, email, password, role) VALUES('미르', 'duho@email.com', 'duho123', 'GUEST');
 
-RUNSCRIPT FROM 'classpath:insert-admin-payment.sql';
-
 -- 테마1: 2-1-3 / 테마2: 3-2-1
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (3, 1, 1, CURRENT_DATE, DATEADD('HOUR', -1, CURRENT_TIMESTAMP), 1);
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (1, 1, 1, CURRENT_DATE, DATEADD('HOUR', -2, CURRENT_TIMESTAMP), 2);
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (2, 1, 1, CURRENT_DATE, DATEADD('HOUR', -3, CURRENT_TIMESTAMP), 3);
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (1, 2, 2, CURRENT_DATE, DATEADD('HOUR', -1, CURRENT_TIMESTAMP), 4);
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (2, 2, 2, CURRENT_DATE, DATEADD('HOUR', -2, CURRENT_TIMESTAMP), 5);
-INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at, payment_id) VALUES (3, 2, 2, CURRENT_DATE, DATEADD('HOUR', -3, CURRENT_TIMESTAMP), 6);
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (3, 1, 1, CURRENT_DATE, DATEADD('HOUR', -1, CURRENT_TIMESTAMP));
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (1, 1, 1, CURRENT_DATE, DATEADD('HOUR', -2, CURRENT_TIMESTAMP));
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (2, 1, 1, CURRENT_DATE, DATEADD('HOUR', -3, CURRENT_TIMESTAMP));
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (1, 2, 2, CURRENT_DATE, DATEADD('HOUR', -1, CURRENT_TIMESTAMP));
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (2, 2, 2, CURRENT_DATE, DATEADD('HOUR', -2, CURRENT_TIMESTAMP));
+INSERT INTO WAITING(member_id, theme_id, time_id, visit_date, created_at) VALUES (3, 2, 2, CURRENT_DATE, DATEADD('HOUR', -3, CURRENT_TIMESTAMP));
 
-INSERT INTO reservation(visit_date, time_id, member_id, theme_id, payment_id) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 2, 7);
-INSERT INTO reservation(visit_date, time_id, member_id, theme_id, payment_id) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 2, 1, 1, 8);
+INSERT INTO reservation(visit_date, time_id, member_id, theme_id) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 2);
+INSERT INTO reservation(visit_date, time_id, member_id, theme_id) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 2, 1, 1);

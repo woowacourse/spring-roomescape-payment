@@ -22,40 +22,6 @@ class PaymentServiceTest extends ServiceTestBase {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @DisplayName("관리자 결제의 경우 저장된 결제 금액은 0원이다.")
-    @Test
-    void paymentAmountOfAdminIsZero() {
-        // given
-        PaymentRequest paymentRequest = new PaymentRequest(
-                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID,
-                BigDecimal.ZERO, PaymentType.ADMIN
-        );
-
-        // when
-        Payment confirmed = paymentService.confirm(paymentRequest);
-
-        // then
-        long paymentId = confirmed.getId();
-        assertThat(paymentRepository.findById(paymentId).orElseThrow().getAmount().intValue()).isZero();
-    }
-
-    @DisplayName("관리자 결제 정보를 DB에 저장한다.")
-    @Test
-    void saveAdminPayment() {
-        // given
-        PaymentRequest paymentRequest = new PaymentRequest(
-                Fixture.TEST_PAYMENT_KEY, Fixture.TEST_ORDER_ID,
-                BigDecimal.ZERO, PaymentType.ADMIN
-        );
-
-        // when
-        Payment confirmed = paymentService.confirm(paymentRequest);
-
-        // then
-        long paymentId = confirmed.getId();
-        assertThat(paymentRepository.findById(paymentId)).isPresent();
-    }
-
     @DisplayName("결제 정보를 DB에 저장한다.")
     @ParameterizedTest
     @ValueSource(longs = {1000, 10000})

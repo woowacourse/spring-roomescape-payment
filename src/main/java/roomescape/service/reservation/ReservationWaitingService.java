@@ -20,6 +20,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.payment.PaymentService;
+import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationWaitingResponse;
 
@@ -48,19 +49,27 @@ public class ReservationWaitingService {
 
     @Transactional
     public ReservationWaitingResponse create(ReservationRequest waitingRequest, long memberId) {
+        ReservationWaiting waiting = generateValidWaiting(waitingRequest, memberId);
+        ReservationWaiting confirmedWaiting = confirmPayment(waiting, waitingRequest.toPaymentRequest());
+        return new ReservationWaitingResponse(reservationWaitingRepository.save(confirmedWaiting));
+    }
+
+    private ReservationWaiting generateValidWaiting(ReservationRequest waitingRequest, long memberId) {
         ReservationDate reservationDate = ReservationDate.of(waitingRequest.date());
         ReservationTime reservationTime = findTimeById(waitingRequest.timeId());
         Schedule schedule = new Schedule(reservationDate, reservationTime);
         Theme theme = findThemeById(waitingRequest.themeId());
         Member member = findMemberById(memberId);
-
         validate(reservationDate, reservationTime, theme, member, schedule);
-        Payment payment = paymentService.confirm(waitingRequest.toPaymentRequest());
+        return new ReservationWaiting(member, theme, schedule);
+    }
 
-        ReservationWaiting waiting = reservationWaitingRepository.save(
-                new ReservationWaiting(member, theme, schedule, payment)
-        );
-        return new ReservationWaitingResponse(waiting);
+    private ReservationWaiting confirmPayment(ReservationWaiting waiting, PaymentRequest paymentRequest) {
+        if (paymentRequest.isAdmin()) {
+            return waiting;
+        }
+        Payment payment = paymentService.confirm(paymentRequest);
+        return waiting.withPayment(payment);
     }
 
     public List<ReservationWaitingResponse> findAll() {
@@ -115,7 +124,9 @@ public class ReservationWaitingService {
 
     private void cancelWaiting(ReservationWaiting waiting) {
         reservationWaitingRepository.deleteById(waiting.getId());
-        paymentService.cancel(waiting.getPayment());
+        if (waiting.isPaid()) {
+            paymentService.cancel(waiting.getPayment());
+        }
     }
 
     @Scheduled(cron = "${resetwaiting.schedule.cron}")

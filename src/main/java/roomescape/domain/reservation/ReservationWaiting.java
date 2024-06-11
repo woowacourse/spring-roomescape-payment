@@ -67,10 +67,18 @@ public class ReservationWaiting {
         this.schedule = schedule;
     }
 
+    public ReservationWaiting withPayment(Payment payment) {
+        return new ReservationWaiting(member, theme, schedule, payment);
+    }
+
     public void checkCancelAuthority(long memberId) {
         if (member.getId() != memberId) {
             throw new UnauthorizedException("예약 대기를 취소할 권한이 없습니다.");
         }
+    }
+
+    public boolean isPaid() {
+        return payment != null;
     }
 
     public Long getId() {

@@ -19,9 +19,6 @@ public class PaymentService {
 
     @Transactional
     public Payment confirm(PaymentRequest paymentRequest) {
-        if (paymentRequest.isAdmin()) {
-            return paymentRepository.save(Payment.ofAdmin());
-        }
         PaymentResult paymentResult = paymentClient.confirm(paymentRequest);
         return paymentRepository.save(
                 new Payment(
@@ -34,8 +31,6 @@ public class PaymentService {
     @Transactional
     public void cancel(Payment payment) {
         paymentRepository.deleteById(payment.getId());
-        if (!payment.isByAdmin()) {
-            paymentClient.cancel(payment);
-        }
+        paymentClient.cancel(payment);
     }
 }

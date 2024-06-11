@@ -23,6 +23,7 @@ import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.payment.PaymentService;
+import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
@@ -53,9 +54,8 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        Payment payment = paymentService.confirm(reservationRequest.toPaymentRequest());
-        Reservation savedReservation = reservationRepository.save(reservation.withPayment(payment));
-        return new ReservationResponse(savedReservation);
+        Reservation confirmedReservation = confirmPayment(reservation, reservationRequest.toPaymentRequest());
+        return new ReservationResponse(reservationRepository.save(confirmedReservation));
     }
 
     private Reservation generateValidReservation(ReservationRequest reservationRequest, long memberId) {
@@ -73,6 +73,14 @@ public class ReservationService {
         Member member = findMemberById(memberId);
 
         return new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
+    }
+
+    private Reservation confirmPayment(Reservation validReservation, PaymentRequest paymentRequest) {
+        if (paymentRequest.isAdmin()) {
+            return validReservation;
+        }
+        Payment payment = paymentService.confirm(paymentRequest);
+        return validReservation.withPayment(payment);
     }
 
     private ReservationTime findTimeById(long timeId) {
@@ -125,7 +133,9 @@ public class ReservationService {
         reservationRepository.delete(reservation);
         reservationWaitingRepository.findTopByThemeAndScheduleOrderByCreatedAt(theme, schedule)
                 .ifPresent(this::convertFirstPriorityWaitingToReservation);
-        paymentService.cancel(reservation.getPayment());
+        if (reservation.isPaid()) {
+            paymentService.cancel(reservation.getPayment());
+        }
     }
 
     private void convertFirstPriorityWaitingToReservation(ReservationWaiting waiting) {

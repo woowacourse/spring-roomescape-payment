@@ -17,8 +17,6 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLDelete(sql = "UPDATE PAYMENT SET deleted = TRUE WHERE PAYMENT.ID = ?")
 @SQLRestriction("deleted = FALSE")
 public class Payment {
-    private static final String ADMIN_MARKER = "ADMIN";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,14 +45,6 @@ public class Payment {
 
     public Payment(String orderId, String paymentKey, BigDecimal amount, String paymentType) {
         this(orderId, paymentKey, amount, PaymentType.valueOf(paymentType));
-    }
-
-    public static Payment ofAdmin() {
-        return new Payment(ADMIN_MARKER, ADMIN_MARKER, BigDecimal.ZERO, PaymentType.ADMIN);
-    }
-
-    public boolean isByAdmin() {
-        return paymentType.isAdmin();
     }
 
     public Long getId() {

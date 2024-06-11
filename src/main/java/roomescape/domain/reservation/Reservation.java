@@ -74,6 +74,10 @@ public class Reservation {
         return new Reservation(member, schedule, theme, payment, status);
     }
 
+    public boolean isPaid() {
+        return payment != null;
+    }
+
     public Long getId() {
         return id;
     }
