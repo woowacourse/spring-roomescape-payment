@@ -15,7 +15,7 @@ public record ThemeRequest(
         String description,
 
         @Schema(description = "테마 썸네일", example = "https://roomescape.s3.ap-northeast-2.amazonaws.com/theme/thumbnail/serendipity.jpg")
-        @NotBlank(message = "썸내일은 빈값을 허용하지 않습니다.")
+        @NotBlank(message = "썸네일은 빈값을 허용하지 않습니다.")
         String thumbnail
 ) {
 
