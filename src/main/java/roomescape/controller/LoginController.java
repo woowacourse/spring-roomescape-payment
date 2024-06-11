@@ -1,8 +1,8 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,14 +28,18 @@ public class LoginController {
 
     @Operation(summary = "로그인 API", description = "로그인한다.")
     @PostMapping("/login")
-    public void login(@RequestBody TokenRequest tokenRequest, HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody TokenRequest tokenRequest) {
         MemberResponse memberResponse = memberService.findByEmailAndPassword(tokenRequest.email(), tokenRequest.password());
         String accessToken = authService.createToken(memberResponse);
 
-        Cookie cookie = new Cookie(authService.getTokenName(), accessToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie
+                .from(authService.getTokenName(), accessToken)
+                .httpOnly(true)
+                .path("/")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
     @Operation(summary = "로그인 체크 API", description = "로그인된 사용자 정보를 반환한다.")
@@ -49,10 +53,13 @@ public class LoginController {
 
     @Operation(summary = "로그아웃 API", description = "로그아웃한다.")
     @PostMapping("/logout")
-    public void logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie(authService.getTokenName(), null);
-        cookie.setMaxAge(0);
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie
+                .from(authService.getTokenName(), null)
+                .httpOnly(true)
+                .path("/")
+                .build();
 
-        response.addCookie(cookie);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 }
