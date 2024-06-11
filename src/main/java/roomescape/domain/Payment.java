@@ -2,6 +2,8 @@ package roomescape.domain;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 public class Payment {
 
@@ -13,20 +15,20 @@ public class Payment {
     @Column(nullable = false)
     private String orderId;
     @Column(nullable = false)
-    private long amount;
+    private BigDecimal amount;
 
     protected Payment() {
 
     }
 
-    public Payment(Long id, String paymentKey, String orderId, long amount) {
+    public Payment(Long id, String paymentKey, String orderId, BigDecimal amount) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
     }
 
-    public Payment(String paymentKey, String orderId, long amount) {
+    public Payment(String paymentKey, String orderId, BigDecimal amount) {
         this(null, paymentKey, orderId, amount);
     }
 
@@ -42,7 +44,7 @@ public class Payment {
         return orderId;
     }
 
-    public long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 }

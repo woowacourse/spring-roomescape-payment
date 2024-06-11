@@ -3,6 +3,7 @@ package roomescape.dto;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -13,19 +14,36 @@ public record ReservationDetailResponse(
         LocalTime time,
         String status,
         String paymentKey,
-        long amount
+        BigDecimal amount
 ) {
 
     public static ReservationDetailResponse from(Reservation reservation, long index) {
+        String paymentKey = checkPaymentKey(reservation);
+        BigDecimal amount = checkAmount(reservation);
+
         return new ReservationDetailResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
                 getStatusNameByIndex(index),
-                reservation.getPayment().getPaymentKey(),
-                reservation.getPayment().getAmount()
+                paymentKey,
+                amount
         );
+    }
+
+    private static String checkPaymentKey(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return null;
+        }
+        return reservation.getPayment().getPaymentKey();
+    }
+
+    private static BigDecimal checkAmount(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return null;
+        }
+        return reservation.getPayment().getAmount();
     }
 
     private static String getStatusName(ReservationStatus status) {

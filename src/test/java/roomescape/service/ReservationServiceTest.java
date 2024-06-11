@@ -20,6 +20,7 @@ import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -48,7 +49,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme1.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 )
         );
         //then
@@ -70,7 +71,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme1.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
@@ -87,7 +88,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme1.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
@@ -104,7 +105,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         themeIdNotSaved,
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
@@ -168,15 +169,11 @@ class ReservationServiceTest extends FixtureUsingTest {
             assertThat(reservationRepository.findAll()).isNotEmpty();
         }
 
-        @DisplayName("관리자는 다른 사람의 예약을 삭제할 수 없다.")
+        @DisplayName("관리자는 다른 사람의 예약을 삭제할 수 있다.")
         @Test
         void deleteOthersReservationByAdminFailTest() {
-            assertThatThrownBy(() ->
-                    reservationService.delete(LoginMemberRequest.from(ADMIN), 1L))
-                    .isInstanceOf(RoomescapeException.class)
-                    .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
-
-            assertThat(reservationRepository.findAll()).isNotEmpty();
+            reservationService.delete(LoginMemberRequest.from(ADMIN), 1L);
+            assertThat(reservationRepository.findAll()).isEmpty();
         }
 
         @DisplayName("관리자는 다른 사람의 예약 대기를 삭제할 수 있다.")
@@ -191,7 +188,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                             defaultReservation.getTheme().getId(),
                             FakePayment.CORRECT_REQ.getPaymentKey(),
                             FakePayment.CORRECT_REQ.getOrderId(),
-                            (int) FakePayment.CORRECT_REQ.getAmount()
+                            FakePayment.CORRECT_REQ.getAmount()
                     ));
             //when
             reservationService.deleteWaitingByAdmin(waitingResponse.id());
@@ -221,7 +218,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme1.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 ));
 
         ReservationResponse waitingReservation = reservationService.saveByUser(
@@ -232,7 +229,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme1.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 ));
 
         ReservationResponse bookedReservation = reservationService.saveByUser(
@@ -243,7 +240,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         theme2.getId(),
                         FakePayment.CORRECT_REQ.getPaymentKey(),
                         FakePayment.CORRECT_REQ.getOrderId(),
-                        (int) FakePayment.CORRECT_REQ.getAmount()
+                        FakePayment.CORRECT_REQ.getAmount()
                 ));
 
         //when
@@ -258,7 +255,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         waitingReservation.time().startAt(),
                         "1번째 예약대기",
                         "truePaymentKey",
-                        1
+                        BigDecimal.valueOf(1)
                 ), new ReservationDetailResponse(
                         bookedReservation.id(),
                         bookedReservation.theme().name(),
@@ -266,7 +263,7 @@ class ReservationServiceTest extends FixtureUsingTest {
                         bookedReservation.time().startAt(),
                         "예약",
                         "truePaymentKey",
-                        1
+                        BigDecimal.valueOf(1)
                 )
         );
     }

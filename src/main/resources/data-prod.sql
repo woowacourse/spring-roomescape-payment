@@ -31,17 +31,17 @@ INSERT INTO payment (payment_key, order_id, amount) VALUES
                 ('paymentKeySample', 'orderIdSample', 140L);
 
 INSERT INTO reservation (date, time_id, theme_id, member_id, created_at, payment_id) VALUES
-                                    (CURRENT_DATE - 3, 1, 1, 1, '2024-04-02', 1),
+                                    (CURRENT_DATE - 3, 1, 1, 1, '2024-04-02', null),
                                     (CURRENT_DATE - 3, 2, 1, 2, '2024-04-02T11:20', 2),
                                     (CURRENT_DATE - 3, 1, 1, 3, '2024-04-02T12:30', 3),
-                                    (CURRENT_DATE - 3, 3, 1, 1, '2024-04-02', 4),
-                                    (CURRENT_DATE - 3, 4, 2, 1, '2024-04-02', 5),
-                                    (CURRENT_DATE - 3, 1, 3, 1, '2024-04-02', 6),
-                                    (CURRENT_DATE - 2, 1, 1, 1, '2024-04-02', 7),
-                                    (CURRENT_DATE - 1, 1, 1, 1, '2024-04-02', 8),
-                                    (CURRENT_DATE, 1, 1, 1, '2024-04-02', 9),
-                                    (CURRENT_DATE + 1, 1, 2, 1, '2024-04-02T10:30', 10),
+                                    (CURRENT_DATE - 3, 3, 1, 1, '2024-04-02', null),
+                                    (CURRENT_DATE - 3, 4, 2, 1, '2024-04-02', null),
+                                    (CURRENT_DATE - 3, 1, 3, 1, '2024-04-02', null),
+                                    (CURRENT_DATE - 2, 1, 1, 1, '2024-04-02', null),
+                                    (CURRENT_DATE - 1, 1, 1, 1, '2024-04-02', null),
+                                    (CURRENT_DATE, 1, 1, 1, '2024-04-02', null),
+                                    (CURRENT_DATE + 1, 1, 2, 1, '2024-04-02T10:30', null),
                                     (CURRENT_DATE + 1, 1, 2, 2, '2024-04-02T10:40', 11),
-                                    (CURRENT_DATE + 2, 1, 2, 1, '2024-04-02T10:30', 12),
+                                    (CURRENT_DATE + 2, 1, 2, 1, '2024-04-02T10:30', null),
                                     (CURRENT_DATE + 2, 1, 2, 2, '2024-04-02T11:30', 13),
                                     (CURRENT_DATE + 2, 1, 2, 3, '2024-04-02T12:30', 14);

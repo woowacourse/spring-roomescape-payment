@@ -24,6 +24,7 @@ import static roomescape.exception.ExceptionType.*;
 @Service
 public class ReservationService {
     private static final int NOT_WAITING_INDEX = 1;
+    private static final long ADMIN_ID = 1;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -153,7 +154,7 @@ public class ReservationService {
         }
 
         Reservation requestedReservation = findResult.get();
-        if (requestedReservation.getMember().getId() != loginMemberRequest.id()) {
+        if (isNotDeletableMember(loginMemberRequest, requestedReservation.getMember())) {
             throw new RoomescapeException(FORBIDDEN_DELETE);
         }
         reservationRepository.delete(requestedReservation);
@@ -161,6 +162,10 @@ public class ReservationService {
         if (isPaidReservation(requestedReservation)) {
             paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("예약 취소")));
         }
+    }
+
+    private static boolean isNotDeletableMember(LoginMemberRequest loginMember, Member requestReservationMember) {
+        return loginMember.id() != requestReservationMember.getId() && loginMember.id() != ADMIN_ID;
     }
 
     @Transactional
@@ -182,7 +187,7 @@ public class ReservationService {
     }
 
     private static boolean isPaidReservation(Reservation requestedReservation) {
-        return requestedReservation.getPayment() == null;
+        return requestedReservation.getPayment() != null;
     }
 
     private boolean isNotWaiting(Reservation requestedReservation) {
