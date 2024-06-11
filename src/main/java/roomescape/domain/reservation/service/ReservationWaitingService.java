@@ -30,8 +30,6 @@ import java.util.NoSuchElementException;
 @Service
 public class ReservationWaitingService {
 
-    private static final int FIRST_RESERVATION_WAITING_ORDER_VALUE = 1;
-
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final CustomReservationWaitingRepository customReservationWaitingRepository;
     private final ReservationRepository reservationRepository;
@@ -73,11 +71,11 @@ public class ReservationWaitingService {
     }
 
     private boolean checkPaymentAvailable(final ReservationWaitingWithOrder reservationWaitingWithOrder) {
-        if (reservationWaitingWithOrder.getOrder() != FIRST_RESERVATION_WAITING_ORDER_VALUE) {
+        if (!reservationWaitingWithOrder.isFirstOrder()) {
             return false;
         }
 
-        final ReservationWaiting reservationWaiting = reservationWaitingWithOrder.getReservationWaiting();
+        final ReservationWaiting reservationWaiting = reservationWaitingWithOrder.reservationWaiting();
         final boolean existReservation = reservationRepository.existsByDateAndTime_IdAndTheme_IdAndStatus(
                 reservationWaiting.getDate(),
                 reservationWaiting.getTime().getId(),
@@ -151,7 +149,7 @@ public class ReservationWaitingService {
         validateReservationWaiting(reservationWaitingWithOrder);
         final SaveReservationRequest saveReservationRequest = convertSaveReservationRequest(request, reservationWaitingWithOrder);
         final ReservationDto reservationDto = reservationService.saveReservationWithPaymentConfirm(saveReservationRequest);
-        deleteReservationWaiting(reservationWaitingWithOrder.getReservationWaiting().getId());
+        deleteReservationWaiting(reservationWaitingWithOrder.reservationWaiting().getId());
 
         return reservationDto;
     }
@@ -163,7 +161,7 @@ public class ReservationWaitingService {
     }
 
     private SaveReservationRequest convertSaveReservationRequest(final ApproveReservationWaitingRequest request, final ReservationWaitingWithOrder reservationWaitingWithOrder) {
-        final ReservationWaiting reservationWaiting = reservationWaitingWithOrder.getReservationWaiting();
+        final ReservationWaiting reservationWaiting = reservationWaitingWithOrder.reservationWaiting();
         return new SaveReservationRequest(
                 reservationWaiting.getDate().getValue(),
                 reservationWaiting.getMember().getId(),

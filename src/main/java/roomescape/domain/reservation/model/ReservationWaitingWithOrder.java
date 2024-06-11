@@ -1,20 +1,10 @@
 package roomescape.domain.reservation.model;
 
-public class ReservationWaitingWithOrder {
+public record ReservationWaitingWithOrder(ReservationWaiting reservationWaiting, int order) {
 
-    private final ReservationWaiting reservationWaiting;
-    private final int order;
+    private static final int FIRST_RESERVATION_WAITING_ORDER_VALUE = 1;
 
-    public ReservationWaitingWithOrder(final ReservationWaiting reservationWaiting, final int order) {
-        this.reservationWaiting = reservationWaiting;
-        this.order = order;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public ReservationWaiting getReservationWaiting() {
-        return reservationWaiting;
+    public boolean isFirstOrder() {
+        return this.order == FIRST_RESERVATION_WAITING_ORDER_VALUE;
     }
 }

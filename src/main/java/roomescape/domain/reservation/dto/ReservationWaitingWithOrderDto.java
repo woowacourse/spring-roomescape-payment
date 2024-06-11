@@ -15,13 +15,13 @@ public record ReservationWaitingWithOrderDto(
 ) {
     public static ReservationWaitingWithOrderDto of(final ReservationWaitingWithOrder reservationWaitingWithOrder, final boolean paymentAvailable) {
         return new ReservationWaitingWithOrderDto(
-                reservationWaitingWithOrder.getReservationWaiting().getId(),
-                reservationWaitingWithOrder.getOrder(),
+                reservationWaitingWithOrder.reservationWaiting().getId(),
+                reservationWaitingWithOrder.order(),
                 paymentAvailable,
-                reservationWaitingWithOrder.getReservationWaiting().getDate(),
-                ReservationTimeDto.from(reservationWaitingWithOrder.getReservationWaiting().getTime()),
-                ThemeDto.from(reservationWaitingWithOrder.getReservationWaiting().getTheme()),
-                MemberDto.from(reservationWaitingWithOrder.getReservationWaiting().getMember())
+                reservationWaitingWithOrder.reservationWaiting().getDate(),
+                ReservationTimeDto.from(reservationWaitingWithOrder.reservationWaiting().getTime()),
+                ThemeDto.from(reservationWaitingWithOrder.reservationWaiting().getTheme()),
+                MemberDto.from(reservationWaitingWithOrder.reservationWaiting().getMember())
         );
     }
 }

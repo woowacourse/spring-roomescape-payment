@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.domain.reservation.model.ReservationWaitingWithOrder;
-import roomescape.domain.reservation.repository.CustomReservationWaitingRepository;
 
 import java.util.List;
 
@@ -31,10 +30,10 @@ class CustomReservationWaitingRepositoryImplTest {
         // Then
         assertAll(
                 () -> assertThat(reservationWaitingWithOrders).hasSize(2),
-                () -> assertThat(firstReservationWaitingWithOrder.getReservationWaiting().getId()).isEqualTo(1L),
-                () -> assertThat(firstReservationWaitingWithOrder.getOrder()).isEqualTo(1),
-                () -> assertThat(secondReservationWaitingWithOrder.getReservationWaiting().getId()).isEqualTo(4L),
-                () -> assertThat(secondReservationWaitingWithOrder.getOrder()).isEqualTo(2)
+                () -> assertThat(firstReservationWaitingWithOrder.reservationWaiting().getId()).isEqualTo(1L),
+                () -> assertThat(firstReservationWaitingWithOrder.order()).isEqualTo(1),
+                () -> assertThat(secondReservationWaitingWithOrder.reservationWaiting().getId()).isEqualTo(4L),
+                () -> assertThat(secondReservationWaitingWithOrder.order()).isEqualTo(2)
         );
     }
 }
