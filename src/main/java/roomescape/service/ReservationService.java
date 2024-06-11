@@ -66,14 +66,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteById(long id) {
+    public void cancelById(long id) {
         Reservation reservation = getReservation(id);
         if (hasReservationWaiting(reservation)) {
             ReservationWaiting reservationWaiting = getReservationWaiting(reservation);
             confirmReservationWaiting(reservationWaiting);
         }
         paymentService.deletePayment(reservation.getId());
-        reservationRepository.deleteById(reservation.getId());
+        reservation.cancel();
     }
 
     private Reservation getReservation(long id) {
@@ -113,7 +113,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findAll() {
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> reservations = reservationRepository.findAllByStatusIn(ReservationStatus.getActiveStatuses());
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -136,7 +136,7 @@ public class ReservationService {
                 reservationWaitingRepository.findReservationWaitWithRankByMemberId(memberId).stream()
                 .map(MyReservationResponse::from);
         Stream<MyReservationResponse> reservationWaitingResponses =
-                reservationRepository.findAllByMemberId(memberId).stream()
+                reservationRepository.findAllByMemberIdAndStatusIn(memberId, ReservationStatus.getActiveStatuses()).stream()
                 .map(MyReservationResponse::from);
         return Stream.concat(reservationResponses, reservationWaitingResponses)
                 .sorted(Comparator.comparing(reservation -> LocalDateTime.of(reservation.date(), reservation.time())))

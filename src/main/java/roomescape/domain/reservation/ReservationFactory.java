@@ -44,7 +44,8 @@ public class ReservationFactory {
         validateRequestDateAfterCurrentTime(dateTime);
         validateUniqueReservation(date, timeId, themeId);
         validateAlreadyWaiting(date, timeId, themeId, memberId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), ReservationStatus.RESERVATION);
+        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId),
+                ReservationStatus.RESERVATION);
     }
 
     public ReservationWaiting createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {
@@ -80,19 +81,22 @@ public class ReservationFactory {
     }
 
     private void validateUniqueReservation(LocalDate date, Long timeId, Long themeId) {
-        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatusIn(date, timeId, themeId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재합니다.");
         }
     }
 
     private void validateReservationNotExist(LocalDate date, Long timeId, Long themeId) {
-        if (!reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+        if (!reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatusIn(date, timeId, themeId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재하지 않아서 예약 대기를 할 수 없습니다.");
         }
     }
 
     private void validateIsExistMyReservation(LocalDate date, Long timeId, Long themeId, Long memberId) {
-        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(date, timeId, themeId, memberId)) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberIdAndStatusIn(date, timeId, themeId, memberId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.CONFLICT, "이미 예약을 했습니다.");
         }
     }

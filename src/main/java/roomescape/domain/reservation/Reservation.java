@@ -55,6 +55,12 @@ public class Reservation {
         this.status = status;
     }
 
+    public void cancel() {
+        if (status.isNotCanceled()) {
+            status = ReservationStatus.CANCELED;
+        }
+    }
+
     public Long getId() {
         return id;
     }

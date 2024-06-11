@@ -69,7 +69,7 @@ public class ReservationController {
     @SwaggerNotFound
     @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> deleteReservation(@PathVariable long reservationId) {
-        reservationService.deleteById(reservationId);
+        reservationService.cancelById(reservationId);
         return ResponseEntity.noContent().build();
     }
 

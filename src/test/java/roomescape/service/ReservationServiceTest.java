@@ -17,6 +17,8 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
@@ -31,6 +33,9 @@ class ReservationServiceTest extends BasicAcceptanceTest {
 
     @Autowired
     private ReservationWaitingService reservationWaitingService;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -66,19 +71,19 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         assertThat(reservationService.findAll()).hasSize(1);
     }
 
-    @DisplayName("해당 id의 예약을 삭제한다.")
+    @DisplayName("해당 id의 상태를 `CANCELED`로 변경한다.")
     @Test
-    void deleteById() {
+    void cancelById() {
         jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '1' DAY , 1, 1, 1, 'RESERVATION')");
-        reservationService.deleteById(1L);
+        reservationService.cancelById(1L);
 
-        assertThat(reservationService.findAll()).hasSize(0);
+        assertThat(reservationRepository.findById(1L).get().getStatus()).isSameAs(ReservationStatus.CANCELED);
     }
 
     @DisplayName("예약 삭제 요청시 예약이 존재하지 않으면 예외를 발생시킨다.")
     @Test
     void invalidNotExistReservation() {
-        assertThatThrownBy(() -> reservationService.deleteById(99L))
+        assertThatThrownBy(() -> reservationService.cancelById(99L))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", 99));
     }
@@ -113,7 +118,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
                 dynamicTest("예약 대기를 조회한다. (총 0개)", () -> assertThat(reservationWaitingService.findAll()).isEmpty()),
                 dynamicTest("예약을 추가한다.", () -> reservationResponse.set(reservationService.saveReservationByAdmin(new AdminReservationRequest(1L, LocalDate.now().plusDays(1L), 1L, 1L)))),
                 dynamicTest("예약 대기를 추가한다.", () -> reservationWaitingService.saveReservationWaiting(new WaitingRequest(LocalDate.now().plusDays(1), 1L, 1L), (new LoginMember(2L, "운영자")))),
-                dynamicTest("예약을 삭제한다.", () -> reservationService.deleteById(reservationResponse.get().id())),
+                dynamicTest("예약을 삭제한다.", () -> reservationService.cancelById(reservationResponse.get().id())),
                 dynamicTest("예약 대기가 삭제된다.", () -> assertThat(reservationWaitingService.findAll()).isEmpty()));
     }
 }
