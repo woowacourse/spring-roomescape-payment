@@ -54,6 +54,7 @@ public class PaymentService {
             foundPayment.updatePaymentStatus(PaymentStatus.REJECTED);
             paymentWAL.setErrorMessage(exception.getMessage());
             paymentWAL.updateWALStatus(PaymentWALStatus.PAY_REJECTED);
+            paymentWALRepository.save(paymentWAL);
             throw exception;
         }
         return PaymentResponse.toResponse(foundPayment);
@@ -71,7 +72,17 @@ public class PaymentService {
 
     public void cancel(ReservationResponse canceledReservation) {
         Optional<Payment> paymentById = paymentRepository.findByReservationId(canceledReservation.id());
-        paymentById.ifPresent(this::updatePaymentStatusToCancel);
+        try {
+            paymentById.ifPresent(this::updatePaymentStatusToCancel);
+        } catch (Exception exception) {
+            paymentById.flatMap(payment -> paymentWALRepository.findByPaymentKey(payment.getPaymentKey()))
+                    .ifPresent(paymentWAL -> {
+                                paymentWAL.updateWALStatus(PaymentWALStatus.CANCEL_REJECTED);
+                                paymentWALRepository.save(paymentWAL);
+                            }
+                    );
+            throw exception;
+        }
     }
 
     private void updatePaymentStatusToCancel(Payment payment) {
