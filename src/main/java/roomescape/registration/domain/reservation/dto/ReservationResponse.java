@@ -28,8 +28,8 @@ public record ReservationResponse(
         PaymentResponse paymentResponse) {
 
     public static ReservationResponse from(Reservation reservation) {
-        return new ReservationResponse(reservation.getId(), reservation.getMember().getName(),
-                reservation.getTheme().getName(), reservation.getDate(),
-                reservation.getReservationTime().getStartAt(), PaymentResponse.getPaymentResponseForNotPaidReservation());
+        return new ReservationResponse(reservation.getId(), reservation.getMemberName(),
+                reservation.getThemName(), reservation.getDate(),
+                reservation.getReservationTimeStartAt(), PaymentResponse.getPaymentResponseForNotPaidReservation());
     }
 }

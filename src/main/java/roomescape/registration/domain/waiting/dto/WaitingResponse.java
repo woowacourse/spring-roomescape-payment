@@ -30,10 +30,10 @@ public record WaitingResponse(
 
         return new WaitingResponse(
                 waiting.getId(),
-                waiting.getReservation().getMember().getName(),
-                reservation.getTheme().getName(),
+                waiting.getReservation().getMemberName(),
+                reservation.getThemName(),
                 reservation.getDate(),
-                reservation.getReservationTime().getStartAt()
+                reservation.getReservationTimeStartAt()
         );
     }
 }
