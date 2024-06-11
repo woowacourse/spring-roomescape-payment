@@ -38,14 +38,13 @@ public class ReservationFactory {
         this.clock = clock;
     }
 
-    public Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
+    public Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId, ReservationStatus status) {
         ReservationTime reservationTime = getReservationTime(timeId);
         LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
         validateRequestDateAfterCurrentTime(dateTime);
         validateUniqueReservation(date, timeId, themeId);
         validateAlreadyWaiting(date, timeId, themeId, memberId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId),
-                ReservationStatus.RESERVATION);
+        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), status);
     }
 
     public ReservationWaiting createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {

@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.dto.payment.PaymentRequest;
@@ -55,15 +56,15 @@ class PaymentServiceTest extends BasicAcceptanceTest {
         );
     }
 
-    @DisplayName("결제 내역을 삭제한다.")
+    @DisplayName("결제 상태를 REFUNDED로 변경한다.")
     @Test
-    void deletePayment() {
+    void refundPayment() {
         PaymentRequest paymentRequest = new PaymentRequest("orderId", BigDecimal.valueOf(1000), "paymentKey");
         Reservation reservation = reservationRepository.findById(1L).get();
         paymentService.confirmPayment(paymentRequest, reservation);
 
-        paymentService.deletePayment(1L);
+        paymentService.refundPayment(1L);
 
-        assertThat(paymentRepository.count()).isEqualTo(0);
+        assertThat(paymentRepository.findById(1L).get().getStatus()).isEqualTo(PaymentStatus.REFUNDED);
     }
 }

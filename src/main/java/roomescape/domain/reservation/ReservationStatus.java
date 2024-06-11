@@ -22,6 +22,10 @@ public enum ReservationStatus {
         return value;
     }
 
+    public boolean isReserved() {
+        return this == RESERVATION;
+    }
+
     public boolean isNotCanceled() {
         return this != CANCELED;
     }

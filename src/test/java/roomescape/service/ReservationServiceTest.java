@@ -74,7 +74,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     @DisplayName("해당 id의 상태를 `CANCELED`로 변경한다.")
     @Test
     void cancelById() {
-        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '1' DAY , 1, 1, 1, 'RESERVATION')");
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '1' DAY , 1, 1, 1, 'PAYMENT_WAITING')");
         reservationService.cancelById(1L);
 
         assertThat(reservationRepository.findById(1L).get().getStatus()).isSameAs(ReservationStatus.CANCELED);

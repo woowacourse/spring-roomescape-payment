@@ -47,7 +47,8 @@ public class ReservationService {
                 loginMember.id(),
                 reservationRequest.date(),
                 reservationRequest.timeId(),
-                reservationRequest.themeId()
+                reservationRequest.themeId(),
+                ReservationStatus.RESERVATION
         );
         Reservation savedReservation = reservationRepository.save(reservation);
         paymentService.confirmPayment(paymentRequest, savedReservation);
@@ -60,7 +61,8 @@ public class ReservationService {
                 adminReservationRequest.memberId(),
                 adminReservationRequest.date(),
                 adminReservationRequest.timeId(),
-                adminReservationRequest.themeId()
+                adminReservationRequest.themeId(),
+                ReservationStatus.PAYMENT_WAITING
         );
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
@@ -72,7 +74,9 @@ public class ReservationService {
             ReservationWaiting reservationWaiting = getReservationWaiting(reservation);
             confirmReservationWaiting(reservationWaiting);
         }
-        paymentService.deletePayment(reservation.getId());
+        if (reservation.isPaid()) {
+            paymentService.refundPayment(reservation.getId());
+        }
         reservation.cancel();
     }
 
