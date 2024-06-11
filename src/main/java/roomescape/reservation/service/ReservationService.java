@@ -131,7 +131,7 @@ public class ReservationService {
         if (reservation.isPaid()) {
             final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
                     .orElseThrow(() -> new NoSuchElementException("존재하지 않는 결제 정보입니다."));
-            paymentHistory.deleteReservation();
+            paymentHistoryRepository.deleteById(paymentHistory.getId());
         }
         reservationRepository.deleteById(reservation.getId());
         reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(

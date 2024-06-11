@@ -8,9 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.member.model.Member;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation_waiting SET is_deleted = true WHERE id = ?")
+@SQLRestriction(value = "is_deleted = false")
 public class ReservationWaiting {
 
     @Id
@@ -31,6 +35,9 @@ public class ReservationWaiting {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
 
     public ReservationWaiting(
             final ReservationTime time,
@@ -63,6 +70,7 @@ public class ReservationWaiting {
         this.theme = theme;
         this.time = time;
         this.createdAt = createdAt;
+        this.isDeleted = false;
     }
 
     protected ReservationWaiting() {
@@ -101,5 +109,9 @@ public class ReservationWaiting {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 }

@@ -1,12 +1,17 @@
 package roomescape.reservation.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE theme SET is_deleted = true WHERE id = ?")
+@SQLRestriction(value = "is_deleted = false")
 public class Theme {
 
     @Id
@@ -21,6 +26,9 @@ public class Theme {
 
     @Embedded
     private ThemeThumbnail thumbnail;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
 
     protected Theme() {
     }
@@ -62,6 +70,7 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.isDeleted = false;
     }
 
     public Long getId() {
@@ -78,5 +87,9 @@ public class Theme {
 
     public ThemeThumbnail getThumbnail() {
         return thumbnail;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 }

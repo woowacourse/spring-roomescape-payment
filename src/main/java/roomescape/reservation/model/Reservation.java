@@ -10,9 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.util.Objects;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.member.model.Member;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation SET status = 'CANCELED' WHERE id = ?")
+@SQLRestriction(value = "status <> 'CANCELED'")
 public class Reservation {
 
     @Id

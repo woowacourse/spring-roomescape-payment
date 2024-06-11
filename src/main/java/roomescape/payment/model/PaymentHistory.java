@@ -10,9 +10,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.reservation.model.Reservation;
 
 @Entity
+@SQLDelete(sql = "UPDATE payment_history SET payment_status = 'RESERVATION_CANCELED' WHERE id = ?")
+@SQLRestriction(value = "payment_status <> 'RESERVATION_CANCELED'")
 public class PaymentHistory {
 
     @Id
@@ -53,11 +57,6 @@ public class PaymentHistory {
 
     public boolean hasSameReservation(final Reservation other) {
         return reservation.equals(other);
-    }
-
-    public void deleteReservation() {
-        this.reservation = null;
-        this.paymentStatus = PaymentHistoryStatus.RESERVATION_CANCELED;
     }
 
     public Long getId() {
