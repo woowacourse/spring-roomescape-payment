@@ -11,12 +11,12 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
@@ -25,6 +25,8 @@ import roomescape.exception.UnauthorizedException;
 @Entity
 @Table(name = "waiting")
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE WAITING SET deleted_at = CURRENT_TIMESTAMP() WHERE WAITING.ID = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ReservationWaiting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,8 +42,9 @@ public class ReservationWaiting {
     private Schedule schedule;
 
     @OneToOne
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Payment payment;
+
+    private LocalDateTime deletedAt;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -62,10 +65,18 @@ public class ReservationWaiting {
         this.schedule = schedule;
     }
 
+    public ReservationWaiting withPayment(Payment payment) {
+        return new ReservationWaiting(member, theme, schedule, payment);
+    }
+
     public void checkCancelAuthority(long memberId) {
         if (member.getId() != memberId) {
             throw new UnauthorizedException("예약 대기를 취소할 권한이 없습니다.");
         }
+    }
+
+    public boolean isPaid() {
+        return payment != null;
     }
 
     public Long getId() {

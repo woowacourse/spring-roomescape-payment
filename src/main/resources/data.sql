@@ -8,7 +8,6 @@ INSERT INTO member(name, email, password, role) VALUES('어드민', 'admin@email
 INSERT INTO member(name, email, password, role) VALUES('리니', 'lini@email.com', 'lini123', 'GUEST');
 INSERT INTO member(name, email, password, role) VALUES('페드로', 'pedro@email.com', 'pedro123', 'GUEST');
 INSERT INTO member(name, email, password, role) VALUES('제이', 'junho@email.com', 'junho123', 'GUEST');
-INSERT INTO member(name, email, password, role) VALUES('미르', 'duho@email.com', 'duho123', 'GUEST');
 
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 1, 'RESERVED');
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', -7, CURRENT_DATE), 1, 2, 1, 'RESERVED');
@@ -24,7 +23,9 @@ INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES
 INSERT INTO reservation(VISIT_DATE, time_id, member_id, theme_id, status) VALUES (DATEADD('DAY', 1, CURRENT_DATE), 1, 3, 3, 'RESERVED');
 
 -- 내일 날짜 2번 테마 1번 시간에 예약 대기 순서대로 생성(페드로 -> 리니 -> 제이 -> 미르)
+INSERT INTO member(name, email, password, role) VALUES('미르', 'duho@email.com', 'duho123', 'GUEST');
 INSERT INTO waiting(member_id, theme_id, time_id, VISIT_DATE, created_at) VALUES (3, 2, 1, DATEADD('DAY', 1, CURRENT_DATE), DATEADD('HOUR', -4, CURRENT_TIMESTAMP));
 INSERT INTO waiting(member_id, theme_id, time_id, VISIT_DATE, created_at) VALUES (2, 2, 1, DATEADD('DAY', 1, CURRENT_DATE), DATEADD('HOUR', -3, CURRENT_TIMESTAMP));
 INSERT INTO waiting(member_id, theme_id, time_id, VISIT_DATE, created_at) VALUES (4, 2, 1, DATEADD('DAY', 1, CURRENT_DATE), DATEADD('HOUR', -2, CURRENT_TIMESTAMP));
+
 INSERT INTO waiting(member_id, theme_id, time_id, VISIT_DATE, created_at) VALUES (5, 2, 1, DATEADD('DAY', 1, CURRENT_DATE), DATEADD('HOUR', -1, CURRENT_TIMESTAMP));

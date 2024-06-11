@@ -29,3 +29,11 @@ security:
 logging:
   level:
     org.springframework.transaction.interceptor: TRACE
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+apiVersion: 0.0.1

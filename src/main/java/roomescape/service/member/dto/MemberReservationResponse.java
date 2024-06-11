@@ -1,5 +1,6 @@
 package roomescape.service.member.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.config.DateFormatConstraint;
@@ -13,7 +14,9 @@ public record MemberReservationResponse(
         String theme,
         @DateFormatConstraint LocalDate date,
         @TimeFormatConstraint LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        BigDecimal paymentAmount
 ) {
     public static MemberReservationResponse from(Reservation reservation) {
         return new MemberReservationResponse(
@@ -21,7 +24,9 @@ public record MemberReservationResponse(
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate(),
                 reservation.getTime(),
-                reservation.getStatus().getDescription()
+                reservation.getStatus().getDescription(),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
@@ -32,7 +37,9 @@ public record MemberReservationResponse(
                 waiting.getTheme().getName().getValue(),
                 waiting.getScheduleDate(),
                 waiting.getSchedule().getTime(),
-                waitingWithRank.rank() + "번째 예약대기"
+                waitingWithRank.rank() + "번째 예약대기",
+                waiting.getPayment().getPaymentKey(),
+                waiting.getPayment().getAmount()
         );
     }
 }

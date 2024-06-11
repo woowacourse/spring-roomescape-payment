@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -22,6 +23,7 @@ import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.payment.PaymentService;
+import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
@@ -52,10 +54,8 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        paymentService.confirm(reservationRequest.toPaymentRequest());
-        return new ReservationResponse(savedReservation);
+        Reservation confirmedReservation = confirmPayment(reservation, reservationRequest.toPaymentRequest());
+        return new ReservationResponse(reservationRepository.save(confirmedReservation));
     }
 
     private Reservation generateValidReservation(ReservationRequest reservationRequest, long memberId) {
@@ -73,6 +73,14 @@ public class ReservationService {
         Member member = findMemberById(memberId);
 
         return new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
+    }
+
+    private Reservation confirmPayment(Reservation validReservation, PaymentRequest paymentRequest) {
+        if (paymentRequest.isAdmin()) {
+            return validReservation;
+        }
+        Payment payment = paymentService.confirm(paymentRequest);
+        return validReservation.withPayment(payment);
     }
 
     private ReservationTime findTimeById(long timeId) {
@@ -104,9 +112,19 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public void deleteById(long reservationId) {
         reservationRepository.findById(reservationId)
                 .ifPresent(this::cancelReservation);
+    }
+
+    @Transactional
+    public void deleteById(long reservationId, long memberId) {
+        reservationRepository.findById(reservationId)
+                .ifPresent(reservation -> {
+                    reservation.checkCancelAuthority(memberId);
+                    cancelReservation(reservation);
+                });
     }
 
     private void cancelReservation(Reservation reservation) {
@@ -115,6 +133,9 @@ public class ReservationService {
         reservationRepository.delete(reservation);
         reservationWaitingRepository.findTopByThemeAndScheduleOrderByCreatedAt(theme, schedule)
                 .ifPresent(this::convertFirstPriorityWaitingToReservation);
+        if (reservation.isPaid()) {
+            paymentService.cancel(reservation.getPayment());
+        }
     }
 
     private void convertFirstPriorityWaitingToReservation(ReservationWaiting waiting) {
@@ -123,12 +144,6 @@ public class ReservationService {
         );
         reservationRepository.save(reservation);
         reservationWaitingRepository.delete(waiting);
-    }
-
-    public void deleteById(long reservationId, long memberId) {
-        reservationRepository.findById(reservationId)
-                .ifPresent(reservation -> reservation.checkCancelAuthority(memberId));
-        deleteById(reservationId);
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {

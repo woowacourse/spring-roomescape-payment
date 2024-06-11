@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.payment.Payment;
@@ -19,6 +20,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.payment.PaymentService;
+import roomescape.service.payment.dto.PaymentRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationWaitingResponse;
 
@@ -45,20 +47,29 @@ public class ReservationWaitingService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationWaitingResponse create(ReservationRequest waitingRequest, long memberId) {
+        ReservationWaiting waiting = generateValidWaiting(waitingRequest, memberId);
+        ReservationWaiting confirmedWaiting = confirmPayment(waiting, waitingRequest.toPaymentRequest());
+        return new ReservationWaitingResponse(reservationWaitingRepository.save(confirmedWaiting));
+    }
+
+    private ReservationWaiting generateValidWaiting(ReservationRequest waitingRequest, long memberId) {
         ReservationDate reservationDate = ReservationDate.of(waitingRequest.date());
         ReservationTime reservationTime = findTimeById(waitingRequest.timeId());
         Schedule schedule = new Schedule(reservationDate, reservationTime);
         Theme theme = findThemeById(waitingRequest.themeId());
         Member member = findMemberById(memberId);
-
         validate(reservationDate, reservationTime, theme, member, schedule);
-        Payment payment = paymentService.confirm(waitingRequest.toPaymentRequest());
+        return new ReservationWaiting(member, theme, schedule);
+    }
 
-        ReservationWaiting waiting = reservationWaitingRepository.save(
-                new ReservationWaiting(member, theme, schedule, payment)
-        );
-        return new ReservationWaitingResponse(waiting);
+    private ReservationWaiting confirmPayment(ReservationWaiting waiting, PaymentRequest paymentRequest) {
+        if (paymentRequest.isAdmin()) {
+            return waiting;
+        }
+        Payment payment = paymentService.confirm(paymentRequest);
+        return waiting.withPayment(payment);
     }
 
     public List<ReservationWaitingResponse> findAll() {
@@ -96,22 +107,31 @@ public class ReservationWaitingService {
         }
     }
 
+    @Transactional
     public void deleteById(long waitingId) {
-        reservationWaitingRepository.deleteById(waitingId);
+        reservationWaitingRepository.findById(waitingId)
+                .ifPresent(this::cancelWaiting);
     }
 
+    @Transactional
     public void deleteById(long waitingId, long memberId) {
         reservationWaitingRepository.findById(waitingId)
                 .ifPresent(waiting -> {
                     waiting.checkCancelAuthority(memberId);
-                    paymentService.cancel(waiting.getPayment());
+                    cancelWaiting(waiting);
                 });
-        deleteById(waitingId);
+    }
+
+    private void cancelWaiting(ReservationWaiting waiting) {
+        reservationWaitingRepository.deleteById(waiting.getId());
+        if (waiting.isPaid()) {
+            paymentService.cancel(waiting.getPayment());
+        }
     }
 
     @Scheduled(cron = "${resetwaiting.schedule.cron}")
-    private void deleteTodayWaiting() {
+    protected void deleteTodayWaiting() {
         List<ReservationWaiting> waitingOfToday = reservationWaitingRepository.findBySchedule_Date(LocalDate.now());
-        waitingOfToday.forEach(w -> deleteById(w.getId()));
+        waitingOfToday.forEach(this::cancelWaiting);
     }
 }

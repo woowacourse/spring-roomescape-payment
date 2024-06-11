@@ -8,12 +8,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "payment")
+@SQLDelete(sql = "UPDATE PAYMENT SET deleted_at = CURRENT_TIMESTAMP() WHERE PAYMENT.ID = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Payment {
-    private static final String ADMIN_MARKER = "ADMIN";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +30,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
+    private LocalDateTime deletedAt;
+
     protected Payment() {
     }
 
@@ -39,14 +44,6 @@ public class Payment {
 
     public Payment(String orderId, String paymentKey, BigDecimal amount, String paymentType) {
         this(orderId, paymentKey, amount, PaymentType.valueOf(paymentType));
-    }
-
-    public static Payment ofAdmin() {
-        return new Payment(ADMIN_MARKER, ADMIN_MARKER, BigDecimal.ZERO, PaymentType.ADMIN);
-    }
-
-    public boolean isByAdmin() {
-        return paymentType.isByAdmin();
     }
 
     public Long getId() {

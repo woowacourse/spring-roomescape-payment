@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.Fixture;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -51,14 +53,18 @@ class ReservationServiceTest extends ServiceTestBase {
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
+    private Payment payment;
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void setUp() {
         reservationTime = reservationTimeRepository.save(Fixture.reservationTime);
         theme = themeRepository.save(Fixture.theme);
         member = memberRepository.save(Fixture.member);
+        payment = paymentRepository.save(Fixture.payment);
     }
 
     @DisplayName("새로운 예약을 저장한다.")
@@ -164,9 +170,9 @@ class ReservationServiceTest extends ServiceTestBase {
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.today), reservationTime);
 
         reservationRepository.save(
-                new Reservation(member, schedule, theme, ReservationStatus.RESERVED)
+                new Reservation(member, schedule, theme, payment, ReservationStatus.RESERVED)
         );
-        reservationWaitingRepository.save(new ReservationWaiting(member, theme, schedule));
+        reservationWaitingRepository.save(new ReservationWaiting(member, theme, schedule, payment));
 
         // when
         List<MemberReservationResponse> reservations = reservationService.findReservationsOf(member.getId());
@@ -180,7 +186,7 @@ class ReservationServiceTest extends ServiceTestBase {
     void deleteById() {
         // given
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.tomorrow), reservationTime);
-        Reservation reservation = new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, schedule, theme, payment, ReservationStatus.RESERVED);
         Reservation target = reservationRepository.save(reservation);
 
         // when
@@ -198,7 +204,7 @@ class ReservationServiceTest extends ServiceTestBase {
         Schedule schedule = new Schedule(ReservationDate.of(date), reservationTime);
         ReservationWaiting waiting = new ReservationWaiting(member, theme, schedule);
         ReservationWaiting savedWaiting = reservationWaitingRepository.save(waiting);
-        Reservation reservation = new Reservation(member, schedule, theme, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, schedule, theme, payment, ReservationStatus.RESERVED);
         Reservation target = reservationRepository.save(reservation);
 
         // when
