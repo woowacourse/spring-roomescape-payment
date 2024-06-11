@@ -13,10 +13,6 @@ public record PaymentResponse(
         return new PaymentResponse(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount());
     }
 
-    public static PaymentResponse empty() {
-        return null;
-    }
-
     public Payment toEntity(final Reservation reservation) {
         return new Payment(orderId, paymentKey, totalAmount, reservation);
     }

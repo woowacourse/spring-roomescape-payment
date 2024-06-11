@@ -35,12 +35,12 @@ class ReservationServiceTest {
 
         PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
         PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount());
-        Mockito.when(paymentService.payByToss(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(paymentService.payByToss(userReservationPaymentRequest)).thenReturn(paymentResponse);
 
         // when
         ReservationResponse reservationResponse = reservationService.registerReservationPayments(
                 userReservationPaymentRequest,
-                userReservationPaymentRequest.memberId());
+                userReservationPaymentRequest.memberId(), paymentResponse);
 
         // then
         assertThat(reservationResponse).isNotNull();

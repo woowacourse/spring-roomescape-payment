@@ -51,6 +51,14 @@ class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(e.getClientStatusCode(), e.getMessage());
     }
 
+    @ExceptionHandler(value = PaymentCancelException.class)
+    private ProblemDetail handlePaymentCancelException(PaymentCancelException e) throws JsonProcessingException {
+        String cancelRequest = objectMapper.writeValueAsString(e.getCancelRequest());
+        log.error(e.getClientStatusCode().toString(), e.getMessage(), cancelRequest, e.getException());
+
+        return ProblemDetail.forStatusAndDetail(e.getClientStatusCode(), e.getMessage());
+    }
+
     @ExceptionHandler(value = PaymentInternalException.class)
     private ProblemDetail handlePaymentInternalException(PaymentInternalException e) {
         log.error(e.getMessage(), e.getException());

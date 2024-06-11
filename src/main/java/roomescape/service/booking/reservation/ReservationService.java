@@ -8,7 +8,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Reservations;
 import roomescape.domain.reservation.Status;
-import roomescape.dto.payment.PaymentRequest;
+import roomescape.dto.payment.CancelRequest;
 import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
@@ -44,21 +44,20 @@ public class ReservationService {
         this.waitingService = waitingService;
     }
 
+    @Transactional
     public ReservationResponse registerReservationPayments(UserReservationPaymentRequest userReservationPaymentRequest,
-                                                           Long memberId) {
-        ReservationRequest reservationRequest = ReservationRequest.of(userReservationPaymentRequest, memberId);
-        Reservation reservation = reservationRegisterService.registerReservation(reservationRequest);
-        PaymentResponse paymentResponse = PaymentResponse.empty();
-
+                                                           Long memberId,
+                                                           final PaymentResponse paymentResponse) {
         try {
-            PaymentRequest paymentRequest = PaymentRequest.from(userReservationPaymentRequest);
-            paymentResponse = paymentService.payByToss(paymentRequest);
+            ReservationRequest reservationRequest = ReservationRequest.of(userReservationPaymentRequest, memberId);
+            Reservation reservation = reservationRegisterService.registerReservation(reservationRequest);
+            paymentService.save(paymentResponse.toEntity(reservation));
+            return ReservationResponse.from(reservation);
         } catch (Exception e) {
-            reservationCancelService.deleteReservation(reservation.getId());
+            CancelRequest cancelRequest = new CancelRequest("예약 과정에서 오류가 발생하였습니다.");
+            paymentService.cancelByToss(cancelRequest, paymentResponse);
+            throw e;
         }
-
-        paymentService.save(paymentResponse.toEntity(reservation));
-        return ReservationResponse.from(reservation);
     }
 
     public ReservationResponse registerReservation(ReservationRequest request) {

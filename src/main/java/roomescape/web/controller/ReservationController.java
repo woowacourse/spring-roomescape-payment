@@ -11,35 +11,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.login.LoginMember;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.ReservationRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationfilterRequest;
 import roomescape.dto.reservation.UserReservationPaymentRequest;
 import roomescape.dto.reservation.UserReservationPaymentResponse;
 import roomescape.service.booking.reservation.ReservationService;
+import roomescape.service.booking.reservation.module.PaymentService;
 
 @RestController
 class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationByAdmin(
             @RequestBody ReservationRequest reservationRequest) {
         ReservationResponse reservationResponse = reservationService.registerReservation(reservationRequest);
-        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id())).body(reservationResponse);
+        return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
+                .body(reservationResponse);
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservationByUser(
             @RequestBody UserReservationPaymentRequest userReservationPaymentRequest,
             LoginMember loginMember) {
+        PaymentResponse paymentResponse = paymentService.payByToss(userReservationPaymentRequest);
         ReservationResponse reservationResponse = reservationService.registerReservationPayments(
-                userReservationPaymentRequest, loginMember.id());
+                userReservationPaymentRequest, loginMember.id(), paymentResponse);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
     }
