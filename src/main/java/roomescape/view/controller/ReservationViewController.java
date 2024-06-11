@@ -8,6 +8,6 @@ public class ReservationViewController {
 
     @GetMapping("/reservation")
     public String memberReservationPage() {
-        return "/reservation";
+        return "reservation";
     }
 }
