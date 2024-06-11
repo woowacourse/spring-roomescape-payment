@@ -15,6 +15,8 @@ import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.reservation.ReservationAuthorityNotExistException;
+import roomescape.service.payment.PaymentStatus;
+import roomescape.service.payment.dto.PaymentCancelOutput;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -22,12 +24,14 @@ import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.ReservationSaveInput;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 class ReservationServiceTest extends ServiceTest {
     @Autowired
@@ -183,6 +187,10 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_id와_예약자_id로_예약을_취소할_수_있다() {
+            given(paymentClient.cancelPayment(any()))
+                    .willReturn(new PaymentCancelOutput(
+                            "paymentKey", "orderId", "orderName", PaymentStatus.CANCELED, ZonedDateTime.now(), ZonedDateTime.now()));
+
             reservationService.cancelReservation(reservation.getId(), member);
             Payment payment = paymentFixture.findByReservation(reservation).get();
             Reservation canceldReservation = reservationFixture.findAllReservation().stream()
@@ -212,7 +220,9 @@ class ReservationServiceTest extends ServiceTest {
 
         @Test
         void 예약_대기가_존재하는_예약_취소_시_예약은_삭제되지_않고_대기번호_1번의_대기자가_결제_대기_상태의_예약자로_승격되고_예약_대기가_삭제된다() {
-            paymentClient.cancelPayment(any());
+            given(paymentClient.cancelPayment(any()))
+                    .willReturn(new PaymentCancelOutput(
+                            "paymentKey", "orderId", "orderName", PaymentStatus.CANCELED, ZonedDateTime.now(), ZonedDateTime.now()));
 
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
             waitingFixture.createWaiting(reservation, anotherMember);

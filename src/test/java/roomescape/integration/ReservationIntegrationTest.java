@@ -13,6 +13,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.service.payment.PaymentStatus;
+import roomescape.service.payment.dto.PaymentCancelOutput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.time.ZonedDateTime;
@@ -272,6 +273,10 @@ class ReservationIntegrationTest extends IntegrationTest {
 
         @Test
         void 예약_id로_예약을_취소할_수_있다() {
+            given(paymentClient.cancelPayment(any()))
+                    .willReturn(new PaymentCancelOutput(
+                            "paymentKey", "orderId", "orderName", PaymentStatus.CANCELED, ZonedDateTime.now(), ZonedDateTime.now()));
+
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
                     .when().delete("/reservations/" + reservation.getId() + "/cancel")
