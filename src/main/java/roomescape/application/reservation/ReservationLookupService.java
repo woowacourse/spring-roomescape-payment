@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.reservation.dto.request.ReservationFilterRequest;
 import roomescape.application.reservation.dto.response.ReservationResponse;
 import roomescape.application.reservation.dto.response.ReservationStatusResponse;
+import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -58,7 +59,9 @@ public class ReservationLookupService {
                 .map(reservation -> ReservationStatusResponse.of(
                         reservation,
                         reservationRepository.getWaitingCount(reservation),
-                        reservationPaymentRepository.getByReservationId(reservation.getId()))
-                ).toList();
+                        reservationPaymentRepository.findByReservationId(reservation.getId())
+                                .orElseGet(ReservationPayment::getEmptyInstance))
+                )
+                .toList();
     }
 }

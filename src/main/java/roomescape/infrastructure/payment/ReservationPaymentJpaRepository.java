@@ -17,8 +17,4 @@ public interface ReservationPaymentJpaRepository extends
 
     Optional<ReservationPayment> findByReservationId(long id);
 
-    @Override
-    default ReservationPayment getByReservationId(long id) {
-        return findByReservationId(id).orElse(ReservationPayment.getEmptyInstance());
-    }
 }
