@@ -3,10 +3,7 @@ package roomescape.domain.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationSlot;
-import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.reservation.Theme;
+import roomescape.domain.reservation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,13 +41,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Reservation> findByDateAndThemeIdAndTimeId(LocalDate date, long themeId, long timeId);
 
     @Query("""
-            select r
+            select new roomescape.domain.reservation.ReservationWithPay(r, p)
             from Reservation r
             join fetch r.reservationSlot
+            left join Payment p on r.id = p.reservation.id
             where r.member = :member
              and r.reservationSlot.date >=:date
             order by r.reservationSlot.date asc, r.reservationSlot.time.startAt asc""")
-    List<Reservation> findByMemberAndDateGreaterThanEqual(Member member, LocalDate date);
+    List<ReservationWithPay> findByMemberAndDateGreaterThanEqual(Member member, LocalDate date);
 
     boolean existsByReservationSlot(ReservationSlot slot);
 

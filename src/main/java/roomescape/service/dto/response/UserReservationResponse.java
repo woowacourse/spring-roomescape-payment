@@ -1,10 +1,8 @@
 package roomescape.service.dto.response;
 
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationSlot;
-import roomescape.domain.reservation.ReservationStatus;
-import roomescape.domain.reservation.WaitingWithRank;
+import roomescape.domain.reservation.*;
 
+import java.util.Optional;
 import java.util.OptionalLong;
 
 import static roomescape.domain.reservation.ReservationStatus.RESERVED;
@@ -14,14 +12,16 @@ public record UserReservationResponse(
         long id,
         ReservationSlot reservationSlot,
         ReservationStatus status,
-        OptionalLong rank
+        OptionalLong rank,
+        Optional<Payment> payment
 ) {
-    public static UserReservationResponse reserved(Reservation reservation) {
+    public static UserReservationResponse reserved(ReservationWithPay reservationWithPay) {
         return new UserReservationResponse(
-                reservation.getId(),
-                reservation.getReservationSlot(),
+                reservationWithPay.reservation().getId(),
+                reservationWithPay.reservation().getReservationSlot(),
                 RESERVED,
-                OptionalLong.empty()
+                OptionalLong.empty(),
+                Optional.ofNullable(reservationWithPay.payment())
         );
     }
 
@@ -30,7 +30,8 @@ public record UserReservationResponse(
                 waitingWithRank.waiting().getId(),
                 waitingWithRank.waiting().getReservation().getReservationSlot(),
                 WAITING,
-                OptionalLong.of(waitingWithRank.rank() + 1)
+                OptionalLong.of(waitingWithRank.rank() + 1),
+                Optional.empty()
         );
     }
 }

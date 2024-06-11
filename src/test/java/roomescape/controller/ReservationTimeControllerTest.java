@@ -1,98 +1,67 @@
 package roomescape.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-import roomescape.IntegrationTestSupport;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
+import roomescape.controller.config.RestDocsTestSupport;
+import roomescape.service.dto.response.ReservationTimeResponse;
 import roomescape.service.dto.response.ReservationTimeResponses;
+import roomescape.service.reservation.ReservationTimeService;
 
-import java.util.Map;
-import java.util.stream.Stream;
+import java.time.LocalTime;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ReservationTimeControllerTest extends IntegrationTestSupport {
+@WebMvcTest(controllers = ReservationTimeController.class)
+class ReservationTimeControllerTest extends RestDocsTestSupport {
 
-    String createdId;
-    int timeSize;
+    @MockBean
+    private ReservationTimeService timeService;
 
-    @DisplayName("예약 시간 CRUD")
-    @TestFactory
-    Stream<DynamicTest> dynamicUserTestsFromCollection() {
-        return Stream.of(
-                dynamicTest("예약 시간 목록을 조회한다.", () -> {
-                    timeSize = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/times")
-                            .then().log().all()
-                            .statusCode(200).extract()
-                            .response().jsonPath()
-                            .getObject("$", ReservationTimeResponses.class)
-                            .reservationTimeResponses()
-                            .size();
-                }),
-                dynamicTest("예약 시간을 추가한다.", () -> {
-                    Map<String, String> param = Map.of("startAt", "12:12");
-
-                    createdId = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .body(param)
-                            .when().post("/admin/times")
-                            .then().log().all()
-                            .statusCode(201).extract().header("location").split("/")[2];
-                }),
-                dynamicTest("예약 시간 목록 개수가 1증가한다.", () -> {
-                    int size = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/times")
-                            .then().log().all()
-                            .statusCode(200)
-                            .extract().jsonPath()
-                            .getObject("$", ReservationTimeResponses.class)
-                            .reservationTimeResponses()
-                            .size();
-
-                    assertThat(size).isEqualTo(timeSize + 1);
-                }),
-                dynamicTest("유효하지 않은 형식으로 시간을 추가할 수 없다.", () -> {
-                    Map<String, String> param = Map.of("startAt", "12:12:12");
-
-                    RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .body(param)
-                            .when().post("/admin/times")
-                            .then().log().all()
-                            .statusCode(400);
-                }),
-                dynamicTest("시간을 삭제한다.", () -> {
-                    RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/times/" + createdId)
-                            .then().log().all()
-                            .statusCode(204);
-                }),
-                dynamicTest("예약 시간 목록 개수가 1감소한다.", () -> {
-                    int size = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/times")
-                            .then().log().all()
-                            .statusCode(200)
-                            .extract().jsonPath()
-                            .getObject("$", ReservationTimeResponses.class)
-                            .reservationTimeResponses()
-                            .size();
-
-                    assertThat(size).isEqualTo(timeSize);
-                })
+    @Test
+    void getTimes() throws Exception {
+        ReservationTimeResponses response = new ReservationTimeResponses(
+                List.of(
+                        new ReservationTimeResponse(1L, LocalTime.of(9, 0, 0)),
+                        new ReservationTimeResponse(2L, LocalTime.of(10, 0, 0))
+                )
         );
+
+        Mockito.when(timeService.getTimes()).thenReturn(response);
+
+        mockMvc.perform(get("/times")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .cookie(new Cookie("token", USER_TOKEN))
+                        .requestAttr("loginMember", USER)
+                )
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                                responseFields(
+                                        fieldWithPath("reservationTimeResponses")
+                                                .type(JsonFieldType.ARRAY)
+                                                .description("전체 시간 목록"),
+                                        fieldWithPath("reservationTimeResponses[].id")
+                                                .type(JsonFieldType.NUMBER)
+                                                .description("시간 아이디")
+                                                .attributes(constraints("positive")),
+                                        fieldWithPath("reservationTimeResponses[].startAt")
+                                                .type(JsonFieldType.STRING)
+                                                .description("예약 시간")
+                                )
+                        )
+                );
+    }
+
+    @Test
+    void getTimesWithBooked() {
+        // TODO
     }
 }

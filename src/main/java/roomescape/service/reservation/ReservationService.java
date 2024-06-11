@@ -7,6 +7,7 @@ import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.repository.*;
 import roomescape.domain.reservation.*;
+import roomescape.exception.customexception.api.AbstractApiException;
 import roomescape.exception.customexception.business.RoomEscapeBusinessException;
 import roomescape.service.dto.request.*;
 import roomescape.service.dto.response.ReservationResponse;
@@ -48,11 +49,15 @@ public class ReservationService {
 
     public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest) {
         try {
-            PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-            paymentService.pay(paymentApproveRequest);
             ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-            return saveReservation(reservationSaveRequest);
-        } catch (RoomEscapeBusinessException | DataAccessException exception) {
+            Reservation reservation = createReservation(reservationSaveRequest);
+            Reservation savedReservation = reservationRepository.save(reservation);
+
+            PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
+            paymentService.pay(paymentApproveRequest, savedReservation);
+
+            return new ReservationResponse(savedReservation);
+        } catch (AbstractApiException | RoomEscapeBusinessException | DataAccessException exception) {
             paymentService.cancel(new PaymentCancelRequest(userReservationSaveRequest.paymentKey(), "예약이 정상적으로 처리되지 않음"));
             throw new RoomEscapeBusinessException(exception.getMessage());
         }
@@ -60,7 +65,6 @@ public class ReservationService {
 
     public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
         Reservation reservation = createReservation(reservationSaveRequest);
-        validateUnique(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
         return new ReservationResponse(savedReservation);
     }
@@ -149,7 +153,9 @@ public class ReservationService {
                 findThemeById(request.themeId())
         );
 
-        return new Reservation(findMemberById(request.memberId()), slot);
+        Reservation reservation = new Reservation(findMemberById(request.memberId()), slot);
+        validateUnique(reservation);
+        return reservation;
     }
 
     private Member findMemberById(Long memberId) {

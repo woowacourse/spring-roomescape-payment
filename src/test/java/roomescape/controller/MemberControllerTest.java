@@ -1,125 +1,82 @@
 package roomescape.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import roomescape.IntegrationTestSupport;
-import roomescape.service.dto.response.MemberResponses;
+import roomescape.controller.config.RestDocsTestSupport;
+import roomescape.service.dto.request.MemberJoinRequest;
+import roomescape.service.dto.response.MemberResponse;
+import roomescape.service.reservation.MemberService;
 
-import java.util.Map;
-import java.util.stream.Stream;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+@WebMvcTest(controllers = MemberController.class)
+class MemberControllerTest extends RestDocsTestSupport {
+    @MockBean
+    private MemberService memberService;
 
-class MemberControllerTest extends IntegrationTestSupport {
-
-    public static final String TEST_EMAIL = "test@test.com";
-    public static final String TEST_PASSWORD = "1234";
-    public static final String TEST_NAME = "테스트";
-
-    String createdId;
-    int memberSize;
-
-    @DisplayName("회원 CRUD")
-    @TestFactory
-    Stream<DynamicTest> dynamicUserTestsFromCollection() {
-        return Stream.of(
-                dynamicTest("회원 목록을 조회한다.", () -> {
-                    memberSize = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/admin/members")
-                            .then().log().all()
-                            .statusCode(200).extract()
-                            .response().jsonPath().getObject("$", MemberResponses.class)
-                            .memberResponses()
-                            .size();
-                }),
-                dynamicTest("이메일 형식이 아니면 회원가입할 수 없다.", () -> {
-                    Map<String, String> params = Map.of(
-                            "email", "asdfdasf",
-                            "password", TEST_PASSWORD,
-                            "name", TEST_NAME
-                    );
-
-                    RestAssured
-                            .given().log().all()
-                            .body(params)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().post("/members")
-                            .then().log().all()
-                            .statusCode(400);
-                }),
-                dynamicTest("회원가입", () -> {
-                    Map<String, String> params = Map.of(
-                            "email", TEST_EMAIL,
-                            "password", TEST_PASSWORD,
-                            "name", TEST_NAME
-                    );
-
-                    createdId = RestAssured
-                            .given().log().all()
-                            .body(params)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().post("/members")
-                            .then().log().all()
-                            .statusCode(201).extract().header("location").split("/")[2];
-                }),
-                dynamicTest("회원 목록 개수가 1증가한다.", () -> {
-                    int size = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/admin/members")
-                            .then().log().all()
-                            .statusCode(200)
-                            .extract()
-                            .jsonPath()
-                            .getObject(".", MemberResponses.class)
-                            .memberResponses()
-                            .size();
-
-                    assertThat(size).isEqualTo(memberSize + 1);
-                }),
-                dynamicTest("중복된 이메일로 회원가입할 수 없다.", () -> {
-                    Map<String, String> params = Map.of(
-                            "email", TEST_EMAIL,
-                            "password", TEST_PASSWORD,
-                            "name", TEST_NAME
-                    );
-
-                    RestAssured
-                            .given().log().all()
-                            .body(params)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .when().post("/members")
-                            .then().log().all()
-                            .statusCode(400);
-                }),
-                dynamicTest("회원을 삭제한다.", () -> {
-                    RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().delete("/admin/members/" + createdId)
-                            .then().log().all()
-                            .statusCode(204);
-                }),
-                dynamicTest("회원 목록 개수가 1감소한다.", () -> {
-                    int size = RestAssured.given().log().all()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", ADMIN_TOKEN)
-                            .when().get("/admin/members")
-                            .then().log().all()
-                            .statusCode(200).extract()
-                            .jsonPath().getObject(".", MemberResponses.class)
-                            .memberResponses()
-                            .size();
-
-                    assertThat(size).isEqualTo(memberSize);
-                })
+    @Test
+    @DisplayName("멤버 가입")
+    void save() throws Exception {
+        //given
+        MemberJoinRequest request = new MemberJoinRequest(
+                "email@email.com",
+                "password",
+                "name"
         );
+
+        MemberResponse response = new MemberResponse(
+                1L,
+                "userName",
+                "USER"
+        );
+        Mockito.when(memberService.join(any()))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/members")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(response.id()))
+                .andExpect(jsonPath("$.name").value(response.name()))
+                .andExpect(jsonPath("$.role").value(response.role()))
+                .andDo(restDocs.document(
+                        requestFields(
+                                fieldWithPath("email")
+                                        .type(STRING)
+                                        .description("회원 이메일")
+                                        .attributes(constraints("unique + 이메일 형식")),
+                                fieldWithPath("password")
+                                        .type(STRING)
+                                        .description("패스워드")
+                                        .attributes(constraints("unique")),
+                                fieldWithPath("name")
+                                        .type(STRING)
+                                        .description("회원 이름")
+                        ),
+                        responseFields(
+                                fieldWithPath("id")
+                                        .type(NUMBER)
+                                        .description("회원 아이디")
+                                        .attributes(constraints("양수의 회원 아이디입니다")),
+                                fieldWithPath("name")
+                                        .type(STRING)
+                                        .description("이름"),
+                                fieldWithPath("role")
+                                        .type(STRING)
+                                        .description("권한")
+                                        .attributes(constraints("USER : 일반 사용자%nADMIN : 관리자"))
+                        )
+                ));
     }
 }

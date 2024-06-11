@@ -2,6 +2,17 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
+
+    id 'org.asciidoctor.jvm.convert' version '3.3.2' // asciidoctor 플러그인 : adoc파일 +스니펫 > html
+
+}
+
+configurations {
+    asciidoctorExt
+}
+
+ext{
+    set('snippetsDir', file("build/generated-snippets")) //스니펫이 저장될 snippetDir 변수 설정
 }
 
 group = 'nextstep'
@@ -21,7 +32,6 @@ dependencies {
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
@@ -40,6 +50,46 @@ dependencies {
 
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")
+
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor' // 개발자가 저장하는 adoc 파일에서 ''을 통해 스니펫 경로에 있는 스니펫 호출
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc' // MockMvc에 기반하여 스니펫을 뽑아낼 수 있도록 하는 라이브러리
+}
+
+tasks.named('testClasses') {
+    doFirst {
+        delete file('build/docs/asciidoc')
+    }
+}
+
+tasks.named('test') {
+    outputs.dir snippetsDir
+    finalizedBy asciidoctor
+}
+
+tasks.named('asciidoctor') {
+    dependsOn test
+    configurations 'asciidoctorExt'
+    inputs.dir snippetsDir
+    finalizedBy copyDocument
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file('build/docs/asciidoc')
+    into file('src/main/resources/static/docs')
+}
+
+bootJar { // asciidoctor 태스크 실행
+    dependsOn asciidoctor
+    doFirst {
+        delete file('static/docs')
+    }
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }
 
 test {

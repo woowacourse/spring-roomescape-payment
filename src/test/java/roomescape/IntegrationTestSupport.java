@@ -21,9 +21,10 @@ public abstract class IntegrationTestSupport {
     protected static final String USER_EMAIL = "user1@user.com";
     protected static final String USER2_EMAIL = "user2@user.com";
     protected static final String USER_PASSWORD = "1234";
-    protected static String ADMIN_TOKEN;
-    protected static String USER_TOKEN;
-    protected static String USER2_TOKEN;
+    public static String ADMIN_TOKEN;
+    public static String USER_TOKEN;
+    public static String USER2_TOKEN;
+
     @MockBean
     protected PaymentService paymentService;
     @LocalServerPort
