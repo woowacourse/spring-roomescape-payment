@@ -35,19 +35,19 @@ public class PaymentRequest {
         this.paymentKey = paymentKey;
     }
 
-    public @NotNull(message = "예약 ID는 비어있을 수 없습니다.") Long getReservationId() {
+    public Long getReservationId() {
         return reservationId;
     }
 
-    public @Min(0) @Max(Integer.MAX_VALUE) @NotNull(message = "결제 금액은 비어있을 수 없습니다.") Integer getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public @NotNull(message = "orderId는 비어있을 수 없습니다.") String getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public @NotNull(message = "paymentKey는 비어있을 수 없습니다.") String getPaymentKey() {
+    public String getPaymentKey() {
         return paymentKey;
     }
 }
