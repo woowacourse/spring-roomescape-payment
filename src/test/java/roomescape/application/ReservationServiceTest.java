@@ -83,7 +83,7 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("성공한다.")
         void success() {
-            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE"))
                     .when(paymentClient).confirmPayment(any());
 
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);

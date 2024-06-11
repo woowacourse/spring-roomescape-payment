@@ -115,7 +115,7 @@ class ReservationControllerTest extends BaseControllerTest {
             String token = tokenProvider.createToken(user.getId().toString());
 
             // given
-            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE"))
                     .when(paymentClient).confirmPayment(any());
 
             ReservationTime time = reservationTimeRepository.save(Fixture.RESERVATION_TIME_1);

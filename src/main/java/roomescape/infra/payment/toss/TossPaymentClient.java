@@ -1,9 +1,5 @@
 package roomescape.infra.payment.toss;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -14,20 +10,16 @@ import roomescape.application.dto.response.PaymentConfirmApiResponse;
 import roomescape.infra.payment.toss.exception.TossPaymentConfirmException;
 
 @Component
-@EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
-    private final String encodedSecretKey;
     private final TossPaymentConfirmErrorHandler errorHandler;
 
     public TossPaymentClient(
-            TossPaymentProperties properties,
             RestClient restClient,
             TossPaymentConfirmErrorHandler errorHandler
     ) {
-        this.restClient = restClient.mutate().baseUrl(properties.baseUrl()).build();
-        this.encodedSecretKey = encodeSecretKey(properties.secretKey());
+        this.restClient = restClient;
         this.errorHandler = errorHandler;
     }
 
@@ -36,7 +28,6 @@ public class TossPaymentClient implements PaymentClient {
         PaymentConfirmApiResponse response = restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, encodedSecretKey)
                 .body(request)
                 .retrieve()
                 .onStatus(errorHandler)
@@ -47,9 +38,5 @@ public class TossPaymentClient implements PaymentClient {
         }
 
         return response;
-    }
-
-    private String encodeSecretKey(String secretKey) {
-        return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }
 }
