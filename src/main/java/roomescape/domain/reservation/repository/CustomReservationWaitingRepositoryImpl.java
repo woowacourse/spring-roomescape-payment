@@ -13,7 +13,6 @@ import roomescape.domain.reservation.model.ReservationWaiting;
 import roomescape.domain.reservation.model.ReservationWaitingWithOrder;
 import roomescape.domain.reservation.model.Theme;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,89 +89,36 @@ public class CustomReservationWaitingRepositoryImpl implements CustomReservation
         ));
     }
 
-//    @Override
-//    public Optional<ReservationWaitingWithOrder> findReservationWaitingWithOrder(
-//            final LocalDate date,
-//            final Long memberId,
-//            final Long timeId,
-//            final Long themeId
-//    ) {
-//        final String sql = """
-//                    SELECT
-//                        rw.id AS reservation_waiting_id, rw.date AS reservation_waiting_date, rw.created_at AS reservation_waiting_created_at,
-//                        rt.id AS time_id, rt.start_at AS reservation_time,
-//                        th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
-//                        m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
-//                        COUNT(rw_sub.id) + 1 AS waiting_order
-//                    FROM
-//                        reservation_waiting rw
-//                    LEFT JOIN
-//                        reservation_waiting rw_sub
-//                    ON
-//                        rw_sub.created_at < rw.created_at
-//                        AND rw_sub.theme_id = rw.theme_id
-//                        AND rw_sub.time_id = rw.time_id
-//                        AND rw_sub.date = rw.date
-//                    INNER JOIN reservation_time AS rt ON rt.id = rw.time_id
-//                    INNER JOIN theme AS th ON th.id = rw.theme_id
-//                    INNER JOIN member AS m ON m.id = rw.member_id
-//                    WHERE rw.date = :date
-//                        AND rw.member_id = :memberId
-//                        AND rw.time_id = :timeId
-//                        AND rw.theme_id = :themeId
-//                    GROUP BY
-//                        rw.id,
-//                        rw.date,
-//                        rw.created_at,
-//                        rw.member_id,
-//                        rw.theme_id,
-//                        rw.time_id;
-//            """;
-//
-//        try {
-//            final MapSqlParameterSource param = new MapSqlParameterSource()
-//                    .addValue("date", date)
-//                    .addValue("memberId", memberId)
-//                    .addValue("timeId", timeId)
-//                    .addValue("themeId", themeId);
-//            final ReservationWaitingWithOrder reservationWaitingWithOrder = template.queryForObject(sql, param, itemRowMapperToReservationWaitingWithOrder());
-//
-//            return Optional.of(reservationWaitingWithOrder);
-//        } catch (final EmptyResultDataAccessException e) {
-//            return Optional.empty();
-//        }
-//    }
-
     @Override
     public Optional<ReservationWaitingWithOrder> findReservationWaitingWithOrder(final Long reservationWaitingId) {
         final String sql = """
-                    SELECT
-                        rw.id AS reservation_waiting_id, rw.date AS reservation_waiting_date, rw.created_at AS reservation_waiting_created_at,
-                        rt.id AS time_id, rt.start_at AS reservation_time,
-                        th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
-                        m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
-                        COUNT(rw_sub.id) + 1 AS waiting_order
-                    FROM
-                        reservation_waiting rw
-                    LEFT JOIN
-                        reservation_waiting rw_sub
-                    ON
-                        rw_sub.created_at < rw.created_at
-                        AND rw_sub.theme_id = rw.theme_id
-                        AND rw_sub.time_id = rw.time_id
-                        AND rw_sub.date = rw.date
-                    INNER JOIN reservation_time AS rt ON rt.id = rw.time_id
-                    INNER JOIN theme AS th ON th.id = rw.theme_id
-                    INNER JOIN member AS m ON m.id = rw.member_id
-                    WHERE rw.id = :reservationWaitingId
-                    GROUP BY
-                        rw.id,
-                        rw.date,
-                        rw.created_at,
-                        rw.member_id,
-                        rw.theme_id,
-                        rw.time_id;
-            """;
+                        SELECT
+                            rw.id AS reservation_waiting_id, rw.date AS reservation_waiting_date, rw.created_at AS reservation_waiting_created_at,
+                            rt.id AS time_id, rt.start_at AS reservation_time,
+                            th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
+                            m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
+                            COUNT(rw_sub.id) + 1 AS waiting_order
+                        FROM
+                            reservation_waiting rw
+                        LEFT JOIN
+                            reservation_waiting rw_sub
+                        ON
+                            rw_sub.created_at < rw.created_at
+                            AND rw_sub.theme_id = rw.theme_id
+                            AND rw_sub.time_id = rw.time_id
+                            AND rw_sub.date = rw.date
+                        INNER JOIN reservation_time AS rt ON rt.id = rw.time_id
+                        INNER JOIN theme AS th ON th.id = rw.theme_id
+                        INNER JOIN member AS m ON m.id = rw.member_id
+                        WHERE rw.id = :reservationWaitingId
+                        GROUP BY
+                            rw.id,
+                            rw.date,
+                            rw.created_at,
+                            rw.member_id,
+                            rw.theme_id,
+                            rw.time_id;
+                """;
 
         try {
             final MapSqlParameterSource param = new MapSqlParameterSource()
