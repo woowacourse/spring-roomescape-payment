@@ -2,7 +2,11 @@ package roomescape.registration.domain.waiting.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
+import roomescape.exception.model.MemberExceptionCode;
+import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.exception.model.WaitingExceptionCode;
+import roomescape.member.domain.Member;
+import roomescape.member.repository.MemberRepository;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.repository.ReservationRepository;
 import roomescape.registration.domain.waiting.domain.Waiting;
@@ -20,10 +24,12 @@ public class WaitingService {
 
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
 
-    public WaitingService(WaitingRepository waitingRepository, ReservationRepository reservationRepository) {
+    public WaitingService(WaitingRepository waitingRepository, ReservationRepository reservationRepository, MemberRepository memberRepository) {
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
+        this.memberRepository = memberRepository;
     }
 
     public WaitingResponse addWaiting(WaitingRequest waitingRequest, long memberId) {
@@ -74,8 +80,18 @@ public class WaitingService {
         );
     }
 
-    public void removeWaiting(long waitingId) {
-        waitingRepository.deleteById(waitingId);
+    public void removeWaiting(long waitingId, Long memberId) {
+        Waiting waiting = waitingRepository.findById(waitingId)
+                .orElseThrow(() -> new RoomEscapeException(WaitingExceptionCode.WAITING_NOT_EXIST_EXCEPTION));
+        Reservation reservation = reservationRepository.findById(waiting.getId())
+                .orElseThrow(() -> new RoomEscapeException(ReservationExceptionCode.RESERVATION_NOT_EXIST));
+        Member member = memberRepository.findMemberById(memberId)
+                .orElseThrow(() -> new RoomEscapeException(MemberExceptionCode.MEMBER_NOT_EXIST_EXCEPTION));
+
+        if(!reservation.getMember().equals(member)) {
+            throw new RoomEscapeException(WaitingExceptionCode.ONLY_OWNER_CAN_DELETE);
+        }
+        waitingRepository.delete(waiting);
     }
 
     private void validateAlreadyReservation(WaitingRequest waitingRequest, long memberId) {

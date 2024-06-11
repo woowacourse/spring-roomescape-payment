@@ -1,6 +1,7 @@
 package roomescape.admin.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -89,5 +90,5 @@ public interface AdminControllerSwagger {
                     )
             }
     )
-    void waitingReject(long waitingId);
+    void waitingReject(long waitingId, @Parameter(hidden = true) Long memberId);
 }

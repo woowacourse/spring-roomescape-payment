@@ -43,8 +43,8 @@ public class WaitingController implements WaitingControllerSwagger {
 
     @Override
     @DeleteMapping("/waitings/{waitingId}")
-    public ResponseEntity<WaitingResponse> waitingRemove(@PathVariable long waitingId) {
-        waitingService.removeWaiting(waitingId);
+    public ResponseEntity<WaitingResponse> waitingRemove(@PathVariable long waitingId, @LoginMemberId Long memberId) {
+        waitingService.removeWaiting(waitingId, memberId);
 
         return ResponseEntity.noContent().build();
     }

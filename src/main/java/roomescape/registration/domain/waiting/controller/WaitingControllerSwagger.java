@@ -73,5 +73,5 @@ public interface WaitingControllerSwagger {
                     )
             }
     )
-    ResponseEntity<WaitingResponse> waitingRemove(long waitingId);
+    ResponseEntity<WaitingResponse> waitingRemove(long waitingId, @Parameter(hidden = true) Long memberId);
 }

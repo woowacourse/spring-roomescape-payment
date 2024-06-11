@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
+import roomescape.member.repository.MemberRepository;
 import roomescape.model.ControllerTest;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.waiting.domain.Waiting;
@@ -22,7 +23,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,12 +36,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(WaitingController.class)
 class WaitingControllerTest extends ControllerTest {
 
+    @MockBean
+    private MemberRepository memberRepository;
+
+    private final Member owner = new Member(1L, new Name("폴라"), "polla@wooteco.com", "polla1234", MemberRole.MEMBER);
     private final Reservation reservation = new Reservation(
             1L,
             LocalDate.now().plusDays(1),
             new ReservationTime(1L, LocalTime.parse("14:00")),
             new Theme(1L, new Name("레모네 테마"), "레모네가 숨겨둔 보물을 찾으세요!", "썸네일 링크", 15000L),
-            new Member(1L, new Name("폴라"), "polla@wooteco.com", "polla1234", MemberRole.MEMBER)
+            owner
     );
     private final Waiting waiting = new Waiting(
             1L,
@@ -70,6 +77,9 @@ class WaitingControllerTest extends ControllerTest {
 
     @Test
     void 예약대기_신청을_취소한다() throws Exception {
+        given(memberRepository.findMemberById(1L))
+                .willReturn(Optional.of(owner));
+
         mockMvc.perform(delete("/waitings/1"))
                 .andDo(print())
                 .andExpect(status().isNoContent());

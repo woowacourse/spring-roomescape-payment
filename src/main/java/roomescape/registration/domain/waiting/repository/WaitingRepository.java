@@ -13,6 +13,8 @@ public interface WaitingRepository extends CrudRepository<Waiting, Long> {
 
     List<Waiting> findAll();
 
+    Optional<Waiting> findByReservationMemberId(Long id);
+
     @Query("SELECT new roomescape.registration.domain.waiting.domain.WaitingWithRank(" +
             "    w, " +
             "    (SELECT COUNT(w2) + 1" +

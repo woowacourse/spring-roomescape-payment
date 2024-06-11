@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
 import roomescape.auth.annotation.Auth;
+import roomescape.auth.annotation.LoginMemberId;
 import roomescape.member.domain.MemberRole;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
 import roomescape.registration.domain.reservation.service.ReservationService;
@@ -63,7 +64,7 @@ public class AdminController implements AdminControllerSwagger {
     @Override
     @DeleteMapping("/waitings/{waitingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void waitingReject(@PathVariable long waitingId) {
-        waitingService.removeWaiting(waitingId);
+    public void waitingReject(@PathVariable long waitingId, @LoginMemberId Long memberId) {
+        waitingService.removeWaiting(waitingId, memberId);
     }
 }
