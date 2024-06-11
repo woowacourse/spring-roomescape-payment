@@ -4,6 +4,7 @@ package roomescape.service;
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -22,6 +23,7 @@ public class AuthService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional(readOnly = true)
     public TokenResponse createToken(TokenRequest tokenRequest) {
         String email = tokenRequest.email();
         Member member = getMemberByEmail(email);
@@ -40,6 +42,7 @@ public class AuthService {
                         String.format("존재하지 않는 회원입니다. 입력한 회원 email:%s", email)));
     }
 
+    @Transactional(readOnly = true)
     public MemberResponse findMemberByCookies(Cookie[] cookies) {
         String payload = tokenManager.getPayload(extractToken(cookies));
         long id = Long.parseLong(payload);

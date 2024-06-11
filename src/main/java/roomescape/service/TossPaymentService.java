@@ -28,6 +28,7 @@ public class TossPaymentService implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentResponse pay(PaymentRequest paymentRequest, Reservation reservation) {
         Payment payment = paymentRequest.toEntity(reservation);
         paymentRepository.save(payment);

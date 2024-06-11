@@ -27,7 +27,7 @@ public class ReservationDeleteService {
         this.canceledReservationRepository = canceledReservationRepository;
     }
 
-    //@Transactional
+    @Transactional
     public void deleteById(long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,

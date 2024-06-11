@@ -73,6 +73,7 @@ public class ReservationService {
         reservationDeleteService.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> findAllByStatus(Status status) {
         List<Reservation> reservations = reservationRepository.findAllByStatus(status);
         return convertToReservationResponses(reservations);
@@ -124,10 +125,12 @@ public class ReservationService {
         return ReservationResponse.from(reservation);
     }
 
+    @Transactional(readOnly = true)
     public ReservationInformResponse findById(long id) {
         return ReservationInformResponse.from(reservationRepository.findById(id).orElseThrow());
     }
 
+    @Transactional(readOnly = true)
     public List<CanceledReservationWebResponse> findAllCanceledReservation() {
         return canceledReservationRepository.findAllCanceledReservationInform().stream()
                 .map(canceledReservationResponse -> CanceledReservationWebResponse.of(

@@ -27,11 +27,13 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public ThemeResponse save(ThemeRequest themeRequest) {
         Theme savedTheme = themeRepository.save(themeRequest.toTheme());
         return ThemeResponse.from(savedTheme);
     }
 
+    @Transactional(readOnly = true)
     public List<ThemeResponse> findAll() {
         return themeRepository.findAll()
                 .stream()
@@ -47,6 +49,7 @@ public class ThemeService {
         themeRepository.deleteById(theme.getId());
     }
 
+    @Transactional(readOnly = true)
     public List<ThemeResponse> findPopularThemes() {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(START_DAY_TO_SUBTRACT);
@@ -57,6 +60,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public ThemePriceResponse findThemePriceById(long id) {
         Theme theme = themeRepository.findById(id)
                 .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 테마입니다."));
