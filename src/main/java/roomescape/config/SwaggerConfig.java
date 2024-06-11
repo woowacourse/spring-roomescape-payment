@@ -7,12 +7,16 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import io.swagger.v3.oas.models.security.SecurityScheme.Type;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import roomescape.auth.AuthConstants;
 
 @Configuration
 public class SwaggerConfig {
+    @Value("${apiVersion}")
+    private static String apiVersion;
+
     @Bean
     public OpenAPI openAPI() {
         Components cookieAuthComponent = new Components()
@@ -34,6 +38,6 @@ public class SwaggerConfig {
         return new Info()
                 .title("RoomEscape API")
                 .description("방탈출 예약 서비스 API 입니다.")
-                .version("0.0.1");
+                .version(apiVersion);
     }
 }

@@ -36,3 +36,5 @@ springdoc:
     groups-order: desc
     tags-sorter: alpha
     operations-sorter: method
+
+apiVersion: 0.0.1
