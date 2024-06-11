@@ -1,0 +1,46 @@
+name: Local Deployment
+
+on:
+  push:
+    branches: step2
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check if room-esc server is running on port 8080
+        id: check-server-on-port
+        run: |
+          echo "Checking if port 8080 is in use..."
+          PID=$(lsof -t -i:8080)
+          if [ -n "$PID" ]; then
+            echo "server_running=true" >> $GITHUB_ENV
+            echo "PID=$PID" >> $GITHUB_ENV
+          else
+            echo "server_running=false" >> $GITHUB_ENV
+          fi
+
+      - name: Stop server if running
+        if: env.server_running == 'true'
+        run: |
+          echo "Stopping server running on port 8080..."
+          kill -9 $PID
+          echo "Server stopped."
+
+      - name: Move to project directory
+        run: cd spring-roomescape-payment
+
+      - name: Remove test codes
+        run: rm -rf src/test
+
+      - name: Build project using Gradle
+        run: ./gradlew clean bootJar
+
+      - name: Start server
+        run: |
+          cd build/libs
+          nohup java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar &
+          echo "Server started."
