@@ -21,6 +21,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import roomescape.config.TossPaymentProperties;
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.encoder.BasicAuthEncoder;
@@ -32,21 +33,20 @@ public class PaymentService {
 
     private final RestClient tossRestClient;
     private final PaymentRepository paymentRepository;
+    private final TossPaymentProperties properties;
 
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
-    @Value("${third-party-api.toss-payment.path.payment-confirm}")
-    private String confirmPath;
 
     public PaymentService(RestTemplateBuilder builder,
-                          @Value("${third-party-api.toss-payment.url}") String url,
-                          @Value("${third-party-api.toss-payment.path.payment}") String path,
+                          TossPaymentProperties properties,
                           PaymentRepository paymentRepository) {
-        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(Duration.of(3000, ChronoUnit.MILLIS))
-                .setReadTimeout(Duration.of(1000, ChronoUnit.MILLIS))
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url + path))
+        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(properties.getConnectTimeout())
+                .setReadTimeout(properties.getReadTimeout())
+                .uriTemplateHandler(new DefaultUriBuilderFactory(properties.getUrl() + properties.getPath()))
                 .build();
         this.tossRestClient = RestClient.create(tossPaymentRestTemplate);
+        this.properties = properties;
         this.paymentRepository = paymentRepository;
     }
 
@@ -54,7 +54,7 @@ public class PaymentService {
         String authorization = BasicAuthEncoder.encode(tossSecretKey);
 
         Payment payment = tossRestClient.post()
-                .uri(confirmPath)
+                .uri(properties.getConfirmPath())
                 .header("Authorization", authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })

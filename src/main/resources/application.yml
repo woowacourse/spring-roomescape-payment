@@ -42,7 +42,8 @@ custom:
 third-party-api:
   toss-payment:
     url: "https://api.tosspayments.com"
-    path:
-      payment: "/v1/payments"
-      payment-confirm: "/confirm"
+    path: "/v1/payments"
+    confirm-path: "/confirm"
+    connect-timeout: 3000 # ms
+    read-timeout: 1000 # ms
 

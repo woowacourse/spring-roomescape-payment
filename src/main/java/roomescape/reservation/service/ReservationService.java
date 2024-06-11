@@ -71,7 +71,6 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
         reservation.updatePayment(payment);
-
         return reservationRepository.save(reservation);
     }
 
