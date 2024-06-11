@@ -27,7 +27,7 @@ import roomescape.service.reservation.dto.ReservationResponse;
 import java.time.LocalDate;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReservationCreateService {
 
     private final ReservationRepository reservationRepository;
@@ -48,12 +48,14 @@ public class ReservationCreateService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
         Reservation reservation = saveReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
                 adminReservationRequest.memberId(), adminReservationRequest.date(), ReservationStatus.RESERVED);
         return new ReservationResponse(reservation);
     }
 
+    @Transactional
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = saveReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
                 reservationRequest.date(), ReservationStatus.PENDING_PAYMENT);
