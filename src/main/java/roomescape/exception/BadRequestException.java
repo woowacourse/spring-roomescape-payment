@@ -5,7 +5,7 @@ public class BadRequestException extends RuntimeException {
     private static final String ERROR = "[ERROR] ";
 
     public BadRequestException(String message) {
-        super(ERROR + message);
+        super(message);
     }
 
     public BadRequestException(String value, String field) {

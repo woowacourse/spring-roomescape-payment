@@ -1,6 +1,5 @@
 package roomescape.model;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,28 +29,21 @@ public class Reservation {
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-    @Embedded
-    private Payment payment;
 
     protected Reservation() {
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment) {
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
         validatePast(date, time);
         this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
-        this.payment = payment;
-    }
-
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment) {
-        this(null, date, time, theme, member, payment);
     }
 
     public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member, new Payment());
+        this(null, date, time, theme, member);
     }
 
     private void validatePast(LocalDate date, ReservationTime time) {
@@ -78,10 +70,6 @@ public class Reservation {
 
     public Member getMember() {
         return member;
-    }
-
-    public Payment getPayment() {
-        return payment;
     }
 
     @Override

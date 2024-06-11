@@ -2,12 +2,9 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.request.AdminReservationRequest;
-import roomescape.request.ReservationRequest;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;
-import roomescape.model.Payment;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTime;
 import roomescape.model.Theme;
@@ -15,6 +12,8 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+import roomescape.request.AdminReservationRequest;
+import roomescape.request.ReservationRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -51,11 +50,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation addReservation(ReservationRequest request, Member member, Payment payment) {
+    public Reservation addReservation(ReservationRequest request, Member member) {
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
         validateDuplicatedReservation(request.date(), reservationTime, theme);
-        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member, payment);
+        Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
         return reservationRepository.save(reservation);
     }
 

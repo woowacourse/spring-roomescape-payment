@@ -5,22 +5,29 @@ import io.restassured.http.ContentType;
 import org.apache.http.HttpHeaders;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
+import roomescape.exception.BadRequestException;
+import roomescape.model.Reservation;
 import roomescape.request.AdminReservationRequest;
 import roomescape.request.ReservationRequest;
 import roomescape.service.PaymentService;
 import roomescape.service.fixture.PaymentFixture;
+import roomescape.service.fixture.ReservationRequestBuilder;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -96,7 +103,7 @@ class ReservationControllerTest extends AbstractControllerTest {
     @DisplayName("사용자가 예약을 추가할 수 있다.")
     @Test
     void should_insert_reservation_when_member_request() {
-        doReturn(PaymentFixture.GENERAL.getPayment()).when(paymentService).confirmReservationPayments(any(ReservationRequest.class));
+        doReturn(PaymentFixture.GENERAL.getPayment()).when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
         RestDocumentationFilter description = document("reservations-success-post",
                 requiredCookie,
                 requestFields(
@@ -232,5 +239,50 @@ class ReservationControllerTest extends AbstractControllerTest {
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("예약등록시 예외가 발생할 경우 결제가 진행되지 않는다")
+    @TestFactory
+    Stream<DynamicTest> should_not_confirm_when_reservation_exception() {
+        doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
+        ReservationRequest request = ReservationRequestBuilder.builder().date(LocalDate.now().minusDays(1)).build();
+        return Stream.of(
+                dynamicTest("예약 등록 시 예외가 발생한다.", () -> {
+                    RestAssured.given().log().all()
+                            .contentType(ContentType.JSON)
+                            .cookie("token", getAdminCookie())
+                            .body(request)
+                            .cookie("token", getMemberCookie())
+                            .then().log().all()
+                            .statusCode(400);
+                }),
+                dynamicTest("결제 서비스가 한 번도 호출되지 않는다.", () -> {
+                    verify(paymentService, never()).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
+                }));
+    }
+
+    @DisplayName("예약등록시 예외가 발생할 경우 결제가 진행되지 않는다")
+    @TestFactory
+    Stream<DynamicTest> should_not_reserved_when_payment_exception() {
+        doThrow(new BadRequestException("결제 오류 발생")).when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
+        ReservationRequest request = ReservationRequestBuilder.builder().build();
+        return Stream.of(
+                dynamicTest("예약 등록 시 예외가 발생한다.", () -> {
+                    RestAssured.given().log().all()
+                            .contentType(ContentType.JSON)
+                            .cookie("token", getAdminCookie())
+                            .body(request)
+                            .when().post("/reservations")
+                            .then().log().all()
+                            .statusCode(400);
+                }),
+                dynamicTest("예약이 등록되지 않는다.", () -> {
+                    RestAssured.given().log().all()
+                            .contentType(ContentType.JSON)
+                            .cookie("token", getMemberCookie())
+                            .when().get("/reservations")
+                            .then().log().all()
+                            .body("size()", is(6));
+                }));
     }
 }

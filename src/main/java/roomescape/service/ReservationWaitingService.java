@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;
+import roomescape.model.Payment;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTime;
 import roomescape.model.Theme;
 import roomescape.model.Waiting;
 import roomescape.model.WaitingWithRank;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.response.MemberReservationResponse;
@@ -19,23 +21,26 @@ import java.util.List;
 @Service
 public class ReservationWaitingService {
 
-    private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
     private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
 
-    public ReservationWaitingService(ReservationRepository reservationRepository, WaitingRepository waitingRepository) {
-        this.reservationRepository = reservationRepository;
+    public ReservationWaitingService(final PaymentRepository paymentRepository,
+                                     final WaitingRepository waitingRepository,
+                                     final ReservationRepository reservationRepository) {
+        this.paymentRepository = paymentRepository;
         this.waitingRepository = waitingRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     @Transactional(readOnly = true)
     public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Member member) {
-        List<Reservation> memberReservations = reservationRepository.findAllByMember(member);
+        List<Payment> payments = paymentRepository.findByMember(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(member.getId());
 
-        List<MemberReservationResponse> allMemberReservations =
-                new java.util.ArrayList<>(memberReservations.stream()
-                        .map(MemberReservationResponse::new)
-                        .toList());
+        List<MemberReservationResponse> allMemberReservations = new java.util.ArrayList<>(payments.stream()
+                .map(MemberReservationResponse::new)
+                .toList());
         List<MemberReservationResponse> waiting = waitingWithRanks.stream()
                 .map(MemberReservationResponse::new)
                 .toList();

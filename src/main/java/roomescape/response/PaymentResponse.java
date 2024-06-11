@@ -1,5 +1,8 @@
 package roomescape.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentResponse {
     private final Long totalAmount;
     private final String paymentKey;

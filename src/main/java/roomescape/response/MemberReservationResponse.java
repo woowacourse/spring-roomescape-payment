@@ -1,6 +1,7 @@
 package roomescape.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import roomescape.model.Payment;
 import roomescape.model.Reservation;
 import roomescape.model.WaitingWithRank;
 
@@ -18,14 +19,15 @@ public class MemberReservationResponse {
     private String paymentkey;
     private Long amount;
 
-    public MemberReservationResponse(Reservation reservation) {
+    public MemberReservationResponse(Payment payment) {
+        Reservation reservation = payment.getReservation();
         this.id = reservation.getId();
         this.theme = reservation.getTheme().getName();
         this.date = reservation.getDate();
         this.time = reservation.getTime().getStartAt();
         this.status = "예약";
-        this.paymentkey = reservation.getPayment().getPaymentKey();
-        this.amount = reservation.getPayment().getAmount().longValue();
+        this.paymentkey = payment.getPaymentKey();
+        this.amount = payment.getAmount().longValue();
     }
 
     public MemberReservationResponse(WaitingWithRank waitingWithRank) {

@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.BaseTest;
-import roomescape.request.AdminReservationRequest;
-import roomescape.request.ReservationRequest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
@@ -14,9 +12,10 @@ import roomescape.model.Member;
 import roomescape.model.Reservation;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
+import roomescape.request.AdminReservationRequest;
+import roomescape.request.ReservationRequest;
 import roomescape.service.fixture.AdminReservationRequestBuilder;
 import roomescape.service.fixture.MemberBuilder;
-import roomescape.service.fixture.PaymentFixture;
 import roomescape.service.fixture.ReservationRequestBuilder;
 
 import java.time.LocalDate;
@@ -63,7 +62,7 @@ class ReservationServiceTest extends BaseTest {
         Member member = memberRepository.findById(2L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().build();
 
-        reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment());
+        reservationService.addReservation(request, member);
 
         List<Reservation> allReservations = reservationRepository.findAll();
         assertThat(allReservations).hasSize(3);
@@ -123,7 +122,7 @@ class ReservationServiceTest extends BaseTest {
                 .build();
         Member member = MemberBuilder.builder().build();
 
-        assertThatThrownBy(() -> reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment()))
+        assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약할 수 없습니다.");
     }
@@ -136,7 +135,7 @@ class ReservationServiceTest extends BaseTest {
         Member member = memberRepository.findById(1L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().date(date).build();
 
-        assertThatThrownBy(() -> reservationService.addReservation(request, member, PaymentFixture.GENERAL.getPayment()))
+        assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(DuplicatedException.class)
                 .hasMessage("[ERROR] 이미 해당 시간에 예약이 존재합니다.");
     }

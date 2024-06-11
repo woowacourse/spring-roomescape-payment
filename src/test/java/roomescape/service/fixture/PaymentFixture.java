@@ -3,16 +3,18 @@ package roomescape.service.fixture;
 import roomescape.model.Payment;
 
 public enum PaymentFixture {
-    GENERAL(1999999L, "tgen_20240604202416eHBf1");
-    private Long amount;
+    GENERAL(1L, "tgen_20240604202416eHBf1", 1999999L);
+    private Long id;
     private String paymentKey;
+    private Long amount;
 
-    PaymentFixture(final Long amount, final String paymentKey) {
-        this.amount = amount;
+    PaymentFixture(final Long id, final String paymentKey, final Long amount) {
+        this.id = id;
         this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     public Payment getPayment() {
-        return new Payment(paymentKey, amount);
+        return new Payment(id, paymentKey, amount, ReservationFixture.GENERAL.getReservation());
     }
 }
