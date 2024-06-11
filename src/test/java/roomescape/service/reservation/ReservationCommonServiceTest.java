@@ -141,7 +141,7 @@ class ReservationCommonServiceTest extends ServiceTest {
         );
     }
 
-    @DisplayName("결제 대기 상태의 예약을 결제 후, 예약 상태로 변경한다.")
+    @DisplayName("존재하지 않는 결제 대기 정보에 대해 결제를 할 수 없다.")
     @Test
     void cannotConfirmReservationOfUnknownReservation() {
         //given
@@ -155,7 +155,7 @@ class ReservationCommonServiceTest extends ServiceTest {
                 .hasMessage("더이상 존재하지 않는 결제 대기 정보입니다.");
     }
 
-    @DisplayName("결제 대기 상태의 예약을 결제 후, 예약 상태로 변경한다.")
+    @DisplayName("본인의 결제 대기가 아닌 경우 결제할 수 없다.")
     @Test
     void cannotConfirmReservationByNotOwner() {
         //given
