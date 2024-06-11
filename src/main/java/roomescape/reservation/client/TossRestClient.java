@@ -1,12 +1,9 @@
 package roomescape.reservation.client;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -15,11 +12,7 @@ import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentApiResponse;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.encoder.BasicAuthEncoder;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
+import roomescape.util.CustomJsonParser;
 
 public class TossRestClient {
 
@@ -48,17 +41,10 @@ public class TossRestClient {
                 })
                 .retrieve()
                 .onStatus(r -> r.is4xxClientError() || r.is5xxServerError(), (request, response) -> {
-                    String errorMessage = parseErrorMessage(response);
+                    String errorMessage = CustomJsonParser.parseResponse(response, "message");
                     throw new PaymentException("결제 오류가 발생했습니다. " + errorMessage, HttpStatus.valueOf(response.getStatusCode().value()));
                 })
                 .toEntity(PaymentApiResponse.class)
                 .getBody();
-    }
-
-    private String parseErrorMessage(ClientHttpResponse response) throws IOException {
-        InputStream body = response.getBody();
-        Reader inputStreamReader = new InputStreamReader(body, StandardCharsets.UTF_8);
-        JsonObject jsonObject = (JsonObject) JsonParser.parseReader(inputStreamReader);
-        return jsonObject.get("message").toString().replace("\"", "");
     }
 }
