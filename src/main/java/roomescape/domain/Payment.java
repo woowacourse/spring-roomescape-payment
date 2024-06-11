@@ -9,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import roomescape.exception.RoomescapeErrorCode;
+import roomescape.exception.RoomescapeException;
 
 @Entity
 @SQLRestriction("deleted_at is NULL")
@@ -36,11 +38,39 @@ public class Payment extends BaseEntity {
     }
 
     public Payment(Long id, Reservation reservation, String paymentKey, String orderId, BigDecimal amount) {
+        validateReservation(reservation);
+        validatePaymentKey(paymentKey);
+        validateOrderId(orderId);
+        validateAmount(amount);
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+    }
+
+    private void validateReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 예약은 비어있을 수 없습니다.");
+        }
+    }
+
+    private void validatePaymentKey(String paymentKey) {
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 키는 비어있을 수 없습니다.");
+        }
+    }
+
+    private void validateOrderId(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 주문id는 비어있을 수 없습니다.");
+        }
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 금액은 0원 이하일 수 없습니다.");
+        }
     }
 
     public Long getId() {
