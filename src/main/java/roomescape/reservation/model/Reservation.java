@@ -115,11 +115,11 @@ public class Reservation {
         return payment;
     }
 
-    public void setMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 
-    public void setPayment(Payment payment) {
+    public void updatePayment(Payment payment) {
         this.payment = payment;
     }
 }
