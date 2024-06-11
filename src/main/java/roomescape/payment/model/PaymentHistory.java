@@ -8,10 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
-import roomescape.member.model.Member;
 import roomescape.reservation.model.Reservation;
 
 @Entity
@@ -37,24 +35,20 @@ public class PaymentHistory {
     @Enumerated(EnumType.STRING)
     private PaymentHistoryStatus paymentStatus;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
 
     protected PaymentHistory() {
     }
 
     public PaymentHistory(final String orderId, final String paymentKey, final Long totalAmount,
-                          final LocalDateTime approvedAt, final Reservation reservation, final Member member) {
+                          final LocalDateTime approvedAt, final Reservation reservation) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.approvedAt = approvedAt;
         this.totalAmount = totalAmount;
         this.paymentStatus = PaymentHistoryStatus.DONE;
         this.reservation = reservation;
-        this.member = member;
     }
 
     public boolean hasSameReservation(final Reservation other) {
@@ -88,10 +82,6 @@ public class PaymentHistory {
 
     public PaymentHistoryStatus getPaymentStatus() {
         return paymentStatus;
-    }
-
-    public Member getMember() {
-        return member;
     }
 
     public Reservation getReservation() {

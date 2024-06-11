@@ -119,7 +119,7 @@ VALUES (1, CAST(TIMESTAMPADD(DAY, 3, NOW()) AS DATE), 1, 10, CAST(TIMESTAMPADD(M
 /**
   Payment History
  */
-INSERT INTO payment_history(order_id, payment_key, total_amount, approved_at, payment_status, reservation_id, member_id)
-VALUES ('orderId1', 'paymentKey1', 13500, NOW(), 'DONE', 5, 1),
-       ('orderId2', 'paymentKey2', 20500, NOW(), 'DONE', 12, 1),
-       ('orderId3', 'paymentKey3', 20500, NOW(), 'DONE', 13, 2)
+INSERT INTO payment_history(order_id, payment_key, total_amount, approved_at, payment_status, reservation_id)
+VALUES ('orderId1', 'paymentKey1', 13500, NOW(), 'DONE', 5),
+       ('orderId2', 'paymentKey2', 20500, NOW(), 'DONE', 12),
+       ('orderId3', 'paymentKey3', 20500, NOW(), 'DONE', 13)

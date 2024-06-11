@@ -103,7 +103,7 @@ public class ReservationService {
         validateReservationDuplicated(reservation);
 
         final Reservation savedReservation = reservationRepository.save(reservation);
-        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), reservation, member);
+        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), reservation);
         return ReservationDto.from(savedReservation);
     }
 
@@ -148,8 +148,9 @@ public class ReservationService {
     }
 
     public List<MyReservationResponse> getMyReservations(final Long memberId) {
-        List<Reservation> allByMemberId = reservationRepository.findAllByMember_Id(memberId);
-        List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAllByMember_Id(memberId);
+        final Member member = memberService.getMember(memberId);
+        final List<Reservation> allByMemberId = reservationRepository.findAllByMember_Id(memberId);
+        final List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAllByReservation_Member(member);
         return allByMemberId.stream()
                 .map(reservation -> MyReservationResponse.from(
                         ReservationDto.from(reservation),

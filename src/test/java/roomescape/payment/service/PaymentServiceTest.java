@@ -21,8 +21,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.exception.PaymentConfirmFailException;
 import roomescape.exception.PaymentCredentialMissMatchException;
 import roomescape.fixture.PaymentConfirmFixtures;
-import roomescape.member.model.Member;
-import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
 import roomescape.payment.infrastructure.PaymentGateway;
 import roomescape.payment.model.PaymentCredential;
@@ -41,9 +39,6 @@ class PaymentServiceTest {
 
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
 
     @MockBean
     private PaymentGateway paymentGateway;
@@ -73,14 +68,13 @@ class PaymentServiceTest {
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
-        final Member member = memberRepository.findById(1L).orElseThrow();
         final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willReturn(PaymentConfirmFixtures.getDefaultResponse(orderId, primaryKey, amount));
         List<PaymentHistory> beforeHistories = paymentHistoryRepository.findAll();
 
         //when
-        paymentService.submitPayment(orderId, amount, primaryKey, reservation, member);
+        paymentService.submitPayment(orderId, amount, primaryKey, reservation);
         List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAll();
         List<PaymentCredential> paymentCredentials = paymentCredentialRepository.findAll();
 
@@ -99,12 +93,11 @@ class PaymentServiceTest {
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
-        final Member member = memberRepository.findById(1L).orElseThrow();
         final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
                 .willThrow(new PaymentConfirmFailException("존재하지 않는 결제입니다.", HttpStatus.BAD_REQUEST));
 
-        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation, member))
+        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation))
                 .isInstanceOf(PaymentConfirmFailException.class)
                 .hasMessage("존재하지 않는 결제입니다.");
     }
@@ -115,10 +108,9 @@ class PaymentServiceTest {
         final String orderId = "orderId";
         final long amount = 1000L;
         final String primaryKey = "primaryKey";
-        final Member member = memberRepository.findById(1L).orElseThrow();
         final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
 
-        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation, member))
+        assertThatThrownBy(() -> paymentService.submitPayment(orderId, amount, primaryKey, reservation))
                 .isInstanceOf(PaymentCredentialMissMatchException.class);
     }
 }
