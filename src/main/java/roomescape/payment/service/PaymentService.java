@@ -8,7 +8,6 @@ import roomescape.payment.service.dto.PaymentRequest;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.reservation.domain.MemberReservation;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,13 +22,13 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public void pay(PaymentRequest paymentRequest, MemberReservation memberReservation) {
+    public void pay(PaymentRequest paymentRequest, long relationId) {
         PaymentResponse response = paymentClient.confirm(paymentRequest);
-        paymentRepository.save(Payment.from(response.paymentKey(), response.method(), response.totalAmount(), memberReservation));
+        paymentRepository.save(Payment.from(response.paymentKey(), response.method(), response.totalAmount(), relationId));
     }
 
     public void refund(long memberReservationId) {
-        Payment payment = paymentRepository.findByMemberReservationId(memberReservationId)
+        Payment payment = paymentRepository.findByRelatedId(memberReservationId)
                 .orElseThrow((() -> new RoomescapeException(ErrorType.PAYMENT_NOT_FOUND)));
 
         paymentClient.cancel(payment.getPaymentKey());

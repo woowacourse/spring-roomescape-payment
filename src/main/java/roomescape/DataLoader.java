@@ -66,7 +66,7 @@ public class DataLoader implements ApplicationRunner {
 
     private void runDataLoader() {
         Theme theme1 = themeRepository.save(new Theme("파라오의 비밀(이집트덕후모험/중급)", """
-                새로운 피라미드유적을 탐사하던 우리 일행은 마침내 파라오의 무덤을 발견하였고 잠입에 성공하여 그의 비밀을 파헤치던 중 실수로 부비트랩을 건드려 파라오의 방이 무너지기 시작하고 60분뒤면 파라오와 함께 생매장 당하게 될 위기에 처해졌다! 
+                새로운 피라미드유적을 탐사하던 우리 일행은 마침내 파라오의 무덤을 발견하였고 잠입에 성공하여 그의 비밀을 파헤치던 중 실수로 부비트랩을 건드려 파라오의 방이 무너지기 시작하고 60분뒤면 파라오와 함께 생매장 당하게 될 위기에 처해졌다!
                 상형문자를 해독하여 분노한 파라오에게 제사를 지내고 아누비스의 저주를 풀어서 안전하게 피라미드 밖으로 탈출하자!!
                 """,
                 "https://naverbooking-phinf.pstatic.net/20201109_121/1604908062178KzsNV_JPEG/%C6%C4%B6%F3%BF%C0%C0%C7%BA%F1%B9%D0.jpeg",
@@ -94,8 +94,8 @@ public class DataLoader implements ApplicationRunner {
 
         Theme theme4 = themeRepository.save(
                 new Theme("비밀갤러리생일파티(안무서워/중급)", """
-                        1920년대 프랑스 파리에 어느 평범한 가정, 그러나 불치병에 걸린 아이가 그만 생일을 몇일 앞두고 하늘나라로... 
-                        시간이 흘러 지금은 갤러리로 쓰이고 있는 집에 떠도는 소문으로 몰래 들어가서 생일파티를 하면 100여년전 아이가 자기의 생일파티인줄 알고 기뻐하며 생일인 친구의 소원을 들어준다고하여 기억에 남는 생일파티를 하기 위해 미스터리한 비밀갤러리에 몰래 들어갔다! 
+                        1920년대 프랑스 파리에 어느 평범한 가정, 그러나 불치병에 걸린 아이가 그만 생일을 몇일 앞두고 하늘나라로...
+                        시간이 흘러 지금은 갤러리로 쓰이고 있는 집에 떠도는 소문으로 몰래 들어가서 생일파티를 하면 100여년전 아이가 자기의 생일파티인줄 알고 기뻐하며 생일인 친구의 소원을 들어준다고하여 기억에 남는 생일파티를 하기 위해 미스터리한 비밀갤러리에 몰래 들어갔다!
                         경비원에게 들키지 않게 오래전 생일파티만을 기다리던 아이의 마지막 소원을 들어주고 우리만의 비밀 생일파티를 즐겁게 마치고 탈출하자..
                         """,
                         "https://naverbooking-phinf.pstatic.net/20201104_210/160445696075352J6M_JPEG/%BA%F1%B9%D0%B0%B6%B7%AF%B8%AE.jpeg",
@@ -193,7 +193,7 @@ public class DataLoader implements ApplicationRunner {
                         memberReservation.getReservation()
                                 .getTheme()
                                 .getPayAmount(),
-                        memberReservation
+                        memberReservation.getId()
                 )
         );
     }

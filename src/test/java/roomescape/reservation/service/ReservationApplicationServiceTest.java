@@ -27,6 +27,7 @@ import roomescape.exception.ErrorType;
 import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
@@ -86,6 +87,10 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
         LocalDate date = getNextDay();
+        reservationApplicationService.createMemberReservation(new MemberReservationCreate(
+                memberChoco.getId(),theme1.getId(),time.getId(),"1234","orderId",15000L,
+                date
+        ));
         ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
                 new WaitingCreate(memberClover.getId(), date, time.getId(), theme1.getId())
         );
@@ -93,7 +98,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //when
         AuthInfo authInfo = new AuthInfo(memberClover.getId(), memberClover.getName(), memberClover.getEmail(),
                 memberClover.getRole());
-        reservationApplicationService.deleteMemberReservation(authInfo, waitingResponse.memberReservationId());
+        reservationApplicationService.deleteWaiting(authInfo, waitingResponse.memberReservationId());
 
         //then
         assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).isEmpty();
@@ -144,7 +149,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
-
+        paymentRepository.save(Payment.from("paymentKey", "카드",15000l,firstReservation.getId()));
         entityManager.clear();
         entityManager.flush();
 
@@ -173,6 +178,6 @@ class ReservationApplicationServiceTest extends ServiceTest {
         reservationApplicationService.delete(reservation.getId());
 
         //then
-        assertThat(paymentRepository.findByMemberReservationId(memberReservation.getId())).isEmpty();
+        assertThat(paymentRepository.findByRelatedId(memberReservation.getId())).isEmpty();
     }
 }

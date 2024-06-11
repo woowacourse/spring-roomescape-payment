@@ -28,9 +28,7 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.exception.PaymentException;
-import roomescape.reservation.domain.MemberReservation;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.util.ServiceTest;
@@ -42,7 +40,6 @@ class PaymentServiceTest extends ServiceTest {
     Theme theme1;
     Member memberChoco;
     Reservation reservation;
-    MemberReservation memberReservation;
     @Autowired
     private PaymentService paymentService;
     @Autowired
@@ -56,8 +53,7 @@ class PaymentServiceTest extends ServiceTest {
         theme1 = themeRepository.save(getTheme1());
         memberChoco = memberRepository.save(getMemberChoco());
         reservation = reservationRepository.save(getNextDayReservation(time, theme1));
-        memberReservation = memberReservationRepository.save(
-                new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+
     }
 
     @DisplayName("결제에 성공하면, 응답을 반환한다.")
@@ -72,7 +68,7 @@ class PaymentServiceTest extends ServiceTest {
         doReturn(okResponse).when(paymentClient).confirm(any());
 
         //when
-        paymentService.pay(paymentRequest, memberReservation);
+        paymentService.pay(paymentRequest, 1l);
 
         //then
         Optional<Payment> optionalPayment = paymentRepository.findByPaymentKey(paymentKey);
@@ -95,7 +91,7 @@ class PaymentServiceTest extends ServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest(1000L, "MC45NTg4ODYxMzA5MTAz", "tgen_20240528172021mxEG4");
 
         //when&then
-        assertThatThrownBy(() -> paymentService.pay(paymentRequest, memberReservation))
+        assertThatThrownBy(() -> paymentService.pay(paymentRequest, 1l))
                 .isInstanceOf(PaymentException.class);
     }
 }

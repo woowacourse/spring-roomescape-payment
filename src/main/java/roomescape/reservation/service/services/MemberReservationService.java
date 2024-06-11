@@ -57,7 +57,7 @@ public class MemberReservationService {
 
     private MyReservationInfo add(MemberReservation memberReservation) {
 
-        PaymentInfo paymentInfo = paymentRepository.findByMemberReservationId(memberReservation.getId())
+        PaymentInfo paymentInfo = paymentRepository.findByRelatedId(memberReservation.getId())
                 .map(PaymentInfo::from)
                 .orElse(PaymentInfo.NOT_PAYMENT);
         return new MyReservationInfo(
