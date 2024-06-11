@@ -9,7 +9,5 @@ public record PaymentProperties(
         String baseUrl,
         String secret,
         Duration connectTimeout,
-        Duration readTimeout,
-        String endpointConfirm,
-        String endpointCancel) {
+        Duration readTimeout) {
 }

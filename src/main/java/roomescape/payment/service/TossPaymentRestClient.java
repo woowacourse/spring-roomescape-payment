@@ -1,6 +1,8 @@
 package roomescape.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpHeaders;
@@ -24,8 +26,12 @@ import java.util.Map;
 @Component
 public class TossPaymentRestClient {
 
+    private static final String ENDPOINT_CONFIRM = "/v1/payments/confirm";
+    private static final String ENDPOINT_CANCEL = "/v1/payments/{paymentKey}/cancel";
+
     private final RestClient restClient;
     private final PaymentProperties properties;
+    private final Logger logger = LoggerFactory.getLogger(TossPaymentRestClient.class);
 
     public TossPaymentRestClient(ObjectMapper objectMapper, PaymentProperties properties) {
         String authorizationToken = Base64.getEncoder()
@@ -45,16 +51,28 @@ public class TossPaymentRestClient {
                 .build();
     }
 
-    private static RestClient.ResponseSpec.ErrorHandler get4xxErrorHandler(ObjectMapper objectMapper) {
+    private RestClient.ResponseSpec.ErrorHandler get4xxErrorHandler(ObjectMapper objectMapper) {
         return (request, response) -> {
             PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            logger.warn("Request: {} {} / Response: {} {} {}",
+                    request.getMethod(),
+                    request.getURI(),
+                    response.getStatusCode(),
+                    response.getStatusText(),
+                    paymentFailure);
             throw new BadRequestException(paymentFailure.message());
         };
     }
 
-    private static RestClient.ResponseSpec.ErrorHandler getDefaultErrorHandler(ObjectMapper objectMapper) {
+    private RestClient.ResponseSpec.ErrorHandler getDefaultErrorHandler(ObjectMapper objectMapper) {
         return (request, response) -> {
             PaymentFailure paymentFailure = objectMapper.readValue(response.getBody(), PaymentFailure.class);
+            logger.warn("Request: {} {} / Response: {} {} {}",
+                    request.getMethod(),
+                    request.getURI(),
+                    response.getStatusCode(),
+                    response.getStatusText(),
+                    paymentFailure);
             throw new PaymentFailureException(paymentFailure.message());
         };
     }
@@ -69,16 +87,16 @@ public class TossPaymentRestClient {
     }
 
     public PaymentResponse confirm(PaymentRequest request) {
-        URI uri = UriComponentsBuilder.fromPath(properties.baseUrl())
-                .path(properties.endpointConfirm())
+        URI uri = UriComponentsBuilder.fromHttpUrl(properties.baseUrl())
+                .path(ENDPOINT_CONFIRM)
                 .build()
                 .toUri();
         return post(uri, request);
     }
 
     public PaymentResponse cancel(String cancelReason) {
-        URI uri = UriComponentsBuilder.fromPath(properties.baseUrl())
-                .path(properties.endpointCancel())
+        URI uri = UriComponentsBuilder.fromHttpUrl(properties.baseUrl())
+                .path(ENDPOINT_CANCEL)
                 .build()
                 .toUri();
         return post(uri, Map.of("cancelReason", cancelReason));

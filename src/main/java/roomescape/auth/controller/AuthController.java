@@ -1,5 +1,6 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,7 @@ import roomescape.auth.dto.*;
 import roomescape.auth.service.AuthService;
 import roomescape.auth.service.TokenCookieService;
 
+@Tag(name = "로그인", description = "사용자 및 관리자의 로그인, 로그아웃, 상태 체크")
 @Controller
 public class AuthController {
 
@@ -28,7 +30,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String readLoginPage() {
-        return "/login";
+        return "login";
     }
 
     @ResponseBody

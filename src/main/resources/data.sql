@@ -63,3 +63,6 @@ INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
 VALUES (1, 9, 'PAYMENT_REQUIRED', CURRENT_TIMESTAMP);
 INSERT INTO member_reservation (member_id, reservation_id, status, created_at)
 VALUES (1, 10, 'PAYMENT_REQUIRED', CURRENT_TIMESTAMP);
+
+INSERT INTO payment (payment_key, order_id, amount, created_at, member_reservation_id)
+VALUES ('tgen_20240605163415F3v93', '1717572855093MC45Nzk0MjM1MzkyODc1', 21000, DATEADD('DAY', -2, NOW()), 4);
