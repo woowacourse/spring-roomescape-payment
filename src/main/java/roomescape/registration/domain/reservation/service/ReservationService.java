@@ -123,13 +123,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public void removeReservation(long reservationId) {
+    public void removeReservation(long reservationId, Long memberId) {
         if (paymentRepository.existsByReservationId(reservationId)) {
             throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_ALREADY_PAID_CAN_NOT_DELETE_EXCEPTION);
         }
 
         Optional<Waiting> waiting = waitingRepository.findFirstByReservationIdOrderByCreatedAt(reservationId);
-
         if (waiting.isEmpty()) {
             reservationRepository.deleteById(reservationId);
             return;
@@ -137,6 +136,11 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(ReservationExceptionCode.RESERVATION_NOT_EXIST));
+        if(reservation.getMember() != memberRepository.findMemberById(memberId)
+                .orElseThrow(() -> new RoomEscapeException(MemberExceptionCode.MEMBER_NOT_EXIST_EXCEPTION))){
+            throw new RoomEscapeException(ReservationExceptionCode.ONLY_OWNER_CAN_DELETE);
+        }
+
         reservation.setMember(waiting.get().getReservation().getMember());
 
         reservationRepository.save(reservation);

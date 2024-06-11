@@ -49,12 +49,13 @@ class ReservationServiceTest {
     private static final LocalDate BEFORE = LocalDate.now().minusDays(1);
     private static final LocalTime TIME = LocalTime.of(9, 0);
 
+    private final Member reservationOwner = new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER);
     private final Reservation reservation = new Reservation(
             1L,
             LocalDate.now().plusDays(2),
             new ReservationTime(1L, TIME),
             new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail",15000L),
-            new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER)
+            reservationOwner
     );
     private final Waiting waiting = new Waiting(
             1L,
@@ -124,7 +125,7 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
         waitingRepository.save(waiting);
 
-        assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId()));
+        assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId(), reservationOwner.getId()));
     }
 
     @Test
@@ -137,12 +138,30 @@ class ReservationServiceTest {
         waitingRepository.save(waiting);
 
         assertAll(
-                () -> assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId())),
+                () -> assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId(), reservationOwner.getId())),
                 () -> assertThat(reservationService.findReservations()).hasSize(1),
                 () -> assertThat(reservationService.findReservations().get(0).memberName()).isEqualTo(
                         waiting.getReservation().getMember().getName()),
                 () -> assertThat(waitingRepository.findAll()).isEmpty()
         );
+    }
+
+    @Test
+    @DisplayName("자신의 것이 아닌 것을 삭제하려 하면 예외가 발생한다.")
+    void cannotDeleteOtherReservation() {
+        reservationTimeRepository.save(reservation.getReservationTime());
+        themeRepository.save(reservation.getTheme());
+        memberRepository.save(reservation.getMember());
+        reservationRepository.save(reservation);
+        waitingRepository.save(waiting);
+        Member notOwner = memberRepository.save(
+                new Member(new Name("주인이 아님"), "notOwner1@email.com", "password1", MemberRole.MEMBER)
+        );
+
+        Throwable cannotDeleteOthersException = assertThrows(RoomEscapeException.class,
+                () -> reservationService.removeReservation(reservation.getId(), notOwner.getId()));
+        assertEquals(ReservationExceptionCode.ONLY_OWNER_CAN_DELETE.getMessage(),
+                cannotDeleteOthersException.getMessage());
     }
 
     @Test

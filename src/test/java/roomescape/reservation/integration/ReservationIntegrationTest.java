@@ -17,7 +17,6 @@ import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.model.IntegrationTest;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +26,7 @@ class ReservationIntegrationTest extends IntegrationTest {
     private TossPaymentClient tossPaymentClient;
 
     @Test
-    @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록, 조회한다.")
+    @DisplayName("정상적인 요청에 대하여 예약을 정상적으로 등록한다.")
     void adminReservationPageWork() {
         Token token = tokenProvider.getAccessToken(1);
         ResponseCookie cookie = CookieProvider.setCookieFrom(token);
@@ -44,12 +43,6 @@ class ReservationIntegrationTest extends IntegrationTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201);
-
-        RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(7));
     }
 
     @Test

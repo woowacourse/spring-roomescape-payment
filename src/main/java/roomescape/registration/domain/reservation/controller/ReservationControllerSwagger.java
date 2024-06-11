@@ -1,6 +1,7 @@
 package roomescape.registration.domain.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,24 +46,7 @@ public interface ReservationControllerSwagger {
                     )
             }
     )
-    ResponseEntity<ReservationResponse> reservationSave(ReservationRequest reservationRequest, long id);
-
-    @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
-    @Operation(
-            summary = "예약 목록 조회",
-            description = "모든 예약 목록을 조회합니다.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "예약 목록이 반환됩니다.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = ReservationResponse.class))
-                            )
-                    )
-            }
-    )
-    List<ReservationResponse> reservationList();
+    ResponseEntity<ReservationResponse> reservationSave(ReservationRequest reservationRequest, Long id);
 
     @Operation(
             summary = "특정 테마에 대한 예약 가능 시간 조회",
@@ -83,7 +67,7 @@ public interface ReservationControllerSwagger {
     @SecurityRequirement(name = JWT_TOKEN_COOKIE_AUTH)
     @Operation(
             summary = "예약 삭제",
-            description = "지정된 예약 ID를 가진 예약을 삭제합니다.",
+            description = "지정된 예약 ID를 가진 예약을 삭제합니다. 이때 자신이 생성하지 않은 예약은 삭제할 수 없습니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "204",
@@ -92,5 +76,5 @@ public interface ReservationControllerSwagger {
                     )
             }
     )
-    ResponseEntity<Void> reservationRemove(long reservationId);
+    ResponseEntity<Void> reservationRemove(long reservationId, @Parameter(hidden = true) Long memberId);
 }
