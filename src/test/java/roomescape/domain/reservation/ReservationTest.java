@@ -63,8 +63,8 @@ class ReservationTest {
     void throw_exception_when_changing_to_canceled_and_member_id_does_not_match() {
         Reservation reservation = new Reservation(member, theme, date, time, Status.CANCELED);
 
-        assertThatThrownBy(() -> reservation.cancel(2L))
-                .isInstanceOf(CancelReservationException.class);
+        assertThatThrownBy(() -> reservation.validateOwner(2L))
+                .isInstanceOf(AuthenticationFailureException.class);
     }
 
     @DisplayName("정상적으로 예약 상태를 CANCELED로 변경한다.")

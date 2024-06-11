@@ -20,14 +20,17 @@ public class CancelService {
     @Transactional
     public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
-        reservation.cancel(memberInfo.id());
-        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
-        updateFirstWaitingToPending(reservation);
+        reservation.validateOwner(memberInfo.id());
+        cancelReservation(reservation);
     }
 
     @Transactional
     public void cancelReservationByAdmin(Long reservationId) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
+        cancelReservation(reservation);
+    }
+
+    private void cancelReservation(Reservation reservation) {
         reservation.cancel();
         reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
         updateFirstWaitingToPending(reservation);

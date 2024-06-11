@@ -83,13 +83,6 @@ public class Reservation {
         this.status = Status.RESERVED;
     }
 
-    public void cancel(Long memberId) {
-        if (!member.hasSameId(memberId)) {
-            throw new CancelReservationException("다른 회원의 예약을 취소할 수 없습니다.");
-        }
-        this.status = Status.CANCELED;
-    }
-
     public void cancel() {
         this.status = Status.CANCELED;
     }
