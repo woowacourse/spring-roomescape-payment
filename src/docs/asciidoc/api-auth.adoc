@@ -1,0 +1,72 @@
+= 인증 관련 API
+
+== 로그인 API
+로그인을 하기 위한 API 입니다.
+
+=== 요청
+include::{snippets}/auth/login/http-request.adoc[]
+
+==== 요청 헤더
+설정할 헤더 값이 없습니다.
+
+==== 요청 바디
+include::{snippets}/auth/login/request-body.adoc[]
+include::{snippets}/auth/login/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/auth/login/http-response.adoc[]
+
+==== 응답 헤더
+로그인에 성공하면 쿠키 값을 반환합니다.
+include::{snippets}/auth/login/response-cookies.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/login/response-body.adoc[]
+include::{snippets}/auth/login/response-fields.adoc[]
+
+== 로그아웃 API
+로그아웃을 하기 위한 API 입니다.
+
+=== 요청
+include::{snippets}/auth/logout/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/auth/logout/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/auth/logout/request-body.adoc[]
+
+=== 응답
+include::{snippets}/auth/logout/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/logout/response-body.adoc[]
+
+
+== 로그인 상태 확인 API
+로그인 여부를 확인하는 API 입니다.
+
+=== 요청
+include::{snippets}/auth/login/check/valid/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/auth/login/check/valid/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/auth/login/check/valid/request-body.adoc[]
+
+=== 응답
+include::{snippets}/auth/login/check/valid/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/login/check/valid/response-body.adoc[]
+include::{snippets}/auth/login/check/valid/response-fields.adoc[]
+
+=== 에러 메시지
+로그인을 하지 않은 경우 아래와 같이 응답합니다.
+include::{snippets}/auth/login/check/invalid/http-response.adoc[]
+에러 메시지의 응답 바디입니다.
+include::{snippets}/auth/login/check/invalid/response-body.adoc[]
+include::{snippets}/auth/login/check/invalid/response-fields.adoc[]

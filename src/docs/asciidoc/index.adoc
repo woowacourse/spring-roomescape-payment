@@ -1,0 +1,704 @@
+= 방탈출 예약 API 문서
+:doctype: book
+:source-highlighter: highlightjs
+:sectlinks:
+:toc: left
+:toclevels: 3
+
+
+= 인증 관련 API
+
+== 로그인 API
+로그인을 하기 위한 API 입니다.
+
+=== 요청
+include::{snippets}/auth/login/http-request.adoc[]
+
+==== 요청 헤더
+설정할 헤더 값이 없습니다.
+
+==== 요청 바디
+include::{snippets}/auth/login/request-body.adoc[]
+include::{snippets}/auth/login/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/auth/login/http-response.adoc[]
+
+==== 응답 헤더
+로그인에 성공하면 쿠키 값을 반환합니다.
+include::{snippets}/auth/login/response-cookies.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/login/response-body.adoc[]
+include::{snippets}/auth/login/response-fields.adoc[]
+
+== 로그아웃 API
+로그아웃을 하기 위한 API 입니다.
+
+=== 요청
+include::{snippets}/auth/logout/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/auth/logout/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/auth/logout/request-body.adoc[]
+
+=== 응답
+include::{snippets}/auth/logout/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/logout/response-body.adoc[]
+
+
+== 로그인 상태 확인 API
+로그인 여부를 확인하는 API 입니다.
+
+=== 요청
+include::{snippets}/auth/login/check/valid/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/auth/login/check/valid/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/auth/login/check/valid/request-body.adoc[]
+
+=== 응답
+include::{snippets}/auth/login/check/valid/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/auth/login/check/valid/response-body.adoc[]
+include::{snippets}/auth/login/check/valid/response-fields.adoc[]
+
+=== 에러 메시지
+로그인을 하지 않은 경우 아래와 같이 응답합니다.
+include::{snippets}/auth/login/check/invalid/http-response.adoc[]
+에러 메시지의 응답 바디입니다.
+include::{snippets}/auth/login/check/invalid/response-body.adoc[]
+include::{snippets}/auth/login/check/invalid/response-fields.adoc[]
+
+
+
+
+:path_sign_in: member/sign-in
+:path_all_members: member/all-members
+= 회원 관련 API
+
+
+
+== 회원가입 API
+회원가입을 위한 API 입니다.
+
+=== 요청
+include::{snippets}/{path_sign_in}/http-request.adoc[]
+
+==== 요청 헤더
+설정할 헤더 값이 없습니다.
+
+==== 요청 바디
+include::{snippets}/{path_sign_in}/request-body.adoc[]
+include::{snippets}/{path_sign_in}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_sign_in}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_sign_in}/response-body.adoc[]
+include::{snippets}/{path_sign_in}/request-fields.adoc[]
+
+
+
+== 회원 조회 API
+모든 회원을 조회합니다. 요청 권한은 관리자만 가지고 있습니다.
+
+=== 요청
+include::{snippets}/{path_all_members}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 응답 받은 쿠키를 설정합니다.
+include::{snippets}/{path_all_members}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_all_members}/request-body.adoc[]
+
+=== 응답
+include::{snippets}/{path_all_members}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_all_members}/response-body.adoc[]
+include::{snippets}/{path_all_members}/response-fields.adoc[]
+
+
+
+
+
+:path_reservations_mine: reservation/reservations-mine
+
+:path_create_reservation: reservation/create-reservation
+:path_create_reservation_exception: reservation/create-reservation/exception
+
+:path_search_reservations: reservation/search-reservations
+
+:path_create_reservation_admin: reservation/create-reservation/admin
+:path_create_reservation_admin_exception_unauthorized: reservation/create-reservation/admin/exception/unauthorized
+
+:path_delete_reservation_admin: reservation/delete-reservation/admin
+
+= 예약 관련 API
+
+
+
+== 나의 예약 및 대기 조회 API
+나의 모든 예약 및 대기를 순번과 함께 조회합니다.
+
+=== 요청
+include::{snippets}/{path_reservations_mine}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_reservations_mine}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_reservations_mine}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_reservations_mine}/response-body.adoc[]
+include::{snippets}/{path_reservations_mine}/response-fields.adoc[]
+
+
+
+== 예약 생성 API
+사용자가 예약을 생성합니다.
+
+=== 요청
+include::{snippets}/{path_create_reservation}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_create_reservation}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_reservation}/request-body.adoc[]
+include::{snippets}/{path_create_reservation}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_reservation}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_reservation}/response-body.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields.adoc[]
+
+member 필드
+include::{snippets}/{path_create_reservation}/response-body-member.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-member.adoc[]
+
+theme 필드
+include::{snippets}/{path_create_reservation}/response-body-theme.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-theme.adoc[]
+
+time 필드
+include::{snippets}/{path_create_reservation}/response-body-time.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-time.adoc[]
+
+== 에러 메시지
+예약한 시간이 이미 지나간 날짜거나 시간이면 400을 반환합니다.
+
+=== 응답
+include::{snippets}/{path_create_reservation_exception}/http-response.adoc[]
+
+=== 응답 바디
+include::{snippets}/{path_create_reservation_exception}/response-body.adoc[]
+include::{snippets}/{path_create_reservation_exception}/response-fields.adoc[]
+
+
+
+== 예약 검색 API
+주어진 조건에 맞는 예약들(예약 대기 제외)을 조회합니다.
+
+=== 요청
+include::{snippets}/{path_search_reservations}/http-request.adoc[]
+
+쿼리 파라미터 정보입니다.
+include::{snippets}/{path_search_reservations}/query-parameters.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_search_reservations}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_search_reservations}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_search_reservations}/response-body.adoc[]
+include::{snippets}/{path_search_reservations}/response-fields.adoc[]
+
+member 필드
+include::{snippets}/{path_search_reservations}/response-body-member.adoc[]
+include::{snippets}/{path_search_reservations}/response-fields-member.adoc[]
+
+time 필드
+include::{snippets}/{path_search_reservations}/response-body-time.adoc[]
+include::{snippets}/{path_search_reservations}/response-fields-time.adoc[]
+
+theme 필드
+include::{snippets}/{path_search_reservations}/response-body-theme.adoc[]
+include::{snippets}/{path_search_reservations}/response-fields-theme.adoc[]
+
+
+
+== 관리자 예약 생성 API
+관리자가 특정 사용자로 예약을 할 수 있다.
+
+=== 요청
+include::{snippets}/{path_create_reservation_admin}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_create_reservation_admin}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_reservation_admin}/request-body.adoc[]
+include::{snippets}/{path_create_reservation_admin}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_reservation_admin}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_reservation_admin}/response-body.adoc[]
+include::{snippets}/{path_create_reservation_admin}/response-fields.adoc[]
+
+member 필드입니다.
+include::{snippets}/{path_create_reservation_admin}/response-body-member.adoc[]
+include::{snippets}/{path_create_reservation_admin}/response-fields-beneath-member.adoc[]
+
+time 필드입니다.
+include::{snippets}/{path_create_reservation_admin}/response-body-time.adoc[]
+include::{snippets}/{path_create_reservation_admin}/response-fields-beneath-time.adoc[]
+
+theme 필드입니다.
+include::{snippets}/{path_create_reservation_admin}/response-body-theme.adoc[]
+include::{snippets}/{path_create_reservation_admin}/response-fields-beneath-theme.adoc[]
+
+=== 에러 메시지
+관리자 권한이 아닌 경우 에러 메시지를 응답합니다.
+include::{snippets}/{path_create_reservation_admin_exception_unauthorized}/response-body.adoc[]
+include::{snippets}/{path_create_reservation_admin_exception_unauthorized}/response-fields.adoc[]
+
+
+
+== 예약 삭제 API
+예약을 삭제합니다.
+
+=== 요청
+include::{snippets}/{path_delete_reservation_admin}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_delete_reservation_admin}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_delete_reservation_admin}/http-response.adoc[]
+
+
+
+
+:path_reservations_mine: reservation/reservations-mine
+:path_create_reservation: reservation/create-reservation
+:path_create_reservation_exception: reservation/create-reservation/exception
+= 예약 관련 API
+
+
+
+== 나의 예약 및 대기 조회 API
+나의 모든 예약 및 대기를 순번과 함께 조회합니다.
+
+=== 요청
+include::{snippets}/{path_reservations_mine}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_reservations_mine}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_reservations_mine}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_reservations_mine}/response-body.adoc[]
+include::{snippets}/{path_reservations_mine}/response-fields.adoc[]
+
+
+
+== 예약 생성 API
+예약을 생성합니다.
+
+=== 요청
+include::{snippets}/{path_create_reservation}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_create_reservation}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_reservation}/request-body.adoc[]
+include::{snippets}/{path_create_reservation}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_reservation}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_reservation}/response-body.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields.adoc[]
+
+member 필드
+include::{snippets}/{path_create_reservation}/response-body-member.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-member.adoc[]
+
+theme 필드
+include::{snippets}/{path_create_reservation}/response-body-theme.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-theme.adoc[]
+
+time 필드
+include::{snippets}/{path_create_reservation}/response-body-time.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-time.adoc[]
+
+== 에러 메시지
+예약한 시간이 이미 지나간 날짜거나 시간이면 400을 반환합니다.
+
+=== 응답
+include::{snippets}/{path_create_reservation_exception}/http-response.adoc[]
+
+=== 응답 바디
+include::{snippets}/{path_create_reservation_exception}/response-body.adoc[]
+include::{snippets}/{path_create_reservation_exception}/response-fields.adoc[]
+
+
+
+:path_all_times: reservation-time/all-times
+
+:path_available_time: reservation-time/available-time
+
+:path_create_time: reservation-time/create-time
+:path_create_time_exist_exception: reservation-time/create-time/exist-exception
+
+:path_delete_time: reservation-time/delete-time
+
+= 예약 시간 관련 API
+
+
+
+== 전체 예약 시간 조회 API
+전체 예약 시간을 조회한다.
+
+=== 요청
+include::{snippets}/{path_all_times}/http-request.adoc[]
+
+=== 응답
+==== 응답 바디
+include::{snippets}/{path_all_times}/response-body.adoc[]
+include::{snippets}/{path_all_times}/response-fields.adoc[]
+
+
+
+== 시간 예약 여부 조회 API
+예약 시간의 예약 여부를 조회한다.
+
+=== 요청
+include::{snippets}/{path_available_time}/http-request.adoc[]
+
+=== 응답
+==== 응답 바디
+include::{snippets}/{path_available_time}/response-body.adoc[]
+
+==== 응답 파라미터
+include::{snippets}/{path_available_time}/response-fields.adoc[]
+
+
+
+== 예약 시간 추가 API
+예약 시간을 추가합니다.
+
+=== 요청
+include::{snippets}/{path_create_time}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 서버에게 받는 쿠키 값을 헤더에 설정합니다.
+include::{snippets}/reservation-time/cookies/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_time}/request-body.adoc[]
+include::{snippets}/{path_create_time}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_time}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_time}/response-body.adoc[]
+include::{snippets}/{path_create_time}/response-fields.adoc[]
+
+=== 에러 메시지
+추가하려는 예약 시간이 이미 존재한다면 400을 반환한다.
+
+include::{snippets}/{path_create_time_exist_exception}/response-body.adoc[]
+include::{snippets}/{path_create_time_exist_exception}/response-fields.adoc[]
+
+
+
+== 예약 시간 삭제 API
+예약 시간을 삭제합니다.
+
+=== 요청
+include::{snippets}/{path_delete_time}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 서버에게 받는 쿠키 값을 헤더에 설정합니다.
+include::{snippets}/{path_delete_time}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_delete_time}/http-response.adoc[]
+
+=== 에러 메시지
+존재하지 않는 예약 시간을 삭제하면 예외 메시지를 응답합니다.
+include::{snippets}/{path_delete_time}/exception/not-exist/response-body.adoc[]
+include::{snippets}/{path_delete_time}/exception/not-exist/response-fields.adoc[]
+
+이미 사용 중인 예약 시간을 삭제하면 예외 메시지를 응답합니다.
+include::{snippets}/{path_delete_time}/exception/already-exist/response-body.adoc[]
+include::{snippets}/{path_delete_time}/exception/already-exist/response-fields.adoc[]
+
+
+
+
+:path_all_themes: theme/all-themes
+:path_popular_theme: theme/popular-themes
+
+:path_create_theme_admin: theme/create-theme/admin
+
+:path_delete_theme_admin: theme/delete-theme/admin
+
+
+
+= 테마 관련 API
+
+== 전체 테마 조회 API
+모든 테마를 조회합니다.
+
+=== 요청
+include::{snippets}/{path_all_themes}/http-request.adoc[]
+
+=== 응답
+include::{snippets}/{path_all_themes}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_all_themes}/response-body.adoc[]
+include::{snippets}/{path_all_themes}/response-fields.adoc[]
+
+
+== 인기 테마 조회 API
+일주일간 예약이 많은 순으로 인기 테마를 조회합니다.
+
+=== 요청
+include::{snippets}/{path_popular_theme}/http-request.adoc[]
+
+=== 응답
+==== 응답 바디
+include::{snippets}/{path_popular_theme}/response-body.adoc[]
+
+==== 응답 파라미터
+include::{snippets}/{path_popular_theme}/response-fields.adoc[]
+
+
+
+== 관리자 테마 추가 API
+관리자 권한으로 테마를 추가합니다.
+
+=== 요청
+include::{snippets}/{path_create_theme_admin}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 응답받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_create_theme_admin}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_theme_admin}/request-body.adoc[]
+include::{snippets}/{path_create_theme_admin}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_theme_admin}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_theme_admin}/response-body.adoc[]
+include::{snippets}/{path_create_theme_admin}/response-fields.adoc[]
+
+=== 에러 메시지
+이미 존재하는 테마이름을 추가하려 하면 에러 메시지를 응답한다.
+include::{snippets}/{path_create_theme_admin}/exception/already-exist/response-body.adoc[]
+include::{snippets}/{path_create_theme_admin}/exception/already-exist/response-fields.adoc[]
+
+
+
+== 관리자 테마 삭제 API
+관리자 권한으로 테마를 삭제합니다.
+
+=== 요청
+include::{snippets}/{path_delete_theme_admin}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 응답받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_delete_theme_admin}/request-cookies.adoc[]
+
+
+=== 응답
+include::{snippets}/{path_delete_theme_admin}/http-response.adoc[]
+
+=== 에러 메시지
+존재하지 않는 테마를 삭제하면 에러 메시지가 응답한다.
+include::{snippets}/{path_delete_theme_admin}/exception/not-exist/response-body.adoc[]
+include::{snippets}/{path_delete_theme_admin}/exception/not-exist/response-fields.adoc[]
+
+이미 사용중인 테마를 삭제하면 에러 메시지가 응답한다.
+include::{snippets}/{path_delete_theme_admin}/exception/already-exist/response-body.adoc[]
+include::{snippets}/{path_delete_theme_admin}/exception/already-exist/response-fields.adoc[]
+
+
+
+
+:path_waiting_create: waiting/create-waiting
+:path_waiting_delete: waiting/delete-waiting
+:path_waiting_find_all: waiting/all-waitings
+:path_waiting_approve: waiting/approve-reservation
+:path_waiting_reject: waiting/reject-reservation
+
+= 예약 대기 관련 API
+
+== 예약 대기 추가 API
+예약 대기 추가를 위한 API
+
+=== 요청
+include::{snippets}/{path_waiting_create}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키값을 설정합니다.
+include::{snippets}/{path_waiting_create}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_waiting_create}/request-body.adoc[]
+include::{snippets}/{path_waiting_create}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_waiting_create}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_waiting_create}/response-body.adoc[]
+include::{snippets}/{path_waiting_create}/response-fields.adoc[]
+
+member 필드입니다.
+include::{snippets}/{path_waiting_create}/response-body-member.adoc[]
+include::{snippets}/{path_waiting_create}/response-fields-beneath-member.adoc[]
+
+theme 필드입니다.
+include::{snippets}/{path_waiting_create}/response-body-theme.adoc[]
+include::{snippets}/{path_waiting_create}/response-fields-beneath-theme.adoc[]
+
+time 필드입니다.
+include::{snippets}/{path_waiting_create}/response-body-time.adoc[]
+include::{snippets}/{path_waiting_create}/response-fields-beneath-time.adoc[]
+
+
+
+== 예약 대기 삭제 API
+예약 대기 삭제 요청을 위한 API 입니다.
+
+=== 요청
+include::{snippets}/{path_waiting_delete}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키값을 설정합니다.
+include::{snippets}/{path_waiting_delete}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_waiting_delete}/http-response.adoc[]
+
+
+
+== 예약 대기 목록 조회 API
+전체 예약 대기 목록을 조회합니다.
+
+=== 요청
+include::{snippets}/{path_waiting_find_all}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키값을 설정합니다.
+include::{snippets}/{path_waiting_find_all}/request-cookies.adoc[]
+
+
+=== 응답
+include::{snippets}/{path_waiting_find_all}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_waiting_find_all}/response-body.adoc[]
+include::{snippets}/{path_waiting_find_all}/response-fields.adoc[]
+
+member 필드입니다.
+include::{snippets}/{path_waiting_find_all}/response-body-member.adoc[]
+include::{snippets}/{path_waiting_find_all}/response-fields-member.adoc[]
+
+time 필드입니다.
+include::{snippets}/{path_waiting_find_all}/response-body-time.adoc[]
+include::{snippets}/{path_waiting_find_all}/response-fields-time.adoc[]
+
+theme 필드입니다.
+include::{snippets}/{path_waiting_find_all}/response-body-theme.adoc[]
+include::{snippets}/{path_waiting_find_all}/response-fields-time.adoc[]
+
+
+
+== 예약 대기 승인 API
+예약 대기에서 예약으로 변경을 승인한다.
+
+=== 요청
+include::{snippets}/{path_waiting_approve}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키값을 설정합니다.
+include::{snippets}/{path_waiting_approve}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_waiting_approve}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_waiting_approve}/response-body.adoc[]
+include::{snippets}/{path_waiting_approve}/response-fields.adoc[]
+
+member 필드입니다.
+include::{snippets}/{path_waiting_approve}/response-body-member.adoc[]
+include::{snippets}/{path_waiting_approve}/response-fields-beneath-member.adoc[]
+
+time 필드입니다.
+include::{snippets}/{path_waiting_approve}/response-body-time.adoc[]
+include::{snippets}/{path_waiting_approve}/response-fields-beneath-time.adoc[]
+
+theme 필드입니다.
+include::{snippets}/{path_waiting_approve}/response-body-theme.adoc[]
+include::{snippets}/{path_waiting_approve}/response-fields-beneath-theme.adoc[]
+
+
+
+== 예약 승인 거부 API
+예약 대기에서 예약으로의 변경을 거부한다.
+
+=== 요청
+include::{snippets}/{path_waiting_reject}/http-request.adoc[]
+
+==== 요청 헤더
+include::{snippets}/{path_waiting_reject}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_waiting_reject}/http-response.adoc[]
+
+
+
+
+
+

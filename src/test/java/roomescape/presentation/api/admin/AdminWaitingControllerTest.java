@@ -1,22 +1,41 @@
 package roomescape.presentation.api.admin;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
+import static roomescape.support.docs.DescriptorUtil.MEMBER_DESCRIPTOR;
+import static roomescape.support.docs.DescriptorUtil.RESERVATION_TIME_DESCRIPTOR;
+import static roomescape.support.docs.DescriptorUtil.THEME_DESCRIPTOR;
+import static roomescape.support.docs.DescriptorUtil.WAITING_DESCRIPTOR;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import roomescape.application.dto.response.MemberResponse;
+import io.restassured.specification.RequestSpecification;
 import roomescape.application.dto.response.ReservationResponse;
-import roomescape.application.dto.response.ReservationTimeResponse;
-import roomescape.application.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -31,6 +50,7 @@ import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
 import roomescape.presentation.BaseControllerTest;
 
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class AdminWaitingControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -48,6 +68,15 @@ class AdminWaitingControllerTest extends BaseControllerTest {
     @Autowired
     private WaitingRepository waitingRepository;
 
+    private RequestSpecification spec;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
+    }
+
     @Test
     @DisplayName("예약 대기 목록을 조회하고 성공하면 200을 반환한다.")
     void getReservationWaitings() {
@@ -61,25 +90,34 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .accept("application/json")
+                .filters(document("waiting/all-waitings",
+                        requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                        responseFields(fieldWithPath("[]").description("예약 대기 배열입니다."))
+                                .andWithPrefix("[].",
+                                        WAITING_DESCRIPTOR[0],
+                                        WAITING_DESCRIPTOR[1],
+                                        subsectionWithPath("member").description("예약한 사용자 정보입니다."),
+                                        subsectionWithPath("time").description("예약한 예약 시간 정보입니다."),
+                                        subsectionWithPath("theme").description("예약한 예약 테마 정보입니다.")),
+                        responseFields(beneathPath("[].member").withSubsectionId("member"), MEMBER_DESCRIPTOR),
+                        responseFields(beneathPath("[].time").withSubsectionId("time"), RESERVATION_TIME_DESCRIPTOR),
+                        responseFields(beneathPath("[].theme").withSubsectionId("theme"), THEME_DESCRIPTOR),
+                        responseBody(beneathPath("[].member").withSubsectionId("member")),
+                        responseBody(beneathPath("[].time").withSubsectionId("time")),
+                        responseBody(beneathPath("[].theme").withSubsectionId("theme"))))
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .when().get("/admin/waitings")
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(1))
+                .body("member.name", hasItems("유저"))
+                .body("time.startAt", hasItems("11:00"))
+                .body("theme.name", hasItems("테마 이름"));
 
-        List<ReservationResponse> reservations = response.jsonPath()
-                .getList(".", ReservationResponse.class);
-
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
-            softly.assertThat(reservations).hasSize(1);
-
-            softly.assertThat(reservations.get(0).date()).isEqualTo(date);
-            softly.assertThat(reservations.get(0).theme()).isEqualTo(ThemeResponse.from(theme));
-            softly.assertThat(reservations.get(0).member()).isEqualTo(MemberResponse.from(member));
-            softly.assertThat(reservations.get(0).time()).isEqualTo(ReservationTimeResponse.from(reservationTime));
-        });
     }
 
     @Test
@@ -95,17 +133,35 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         Waiting savedWaiting = waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ReservationResponse reservationResponse = RestAssured.given(spec).log().all()
+                .accept("application/json")
+                .filter(document(
+                        "waiting/approve-reservation",
+                        requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                        responseFields(
+                                WAITING_DESCRIPTOR[0],
+                                WAITING_DESCRIPTOR[1],
+                                subsectionWithPath("member").description("예약한 사용자 정보입니다."),
+                                subsectionWithPath("time").description("예약한 예약 시간 정보입니다."),
+                                subsectionWithPath("theme").description("예약한 예약 테마 정보입니다."),
+                                fieldWithPath("paymentKey").description("토스에서 제공하는 paymentKey입니다."),
+                                fieldWithPath("amount").description("예약 결제 금액입니다.")
+                        ),
+                        responseFields(beneathPath("member"), MEMBER_DESCRIPTOR),
+                        responseFields(beneathPath("time"), RESERVATION_TIME_DESCRIPTOR),
+                        responseFields(beneathPath("theme"), THEME_DESCRIPTOR),
+                        responseBody(beneathPath("member").withSubsectionId("member")),
+                        responseBody(beneathPath("time").withSubsectionId("time")),
+                        responseBody(beneathPath("theme").withSubsectionId("theme"))
+                ))
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .when().post("/admin/waitings/" + savedWaiting.getId() + "/approve")
+                .when().post("/admin/waitings/{id}/approve", savedWaiting.getId())
                 .then().log().all()
-                .extract();
-
-        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(ReservationResponse.class);
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
             softly.assertThat(waitingRepository.findById(savedWaiting.getId())).isEmpty();
             softly.assertThat(reservationRepository.findById(reservationResponse.id())).isPresent();
         });
@@ -124,15 +180,19 @@ class AdminWaitingControllerTest extends BaseControllerTest {
         ReservationDetail reservationDetail = new ReservationDetail(date, reservationTime, theme);
         Waiting savedWaiting = waitingRepository.save(new Waiting(reservationDetail, member));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .accept("application/json")
+                .filter(document(
+                        "waiting/reject-reservation",
+                        requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다."))))
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .when().delete("/admin/waitings/" + savedWaiting.getId() + "/reject")
+                .when().delete("/admin/waitings/{id}/reject", savedWaiting.getId())
                 .then().log().all()
-                .extract();
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.statusCode()).isEqualTo(200);
             softly.assertThat(waitingRepository.findById(savedWaiting.getId())).isEmpty();
         });
     }

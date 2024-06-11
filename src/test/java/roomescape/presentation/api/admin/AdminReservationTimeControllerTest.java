@@ -1,23 +1,37 @@
 package roomescape.presentation.api.admin;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
+import static roomescape.support.docs.DescriptorUtil.ERROR_MESSAGE_DESCRIPTOR;
+import static roomescape.support.docs.DescriptorUtil.RESERVATION_TIME_DESCRIPTOR;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import roomescape.application.dto.request.ReservationTimeRequest;
-import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
@@ -31,6 +45,7 @@ import roomescape.domain.reservation.detail.ThemeRepository;
 import roomescape.fixture.Fixture;
 import roomescape.presentation.BaseControllerTest;
 
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class AdminReservationTimeControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -44,11 +59,18 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+    private RequestSpecification spec;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
+    }
 
     @Nested
     @DisplayName("예약 시간을 생성하는 경우")
     class AddReservationTime extends BaseControllerTest {
-
         @Test
         @DisplayName("성공할 경우 201을 반환한다.")
         void success() {
@@ -57,23 +79,24 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .accept("application/json")
+                    .filters(document("reservation-time/cookies",
+                                    requestCookies(cookieWithName("token").description("세션에 저장된 쿠기 값입니다.")))
+                            , document("reservation-time/create-time",
+                                    requestFields(fieldWithPath("startAt").description("예약할 시간입니다.")),
+                                    responseFields(RESERVATION_TIME_DESCRIPTOR)))
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/times")
                     .then().log().all()
-                    .extract();
-
-            ReservationTimeResponse reservationTimeResponse = response.as(ReservationTimeResponse.class);
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-                softly.assertThat(response.header("Location")).isEqualTo("/times/1");
-                softly.assertThat(reservationTimeResponse)
-                        .isEqualTo(new ReservationTimeResponse(1L, LocalTime.of(10, 30)));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .header("Location", response1 -> equalTo("/times/" + response1.path("id")))
+                    .body("startAt", equalTo("10:30"));
         }
+
 
         @Test
         @DisplayName("이미 예약 시간이 존재하면 400을 반환한다.")
@@ -85,19 +108,20 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(10, 30));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .accept("application/json")
+                    .filters(document("reservation-time/create-time/exist-exception",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키입니다.")),
+                            requestFields(fieldWithPath("startAt").description("예약할 시간입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/admin/times")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 시간의 예약 시간이 이미 존재합니다. (시작 시간: %s)", LocalTime.of(10, 30)));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body("message", containsString("해당 시간의 예약 시간이 이미 존재합니다."));
         }
     }
 
@@ -114,13 +138,13 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
 
             reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 30)));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다."))))
                     .cookie("token", token)
-                    .when().delete("/admin/times/1")
+                    .when().delete("/admin/times/{id}", 1)
                     .then().log().all()
-                    .extract();
-
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                    .statusCode(HttpStatus.NO_CONTENT.value());
         }
 
         @Test
@@ -129,17 +153,16 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             Member admin = memberRepository.save(Fixture.MEMBER_ADMIN);
             String token = tokenProvider.createToken(admin.getId().toString());
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time/exception/not-exist",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 id의 예약 시간이 존재하지 않습니다. (id: %d)", 1));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .body("message", containsString("해당 id의 예약 시간이 존재하지 않습니다."));
         }
 
         @Test
@@ -155,17 +178,16 @@ class AdminReservationTimeControllerTest extends BaseControllerTest {
             ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
             reservationRepository.save(new Reservation(detail, member));
 
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filters(document("reservation-time/delete-time/exception/already-exist",
+                            requestCookies(cookieWithName("token").description("로그인시 응답받은 쿠키값입니다.")),
+                            responseFields(ERROR_MESSAGE_DESCRIPTOR)))
                     .cookie("token", token)
                     .when().delete("/admin/times/1")
                     .then().log().all()
-                    .extract();
-
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-                softly.assertThat(response.body().asString())
-                        .contains(String.format("해당 예약 시간을 사용하는 예약이 존재합니다. (예약 시간 id: %d)", 1));
-            });
+                    .assertThat()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body("message", containsString("해당 예약 시간을 사용하는 예약이 존재합니다."));
         }
     }
 }

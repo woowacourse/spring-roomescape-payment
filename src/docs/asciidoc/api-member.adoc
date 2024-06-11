@@ -1,0 +1,50 @@
+:path_sign_in: member/sign-in
+:path_all_members: member/all-members
+= 회원 관련 API
+
+
+
+== 회원가입 API
+회원가입을 위한 API 입니다.
+
+=== 요청
+include::{snippets}/{path_sign_in}/http-request.adoc[]
+
+==== 요청 헤더
+설정할 헤더 값이 없습니다.
+
+==== 요청 바디
+include::{snippets}/{path_sign_in}/request-body.adoc[]
+include::{snippets}/{path_sign_in}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_sign_in}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_sign_in}/response-body.adoc[]
+include::{snippets}/{path_sign_in}/request-fields.adoc[]
+
+
+
+== 회원 조회 API
+모든 회원을 조회합니다. 요청 권한은 관리자만 가지고 있습니다.
+
+=== 요청
+include::{snippets}/{path_all_members}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 응답 받은 쿠키를 설정합니다.
+include::{snippets}/{path_all_members}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_all_members}/request-body.adoc[]
+
+=== 응답
+include::{snippets}/{path_all_members}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_all_members}/response-body.adoc[]
+include::{snippets}/{path_all_members}/response-fields.adoc[]
+
+
+

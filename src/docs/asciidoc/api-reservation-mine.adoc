@@ -1,0 +1,69 @@
+:path_reservations_mine: reservation/reservations-mine
+:path_create_reservation: reservation/create-reservation
+:path_create_reservation_exception: reservation/create-reservation/exception
+= 예약 관련 API
+
+
+
+== 나의 예약 및 대기 조회 API
+나의 모든 예약 및 대기를 순번과 함께 조회합니다.
+
+=== 요청
+include::{snippets}/{path_reservations_mine}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_reservations_mine}/request-cookies.adoc[]
+
+=== 응답
+include::{snippets}/{path_reservations_mine}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_reservations_mine}/response-body.adoc[]
+include::{snippets}/{path_reservations_mine}/response-fields.adoc[]
+
+
+
+== 예약 생성 API
+예약을 생성합니다.
+
+=== 요청
+include::{snippets}/{path_create_reservation}/http-request.adoc[]
+
+==== 요청 헤더
+로그인 시 받은 쿠키 값을 설정합니다.
+include::{snippets}/{path_create_reservation}/request-cookies.adoc[]
+
+==== 요청 바디
+include::{snippets}/{path_create_reservation}/request-body.adoc[]
+include::{snippets}/{path_create_reservation}/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/{path_create_reservation}/http-response.adoc[]
+
+==== 응답 바디
+include::{snippets}/{path_create_reservation}/response-body.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields.adoc[]
+
+member 필드
+include::{snippets}/{path_create_reservation}/response-body-member.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-member.adoc[]
+
+theme 필드
+include::{snippets}/{path_create_reservation}/response-body-theme.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-theme.adoc[]
+
+time 필드
+include::{snippets}/{path_create_reservation}/response-body-time.adoc[]
+include::{snippets}/{path_create_reservation}/response-fields-beneath-time.adoc[]
+
+== 에러 메시지
+예약한 시간이 이미 지나간 날짜거나 시간이면 400을 반환합니다.
+
+=== 응답
+include::{snippets}/{path_create_reservation_exception}/http-response.adoc[]
+
+=== 응답 바디
+include::{snippets}/{path_create_reservation_exception}/response-body.adoc[]
+include::{snippets}/{path_create_reservation_exception}/response-fields.adoc[]
+

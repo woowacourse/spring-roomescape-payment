@@ -58,7 +58,9 @@ public class ReservationService {
                 request.date(),
                 request.timeId(),
                 request.themeId(),
-                request.memberId()
+                request.memberId(),
+                request.paymentKey(),
+                request.amount()
         );
 
         validateReservationExists(reservation);
@@ -105,6 +107,24 @@ public class ReservationService {
         ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
 
         return Reservation.create(currentDateTime, detail, member);
+    }
+
+    private Reservation createReservation(
+            LocalDateTime currentDateTime,
+            LocalDate date,
+            Long timeId,
+            Long themeId,
+            Long memberId,
+            String paymentKey,
+            Long amount
+    ) {
+        Member member = memberRepository.getById(memberId);
+        ReservationTime reservationTime = reservationTimeRepository.getById(timeId);
+        Theme theme = themeRepository.getById(themeId);
+
+        ReservationDetail detail = new ReservationDetail(date, reservationTime, theme);
+
+        return Reservation.create(currentDateTime, detail, amount, paymentKey, member);
     }
 
     private void validateReservationExists(Reservation reservation) {
