@@ -1,5 +1,6 @@
 package roomescape.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,9 +14,13 @@ public class Theme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "테마 ID", example = "1")
     private Long id;
+    @Schema(description = "테마 이름", example = "에버")
     private String name;
+    @Schema(description = "테마 설명", example = "공포")
     private String description;
+    @Schema(description = "테마 썸네일 주소", example = "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg")
     private String thumbnail;
 
     protected Theme() {

@@ -8,16 +8,16 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.annotation.AuthenticationPrincipal;
 import roomescape.service.AuthService;
-import roomescape.service.MemberService;
+import roomescape.service.MemberReadService;
 
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final AuthService authService;
-    private final MemberService memberService;
+    private final MemberReadService memberReadService;
 
-    public LoginMemberArgumentResolver(AuthService authService, MemberService memberService) {
+    public LoginMemberArgumentResolver(AuthService authService, MemberReadService memberReadService) {
         this.authService = authService;
-        this.memberService = memberService;
+        this.memberReadService = memberReadService;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        Long memberId = authService.findMemberIdByCookie(request.getCookies());
-        return memberService.findMemberById(memberId);
+        Long memberId = authService.getMemberIdByCookie(request.getCookies());
+        return memberReadService.getMemberById(memberId);
     }
 }

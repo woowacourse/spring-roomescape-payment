@@ -28,7 +28,7 @@ public class PaymentServiceTest {
     void should_throw_exception_when_different_amount() {
         assertThatThrownBy(() ->
                 paymentService.confirmReservationPayments(
-                        new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "orderId", "paymentKey", 1234L)
+                        new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, "paymentId", "paymentKey", 1234L)
                 ))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("[ERROR] 클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [1234]");

@@ -28,22 +28,22 @@ public class AuthService {
         return cookie;
     }
 
-    public Long findMemberIdByCookie(Cookie[] cookies) {
-        Cookie cookie = findCookieIfExist(cookies);
+    public Long getMemberIdByCookie(Cookie[] cookies) {
+        Cookie cookie = getCookie(cookies);
         Claims claims = tokenProvider.getPayload(cookie.getValue());
         String payload = claims.getSubject();
         validatePayload(payload);
         return Long.parseLong(payload);
     }
 
-    public Role findRoleByCookie(Cookie[] cookies) {
-        Cookie cookie = findCookieIfExist(cookies);
+    public Role getRoleByCookie(Cookie[] cookies) {
+        Cookie cookie = getCookie(cookies);
         Claims claims = tokenProvider.getPayload(cookie.getValue());
         String payload = claims.get("role", String.class);
         return Role.valueOf(payload);
     }
 
-    private Cookie findCookieIfExist(Cookie[] cookies) {
+    private Cookie getCookie(Cookie[] cookies) {
         return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(COOKIE_NAME))
                 .findAny()
@@ -59,7 +59,7 @@ public class AuthService {
     }
 
     public Cookie expireCookie(Cookie[] cookies) {
-        Cookie cookie = findCookieIfExist(cookies);
+        Cookie cookie = getCookie(cookies);
         cookie.setMaxAge(0);
         return cookie;
     }

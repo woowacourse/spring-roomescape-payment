@@ -11,11 +11,11 @@ import java.util.List;
 
 @Transactional(readOnly = true)
 @Service
-public class ThemeService {
+public class ThemeReadService {
 
     private final ThemeRepository themeRepository;
 
-    public ThemeService(ThemeRepository themeRepository) {
+    public ThemeReadService(ThemeRepository themeRepository) {
         this.themeRepository = themeRepository;
     }
 
@@ -28,15 +28,9 @@ public class ThemeService {
         return themeRepository.save(theme);
     }
 
-    @Transactional
-    public void deleteTheme(long id) {
-        themeRepository.deleteById(id);
-    }
-
     public List<Theme> findPopularThemes() {
         LocalDate before = LocalDate.now().minusDays(8);
         LocalDate after = LocalDate.now().minusDays(1);
         return themeRepository.findFirst10ByDateBetweenOrderByTheme(before, after);
     }
-
 }

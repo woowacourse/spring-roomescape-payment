@@ -4,23 +4,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.response.MemberReservationResponse;
 import roomescape.exception.NotFoundException;
-import roomescape.model.*;
+import roomescape.model.Member;
+import roomescape.model.Reservation;
+import roomescape.model.ReservationWithPaymentInfo;
+import roomescape.model.WaitingWithRank;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.WaitingRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Transactional(readOnly = true)
 @Service
-public class ReservationWaitingService {
+public class ReservationWaitingReadService {
 
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationWaitingService(ReservationRepository reservationRepository, WaitingRepository waitingRepository, MemberRepository memberRepository) {
+    public ReservationWaitingReadService(ReservationRepository reservationRepository,
+                                         WaitingRepository waitingRepository,
+                                         MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.memberRepository = memberRepository;
@@ -30,41 +34,23 @@ public class ReservationWaitingService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
 
-        List<Reservation> memberReservations = reservationRepository.findAllByMember(member);
+        List<ReservationWithPaymentInfo> memberReservationsWithPaymentInfo = reservationRepository.findAllByMemberWithPaymentInfo(member);
+        List<Reservation> memberReservationsWithoutPaymentInfo = reservationRepository.findAllByMemberWithoutPaymentInfo(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
 
         List<MemberReservationResponse> allMemberReservations =
-                new java.util.ArrayList<>(memberReservations.stream()
+                new java.util.ArrayList<>(memberReservationsWithPaymentInfo.stream()
                         .map(MemberReservationResponse::new)
                         .toList());
+        List<MemberReservationResponse> allMemberReservationsWithoutPaymentInfo = memberReservationsWithoutPaymentInfo.stream()
+                .map(MemberReservationResponse::new)
+                .toList();
         List<MemberReservationResponse> waiting = waitingWithRanks.stream()
                 .map(MemberReservationResponse::new)
                 .toList();
 
         allMemberReservations.addAll(waiting);
+        allMemberReservations.addAll(allMemberReservationsWithoutPaymentInfo);
         return allMemberReservations;
-    }
-
-    @Transactional
-    public void deleteReservation(Long id) {
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(() ->
-                new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
-        reservationRepository.deleteById(id);
-
-        Theme theme = reservation.getTheme();
-        LocalDate date = reservation.getDate();
-        ReservationTime time = reservation.getTime();
-        if (waitingRepository.existsWaitingByThemeAndDateAndTime(theme, date, time)) {
-            convertWaitingToReservation(theme, date, time);
-        }
-    }
-
-    private void convertWaitingToReservation(Theme theme, LocalDate date, ReservationTime time) {
-        Waiting waiting = waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time).orElseThrow(() ->
-                new NotFoundException("해당 테마:[%s], 날짜:[%s], 시간:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(theme.getName(), date, time.getStartAt())));
-
-        reservationRepository.save(new Reservation(date, time, theme, waiting.getMember()));
-
-        waitingRepository.deleteById(waiting.getId());
     }
 }

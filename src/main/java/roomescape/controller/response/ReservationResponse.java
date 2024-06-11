@@ -1,15 +1,21 @@
 package roomescape.controller.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.model.Reservation;
 
 import java.time.LocalDate;
 
 public class ReservationResponse {
 
+    @Schema(description = "예약 ID", example = "1")
     private Long id;
+    @Schema(description = "예약자 이름", example = "수달")
     private String name;
+    @Schema(description = "예약 날짜", example = "2024-06-11")
     private LocalDate date;
+    @Schema(description = "예약 시간")
     private ReservationTimeResponse time;
+    @Schema(description = "예약 테마")
     private ReservationThemeResponse theme;
 
     private ReservationResponse() {

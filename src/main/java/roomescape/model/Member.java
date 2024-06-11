@@ -1,5 +1,6 @@
 package roomescape.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import roomescape.exception.BadRequestException;
 
@@ -10,11 +11,16 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "멤버 ID", example = "1")
     private Long id;
+    @Schema(description = "멤버 이름", example = "수달")
     private String name;
     @Enumerated(EnumType.STRING)
+    @Schema(description = "멤버 역할", example = "MEMBER")
     private Role role;
+    @Schema(description = "이메일", example = "otter@email.com")
     private String email;
+    @Schema(description = "비밀번호", example = "1234")
     private String password;
 
     protected Member() {

@@ -28,15 +28,17 @@ class WaitingServiceTest {
     private ReservationTimeRepository reservationTimeRepository;
     private WaitingRepository waitingRepository;
     private MemberRepository memberRepository;
-    private WaitingService waitingService;
+    private WaitingReadService waitingReadService;
+    private WaitingWriteService waitingWriteService;
 
     @Autowired
-    public WaitingServiceTest(ThemeRepository themeRepository, ReservationTimeRepository reservationTimeRepository, WaitingRepository waitingRepository, MemberRepository memberRepository, WaitingService waitingService) {
+    public WaitingServiceTest(ThemeRepository themeRepository, ReservationTimeRepository reservationTimeRepository, WaitingRepository waitingRepository, MemberRepository memberRepository, WaitingReadService waitingReadService, WaitingWriteService waitingWriteService) {
         this.themeRepository = themeRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.waitingRepository = waitingRepository;
         this.memberRepository = memberRepository;
-        this.waitingService = waitingService;
+        this.waitingReadService = waitingReadService;
+        this.waitingWriteService = waitingWriteService;
     }
 
     @DisplayName("사용자가 예약 대기를 추가한다")
@@ -45,7 +47,7 @@ class WaitingServiceTest {
         Member member = memberRepository.findById(1L).get();
         WaitingRequest request = new WaitingRequest(now().plusDays(2), 1L, 1L);
 
-        waitingService.addWaiting(request, member);
+        waitingWriteService.addWaiting(request, member);
 
         Iterable<Waiting> allReservations = waitingRepository.findAll();
         assertThat(allReservations).hasSize(3);
@@ -54,16 +56,16 @@ class WaitingServiceTest {
     @DisplayName("예약 대기를 삭제한다")
     @Test
     void should_remove_waiting() {
-        waitingService.deleteWaiting(1L);
+        waitingWriteService.deleteWaiting(1L);
 
-        Iterable<Waiting> waiting = waitingService.findAllWaiting();
+        Iterable<Waiting> waiting = waitingReadService.findAllWaiting();
         assertThat(waiting).hasSize(1);
     }
 
     @DisplayName("존재하지 않는 예약 대기를 삭제하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_not_exist_waiting() {
-        assertThatThrownBy(() -> waitingService.deleteWaiting(1000000))
+        assertThatThrownBy(() -> waitingWriteService.deleteWaiting(1000000))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 id:[1000000] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.");
     }
@@ -71,7 +73,7 @@ class WaitingServiceTest {
     @DisplayName("존재하는 예약 대기를 삭제하면 예외가 발생하지 않는다.")
     @Test
     void should_not_throw_exception_when_exist_waiting() {
-        assertThatCode(() -> waitingService.deleteWaiting(1L))
+        assertThatCode(() -> waitingWriteService.deleteWaiting(1L))
                 .doesNotThrowAnyException();
     }
 
@@ -82,7 +84,7 @@ class WaitingServiceTest {
                 new WaitingRequest(LocalDate.now().minusDays(1), 1L, 1L);
         Member member = memberRepository.findById(1L).get();
 
-        assertThatThrownBy(() -> waitingService.addWaiting(request, member))
+        assertThatThrownBy(() -> waitingWriteService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약 대기를 추가할 수 없습니다.");
     }
@@ -93,7 +95,7 @@ class WaitingServiceTest {
         Member member = memberRepository.findById(1L).get();
         WaitingRequest request = new WaitingRequest(LocalDate.now().plusDays(4), 1L, 1L);
 
-        assertThatCode(() -> waitingService.addWaiting(request, member))
+        assertThatCode(() -> waitingWriteService.addWaiting(request, member))
                 .doesNotThrowAnyException();
     }
 
@@ -102,7 +104,7 @@ class WaitingServiceTest {
     void should_return_member_waiting() {
         Member member = memberRepository.findById(2L).get();
 
-        List<WaitingWithRank> waiting = waitingService
+        List<WaitingWithRank> waiting = waitingReadService
                 .findMemberWaiting(member.getId());
 
         assertThat(waiting).hasSize(2);
@@ -115,7 +117,7 @@ class WaitingServiceTest {
 
         WaitingRequest request = new WaitingRequest(now().plusDays(1), 1L, 1L);
 
-        assertThatThrownBy(() -> waitingService.addWaiting(request, member))
+        assertThatThrownBy(() -> waitingWriteService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("[ERROR] 현재 이름(수달)으로 예약 내역이 이미 존재합니다.");
     }
@@ -127,7 +129,7 @@ class WaitingServiceTest {
 
         WaitingRequest request = new WaitingRequest(now().plusDays(1), 1L, 1L);
 
-        assertThatThrownBy(() -> waitingService.addWaiting(request, member))
+        assertThatThrownBy(() -> waitingWriteService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("[ERROR] 현재 이름(배키)으로 예약된 예약 대기 내역이 이미 존재합니다.");
     }
@@ -147,7 +149,7 @@ class WaitingServiceTest {
         ReservationTime time = reservationTimeRepository.findById(1L).get();
         LocalDate date = LocalDate.now().plusDays(1);
 
-        Waiting waiting = waitingService.findFirstWaitingByCondition(theme, date, time);
+        Waiting waiting = waitingReadService.getFirstWaitingByCondition(theme, date, time);
 
         assertThat(waiting).isNotNull();
     }
@@ -159,7 +161,7 @@ class WaitingServiceTest {
         ReservationTime time = reservationTimeRepository.findById(1L).get();
         LocalDate date = LocalDate.now().plusDays(3);
 
-        assertThatThrownBy(() -> waitingService.findFirstWaitingByCondition(theme, date, time))
+        assertThatThrownBy(() -> waitingReadService.getFirstWaitingByCondition(theme, date, time))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 테마:[name1], 날짜:[" + date + "], 시간:[10:00] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.");
     }
@@ -171,7 +173,7 @@ class WaitingServiceTest {
         ReservationTime time = reservationTimeRepository.findById(1L).get();
         LocalDate date = LocalDate.now().plusDays(1);
 
-        boolean exist = waitingService.existsWaiting(theme, date, time);
+        boolean exist = waitingReadService.existsWaiting(theme, date, time);
 
         assertThat(exist).isTrue();
     }

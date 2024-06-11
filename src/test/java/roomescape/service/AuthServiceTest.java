@@ -41,7 +41,7 @@ class AuthServiceTest {
         String token = jwtTokenProvider.createToken(member);
         Cookie[] cookies = new Cookie[]{new Cookie("id", token)};
 
-        assertThatThrownBy(() -> authService.findMemberIdByCookie(cookies))
+        assertThatThrownBy(() -> authService.getMemberIdByCookie(cookies))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("[ERROR] 아이디가 token인 쿠키가 없습니다.");
     }
@@ -53,7 +53,7 @@ class AuthServiceTest {
         String token = jwtTokenProvider.createToken(member);
         Cookie[] cookies = new Cookie[]{new Cookie("token", token)};
 
-        Long memberId = authService.findMemberIdByCookie(cookies);
+        Long memberId = authService.getMemberIdByCookie(cookies);
 
         assertThat(memberId).isEqualTo(1L);
     }
@@ -66,8 +66,8 @@ class AuthServiceTest {
         String adminToken = jwtTokenProvider.createToken(adminMember);
         String memberToken = jwtTokenProvider.createToken(memberMember);
 
-        Role admin = authService.findRoleByCookie(new Cookie[]{new Cookie("token", adminToken)});
-        Role member = authService.findRoleByCookie(new Cookie[]{new Cookie("token", memberToken)});
+        Role admin = authService.getRoleByCookie(new Cookie[]{new Cookie("token", adminToken)});
+        Role member = authService.getRoleByCookie(new Cookie[]{new Cookie("token", memberToken)});
 
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(admin).isEqualTo(ADMIN);

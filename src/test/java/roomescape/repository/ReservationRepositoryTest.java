@@ -54,7 +54,7 @@ class ReservationRepositoryTest {
         Theme theme = themeRepository.findById(1L).get();
         Member member = memberRepository.findById(1L).get();
 
-        reservationRepository.save(new Reservation(day, time, theme, member));
+        reservationRepository.save(Reservation.paymentWaitingStatusOf(day, time, theme, member));
 
         assertThat(reservationRepository.count()).isEqualTo(3);
     }
