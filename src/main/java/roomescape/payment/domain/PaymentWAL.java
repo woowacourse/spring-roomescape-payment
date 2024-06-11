@@ -47,7 +47,7 @@ public class PaymentWAL extends AuditedEntity {
         this.updatedAt = updatedAt;
     }
 
-    public void updateStatus(PaymentWALStatus status) {
+    public void updateWALStatus(PaymentWALStatus status) {
         this.status = status;
     }
 

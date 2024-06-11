@@ -2,6 +2,7 @@ package roomescape.payment.service;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.client.TossPayRestClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
@@ -28,6 +29,7 @@ public class PaymentService {
         this.tossPayRestClient = tossPayRestClient;
     }
 
+    @Transactional
     public Payment createPayment(PaymentRequest paymentRequest, Long reservationId) {
         PaymentWAL paymentWAL = new PaymentWAL(PaymentWALStatus.READY, paymentRequest.paymentKey());
         paymentWALRepository.save(paymentWAL);
@@ -38,25 +40,33 @@ public class PaymentService {
     }
 
     public PaymentResponse confirm(Payment payment) {
-        PaymentWAL paymentWAL = paymentWALRepository.findByPaymentKey(payment.getPaymentKey())
-                .orElseThrow(() -> new IllegalArgumentException("진행중인 결제가 아닙니다."));
-        paymentWAL.updateStatus(PaymentWALStatus.PAY_REQUEST);
+        PaymentWAL paymentWAL = getPaymentWAL(payment);
+        paymentWAL.updateWALStatus(PaymentWALStatus.PAY_REQUEST);
 
-        Payment foundPayment = paymentRepository.findByReservationId(payment.getReservationId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하는 결제 내역이 없습니다."));
+        Payment foundPayment = getReadyPayment(payment);
         try {
             Payment confirmedPayment = tossPayRestClient.pay(
                     new PaymentRequest(foundPayment.getOrderId(), foundPayment.getTotalAmount().intValue(),
                             foundPayment.getPaymentKey()));
             foundPayment.updatePaymentStatus(confirmedPayment.getStatus());
-            paymentWAL.updateStatus(PaymentWALStatus.PAY_CONFIRMED);
+            paymentWAL.updateWALStatus(PaymentWALStatus.PAY_CONFIRMED);
         } catch (Exception exception) {
             foundPayment.updatePaymentStatus(PaymentStatus.REJECTED);
             paymentWAL.setErrorMessage(exception.getMessage());
-            paymentWAL.updateStatus(PaymentWALStatus.PAY_REJECTED);
+            paymentWAL.updateWALStatus(PaymentWALStatus.PAY_REJECTED);
             throw exception;
         }
         return PaymentResponse.toResponse(foundPayment);
+    }
+
+    private Payment getReadyPayment(Payment payment) {
+        return paymentRepository.findByReservationId(payment.getReservationId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하는 결제 내역이 없습니다."));
+    }
+
+    private PaymentWAL getPaymentWAL(Payment payment) {
+        return paymentWALRepository.findByPaymentKey(payment.getPaymentKey())
+                .orElseThrow(() -> new IllegalArgumentException("진행중인 결제가 아닙니다."));
     }
 
     public void cancel(ReservationResponse canceledReservation) {
@@ -70,6 +80,6 @@ public class PaymentService {
         paymentRepository.save(payment);
 
         paymentWALRepository.findByPaymentKey(payment.getPaymentKey())
-                .ifPresent(paymentWAL -> paymentWAL.updateStatus(PaymentWALStatus.CANCEL_CONFIRMED));
+                .ifPresent(paymentWAL -> paymentWAL.updateWALStatus(PaymentWALStatus.CANCEL_CONFIRMED));
     }
 }
