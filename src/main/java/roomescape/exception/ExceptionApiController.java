@@ -8,7 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.payment.PaymentException;
+import roomescape.payment.config.PaymentException;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionApiController {

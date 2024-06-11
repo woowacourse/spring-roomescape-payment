@@ -2,10 +2,12 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
@@ -47,6 +51,9 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @AfterEach
     void init() {
@@ -84,6 +91,8 @@ class ReservationServiceTest {
                 new Reservation(member, LocalDate.now(), theme, time, Status.WAITING));
         Reservation reservation2 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
+        Payment payment1 = paymentRepository.save(new Payment("a", 15000, reservation1));
+        Payment payment2 = paymentRepository.save(new Payment("b", 15000, reservation2));
 
         List<MyReservationResponse> memberReservations = reservationService.findAllByMemberId(member.getId());
         assertThat(memberReservations.size()).isEqualTo(2);
@@ -99,11 +108,17 @@ class ReservationServiceTest {
                 new Reservation(member, LocalDate.now(), theme, time, Status.WAITING));
         Reservation reservation2 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(), theme, time, Status.SUCCESS));
+        Payment payment = paymentRepository.save(new Payment("a", 10000, reservation2));
 
         reservationService.delete(reservation2.getId());
         Reservation findReservation = reservationRepository.findById(reservation1.getId()).get();
-        
-        assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS);
+
+        Optional<Payment> findPayment = paymentRepository.findByReservationId(reservation2.getId());
+
+        assertAll(
+                () -> assertThat(findReservation.getStatus()).isEqualTo(Status.SUCCESS),
+                () -> assertThat(findPayment.isEmpty()).isTrue()
+        );
     }
 }
 

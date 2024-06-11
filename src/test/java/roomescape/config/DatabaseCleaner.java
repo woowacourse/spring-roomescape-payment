@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,29 +13,11 @@ public class DatabaseCleaner {
     }
 
     public void cleanUp() {
-        clearReservation();
-        clearTime();
-        clearTheme();
-        clearMember();
-    }
-
-    private void clearReservation() {
-        jdbcTemplate.update("delete from reservation");
-        jdbcTemplate.update("alter table reservation alter column id restart with 1");
-    }
-
-    private void clearTime() {
-        jdbcTemplate.update("delete from reservation_time");
-        jdbcTemplate.update("alter table reservation_time alter column id restart with 1");
-    }
-
-    private void clearTheme() {
-        jdbcTemplate.update("delete from theme");
-        jdbcTemplate.update("alter table theme alter column id restart with 1");
-    }
-
-    private void clearMember() {
-        jdbcTemplate.update("delete from member");
-        jdbcTemplate.update("alter table member alter column id restart with 1");
+        String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'PUBLIC' AND table_type='BASE TABLE'";
+        List<String> tables = jdbcTemplate.queryForList(sql, String.class);
+        for (String tableName : tables) {
+            jdbcTemplate.update("DELETE FROM " + tableName);
+            jdbcTemplate.update("ALTER TABLE " + tableName + " alter column id restart with 1");
+        }
     }
 }

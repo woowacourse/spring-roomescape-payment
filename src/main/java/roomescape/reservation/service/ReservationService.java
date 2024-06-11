@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginMemberInToken;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.PaymentService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Status;
@@ -49,13 +49,13 @@ public class ReservationService {
                 reservationCreateRequest.timeId(), reservationCreateRequest.themeId())) {
             Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken,
                     Status.WAITING);
-            paymentService.pay(reservationCreateRequest);
+            paymentService.pay(reservationCreateRequest, reservation);
 
             return reservationRepository.save(reservation).getId();
         }
 
         Reservation reservation = getValidatedReservation(reservationCreateRequest, loginMemberInToken, Status.SUCCESS);
-        paymentService.pay(reservationCreateRequest);
+        paymentService.pay(reservationCreateRequest, reservation);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -107,11 +107,13 @@ public class ReservationService {
 
         return reservationRepository.findAllByMemberId(memberId).stream()
                 .map(reservation -> MyReservationResponse.toResponse(reservation,
-                        waitings.findMemberRank(reservation, memberId)))
+                        waitings.findMemberRank(reservation, memberId),
+                        paymentService.findByReservation(reservation.getId())))
                 .toList();
     }
 
     public void delete(Long id) {
+        paymentService.deleteByReservationId(id);
         Reservation reservation = reservationRepository.findById(id).get();
         reservationRepository.deleteById(id);
 
