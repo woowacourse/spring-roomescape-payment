@@ -58,12 +58,12 @@ public class ReservationCommonService {
     public void deleteById(long id) {
         reservationRepository.findById(id)
                 .ifPresent(reservation -> {
-                    deleteIfAvailable(reservation);
-                    updateIfDeletedReserved(reservation);
+                    cancelReservation(reservation);
+                    updateToReserved(reservation);
                 });
     }
 
-    private void deleteIfAvailable(Reservation reservation) {
+    private void cancelReservation(Reservation reservation) {
         validatePastReservation(reservation);
         if (reservation.isReserved()) {
             paymentService.cancelPayment(reservation.getPayment());
@@ -77,7 +77,7 @@ public class ReservationCommonService {
         }
     }
 
-    private void updateIfDeletedReserved(Reservation reservation) {
+    private void updateToReserved(Reservation reservation) {
         if (reservation.isReserved()) {
             ReservationDetail detail = reservation.getDetail();
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())

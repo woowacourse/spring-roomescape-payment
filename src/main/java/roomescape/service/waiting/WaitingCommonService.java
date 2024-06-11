@@ -37,7 +37,7 @@ public class WaitingCommonService {
     public void deleteWaitingById(long reservationId, long memberId) {
         Member member = getById(memberId);
         reservationRepository.findById(reservationId)
-                .ifPresent(reservation -> deleteIfAvailable(member, reservation));
+                .ifPresent(reservation -> cancelWaiting(member, reservation));
     }
 
     private Member getById(long memberId) {
@@ -45,11 +45,11 @@ public class WaitingCommonService {
                 .orElseThrow(() -> new InvalidMemberException("회원 정보를 찾을 수 없습니다."));
     }
 
-    private void deleteIfAvailable(Member member, Reservation reservation) {
+    private void cancelWaiting(Member member, Reservation reservation) {
         validateAuthority(reservation, member);
         validateStatus(reservation);
         reservationRepository.deleteById(reservation.getId());
-        updateIfDeletedPendingPayment(reservation);
+        updateToPendingPayment(reservation);
     }
 
     private void validateAuthority(Reservation reservation, Member member) {
@@ -64,7 +64,7 @@ public class WaitingCommonService {
         }
     }
 
-    private void updateIfDeletedPendingPayment(Reservation reservation) {
+    private void updateToPendingPayment(Reservation reservation) {
         if (reservation.isPendingPayment()) {
             ReservationDetail detail = reservation.getDetail();
             reservationRepository.findFirstByDetailIdOrderByCreatedAt(detail.getId())
