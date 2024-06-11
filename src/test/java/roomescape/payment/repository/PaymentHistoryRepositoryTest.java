@@ -40,11 +40,11 @@ class PaymentHistoryRepositoryTest {
         final Reservation reservation3 = entityManager.find(Reservation.class, 13L);
 
         final PaymentHistory paymentHistory1 =
-                new PaymentHistory("order1", "paymentKey", 100L, LocalDateTime.now(), reservation1);
+                new PaymentHistory("order1", "paymentKey", "DONE", 100L, LocalDateTime.now(), reservation1);
         final PaymentHistory paymentHistory2 =
-                new PaymentHistory("order2", "paymentKey", 100L, LocalDateTime.now(), reservation2);
+                new PaymentHistory("order2", "paymentKey", "DONE", 100L, LocalDateTime.now(), reservation2);
         final PaymentHistory paymentHistory3 =
-                new PaymentHistory("order3", "paymentKey", 100L, LocalDateTime.now(), reservation3);
+                new PaymentHistory("order3", "paymentKey", "DONE", 100L, LocalDateTime.now(), reservation3);
 
         entityManager.persist(paymentHistory1);
         entityManager.persist(paymentHistory2);

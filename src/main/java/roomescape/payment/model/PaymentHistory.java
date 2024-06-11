@@ -30,6 +30,9 @@ public class PaymentHistory {
     private String paymentKey;
 
     @Column(nullable = false)
+    private String status;
+
+    @Column(nullable = false)
     private Long totalAmount;
 
     @Column(nullable = false)
@@ -45,11 +48,12 @@ public class PaymentHistory {
     protected PaymentHistory() {
     }
 
-    public PaymentHistory(final String orderId, final String paymentKey, final Long totalAmount,
+    public PaymentHistory(final String orderId, final String paymentKey, final String status, final Long totalAmount,
                           final LocalDateTime approvedAt, final Reservation reservation) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.approvedAt = approvedAt;
+        this.status = status;
         this.totalAmount = totalAmount;
         this.paymentStatus = PaymentHistoryStatus.DONE;
         this.reservation = reservation;
@@ -69,6 +73,10 @@ public class PaymentHistory {
 
     public String getPaymentKey() {
         return paymentKey;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public Long getTotalAmount() {

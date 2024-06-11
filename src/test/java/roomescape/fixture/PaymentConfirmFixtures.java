@@ -9,6 +9,6 @@ public class PaymentConfirmFixtures {
     }
 
     public static PaymentConfirmResponse getDefaultResponse(String orderId, String paymentKey, long amount) {
-        return new PaymentConfirmResponse(orderId, paymentKey, amount, OffsetDateTime.now().toString());
+        return new PaymentConfirmResponse(orderId, paymentKey, "DONE", amount, OffsetDateTime.now().toString());
     }
 }
