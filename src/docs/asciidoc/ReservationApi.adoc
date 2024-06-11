@@ -1,0 +1,90 @@
+== 예약 API
+
+=== 예약 생성
+
+==== 예약 생성 성공
+
+operation::reservation-integration-test/create-reservation[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 날짜 형식 오류
+
+operation::reservation-integration-test/create-reservation_-when-date-is-invalid-type[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 날짜 없음
+
+operation::reservation-integration-test/create-reservation_-when-date-is-null[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 날짜가 현재 시간보다 과거
+
+operation::reservation-integration-test/create-reservation_-when-date-is-past[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 테마 식별자의 형식 오류
+
+operation::reservation-integration-test/create-reservation_-when-theme-id-is-invalid-type[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 테마가 빈 값
+
+operation::reservation-integration-test/create-reservation_-when-theme-is-null[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 존재하지 않는 테마
+
+operation::reservation-integration-test/create-reservation_-when-theme-not-exist[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 이미 동일한 시간, 날짜, 테마의 예약이 존재할 경우
+
+operation::reservation-integration-test/create-reservation_-when-time-and-date-and-theme-exist[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 시간 형식 오류
+
+operation::reservation-integration-test/create-reservation_-when-time-is-invalid-type[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 예약 시간이 빈 값
+
+operation::reservation-integration-test/create-reservation_-when-time-is-null[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 존재하지 않는 시간
+
+operation::reservation-integration-test/create-reservation_-when-time-not-exist[snippets='http-request,http-response']
+
+==== 예약 생성 실패 - 결제 오류
+
+operation::reservation-integration-test/create-reservation_-when-payment-client-exception[snippets='http-request,http-response']
+
+
+=== 예약 단건 조회
+
+==== 예약 단건 조회 성공
+
+operation::reservation-integration-test/get-reservation[snippets='http-request,http-response']
+
+==== 예약 조회 실패 - 존재하지 않는 예약
+
+operation::reservation-integration-test/get-reservation_-when-time-not-exist[snippets='http-request,http-response']
+
+=== 전체 예약 조회
+
+==== 전체 예약 성공
+
+operation::reservation-integration-test/get-members-with-reservations[snippets='http-request,http-response']
+
+=== 예약 검색
+
+==== 예약 검색 성공
+
+operation::reservation-integration-test/search-by[snippets='http-request,http-response']
+
+=== 예약 가능한 시간대 조회 검색
+
+==== 예약 가능한 시간대 조회
+
+operation::reservation-integration-test/get-available-times[snippets='http-request,http-response']
+
+=== 예약 삭제
+
+==== 예약 삭제 성공 - 해당 예약인 대기가 존재하는 경우 (자동 갱신)
+
+operation::reservation-integration-test/cancel-reservation_-when-waiting-exists[snippets='http-request,http-response']
+
+==== 예약 삭제 성공 - 해당 예약인 대기가 존재하지 않는 경우
+
+operation::reservation-integration-test/cancel-reservation_-when-waiting-not-exists[snippets='http-request,http-response']

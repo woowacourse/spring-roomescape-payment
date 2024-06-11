@@ -1,0 +1,64 @@
+== 관리자 API
+
+=== 관리자 권한의 예약 생성
+
+==== 관리자 권한의 예약 생성 성공
+
+operation::admin-reservation-integration-test/create-reservation-by-admin[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 날짜 값이 없음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-dime-is-null[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 회원 식별자 형식이 올바르지 않음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-member-id-is-invalid-type[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 현재보다 과거인 예약 날짜
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-dime-is-past[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 존재하지 않는 회원으로 예약 시도
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-member-not-exist[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 회원 식별자 값이 없음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-member-id-is-null[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 테마 식별자 값이 없음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-theme-id-is-null[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 테마 식별자의 형식이 올바르지 않음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-theme-id-is-invalid-type[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 존재하지 않는 테마로 예약 시도
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-theme-not-exist[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 예약 시간 식별자 겂이 올바르지 않음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-time-is-invalid-type[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 예약 시간 식별자 값이 없음
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-time-is-null[snippets='http-request,http-response']
+
+==== 관리자 권한의 예약 생성 실패 - 존재하지 않는 예약 시간대로 예약 시도
+
+operation::admin-reservation-integration-test/create-reservation-by-admin_-when-time-not-exist[snippets='http-request,http-response']
+
+=== 전체 예약 조회
+
+==== 전체 예약 조회 성공
+
+operation::admin-reservation-integration-test/get-reservations[snippets='http-request,http-response']
+
+
+=== 전체 대기 조회
+
+==== 전체 대기 조회 성공
+
+operation::admin-waiting-integration-test/get-waitings[snippets='http-request,http-response']
