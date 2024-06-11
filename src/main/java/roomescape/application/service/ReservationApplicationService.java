@@ -6,10 +6,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import roomescape.exception.RoomescapeException;
+import roomescape.exception.type.RoomescapeExceptionType;
 import roomescape.member.domain.LoginMember;
 import roomescape.payment.api.PaymentClient;
 import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.dto.CancelReason;
 import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.ReservationDetailResponse;
 import roomescape.reservation.dto.ReservationPaymentDetail;
@@ -33,12 +37,19 @@ public class ReservationApplicationService {
         this.paymentRepository = paymentRepository;
     }
 
-    public ReservationPaymentResponse reservationPayment(
+    public ReservationPaymentResponse saveReservationPayment(
             LoginMember loginMember,
             ReservationPaymentRequest reservationPaymentRequest
     ) {
         PaymentInfo paymentInfo = paymentClient.payment(reservationPaymentRequest.toPaymentRequest());
         return reservationService.saveReservationPayment(loginMember, reservationPaymentRequest.toReservationRequest(), paymentInfo);
+    }
+
+    public void cancelReservationPayment(long reservationId) {
+        Payment payment = paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new RoomescapeException(RoomescapeExceptionType.NOT_FOUND_RESERVATION_PAYMENT, reservationId));
+        paymentClient.cancel(payment.getPaymentKey(), new CancelReason("관리자 권한 취소"));
+        reservationService.cancelReservationPayment(reservationId, payment.getId());
     }
 
     @Transactional
@@ -47,8 +58,7 @@ public class ReservationApplicationService {
         List<ReservationPaymentDetail> paymentDetails = new ArrayList<>();
         for (ReservationDetailResponse reservationDetailResponse : allByMemberId) {
             paymentRepository.findByReservationId(reservationDetailResponse.reservationId())
-                    .ifPresentOrElse(payment -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment))),
-                            () -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.pending())));
+                    .ifPresent(payment -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment))));
         }
         return paymentDetails;
     }

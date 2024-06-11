@@ -174,6 +174,12 @@ public class ReservationService {
     }
 
     @Transactional
+    public void cancelReservationPayment(long reservationId, long paymentId) {
+        paymentRepository.deleteById(paymentId);
+        reservationRepository.deleteById(reservationId);
+    }
+
+    @Transactional
     public void deleteById(long reservationId) {
         reservationRepository.deleteById(reservationId);
     }

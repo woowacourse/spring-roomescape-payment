@@ -52,7 +52,7 @@ public class ReservationController {
     public ResponseEntity<ReservationPaymentResponse> saveReservation(@Parameter(hidden = true)
                                                                       @Authenticated LoginMember loginMember,
                                                                       @RequestBody ReservationPaymentRequest request) {
-        ReservationPaymentResponse response = reservationApplicationService.reservationPayment(loginMember, request);
+        ReservationPaymentResponse response = reservationApplicationService.saveReservationPayment(loginMember, request);
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationResponse().id()))
                 .body(response);
     }
@@ -102,7 +102,7 @@ public class ReservationController {
             @ApiResponse(responseCode = "400", description = "특정 예약 삭제 실패")})
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> delete(@Parameter(required = true, name = "id") @PathVariable long id) {
-        reservationService.deleteById(id);
+        reservationApplicationService.cancelReservationPayment(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -37,6 +37,8 @@ import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
@@ -65,6 +67,8 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void initService() {
@@ -90,6 +94,7 @@ class ReservationServiceTest {
         assertAll(
                 () -> assertThat(new Reservations(reservationRepository.findAll()).getReservations())
                         .hasSize(1),
+                () -> assertThat(paymentRepository.findByReservationId(saved.id()).get()).isNotNull(),
                 () -> assertThat(saved.id()).isEqualTo(1L)
         );
     }
@@ -310,7 +315,18 @@ class ReservationServiceTest {
                     .hasMessage(DUPLICATE_WAITING_RESERVATION.getMessage());
         }
 
-        @DisplayName("예약을 삭제할 수 있다.")
+        @DisplayName("결제된 예약을 삭제할 수 있다.")
+        @Test
+        void deleteReservationPaymentTest() {
+            paymentRepository.save(new Payment(defaultReservation, PAYMENT_INFO));
+            //when
+            reservationService.cancelReservationPayment(1L, 1L);
+
+            //then
+            assertThat(new Reservations(reservationRepository.findAll()).getReservations()).isEmpty();
+        }
+
+        @DisplayName("결제되지 않은 예약을 삭제할 수 있다.")
         @Test
         void deleteReservationTest() {
             //when
