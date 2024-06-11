@@ -4,7 +4,7 @@
 
 ## 어드민 권한 페이지
 - description: 어드민(ADMIN) 권한을 가진 사람만 접근 가능한 페이지입니다.
-- 
+
 ### 어드민 메인 페이지
 - http method: GET
 - uri: /admin
