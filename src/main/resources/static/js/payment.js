@@ -40,8 +40,6 @@ function onReservationButtonClick(event, paymentWidget, reservationId, paymentAm
     }).then(function (data) {
         console.debug(data);
         fetchReservationPayment(data, reservationData);
-        setTimeout(1000);
-        window.location.href = "/reservation-mine";
     }).catch(function (error) {
         window.location.href = "/reservation-mine";
     }).catch(function (error) {
@@ -69,6 +67,7 @@ function fetchReservationPayment(paymentData, reservationData) {
         },
         body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
+        window.location.href = "/reservation-mine";
         if (!response.ok) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
@@ -76,8 +75,7 @@ function fetchReservationPayment(paymentData, reservationData) {
             });
         } else {
             response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
+                setTimeout(console.log("예약 결제 성공 : " + JSON.stringify(successBody)), 1000);
             });
         }
     }).catch(error => {
