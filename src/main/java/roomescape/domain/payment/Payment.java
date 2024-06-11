@@ -8,14 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import org.hibernate.annotations.ColumnDefault;
+import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "payment")
-@SQLDelete(sql = "UPDATE PAYMENT SET deleted = TRUE WHERE PAYMENT.ID = ?")
-@SQLRestriction("deleted = FALSE")
+@SQLDelete(sql = "UPDATE PAYMENT SET deleted_at = CURRENT_TIMESTAMP() WHERE PAYMENT.ID = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +30,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
-    @ColumnDefault("false")
-    private boolean deleted;
+    private LocalDateTime deletedAt;
 
     protected Payment() {
     }

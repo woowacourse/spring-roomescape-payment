@@ -11,8 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import roomescape.domain.member.Member;
@@ -24,8 +24,8 @@ import roomescape.exception.UnauthorizedException;
 
 @Entity
 @Table(name = "reservation")
-@SQLDelete(sql = "UPDATE RESERVATION SET deleted = TRUE WHERE RESERVATION.ID = ?")
-@SQLRestriction("deleted = FALSE")
+@SQLDelete(sql = "UPDATE RESERVATION SET deleted_at = CURRENT_TIMESTAMP() WHERE RESERVATION.ID = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,8 +46,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    @ColumnDefault("false")
-    private boolean deleted;
+    private LocalDateTime deletedAt;
 
     protected Reservation() {
     }

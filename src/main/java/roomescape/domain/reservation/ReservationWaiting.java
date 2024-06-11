@@ -11,7 +11,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,8 +25,8 @@ import roomescape.exception.UnauthorizedException;
 @Entity
 @Table(name = "waiting")
 @EntityListeners(AuditingEntityListener.class)
-@SQLDelete(sql = "UPDATE WAITING SET deleted = TRUE WHERE WAITING.ID = ?")
-@SQLRestriction("deleted = FALSE")
+@SQLDelete(sql = "UPDATE WAITING SET deleted_at = CURRENT_TIMESTAMP() WHERE WAITING.ID = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ReservationWaiting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,8 +44,7 @@ public class ReservationWaiting {
     @OneToOne
     private Payment payment;
 
-    @ColumnDefault("false")
-    private boolean deleted;
+    private LocalDateTime deletedAt;
 
     @CreatedDate
     private LocalDateTime createdAt;
