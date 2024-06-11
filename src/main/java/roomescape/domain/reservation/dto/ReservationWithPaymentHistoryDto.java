@@ -15,7 +15,7 @@ public record ReservationWithPaymentHistoryDto(
         String paymentKey,
         Long totalAmount
 ) {
-    public static ReservationWithPaymentHistoryDto from(
+    public static ReservationWithPaymentHistoryDto of(
             final Reservation reservation,
             final String paymentKey,
             final Long totalAmount

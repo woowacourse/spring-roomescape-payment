@@ -29,7 +29,7 @@ public record SaveReservationRequest(
         );
     }
 
-    public Reservation toReservation(
+    public Reservation toModel(
             final ReservationTime reservationTime,
             final Theme theme,
             final Member member

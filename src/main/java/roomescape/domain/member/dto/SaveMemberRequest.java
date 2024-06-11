@@ -9,7 +9,7 @@ public record SaveMemberRequest(
         String name,
         MemberRole role
 ) {
-    public Member toMember(final String encodedPassword) {
+    public Member toModel(final String encodedPassword) {
         return new Member(
                 MemberRole.USER,
                 encodedPassword,

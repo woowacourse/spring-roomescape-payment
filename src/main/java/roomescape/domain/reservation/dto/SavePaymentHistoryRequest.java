@@ -16,7 +16,7 @@ public record SavePaymentHistoryRequest(
         String paymentProvider,
         Reservation reservation
 ) {
-    public PaymentHistory toPaymentHistory() {
+    public PaymentHistory toModel() {
         return new PaymentHistory(
                 orderId,
                 paymentStatus,

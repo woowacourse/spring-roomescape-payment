@@ -88,7 +88,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
         final Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
-        final Reservation reservation = request.toReservation(reservationTime, theme, member);
+        final Reservation reservation = request.toModel(reservationTime, theme, member);
 
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplicated(reservation);
@@ -120,7 +120,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
         final Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
-        final Reservation reservation = request.toReservation(reservationTime, theme, member);
+        final Reservation reservation = request.toModel(reservationTime, theme, member);
 
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplicated(reservation);
@@ -170,6 +170,6 @@ public class ReservationService {
         final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
                 .orElseThrow(() -> new NoSuchElementException("해당 예약의 결제 정보가 존재하지 않습니다."));
 
-        return ReservationWithPaymentHistoryDto.from(reservation, paymentHistory.getPaymentKey(), paymentHistory.getTotalAmount());
+        return ReservationWithPaymentHistoryDto.of(reservation, paymentHistory.getPaymentKey(), paymentHistory.getTotalAmount());
     }
 }

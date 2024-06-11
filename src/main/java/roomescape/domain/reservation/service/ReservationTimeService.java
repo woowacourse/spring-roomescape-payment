@@ -37,7 +37,7 @@ public class ReservationTimeService {
     public ReservationTimeDto saveReservationTime(final SaveReservationTimeRequest request) {
         validateReservationTimeDuplication(request);
 
-        final ReservationTime savedReservationTime = reservationTimeRepository.save(request.toReservationTime());
+        final ReservationTime savedReservationTime = reservationTimeRepository.save(request.toModel());
         return ReservationTimeDto.from(savedReservationTime);
     }
 

@@ -33,7 +33,7 @@ public class PaymentService {
     }
 
     public void saveCredential(final SavePaymentCredentialRequest request) {
-        final PaymentCredential paymentCredential = request.toPaymentCredential();
+        final PaymentCredential paymentCredential = request.toModel();
         paymentCredentialRepository.save(paymentCredential);
     }
 
@@ -47,7 +47,7 @@ public class PaymentService {
         matchPaymentCredential(orderId, amount);
 
         final PaymentConfirmResponse confirmResponse = tossPaymentGateway.confirm(orderId, amount, paymentKey);
-        final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(reservation);
+        final PaymentHistory paymentHistory = confirmResponse.toModel(reservation);
 
         paymentHistoryRepository.save(paymentHistory);
 
@@ -74,6 +74,6 @@ public class PaymentService {
     }
 
     public void savePaymentHistory(final SavePaymentHistoryRequest request) {
-        paymentHistoryRepository.save(request.toPaymentHistory());
+        paymentHistoryRepository.save(request.toModel());
     }
 }

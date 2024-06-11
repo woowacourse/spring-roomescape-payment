@@ -40,7 +40,7 @@ public class PaymentConfirmResponse {
         return offsetDateTime.toLocalDateTime();
     }
 
-    public PaymentHistory toPaymentHistory(final Reservation reservation) {
+    public PaymentHistory toModel(final Reservation reservation) {
         return new PaymentHistory(
                 orderId,
                 PaymentStatus.valueOf(status),

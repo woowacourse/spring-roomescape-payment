@@ -4,7 +4,7 @@ import roomescape.domain.payment.model.PaymentCredential;
 
 public record SavePaymentCredentialRequest(String orderId, Long amount) {
 
-    public PaymentCredential toPaymentCredential() {
+    public PaymentCredential toModel() {
         return new PaymentCredential(orderId, amount);
     }
 }

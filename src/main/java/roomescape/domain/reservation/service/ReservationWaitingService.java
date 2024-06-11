@@ -68,7 +68,7 @@ public class ReservationWaitingService {
     public List<ReservationWaitingWithOrderDto> getMyReservationWaiting(final Long memberId) {
         return customReservationWaitingRepository.findAllReservationWaitingWithOrdersByMemberId(memberId)
                 .stream()
-                .map(reservationWaitingWithOrder -> ReservationWaitingWithOrderDto.from(reservationWaitingWithOrder, checkPaymentAvailable(reservationWaitingWithOrder)))
+                .map(reservationWaitingWithOrder -> ReservationWaitingWithOrderDto.of(reservationWaitingWithOrder, checkPaymentAvailable(reservationWaitingWithOrder)))
                 .toList();
     }
 
