@@ -51,14 +51,6 @@ public class PaymentWAL extends AuditedEntity {
         this.status = status;
     }
 
-    public void updateStatusPaySuccess() {
-        this.status = PaymentWALStatus.PAY_CONFIRMED;
-    }
-
-    public void updateStatusPayRejected() {
-        this.status = PaymentWALStatus.PAY_REJECTED;
-    }
-
     public void setErrorMessage(String message) {
         this.message = message;
     }

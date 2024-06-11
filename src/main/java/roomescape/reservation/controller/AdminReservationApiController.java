@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.MultipleResponses;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.ReservationPaymentManager;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -28,11 +28,12 @@ import roomescape.reservation.service.ReservationService;
 public class AdminReservationApiController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final ReservationPaymentManager reservationPaymentManager;
 
-    public AdminReservationApiController(ReservationService reservationService, PaymentService paymentService) {
+    public AdminReservationApiController(ReservationService reservationService,
+                                         ReservationPaymentManager reservationPaymentManager) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
+        this.reservationPaymentManager = reservationPaymentManager;
     }
 
     @GetMapping("/reservations")
@@ -74,7 +75,7 @@ public class AdminReservationApiController {
 
     @PatchMapping("/reservations/{id}")
     public ResponseEntity<Void> cancelReservation(@PathVariable("id") Long id) {
-        paymentService.cancel(reservationService.findById(id));
+        reservationPaymentManager.cancelReservation(id);
         reservationService.cancelReservationById(id);
 
         return ResponseEntity.noContent().build();

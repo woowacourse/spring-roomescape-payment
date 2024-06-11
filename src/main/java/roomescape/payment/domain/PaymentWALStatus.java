@@ -5,7 +5,6 @@ public enum PaymentWALStatus {
     PAY_REQUEST,
     PAY_CONFIRMED,
     PAY_REJECTED,
-    CANCEL_REQUEST,
     CANCEL_CONFIRMED,
     CANCEL_REJECTED
     ;

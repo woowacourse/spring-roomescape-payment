@@ -61,12 +61,15 @@ public class PaymentService {
 
     public void cancel(ReservationResponse canceledReservation) {
         Optional<Payment> paymentById = paymentRepository.findByReservationId(canceledReservation.id());
-        paymentById.ifPresent(
-                payment -> {
-                    tossPayRestClient.cancel(new CancelRequest(payment.getPaymentKey()));
-                    payment.cancel();
-                    paymentRepository.save(payment);
-                }
-        );
+        paymentById.ifPresent(this::updatePaymentStatusToCancel);
+    }
+
+    private void updatePaymentStatusToCancel(Payment payment) {
+        tossPayRestClient.cancel(new CancelRequest(payment.getPaymentKey()));
+        payment.cancel();
+        paymentRepository.save(payment);
+
+        paymentWALRepository.findByPaymentKey(payment.getPaymentKey())
+                .ifPresent(paymentWAL -> paymentWAL.updateStatus(PaymentWALStatus.CANCEL_CONFIRMED));
     }
 }
