@@ -57,7 +57,7 @@ operation::getAvailableReservationTime[snippets="http-request,query-parameters,h
 operation::getEntireMembers[snippets="http-request,http-response,response-fields"]
 
 === 전체 예약 조회
-operation::getEntireReservations[snippets="http-request,http-response"]
+operation::getEntireReservations[snippets="http-request,query-parameters,http-response"]
 
 === 특정 예약 검색
 operation::searchReservations[snippets="http-request,http-response"]

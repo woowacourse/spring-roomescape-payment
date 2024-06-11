@@ -156,7 +156,7 @@ public enum RestDocsFilter {
     GET_ENTIRE_RESERVATIONS(
             document("getEntireReservations",
                     requestCookies(cookieWithName("token").description("로그인 된 관리자 토큰")),
-                    pathParameters(parameterWithName("reservationStatus").description("조회할 예약 상태").optional()),
+                    queryParameters(parameterWithName("reservationStatus").description("조회할 예약 상태").optional()),
                     responseFields(
                             fieldWithPath("responses[].id").description("예약 식별번호"),
                             fieldWithPath("responses[].member.id").description("예약 대기자 식별자"),
