@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.AdminOnly;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
+@RequestMapping("/admin")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
@@ -27,14 +28,12 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/admin/reservations")
-    @AdminOnly
+    @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationList() {
         return ResponseEntity.ok(reservationService.findAllReservation());
     }
 
-    @GetMapping(path = "/admin/reservations", params = {"memberId", "themeId", "dateFrom", "dateTo"})
-    @AdminOnly
+    @GetMapping(path = "/reservations", params = {"memberId", "themeId", "dateFrom", "dateTo"})
     public ResponseEntity<List<ReservationResponse>> findAllByMemberAndThemeAndPeriod(
             @RequestParam(name = "memberId") Long memberId,
             @RequestParam(name = "themeId") Long themeId,
@@ -45,23 +44,20 @@ public class AdminReservationController {
         );
     }
 
-    @PostMapping("/admin/reservations")
-    @AdminOnly
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Valid @RequestBody ReservationRequest reservationRequest) {
-        ReservationResponse saveResponse = reservationService.saveReservation(reservationRequest);
+        ReservationResponse saveResponse = reservationService.saveAdminReservation(reservationRequest);
         URI createdUri = URI.create("/reservations/" + saveResponse.id());
         return ResponseEntity.created(createdUri).body(saveResponse);
     }
 
-    @GetMapping("/admin/reservations/waitings")
-    @AdminOnly
+    @GetMapping("/reservations/waitings")
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
         return ResponseEntity.ok(reservationService.findReservationsOnWaiting());
     }
 
-    @DeleteMapping("/admin/reservations/{id}")
-    @AdminOnly
+    @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> removeWaiting(@PathVariable("id") Long id) {
         reservationService.removeReservation(id);
         return ResponseEntity.noContent().build();

@@ -1,21 +1,28 @@
 package roomescape.reservation.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 
-public class ReservationWithWaiting {
+public class MyReservation {
 
     private final Reservation reservation;
-    private final int waitingNumber;
+    private final Long waitingNumber;
+    private final String paymentKey;
+    private final String orderId;
+    private final BigDecimal amount;
 
-    public ReservationWithWaiting(Reservation reservation, int waitingNumber) {
+    public MyReservation(Reservation reservation,
+                         Long waitingNumber,
+                         String paymentKey,
+                         String orderId,
+                         BigDecimal amount) {
         this.reservation = reservation;
         this.waitingNumber = waitingNumber;
-    }
-
-    public ReservationWithWaiting(Reservation reservation, Long waitingNumber) {
-        this(reservation, waitingNumber.intValue());
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
     }
 
     public Reservation getReservation() {
@@ -38,8 +45,20 @@ public class ReservationWithWaiting {
         return reservation.getStartAt();
     }
 
-    public int getWaitingNumber() {
+    public Long getWaitingNumber() {
         return waitingNumber;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     @Override
@@ -50,7 +69,7 @@ public class ReservationWithWaiting {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ReservationWithWaiting that = (ReservationWithWaiting) o;
+        MyReservation that = (MyReservation) o;
         return waitingNumber == that.waitingNumber && Objects.equals(reservation, that.reservation);
     }
 

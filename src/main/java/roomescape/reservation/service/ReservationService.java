@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
@@ -25,17 +25,17 @@ public class ReservationService {
     private final MemberService memberService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
-    private final PaymentClient paymentClient;
 
     public ReservationService(MemberService memberService, ReservationTimeService reservationTimeService,
                               ThemeService themeService, ReservationRepository reservationRepository,
-                              PaymentClient paymentClient) {
+                              PaymentService paymentService) {
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.reservationRepository = reservationRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -54,9 +54,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberReservationResponse> findMemberReservationWithWaitingStatus(Long memberId) {
-        return reservationRepository.findByMemberIdWithWaitingStatus(memberId).stream()
-                .map(MemberReservationResponse::new)
+    public List<MyReservationResponse> findMyReservations(Long memberId) {
+        return reservationRepository.findMyReservations(memberId).stream()
+                .map(MyReservationResponse::new)
                 .toList();
     }
 
@@ -67,7 +67,6 @@ public class ReservationService {
                 .toList();
     }
 
-
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
         ReservationRequest reservationRequest = new ReservationRequest(
@@ -76,25 +75,27 @@ public class ReservationService {
                 request.timeId(),
                 request.themeId()
         );
-        ReservationResponse reservationResponse = saveReservation(reservationRequest);
-        paymentClient.requestConfirmPayment(request.extractPaymentInformation());
+        Reservation saved = reservationRepository.save(createReservationFrom(reservationRequest));
+        paymentService.confirmPayment(saved, request.extractPaymentInformation());
 
-        return reservationResponse;
+        return new ReservationResponse(saved);
     }
 
     @Transactional
-    public ReservationResponse saveReservation(ReservationRequest request) {
+    public ReservationResponse saveAdminReservation(ReservationRequest request) {
+        Reservation saved = reservationRepository.save(createReservationFrom(request));
+        return new ReservationResponse(saved);
+    }
+
+    private Reservation createReservationFrom(ReservationRequest request) {
         validateMemberReservationNotExistInSlot(request);
 
-        Reservation newReservation = Reservation.createNewReservation(
+        return Reservation.createNewReservation(
                 memberService.findById(request.memberId()),
                 new ReservationDate(request.date()),
                 reservationTimeService.findById(request.timeId()),
                 themeService.findById(request.themeId())
         );
-
-        Reservation saved = reservationRepository.save(newReservation);
-        return new ReservationResponse(saved);
     }
 
     private void validateMemberReservationNotExistInSlot(ReservationRequest request) {

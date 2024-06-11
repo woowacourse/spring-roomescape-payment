@@ -1,0 +1,20 @@
+== Admin 예약
+
+=== 전체 예약 조회
+
+operation::admin-reservation-controller-test/should_handle_read_all_reservations_request_when_requested[snippets='http-request,http-response']
+
+=== 전체 예약 조회 (필터링)
+
+operation::admin-reservation-controller-test/should_handle_filtered_read_all[snippets='http-request,http-response']
+
+=== 예약 생성
+
+operation::admin-reservation-controller-test/should_handle_create_reservation_request_from_admin[snippets='http-request,http-response']
+
+=== 예약 삭제
+
+operation::admin-reservation-controller-test/should_handle_delete_reservation_request[snippets='http-request,http-response']
+
+=== 대기 중인 예약 조회
+operation::admin-reservation-controller-test/should_handle_read_waiting_reservations_request[snippets='http-request,http-response']

@@ -1,0 +1,4 @@
+== 멤버
+
+=== 회원가입
+operation::member-controller-test/should_handle_join_request[snippets='http-request,http-response']

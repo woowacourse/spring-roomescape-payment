@@ -26,6 +26,16 @@ CREATE TABLE reservation
     FOREIGN KEY (theme_id) REFERENCES theme (id)
 );
 
+CREATE TABLE payment
+(
+    id             BIGINT       NOT NULL AUTO_INCREMENT,
+    payment_key    VARCHAR(255) NOT NULL,
+    order_id       VARCHAR(255) NOT NULL,
+    amount         NUMERIC      NOT NULL,
+    reservation_id BIGINT       NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (reservation_id) REFERENCES reservation (id)
+);
 
 CREATE TABLE member
 (

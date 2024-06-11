@@ -1,3 +1,6 @@
+DELETE FROM payment;
+ALTER TABLE payment ALTER COLUMN id RESTART;
+
 DELETE FROM reservation;
 ALTER TABLE reservation ALTER COLUMN id RESTART;
 

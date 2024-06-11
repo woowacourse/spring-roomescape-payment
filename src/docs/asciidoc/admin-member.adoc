@@ -1,0 +1,5 @@
+== Admin 회원
+=== 전체 멤버 조회
+operation::admin-member-controller-test/should_get_all_members_id_and_name_when_requested[snippets='http-request,http-response']
+
+

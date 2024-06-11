@@ -18,6 +18,7 @@ import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATIO
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -29,12 +30,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.MyReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationWithWaiting;
-import roomescape.reservation.dto.MemberReservationResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.service.ThemeService;
 import roomescape.time.service.ReservationTimeService;
@@ -55,7 +56,7 @@ class ReservationServiceTest {
     private ThemeService themeService;
 
     @Mock
-    private PaymentClient paymentClient;
+    private PaymentService paymentService;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -73,11 +74,14 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findByMemberIdWithWaitingStatus(1L))
-                .thenReturn(List.of(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        when(reservationRepository.findMyReservations(1L))
+                .thenReturn(List.of(new MyReservation(MEMBER_ID_1_RESERVATION, 0L, "paymentKey", "orderId",
+                        BigDecimal.valueOf(1000L))));
 
-        assertThat(reservationService.findMemberReservationWithWaitingStatus(1L))
-                .containsExactly(new MemberReservationResponse(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        assertThat(reservationService.findMyReservations(1L))
+                .containsExactly(new MyReservationResponse(
+                        new MyReservation(MEMBER_ID_1_RESERVATION, 0L, "paymentKey", "orderId",
+                                BigDecimal.valueOf(1000L))));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")
@@ -88,7 +92,7 @@ class ReservationServiceTest {
         when(themeService.findById(1L)).thenReturn(THEME_1);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(MEMBER_ID_1_RESERVATION);
 
-        ReservationResponse savedReservation = reservationService.saveReservation(RESERVATION_REQUEST_1);
+        ReservationResponse savedReservation = reservationService.saveAdminReservation(RESERVATION_REQUEST_1);
 
         assertThat(savedReservation).isEqualTo(new ReservationResponse(MEMBER_ID_1_RESERVATION));
     }
@@ -100,7 +104,7 @@ class ReservationServiceTest {
         when(reservationTimeService.findById(1L)).thenReturn(RESERVATION_TIME_10_00_ID_1);
         when(themeService.findById(1L)).thenReturn(THEME_1);
 
-        assertThatThrownBy(() -> reservationService.saveReservation(PAST_DATE_RESERVATION_REQUEST))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(PAST_DATE_RESERVATION_REQUEST))
                 .isInstanceOf(IllegalRequestException.class);
     }
 
@@ -111,7 +115,7 @@ class ReservationServiceTest {
                 any(Long.class))).thenReturn(List.of(
                 MEMBER_ID_1_RESERVATION));
 
-        assertThatThrownBy(() -> reservationService.saveReservation(RESERVATION_REQUEST_1))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(RESERVATION_REQUEST_1))
                 .isInstanceOf(IllegalRequestException.class);
     }
 
@@ -120,8 +124,8 @@ class ReservationServiceTest {
     void should_throw_exception_when_reservation_not_confirmed_payments() {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
         doThrow(IllegalRequestException.class)
-                .when(paymentClient)
-                .requestConfirmPayment(any(PaymentConfirmRequest.class));
+                .when(paymentService)
+                .confirmPayment(any(Reservation.class), any(PaymentConfirmRequest.class));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
@@ -131,7 +135,7 @@ class ReservationServiceTest {
     @DisplayName("결제가 승인된 후 멤버의 예약 저장 프로세스가 수행된다")
     @Test
     void should_save_member_reservation_when_payment_is_confirmed() {
-        doNothing().when(paymentClient).requestConfirmPayment(any(PaymentConfirmRequest.class));
+        doNothing().when(paymentService).confirmPayment(any(Reservation.class), any(PaymentConfirmRequest.class));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);

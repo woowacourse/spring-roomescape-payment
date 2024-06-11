@@ -21,12 +21,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                     @Param("dateTo") LocalDate dateTo);
 
     @Query("""
-            SELECT new roomescape.reservation.domain.ReservationWithWaiting(r1, COUNT(*))
+            SELECT new roomescape.reservation.domain.MyReservation(r1, COUNT(*), p.paymentKey,p.orderId,p.amount)
             FROM Reservation AS r1
             INNER JOIN Reservation AS r2 
                 ON r1.date = r2.date
                 AND r1.time = r2.time
                 AND r1.theme = r2.theme
+            INNER JOIN Payment AS p
+                ON p.reservation.id = r1.id
             JOIN FETCH r1.theme
             JOIN FETCH r1.time
             JOIN FETCH r1.member
@@ -34,7 +36,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 AND r1.id >= r2.id
             GROUP BY r1
             """)
-    List<ReservationWithWaiting> findByMemberIdWithWaitingStatus(@Param("memberId") Long memberId);
+    List<MyReservation> findMyReservations(@Param("memberId") Long memberId);
 
     @Query("""
             SELECT r

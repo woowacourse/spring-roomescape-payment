@@ -1,0 +1,7 @@
+== 예약 시간
+
+=== 전체 시간 조회
+operation::reservation-time-controller-test/should_handle_get_times_request_when_requested[snippets='http-request,http-response']
+
+=== 예약 가능 상태 조회
+operation::reservation-time-controller-test/should_handle_get_times_with_book_status_when_requested[snippets='http-request,http-response']

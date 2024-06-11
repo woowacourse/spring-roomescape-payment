@@ -1,0 +1,10 @@
+== Admin 예약 시간
+
+=== 예약 가능 시각 추가
+
+operation::admin-reservation-time-controller-test/should_handle_post_times_when_requested[snippets='http-request,http-response']
+
+=== 예약 가능 시각 삭제
+
+operation::admin-reservation-time-controller-test/should_handle_delete_time_when_requested[snippets='http-request,http-response']
+

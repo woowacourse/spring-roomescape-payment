@@ -1,27 +1,33 @@
 package roomescape.reservation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.reservation.domain.ReservationWithWaiting;
+import roomescape.reservation.domain.MyReservation;
 
-public record MemberReservationResponse(
+public record MyReservationResponse(
         Long id,
         String themeName,
         LocalDate date,
         LocalTime time,
-        String status) {
+        String status,
+        String paymentKey,
+        BigDecimal amount
+) {
 
-    public MemberReservationResponse(ReservationWithWaiting reservation) {
+    public MyReservationResponse(MyReservation reservation) {
         this(
                 reservation.getReservationId(),
                 reservation.getThemeName(),
                 reservation.getReservationDate(),
                 reservation.getStartAt(),
-                statusMessage(reservation.getWaitingNumber())
+                statusMessage(reservation.getWaitingNumber()),
+                reservation.getPaymentKey(),
+                reservation.getAmount()
         );
     }
 
-    private static String statusMessage(int waitingNumber) {
+    private static String statusMessage(Long waitingNumber) {
         if (waitingNumber > 1) {
             return waitingNumber + "번째 예약 대기";
         }

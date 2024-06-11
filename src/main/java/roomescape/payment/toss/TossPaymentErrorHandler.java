@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.toss;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +22,11 @@ public class TossPaymentErrorHandler {
         }
 
         PaymentErrorResponse paymentErrorResponse = OBJECT_MAPPER.readValue(res.getBody(), PaymentErrorResponse.class);
-        HandlingTargetErrorCode targetErrorCode = HandlingTargetErrorCode.from(paymentErrorResponse.code());
+        TossHandlingTargetErrorCode targetErrorCode = TossHandlingTargetErrorCode.from(paymentErrorResponse.code());
         throw new PaymentException(targetErrorCode.handledMessage, targetErrorCode.handledStatusCode);
     }
 
-    private enum HandlingTargetErrorCode {
+    private enum TossHandlingTargetErrorCode {
         REJECT_ACCOUNT_PAYMENT(HttpStatus.BAD_REQUEST, "잔액 부족"),
         UNAUTHORIZED_KEY(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"),
         DEFAULT(HttpStatus.BAD_REQUEST, "결제 실패");
@@ -34,12 +34,12 @@ public class TossPaymentErrorHandler {
         private final HttpStatus handledStatusCode;
         private final String handledMessage;
 
-        HandlingTargetErrorCode(HttpStatus handledStatusCode, String handledMessage) {
+        TossHandlingTargetErrorCode(HttpStatus handledStatusCode, String handledMessage) {
             this.handledStatusCode = handledStatusCode;
             this.handledMessage = handledMessage;
         }
 
-        private static HandlingTargetErrorCode from(String targetCode) {
+        private static TossHandlingTargetErrorCode from(String targetCode) {
             return Arrays.stream(values())
                     .filter(ht -> ht.name().equals(targetCode))
                     .findAny()
