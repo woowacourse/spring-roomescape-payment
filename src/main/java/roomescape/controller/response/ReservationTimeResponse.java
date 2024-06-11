@@ -1,15 +1,18 @@
 package roomescape.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.model.ReservationTime;
 
 import java.time.LocalTime;
 
 public class ReservationTimeResponse {
 
+    @Schema(description = "예약 시간 ID", example = "1")
     private Long id;
 
     @JsonFormat(pattern = "HH:mm")
+    @Schema(description = "예약 시간", example = "10:00")
     private LocalTime startAt;
 
     public ReservationTimeResponse() {

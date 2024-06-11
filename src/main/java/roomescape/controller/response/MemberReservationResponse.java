@@ -1,6 +1,7 @@
 package roomescape.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationStatus;
 import roomescape.model.ReservationWithPaymentInfo;
@@ -15,11 +16,16 @@ public class MemberReservationResponse {
     private static final String PAYMENT_WAITING = "결제 대기";
     private static final String WAITING = "%d번째 예약대기";
 
+    @Schema(description = "예약 ID", example = "1")
     private Long id;
+    @Schema(description = "테마 이름", example = "에버")
     private String theme;
+    @Schema(description = "예약 날짜", example = "2024-06-11")
     private LocalDate date;
     @JsonFormat(pattern = "HH:mm")
+    @Schema(description = "예약 시간", example = "10:00")
     private LocalTime time;
+    @Schema(description = "예약 상태", example = "예약", allowableValues = {RESERVED, PAYMENT_WAITING, WAITING})
     private String status;
     private String paymentKey;
     private Long amount;
