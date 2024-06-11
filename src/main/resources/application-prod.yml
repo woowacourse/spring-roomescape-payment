@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+  h2:
+    console:
+      enabled: false
+  datasource:
+    url: ${ROOMESCAPE_MYSQL_DB_URL}
+    username: ${ROOMESCAPE_MYSQL_USERNAME}
+    password: ${ROOMESCAPE_MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      encoding: utf-8
