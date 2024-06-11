@@ -39,7 +39,6 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private BookedMember bookedMember;
 
-
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WaitingMember> waitingMembers = new ArrayList<>();
 
