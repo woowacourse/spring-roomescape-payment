@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
+import roomescape.config.swagger.SwaggerAuthToken;
 import roomescape.service.member.MemberService;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.member.dto.MemberResponse;
@@ -29,7 +30,7 @@ public class MemberController {
     }
 
     @GetMapping("/reservations")
-    public List<MemberReservationResponse> findReservations(@LoginMemberId long memberId) {
+    public List<MemberReservationResponse> findReservations(@LoginMemberId @SwaggerAuthToken long memberId) {
         return reservationService.findReservationsOf(memberId);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
+import roomescape.config.swagger.SwaggerAuthToken;
 import roomescape.service.reservation.ReservationWaitingService;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationWaitingResponse;
@@ -28,7 +29,7 @@ public class ReservationWaitingController {
     @PostMapping
     public ResponseEntity<ReservationWaitingResponse> createReservationWaiting(
             @RequestBody @Valid ReservationRequest waitingRequest,
-            @LoginMemberId long memberId
+            @LoginMemberId @SwaggerAuthToken long memberId
     ) {
         ReservationWaitingResponse response = reservationWaitingService.create(waitingRequest, memberId);
         return ResponseEntity.created(URI.create("/reservations/waiting/" + response.id()))
@@ -38,7 +39,7 @@ public class ReservationWaitingController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationWaiting(
             @PathVariable("id") long waitingId,
-            @LoginMemberId long memberId
+            @LoginMemberId @SwaggerAuthToken long memberId
     ) {
         reservationWaitingService.deleteById(waitingId, memberId);
         return ResponseEntity.noContent().build();
