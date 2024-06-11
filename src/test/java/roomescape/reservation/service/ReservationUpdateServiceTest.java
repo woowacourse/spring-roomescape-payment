@@ -41,12 +41,11 @@ class ReservationUpdateServiceTest {
     @InjectMocks
     private ReservationUpdateService reservationUpdateService;
 
-    @DisplayName("id를 통해 예약을 조회할 수 있다.")
+    @DisplayName("예약의 결제 정보를 업데이트한다.")
     @Test
     void updateReservationPaymentStatusTest() {
         given(reservationRepository.findById(1L)).willReturn(Optional.of(RESERVATION1));
-        MyReservationResponse expected = RESPONSE1;
 
-        assertThat(reservationUpdateService.updateReservationPaymentStatus(1L, PaymentStatus.COMPLETED)).isIn(expected);
+        assertThat(reservationUpdateService.updateReservationPaymentStatus(1L, PaymentStatus.COMPLETED)).isIn(RESPONSE1);
     }
 }
