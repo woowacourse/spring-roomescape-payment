@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.theme.dto.ThemeRankResponse;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/themes")
 public class ThemeController implements ThemeControllerSwagger {
 
     private final ThemeService themeService;
@@ -29,7 +27,7 @@ public class ThemeController implements ThemeControllerSwagger {
     }
 
     @Override
-    @PostMapping
+    @PostMapping("/admin/themes")
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody ThemeRequest themeRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -37,7 +35,7 @@ public class ThemeController implements ThemeControllerSwagger {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/themes")
     public ResponseEntity<List<ThemeResponse>> themeList() {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -45,7 +43,7 @@ public class ThemeController implements ThemeControllerSwagger {
     }
 
     @Override
-    @GetMapping("/rank")
+    @GetMapping("/themes/rank")
     public ResponseEntity<List<ThemeRankResponse>> themeRankList(@RequestParam LocalDate date) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -53,7 +51,7 @@ public class ThemeController implements ThemeControllerSwagger {
     }
 
     @Override
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/themes/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") long themeId) {
         themeService.removeTheme(themeId);
         return ResponseEntity
@@ -62,7 +60,7 @@ public class ThemeController implements ThemeControllerSwagger {
     }
 
     @Override
-    @GetMapping("/{id}")
+    @GetMapping("/themes/{id}")
     public ResponseEntity<ThemeResponse> getThemeById(@PathVariable("id") long themeId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
