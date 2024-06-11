@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum PaymentStatus {
+    READY("READY"),
     DONE("DONE"),
-    CANCELED("CANCELED")
+    CANCELED("CANCELED"),
+    REJECTED("ABORTED")
     ;
 
     private static final Map<String, PaymentStatus> TOSS_PAY_STATUS =

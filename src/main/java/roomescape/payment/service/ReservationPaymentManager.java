@@ -2,6 +2,7 @@ package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveRequest;
@@ -20,12 +21,13 @@ public class ReservationPaymentManager {
 
     public ReservationResponse saveReservationByUser(ReservationSaveRequest reservationSaveRequest,
                                                      LoginMember loginMember) {
-        ReservationResponse reservationResponse = reservationService.saveReservationPending(reservationSaveRequest,
-                loginMember);
+        ReservationResponse reservationResponse =
+                reservationService.saveReservationPending(reservationSaveRequest, loginMember);
         try {
-            paymentService.pay(PaymentRequest.from(reservationSaveRequest), reservationResponse.id());
+            Payment payment = paymentService.createPayment(PaymentRequest.from(reservationSaveRequest),
+                    reservationResponse.id());
+            paymentService.confirm(payment);
             return reservationService.confirmReservation(reservationResponse.id());
-
         } catch (Exception exception) {
             reservationService.rollBackPendingReservation(reservationResponse.id());
             throw exception;
