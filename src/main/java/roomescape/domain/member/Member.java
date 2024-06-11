@@ -52,6 +52,6 @@ public class Member {
     }
 
     public boolean isNotAdmin() {
-        return role == Role.ADMIN;
+        return role != Role.ADMIN;
     }
 }
