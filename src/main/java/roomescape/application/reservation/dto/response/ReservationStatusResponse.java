@@ -2,7 +2,6 @@ package roomescape.application.reservation.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -16,7 +15,8 @@ public record ReservationStatusResponse(
         String paymentKey,
         long amount
 ) {
-    public static ReservationStatusResponse of(Reservation reservation, long waitingCount, ReservationPayment payment) {
+    public static ReservationStatusResponse of(Reservation reservation, long waitingCount, String paymentKey,
+                                               long amount) {
         Theme theme = reservation.getTheme();
         ReservationTime time = reservation.getTime();
         return new ReservationStatusResponse(
@@ -25,8 +25,8 @@ public record ReservationStatusResponse(
                 reservation.getDate(),
                 time.getStartAt(),
                 waitingCount,
-                payment.getPaymentKey(),
-                payment.getAmount()
+                paymentKey,
+                amount
         );
     }
 }

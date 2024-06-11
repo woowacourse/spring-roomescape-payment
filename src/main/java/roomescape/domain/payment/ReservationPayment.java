@@ -9,7 +9,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "reservation_payment")
 public class ReservationPayment {
-    private static final ReservationPayment EMPTY_INSTANCE = new ReservationPayment(null, null, null, 0);
+
+    private static final int MIN_AMOUNT = 0;
+    public static final int MIN_RESERVATION_ID = 1;
 
     @Id
     private String orderId;
@@ -27,14 +29,24 @@ public class ReservationPayment {
     }
 
     public ReservationPayment(String orderId, Long reservationId, String paymentKey, long amount) {
+        validateReservationId(reservationId);
+        validateAmount(amount);
         this.orderId = orderId;
         this.reservationId = reservationId;
         this.paymentKey = paymentKey;
         this.amount = amount;
     }
 
-    public static ReservationPayment getEmptyInstance() {
-        return EMPTY_INSTANCE;
+    private void validateReservationId(Long reservationId) {
+        if (reservationId == null || reservationId < MIN_RESERVATION_ID) {
+            throw new IllegalArgumentException("결제 정보는 예약 정보가 필수입니다.");
+        }
+    }
+
+    private void validateAmount(long amount) {
+        if (amount < MIN_AMOUNT) {
+            throw new IllegalArgumentException("결제 금액은 음수일 수 없습니다.");
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package roomescape.application.reservation;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,14 +55,20 @@ public class ReservationLookupService {
     }
 
     public List<ReservationStatusResponse> getReservationStatusesByMemberId(long memberId) {
-        return reservationRepository.findActiveReservationByMemberId(memberId)
-                .stream()
-                .map(reservation -> ReservationStatusResponse.of(
-                        reservation,
-                        reservationRepository.getWaitingCount(reservation),
-                        reservationPaymentRepository.findByReservationId(reservation.getId())
-                                .orElseGet(ReservationPayment::getEmptyInstance))
-                )
+        return reservationRepository.findActiveReservationByMemberId(memberId).stream()
+                .map(reservation -> {
+                    Optional<ReservationPayment> optionalPayment =
+                            reservationPaymentRepository.findByReservationId(reservation.getId());
+                    String paymentKey = optionalPayment.map(ReservationPayment::getPaymentKey).orElse("");
+                    long amount = optionalPayment.map(ReservationPayment::getAmount).orElse(0L);
+
+                    return ReservationStatusResponse.of(
+                            reservation,
+                            reservationRepository.getWaitingCount(reservation),
+                            paymentKey,
+                            amount
+                    );
+                })
                 .toList();
     }
 }
