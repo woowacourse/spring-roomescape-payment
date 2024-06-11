@@ -31,6 +31,7 @@ import roomescape.waiting.repository.WaitingRepository;
 import roomescape.waiting.service.WaitingService;
 
 @Service
+@Transactional
 public class ReservationService {
 
     private final WaitingService waitingService;
@@ -57,7 +58,6 @@ public class ReservationService {
         this.waitingRepository = waitingRepository;
     }
 
-    @Transactional
     public CreateReservationResponse createMyReservation(final AuthInfo authInfo,
                                                          final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
