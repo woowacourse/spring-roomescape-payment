@@ -15,7 +15,6 @@ import roomescape.reservation.dto.ReservationDetailResponse;
 import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationPaymentResponse;
-import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
 @Service
@@ -24,20 +23,22 @@ public class ReservationApplicationService {
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
 
-    public ReservationApplicationService(PaymentClient paymentClient, ReservationService reservationService, PaymentRepository paymentRepository) {
+    public ReservationApplicationService(
+            PaymentClient paymentClient,
+            ReservationService reservationService,
+            PaymentRepository paymentRepository
+    ) {
         this.paymentClient = paymentClient;
         this.reservationService = reservationService;
         this.paymentRepository = paymentRepository;
     }
 
-    public ReservationPaymentResponse reservationPayment(LoginMember loginMember, ReservationPaymentRequest reservationPaymentRequest) {
+    public ReservationPaymentResponse reservationPayment(
+            LoginMember loginMember,
+            ReservationPaymentRequest reservationPaymentRequest
+    ) {
         PaymentInfo paymentInfo = paymentClient.payment(reservationPaymentRequest.toPaymentRequest());
-        ReservationResponse reservationResponse = reservationService.save(
-                loginMember,
-                reservationPaymentRequest.toReservationRequest(),
-                paymentInfo
-        );
-        return new ReservationPaymentResponse(reservationResponse, PaymentResponse.from(paymentInfo));
+        return reservationService.saveReservationPayment(loginMember, reservationPaymentRequest.toReservationRequest(), paymentInfo);
     }
 
     @Transactional
@@ -46,9 +47,8 @@ public class ReservationApplicationService {
         List<ReservationPaymentDetail> paymentDetails = new ArrayList<>();
         for (ReservationDetailResponse reservationDetailResponse : allByMemberId) {
             paymentRepository.findByReservationId(reservationDetailResponse.reservationId())
-                    .ifPresent(payment -> paymentDetails.add(
-                            new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment)))
-                    );
+                    .ifPresentOrElse(payment -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.from(payment))),
+                            () -> paymentDetails.add(new ReservationPaymentDetail(reservationDetailResponse, PaymentResponse.pending())));
         }
         return paymentDetails;
     }

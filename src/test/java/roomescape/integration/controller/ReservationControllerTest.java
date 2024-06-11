@@ -3,7 +3,6 @@ package roomescape.integration.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION;
@@ -26,12 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
@@ -46,7 +41,6 @@ import roomescape.payment.api.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
@@ -75,8 +69,6 @@ public class ReservationControllerTest {
     private MemberRepository memberRepository;
     @MockBean
     private PaymentClient paymentClient;
-    @MockBean
-    private PaymentService paymentService;
 
     private Theme theme = ThemeFixture.themeOfName("theme");
     private String token;
@@ -165,16 +157,6 @@ public class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(200)
                     .body("size()", is(10));
-        }
-
-        @TestConfiguration
-        static class MockitoPublisherConfiguration {
-
-            @Bean
-            @Primary
-            ApplicationEventPublisher publisher() {
-                return mock(ApplicationEventPublisher.class);
-            }
         }
 
         @DisplayName("예약을 하나 생성할 수 있다.")

@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +21,14 @@ import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.PaymentInfo;
-import roomescape.reservation.domain.ReservationConfirmedEvent;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -42,22 +44,22 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
-                              ApplicationEventPublisher eventPublisher) {
+                              PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.eventPublisher = eventPublisher;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
-    public ReservationResponse save(
+    public ReservationPaymentResponse saveReservationPayment(
             LoginMember loginMember,
             ReservationRequest reservationRequest,
             PaymentInfo paymentInfo
@@ -72,9 +74,13 @@ public class ReservationService {
                     reservationRequest.themeId(),
                     reservationRequest.timeId());
         }
-        eventPublisher.publishEvent(new ReservationConfirmedEvent(reservation, paymentInfo));
+        Reservation savedReservation = reservationRepository.save(reservation);
+        paymentRepository.save(new Payment(savedReservation, paymentInfo));
 
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return new ReservationPaymentResponse(
+                ReservationResponse.from(reservation),
+                PaymentResponse.from(paymentInfo)
+        );
     }
 
     @Transactional

@@ -77,14 +77,14 @@ class ReservationServiceTest {
     @Test
     void createFutureReservationTest() {
         //when
-        ReservationResponse saved = reservationService.save(
-                loginMember,
-                new ReservationRequest(
-                        LocalDate.now().plusDays(1),
-                        DEFAULT_THEME.getId(),
-                        DEFAULT_RESERVATION_TIME.getId()
-                ),
-                PAYMENT_INFO);
+        ReservationResponse saved = reservationService.saveReservationPayment(
+                        loginMember,
+                        new ReservationRequest(
+                                LocalDate.now().plusDays(1),
+                                DEFAULT_THEME.getId(),
+                                DEFAULT_RESERVATION_TIME.getId()
+                        ), PAYMENT_INFO)
+                .reservationResponse();
 
         //then
         assertAll(
@@ -97,7 +97,7 @@ class ReservationServiceTest {
     @DisplayName("지난 시간에 대해 예약을 시도할 경우 예외가 발생한다.")
     @Test
     void createPastReservationFailTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
@@ -111,7 +111,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 시간에 대해 예약을 생성하면 예외가 발생한다.")
     @Test
     void createReservationWithTimeNotExistsTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
@@ -125,7 +125,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 테마에 대해 예약을 생성하면 예외가 발생한다.")
     @Test
     void createReservationWithThemeNotExistsTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().plusDays(1),
@@ -289,7 +289,7 @@ class ReservationServiceTest {
         @DisplayName("이미 예약된 시간, 테마의 예약을 또 생성할 수 없다.")
         @Test
         void duplicatedReservationFailTest() {
-            assertThatThrownBy(() -> reservationService.save(
+            assertThatThrownBy(() -> reservationService.saveReservationPayment(
                     loginMember,
                     new ReservationRequest(
                             defaultDate,
