@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 
 public record ReservationResponse(
         @JsonProperty("id")
@@ -14,7 +14,7 @@ public record ReservationResponse(
         LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme) {
-    public static ReservationResponse from(long memberReservationId, Reservation reservation, Member member) {
+    public static ReservationResponse from(long memberReservationId, ReservationInfo reservation, Member member) {
         return new ReservationResponse(
                 memberReservationId,
                 MemberResponse.from(member),

@@ -31,7 +31,7 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -60,7 +60,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         String paymentType = "카드";
         long totalAmount = 1000L;
         PaymentResponse okResponse = new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
-        doReturn(okResponse).when(paymentClient).confirm(any());
+        doReturn(okResponse).when(paymentClient)
+                .confirm(any());
     }
 
 
@@ -68,7 +69,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void duplicatedWaitingList() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when & then
@@ -88,7 +89,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         Member memberClover = memberRepository.save(getMemberClover());
         LocalDate date = getNextDay();
         reservationApplicationService.createMemberReservation(new MemberReservationCreate(
-                memberChoco.getId(),theme1.getId(),time.getId(),"1234","orderId",15000L,
+                memberChoco.getId(), theme1.getId(), time.getId(), "1234", "orderId", 15000L,
                 date
         ));
         ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
@@ -125,7 +126,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void duplicatedReservation() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         LocalDate date = getNextDay();
 
@@ -144,12 +145,12 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
 
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation firstReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
-        paymentRepository.save(Payment.from("paymentKey", "카드",15000l,firstReservation.getId()));
+        paymentRepository.save(Payment.from("paymentKey", "카드", 15000l, firstReservation.getId()));
         entityManager.clear();
         entityManager.flush();
 
@@ -170,12 +171,12 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void deleteRefund() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when
-        reservationApplicationService.delete(reservation.getId());
+        reservationApplicationService.delete(memberReservation.getId());
 
         //then
         assertThat(paymentRepository.findByRelatedId(memberReservation.getId())).isEmpty();

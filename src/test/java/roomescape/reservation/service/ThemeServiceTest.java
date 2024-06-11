@@ -14,11 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.exception.ErrorType;
 import roomescape.exception.RoomescapeException;
+import roomescape.fixture.MemberFixture;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.ThemeResponse;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.service.dto.ThemeCreate;
@@ -28,11 +29,11 @@ import roomescape.util.ServiceTest;
 @DisplayName("테마 로직 테스트")
 class ThemeServiceTest extends ServiceTest {
     @Autowired
-    ReservationRepository reservationRepository;
-    @Autowired
     ThemeRepository themeRepository;
     @Autowired
     ReservationTimeRepository timeRepository;
+    @Autowired
+    MemberRepository memberRepository;
     @Autowired
     MemberReservationRepository memberReservationRepository;
     @Autowired
@@ -93,7 +94,9 @@ class ThemeServiceTest extends ServiceTest {
         //given
         ReservationTime time = timeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
-        reservationRepository.save(getNextDayReservation(time, theme));
+        ReservationInfo reservation = getNextDayReservation(time, theme);
+        Member member = memberRepository.save(MemberFixture.getMemberChoco());
+        memberReservationRepository.save(new MemberReservation(member,reservation, ReservationStatus.APPROVED));
 
         //when & then
         assertThatThrownBy(() -> themeService.delete(theme.getId()))

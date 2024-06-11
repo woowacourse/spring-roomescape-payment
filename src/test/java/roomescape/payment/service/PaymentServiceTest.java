@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
-import static roomescape.fixture.ReservationFixture.getNextDayReservation;
 import static roomescape.fixture.ReservationTimeFixture.getNoon;
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
@@ -28,7 +27,6 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.exception.PaymentException;
-import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.util.ServiceTest;
@@ -39,7 +37,6 @@ class PaymentServiceTest extends ServiceTest {
     ReservationTime time;
     Theme theme1;
     Member memberChoco;
-    Reservation reservation;
     @Autowired
     private PaymentService paymentService;
     @Autowired
@@ -52,7 +49,6 @@ class PaymentServiceTest extends ServiceTest {
         time = reservationTimeRepository.save(getNoon());
         theme1 = themeRepository.save(getTheme1());
         memberChoco = memberRepository.save(getMemberChoco());
-        reservation = reservationRepository.save(getNextDayReservation(time, theme1));
 
     }
 

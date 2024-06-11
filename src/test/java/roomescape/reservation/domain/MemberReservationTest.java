@@ -21,8 +21,8 @@ class MemberReservationTest {
         Member member = new Member(2L, "초코칩", "dev.chocochip@gmail.com", "password", Role.USER);
         ReservationTime noon = getNoon();
         Theme theme = getTheme1();
-        Reservation nextDayReservation = getNextDayReservation(noon, theme);
-        Reservation nextMonthReservation = getNextMonthReservation(noon, theme);
+        ReservationInfo nextDayReservation = getNextDayReservation(noon, theme);
+        ReservationInfo nextMonthReservation = getNextMonthReservation(noon, theme);
 
         //when
         MemberReservation memberReservation1 = new MemberReservation(id, member, nextDayReservation,

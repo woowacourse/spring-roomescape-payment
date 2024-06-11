@@ -8,7 +8,7 @@ import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 
@@ -36,7 +36,7 @@ public class WaitingReservationService {
     }
 
     @Transactional
-    public MemberReservation addWaiting(Member member, Reservation reservation) {
+    public MemberReservation addWaiting(Member member, ReservationInfo reservation) {
         return memberReservationRepository.save(
                 new MemberReservation(member, reservation, ReservationStatus.PENDING));
     }

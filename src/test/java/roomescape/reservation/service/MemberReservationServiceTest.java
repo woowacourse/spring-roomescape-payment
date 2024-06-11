@@ -20,7 +20,7 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -55,8 +55,8 @@ class MemberReservationServiceTest extends ServiceTest {
     void find() {
         //given
         Theme theme2 = themeRepository.save(getTheme2());
-        Reservation reservation1 = reservationRepository.save(getNextDayReservation(time, theme1));
-        Reservation reservation2 = reservationRepository.save(getNextDayReservation(time, theme2));
+        ReservationInfo reservation1 = getNextDayReservation(time, theme1);
+        ReservationInfo reservation2 = getNextDayReservation(time, theme2);
 
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation1, ReservationStatus.APPROVED));
 
@@ -79,7 +79,7 @@ class MemberReservationServiceTest extends ServiceTest {
     @Test
     void findByMemberId() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
 
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
@@ -102,8 +102,8 @@ class MemberReservationServiceTest extends ServiceTest {
     void findByThemeId() {
         //given
         Theme theme2 = themeRepository.save(getTheme2());
-        Reservation reservation1 = reservationRepository.save(getNextDayReservation(time, theme1));
-        Reservation reservation2 = reservationRepository.save(getNextDayReservation(time, theme2));
+        ReservationInfo reservation1 = getNextDayReservation(time, theme1);
+        ReservationInfo reservation2 = getNextDayReservation(time, theme2);
 
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation1, ReservationStatus.APPROVED));
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation2, ReservationStatus.APPROVED));
@@ -124,8 +124,8 @@ class MemberReservationServiceTest extends ServiceTest {
     void findByDate() {
         //given
         Theme theme2 = themeRepository.save(getTheme2());
-        Reservation reservation1 = reservationRepository.save(getNextDayReservation(time, theme1));
-        Reservation reservation2 = reservationRepository.save(getNextDayReservation(time, theme2));
+        ReservationInfo reservation1 = getNextDayReservation(time, theme1);
+        ReservationInfo reservation2 = getNextDayReservation(time, theme2);
 
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation1, ReservationStatus.APPROVED));
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation2, ReservationStatus.APPROVED));
@@ -145,8 +145,7 @@ class MemberReservationServiceTest extends ServiceTest {
     @Test
     void updateStatus() {
         //given
-        Reservation reservation = getNextDayReservation(time, theme1);
-        reservationRepository.save(reservation);
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
@@ -155,7 +154,7 @@ class MemberReservationServiceTest extends ServiceTest {
 
         //then
         assertThat(
-                memberReservationRepository.findBy(null, null, ReservationStatus.NOT_PAID, LocalDate.now(),
+                memberReservationRepository.findBy(memberChoco.getId(), null, ReservationStatus.NOT_PAID, LocalDate.now(),
                         LocalDate.now().plusDays(1))).hasSize(1);
     }
 
@@ -163,16 +162,16 @@ class MemberReservationServiceTest extends ServiceTest {
     @Test
     void deleteMemberReservation() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
-        memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
+        MemberReservation memberReservation = memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when
-        memberReservationService.delete(reservation.getId());
+        memberReservationService.delete(memberReservation.getId());
 
         //then
         assertThat(memberReservationService.findMemberReservations(
                 new ReservationQueryRequest(theme1.getId(), memberChoco.getId(), LocalDate.now(),
-                        LocalDate.now().plusDays(1)))).hasSize(0);
+                        LocalDate.now().plusDays(1)))).isEmpty();
     }
 
     @DisplayName("나의 예약 조회에 성공한다.")
@@ -180,8 +179,8 @@ class MemberReservationServiceTest extends ServiceTest {
     void myReservations() {
         //given
         Theme theme2 = themeRepository.save(getTheme2());
-        Reservation reservation1 = reservationRepository.save(getNextDayReservation(time, theme1));
-        Reservation reservation2 = reservationRepository.save(getNextDayReservation(time, theme2));
+        ReservationInfo reservation1 = getNextDayReservation(time, theme1);
+        ReservationInfo reservation2 = getNextDayReservation(time, theme2);
 
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation1, ReservationStatus.APPROVED));
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation2, ReservationStatus.APPROVED));

@@ -10,27 +10,22 @@ import roomescape.reservation.controller.dto.ReservationQueryRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.WaitingResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.service.dto.MyReservationInfo;
 import roomescape.reservation.service.dto.PaymentInfo;
-import roomescape.reservation.service.dto.ReservationInfo;
 
 @Service
 @Transactional(readOnly = true)
 public class MemberReservationService {
 
-    private final ReservationRepository reservationRepository;
 
     private final MemberReservationRepository memberReservationRepository;
 
     private final PaymentRepository paymentRepository;
 
-    public MemberReservationService(ReservationRepository reservationRepository,
-                                    MemberReservationRepository memberReservationRepository, final PaymentRepository paymentRepository) {
-        this.reservationRepository = reservationRepository;
+    public MemberReservationService(MemberReservationRepository memberReservationRepository, final PaymentRepository paymentRepository) {
         this.memberReservationRepository = memberReservationRepository;
         this.paymentRepository = paymentRepository;
     }
@@ -60,22 +55,22 @@ public class MemberReservationService {
         PaymentInfo paymentInfo = paymentRepository.findByRelatedId(memberReservation.getId())
                 .map(PaymentInfo::from)
                 .orElse(PaymentInfo.NOT_PAYMENT);
+
         return new MyReservationInfo(
                 memberReservation.getId(),
-                ReservationInfo.from(memberReservation.getReservation()),
+                roomescape.reservation.service.dto.ReservationInfo.from(memberReservation.getReservation()),
                 new WaitingResponse(memberReservation.getReservationStatus(), findRankInReservation(memberReservation)),
                 paymentInfo);
     }
 
     private int findRankInReservation(MemberReservation memberReservation) {
-        List<MemberReservation> memberReservations = memberReservationRepository.findAllByReservationId(
-                memberReservation.getReservation()
-                        .getId());
+        List<MemberReservation> memberReservations = memberReservationRepository.findAllByReservation(
+                memberReservation.getReservation());
         return memberReservations.indexOf(memberReservation) + 1;
     }
 
     @Transactional
-    public void updateStatus(Reservation reservation) {
+    public void updateStatus(ReservationInfo reservation) {
         memberReservationRepository.findFirstByReservationOrderByCreatedAt(reservation)
                 .ifPresent(
                         MemberReservation::notPaid
@@ -84,7 +79,6 @@ public class MemberReservationService {
 
     @Transactional
     public void delete(long reservationId) {
-        memberReservationRepository.deleteByReservationId(reservationId);
-        reservationRepository.deleteById(reservationId);
+        memberReservationRepository.deleteById(reservationId);
     }
 }

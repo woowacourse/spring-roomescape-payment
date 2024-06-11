@@ -16,12 +16,11 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 
@@ -33,7 +32,6 @@ public class DataLoader implements ApplicationRunner {
 
     private final ReservationTimeRepository timeRepository;
 
-    private final ReservationRepository reservationRepository;
 
     private final MemberRepository memberRepository;
 
@@ -46,12 +44,10 @@ public class DataLoader implements ApplicationRunner {
 
     public DataLoader(ThemeRepository themeRepository,
                       ReservationTimeRepository timeRepository,
-                      ReservationRepository reservationRepository,
                       MemberRepository memberRepository,
                       MemberReservationRepository memberReservationRepository, final PaymentRepository paymentRepository) {
         this.themeRepository = themeRepository;
         this.timeRepository = timeRepository;
-        this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.memberReservationRepository = memberReservationRepository;
         this.paymentRepository = paymentRepository;
@@ -112,30 +108,30 @@ public class DataLoader implements ApplicationRunner {
         ReservationTime time8 = timeRepository.save(new ReservationTime(LocalTime.of(21, 10)));
         timeRepository.save(new ReservationTime(LocalTime.of(22, 30)));
 
-        Reservation reservation1 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .minusDays(2), time1, theme1));
-        Reservation reservation2 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusDays(16), time1, theme2));
-        Reservation reservation3 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusYears(1), time2, theme1));
-        Reservation reservation4 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusDays(1), time2, theme2));
-        Reservation reservation5 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .minusDays(4), time3, theme3));
-        Reservation reservation6 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusDays(4), time4, theme4));
-        Reservation reservation7 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusMonths(1), time6, theme4));
-        Reservation reservation8 = reservationRepository.save(
-                new Reservation(LocalDate.now()
-                        .plusDays(4), time8, theme4));
+        ReservationInfo reservation1 =
+                new ReservationInfo(LocalDate.now()
+                        .minusDays(2), time1, theme1);
+        ReservationInfo reservation2 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(16), time1, theme2);
+        ReservationInfo reservation3 =
+                new ReservationInfo(LocalDate.now()
+                        .plusYears(1), time2, theme1);
+        ReservationInfo reservation4 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(1), time2, theme2);
+        ReservationInfo reservation5 =
+                new ReservationInfo(LocalDate.now()
+                        .minusDays(4), time3, theme3);
+        ReservationInfo reservation6 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(4), time4, theme4);
+        ReservationInfo reservation7 =
+                new ReservationInfo(LocalDate.now()
+                        .plusMonths(1), time6, theme4);
+        ReservationInfo reservation8 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(4), time8, theme4);
 
         Member member1 = memberRepository.save(
                 new Member("초코칩", "dev.chocochip@gmail.com",

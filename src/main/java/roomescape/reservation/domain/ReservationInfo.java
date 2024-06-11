@@ -1,13 +1,7 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,13 +10,8 @@ import java.util.Objects;
 import roomescape.exception.ErrorType;
 import roomescape.exception.RoomescapeException;
 
-@Entity
-public class Reservation {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+@Embeddable
+public class ReservationInfo {
     @Column(nullable = false)
     private LocalDate date;
 
@@ -34,23 +23,20 @@ public class Reservation {
     @JoinColumn(name = "THEME_ID")
     private Theme theme;
 
-    protected Reservation() {
+    protected ReservationInfo() {
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme) {
+    public ReservationInfo(LocalDate date, ReservationTime time, Theme theme) {
         validate(date, time);
-        this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme) {
-        this(null, date, time, theme);
-    }
 
     public boolean isPast() {
-        return LocalDateTime.of(this.date, this.time.getStartAt()).isBefore(LocalDateTime.now());
+        return LocalDateTime.of(this.date, this.time.getStartAt())
+                .isBefore(LocalDateTime.now());
     }
 
 
@@ -58,10 +44,6 @@ public class Reservation {
         if (date == null || time == null) {
             throw new RoomescapeException(ErrorType.MISSING_REQUIRED_VALUE_ERROR);
         }
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public LocalDate getDate() {
@@ -86,25 +68,19 @@ public class Reservation {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Reservation)) {
-            return false;
-        }
-        Reservation that = (Reservation) o;
-        return Objects.equals(getId(), that.getId());
+        if (this == o) return true;
+        if (!(o instanceof final ReservationInfo that)) return false;
+        return Objects.equals(date, that.date) && Objects.equals(time, that.time) && Objects.equals(theme, that.theme);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(date, time, theme);
     }
 
     @Override
     public String toString() {
         return "Reservation{" +
-                "id=" + id +
                 ", date=" + date +
                 ", time=" + time +
                 ", theme=" + theme +
