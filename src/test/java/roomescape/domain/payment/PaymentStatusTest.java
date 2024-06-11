@@ -17,7 +17,7 @@ class PaymentStatusTest {
     void purchaseFail(PaymentStatus status) {
         assertThatCode(status::purchase)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("결제할 수 없습니다.");
+                .hasMessage("결제 대기 상태에서만 결제할 수 있습니다.");
     }
 
     @ParameterizedTest
@@ -26,7 +26,7 @@ class PaymentStatusTest {
     void cancelFail(PaymentStatus status) {
         assertThatCode(status::cancel)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("취소할 수 없습니다.");
+                .hasMessage("결제 성공 상태에서만 취소할 수 있습니다.");
     }
 
     @Test
