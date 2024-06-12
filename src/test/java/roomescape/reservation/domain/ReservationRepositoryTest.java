@@ -12,6 +12,7 @@ import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationSlotFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
+import roomescape.reservation.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
 
@@ -24,6 +25,9 @@ class ReservationRepositoryTest {
     @Autowired
     ReservationRepository reservationRepository;
 
+    @Autowired
+    PaymentRepository paymentRepository;
+
 
     @DisplayName("성공 : 예약을 등록한다.")
     @Test
@@ -35,7 +39,7 @@ class ReservationRepositoryTest {
         //when
         ReservationSlot reservationSlot = slotRepository.save(nextDayReservationSlot);
         Reservation beforeSaveReservation = new Reservation(MemberFixture.getMemberTacan(), reservationSlot,
-                PaymentFixture.getPayment());
+                PaymentFixture.getPaymentWithId());
         Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
 
         //then
@@ -48,7 +52,7 @@ class ReservationRepositoryTest {
         //given
         ReservationSlot reservedSlot = ReservationSlotFixture.getReservationSlot1();
         Reservation reservation = new Reservation(MemberFixture.getMemberTacan(), reservedSlot,
-                PaymentFixture.getPayment());
+                PaymentFixture.getPaymentWithId());
 
         //when
         Reservation savedReservation = reservationRepository.save(reservation);

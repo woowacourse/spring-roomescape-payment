@@ -68,7 +68,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void create() {
         //given
-        BDDMockito.doReturn(PaymentFixture.getPayment())
+        BDDMockito.doReturn(PaymentFixture.getPaymentWithId())
                 .when(paymentWithRestClient)
                 .confirm(any());
 

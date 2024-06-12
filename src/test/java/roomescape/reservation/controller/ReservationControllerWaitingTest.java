@@ -34,7 +34,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @BeforeEach
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
-        BDDMockito.doReturn(PaymentFixture.getPayment())
+        BDDMockito.doReturn(PaymentFixture.getPaymentWithId())
                 .when(paymentWithRestClient)
                 .confirm(any());
     }
