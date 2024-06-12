@@ -43,10 +43,9 @@ public class ThemeApiController {
 
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> save(@Valid @RequestBody ThemeCreateRequest request) {
-        Long saveId = themeService.save(request);
-        ThemeResponse response = themeService.findById(saveId);
+        ThemeResponse response = themeService.save(request);
 
-        return ResponseEntity.created(URI.create("/themes/" + saveId)).body(response);
+        return ResponseEntity.created(URI.create("/themes/" + response.id())).body(response);
     }
 
     @DeleteMapping("/themes/{id}")

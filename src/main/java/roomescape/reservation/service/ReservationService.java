@@ -55,7 +55,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public long save(ReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
+    public ReservationResponse save(ReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
         Reservation reservation = getValidatedReservation(request.date(), request.themeId(), request.timeId(),
                 loginMemberInToken);
 
@@ -63,14 +63,15 @@ public class ReservationService {
         if (reservation.isSuccess()) {
             paymentService.purchase(request.toPaymentRequest(), reservationId);
         }
-        return reservationId;
+        return ReservationResponse.toResponse(reservation);
     }
 
     @Transactional
-    public long save(FreeReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
+    public ReservationResponse save(FreeReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
         Reservation reservation = getValidatedReservation(request.date(), request.themeId(), request.timeId(),
                 loginMemberInToken);
-        return reservationRepository.save(reservation).getId();
+        reservationRepository.save(reservation);
+        return ReservationResponse.toResponse(reservation);
     }
 
     private Reservation getValidatedReservation(LocalDate date,

@@ -1,7 +1,6 @@
 package roomescape.reservation.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -97,8 +96,6 @@ class ReservationApiControllerTest {
         ReservationResponse response = new ReservationResponse(1L, name, date, theme, time);
 
         Mockito.when(reservationService.save(any(ReservationCreateRequest.class), any()))
-                .thenReturn(1L);
-        Mockito.when(reservationService.findById(anyLong()))
                 .thenReturn(response);
 
         // when & then

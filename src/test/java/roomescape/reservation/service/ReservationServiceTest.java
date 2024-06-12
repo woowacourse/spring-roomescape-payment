@@ -31,6 +31,7 @@ import roomescape.reservation.domain.Theme;
 import roomescape.reservation.dto.request.FreeReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -62,15 +63,15 @@ class ReservationServiceTest {
         Theme theme = themeRepository.save(new Theme("t", "d", "t"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(1, 0)));
         Member member = memberRepository.save(new Member("n", "e", "p"));
-        ReservationCreateRequest reservationCreateRequest
+        ReservationCreateRequest request
                 = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(), time.getId(), "paymentKey",
                 "orderId", 1000L, "paymentType");
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
                 member.getName(), member.getEmail());
 
-        Long reservationId = reservationService.save(reservationCreateRequest, loginMemberInToken);
+        ReservationResponse response = reservationService.save(request, loginMemberInToken);
 
-        assertThat(reservationRepository.findById(reservationId)).isPresent();
+        assertThat(reservationRepository.findById(response.id())).isPresent();
     }
 
     @Test
@@ -84,9 +85,10 @@ class ReservationServiceTest {
         LoginMemberInToken loginMemberInToken = new LoginMemberInToken(member.getId(), member.getRole(),
                 member.getName(), member.getEmail());
 
-        Long reservationId = reservationService.save(request, loginMemberInToken);
+        ReservationResponse response = reservationService.save(request, loginMemberInToken);
 
-        assertThat(reservationRepository.findById(reservationId)).isPresent();
+        assertThat(reservationRepository.findById(response.id()))
+                .isPresent();
     }
 
     @Test

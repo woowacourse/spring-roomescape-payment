@@ -53,10 +53,9 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        long id = reservationService.save(request, loginMemberInToken);
-        ReservationResponse response = reservationService.findById(id);
+        ReservationResponse response = reservationService.save(request, loginMemberInToken);
 
-        return ResponseEntity.created(URI.create("/reservations/" + id)).body(response);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @PostMapping("/admin/reservations")
@@ -64,10 +63,9 @@ public class ReservationApiController {
             @Valid @RequestBody FreeReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        long id = reservationService.save(request, loginMemberInToken);
-        ReservationResponse response = reservationService.findById(id);
+        ReservationResponse response = reservationService.save(request, loginMemberInToken);
 
-        return ResponseEntity.created(URI.create("/reservations/" + id)).body(response);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping("/reservations/waiting")

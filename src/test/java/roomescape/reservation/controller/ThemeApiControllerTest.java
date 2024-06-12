@@ -1,6 +1,6 @@
 package roomescape.reservation.controller;
 
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,16 +8,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import roomescape.config.ControllerConfig;
 import roomescape.reservation.dto.request.ThemeCreateRequest;
 import roomescape.reservation.dto.response.ThemeResponse;
@@ -58,14 +62,11 @@ class ThemeApiControllerTest {
     @DisplayName("테마를 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
     void createThemeRequestTest() throws Exception {
         ThemeCreateRequest themeCreateRequest = new ThemeCreateRequest("공포", "진짜 무서움", "https://i.pinimg.com/236x.jpg");
-        ThemeResponse themeResponse = new ThemeResponse(1L, themeCreateRequest.name(), themeCreateRequest.description(),
+        ThemeResponse response = new ThemeResponse(1L, themeCreateRequest.name(), themeCreateRequest.description(),
                 themeCreateRequest.thumbnail());
 
-        doReturn(1L).when(themeService)
-                .save(themeCreateRequest);
-
-        doReturn(themeResponse).when(themeService)
-                .findById(1L);
+        Mockito.when(themeService.save(any()))
+                .thenReturn(response);
 
         mockMvc.perform(post("/themes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +75,7 @@ class ThemeApiControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/themes/1"))
-                .andExpect(jsonPath("$.id").value(themeResponse.id()));
+                .andExpect(jsonPath("$.id").value(response.id()));
     }
 
     @Test

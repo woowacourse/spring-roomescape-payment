@@ -28,10 +28,11 @@ public class ReservationTimeService {
     }
 
     @Transactional
-    public Long save(TimeCreateRequest timeCreateRequest) {
+    public TimeResponse save(TimeCreateRequest timeCreateRequest) {
         ReservationTime reservationTime = timeCreateRequest.toReservationTime();
 
-        return reservationTimeRepository.save(reservationTime).getId();
+        ReservationTime time = reservationTimeRepository.save(reservationTime);
+        return TimeResponse.toResponse(time);
     }
 
     public TimeResponse findById(Long id) {

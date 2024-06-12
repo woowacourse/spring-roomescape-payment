@@ -48,10 +48,9 @@ public class ReservationTimeApiController {
 
     @PostMapping("/times")
     public ResponseEntity<TimeResponse> save(@Valid @RequestBody TimeCreateRequest request) {
-        Long saveId = reservationTimeService.save(request);
-        TimeResponse response = reservationTimeService.findById(saveId);
+        TimeResponse response = reservationTimeService.save(request);
 
-        return ResponseEntity.created(URI.create("/times/" + saveId)).body(response);
+        return ResponseEntity.created(URI.create("/times/" + response.id())).body(response);
     }
 
     @DeleteMapping("/times/{id}")
