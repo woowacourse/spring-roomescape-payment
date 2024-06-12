@@ -88,7 +88,7 @@ public class Reservation {
         return member.isDifferentId(memberId);
     }
 
-    public void reconfirmReservation(Member newMember) {
+    public void confirm(Member newMember) {
         this.member = newMember;
         this.status = DEFAULT_STATUS;
     }

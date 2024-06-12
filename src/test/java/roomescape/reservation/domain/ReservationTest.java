@@ -143,12 +143,12 @@ class ReservationTest {
 
     @DisplayName("다른 멤버로 예약을 재확정할 수 있다.")
     @Test
-    void reconfirmReservationTest() {
+    void confirmTest() {
         Reservation reservation = new Reservation(
                 1L, member, LocalDate.of(2024, 4, 30), time, theme);
         Member newMember = new Member(2L, "브리", "bri@abc.com");
 
-        reservation.reconfirmReservation(newMember);
+        reservation.confirm(newMember);
 
         assertAll(
                 () -> assertThat(reservation.getMember()).isEqualTo(newMember),

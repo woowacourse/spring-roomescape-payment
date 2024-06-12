@@ -69,7 +69,7 @@ public class ReservationDeleteService {
     }
 
     private void confirmReservation(Reservation reservation, Waiting waiting) {
-        reservation.reconfirmReservation(waiting.getMember());
+        reservation.confirm(waiting.getMember());
         waitingRepository.delete(waiting);
     }
 }
