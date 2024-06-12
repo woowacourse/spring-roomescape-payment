@@ -124,7 +124,7 @@ class ReservationServiceTest extends BaseTest {
 
         assertThatThrownBy(() -> reservationService.addReservation(request, member))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약할 수 없습니다.");
+                .hasMessageContaining("현재(", ") 이전 시간으로 예약할 수 없습니다.");
     }
 
 

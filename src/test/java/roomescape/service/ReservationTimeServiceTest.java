@@ -4,13 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.request.ReservationTimeRequest;
 import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.ReservationTime;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.request.ReservationTimeRequest;
 import roomescape.response.IsReservedTimeResponse;
 
 import java.time.LocalTime;
@@ -81,7 +81,7 @@ class ReservationTimeServiceTest extends BaseTest {
     void should_throw_exception_when_exist_reservation_using_time() {
         assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(1L))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
+                .hasMessage("해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
     }
 
     @DisplayName("존재하는 시간을 추가하려 할 때 예외가 발생한다.")

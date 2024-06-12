@@ -18,7 +18,6 @@ import roomescape.model.Reservation;
 import roomescape.request.AdminReservationRequest;
 import roomescape.request.ReservationRequest;
 import roomescape.service.PaymentService;
-import roomescape.service.fixture.PaymentFixture;
 import roomescape.service.fixture.ReservationRequestBuilder;
 
 import java.lang.reflect.Field;
@@ -103,7 +102,7 @@ class ReservationControllerTest extends AbstractControllerTest {
     @DisplayName("사용자가 예약을 추가할 수 있다.")
     @Test
     void should_insert_reservation_when_member_request() {
-        doReturn(PaymentFixture.GENERAL.getPayment()).when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
+        doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
         RestDocumentationFilter description = document("reservations-success-post",
                 requiredCookie,
                 requestFields(

@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.exception.BadRequestException;
 
 import java.time.LocalDate;
@@ -17,6 +20,8 @@ import java.util.Objects;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time_id", "theme_id"})})
+@SQLDelete(sql = "UPDATE reservation set deleted = true WHERE id = ?")
+@SQLRestriction("deleted <> true")
 public class Reservation {
 
     @Id
@@ -29,6 +34,8 @@ public class Reservation {
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+    @ColumnDefault("false")
+    private Boolean deleted;
 
     protected Reservation() {
     }
@@ -40,6 +47,7 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.member = member;
+        this.deleted = false;
     }
 
     public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {

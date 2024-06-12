@@ -45,7 +45,7 @@ class AuthServiceTest extends BaseTest {
 
         assertThatThrownBy(() -> authService.findMemberIdByCookie(cookies))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 아이디가 token인 쿠키가 없습니다.");
+                .hasMessage("아이디가 token인 쿠키가 없습니다.");
     }
 
     @DisplayName("쿠키를 제공하면 쿠키 아이디가 있는지 확인하고 있다면 사용자 아이디를 반환한다.")
