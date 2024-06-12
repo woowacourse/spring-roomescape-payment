@@ -21,7 +21,7 @@ public interface LoginApiDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = TimeResponse.class))}),
+                            mediaType = "application/json", schema = @Schema(implementation = LoginCheckResponse.class))}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
