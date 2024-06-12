@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 public class ThemePrice {
     private int price;
 
-    public ThemePrice() {
+    protected ThemePrice() {
     }
 
     public ThemePrice(int price) {

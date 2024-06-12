@@ -32,7 +32,7 @@ public class Payment {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(String paymentKey, String orderId, int amount, String orderName, ZonedDateTime requestedAt,
