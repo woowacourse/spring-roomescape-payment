@@ -32,7 +32,6 @@ CREATE TABLE reservation (
                              time_id BIGINT,
                              deleted BOOLEAN default false,
                              PRIMARY KEY (id),
-                             UNIQUE (date, time_id, theme_id),
                              FOREIGN KEY (member_id) REFERENCES member(id),
                              FOREIGN KEY (theme_id) REFERENCES theme(id),
                              FOREIGN KEY (time_id) REFERENCES reservation_time(id)
