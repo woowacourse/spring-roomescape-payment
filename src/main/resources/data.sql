@@ -1,19 +1,19 @@
--- 테마 목록 : 11개
+-- 테마 목록 : 4개
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
-VALUES ('테마1', '재밌는 테마입니다',
-        'https://www.google.co.kr/url?sa=i&url=http%3A%2F%2Fwww.code-k.co.kr%2Fsub%2Fcode_sub03.html%3FR_JIJEM%3DS1&psig=AOvVaw20fNjL28MSMMiR0Nb57Eh-&ust=1714695060162000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOiO2oLX7YUDFQAAAAAdAAAAABAE',
+VALUES ('공대 탈출', '정신 차려보니 주변엔 체크무늬 셔츠뿐.. 이 곳에서 탈출할 수 있을까?',
+        'https://upload2.inven.co.kr/upload/2019/12/13/bbs/i13979925128.jpg',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
-VALUES ('테마2', '재밌는 테마입니다',
-        'https://www.google.co.kr/url?sa=i&url=http%3A%2F%2Fwww.code-k.co.kr%2Fsub%2Fcode_sub03.html%3FR_JIJEM%3DS1&psig=AOvVaw20fNjL28MSMMiR0Nb57Eh-&ust=1714695060162000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOiO2oLX7YUDFQAAAAAdAAAAABAE',
+VALUES ('짱구야 아빠를 속인거니?', '올 여름을 강타할 단 하나의 호러 서바이벌 생존 스릴러',
+        'https://i.namu.wiki/i/K3QgYrz4Ts2hb4b0-IPf_3hXbhImQR2ICzBIUPrF63c5OhqxOq2KEYKgZe2BbL92c_Omo4gjpNmKWtHnrSRWBg.webp',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
-VALUES ('테마3', '재밌는 테마입니다',
-        'https://www.google.co.kr/url?sa=i&url=http%3A%2F%2Fwww.code-k.co.kr%2Fsub%2Fcode_sub03.html%3FR_JIJEM%3DS1&psig=AOvVaw20fNjL28MSMMiR0Nb57Eh-&ust=1714695060162000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOiO2oLX7YUDFQAAAAAdAAAAABAE',
+VALUES ('몽키가든', '원숭지몽. 내가 원숭이 꿈을 꾸는 걸까 원숭이가 내 꿈을 꾸는 걸까',
+        'https://image.fmkorea.com/files/attach/new4/20240419/6938511254_494354581_0610c09d6dd2eb271bc1eb79d4bab922.png',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
-VALUES ('테마4', '재밌는 테마입니다',
-        'https://www.google.co.kr/url?sa=i&url=http%3A%2F%2Fwww.code-k.co.kr%2Fsub%2Fcode_sub03.html%3FR_JIJEM%3DS1&psig=AOvVaw20fNjL28MSMMiR0Nb57Eh-&ust=1714695060162000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOiO2oLX7YUDFQAAAAAdAAAAABAE',
+VALUES ('시스테마', '시스테마는 러시아의 군용 무술입니다.'
+    'https://i.ytimg.com/vi/cGRPXgEH3vc/maxresdefault.jpg',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 
 -- 예약 시간 목록 : 5개
