@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.exception.payment.PaymentAmountException;
 
 @Entity
 @Getter
@@ -35,9 +36,16 @@ public class Payment {
 
     public Payment(BigDecimal amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
         this.amount = amount;
+        validateAmount(amount);
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount.doubleValue() <= 0) {
+            throw new PaymentAmountException();
+        }
     }
 }
