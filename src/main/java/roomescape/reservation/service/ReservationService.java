@@ -173,7 +173,7 @@ public class ReservationService {
         validateDuplicatedReservation(memberReservationAddRequest);
 
         PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
-        if (paymentConfirmResponse.isPaymentNotFinished()) {
+        if (paymentConfirmResponse.isConfirmNotFinished()) {
             throw new PaymentFailException("결제가 완료되지 않았습니다.");
         }
         ReservationResponse reservationResponse

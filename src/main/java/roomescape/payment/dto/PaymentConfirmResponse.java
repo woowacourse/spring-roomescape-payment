@@ -7,7 +7,7 @@ public record PaymentConfirmResponse(
         String status
 ) {
 
-    public boolean isPaymentNotFinished() {
+    public boolean isConfirmNotFinished() {
         return !this.status.equals("DONE");
     }
 }
