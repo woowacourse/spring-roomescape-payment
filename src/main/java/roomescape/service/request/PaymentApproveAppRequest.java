@@ -2,7 +2,6 @@ package roomescape.service.request;
 
 import java.math.BigDecimal;
 import roomescape.domain.Payment;
-import roomescape.domain.Reservation;
 import roomescape.web.controller.request.MemberReservationRequest;
 
 public record PaymentApproveAppRequest(
@@ -15,7 +14,7 @@ public record PaymentApproveAppRequest(
         return new PaymentApproveAppRequest(request.paymentKey(), request.orderId(), request.amount());
     }
 
-    public Payment toPaymentWith(Reservation reservation) {
-        return new Payment(reservation, paymentKey, orderId, amount);
+    public Payment toPayment() {
+        return new Payment(null, paymentKey, orderId, amount);
     }
 }

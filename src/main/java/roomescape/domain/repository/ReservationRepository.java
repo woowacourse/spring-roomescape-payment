@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationWithPayment;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
@@ -26,10 +25,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     Optional<Reservation> findByDateAndTimeIdAndThemeId(ReservationDate date, Long timeId, Long themeId);
 
     @Query("""
-            SELECT new roomescape.domain.ReservationWithPayment(r, p)
-            FROM Reservation r
-            LEFT JOIN Payment p ON r.id = p.reservation.id
+            SELECT r FROM Reservation r
+            JOIN FETCH r.payments p
             WHERE r.member.id = :id
             """)
-    List<ReservationWithPayment> findAllByMemberIdWithPayment(Long id);
+    List<Reservation> findAllByMemberIdWithPayments(Long id);
 }

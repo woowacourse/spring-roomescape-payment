@@ -1,6 +1,7 @@
 package roomescape.web.controller.response;
 
 import java.time.LocalDate;
+import java.util.List;
 import roomescape.service.response.ReservationAppResponse;
 
 public record ReservationMineResponse(
@@ -8,7 +9,7 @@ public record ReservationMineResponse(
         ThemeResponse theme,
         LocalDate date,
         ReservationTimeResponse time,
-        PaymentResponse payment
+        List<PaymentResponse> payments
 ) {
 
     public static ReservationMineResponse from(ReservationAppResponse reservationAppResponse) {
@@ -17,7 +18,7 @@ public record ReservationMineResponse(
                 ThemeResponse.from(reservationAppResponse.themeAppResponse()),
                 reservationAppResponse.date().getDate(),
                 ReservationTimeResponse.from(reservationAppResponse.reservationTimeAppResponse()),
-                PaymentResponse.from(reservationAppResponse.paymentAppResponse())
+                PaymentResponse.from(reservationAppResponse.paymentAppResponses())
         );
     }
 }

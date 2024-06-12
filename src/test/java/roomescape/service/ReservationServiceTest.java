@@ -9,6 +9,7 @@ import static roomescape.Fixture.VALID_THEME;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ class ReservationServiceTest {
         ReservationDate date = reservationAppResponse.date();
         ReservationTimeAppResponse reservationTimeAppResponse = reservationAppResponse.reservationTimeAppResponse();
         ThemeAppResponse themeAppResponse = reservationAppResponse.themeAppResponse();
-        PaymentAppResponse paymentAppResponse = reservationAppResponse.paymentAppResponse();
+        List<PaymentAppResponse> paymentAppResponses = reservationAppResponse.paymentAppResponses();
 
         assertAll(
                 () -> assertThat(reservationAppResponse.id()).isEqualTo(1L),
@@ -79,9 +80,9 @@ class ReservationServiceTest {
                 () -> assertThat(reservationAppResponse.name()).isEqualTo(member.getName()),
                 () -> assertThat(reservationTimeAppResponse.id()).isEqualTo(reservationTime.getId()),
                 () -> assertThat(themeAppResponse.id()).isEqualTo(theme.getId()),
-                () -> assertThat(paymentAppResponse.paymentKey()).isEqualTo("paymentKey"),
-                () -> assertThat(paymentAppResponse.orderId()).isEqualTo("orderId"),
-                () -> assertThat(paymentAppResponse.amount()).isEqualTo(BigDecimal.valueOf(1000))
+                () -> assertThat(paymentAppResponses.get(0).paymentKey()).isEqualTo("paymentKey"),
+                () -> assertThat(paymentAppResponses.get(0).orderId()).isEqualTo("orderId"),
+                () -> assertThat(paymentAppResponses.get(0).amount()).isEqualTo(BigDecimal.valueOf(1000))
         );
     }
 

@@ -67,15 +67,15 @@ TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
 예약 완료 상태일 때 결제 정보를 함께 보여주기
 결제 정보 필드명은 자신의 response 에 맞게 변경하기
 */
-            const payment = item.payment;
+            const payment = item.payments;
             row.insertCell(4).textContent = '';
             if (payment === null) {
                 row.insertCell(5).textContent = '';
                 row.insertCell(6).textContent = '0';
                 return;
             }
-            row.insertCell(5).textContent = payment.paymentKey;
-            row.insertCell(6).textContent = payment.amount;
+            row.insertCell(5).textContent = payment[0].paymentKey;
+            row.insertCell(6).textContent = payment[0].amount;
         }
     });
 }

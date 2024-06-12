@@ -1,6 +1,7 @@
 package roomescape.domain;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -10,6 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -37,6 +41,9 @@ public class Reservation extends BaseEntity {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Theme theme;
+
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+    private List<Payment> payments = new ArrayList<>();
 
     protected Reservation() {
     }
@@ -110,5 +117,9 @@ public class Reservation extends BaseEntity {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public List<Payment> getPayments() {
+        return payments;
     }
 }

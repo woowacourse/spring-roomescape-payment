@@ -50,15 +50,15 @@ public class ReservationService {
     @Transactional
     public ReservationAppResponse save(ReservationSaveAppRequest reservationSaveAppRequest) {
         Reservation reservation = createReservation(reservationSaveAppRequest);
-        Reservation savedReservation = reservationRepository.save(reservation);
         PaymentApproveAppRequest paymentApproveAppRequest = reservationSaveAppRequest.paymentApproveAppRequest();
+        Reservation savedReservation = reservationRepository.save(reservation);
         if (paymentApproveAppRequest == null) {
-            return ReservationAppResponse.from(savedReservation);
+            return ReservationAppResponse.withoutPayments(savedReservation);
         }
-        Payment payment = paymentApproveAppRequest.toPaymentWith(savedReservation);
-        Payment savedPayment = paymentRepository.save(payment);
+        Payment payment = paymentApproveAppRequest.toPayment();
+        payment.setReservation(savedReservation);
         paymentClient.approve(paymentApproveAppRequest);
-        return ReservationAppResponse.of(savedReservation, savedPayment);
+        return ReservationAppResponse.withPayments(savedReservation);
     }
 
     private Reservation createReservation(ReservationSaveAppRequest reservationSaveAppRequest) {
@@ -109,7 +109,7 @@ public class ReservationService {
 
     public List<ReservationAppResponse> findAll() {
         return reservationRepository.findAll().stream()
-                .map(ReservationAppResponse::from)
+                .map(ReservationAppResponse::withoutPayments)
                 .toList();
     }
 
@@ -117,13 +117,13 @@ public class ReservationService {
         Specification<Reservation> reservationSpecification = new ReservationSpecification().generate(request);
 
         return reservationRepository.findAll(reservationSpecification).stream()
-                .map(ReservationAppResponse::from)
+                .map(ReservationAppResponse::withoutPayments)
                 .toList();
     }
 
     public List<ReservationAppResponse> findByMemberId(Long id) {
-        return reservationRepository.findAllByMemberIdWithPayment(id).stream()
-                .map(ReservationAppResponse::from)
+        return reservationRepository.findAllByMemberIdWithPayments(id).stream()
+                .map(ReservationAppResponse::withPayments)
                 .toList();
     }
 }

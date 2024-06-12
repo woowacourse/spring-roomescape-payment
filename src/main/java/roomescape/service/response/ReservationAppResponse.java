@@ -1,11 +1,11 @@
 package roomescape.service.response;
 
+import java.util.List;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationTime;
-import roomescape.domain.ReservationWithPayment;
 import roomescape.domain.Theme;
 
 public record ReservationAppResponse(
@@ -14,10 +14,10 @@ public record ReservationAppResponse(
         ReservationDate date,
         ReservationTimeAppResponse reservationTimeAppResponse,
         ThemeAppResponse themeAppResponse,
-        PaymentAppResponse paymentAppResponse
+        List<PaymentAppResponse> paymentAppResponses
 ) {
 
-    public static ReservationAppResponse from(Reservation reservation) {
+    public static ReservationAppResponse withoutPayments(Reservation reservation) {
         Member member = reservation.getMember();
         ReservationTime time = reservation.getTime();
         Theme theme = reservation.getTheme();
@@ -31,26 +31,18 @@ public record ReservationAppResponse(
         );
     }
 
-    public static ReservationAppResponse of(Reservation reservation, Payment payment) {
+    public static ReservationAppResponse withPayments(Reservation reservation) {
         Member member = reservation.getMember();
         ReservationTime time = reservation.getTime();
         Theme theme = reservation.getTheme();
+        List<Payment> payments = reservation.getPayments();
         return new ReservationAppResponse(
                 reservation.getId(),
                 member.getName(),
                 reservation.getDate(),
                 ReservationTimeAppResponse.from(time),
                 ThemeAppResponse.from(theme),
-                PaymentAppResponse.from(payment)
+                PaymentAppResponse.from(payments)
         );
-    }
-
-    public static ReservationAppResponse from(ReservationWithPayment reservationWithPayment) {
-        Reservation reservation = reservationWithPayment.reservation();
-        Payment payment = reservationWithPayment.payment();
-        if (payment == null) {
-            return from(reservation);
-        }
-        return of(reservation, payment);
     }
 }

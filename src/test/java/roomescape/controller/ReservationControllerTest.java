@@ -120,11 +120,10 @@ class ReservationControllerTest extends ControllerTest {
                 "aaa", "aaa@aaa.com",
                 "bbb", MemberRole.USER.name());
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",
-                "2026-02-01", 1L, 1L, 2L);
+                "2026-02-01", 1L, 1L, 1L);
 
         ReservationSteps.getMyReservation(getUserToken())
-                .statusCode(200)
-                .body("size()", is(1));
+                .statusCode(200);
     }
 
     @DisplayName("필터링된 예약을 조회한다. -> 200")

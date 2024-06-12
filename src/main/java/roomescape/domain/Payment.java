@@ -38,7 +38,6 @@ public class Payment extends BaseEntity {
     }
 
     public Payment(Long id, Reservation reservation, String paymentKey, String orderId, BigDecimal amount) {
-        validateReservation(reservation);
         validatePaymentKey(paymentKey);
         validateOrderId(orderId);
         validateAmount(amount);
@@ -47,12 +46,6 @@ public class Payment extends BaseEntity {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-    }
-
-    private void validateReservation(Reservation reservation) {
-        if (reservation == null) {
-            throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 예약은 비어있을 수 없습니다.");
-        }
     }
 
     private void validatePaymentKey(String paymentKey) {
@@ -71,6 +64,11 @@ public class Payment extends BaseEntity {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RoomescapeException(RoomescapeErrorCode.BAD_REQUEST, "결제 금액은 0원 이하일 수 없습니다.");
         }
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+        reservation.getPayments().add(this);
     }
 
     public Long getId() {
