@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class PaymentController {
 
     @PostMapping
     @Operation(summary = "예약 결제", description = "예약을 결제합니다.")
+    @ApiResponse(responseCode = "201", description = "결제 성공")
     public ResponseEntity<PaymentResponse> payReservation(@RequestBody PaymentRequest paymentRequest) {
         PaymentResponse response = paymentService.payReservation(paymentRequest);
 

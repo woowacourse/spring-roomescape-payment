@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class ReservationTimeController {
 
     @PostMapping
     @Operation(summary = "예약 시간 등록 API", description = "예약 시간을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "예약 시간 등록 성공")
     public ResponseEntity<ReservationTimeResponse> save(@RequestBody ReservationTimeRequest reservationTimeRequest) {
         ReservationTimeResponse saved = reservationTimeService.save(reservationTimeRequest);
         return ResponseEntity.created(URI.create("/times/" + saved.id()))
@@ -46,18 +48,21 @@ public class ReservationTimeController {
 
     @GetMapping
     @Operation(summary = "예약 시간 목록 조회 API", description = "모든 예약 시간 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "예약 시간 목록 조회 성공")
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeService.findAll();
     }
 
     @GetMapping("/book-able")
     @Operation(summary = "예약 가능 시간 목록 조회 API", description = "예약 가능한 시간 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "예약 가능 시간 목록 조회 성공")
     public List<AvailableTimeResponse> findByThemeAndDate(@RequestParam LocalDate date, @RequestParam long themeId) {
         return availableTimeService.findByThemeAndDate(date, themeId);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "예약 시간 삭제 API", description = "예약 시간을 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "예약 시간 삭제 성공")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         reservationTimeService.delete(id);
         return ResponseEntity.noContent().build();

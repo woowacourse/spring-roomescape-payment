@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -29,6 +30,7 @@ public class AdminController {
 
     @PostMapping("/reservations")
     @Operation(summary = "예약 등록 API", description = "예약을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "예약 등록 성공")
     public ResponseEntity<ReservationResponse> saveReservation(@RequestBody ReservationRequest reservationRequest) {
         ReservationResponse saved = reservationService.save(reservationRequest);
 
@@ -38,12 +40,14 @@ public class AdminController {
 
     @GetMapping("/reservations")
     @Operation(summary = "예약 목록 조회 API", description = "모든 예약 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "예약 목록 조회 성공")
     public List<ReservationResponse> search(@ModelAttribute ReservationSearchCondition condition) {
         return reservationService.findByMemberAndThemeBetweenDates(condition);
     }
 
     @GetMapping("/reservations/waiting")
     @Operation(summary = "대기 중인 예약 목록 조회 API", description = "대기 중인 예약 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "대기 중인 예약 목록 조회 성공")
     public List<ReservationResponse> findAllPendingReservations() {
         return reservationService.findByStatusPending();
     }

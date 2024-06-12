@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ReservationController {
 
     @PostMapping
     @Operation(summary = "예약 등록 API", description = "예약을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "예약 등록 성공")
     public ResponseEntity<ReservationResponse> saveReservation(
             @Auth long memberId,
             @RequestBody ReservationRequest reservationRequest
@@ -48,18 +50,21 @@ public class ReservationController {
 
     @GetMapping
     @Operation(summary = "예약 목록 조회 API", description = "모든 예약 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "예약 목록 조회 성공")
     public List<ReservationResponse> findAllReservations() {
         return reservationService.findAll();
     }
 
     @GetMapping("/mine")
     @Operation(summary = "내 예약 목록 조회 API", description = "내 예약 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "내 예약 목록 조회 성공")
     public List<MyReservationResponse> findLoginMemberReservations(@Auth long memberId) {
         return reservationService.findByMemberId(memberId);
     }
 
     @DeleteMapping("/{reservationId}")
     @Operation(summary = "예약 취소 API", description = "예약을 취소합니다.")
+    @ApiResponse(responseCode = "204", description = "예약 취소 성공")
     public ResponseEntity<Void> delete(@PathVariable long reservationId, @Auth long memberId) {
         reservationService.delete(reservationId, memberId);
         return ResponseEntity.noContent().build();
