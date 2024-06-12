@@ -29,7 +29,7 @@ import roomescape.member.domain.MemberName;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(RestDocumentationExtension.class)
-public class IntegrationTest {
+public abstract class IntegrationTest {
 
     @LocalServerPort
     private int port;

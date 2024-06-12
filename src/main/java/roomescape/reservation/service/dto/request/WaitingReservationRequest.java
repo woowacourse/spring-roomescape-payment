@@ -25,6 +25,6 @@ public record WaitingReservationRequest(
     }
 
     public Reservation toWaitingReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.WAIT, null, null);
+        return new Reservation(member, date, theme, reservationTime, Status.WAIT);
     }
 }

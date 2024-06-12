@@ -33,9 +33,7 @@ class ReservationTest {
                         LocalDate.now().minusDays(1),
                         theme,
                         reservationTime,
-                        Status.SUCCESS,
-                        "paymentKey",
-                        1000L
+                        Status.SUCCESS
                 )
         ).isInstanceOf(IllegalArgumentException.class);
     }
@@ -48,9 +46,7 @@ class ReservationTest {
                 TOMORROW,
                 HORROR_THEME,
                 RESERVATION_TIME_10_00,
-                Status.WAIT,
-                "paymentKey",
-                1000L
+                Status.WAIT
         );
 
         waitingReservation.updatePaymentPending();
@@ -67,9 +63,7 @@ class ReservationTest {
                 TOMORROW,
                 HORROR_THEME,
                 RESERVATION_TIME_10_00,
-                Status.SUCCESS,
-                "paymentKey",
-                1000L
+                Status.SUCCESS
         );
 
         assertThatThrownBy(reservation::updatePaymentPending)
@@ -84,9 +78,7 @@ class ReservationTest {
                 TOMORROW,
                 HORROR_THEME,
                 RESERVATION_TIME_10_00,
-                Status.PAYMENT_PENDING,
-                "paymentKey",
-                1000L
+                Status.PAYMENT_PENDING
         );
 
         assertThatThrownBy(reservation::updatePaymentPending)

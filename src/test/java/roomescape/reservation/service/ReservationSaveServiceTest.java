@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.common.config.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.client.PaymentService;
+import roomescape.reservation.client.PaymentConfirmClient;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -45,7 +45,7 @@ class ReservationSaveServiceTest {
     private ReservationService reservationService;
 
     @MockBean
-    private PaymentService paymentService;
+    private PaymentConfirmClient paymentConfirmClient;
 
     @AfterEach
     void init() {
@@ -62,8 +62,7 @@ class ReservationSaveServiceTest {
         ReservationPaymentRequest saveRequest = new ReservationPaymentRequest(
                 jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
         );
-
-        doNothing().when(paymentService).confirmPayment(any());
+        doNothing().when(paymentConfirmClient).confirmPayment(any());
         reservationService.save(saveRequest);
 
         assertThatThrownBy(() -> reservationService.save(saveRequest))

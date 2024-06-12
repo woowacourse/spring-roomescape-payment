@@ -44,17 +44,12 @@ public class Reservation {
     @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
-    private String paymentKey;
-
-    private Long amount;
-
     protected Reservation() {
     }
 
     public Reservation(
-            Long id, Member member, LocalDate date,
-            Theme theme, ReservationTime reservationTime, Status status,
-            String paymentKey, Long amount
+            Long id, Member member, LocalDate date, Theme theme,
+            ReservationTime reservationTime, Status status
     ) {
         this.id = id;
         this.member = member;
@@ -63,8 +58,6 @@ public class Reservation {
         this.theme = theme;
         this.reservationTime = reservationTime;
         this.status = status;
-        this.paymentKey = paymentKey;
-        this.amount = amount;
     }
 
     private void validateLastDate(LocalDate date) {
@@ -75,10 +68,9 @@ public class Reservation {
 
     public Reservation(
             Member member, LocalDate date, Theme theme,
-            ReservationTime reservationTime, Status status,
-            String paymentKey, Long amount
+            ReservationTime reservationTime, Status status
     ) {
-        this(null, member, date, theme, reservationTime, status, paymentKey, amount);
+        this(null, member, date, theme, reservationTime, status);
     }
 
     public void updatePaymentPending() {
@@ -133,13 +125,5 @@ public class Reservation {
 
     public String getStatusDisplayName() {
         return status.getDisplayName();
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public long getAmount() {
-        return amount;
     }
 }

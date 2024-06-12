@@ -40,6 +40,6 @@ public record ReservationSaveRequest(
     }
 
     public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS, paymentKey, amount);
+        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS);
     }
 }

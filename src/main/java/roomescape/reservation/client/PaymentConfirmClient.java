@@ -15,7 +15,7 @@ import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
@@ -25,15 +25,15 @@ import roomescape.reservation.client.errorcode.PaymentConfirmErrorCode;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.service.dto.response.PaymentConfirmResponse;
 
-@Service
-public class PaymentService {
-    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+@Component
+public class PaymentConfirmClient {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentConfirmClient.class);
 
     private final RestClient restClient;
     private final String encodedSecretKey;
     private final ObjectMapper objectMapper;
 
-    public PaymentService(
+    public PaymentConfirmClient(
             @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
             ObjectMapper objectMapper
@@ -44,6 +44,19 @@ public class PaymentService {
                 .build();
         this.encodedSecretKey = encodeSecretKey(secretKey);
         this.objectMapper = objectMapper;
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(10))
+                .withReadTimeout(Duration.ofSeconds(30));
+        return ClientHttpRequestFactories.get(settings);
+    }
+
+    private static String encodeSecretKey(String secretKey) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encodedBytes);
     }
 
     public void confirmPayment(PaymentConfirmRequest paymentRequest) {
@@ -77,18 +90,5 @@ public class PaymentService {
         customErrorCode.ifPresent(code -> {
             throw new PaymentConfirmCustomException(customErrorCode.get(), confirmResponse.message());
         });
-    }
-
-    private ClientHttpRequestFactory getClientHttpRequestFactory() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(10))
-                .withReadTimeout(Duration.ofSeconds(30));
-        return ClientHttpRequestFactories.get(settings);
-    }
-
-    private static String encodeSecretKey(String secretKey) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
     }
 }

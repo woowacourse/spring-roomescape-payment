@@ -12,6 +12,7 @@ import static roomescape.reservation.domain.Status.SUCCESS;
 import static roomescape.reservation.domain.Status.WAIT;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,16 +94,15 @@ class ReservationServiceTest {
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
         Reservation success = reservationRepository.save(
-                new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS, "paymentKey", 1000L));
-        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT, "paymentKey", 1000L));
-        Reservation secondWait = reservationRepository.save(
-                new Reservation(jojo, TODAY, theme, reservationTime, WAIT, "paymentKey", 1000L));
+                new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS));
+        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT));
+        Reservation secondWait = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, WAIT));
 
         MemberReservationResponse expectedSuccess = MemberReservationResponse.toResponse(
-                new ReservationWithRank(success, 0)
+                new ReservationWithRank(success, 0), Optional.empty()
         );
         MemberReservationResponse expectedWait = MemberReservationResponse.toResponse(
-                new ReservationWithRank(secondWait, 2)
+                new ReservationWithRank(secondWait, 2), Optional.empty()
         );
 
         // when
