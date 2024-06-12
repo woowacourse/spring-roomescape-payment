@@ -10,7 +10,9 @@ import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findAllByDateAndTheme(final LocalDate date, final Theme theme);
+    
+    List<Reservation> findAllByDateAndThemeAndStatus(final LocalDate date, final Theme theme,
+                                                     final ReservationStatus status);
 
     List<Reservation> findAllByMemberAndThemeAndDateBetween(final Member member,
                                                             final Theme theme,
