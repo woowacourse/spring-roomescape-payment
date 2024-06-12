@@ -101,14 +101,7 @@ public class ReservationService {
         ReservationSlot reservationSlot = findReservationSlot(reservationRequest);
         Member member = findMember(memberId);
         ReservationStatus reservationStatus = findReservationStatus(reservationSlot);
-        Payment adminPayment = new Payment("adminPaymentKey",
-                "adminOrderId",
-                "adminOrderName",
-                "adminMethod",
-                1000L,
-                "adminStatus",
-                "adminRequestedAt",
-                "adminApprovedAt");
+        Payment adminPayment = Payment.admin();
         paymentRepository.save(adminPayment);
 
         validateReservation(reservationSlot, member);

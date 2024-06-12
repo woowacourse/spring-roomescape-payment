@@ -51,6 +51,17 @@ public class Payment {
         this(null, paymentKey, orderId, orderName, method, totalAmount, status, requestedAt, approvedAt);
     }
 
+    public static Payment admin() {
+        return new Payment("adminPaymentKey",
+                "adminOrderId",
+                "adminOrderName",
+                "adminMethod",
+                1000L,
+                "adminStatus",
+                "adminRequestedAt",
+                "adminApprovedAt");
+    }
+
     public Long getId() {
         return id;
     }

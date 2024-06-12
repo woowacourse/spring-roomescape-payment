@@ -33,6 +33,7 @@ public class Reservation {
     @ManyToOne
     private ReservationSlot reservationSlot;
 
+    @NotNull
     @OneToOne
     private Payment payment;
 
