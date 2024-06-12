@@ -118,4 +118,8 @@ public class Payment {
                 ", approvedAt='" + approvedAt + '\'' +
                 '}';
     }
+
+    public boolean hasSameAmount(Long amount) {
+        return Objects.equals(totalAmount, amount);
+    }
 }

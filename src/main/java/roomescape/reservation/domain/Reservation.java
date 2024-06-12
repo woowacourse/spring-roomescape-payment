@@ -57,7 +57,7 @@ public class Reservation {
     }
 
     private void validate(Member member, Payment payment) {
-        if (member.getRole() == Role.USER && !Objects.equals(payment.getTotalAmount(), AMOUNT)) {
+        if (member.isUser() && payment.hasSameAmount(AMOUNT)) {
             throw new BadRequestException("결제 금액이 잘못되었습니다.");
         }
     }
