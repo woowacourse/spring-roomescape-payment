@@ -14,7 +14,7 @@ import roomescape.service.httpclient.TossPaymentClient;
 public class PaymentService {
 
     private final static long RESERVATION_PRICE = 1999999;
-
+    private final static String ADMIN_PAYMENT = "ADMIN_PAYMENT";
     private final TossPaymentClient tossPaymentClient;
     private final PaymentRepository paymentRepository;
 
@@ -29,9 +29,14 @@ public class PaymentService {
         paymentRepository.save(new Payment(paymentResponse, reservation));
     }
 
+    public void addAdminPayment(final Reservation reservation) {
+        paymentRepository.save(new Payment(ADMIN_PAYMENT, 0L, reservation));
+    }
+
     private void validatePayments(long amount) {
         if (RESERVATION_PRICE != amount) {
             throw new PaymentException("클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [%d]".formatted(amount));
         }
     }
+
 }

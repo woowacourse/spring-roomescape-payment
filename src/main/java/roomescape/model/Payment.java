@@ -34,6 +34,10 @@ public class Payment {
         this(null, paymentResponse.getPaymentKey(), paymentResponse.getTotalAmount(), reservation);
     }
 
+    public Payment(final String paymentKey, final Long amount, final Reservation reservation) {
+        this(null, paymentKey, amount, reservation);
+    }
+
     public Long getId() {
         return id;
     }
