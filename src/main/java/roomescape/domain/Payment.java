@@ -21,8 +21,14 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Long id, final String paymentKey, final String order_id, final Long amount) {
+    public Payment(Long id, String paymentKey, String order_id, Long amount) {
         this.id = id;
+        this.paymentKey = paymentKey;
+        this.order_id = order_id;
+        this.amount = amount;
+    }
+
+    public Payment(String paymentKey, String order_id, Long amount) {
         this.paymentKey = paymentKey;
         this.order_id = order_id;
         this.amount = amount;

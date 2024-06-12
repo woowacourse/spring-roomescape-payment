@@ -16,7 +16,7 @@ public record WaitingRequest(Long memberId, LocalDate date, Long timeId, Long th
     }
 
     public Waiting toEntity(Member member, TimeSlot timeSlot, Theme theme) {
-        return new Waiting(null, member, date, timeSlot, theme, ReservationStatus.WAITING);
+        return new Waiting(member, date, timeSlot, theme, ReservationStatus.WAITING);
     }
 
     private void isValid(Long memberId, LocalDate date, Long timeId, Long themeId) {

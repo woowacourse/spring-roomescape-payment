@@ -8,7 +8,7 @@ public record PaymentInfo(Long amount, String orderId, String paymentKey) {
     }
 
     public Payment toEntity() {
-        return new Payment(null, paymentKey, orderId, amount);
+        return new Payment(paymentKey, orderId, amount);
     }
 
     private void isValid(Long amount, String orderId, String paymentKey) {

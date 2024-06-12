@@ -19,7 +19,7 @@ public record ReservationRequest(Long memberId, LocalDate date, Long timeId, Lon
     }
 
     public Reservation toEntity(Member member, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, null, ReservationStatus.BOOKING);
+        return new Reservation(member, date, time, theme, ReservationStatus.BOOKING);
     }
 
     private void isValid(Long memberId, LocalDate date, Long timeId, Long themeId) {

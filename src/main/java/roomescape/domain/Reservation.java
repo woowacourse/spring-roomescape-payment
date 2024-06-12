@@ -46,6 +46,15 @@ public class Reservation {
         this.status = status;
     }
 
+    public Reservation(Member member, LocalDate date, TimeSlot time, Theme theme, ReservationStatus status) {
+        this.member = member;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+        this.payment = null;
+        this.status = status;
+    }
+
     public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme, Payment payment) {
         return new Reservation(null, member, date, time, theme, payment, ReservationStatus.BOOKING);
     }

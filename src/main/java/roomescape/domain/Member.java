@@ -22,7 +22,6 @@ public class Member {
     private Role role;
 
     protected Member() {
-
     }
 
     public Member(Long id, String name, String email, String password, Role role) {

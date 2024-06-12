@@ -41,6 +41,14 @@ public class Waiting {
         this.status = status;
     }
 
+    public Waiting(Member member, LocalDate date, TimeSlot time, Theme theme, ReservationStatus status) {
+        this.member = member;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }

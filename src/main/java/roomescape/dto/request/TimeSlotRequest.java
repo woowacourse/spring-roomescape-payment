@@ -11,7 +11,7 @@ public record TimeSlotRequest(@JsonFormat(pattern = "HH:mm") LocalTime startAt) 
     }
 
     public TimeSlot toEntity() {
-        return new TimeSlot(null, startAt);
+        return new TimeSlot(startAt);
     }
 
     private void isValid(LocalTime startAt) {
