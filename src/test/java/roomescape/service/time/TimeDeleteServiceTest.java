@@ -21,7 +21,7 @@ class TimeDeleteServiceTest extends ServiceBaseTest {
 
     @Sql("/reset-data.sql")
     @Test
-    void 테마_삭제() {
+    void 시간_삭제() {
         // given
         timeRepository.save(new ReservationTime(LocalTime.now()));
         timeRepository.save(new ReservationTime(LocalTime.now().plusHours(1)));
@@ -29,7 +29,7 @@ class TimeDeleteServiceTest extends ServiceBaseTest {
         // when
         timeDeleteService.deleteTime(1L);
 
-        // when
+        // then
         List<ReservationTime> allTimes = timeRepository.findAll();
         assertThat(allTimes).extracting(ReservationTime::getId)
                 .isNotEmpty()

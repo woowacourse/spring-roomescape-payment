@@ -28,7 +28,7 @@ class ThemeDeleteServiceTest extends ServiceBaseTest {
         // when
         themeDeleteService.deleteTheme(1L);
 
-        // when
+        // then
         List<Theme> allThemes = themeRepository.findAll();
         assertThat(allThemes).extracting(Theme::getId)
                 .isNotEmpty()
