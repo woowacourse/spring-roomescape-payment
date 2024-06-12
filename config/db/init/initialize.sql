@@ -1,4 +1,4 @@
-CREATE DATABASE roomescape DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE roomescape DEFAULT CHARACTER SET utf8m4 COLLATE utf8_general_ci;
 USE roomescape;
 
 CREATE TABLE member (
@@ -30,6 +30,7 @@ CREATE TABLE reservation (
                              member_id BIGINT,
                              theme_id BIGINT,
                              time_id BIGINT,
+                             deleted BOOLEAN default false,
                              PRIMARY KEY (id),
                              UNIQUE (date, time_id, theme_id),
                              FOREIGN KEY (member_id) REFERENCES member(id),
@@ -52,6 +53,7 @@ CREATE TABLE waiting (
                          member_id BIGINT,
                          theme_id BIGINT,
                          time_id BIGINT,
+                         deleted BOOLEAN default false,
                          PRIMARY KEY (id),
                          FOREIGN KEY (member_id) REFERENCES member(id),
                          FOREIGN KEY (theme_id) REFERENCES theme(id),
