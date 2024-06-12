@@ -18,6 +18,7 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentMatcher;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.PaymentCancelRequest;
+import roomescape.payment.dto.PaymentCancelResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
@@ -249,13 +250,20 @@ public class ReservationService {
         Reservation reservationForDelete = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
         if (reservationForDelete.isReserved()) {
-            Payment paymentForCancel = paymentRepository.findByReservationId(id)
-                    .orElseThrow(() -> new NoSuchRecordException("해당하는 결제 정보가 존재하지 않습니다 ID: " + id));
-            PaymentCancelRequest request = new PaymentCancelRequest(paymentForCancel.getPaymentKey());
-            tossPaymentClient.cancelPayments(request, DEFAULT_CANCEL_REASON);
-            updateWaitingReservationStatus(reservationForDelete);
+            cancelPaymentByReservation(id, reservationForDelete);
         }
         reservationRepository.deleteById(id);
+    }
+
+    private void cancelPaymentByReservation(Long id, Reservation reservationForDelete) {
+        Payment paymentForCancel = paymentRepository.findByReservationId(id)
+                .orElseThrow(() -> new NoSuchRecordException("해당하는 결제 정보가 존재하지 않습니다 ID: " + id));
+        PaymentCancelRequest request = new PaymentCancelRequest(paymentForCancel.getPaymentKey());
+        PaymentCancelResponse response = tossPaymentClient.cancelPayments(request, DEFAULT_CANCEL_REASON);
+        if (response.isCancelNotFinished()) {
+            throw new PaymentFailException("결제 취소가 완료되지 않았습니다.");
+        }
+        updateWaitingReservationStatus(reservationForDelete);
     }
 
     private void updateWaitingReservationStatus(Reservation reservationForDelete) {
