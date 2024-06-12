@@ -192,7 +192,7 @@ public class ReservationService {
     private void updateWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
         reservation.cancel();
 
-        Reservation newMemberReservation = reservation.changeMember(waiting.getMember());
+        Reservation newMemberReservation = Reservation.fromDifferentMember(reservation, waiting.getMember());
         reservationRepository.save(newMemberReservation);
 
         reservationWaitingRepository.delete(waiting);

@@ -31,6 +31,10 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+    public static Reservation fromDifferentMember(Reservation reservation, Member member) {
+        return new Reservation(reservation.info, member, ReservationStatus.PAYMENT_WAITING);
+    }
+
     protected Reservation() {
     }
 
@@ -67,10 +71,6 @@ public class Reservation {
 
     public void changeStatusToBooked() {
         this.status = ReservationStatus.BOOKED;
-    }
-
-    public Reservation changeMember(Member member) {
-        return new Reservation(this.info, member, ReservationStatus.PAYMENT_WAITING);
     }
 
     public boolean isPast(LocalDateTime now) {
