@@ -19,6 +19,8 @@ public record MyReservationWaitingResponse(
 ) {
     private static final String RESERVATION_STATUS = "예약";
     private static final String WAITING_STATUS = "%d번째 예약대기";
+    private static final String EMPTY_PARAMETER_KEY = null;
+    private static final int NOT_PAID = 0;
 
     public static MyReservationWaitingResponse from(MyReservationResponse reservationResponse,
                                                     PaymentResponse paymentResponse) {
@@ -38,8 +40,8 @@ public record MyReservationWaitingResponse(
                 reservationResponse.themeName(),
                 reservationResponse.date(),
                 reservationResponse.startAt(),
-                null,
-                0,
+                EMPTY_PARAMETER_KEY,
+                NOT_PAID,
                 reservationResponse.reservationStatus().getName());
     }
 
@@ -49,8 +51,8 @@ public record MyReservationWaitingResponse(
                 waitingWithOrder.getWaiting().getReservation().getTheme().getName(),
                 waitingWithOrder.getWaiting().getReservation().getDate(),
                 waitingWithOrder.getWaiting().getReservation().getTime().getStartAt(),
-                null,
-                0,
+                EMPTY_PARAMETER_KEY,
+                NOT_PAID,
                 java.lang.String.format(WAITING_STATUS, waitingWithOrder.getOrder()));
     }
 }
