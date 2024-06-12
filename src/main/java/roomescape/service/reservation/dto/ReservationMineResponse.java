@@ -35,6 +35,18 @@ public class ReservationMineResponse {
         this.amount = amount;
     }
 
+    public static ReservationMineResponse fromReservationWaitingInfo(ReservationWaitingWithRank waitingWithRank) {
+        return new ReservationMineResponse(
+                waitingWithRank.getWaiting().getReservation().getId(),
+                waitingWithRank.getWaiting().getReservation().getTheme().getName().getName(),
+                waitingWithRank.getWaiting().getReservation().getDate(),
+                waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
+                String.format(WAITING_MESSAGE, waitingWithRank.getRank()),
+                "",
+                waitingWithRank.getWaiting().getReservation().getTheme().getPrice()
+        );
+    }
+
     public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
         return new ReservationMineResponse(reservation.getId(),
                 reservation.getTheme().getName().getName(),
@@ -71,17 +83,6 @@ public class ReservationMineResponse {
             }
         }
         return message;
-    }
-
-    public ReservationMineResponse(ReservationWaitingWithRank waitingWithRank) {
-        this(waitingWithRank.getWaiting().getReservation().getId(),
-                waitingWithRank.getWaiting().getReservation().getTheme().getName().getName(),
-                waitingWithRank.getWaiting().getReservation().getDate(),
-                waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
-                String.format(WAITING_MESSAGE, waitingWithRank.getRank()),
-                "",
-                waitingWithRank.getWaiting().getReservation().getTheme().getPrice()
-        );
     }
 
     public LocalDateTime retrieveDateTime() {

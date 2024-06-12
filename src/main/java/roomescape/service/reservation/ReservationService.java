@@ -98,7 +98,7 @@ public class ReservationService {
                                     .findAny();
                             return ReservationMineResponse.ofReservationPayment(reservation, payment);
                         }),
-                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
+                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::fromReservationWaitingInfo)
                 )
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();
