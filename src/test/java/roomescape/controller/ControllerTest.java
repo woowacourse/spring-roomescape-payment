@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.MockMvcOperationPreprocessorsConfigurer;
@@ -78,15 +79,19 @@ abstract class ControllerTest {
 
     @BeforeEach
     void setUpRestDocs(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        UriModifyingOperationPreprocessor uriModifier = modifyUris().scheme("http").host("woowa.hoony.me").port(8080);
+        UriModifyingOperationPreprocessor uriModifier = modifyUris()
+                .scheme("http")
+                .host("woowa.hoony.me")
+                .port(8080);
         HeadersModifyingOperationPreprocessor requestHeaderModifier = modifyHeaders()
-                .remove("Content-Length");
+                .remove(HttpHeaders.CONTENT_LENGTH);
         HeadersModifyingOperationPreprocessor responseHeaderModifier = modifyHeaders()
-                .remove("Date")
+                .remove(HttpHeaders.DATE)
                 .remove("Keep-Alive")
-                .remove("Connection")
-                .remove("Transfer-Encoding")
-                .remove("Content-Length")
+                .remove(HttpHeaders.CONNECTION)
+                .remove(HttpHeaders.TRANSFER_ENCODING)
+                .remove(HttpHeaders.CONTENT_LENGTH)
+                .remove(HttpHeaders.VARY)
                 .set(CONTENT_TYPE, APPLICATION_JSON_VALUE);
 
         MockMvcOperationPreprocessorsConfigurer configurer = documentationConfiguration(provider)
