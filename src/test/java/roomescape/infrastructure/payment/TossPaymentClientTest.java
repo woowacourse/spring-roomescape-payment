@@ -5,6 +5,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +45,7 @@ class TossPaymentClientTest {
     @DisplayName("응답의 에러 코드가 정의해놓은 에러 코드에 포함되는 경우 에러 메시지와 상태코드를 매핑해서 반환한다.")
     @Test
     void throw_exception_and_message_when_error_code_is_defined() {
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "orderId", "paymentKey");
+        PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
         String errorResponse = """
                 {
                   "code": "FAILED_INTERNAL_SYSTEM_PROCESSING",
@@ -65,7 +66,7 @@ class TossPaymentClientTest {
     @DisplayName("응답의 에러 코드가 정의한 에러 코드에 포함되지 않을 경우 적절한 에러 메시지와 상태코드 500을 반환한다.")
     @Test
     void throw_exception_with_500_status_code_and_default_message() {
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "orderId", "paymentKey");
+        PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
         String errorResponse = """
                 {
                   "code": "UNAUTHORIZED_KEY",

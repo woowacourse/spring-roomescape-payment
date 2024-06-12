@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class Payment {
     private Long id;
 
     @Column(name = "amount", nullable = false)
-    private int amount;
+    private BigDecimal amount;
 
     @Column(name = "payment_key", nullable = false)
     private String paymentKey;
@@ -32,7 +33,7 @@ public class Payment {
     @Column(name = "approved_at", nullable = false)
     private String approvedAt;
 
-    public Payment(int amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
+    public Payment(BigDecimal amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
         this.amount = amount;
         this.paymentKey = paymentKey;
         this.orderId = orderId;

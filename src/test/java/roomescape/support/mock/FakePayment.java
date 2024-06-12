@@ -1,5 +1,6 @@
 package roomescape.support.mock;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.payment.PaymentFailException;
 
 public class FakePayment implements PaymentClient {
-    public static final int AMOUNT = 1000;
+    public static final BigDecimal AMOUNT = BigDecimal.valueOf(1000);
     public static final String ORDER_ID = "orderId";
     public static final String PAYMENT_KEY = "paymentKey";
 
@@ -23,7 +24,7 @@ public class FakePayment implements PaymentClient {
     public PaymentResponse confirm(PaymentRequest paymentRequest) {
         if (Objects.equals(paymentRequest.paymentKey(), PAYMENT_KEY)
                 && Objects.equals(paymentRequest.orderId(), ORDER_ID)
-                && paymentRequest.amount() == AMOUNT) {
+                && Objects.equals(paymentRequest.amount(), AMOUNT)) {
 
             LocalDateTime requestedAt = LocalDateTime.now();
             LocalDateTime approvedAt = requestedAt.plusSeconds(1);

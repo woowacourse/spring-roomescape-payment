@@ -22,6 +22,7 @@ import static roomescape.web.ApiDocumentUtils.getDocumentResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -98,7 +99,7 @@ class MemberReservationControllerSliceTest {
     @Test
     void makeReservation() throws Exception {
         UserReservationRequest request = new UserReservationRequest(
-                tomorrow, 1L, 1L, 1000, "orderId", "paymentKey"
+                tomorrow, 1L, 1L, BigDecimal.valueOf(1000), "orderId", "paymentKey"
         );
         ReservationResponse response = new ReservationResponse(1L, tomorrow, time1, theme1, member1, Status.RESERVED);
 
@@ -149,7 +150,7 @@ class MemberReservationControllerSliceTest {
     @Test
     void paymentForPending() throws Exception {
         ReservationPaymentRequest request = new ReservationPaymentRequest(
-                1L, 1000, "orderId", "paymentKey");
+                1L, BigDecimal.valueOf(1000), "orderId", "paymentKey");
 
         ReservationResponse response = new ReservationResponse(1L, tomorrow, time1, theme1, member1, Status.RESERVED);
 
@@ -196,10 +197,10 @@ class MemberReservationControllerSliceTest {
         List<UserReservationResponse> response = List.of(
                 new UserReservationResponse(
                         1L, theme1.name(), tomorrow, time1.startAt(), "RESERVED",
-                        "paymentKey", 1000, 1),
+                        "paymentKey", BigDecimal.valueOf(1000), 1),
                 new UserReservationResponse(
                         5L, theme1.name(), tomorrow, time2.startAt(), "WAITING",
-                        "paymentKEy", 1000, 3)
+                        "paymentKEy", BigDecimal.valueOf(1000), 3)
         );
 
         given(reservationService.findAllWithRank(anyLong())).willReturn(response);

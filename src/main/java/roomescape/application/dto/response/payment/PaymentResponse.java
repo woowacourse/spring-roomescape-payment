@@ -1,9 +1,10 @@
 package roomescape.application.dto.response.payment;
 
+import java.math.BigDecimal;
 import roomescape.domain.payment.Payment;
 
 public record PaymentResponse(
-        int totalAmount,
+        BigDecimal totalAmount,
         String paymentKey,
         String orderId,
         String requestedAt,
