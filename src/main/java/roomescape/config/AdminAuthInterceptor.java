@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.controller.AdminOnly;
-import roomescape.dto.LoginMemberRequest;
+import roomescape.dto.request.LoginMemberRequest;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.LoginService;

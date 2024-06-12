@@ -9,8 +9,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.CancelReason;
 import roomescape.domain.Payment;
-import roomescape.dto.PaymentErrorResponse;
-import roomescape.dto.TossPaymentRequest;
+import roomescape.dto.response.PaymentErrorResponse;
+import roomescape.dto.request.TossPaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.service.PaymentClient;
 

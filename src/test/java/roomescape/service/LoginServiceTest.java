@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.LoginRequest;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.request.LoginRequest;
 import roomescape.exception.RoomescapeException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)

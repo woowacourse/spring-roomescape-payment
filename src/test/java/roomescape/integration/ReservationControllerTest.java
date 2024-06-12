@@ -16,7 +16,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.config.TestPaymentConfig;
 import roomescape.domain.*;
-import roomescape.dto.ReservationResponse;
+import roomescape.dto.response.ReservationResponse;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;

@@ -1,9 +1,14 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.dto.*;
+import roomescape.dto.request.AdminReservationRequest;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.request.ReservationWithPaymentRequest;
+import roomescape.dto.response.ReservationDetailResponse;
+import roomescape.dto.response.ReservationResponse;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
@@ -52,17 +57,17 @@ public class ReservationController {
 
     @GetMapping("/reservations/mine")
     public List<ReservationDetailResponse> findMemberReservations(
-            @Authenticated LoginMemberRequest loginMemberRequest) {
+            @Parameter(description = "로그인한 회원 정보") @Authenticated LoginMemberRequest loginMemberRequest) {
         return reservationService.findAllByMemberId(loginMemberRequest.id());
     }
 
     @GetMapping("/reservations/search")
-    public List<ReservationResponse> searchReservation(@RequestParam(required = false) Long themeId,
-                                                       @RequestParam(required = false) Long memberId,
-                                                       @RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}")
-                                                       LocalDate dateFrom,
-                                                       @RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}")
-                                                       LocalDate dateTo) {
+    public List<ReservationResponse> searchReservation(
+            @Parameter(description = "테마 아이디") @RequestParam(required = false) Long themeId,
+            @Parameter(description = "멤버 아이디") @RequestParam(required = false) Long memberId,
+            @Parameter(description = "조회 기간 시작 날짜") @RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate dateFrom,
+            @Parameter(description = "조회 기간 끝 날짜") @RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate dateTo
+    ) {
         return reservationService.searchReservation(themeId, memberId, dateFrom, dateTo);
     }
 

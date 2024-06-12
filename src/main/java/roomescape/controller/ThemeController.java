@@ -1,10 +1,11 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.dto.ThemeRequest;
-import roomescape.dto.ThemeResponse;
+import roomescape.dto.request.ThemeRequest;
+import roomescape.dto.response.ThemeResponse;
 import roomescape.service.ThemeService;
 
 import java.net.URI;
@@ -25,7 +26,7 @@ public class ThemeController {
     }
 
     @GetMapping("/themes/ranking")
-    public List<ThemeResponse> findAndOrderByPopularity(@RequestParam int count) {
+    public List<ThemeResponse> findAndOrderByPopularity(@Parameter(description = "조회 할 테마 개수") @RequestParam int count) {
         return themeService.findAndOrderByPopularity(count);
     }
 

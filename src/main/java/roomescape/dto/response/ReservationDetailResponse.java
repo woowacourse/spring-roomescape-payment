@@ -1,22 +1,21 @@
-package roomescape.dto;
+package roomescape.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.Reservation;
-import roomescape.domain.ReservationStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record ReservationDetailResponse(
-        long id,
-        String theme,
-        LocalDate date,
-        LocalTime time,
-        String status,
-        String paymentKey,
-        BigDecimal amount
+        @Schema(description = "예약 엔티티 식별자") long id,
+        @Schema(description = "예약된 테마") String theme,
+        @Schema(description = "예약된 날짜") LocalDate date,
+        @Schema(description = "예약된 시간") LocalTime time,
+        @Schema(description = "예약 혹은 대기 상태") String status,
+        @Schema(description = "결제 키") String paymentKey,
+        @Schema(description = "금액") BigDecimal amount
 ) {
-
     public static ReservationDetailResponse from(Reservation reservation, long index) {
         String paymentKey = checkPaymentKey(reservation);
         BigDecimal amount = checkAmount(reservation);
@@ -44,13 +43,6 @@ public record ReservationDetailResponse(
             return null;
         }
         return reservation.getPayment().getAmount();
-    }
-
-    private static String getStatusName(ReservationStatus status) {
-        return switch (status) {
-            case BOOKED -> "예약";
-            case WAITING -> "%d번째 예약대기";
-        };
     }
 
     private static String getStatusNameByIndex(long index) {

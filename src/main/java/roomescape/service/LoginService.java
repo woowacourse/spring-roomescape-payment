@@ -9,8 +9,8 @@ import roomescape.domain.Email;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
 import roomescape.domain.Role;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.LoginRequest;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.request.LoginRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 
