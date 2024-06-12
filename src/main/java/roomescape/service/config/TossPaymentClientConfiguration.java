@@ -25,6 +25,7 @@ public class TossPaymentClientConfiguration {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .setConnectTimeout(CONNECT_TIMEOUT_DURATION)
             .setReadTimeout(READ_TIMEOUT_DURATION)
+            .additionalInterceptors(new TossPaymentInterceptor())
             .build();
     }
 
