@@ -60,11 +60,8 @@ jobs:
       - name: Start server
         run: |
           nohup java -jar build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar > server.log 2>&1 &
-          sleep 10
-          if lsof -Pi :8080 -sTCP:LISTEN -t > /dev/null ; then
-            echo "Server started successfully and is listening on port 8080"
-          else
-            echo "Server failed to start or is not listening on port 8080"
-            cat server.log
-            exit 1
-          fi
+          echo "Waiting for server to start..."
+          while ! grep -q 'Tomcat started on port(s): 8080' server.log; do
+            sleep 1
+          done
+          echo "Server started successfully and is listening on port 8080"
