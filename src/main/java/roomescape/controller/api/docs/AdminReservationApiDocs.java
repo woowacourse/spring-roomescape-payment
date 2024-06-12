@@ -22,6 +22,9 @@ public interface AdminReservationApiDocs {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
@@ -36,6 +39,9 @@ public interface AdminReservationApiDocs {
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
@@ -47,6 +53,9 @@ public interface AdminReservationApiDocs {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
@@ -59,6 +68,9 @@ public interface AdminReservationApiDocs {
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
@@ -74,6 +86,9 @@ public interface AdminReservationApiDocs {
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
@@ -85,6 +100,9 @@ public interface AdminReservationApiDocs {
             @ApiResponse(responseCode = "204", description = "삭제 성공",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
+                    content = {@Content(
+                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
                     content = {@Content(
                             mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
