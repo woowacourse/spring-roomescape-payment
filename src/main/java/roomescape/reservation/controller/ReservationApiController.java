@@ -22,14 +22,17 @@ import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationApiController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService) {
+    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -53,7 +56,7 @@ public class ReservationApiController {
             @Valid @RequestBody ReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        ReservationResponse response = reservationService.save(request, loginMemberInToken);
+        ReservationResponse response = paymentService.purchase(request, loginMemberInToken);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }

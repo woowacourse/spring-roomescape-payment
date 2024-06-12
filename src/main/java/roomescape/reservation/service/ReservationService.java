@@ -18,7 +18,6 @@ import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waitings;
 import roomescape.reservation.dto.request.FreeReservationCreateRequest;
-import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -35,7 +34,6 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
 
     public ReservationService(
@@ -43,27 +41,13 @@ public class ReservationService {
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentService paymentService,
             PaymentRepository paymentRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentService = paymentService;
         this.paymentRepository = paymentRepository;
-    }
-
-    @Transactional
-    public ReservationResponse save(ReservationCreateRequest request, LoginMemberInToken loginMemberInToken) {
-        Reservation reservation = getValidatedReservation(request.date(), request.themeId(), request.timeId(),
-                loginMemberInToken);
-
-        Long reservationId = reservationRepository.save(reservation).getId();
-        if (reservation.isSuccess()) {
-            paymentService.purchase(request.toPaymentRequest(), reservationId);
-        }
-        return ReservationResponse.toResponse(reservation);
     }
 
     @Transactional
@@ -88,6 +72,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("회원 인증에 실패했습니다."));
 
         boolean reserved = reservationRepository.existsByDateAndReservationTimeIdAndThemeId(date, timeId, themeId);
+
         if (reserved) {
             return new Reservation(member, date, theme, reservationTime, Status.WAITING);
         }
