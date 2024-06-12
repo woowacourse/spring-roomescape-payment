@@ -47,7 +47,11 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "예약 생성 성공",
                     content = @Content(schema = @Schema(implementation = ReservationPaymentResponse.class))),
-            @ApiResponse(responseCode = "400", description = "예약 생성 실패")})
+            @ApiResponse(responseCode = "400",
+                    description = """
+                            (1) 이미 예약되어 있는 방탈출을 예약 할 경우 실패
+                            (2) 존재하지 않는 방탈출을 예약 할 경우 실패
+                            """)})
     @PostMapping("/reservations")
     public ResponseEntity<ReservationPaymentResponse> saveReservation(@Parameter(hidden = true)
                                                                       @Authenticated LoginMember loginMember,
@@ -61,7 +65,11 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "예약 대기 생성 성공",
                     content = @Content(schema = @Schema(implementation = ReservationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "예약 대기 생성 실패")})
+            @ApiResponse(responseCode = "400",
+                    description = """
+                            (1) 자신이 예약 대기한 방탈출을 예약 대기 할 경우 실패
+                            (2) 존재하지 않는 방탈출을 예약 대기 할 경우 실패
+                            """)})
     @PostMapping("/reservations-waiting")
     public ResponseEntity<ReservationResponse> saveReservationWaiting(@Parameter(hidden = true)
                                                                       @Authenticated LoginMember loginMember,
@@ -75,7 +83,9 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모든 예약 리스트 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReservationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모든 예약 리스트 조회 실패")})
+            @ApiResponse(responseCode = "500", description = """
+                    (1) 데이터 베이스 통신 오류로 인한 실패 
+                    """)})
     @GetMapping("/reservations")
     public List<ReservationResponse> findAllReservations() {
         return reservationService.findAllReservations();
@@ -85,7 +95,9 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "특정 예약 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReservationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "특정 예약 조회 실패")})
+            @ApiResponse(responseCode = "400", description = """
+                    (1) 필수 인자를 넣지 않고 특정 예약을 조회할 경우 실패
+                    """)})
     @GetMapping("/reservations/search")
     public List<ReservationResponse> searchReservation(@Parameter(required = true) @RequestParam Long themeId,
                                                        @Parameter(required = true) @RequestParam Long memberId,
@@ -99,7 +111,9 @@ public class ReservationController {
     @Operation(summary = "특정 예약 삭제", description = "특정 예약을 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "특정 예약 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "특정 예약 삭제 실패")})
+            @ApiResponse(responseCode = "400", description = """
+                    (1) 존재하지 않는 예약을 삭제할 경우 실패
+                    """)})
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> delete(@Parameter(required = true, name = "id") @PathVariable long id) {
         reservationApplicationService.cancelReservationPayment(id);
@@ -109,7 +123,9 @@ public class ReservationController {
     @Operation(summary = "특정 예약 대기 삭제", description = "특정 예약 대기를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "특정 예약 대기 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "특정 예약 대기 삭제 실패")})
+            @ApiResponse(responseCode = "500", description = """
+                    (1) 데이터 베이스 통신 오류로 인한 실패
+                    """)})
     @DeleteMapping("/reservations-waiting/{id}")
     public ResponseEntity<Void> deleteReservationWaiting(@Parameter(hidden = true)
                                                          @Authenticated LoginMember loginMember,
@@ -122,7 +138,9 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "전체 예약 대기 조회 성공",
                     content = @Content(schema = @Schema(implementation = AdminReservationDetailResponse.class))),
-            @ApiResponse(responseCode = "400", description = "전체 예약 대기 조회 실패")})
+            @ApiResponse(responseCode = "500", description = """
+                    (1) 데이터 베이스 통신 오류로 인한 실패
+                    """)})
     @GetMapping("admin/reservations-waiting")
     public List<AdminReservationDetailResponse> findAllWaitingReservations() {
         return reservationService.findAllWaitingReservations();
@@ -132,7 +150,11 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "관리자 권한 예약 생성 성공",
                     content = @Content(schema = @Schema(implementation = ReservationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "관리자 권한 예약 생성 실패")})
+            @ApiResponse(responseCode = "400",
+                    description = """
+                            (1) 이미 예약되어 있는 방탈출을 예약 할 경우 실패
+                            (2) 존재하지 않는 방탈출을 예약 할 경우 실패
+                            """)})
     @PostMapping("admin/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByAdmin(@RequestBody AdminReservationRequest reservationRequest) {
         ReservationResponse reservationResponse = reservationService.saveByAdmin(reservationRequest);
@@ -143,7 +165,9 @@ public class ReservationController {
     @Operation(summary = "관리자 권한 예약 대기 삭제", description = "관리자 권한으로 예약 대기를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "관리자 권한 예약 대기 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "관리자 권한 예약 대기 삭제 실패")})
+            @ApiResponse(responseCode = "500", description = """
+                    (1) 데이터 베이스 통신 오류로 인한 실패
+                    """)})
     @DeleteMapping("admin/reservations-waiting/{id}")
     public ResponseEntity<Void> deleteReservationWaitingByAdmin(
             @Parameter(required = true, name = "id") @PathVariable long id) {
@@ -155,7 +179,9 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "자신의 예약 내역 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReservationPaymentDetail.class))),
-            @ApiResponse(responseCode = "400", description = "자신의 예약 내역 조회 실패")})
+            @ApiResponse(responseCode = "500", description = """
+                    (1) 데이터 베이스 통신 오류로 인한 실패
+                    """)})
     @GetMapping("/member/reservation")
     public List<ReservationPaymentDetail> findMemberReservations(
             @Parameter(hidden = true) @Authenticated LoginMember loginMember) {

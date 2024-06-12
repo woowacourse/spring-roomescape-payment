@@ -38,7 +38,7 @@ public class ReservationTimeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "예약 시간 생성 성공",
                     content = @Content(schema = @Schema(implementation = ReservationTimeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "예약 시간 생성 실패")})
+            @ApiResponse(responseCode = "400", description = "이미 존재하는 예약 시간 생성 시 실패")})
     @PostMapping("/times")
     public ResponseEntity<ReservationTimeResponse> save(@RequestBody ReservationTimeRequest reservationTimeRequest) {
         ReservationTimeResponse savedReservationTimeResponse = reservationTimeService.save(reservationTimeRequest);
@@ -50,7 +50,7 @@ public class ReservationTimeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모든 예약 시간 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReservationTimeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모든 예약 시간 조회 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @GetMapping("/times")
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeService.findAll();
@@ -60,7 +60,7 @@ public class ReservationTimeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모든 예약 가능 시간 조회 성공",
                     content = @Content(schema = @Schema(implementation = AvailableTimeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모든 예약 가능 시간 조회 실패")})
+            @ApiResponse(responseCode = "400", description = "(1) 적합하지 않은 인자로 예약 가능 시간 조회 시 실패")})
     @GetMapping("/times/available")
     public List<AvailableTimeResponse> findAvailableTimeWith(
             @Parameter(description = "예약 날짜", required = true) @RequestParam LocalDate date,
@@ -71,7 +71,7 @@ public class ReservationTimeController {
     @Operation(summary = "예약 시간 삭제", description = "예약 시간을 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "예약 시간 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "예약 시간 삭제 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @DeleteMapping("/times/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(required = true, name = "id") @PathVariable long id) {

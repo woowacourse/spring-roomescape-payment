@@ -28,7 +28,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모든 사용자 조회 성공",
                     content = @Content(schema = @Schema(implementation = MemberResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모든 사용자 조회 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @GetMapping("/members")
     public List<MemberResponse> findAllMembers() {
         return memberService.findAll();

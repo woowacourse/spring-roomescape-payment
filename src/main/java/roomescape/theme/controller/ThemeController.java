@@ -35,7 +35,7 @@ public class ThemeController {
     @Operation(summary = "모든 테마 조회", description = "모든 테마를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "모든 테마 조회 성공", content = @Content(schema = @Schema(implementation = ThemeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "모든 테마 조회 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @GetMapping("/themes")
     public List<ThemeResponse> findAll() {
         return themeService.findAll();
@@ -44,7 +44,7 @@ public class ThemeController {
     @Operation(summary = "인기 테마 조회", description = "인기 테마를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인기 테마 조회 성공", content = @Content(schema = @Schema(implementation = ThemeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "인기 테마 조회 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @GetMapping("/themes/ranking")
     public List<ThemeResponse> findAndOrderByPopularity(
             @Parameter(required = true, description = "인기 테마 조회 개수") @RequestParam int count) {
@@ -54,7 +54,7 @@ public class ThemeController {
     @Operation(summary = "테마 생성", description = "테마를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "테마 생성 성공", content = @Content(schema = @Schema(implementation = ThemeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "테마 생성 실패")})
+            @ApiResponse(responseCode = "400", description = "이미 존재하는 테마 생성 시 실패")})
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
         ThemeResponse savedThemeResponse = themeService.save(themeRequest);
@@ -65,7 +65,7 @@ public class ThemeController {
     @Operation(summary = "테마 삭제", description = "테마를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "테마 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "테마 삭제 실패")})
+            @ApiResponse(responseCode = "500", description = "(1) 데이터 베이스 통신 오류로 인한 실패")})
     @DeleteMapping("/themes/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(required = true, name = "id") @PathVariable long id) {
