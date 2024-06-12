@@ -87,9 +87,8 @@ public class ReservationService {
         savePayment(reservationResponse, request);
         return reservationResponse;
     }
-
-    @Transactional
-    public void savePayment(ReservationResponse reservationResponse, MemberReservationAddRequest request) {
+    
+    private void savePayment(ReservationResponse reservationResponse, MemberReservationAddRequest request) {
         Reservation reservation = reservationRepository.findById(reservationResponse.id())
                 .orElseThrow(() -> new IllegalRequestException("예약 번호가 존재하지 않습니다: " + reservationResponse.id()));
         paymentRepository.save(new Payment(reservation, request.paymentKey(), request.amount()));
