@@ -17,7 +17,7 @@ import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
 
 @RestController
-@RequestMapping(value = "/admin", produces = "application/json")
+@RequestMapping(value = "/admin")
 @Tag(name = "관리자 API", description = "관리자 페이지 API 입니다.")
 public class AdminController {
 

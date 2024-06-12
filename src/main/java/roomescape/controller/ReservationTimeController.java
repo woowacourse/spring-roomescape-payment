@@ -21,7 +21,7 @@ import roomescape.service.AvailableTimeService;
 import roomescape.service.ReservationTimeService;
 
 @RestController
-@RequestMapping(value = "/times", produces = "application/json")
+@RequestMapping(value = "/times")
 @Tag(name = "예약 시간 API", description = "예약 시간 관련 API 입니다.")
 public class ReservationTimeController {
 

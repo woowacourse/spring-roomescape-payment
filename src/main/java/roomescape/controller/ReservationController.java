@@ -19,7 +19,7 @@ import roomescape.dto.ReservationResponse;
 import roomescape.service.ReservationService;
 
 @RestController
-@RequestMapping(value = "/reservations", produces = "application/json")
+@RequestMapping(value = "/reservations")
 @Tag(name = "예약 API", description = "예약 관련 API 입니다.")
 public class ReservationController {
 
