@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.reservation.domain.PopularThemes;
 import roomescape.reservation.domain.Reservation;
@@ -15,6 +16,7 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ThemeRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
@@ -24,6 +26,7 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public Long save(ThemeCreateRequest themeCreateRequest) {
         themeRepository.findByThemeName(themeCreateRequest.name())
                 .ifPresent(empty -> {
@@ -66,6 +69,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional
     public void delete(Long id) {
         themeRepository.deleteById(id);
     }

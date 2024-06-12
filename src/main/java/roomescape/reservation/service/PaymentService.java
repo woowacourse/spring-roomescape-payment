@@ -14,7 +14,6 @@ import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class PaymentService {
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
