@@ -88,7 +88,7 @@ public class PaymentConfirmClient {
     private static void throwByCustomErrorResponse(PaymentConfirmResponse confirmResponse) {
         Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(confirmResponse.code());
         customErrorCode.ifPresent(code -> {
-            throw new PaymentConfirmCustomException(customErrorCode.get(), confirmResponse.message());
+            throw new PaymentConfirmCustomException(code, confirmResponse.message());
         });
     }
 }
