@@ -15,7 +15,6 @@ spring:
     url: jdbc:h2:mem:database
   jpa:
     defer-datasource-initialization: true
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
