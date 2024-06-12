@@ -1,5 +1,7 @@
 package roomescape.exception;
 
+import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         logger.error(e.getMessage(), e);
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponse("[Server Error] " + e.getMessage()));
+                .body(new ErrorResponse(INTERNAL_SERVER_ERROR.message()));
     }
 }

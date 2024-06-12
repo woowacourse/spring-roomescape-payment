@@ -1,6 +1,6 @@
 package roomescape.config.payment;
 
-import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
+import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
 
 import java.io.IOException;
 
