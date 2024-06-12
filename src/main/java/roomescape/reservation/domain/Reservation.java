@@ -78,6 +78,10 @@ public class Reservation {
         status = Status.SUCCESS;
     }
 
+    public boolean isSuccess() {
+        return status == Status.SUCCESS;
+    }
+
     public Long getId() {
         return id;
     }

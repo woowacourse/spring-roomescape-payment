@@ -60,7 +60,7 @@ public class ReservationService {
                 loginMemberInToken);
 
         Long reservationId = reservationRepository.save(reservation).getId();
-        if (reservation.getStatus().isSuccess()) {
+        if (reservation.isSuccess()) {
             paymentService.purchase(request.toPaymentRequest(), reservationId);
         }
         return reservationId;

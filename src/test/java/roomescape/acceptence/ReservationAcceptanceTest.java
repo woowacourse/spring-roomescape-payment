@@ -179,29 +179,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약을 저장한다.(어드민)")
     void saveAdminReservation_ShouldSaveReservation() {
-        RestDocumentationFilter filter = document("reservation/save-admin",
-                requestCookies(
-                        cookieWithName("token").description("어드민 권한 사용자 토큰")
-                ),
-                requestFields(
-                        fieldWithPath("date").description("예약 날짜"),
-                        fieldWithPath("themeId").description("테마 식별자"),
-                        fieldWithPath("timeId").description("시간 식별자")
-                ),
-                responseFields(
-                        fieldWithPath("id").description("예약 식별자"),
-                        fieldWithPath("member.id").description("회원 식별자"),
-                        fieldWithPath("member.name").description("회원명"),
-                        fieldWithPath("date").description("예약 날짜"),
-                        fieldWithPath("theme.id").description("테마 식별자"),
-                        fieldWithPath("theme.name").description("테마명"),
-                        fieldWithPath("theme.description").description("테마 설명"),
-                        fieldWithPath("theme.thumbnail").description("테마 썸네일 사진 url"),
-                        fieldWithPath("time.id").description("예약 시간 식별자"),
-                        fieldWithPath("time.startAt").description("예약 시간")
-                )
-        );
-
         // given
         Member admin = memberRepository.save(new Member(1L, Role.ADMIN, "admin", "admin@email.com", "admin"));
         saveThemeRequest("name");
@@ -217,7 +194,28 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 .given(spec)
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .filter(filter)
+                .filter(document("reservation/save-admin",
+                        requestCookies(
+                                cookieWithName("token").description("어드민 권한 사용자 토큰")
+                        ),
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("themeId").description("테마 식별자"),
+                                fieldWithPath("timeId").description("시간 식별자")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("예약 식별자"),
+                                fieldWithPath("member.id").description("회원 식별자"),
+                                fieldWithPath("member.name").description("회원명"),
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("theme.id").description("테마 식별자"),
+                                fieldWithPath("theme.name").description("테마명"),
+                                fieldWithPath("theme.description").description("테마 설명"),
+                                fieldWithPath("theme.thumbnail").description("테마 썸네일 사진 url"),
+                                fieldWithPath("time.id").description("예약 시간 식별자"),
+                                fieldWithPath("time.startAt").description("예약 시간")
+                        )
+                ))
                 .body(requestBody)
 
                 .when()
@@ -231,30 +229,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("조건에 따른 예약을 조회한다.")
     void findAllBySearchCond() {
-        RestDocumentationFilter filter = document("reservation/search-cond",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토큰")
-                ),
-                queryParameters(
-                        parameterWithName("memberId").description("회원 식별자"),
-                        parameterWithName("themeId").description("테마 식별자"),
-                        parameterWithName("dateFrom").description("조회 시작 날짜"),
-                        parameterWithName("dateTo").description("조회 마지막 날짜")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("예약 식별자"),
-                        fieldWithPath("[].member.id").description("예약 회원식별자"),
-                        fieldWithPath("[].member.name").description("예약 회원명"),
-                        fieldWithPath("[].date").description("예약 일자"),
-                        fieldWithPath("[].theme.id").description("예약 테마 식별자"),
-                        fieldWithPath("[].theme.name").description("예약 테마명"),
-                        fieldWithPath("[].theme.description").description("예약 테마 설명"),
-                        fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 url"),
-                        fieldWithPath("[].time.id").description("예약 시간 식별자"),
-                        fieldWithPath("[].time.startAt").description("예약 시간")
-                )
-        );
-
         // given
         saveThemeRequest("name");
         saveMemberRequest("aa@aa.aa");
@@ -308,7 +282,29 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("reservation/search-cond",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("memberId").description("회원 식별자"),
+                                parameterWithName("themeId").description("테마 식별자"),
+                                parameterWithName("dateFrom").description("조회 시작 날짜"),
+                                parameterWithName("dateTo").description("조회 마지막 날짜")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 식별자"),
+                                fieldWithPath("[].member.id").description("예약 회원식별자"),
+                                fieldWithPath("[].member.name").description("예약 회원명"),
+                                fieldWithPath("[].date").description("예약 일자"),
+                                fieldWithPath("[].theme.id").description("예약 테마 식별자"),
+                                fieldWithPath("[].theme.name").description("예약 테마명"),
+                                fieldWithPath("[].theme.description").description("예약 테마 설명"),
+                                fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 url"),
+                                fieldWithPath("[].time.id").description("예약 시간 식별자"),
+                                fieldWithPath("[].time.startAt").description("예약 시간")
+                        )
+                ))
                 .accept(ContentType.JSON)
                 .cookie(normalToken)
                 .queryParam("memberId", 1)

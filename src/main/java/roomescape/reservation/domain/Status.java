@@ -14,12 +14,4 @@ public enum Status {
     public String getStatus() {
         return message;
     }
-
-    public boolean isWaiting() {
-        return this == WAITING;
-    }
-
-    public boolean isSuccess() {
-        return this == SUCCESS;
-    }
 }

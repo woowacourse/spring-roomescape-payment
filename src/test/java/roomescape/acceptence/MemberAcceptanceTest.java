@@ -16,7 +16,6 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -26,21 +25,19 @@ class MemberAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("회원을 저장한다.")
     void save_ShouldSaveMember() {
-        RestDocumentationFilter filter = document("member/save",
-                requestFields(
-                        fieldWithPath("name").description("회원 이름"),
-                        fieldWithPath("email").description("회원 이메일, 중복X"),
-                        fieldWithPath("password").description("회원 비밀번호")
-                )
-        );
-
         // given
         Map<String, String> requestBody = Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa");
 
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("member/save",
+                        requestFields(
+                                fieldWithPath("name").description("회원 이름"),
+                                fieldWithPath("email").description("회원 이메일, 중복X"),
+                                fieldWithPath("password").description("회원 비밀번호")
+                        )
+                ))
                 .contentType(ContentType.JSON)
                 .body(requestBody)
 
@@ -55,16 +52,6 @@ class MemberAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("로그인")
     void login_ShouldSignIn() {
-        RestDocumentationFilter filter = document("login",
-                requestFields(
-                        fieldWithPath("email").description("회원 이메일"),
-                        fieldWithPath("password").description("회원 비밀번호")
-                ),
-                responseCookies(
-                        cookieWithName("token").description("JWT 토큰")
-                )
-        );
-
         // given
         RestAssured
                 .given()
@@ -81,7 +68,15 @@ class MemberAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("login",
+                        requestFields(
+                                fieldWithPath("email").description("회원 이메일"),
+                                fieldWithPath("password").description("회원 비밀번호")
+                        ),
+                        responseCookies(
+                                cookieWithName("token").description("JWT 토큰")
+                        )
+                ))
                 .contentType(ContentType.JSON)
                 .body(Map.of("email", "aa@aa.aa", "password", "aa"))
 
@@ -96,16 +91,6 @@ class MemberAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("모든 회원 정보를 조회한다.")
     void findAll_ShouldInquiryAllMembers() {
-        RestDocumentationFilter filter = document("member/search",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토콘")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("회원 식별자"),
-                        fieldWithPath("[].name").description("회원 이름")
-                )
-
-        );
         // given
         Map<String, String> requestBody1 = Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa");
         Map<String, String> requestBody2 = Map.of("name", "bb", "email", "bb@bb.bb", "password", "bb");
@@ -137,7 +122,16 @@ class MemberAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("member/search",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토콘")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("회원 식별자"),
+                                fieldWithPath("[].name").description("회원 이름")
+                        )
+
+                ))
                 .cookie(normalToken)
                 .accept(ContentType.JSON)
 
@@ -156,16 +150,6 @@ class MemberAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("로그인 상태 확인")
     void loginCheck_ShouldCheckLoginStatus() {
-        RestDocumentationFilter filter = document("login/check",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토콘")
-                ),
-                responseFields(
-                        fieldWithPath("id").description("회원 식별자"),
-                        fieldWithPath("name").description("회원 이름")
-                )
-        );
-
         // given
         // 회원가입
         RestAssured
@@ -195,7 +179,15 @@ class MemberAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("login/check",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토콘")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("회원 식별자"),
+                                fieldWithPath("name").description("회원 이름")
+                        )
+                ))
                 .cookie("token", token)
                 .accept(ContentType.JSON)
 
