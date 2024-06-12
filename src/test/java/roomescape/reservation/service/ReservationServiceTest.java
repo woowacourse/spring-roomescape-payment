@@ -92,7 +92,7 @@ class ReservationServiceTest {
         when(paymentRepository.save(any(Payment.class))).thenReturn(PAYMENT_1);
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
                 .thenReturn(new PaymentConfirmResponse("test_payment_key",
-                        "testOrderId", 20000L));
+                        "testOrderId", 20000L, "DONE"));
 
         ReservationResponse savedReservation = reservationService.saveMemberReservation(1L,
                 RESERVATION_PAYMENT_REQUEST_1);

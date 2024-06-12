@@ -85,7 +85,7 @@ class ReservationControllerE2ETest {
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
                 .thenReturn(new PaymentConfirmResponse("test_payment_key",
-                        "testOrderId", 20000L));
+                        "testOrderId", 20000L, "DONE"));
 
         when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
                 .thenReturn(new PaymentCancelResponse("test_payment_key",
@@ -207,7 +207,7 @@ class ReservationControllerE2ETest {
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
                 .thenReturn(new PaymentConfirmResponse("test_payment_key",
-                        "testOrderId", 20000L));
+                        "testOrderId", 20000L, "DONE"));
 
         when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
                 .thenReturn(new PaymentCancelResponse("test_payment_key",

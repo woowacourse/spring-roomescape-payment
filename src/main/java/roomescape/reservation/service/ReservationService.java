@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.DuplicateSaveException;
 import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
+import roomescape.global.exception.PaymentFailException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
@@ -171,6 +172,9 @@ public class ReservationService {
         validateDuplicatedReservation(memberReservationAddRequest);
 
         PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        if (paymentConfirmResponse.isPaymentNotFinished()) {
+            throw new PaymentFailException("결제가 완료되지 않았습니다.");
+        }
         ReservationResponse reservationResponse
                 = saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
         saveMemberPayment(reservationResponse, paymentConfirmResponse);
