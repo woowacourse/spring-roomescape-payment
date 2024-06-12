@@ -36,7 +36,7 @@ public class Payment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EasyPayType easyPayType;
     @Column(nullable = false)
-    private String currency;
+    private String currencyCode;
 
     protected Payment() {
 
@@ -51,7 +51,7 @@ public class Payment extends BaseEntity {
             String approvedAt,
             BigDecimal amount,
             EasyPayType easyPayType,
-            String currency) {
+            String currencyCode) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
@@ -60,7 +60,7 @@ public class Payment extends BaseEntity {
         this.approvedAt = approvedAt;
         this.amount = amount;
         this.easyPayType = easyPayType;
-        this.currency = currency;
+        this.currencyCode = currencyCode;
     }
 
     public Payment(Reservation reservation, PaymentResult paymentResult) {
@@ -109,7 +109,7 @@ public class Payment extends BaseEntity {
         return easyPayType;
     }
 
-    public String getCurrency() {
-        return currency;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 }

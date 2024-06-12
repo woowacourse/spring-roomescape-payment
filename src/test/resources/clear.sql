@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS payment
     approved_at   VARCHAR(255) NOT NULL,
     amount        DECIMAL(19, 4) NOT NULL,
     easy_pay_type VARCHAR(255) NOT NULL,
-    currency      VARCHAR(20) NOT NULL,
+    currency_code      VARCHAR(20) NOT NULL,
     created_at      TIMESTAMP   NOT NULL,
     PRIMARY KEY (id)
 );
