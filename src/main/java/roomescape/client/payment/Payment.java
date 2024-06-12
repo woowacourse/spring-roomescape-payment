@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import roomescape.client.payment.dto.PaymentCancelDto;
 import roomescape.client.payment.dto.TossPaymentConfirmResponse;
-import roomescape.registration.domain.reservation.domain.Reservation;
+import roomescape.reservation.domain.Reservation;
 
 @Tag(name = "결제 엔티티", description = "결제와 관련된 정보가 들어있다. toss api가 제공하는 결제 승인 응답 데이터를 기준으로 작성되었다.")
 @Entity

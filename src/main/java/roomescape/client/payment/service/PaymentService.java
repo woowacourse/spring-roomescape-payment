@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.Payment;
 import roomescape.client.payment.PaymentRepository;
-import roomescape.client.payment.service.PaymentClient;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.client.payment.dto.TossPaymentConfirmResponse;
 import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.model.PaymentConfirmExceptionCode;
-import roomescape.registration.domain.reservation.domain.Reservation;
+import roomescape.reservation.domain.Reservation;
 
 @Tag(name = "결제 서비스", description = "결제 승인, 예약 id에 해당하는 결제를 반환하는 로직 수행")
 @Transactional

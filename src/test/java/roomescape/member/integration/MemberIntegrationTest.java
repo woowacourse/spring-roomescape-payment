@@ -14,7 +14,7 @@ import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
 import roomescape.model.IntegrationTest;
-import roomescape.registration.dto.RegistrationInfoResponse;
+import roomescape.reservation.dto.RegistrationInfoResponse;
 
 class MemberIntegrationTest extends IntegrationTest {
 

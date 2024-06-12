@@ -17,7 +17,7 @@ import roomescape.auth.provider.CookieProvider;
 import roomescape.client.payment.service.PaymentClient;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
 import roomescape.model.IntegrationTest;
-import roomescape.registration.domain.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationIntegrationTest extends IntegrationTest {
