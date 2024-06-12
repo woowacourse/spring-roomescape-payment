@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import roomescape.controller.api.docs.LogoutApiDocs;
 
-@Tag(name = "Logout", description = "로그아웃 관련 API")
 @RestController
 @RequestMapping("/logout")
-public class LogoutController {
-    @Operation(summary = "로그아웃", description = "로그아웃 할 수 있다.")
+public class LogoutController implements LogoutApiDocs {
     @PostMapping
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("token", null);
