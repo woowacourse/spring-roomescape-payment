@@ -21,6 +21,7 @@ public class Reservation {
     protected static final String DATE_FORMAT_EXCEPTION_MESSAGE = "날짜 형식이 잘못되었습니다.";
     protected static final String PAST_DATE_EXCEPTION_MESSAGE = "지난 날짜에는 예약할 수 없습니다.";
     protected static final String PAST_TIME_EXCEPTION_MESSAGE = "지난 시간에는 예약할 수 없습니다.";
+    protected static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약만 취소할 수 있습니다.";
     private static final String TIME_ZONE = "Asia/Seoul";
 
     @Id
@@ -92,7 +93,10 @@ public class Reservation {
         return date.isEqual(LocalDate.now(kst));
     }
 
-    public void cancel() {
+    public void cancel(final Member requester) {
+        if (requester.isNotAdmin() && !member.equals(requester)) {
+            throw new IllegalArgumentException(RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE);
+        }
         this.status = ReservationStatus.CANCELED;
     }
 

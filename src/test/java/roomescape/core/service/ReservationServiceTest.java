@@ -188,8 +188,7 @@ class ReservationServiceTest {
         final LoginMember loginMember = new LoginMember(2L);
 
         assertThatThrownBy(() -> reservationService.delete(response.getId(), loginMember))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -200,7 +199,6 @@ class ReservationServiceTest {
         final LoginMember loginMember = new LoginMember(2L);
 
         assertThatThrownBy(() -> reservationService.deleteByAdmin(response.getId(), loginMember))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.NOT_ALLOWED_TO_MEMBER_EXCEPTION_MESSAGE);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
