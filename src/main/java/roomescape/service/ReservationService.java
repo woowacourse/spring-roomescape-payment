@@ -61,10 +61,7 @@ public class ReservationService {
             return;
         }
         paymentRepository.findByOrderIdAndPaymentKey(approveRequest.orderId(), approveRequest.paymentKey())
-                .ifPresent(payment -> {
-                    payment.updateReservation(reservation);
-                    paymentRepository.save(payment);
-                });
+                .ifPresent(payment -> payment.updateReservation(reservation));
     }
 
     public List<ReservationResponse> findAll() {

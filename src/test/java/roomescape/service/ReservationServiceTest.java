@@ -185,4 +185,17 @@ class ReservationServiceTest {
         Assertions.assertThat(savedPaymentKey)
                 .isEqualTo(PaymentFixture.DEFAULT_PAYMENT_WITHOUT_ID.getPaymentKey());
     }
+
+    @Test
+    @DisplayName("결제 정보가 있는 예약을 저장하면 결제 정보의 예약 필드를 업데이트하는지 확인")
+    void saveWithUpdatingPayment() {
+        initServiceWithMember();
+        reservationTimeRepository.save(DEFAULT_TIME);
+        themeRepository.save(DEFAULT_THEME);
+        var payment = paymentRepository.save(PaymentFixture.DEFAULT_PAYMENT_WITHOUT_RESERVATION);
+        var reservation = reservationService.save(ReservationFixture.DEFAULT_REQUEST);
+
+        Assertions.assertThat(paymentRepository.findByReservationId(reservation.id()))
+                .contains(payment);
+    }
 }

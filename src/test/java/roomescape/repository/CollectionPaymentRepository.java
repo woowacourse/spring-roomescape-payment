@@ -42,6 +42,7 @@ public class CollectionPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> findByReservationId(Long reservationId) {
         return payments.stream()
+                .filter(payment -> payment.getReservation() != null)
                 .filter(payment -> reservationId.equals(payment.getReservation().getId()))
                 .findFirst();
     }
