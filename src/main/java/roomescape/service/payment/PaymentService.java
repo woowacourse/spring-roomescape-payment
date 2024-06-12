@@ -11,7 +11,7 @@ import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
@@ -21,14 +21,12 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    @Transactional
     public Payment confirmPayment(PaymentConfirmInput paymentConfirmInput, Reservation reservation) {
         PaymentConfirmOutput paymentConfirmOutput = paymentClient.confirmPayment(paymentConfirmInput);
         Payment payment = paymentConfirmOutput.toPayment(reservation);
         return paymentRepository.save(payment);
     }
 
-    @Transactional
     public void cancelReservationPayment(Reservation reservation) {
         Payment payment = paymentRepository.findByReservation(reservation)
                 .orElseThrow(NotFoundPaymentException::new);
