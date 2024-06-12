@@ -18,7 +18,7 @@ public record ReservationPaymentRequest(
         String paymentKey,
         @Schema(description = "OrderId", example = "orderId")
         String orderId,
-        @Schema(description = "Amount", example = "1000")
+        @Schema(description = "금액", example = "1000")
         BigDecimal amount) {
 
     public PaymentRequest toPaymentRequest() {
