@@ -5,7 +5,9 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class Amount {
+
     public static final int ROOM_ESCAPTE_AMOUNT = 128000;
+
     @Column(name = "amount", nullable = false)
     private long amount;
 
