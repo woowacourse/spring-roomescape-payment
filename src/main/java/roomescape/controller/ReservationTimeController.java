@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
@@ -56,14 +57,17 @@ public class ReservationTimeController {
     @GetMapping("/book-able")
     @Operation(summary = "예약 가능 시간 목록 조회 API", description = "예약 가능한 시간 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "예약 가능 시간 목록 조회 성공")
-    public List<AvailableTimeResponse> findByThemeAndDate(@RequestParam LocalDate date, @RequestParam long themeId) {
+    public List<AvailableTimeResponse> findByThemeAndDate(
+            @RequestParam @Schema(description = "날짜") LocalDate date,
+            @RequestParam @Schema(description = "테마 ID") long themeId
+    ) {
         return availableTimeService.findByThemeAndDate(date, themeId);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "예약 시간 삭제 API", description = "예약 시간을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "예약 시간 삭제 성공")
-    public ResponseEntity<Void> delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable @Schema(description = "시간 ID") long id) {
         reservationTimeService.delete(id);
         return ResponseEntity.noContent().build();
     }

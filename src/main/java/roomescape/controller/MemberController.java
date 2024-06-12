@@ -1,6 +1,7 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
@@ -54,7 +55,7 @@ public class MemberController {
     @GetMapping("/login/check")
     @Operation(summary = "로그인 확인 API", description = "로그인 상태를 확인합니다.")
     @ApiResponse(responseCode = "200", description = "로그인 상태 확인")
-    public ResponseEntity<MemberInfo> myInfo(@Auth long memberId) {
+    public ResponseEntity<MemberInfo> myInfo(@Auth @Schema(description = "회원 ID") long memberId) {
         MemberInfo memberInfo = memberService.findByMemberId(memberId);
         return ResponseEntity.ok(memberInfo);
     }

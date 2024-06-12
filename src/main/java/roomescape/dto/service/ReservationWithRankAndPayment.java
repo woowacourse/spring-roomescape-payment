@@ -1,5 +1,6 @@
 package roomescape.dto.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.domain.Payment;
@@ -8,9 +9,14 @@ import roomescape.domain.Theme;
 
 public class ReservationWithRankAndPayment {
 
-    private Reservation reservation;
-    private Long rank;
-    private Payment payment;
+    @Schema(description = "예약 ID")
+    private final Reservation reservation;
+
+    @Schema(description = "대기 순서")
+    private final Long rank;
+
+    @Schema(description = "결제 정보")
+    private final Payment payment;
 
     public ReservationWithRankAndPayment(Reservation reservation, Long rank, Payment payment) {
         this.reservation = reservation;
@@ -36,10 +42,6 @@ public class ReservationWithRankAndPayment {
 
     public String getStatusMessage() {
         return reservation.getStatus().makeStatusMessage(rank);
-    }
-
-    public Payment getPayment() {
-        return payment;
     }
 
     public String getPaymentKey() {
