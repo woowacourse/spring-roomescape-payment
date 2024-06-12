@@ -55,7 +55,7 @@ public class ReservationDeleteService {
     }
 
     private void refund(Reservation reservation) {
-        if (reservation.canRefund()) {
+        if (reservation.isUserReserved()) {
             Payment payment = paymentRepository.findByScheduleAndMemberAndStatus(
                             reservation.getSchedule(), reservation.getMember(), PaymentStatus.PAID)
                     .orElseThrow(() -> new BadArgumentRequestException("해당 예약 내역이 존재하지 않습니다."));

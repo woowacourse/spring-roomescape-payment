@@ -1,22 +1,15 @@
 package roomescape.reservation.domain;
 
 public enum ReservationStatus {
-    WAITING_FOR_PAYMENT(false),
-    DONE_PAYMENT(true),
-    ADMIN_RESERVE(true),
+    USER_RESERVE,
+    ADMIN_RESERVE,
     ;
 
-    private final boolean isPaid;
-
-    ReservationStatus(boolean isPaid) {
-        this.isPaid = isPaid;
+    public boolean isUserReserved() {
+        return this == USER_RESERVE;
     }
 
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    public boolean isNeedRefund() {
-        return this == DONE_PAYMENT;
+    public boolean isAdminReserved() {
+        return this == ADMIN_RESERVE;
     }
 }

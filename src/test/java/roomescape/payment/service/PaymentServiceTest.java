@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
@@ -94,8 +96,9 @@ class PaymentServiceTest {
     @Test
     void createPaymentTest_whenReservationIsAlreadyPaid() {
         Reservation paidReservation = new Reservation(1L, DEFAULT_MEMBER, DEFAULT_DATE, DEFAULT_TIME, DEFAULT_THEME);
-        paidReservation.completePaying();
         given(reservationRepository.findById(1L)).willReturn(Optional.of(paidReservation));
+        given(paymentRepository.findByScheduleAndMemberAndStatus(any(), eq(DEFAULT_MEMBER), eq(PaymentStatus.PAID)))
+                .willReturn(Optional.of(SAVED_PAYMENT));
 
         assertThatThrownBy(() -> paymentService.createPayment(DEFAULT_REQUEST, 1L))
                 .isInstanceOf(BadArgumentRequestException.class)

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.BadArgumentRequestException;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
@@ -34,7 +35,6 @@ public class PaymentService {
 
         paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
         Payment payment = savePayment(request, reservation);
-        reservation.completePaying();
         return PaymentResponse.from(payment);
     }
 
@@ -47,12 +47,17 @@ public class PaymentService {
         if (reservation.isBefore(LocalDateTime.now())) {
             throw new BadArgumentRequestException("결제하기 위해서 해당 예약은 현재 시간 이후여야 합니다.");
         }
-        if (reservation.isPaid()) {
+        if (isPaid(reservation)) {
             throw new BadArgumentRequestException("해당 예약은 이미 결제 되었습니다.");
         }
         if (reservation.isDifferentMember(memberId)) {
             throw new BadArgumentRequestException("예약한 회원과 동일한 회원이 결제해야 합니다.");
         }
+    }
+
+    private boolean isPaid(Reservation reservation) {
+        return paymentRepository.findByScheduleAndMemberAndStatus(
+                reservation.getSchedule(), reservation.getMember(), PaymentStatus.PAID).isPresent();
     }
 
     private Payment savePayment(PaymentRequest request, Reservation reservation) {

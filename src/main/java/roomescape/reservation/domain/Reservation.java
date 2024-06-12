@@ -20,7 +20,7 @@ import roomescape.time.domain.ReservationTime;
 
 @Entity
 public class Reservation {
-    private static final ReservationStatus DEFAULT_STATUS = ReservationStatus.WAITING_FOR_PAYMENT;
+    private static final ReservationStatus DEFAULT_STATUS = ReservationStatus.USER_RESERVE;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,19 +69,12 @@ public class Reservation {
         return schedule.isBefore(currentDateTime);
     }
 
-    public void completePaying() {
-        if (status.isPaid()) {
-            throw new IllegalArgumentException("이미 결제된 예약입니다.");
-        }
-        status = ReservationStatus.DONE_PAYMENT;
+    public boolean isUserReserved() {
+        return status.isUserReserved();
     }
 
-    public boolean isPaid() {
-        return status.isPaid();
-    }
-
-    public boolean canRefund() {
-        return status.isNeedRefund();
+    public boolean isAdminReserved() {
+        return status.isAdminReserved();
     }
 
     public boolean isDifferentMember(Long memberId) {
