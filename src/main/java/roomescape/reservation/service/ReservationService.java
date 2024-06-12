@@ -104,18 +104,7 @@ public class ReservationService {
         PaymentMatcher paymentMatcher = new PaymentMatcher(paymentRepository.findAllByMemberId(memberId));
         for (Reservation reservation : reservations) {
             Payment payment = paymentMatcher.getPaymentByReservationId(reservation.getId());
-            responses.add(
-                    new MemberReservationResponse(
-                            reservation.getId(),
-                            reservation.getTheme().getName(),
-                            reservation.getDate(),
-                            reservation.getTime().getStartAt(),
-                            reservation.getStatus().getValue(),
-                            payment.getPaymentKey(),
-                            payment.getOrderId(),
-                            payment.getAmount()
-                    )
-            );
+            responses.add(MemberReservationResponse.of(reservation, payment));
         }
     }
 
