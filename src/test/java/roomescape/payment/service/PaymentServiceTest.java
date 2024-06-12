@@ -54,18 +54,18 @@ class PaymentServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @MockBean
-    private TossPaymentClient tossPaymentClient;
-
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @MockBean
+    private TossPaymentClient tossPaymentClient;
 
     @AfterEach
     void init() {
         databaseCleaner.cleanUp();
     }
 
-    @DisplayName("결제 후 결제 내역을 저장한다.")
+    @DisplayName("결제 시, 토스 결제 요청이 성공하면 payment 엔티티를 반환한다.")
     @Test
     void confirmPayment() {
         Member jojo = memberRepository.save(MEMBER_JOJO);

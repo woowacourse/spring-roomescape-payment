@@ -1,9 +1,9 @@
 package roomescape.payment.service;
 
 import java.util.List;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.exception.PaymentSaveFailureException;
 import roomescape.payment.controller.dto.response.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
@@ -24,17 +24,17 @@ public class PaymentService {
 
     public Payment confirm(PaymentConfirmRequest confirmRequest, Reservation reservation) {
         PaymentConfirmResponse confirmResponse = tossPaymentClient.confirmPayment(confirmRequest);
-        Payment payment = new Payment(
+        return new Payment(
                 confirmResponse.paymentKey(),
                 confirmResponse.orderId(),
                 confirmResponse.totalAmount(),
                 reservation
         );
-        try {
-            return paymentRepository.save(payment);
-        } catch (Exception e) {
-            throw new PaymentSaveFailureException(e.getMessage());
-        }
+    }
+
+    @Retryable(maxAttempts = 2)
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
     }
 
     @Transactional
