@@ -17,10 +17,12 @@ public class UserPaymentExceptionResponse {
         return Arrays.stream(UserPaymentExceptionType.values())
                 .filter(userPaymentExceptionType -> userPaymentExceptionType.name().equals(errorCode))
                 .findAny()
-                .map(userPaymentExceptionType -> new UserPaymentExceptionResponse(
-                        userPaymentExceptionType.name(),
-                        userPaymentExceptionType.getMessage()))
+                .map(UserPaymentExceptionResponse::from)
                 .orElse(new UserPaymentExceptionResponse(errorCode, message));
+    }
+
+    public static UserPaymentExceptionResponse from(UserPaymentExceptionType exceptionType) {
+        return new UserPaymentExceptionResponse(exceptionType.name(), exceptionType.getMessage());
     }
 
     public String getErrorCode() {

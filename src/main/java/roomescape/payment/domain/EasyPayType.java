@@ -1,6 +1,11 @@
 package roomescape.payment.domain;
 
+import static roomescape.exception.type.UserPaymentExceptionType.UNSUPPORTED_PAY_TYPE;
+
 import java.util.Arrays;
+
+import roomescape.exception.PaymentException;
+import roomescape.exception.response.UserPaymentExceptionResponse;
 
 public enum EasyPayType {
     TOSS_PAY("토스페이"),
@@ -11,8 +16,7 @@ public enum EasyPayType {
     L_PAY("엘페이"),
     PIN_PAY("핀페이"),
     PAYCO("페이코"),
-    SSG_PAY("SSG페이"),
-    ETC("기타");
+    SSG_PAY("SSG페이");
 
     private String title;
 
@@ -28,6 +32,6 @@ public enum EasyPayType {
         return Arrays.stream(values())
                 .filter(easyPayType -> easyPayType.title.equals(easyPay))
                 .findAny()
-                .orElse(ETC);
+                .orElseThrow(() -> new PaymentException(UserPaymentExceptionResponse.from(UNSUPPORTED_PAY_TYPE)));
     }
 }
