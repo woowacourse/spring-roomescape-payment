@@ -66,26 +66,4 @@ public class Payment {
     public Long getAmount() {
         return amount;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Payment payment = (Payment) o;
-        return Objects.equals(id, payment.id)
-                && Objects.equals(reservationId, payment.reservationId)
-                && Objects.equals(memberId, payment.memberId)
-                && Objects.equals(paymentKey, payment.paymentKey)
-                && Objects.equals(orderId, payment.orderId)
-                && Objects.equals(amount, payment.amount);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, reservationId, memberId, paymentKey, orderId, amount);
-    }
 }
