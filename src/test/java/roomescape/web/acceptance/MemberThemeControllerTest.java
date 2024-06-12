@@ -89,14 +89,14 @@ class MemberThemeControllerTest {
         Member jazz = memberRepository.save(MemberFixture.MEMBER_JAZZ.create());
         Member bri = memberRepository.save(MemberFixture.MEMBER_BRI.create());
 
-        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
 
-        reservationRepository.save(reservation(sun, java, yesterday.toString(), onePm, Status.RESERVED));
-        reservationRepository.save(reservation(sun, database, yesterday.toString(), threePm, Status.RESERVED));
-        reservationRepository.save(reservation(bri, java, yesterday.toString(), twoPm, Status.RESERVED));
-        reservationRepository.save(reservation(bri, database, yesterday.toString(), onePm, Status.RESERVED));
-        reservationRepository.save(reservation(jazz, database, yesterday.toString(), onePm, Status.WAITING));
-        reservationRepository.save(reservation(jazz, dream, yesterday.toString(), onePm, Status.WAITING));
+        reservationRepository.save(reservation(sun, java, tomorrow.toString(), onePm, Status.RESERVED));
+        reservationRepository.save(reservation(sun, database, tomorrow.toString(), threePm, Status.RESERVED));
+        reservationRepository.save(reservation(bri, java, tomorrow.toString(), twoPm, Status.RESERVED));
+        reservationRepository.save(reservation(bri, database, tomorrow.toString(), onePm, Status.RESERVED));
+        reservationRepository.save(reservation(jazz, database, tomorrow.toString(), onePm, Status.WAITING));
+        reservationRepository.save(reservation(jazz, dream, tomorrow.toString(), onePm, Status.WAITING));
 
         List<ThemeResponse> actualResponse = RestAssured.given().log().all()
                 .when().get("/themes/ranking")

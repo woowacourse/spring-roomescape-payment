@@ -83,7 +83,7 @@ class MemberReservationTimeControllerTest {
     @Test
     void return_200_when_find_available_reservation_times() {
         Member member = memberRepository.save(MemberFixture.MEMBER_SUN.create());
-        LocalDate date = LocalDate.parse("2024-06-04");
+        LocalDate date = LocalDate.now().plusDays(1);
 
         Theme java = themeRepository.save(ThemeFixture.THEME_JAVA.create());
         ReservationTime onePm = timeRepository.save(TimeFixture.ONE_PM.create());
@@ -92,7 +92,7 @@ class MemberReservationTimeControllerTest {
         reservationRepository.save(new Reservation(member, java, date, onePm, Status.RESERVED));
 
         List<AvailableReservationTimeResponse> actualResponse = RestAssured.given().log().all()
-                .when().get("/times/available?date=2024-06-04&themeId=1")
+                .when().get("/times/available?date=" + date.toString() + "&themeId=1")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

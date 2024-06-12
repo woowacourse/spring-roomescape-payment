@@ -84,7 +84,8 @@ class ReservationTimeServiceTest {
         Member sun = memberRepository.save(MEMBER_SUN.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         Theme bed = themeRepository.save(THEME_BED.create());
-        reservationRepository.save(reservation(sun, bed, "2024-06-01", onePm, RESERVED));
+        LocalDate date = LocalDate.now().plusDays(1);
+        reservationRepository.save(reservation(sun, bed, date.toString(), onePm, RESERVED));
 
         assertThatThrownBy(() -> timeService.deleteReservationTime(1L))
                 .isInstanceOf(ReservationReferencedTimeException.class);

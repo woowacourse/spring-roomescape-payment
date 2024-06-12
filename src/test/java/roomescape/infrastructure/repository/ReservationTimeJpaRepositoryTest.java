@@ -79,10 +79,11 @@ class ReservationTimeJpaRepositoryTest {
     @DisplayName("특정 테마 및 날짜에 예약이 존재하는 시간을 가져오는 쿼리 테스트")
     @Test
     void find_all_reserved_time_by_date_and_theme_id() {
-        LocalDate date = LocalDate.parse("2024-06-04");
+        LocalDate date = LocalDate.now().plusDays(1);
+        LocalDate laterDate = date.plusDays(1);
 
         reservationRepository.save(reservation(sun, bed, date.toString(), twoPm, RESERVED));
-        reservationRepository.save(reservation(solar, database, "2024-06-05", onePm, RESERVED));
+        reservationRepository.save(reservation(solar, database, laterDate.toString(), onePm, RESERVED));
 
         List<ReservationTime> expected = timeRepository.findAllReservedTimeByDateAndThemeId(
                 date, bed.getId());

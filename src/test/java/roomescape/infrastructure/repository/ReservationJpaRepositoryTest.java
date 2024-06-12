@@ -80,13 +80,15 @@ class ReservationJpaRepositoryTest {
     @DisplayName("시작, 종료 날짜와 회원 아이디, 테마 아이디로 예약 목록을 검색하는 쿼리 테스트")
     @Test
     void search_reservation_with_start_date_end_date_member_id_theme_id() {
+        LocalDate start = LocalDate.now().plusDays(1);
+        LocalDate end = LocalDate.now().plusDays(3);
+        LocalDate laterEnd = end.plusDays(1);
+
         Reservation reservation = reservationRepository.save(
-                reservation(bri, java, "2024-06-04", onePm, Status.RESERVED));
-        reservationRepository.save(reservation(solar, java, "2024-06-06", twoPm, Status.RESERVED));
-        reservationRepository.save(reservation(sun, database, "2024-06-04", onePm, Status.RESERVED));
-        reservationRepository.save(reservation(sun, java, "2024-06-11", onePm, Status.RESERVED));
-        LocalDate start = LocalDate.parse("2024-06-04");
-        LocalDate end = LocalDate.parse("2024-06-06");
+                reservation(bri, java, start.toString(), onePm, Status.RESERVED));
+        reservationRepository.save(reservation(solar, java, end.toString(), twoPm, Status.RESERVED));
+        reservationRepository.save(reservation(sun, database, start.toString(), onePm, Status.RESERVED));
+        reservationRepository.save(reservation(sun, java, laterEnd.toString(), onePm, Status.RESERVED));
 
         List<Reservation> reservations = reservationRepository.findByPeriodAndThemeAndMember(start, end, bri.getId(),
                 java.getId());
@@ -97,7 +99,7 @@ class ReservationJpaRepositoryTest {
     @DisplayName("예약 대기 순번 1등을 조회하는 쿼리 테스트.")
     @Test
     void find_next_waiting_reservation() {
-        LocalDate date = LocalDate.parse("2024-06-04");
+        LocalDate date = LocalDate.now().plusDays(1);
         reservationRepository.save(reservation(bri, java, date.toString(), onePm, Status.RESERVED));
         Reservation actual = reservationRepository.save(reservation(sun, java, date.toString(), onePm, Status.WAITING));
 

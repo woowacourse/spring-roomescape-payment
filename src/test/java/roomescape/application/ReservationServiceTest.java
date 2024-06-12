@@ -33,6 +33,7 @@ import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.reservation.DuplicatedReservationException;
+import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.exception.time.NotFoundReservationTimeException;
@@ -126,7 +127,7 @@ class ReservationServiceTest {
                 FakePayment.AMOUNT, FakePayment.ORDER_ID, FakePayment.PAYMENT_KEY);
 
         assertThatThrownBy(() -> reservationService.saveReservation(request, jazz.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidDateTimeReservationException.class);
     }
 
     @DisplayName("이미 해당 회원의 중복된 예약이 존재하면 예외를 발생시킨다.")

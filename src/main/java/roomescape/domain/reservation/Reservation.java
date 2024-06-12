@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import roomescape.domain.reservationdetail.ReservationTime;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.reservation.CancelReservationException;
+import roomescape.exception.reservation.InvalidDateTimeReservationException;
 
 @Entity
 @Getter
@@ -66,6 +68,7 @@ public class Reservation {
         this.theme = theme;
         this.date = date;
         this.time = time;
+        validatePastTime(date, time);
         this.status = status;
     }
 
@@ -107,6 +110,17 @@ public class Reservation {
 
     private boolean isCanceled() {
         return this.status == Status.CANCELED;
+    }
+
+    private void validatePastTime(LocalDate date, ReservationTime time) {
+        if (createdAt == null & isBefore(date, time)) {
+            throw new InvalidDateTimeReservationException();
+        }
+    }
+
+    private boolean isBefore(LocalDate date, ReservationTime time) {
+        return LocalDateTime.of(date, time.getStartAt())
+                .isBefore(LocalDateTime.now());
     }
 
     public Optional<Payment> getPayment() {

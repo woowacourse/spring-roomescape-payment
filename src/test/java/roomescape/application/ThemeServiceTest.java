@@ -93,12 +93,15 @@ class ThemeServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         Theme java = themeRepository.save(THEME_JAVA.create());
         Theme database = themeRepository.save(THEME_DATABASE.create());
+        String startDate = LocalDate.now().plusDays(1).toString();
+        String endDate = LocalDate.now().plusDays(4).toString();
+        String laterEnd = LocalDate.now().plusDays(5).toString();
 
-        reservationRepository.save(reservation(sun, bed, "2024-06-01", onePm, RESERVED));
-        reservationRepository.save(reservation(jazz, bed, "2024-06-01", twoPm, RESERVED));
-        reservationRepository.save(reservation(bri, bed, "2024-06-01", threePm, RESERVED));
-        reservationRepository.save(reservation(solar, database, "2024-06-02", threePm, RESERVED));
-        reservationRepository.save(reservation(jazz, java, "2024-06-06", threePm, RESERVED));
+        reservationRepository.save(reservation(sun, bed, startDate, onePm, RESERVED));
+        reservationRepository.save(reservation(jazz, bed, startDate, twoPm, RESERVED));
+        reservationRepository.save(reservation(bri, bed, startDate, threePm, RESERVED));
+        reservationRepository.save(reservation(solar, database, endDate, threePm, RESERVED));
+        reservationRepository.save(reservation(jazz, java, laterEnd, threePm, RESERVED));
 
         List<ThemeResponse> allPopularThemes = themeService.findAllPopularThemes(new FakeRankingPolicy());
 
@@ -112,7 +115,8 @@ class ThemeServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         Member bri = memberRepository.save(MEMBER_BRI.create());
-        reservationRepository.save((reservation(bri, bed, "2024-06-01", onePm, RESERVED)));
+        LocalDate date = LocalDate.now().plusDays(1);
+        reservationRepository.save((reservation(bri, bed, date.toString(), onePm, RESERVED)));
 
         assertThatThrownBy(() -> themeService.deleteTheme(1L))
                 .isInstanceOf(ReservationReferencedThemeException.class);

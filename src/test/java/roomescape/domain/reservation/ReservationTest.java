@@ -19,7 +19,7 @@ class ReservationTest {
 
     Member member = MEMBER_SUN.create();
     Theme theme = THEME_BED.create();
-    LocalDate date = LocalDate.now();
+    LocalDate date = LocalDate.now().plusDays(1);
     ReservationTime time = ONE_PM.create();
 
     @DisplayName("예약 상태를 PAYMENT_PENDING 으로 변경할 시 현재 상태가 CANCELED 라면 예외를 발생시킨다. ")
