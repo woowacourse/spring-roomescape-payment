@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class Amount {
 
-    public static final int ROOM_ESCAPTE_AMOUNT = 128000;
+    private static final int ROOM_ESCAPE_AMOUNT = 128000;
 
     @Column(name = "amount", nullable = false)
     private long amount;
@@ -15,12 +15,12 @@ public class Amount {
     }
 
     public Amount(long amount) {
-        validation(amount);
+        validate(amount);
         this.amount = amount;
     }
 
-    public void validation(long amount) {
-        if (amount != ROOM_ESCAPTE_AMOUNT) {
+    public void validate(long amount) {
+        if (amount != ROOM_ESCAPE_AMOUNT) {
             throw new IllegalArgumentException("방탈출 가격이 일치하지 않습니다.");
         }
     }
