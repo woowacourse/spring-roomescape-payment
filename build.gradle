@@ -15,6 +15,10 @@ repositories {
 
 configurations {
     asciidoctorExt
+
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 dependencies {
@@ -27,7 +31,13 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-gson:0.11.2'
+
     implementation 'mysql:mysql-connector-java:8.0.32'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly 'com.h2database:h2'
 
