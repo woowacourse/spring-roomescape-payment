@@ -1,5 +1,6 @@
 package roomescape.fixture;
 
+import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
@@ -8,13 +9,22 @@ import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.service.reservation.dto.AdminReservationRequest;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 
 import java.time.LocalDate;
 
 public class ReservationFixture {
     public static Reservation createReserved(Member member, ReservationDetail reservationDetail) {
-        return new Reservation(member, reservationDetail, ReservationStatus.RESERVED, Payment.createEmpty());
+        return new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
+    }
+
+    public static Reservation createReserved(Member member, ReservationDetail reservationDetail, Payment payment) {
+        return new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment);
+    }
+
+    public static Reservation createPendingPayment(Member member, ReservationDetail reservationDetail) {
+        return new Reservation(member, reservationDetail, ReservationStatus.PENDING_PAYMENT);
     }
 
     public static AdminReservationRequest createAdminReservationRequest(Member admin, ReservationDetail reservationDetail) {
@@ -39,5 +49,9 @@ public class ReservationFixture {
                 reservationDetail.getReservationTime().getId(),
                 reservationDetail.getTheme().getId(),
                 "paymentKey", "orderId", 1000L);
+    }
+
+    public static ReservationConfirmRequest createReservationConfirmRequest(Reservation reservation) {
+        return new ReservationConfirmRequest(reservation.getId(), new PaymentRequest("paymentKey", "orderId", 1000L));
     }
 }

@@ -37,10 +37,10 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             select new roomescape.domain.dto.ReservationWithRank(r,
             (select count(*) from Reservation as cr
             where cr.detail.id = r.detail.id and cr.createdAt < r.createdAt))
-            from Reservation r
+            from Reservation r left join r.payment
             where r.member.id = :memberId
             """)
     List<ReservationWithRank> findWithRankingByMemberId(@Param("memberId") long memberId);
 
-    boolean existsByDetailIdAndStatus(Long reservationDetailId, ReservationStatus status);
+    boolean existsByDetailIdAndStatusIn(Long reservationDetailId, List<ReservationStatus> statuses);
 }

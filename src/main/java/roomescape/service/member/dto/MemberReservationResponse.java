@@ -11,16 +11,18 @@ public record MemberReservationResponse(
         String theme,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate date,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul") LocalTime time,
-        ReservationStatusResponse reservationStatus
+        ReservationStatusResponse reservationStatus,
+        MemberPaymentResponse payment
 ) {
 
     public static MemberReservationResponse from(ReservationWithRank reservationWithRank) {
         return new MemberReservationResponse(
-                reservationWithRank.getReservation().getId(),
-                reservationWithRank.getReservation().getTheme().getName().getValue(),
-                reservationWithRank.getReservation().getDate(),
-                reservationWithRank.getReservation().getTime(),
-                new ReservationStatusResponse(reservationWithRank.getReservation().getStatus().getDescription(), reservationWithRank.getRank())
+                reservationWithRank.reservation().getId(),
+                reservationWithRank.reservation().getTheme().getName().getValue(),
+                reservationWithRank.reservation().getDate(),
+                reservationWithRank.reservation().getTime(),
+                new ReservationStatusResponse(reservationWithRank.reservation().getStatus().getDescription(), reservationWithRank.rank()),
+                MemberPaymentResponse.of(reservationWithRank.reservation().getPayment())
         );
     }
 }

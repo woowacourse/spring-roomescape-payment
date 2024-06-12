@@ -1,8 +1,6 @@
 package roomescape.domain.reservation;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,7 +39,6 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     @OneToOne
-    @Cascade(CascadeType.PERSIST)
     private Payment payment;
 
     protected Reservation() {
@@ -52,6 +49,10 @@ public class Reservation {
         this.detail = detail;
         this.status = status;
         this.payment = payment;
+    }
+
+    public Reservation(Member member, ReservationDetail detail, ReservationStatus status) {
+        this(member, detail, status, null);
     }
 
     public boolean isReservationOf(Member member) {
@@ -66,8 +67,8 @@ public class Reservation {
         return status.isReserved();
     }
 
-    public void reserved() {
-        this.status = ReservationStatus.RESERVED;
+    public boolean isPendingPayment() {
+        return status.isPendingPayment();
     }
 
     @Override
@@ -116,5 +117,22 @@ public class Reservation {
 
     public ReservationDetail getDetail() {
         return detail;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void reserved() {
+        this.status = ReservationStatus.RESERVED;
+    }
+
+    public void pendingPayment() {
+        this.status = ReservationStatus.PENDING_PAYMENT;
+    }
+
+    public void paid(Payment payment) {
+        this.payment = payment;
+        this.status = ReservationStatus.RESERVED;
     }
 }

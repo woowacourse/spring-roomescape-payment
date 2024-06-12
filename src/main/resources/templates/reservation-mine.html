@@ -7,6 +7,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/toss-style.css">
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
@@ -54,11 +56,21 @@
             <th>시간</th>
             <th>상태</th>
             <th></th>
+            <th>paymentKey</th>
+            <th>결제금액</th>
+            <th></th>
         </tr>
         </thead>
         <tbody id="table-body">
         </tbody>
     </table>
+</div>
+
+<div class="wrapper w-100">
+    <div class="max-w-540 w-100">
+        <div id="payment-method" class="w-100"></div>
+        <div id="agreement" class="w-100"></div>
+    </div>
 </div>
 
 <script src="/js/user-scripts.js"></script>

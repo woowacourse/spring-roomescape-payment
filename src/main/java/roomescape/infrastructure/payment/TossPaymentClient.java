@@ -7,12 +7,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.domain.dto.PaymentCancelRequest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.infrastructure.payment.dto.PaymentResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -46,13 +49,23 @@ public class TossPaymentClient implements PaymentClient {
     @Override
     public Payment approve(PaymentRequest request) {
         String authorizations = getEncodedKey();
-        return restClient.post()
-                .uri("/v1/payments/confirm")
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, authorizations)
-                .body(request)
-                .retrieve()
-                .body(Payment.class);
+        PaymentResponse response = Optional.ofNullable(restClient.post()
+                        .uri("/v1/payments/confirm")
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, authorizations)
+                        .body(request)
+                        .retrieve()
+                        .body(PaymentResponse.class))
+                .orElseGet(PaymentResponse::empty);
+        return response.toPayment();
+    }
+
+    @Override
+    public void cancel(PaymentCancelRequest request) {
+        String authorizations = getEncodedKey();
+        restClient.post()
+                .uri("/v1/payments/" + request.paymentKey() + "/cancel")
+                .header(HttpHeaders.AUTHORIZATION, authorizations);
     }
 
     private String getEncodedKey() {

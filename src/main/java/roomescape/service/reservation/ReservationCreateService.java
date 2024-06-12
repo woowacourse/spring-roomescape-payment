@@ -27,7 +27,7 @@ import roomescape.service.reservation.dto.ReservationResponse;
 import java.time.LocalDate;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReservationCreateService {
 
     private final ReservationRepository reservationRepository;
@@ -48,42 +48,49 @@ public class ReservationCreateService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
-        return createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
-                adminReservationRequest.memberId(), adminReservationRequest.date(), Payment.createEmpty());
-    }
-
-    public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
-        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
-        Payment payment = paymentService.approvePayment(request);
-
-        return createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
-                reservationRequest.date(), payment);
-    }
-
-    private ReservationResponse createReservation(long timeId, long themeId, long memberId, LocalDate date, Payment payment) {
-        ReservationDate reservationDate = ReservationDate.of(date);
-        ReservationTime reservationTime = findTimeById(timeId);
-        Theme theme = findThemeById(themeId);
-        Member member = findMemberById(memberId);
-        ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
-        validateDuplication(reservationDetail);
-
-        Reservation reservation = reservationRepository.save(new Reservation(member, reservationDetail, ReservationStatus.RESERVED, payment));
+        Reservation reservation = saveReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
+                adminReservationRequest.memberId(), adminReservationRequest.date(), ReservationStatus.RESERVED);
         return new ReservationResponse(reservation);
     }
 
-    private ReservationTime findTimeById(long timeId) {
+    @Transactional
+    public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
+        Reservation reservation = saveReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
+                reservationRequest.date(), ReservationStatus.PENDING_PAYMENT);
+
+        PaymentRequest request = new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(), reservationRequest.amount());
+        if (reservation.isPendingPayment()) {
+            Payment payment = paymentService.approvePayment(request);
+            reservation.paid(payment);
+        }
+
+        return new ReservationResponse(reservation);
+    }
+
+    private Reservation saveReservation(long timeId, long themeId, long memberId, LocalDate date, ReservationStatus status) {
+        ReservationDate reservationDate = ReservationDate.of(date);
+        ReservationTime reservationTime = getTimeById(timeId);
+        Theme theme = getThemeById(themeId);
+        Member member = getMemberById(memberId);
+        ReservationDetail reservationDetail = getReservationDetail(reservationDate, reservationTime, theme);
+        validateDuplication(reservationDetail);
+
+        return reservationRepository.save(new Reservation(member, reservationDetail, status));
+    }
+
+    private ReservationTime getTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 시간입니다."));
     }
 
-    private Theme findThemeById(long themeId) {
+    private Theme getThemeById(long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new InvalidReservationException("더이상 존재하지 않는 테마입니다."));
     }
 
-    private Member findMemberById(long memberId) {
+    private Member getMemberById(long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new InvalidMemberException("존재하지 않는 회원입니다."));
     }

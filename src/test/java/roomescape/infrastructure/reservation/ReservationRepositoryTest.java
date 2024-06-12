@@ -1,6 +1,7 @@
 package roomescape.infrastructure.reservation;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.jdbc.SqlGroup;
+import roomescape.domain.dto.ReservationWithRank;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.schedule.ReservationDate;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 class ReservationRepositoryTest {
@@ -64,6 +67,37 @@ class ReservationRepositoryTest {
 
         //then
         assertThat(result).isEqualTo(expected);
+    }
+
+    @DisplayName("멤버 식별자로 예약 및 대기 정보를 조회한다.")
+    @Test
+    @SqlGroup({
+            @Sql(value = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD),
+            @Sql({"/member.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/payment.sql", "/reservation.sql", "/waiting.sql"})
+    })
+    void findWithRankingByMemberId() {
+        //given
+        long memberId = 1;
+
+        //when
+        List<ReservationWithRank> result = reservationRepository.findWithRankingByMemberId(memberId);
+
+        //then
+        assertAll(
+                () -> assertThat(result).hasSize(2),
+                () -> assertThat(result.stream()
+                        .map(ReservationWithRank::reservation)
+                        .filter(Reservation::isReserved)
+                        .findFirst()
+                        .get()
+                        .getPayment()).isNotNull(),
+                () -> assertThat(result.stream()
+                        .map(ReservationWithRank::reservation)
+                        .filter(reservation -> !reservation.isReserved())
+                        .findFirst()
+                        .get()
+                        .getPayment()).isNull()
+        );
 
     }
 }

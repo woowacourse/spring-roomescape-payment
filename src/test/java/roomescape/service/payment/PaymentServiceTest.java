@@ -1,6 +1,5 @@
 package roomescape.service.payment;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +7,8 @@ import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.fixture.PaymentFixture;
 import roomescape.service.ServiceTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PaymentServiceTest extends ServiceTest {
     @Autowired
@@ -23,6 +24,6 @@ class PaymentServiceTest extends ServiceTest {
         Payment payment = paymentService.approvePayment(request);
 
         //then
-        Assertions.assertThat(payment.getId()).isNotZero();
+        assertThat(payment.getId()).isNotZero();
     }
 }

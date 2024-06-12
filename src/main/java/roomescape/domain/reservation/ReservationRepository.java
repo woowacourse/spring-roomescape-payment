@@ -31,5 +31,5 @@ public interface ReservationRepository {
 
     boolean existsByDetailId(Long id);
 
-    boolean existsByDetailIdAndStatus(Long id, ReservationStatus reservationStatus);
+    boolean existsByDetailIdAndStatusIn(Long id, List<ReservationStatus> statuses);
 }

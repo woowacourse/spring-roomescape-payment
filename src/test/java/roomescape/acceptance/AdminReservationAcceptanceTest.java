@@ -81,7 +81,7 @@ class AdminReservationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("관리자가 일정이 지난 예약을 삭제하려고 하면 예외가 발생한다.")
     @TestFactory
-    @Sql(value = {"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/reservation.sql"})
+    @Sql({"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-past-detail.sql", "/reservation.sql"})
     void cannotDeletePastReservation() {
         //given
         long reservationId = 1;

@@ -4,8 +4,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.LoginMemberId;
+import roomescape.domain.dto.PaymentRequest;
 import roomescape.service.reservation.ReservationCommonService;
 import roomescape.service.reservation.ReservationCreateService;
+import roomescape.service.reservation.dto.ReservationConfirmRequest;
+import roomescape.service.reservation.dto.ReservationConfirmedResponse;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
@@ -17,16 +20,16 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationCreateService reservationCreateService;
-    private final ReservationCommonService reservationReadService;
+    private final ReservationCommonService reservationCommonService;
 
-    public ReservationController(ReservationCreateService reservationCreateService, ReservationCommonService reservationReadService) {
+    public ReservationController(ReservationCreateService reservationCreateService, ReservationCommonService reservationCommonService) {
         this.reservationCreateService = reservationCreateService;
-        this.reservationReadService = reservationReadService;
+        this.reservationCommonService = reservationCommonService;
     }
 
     @GetMapping
     public List<ReservationResponse> findAll() {
-        return reservationReadService.findAll();
+        return reservationCommonService.findAll();
     }
 
     @PostMapping
@@ -36,5 +39,15 @@ public class ReservationController {
         ReservationResponse reservationResponse = reservationCreateService.createMemberReservation(reservationRequest, memberId);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
+    }
+
+    @PostMapping("/{id}/payment")
+    public ResponseEntity<ReservationConfirmedResponse> confirmReservation(
+            @RequestBody @Valid PaymentRequest paymentRequest,
+            @PathVariable("id") long id,
+            @LoginMemberId long memberId) {
+        ReservationConfirmRequest reservationConfirmRequest = new ReservationConfirmRequest(id, paymentRequest);
+        ReservationConfirmedResponse reservationConfirmedResponse = reservationCommonService.confirmReservation(reservationConfirmRequest, memberId);
+        return ResponseEntity.ok(reservationConfirmedResponse);
     }
 }
