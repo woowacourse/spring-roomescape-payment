@@ -12,10 +12,16 @@ public class DatabaseCleaner {
     }
 
     public void cleanUp() {
+        clearPayment();
         clearReservation();
         clearTime();
         clearTheme();
         clearMember();
+    }
+
+    private void clearPayment() {
+        jdbcTemplate.update("delete from payment");
+        jdbcTemplate.update("alter table payment alter column id restart with 1");
     }
 
     private void clearReservation() {

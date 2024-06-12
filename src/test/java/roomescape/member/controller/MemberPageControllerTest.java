@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+
 import roomescape.config.ControllerConfig;
 
 @WebMvcTest(MemberPageController.class)
@@ -18,6 +19,14 @@ class MemberPageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+
+    @Test
+    @DisplayName("/을 요청하면 index.html을 반환한다.")
+    void welcomePage() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk());
+    }
 
     @Test
     @DisplayName("/signup을 요청하면 signup.html을 반환한다.")
@@ -34,4 +43,6 @@ class MemberPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"));
     }
+
+
 }

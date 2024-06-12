@@ -38,6 +38,12 @@ public class ExceptionApiController {
     public ResponseEntity<ErrorResponse> paymentExHandler(PaymentException paymentException) {
         ErrorResponse errorResponse = new ErrorResponse(paymentException.getMessage());
 
+        return ResponseEntity.status(paymentException.getStatusCode()).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> unknownExHandler(Exception exception) {
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

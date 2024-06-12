@@ -1,0 +1,126 @@
+= 방탈출 예약
+
+== 저장 API
+
+=== 방탈출 예약/대기 저장
+
+**curl**
+
+include::{snippets}/reservation/save/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/save/request-cookies.adoc[]
+include::{snippets}/reservation/save/request-fields.adoc[]
+include::{snippets}/reservation/save/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/save/response-fields.adoc[]
+include::{snippets}/reservation/save/http-response.adoc[]
+
+=== 방탈출 어드민 예약/대기 저장
+
+**curl**
+
+include::{snippets}/reservation/save-admin/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/save-admin/request-cookies.adoc[]
+include::{snippets}/reservation/save-admin/request-fields.adoc[]
+include::{snippets}/reservation/save-admin/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/save-admin/response-fields.adoc[]
+include::{snippets}/reservation/save-admin/http-response.adoc[]
+
+== 조회 API
+
+=== 방탈출 모든 예약 조회
+
+**curl**
+
+include::{snippets}/reservation/search/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/search/request-cookies.adoc[]
+include::{snippets}/reservation/search/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/search/response-fields.adoc[]
+include::{snippets}/reservation/search/http-response.adoc[]
+
+=== 방탈출 예약 대기 조회
+
+**curl**
+
+include::{snippets}/reservation/waits-search/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/waits-search/request-cookies.adoc[]
+include::{snippets}/reservation/waits-search/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/waits-search/response-fields.adoc[]
+include::{snippets}/reservation/waits-search/http-response.adoc[]
+
+=== 방탈출 조건부 조회
+
+**curl**
+
+include::{snippets}/reservation/search-cond/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/search-cond/query-parameters.adoc[]
+include::{snippets}/reservation/search-cond/request-cookies.adoc[]
+include::{snippets}/reservation/search-cond/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/search-cond/response-fields.adoc[]
+include::{snippets}/reservation/search-cond/http-response.adoc[]
+
+=== 본인 예약 /대기 조회
+
+**curl**
+
+include::{snippets}/reservation/mine/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/mine/request-cookies.adoc[]
+include::{snippets}/reservation/mine/http-response.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/mine/response-fields.adoc[]
+include::{snippets}/reservation/mine/http-response.adoc[]
+
+== 삭제 API
+
+=== 예약/대기 삭제
+
+**curl**
+
+include::{snippets}/reservation/delete/curl-request.adoc[]
+
+**요청**
+
+include::{snippets}/reservation/delete/path-parameters.adoc[]
+include::{snippets}/reservation/delete/request-cookies.adoc[]
+include::{snippets}/reservation/delete/http-request.adoc[]
+
+**응답**
+
+include::{snippets}/reservation/delete/http-response.adoc[]
+
+
+
+

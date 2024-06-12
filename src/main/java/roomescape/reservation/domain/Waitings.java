@@ -19,8 +19,8 @@ public class Waitings {
         return waitingReservations;
     }
 
-    public int findMemberRank(Reservation reservation, Long memberId) {
-        if (reservation.getStatus() == Status.SUCCESS) {
+    public int findMemberRank(Reservation reservation) {
+        if (reservation.isSuccess()) {
             return 0;
         }
 
@@ -28,7 +28,7 @@ public class Waitings {
                 .filter(waiting -> waiting.getTheme().sameThemeId(reservation.getTheme().getId()))
                 .filter(waiting -> waiting.getDate().equals(reservation.getDate()))
                 .filter(waiting -> waiting.getTime().getStartAt().equals(reservation.getTime().getStartAt()))
-                .takeWhile(waiting -> !waiting.getMember().sameMemberId(memberId))
+                .takeWhile(waiting -> !waiting.getMember().sameMemberId(reservation.getMember().getId()))
                 .count() + 1;
     }
 

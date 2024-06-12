@@ -16,53 +16,66 @@ import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.auth.Login;
 import roomescape.member.dto.LoginMemberInToken;
+import roomescape.reservation.dto.request.FreeReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationApiController {
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationApiController(ReservationService reservationService) {
+    public ReservationApiController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> findAll() {
-        List<ReservationResponse> reservationResponses = reservationService.findAll();
+        List<ReservationResponse> responses = reservationService.findAll();
 
-        return ResponseEntity.ok(reservationResponses);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/reservations/search")
     public ResponseEntity<List<ReservationResponse>> findAllBySearchCond(
-            @Valid @ModelAttribute ReservationSearchRequest reservationSearchRequest
+            @Valid @ModelAttribute ReservationSearchRequest request
     ) {
-        List<ReservationResponse> reservationResponses = reservationService.findAllBySearch(reservationSearchRequest);
+        List<ReservationResponse> responses = reservationService.findAllBySearch(request);
 
-        return ResponseEntity.ok(reservationResponses);
+        return ResponseEntity.ok(responses);
     }
 
-    @PostMapping(path = {"/reservations", "/admin/reservations"})
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createMemberReservation(
-            @Valid @RequestBody ReservationCreateRequest reservationCreateRequest,
+            @Valid @RequestBody ReservationCreateRequest request,
             @Login LoginMemberInToken loginMemberInToken
     ) {
-        Long id = reservationService.save(reservationCreateRequest, loginMemberInToken);
-        ReservationResponse reservationResponse = reservationService.findById(id);
+        ReservationResponse response = paymentService.purchase(request, loginMemberInToken);
 
-        return ResponseEntity.created(URI.create("/reservations/" + id)).body(reservationResponse);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
+    }
+
+    @PostMapping("/admin/reservations")
+    public ResponseEntity<ReservationResponse> createAdminReservation(
+            @Valid @RequestBody FreeReservationCreateRequest request,
+            @Login LoginMemberInToken loginMemberInToken
+    ) {
+        ReservationResponse response = reservationService.save(request, loginMemberInToken);
+
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping("/reservations/waiting")
     public ResponseEntity<List<WaitingResponse>> findWaiting() {
-        List<WaitingResponse> waitingResponses = reservationService.findWaiting();
+        List<WaitingResponse> responses = reservationService.findWaiting();
 
-        return ResponseEntity.ok(waitingResponses);
+        return ResponseEntity.ok(responses);
     }
 
     @DeleteMapping("/reservations/{id}")
@@ -74,9 +87,10 @@ public class ReservationApiController {
 
     @GetMapping("/reservations/me")
     public ResponseEntity<List<MyReservationResponse>> myReservations(@Login LoginMemberInToken loginMemberInToken) {
-        List<MyReservationResponse> myReservationResponses = reservationService.findAllByMemberId(
+        List<MyReservationResponse> responses = reservationService.findChargedReservationByMemberId(
                 loginMemberInToken.id());
+        responses.addAll(reservationService.findFreeReservationByMemberId(loginMemberInToken.id()));
 
-        return ResponseEntity.ok(myReservationResponses);
+        return ResponseEntity.ok(responses);
     }
 }

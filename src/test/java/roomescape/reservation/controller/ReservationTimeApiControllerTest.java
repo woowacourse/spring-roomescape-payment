@@ -9,19 +9,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+
+import jakarta.servlet.http.Cookie;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import roomescape.config.ControllerConfig;
 import roomescape.reservation.dto.request.TimeCreateRequest;
 import roomescape.reservation.dto.response.TimeResponse;
@@ -70,13 +75,10 @@ class ReservationTimeApiControllerTest {
     @DisplayName("시간 정보를 저장 성공 시 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
     void createSuccessTest() throws Exception {
         TimeCreateRequest timeCreateRequest = new TimeCreateRequest(LocalTime.now());
-        TimeResponse timeResponse = new TimeResponse(1L, timeCreateRequest.startAt());
+        TimeResponse response = new TimeResponse(1L, timeCreateRequest.startAt());
 
-        doReturn(1L).when(reservationTimeService)
-                .save(any(TimeCreateRequest.class));
-
-        doReturn(timeResponse).when(reservationTimeService)
-                .findById(1L);
+        Mockito.when(reservationTimeService.save(any()))
+                .thenReturn(response);
 
         mockMvc.perform(post("/times")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +87,7 @@ class ReservationTimeApiControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/times/1"))
-                .andExpect(jsonPath("$.id").value(timeResponse.id()));
+                .andExpect(jsonPath("$.id").value(response.id()));
     }
 
     @Test

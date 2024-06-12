@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.dto.request.TimeCreateRequest;
@@ -13,6 +14,7 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationTimeService {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -25,10 +27,12 @@ public class ReservationTimeService {
         this.reservationTimeRepository = reservationTimeRepository;
     }
 
-    public Long save(TimeCreateRequest timeCreateRequest) {
+    @Transactional
+    public TimeResponse save(TimeCreateRequest timeCreateRequest) {
         ReservationTime reservationTime = timeCreateRequest.toReservationTime();
 
-        return reservationTimeRepository.save(reservationTime).getId();
+        ReservationTime time = reservationTimeRepository.save(reservationTime);
+        return TimeResponse.toResponse(time);
     }
 
     public TimeResponse findById(Long id) {
@@ -55,6 +59,7 @@ public class ReservationTimeService {
                 .toList();
     }
 
+    @Transactional
     public void delete(Long id) {
         reservationTimeRepository.findByReservationsId(id)
                 .ifPresent(empty -> {
