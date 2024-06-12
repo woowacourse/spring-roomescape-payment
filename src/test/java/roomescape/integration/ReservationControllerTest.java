@@ -1,17 +1,7 @@
 package roomescape.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,22 +15,26 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.config.TestPaymentConfig;
-import roomescape.domain.Duration;
-import roomescape.domain.Email;
-import roomescape.domain.Member;
-import roomescape.domain.Name;
-import roomescape.domain.Password;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.dto.ReservationResponse;
+import roomescape.domain.*;
+import roomescape.dto.response.ReservationResponse;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.FakePayment;
 import roomescape.service.JwtGenerator;
+import roomescape.service.PaymentService;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
+import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(TestPaymentConfig.class)
@@ -61,6 +55,8 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentService paymentService;
 
     private Theme defaultTheme1 = new Theme("theme1", "description", "thumbnail");
     private Theme defaultTheme2 = new Theme("theme2", "description", "thumbnail");
@@ -81,6 +77,7 @@ public class ReservationControllerTest {
     private String token;
     private String othersToken;
     private String adminToken;
+    private Payment payment;
 
     @BeforeEach
     void initData() {
@@ -95,6 +92,7 @@ public class ReservationControllerTest {
         token = generateTokenWith(defaultMember);
         othersToken = generateTokenWith(otherMember);
         adminToken = generateTokenWith(admin);
+        payment = paymentService.pay(FakePayment.CORRECT_REQ);
     }
 
     private String generateTokenWith(Member member) {
@@ -117,7 +115,8 @@ public class ReservationControllerTest {
                 LocalDate.now().plusDays(1),
                 defaultTime,
                 defaultTheme1,
-                savedUser
+                savedUser,
+                FakePayment.CORRECT_REQ
         );
 
         @BeforeEach
@@ -129,9 +128,9 @@ public class ReservationControllerTest {
         @Test
         void createReservationTest() {
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", savedReservation.getDate().plusDays(1).toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -161,9 +160,9 @@ public class ReservationControllerTest {
         @Test
         void paymentFailTest() {
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.WRONG_REQ.paymentKey(),
-                    "orderId", FakePayment.WRONG_REQ.orderId(),
-                    "amount", FakePayment.WRONG_REQ.amount(),
+                    "paymentKey", FakePayment.WRONG_REQ.getPaymentKey(),
+                    "orderId", FakePayment.WRONG_REQ.getOrderId(),
+                    "amount", FakePayment.WRONG_REQ.getAmount(),
                     "date", savedReservation.getDate().plusDays(1).toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -175,7 +174,7 @@ public class ReservationControllerTest {
                     .body(reservationParam)
                     .post("/reservations")
                     .then().log().all()
-                    .statusCode(400);
+                    .statusCode(500);
 
             RestAssured.given().log().all()
                     .when().get("/reservations")
@@ -188,9 +187,9 @@ public class ReservationControllerTest {
         @Test
         void createReservationWaitTest() {
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -220,9 +219,9 @@ public class ReservationControllerTest {
         @Test
         void createPastReservationTest() {
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", LocalDate.now().minusMonths(1).toString(),
                     "timeId", "1",
                     "themeId", "1");
@@ -260,9 +259,9 @@ public class ReservationControllerTest {
         void deleteReservationWaitTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -329,9 +328,9 @@ public class ReservationControllerTest {
         void deleteWaitingByAdminTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -382,9 +381,9 @@ public class ReservationControllerTest {
         void adminDeleteWaitingByUserFailTest() {
             //given
             Map<String, Object> reservationParam = Map.of(
-                    "paymentKey", FakePayment.CORRECT_REQ.paymentKey(),
-                    "orderId", FakePayment.CORRECT_REQ.orderId(),
-                    "amount", FakePayment.CORRECT_REQ.amount(),
+                    "paymentKey", FakePayment.CORRECT_REQ.getPaymentKey(),
+                    "orderId", FakePayment.CORRECT_REQ.getOrderId(),
+                    "amount", FakePayment.CORRECT_REQ.getAmount(),
                     "date", savedReservation.getDate().toString(),
                     "timeId", savedReservation.getReservationTime().getId(),
                     "themeId", savedReservation.getTheme().getId());
@@ -435,58 +434,65 @@ public class ReservationControllerTest {
         @BeforeEach
         void initData() {
             reservation1 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(5), defaultTime, defaultTheme1,
-                            defaultMember));
+                    new Reservation(LocalDate.now().minusDays(5),
+                            defaultTime,
+                            defaultTheme1,
+                            defaultMember,
+                            payment));
             reservation1_waiting1 = reservationRepository.save(new Reservation(
                     reservation1.getDate(),
                     reservation1.getReservationTime(),
                     reservation1.getTheme(),
-                    otherMember)
+                    otherMember,
+                    payment)
             );
             reservation2 = reservationRepository.save(
                     new Reservation(LocalDate.now().minusDays(4), defaultTime, defaultTheme1,
-                            defaultMember));
+                            defaultMember, payment));
             reservation3 = reservationRepository.save(
                     new Reservation(LocalDate.now().minusDays(3), defaultTime, defaultTheme1,
-                            defaultMember));
+                            defaultMember, payment));
             reservation4 = reservationRepository.save(
                     new Reservation(LocalDate.now().minusDays(2), defaultTime, defaultTheme1,
-                            defaultMember));
+                            defaultMember, payment));
             reservation4_waiting1 = reservationRepository.save(new Reservation(
                     reservation4.getDate(),
                     reservation4.getReservationTime(),
                     reservation4.getTheme(),
-                    otherMember
+                    otherMember,
+                    payment
             ));
             reservation4_waiting2 = reservationRepository.save(new Reservation(
                     reservation4.getDate(),
                     reservation4.getReservationTime(),
                     reservation4.getTheme(),
-                    otherMember
+                    otherMember,
+                    payment
             ));
             reservation5 = reservationRepository.save(
                     new Reservation(LocalDate.now().minusDays(1), defaultTime, defaultTheme1,
-                            defaultMember));
+                            defaultMember, payment));
 
             reservation6 = reservationRepository.save(
-                    new Reservation(LocalDate.now(), defaultTime, defaultTheme2, defaultMember));
+                    new Reservation(LocalDate.now(), defaultTime, defaultTheme2, defaultMember, payment));
             reservation7 = reservationRepository.save(
                     new Reservation(LocalDate.now().plusDays(1), defaultTime, defaultTheme2,
-                            defaultMember));
+                            defaultMember, payment));
             reservation8 = reservationRepository.save(
                     new Reservation(LocalDate.now().plusDays(2), defaultTime, defaultTheme2,
-                            defaultMember));
+                            defaultMember, payment));
             reservation9 = reservationRepository.save(
                     new Reservation(LocalDate.now().plusDays(3), defaultTime, defaultTheme2,
-                            defaultMember));
+                            defaultMember, payment));
             reservation10 = reservationRepository.save(
                     new Reservation(LocalDate.now().plusDays(4), defaultTime, defaultTheme2,
-                            defaultMember));
+                            defaultMember, payment));
             reservation10_waiting1 = reservationRepository.save(new Reservation(
                     reservation10.getDate(),
                     reservation10.getReservationTime(),
                     reservation10.getTheme(),
-                    otherMember)
+                    otherMember,
+                    payment)
             );
 
             allReservation = List.of(

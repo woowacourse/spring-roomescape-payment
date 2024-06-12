@@ -1,15 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,20 +7,35 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
+import roomescape.config.TestPaymentConfig;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.response.ReservationDetailResponse;
+import roomescape.dto.response.ReservationResponse;
+import roomescape.dto.request.ReservationWithPaymentRequest;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
+import roomescape.repository.PaymentRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.exception.ExceptionType.*;
+
+@Import(TestPaymentConfig.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class ReservationServiceTest extends FixtureUsingTest {
 
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @DisplayName("지나지 않은 시간에 대한 예약을 생성할 수 있다.")
     @Test
@@ -38,12 +43,15 @@ class ReservationServiceTest extends FixtureUsingTest {
         //when
         ReservationResponse saved = reservationService.saveByUser(
                 LoginMemberRequest.from(USER1),
-                new ReservationRequest(
+                new ReservationWithPaymentRequest(
                         LocalDate.now().plusDays(1),
                         reservationTime_10_0.getId(),
-                        theme1.getId()
-                ));
-
+                        theme1.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
+                )
+        );
         //then
         assertAll(
                 () -> assertThat(reservationRepository.findAll())
@@ -57,10 +65,13 @@ class ReservationServiceTest extends FixtureUsingTest {
     void createPastReservationFailTest() {
         assertThatThrownBy(() -> reservationService.saveByUser(
                 LoginMemberRequest.from(USER1),
-                new ReservationRequest(
+                new ReservationWithPaymentRequest(
                         LocalDate.now().minusDays(1),
                         reservationTime_10_0.getId(),
-                        theme1.getId()
+                        theme1.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
@@ -71,10 +82,13 @@ class ReservationServiceTest extends FixtureUsingTest {
     void createReservationWithTimeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.saveByUser(
                 LoginMemberRequest.from(USER1),
-                new ReservationRequest(
+                new ReservationWithPaymentRequest(
                         LocalDate.now().minusDays(1),
                         reservationTimeIdNotExists,
-                        theme1.getId()
+                        theme1.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
@@ -85,10 +99,13 @@ class ReservationServiceTest extends FixtureUsingTest {
     void createReservationWithThemeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.saveByUser(
                 LoginMemberRequest.from(USER1),
-                new ReservationRequest(
+                new ReservationWithPaymentRequest(
                         LocalDate.now().plusDays(1),
                         reservationTime_10_0.getId(),
-                        themeIdNotSaved
+                        themeIdNotSaved,
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
@@ -122,10 +139,12 @@ class ReservationServiceTest extends FixtureUsingTest {
         Reservation defaultReservation;
         Member usedMember = USER1;
         Member notUsedMember = USER2;
+        Payment payment;
 
         @BeforeEach
         void addDefaultReservation() {
-            defaultReservation = new Reservation(defaultDate, reservationTime_10_0, theme1, USER1);
+            payment = paymentRepository.save(FakePayment.CORRECT_REQ);
+            defaultReservation = new Reservation(defaultDate, reservationTime_10_0, theme1, USER1, payment);
             defaultReservation = reservationRepository.save(defaultReservation);
         }
 
@@ -133,7 +152,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteReservationTest() {
             //when
-            reservationService.deleteByUser(LoginMemberRequest.from(usedMember), 1L);
+            reservationService.delete(LoginMemberRequest.from(usedMember), 1L);
 
             //then
             assertThat(reservationRepository.findAll()).isEmpty();
@@ -143,35 +162,34 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteOthersReservationFailTest() {
             assertThatThrownBy(() ->
-                    reservationService.deleteByUser(LoginMemberRequest.from(notUsedMember), 1L))
+                    reservationService.delete(LoginMemberRequest.from(notUsedMember), 1L))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
 
             assertThat(reservationRepository.findAll()).isNotEmpty();
         }
 
-        @DisplayName("관리자는 다른 사람의 예약을 삭제할 수 없다.")
+        @DisplayName("관리자는 다른 사람의 예약을 삭제할 수 있다.")
         @Test
         void deleteOthersReservationByAdminFailTest() {
-            assertThatThrownBy(() ->
-                    reservationService.deleteByUser(LoginMemberRequest.from(ADMIN), 1L))
-                    .isInstanceOf(RoomescapeException.class)
-                    .hasMessage(ExceptionType.FORBIDDEN_DELETE.getMessage());
-
-            assertThat(reservationRepository.findAll()).isNotEmpty();
+            reservationService.delete(LoginMemberRequest.from(ADMIN), 1L);
+            assertThat(reservationRepository.findAll()).isEmpty();
         }
 
         @DisplayName("관리자는 다른 사람의 예약 대기를 삭제할 수 있다.")
         @Test
         void deleteWaitingByAdminTest() {
             //given
-            ReservationResponse waitingResponse = reservationService.saveByUser(LoginMemberRequest.from(USER2),
-                    new ReservationRequest(
+            ReservationResponse waitingResponse = reservationService.saveByUser(
+                    LoginMemberRequest.from(USER2),
+                    new ReservationWithPaymentRequest(
                             defaultReservation.getDate(),
                             defaultReservation.getReservationTime().getId(),
-                            defaultReservation.getTheme().getId()
+                            defaultReservation.getTheme().getId(),
+                            FakePayment.CORRECT_REQ.getPaymentKey(),
+                            FakePayment.CORRECT_REQ.getOrderId(),
+                            FakePayment.CORRECT_REQ.getAmount()
                     ));
-
             //when
             reservationService.deleteWaitingByAdmin(waitingResponse.id());
 
@@ -183,7 +201,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @Test
         void deleteNotExistReservationNotThrowsException() {
             assertThatCode(
-                    () -> reservationService.deleteByUser(LoginMemberRequest.from(defaultReservation.getMember()), 2L))
+                    () -> reservationService.delete(LoginMemberRequest.from(defaultReservation.getMember()), 2L))
                     .doesNotThrowAnyException();
         }
     }
@@ -192,12 +210,38 @@ class ReservationServiceTest extends FixtureUsingTest {
     @Test
     void findMembersReservationTest() {
         //given
-        reservationService.saveByUser(LoginMemberRequest.from(USER2),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()));
-        ReservationResponse waitingReservation = reservationService.saveByUser(LoginMemberRequest.from(USER1),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_10_0.getId(), theme1.getId()));
-        ReservationResponse bookedReservation = reservationService.saveByUser(LoginMemberRequest.from(USER1),
-                new ReservationRequest(LocalDate.now().plusDays(1), reservationTime_11_0.getId(), theme2.getId()));
+        reservationService.saveByUser(
+                LoginMemberRequest.from(USER2),
+                new ReservationWithPaymentRequest(
+                        LocalDate.now().plusDays(1),
+                        reservationTime_10_0.getId(),
+                        theme1.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
+                ));
+
+        ReservationResponse waitingReservation = reservationService.saveByUser(
+                LoginMemberRequest.from(USER1),
+                new ReservationWithPaymentRequest(
+                        LocalDate.now().plusDays(1),
+                        reservationTime_10_0.getId(),
+                        theme1.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
+                ));
+
+        ReservationResponse bookedReservation = reservationService.saveByUser(
+                LoginMemberRequest.from(USER1),
+                new ReservationWithPaymentRequest(
+                        LocalDate.now().plusDays(1),
+                        reservationTime_11_0.getId(),
+                        theme2.getId(),
+                        FakePayment.CORRECT_REQ.getPaymentKey(),
+                        FakePayment.CORRECT_REQ.getOrderId(),
+                        FakePayment.CORRECT_REQ.getAmount()
+                ));
 
         //when
         List<ReservationDetailResponse> usersReservations = reservationService.findAllByMemberId(USER1.getId());
@@ -209,13 +253,17 @@ class ReservationServiceTest extends FixtureUsingTest {
                         waitingReservation.theme().name(),
                         waitingReservation.date(),
                         waitingReservation.time().startAt(),
-                        "1번째 예약대기"
+                        "1번째 예약대기",
+                        "truePaymentKey",
+                        BigDecimal.valueOf(1)
                 ), new ReservationDetailResponse(
                         bookedReservation.id(),
                         bookedReservation.theme().name(),
                         bookedReservation.date(),
                         bookedReservation.time().startAt(),
-                        "예약"
+                        "예약",
+                        "truePaymentKey",
+                        BigDecimal.valueOf(1)
                 )
         );
     }

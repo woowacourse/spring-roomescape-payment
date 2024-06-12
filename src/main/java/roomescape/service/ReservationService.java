@@ -1,81 +1,117 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.FORBIDDEN_DELETE;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
-import roomescape.dto.AdminReservationRequest;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.*;
+import roomescape.dto.request.AdminReservationRequest;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.request.ReservationWithPaymentRequest;
+import roomescape.dto.response.ReservationDetailResponse;
+import roomescape.dto.response.ReservationResponse;
+import roomescape.exception.PaymentException;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static roomescape.exception.ExceptionType.*;
+
 @Service
 public class ReservationService {
     private static final int NOT_WAITING_INDEX = 1;
+    private static final long ADMIN_ID = 1;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
+    private final Logger logger = LogManager.getLogger(ReservationService.class);
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationResponse saveByUser(LoginMemberRequest loginMemberRequest,
-                                          ReservationRequest reservationRequest) {
-        ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
-        Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
-        Member requestedMember = memberRepository.findById(loginMemberRequest.id())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+                                          ReservationWithPaymentRequest reservationWithPaymentRequest) {
 
-        return save(reservationRequest.toReservation(
-                requestedMember, requestedTime, requestedTheme));
+        Reservation requestedReservation = makeReservationByRequest(
+                reservationWithPaymentRequest.date(),
+                reservationWithPaymentRequest.timeId(),
+                reservationWithPaymentRequest.themeId(),
+                loginMemberRequest.id()
+        );
+
+        Payment payment = paymentService.pay(reservationWithPaymentRequest.toPayment());
+
+        ReservationResponse response;
+        try {
+            Reservation reservation = new Reservation(
+                    requestedReservation.getDate(),
+                    requestedReservation.getReservationTime(),
+                    requestedReservation.getTheme(),
+                    requestedReservation.getMember(),
+                    payment
+            );
+
+            Reservation savedReservation = reservationRepository.save(reservation);
+            response = ReservationResponse.from(savedReservation);
+        } catch (Exception e) {
+            logger.debug(e.getMessage(), e);
+            paymentService.cancel(new CancelPayment(payment, new CancelReason("서버 오류")));
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "예약에 실패했습니다. 다시 시도해주세요.");
+        }
+        return response;
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
-        ReservationTime requestedTime = reservationTimeRepository.findById(reservationRequest.timeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
-        Theme requestedTheme = themeRepository.findById(reservationRequest.themeId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
-        Member requestedMember = memberRepository.findById(reservationRequest.memberId())
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+        Reservation requestedReservation = makeReservationByRequest(
+                reservationRequest.date(),
+                reservationRequest.timeId(),
+                reservationRequest.themeId(),
+                reservationRequest.memberId()
+        );
+        Reservation savedReservation = reservationRepository.save(requestedReservation);
 
-        return save(new Reservation(
-                reservationRequest.date(), requestedTime, requestedTheme, requestedMember));
+        return ReservationResponse.from(
+                savedReservation
+        );
     }
 
-    private ReservationResponse save(Reservation beforeSaveReservation) {
+    private Reservation makeReservationByRequest(LocalDate date, long timeId, long themeId, long memberId) {
+        ReservationTime requestedTime = reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION_TIME));
+        Theme requestedTheme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
+        Member requestedMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
+
+        Reservation beforeSaveReservation = new Reservation(
+                date,
+                requestedTime,
+                requestedTheme,
+                requestedMember);
         if (beforeSaveReservation.isBefore(LocalDateTime.now())) {
             throw new RoomescapeException(PAST_TIME_RESERVATION);
         }
-        Reservation savedReservation = reservationRepository.save(beforeSaveReservation);
-        return ReservationResponse.from(savedReservation);
+        return beforeSaveReservation;
     }
 
     public List<ReservationResponse> findAll() {
@@ -114,19 +150,29 @@ public class ReservationService {
         return reservationRepository.findByDateBetween(dateFrom, dateTo);
     }
 
-    public void deleteByUser(LoginMemberRequest loginMemberRequest, long reservationId) {
+    @Transactional
+    public void delete(LoginMemberRequest loginMemberRequest, long reservationId) {
         Optional<Reservation> findResult = reservationRepository.findById(reservationId);
         if (findResult.isEmpty()) {
             return;
         }
 
         Reservation requestedReservation = findResult.get();
-        if (requestedReservation.getMember().getId() != loginMemberRequest.id()) {
+        if (isNotDeletableMember(loginMemberRequest, requestedReservation.getMember())) {
             throw new RoomescapeException(FORBIDDEN_DELETE);
         }
         reservationRepository.delete(requestedReservation);
+
+        if (isPaidReservation(requestedReservation)) {
+            paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("예약 취소")));
+        }
     }
 
+    private static boolean isNotDeletableMember(LoginMemberRequest loginMember, Member requestReservationMember) {
+        return loginMember.id() != requestReservationMember.getId() && loginMember.id() != ADMIN_ID;
+    }
+
+    @Transactional
     public void deleteWaitingByAdmin(long id) {
         Optional<Reservation> findResult = reservationRepository.findById(id);
         if (findResult.isEmpty()) {
@@ -138,6 +184,14 @@ public class ReservationService {
             throw new RoomescapeException(FORBIDDEN_DELETE);
         }
         reservationRepository.deleteById(id);
+
+        if (isPaidReservation(requestedReservation)) {
+            paymentService.cancel(new CancelPayment(requestedReservation.getPayment(), new CancelReason("관리자의 대기 취소")));
+        }
+    }
+
+    private static boolean isPaidReservation(Reservation requestedReservation) {
+        return requestedReservation.getPayment() != null;
     }
 
     private boolean isNotWaiting(Reservation requestedReservation) {

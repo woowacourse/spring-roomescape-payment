@@ -1,21 +1,19 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import roomescape.dto.request.ReservationTimeRequest;
+import roomescape.dto.response.AvailableTimeResponse;
+import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.service.ReservationTimeService;
+
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import roomescape.dto.AvailableTimeResponse;
-import roomescape.dto.ReservationTimeRequest;
-import roomescape.dto.ReservationTimeResponse;
-import roomescape.service.ReservationTimeService;
 
+@Tag(name = "Reservation Time", description = "예약 시간 API")
 @RestController
 public class ReservationTimeController {
     private final ReservationTimeService reservationTimeService;
@@ -37,7 +35,9 @@ public class ReservationTimeController {
     }
 
     @GetMapping("/times/available")
-    public List<AvailableTimeResponse> findAvailableTimeWith(@RequestParam LocalDate date, @RequestParam long themeId) {
+    public List<AvailableTimeResponse> findAvailableTimeWith(
+            @Parameter(description = "조회 할 날짜") @RequestParam LocalDate date,
+            @Parameter(description = "테마 아이디") @RequestParam long themeId) {
         return reservationTimeService.findByThemeAndDate(date, themeId);
     }
 

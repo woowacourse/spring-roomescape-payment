@@ -1,12 +1,16 @@
 package roomescape.api;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
-import roomescape.dto.PaymentErrorResponse;
-import roomescape.dto.PaymentRequest;
+import roomescape.domain.CancelReason;
+import roomescape.domain.Payment;
+import roomescape.dto.response.PaymentErrorResponse;
+import roomescape.dto.request.TossPaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.service.PaymentClient;
 
@@ -17,6 +21,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final String authorizations;
+    private final Logger logger = LogManager.getLogger(TossPaymentClient.class);
 
     public TossPaymentClient(RestClient restClient, String widgetSecretKey) {
         this.restClient = restClient;
@@ -26,19 +31,34 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void pay(PaymentRequest paymentRequest) {
+    public void pay(Payment payment) {
+        TossPaymentRequest tossPaymentRequest = TossPaymentRequest.from(payment);
         try {
             restClient.post()
                     .uri("v1/payments/confirm")
                     .header("Authorization", authorizations)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(paymentRequest)
+                    .body(tossPaymentRequest)
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
+            logger.debug(e.getMessage(), e);
             throw new PaymentException(e.getStatusCode(), e.getResponseBodyAs(PaymentErrorResponse.class).message());
         } catch (Exception e) {
+            logger.debug(e.getMessage(), e);
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류로 결제에 실패했습니다.");
         }
+    }
+
+    @Override
+    public void cancel(Payment payment, CancelReason cancelReason) {
+        TossPaymentRequest tossPaymentRequest = TossPaymentRequest.from(payment);
+        restClient.post()
+                .uri("v1/payments/{paymentKey}/cancel", tossPaymentRequest.paymentKey())
+                .header("Authorization", authorizations)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cancelReason)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

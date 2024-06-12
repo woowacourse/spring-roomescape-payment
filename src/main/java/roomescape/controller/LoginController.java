@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,9 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.config.CookieExtractor;
-import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.LoginRequest;
-import roomescape.dto.LoginResponse;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.request.LoginRequest;
+import roomescape.dto.response.LoginResponse;
 import roomescape.service.LoginService;
 
 @Controller
@@ -24,9 +26,10 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginView() {
-        return "/login";
+        return "login";
     }
 
+    @Operation
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         String loginToken = loginService.getLoginToken(loginRequest);
@@ -47,8 +50,9 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation
     @GetMapping("/login/check")
-    public ResponseEntity<LoginResponse> loginCheck(@Authenticated LoginMemberRequest loginMemberRequest) {
+    public ResponseEntity<LoginResponse> loginCheck(@Parameter(description = "로그인한 멤버 정보") @Authenticated LoginMemberRequest loginMemberRequest) {
         return ResponseEntity.ok(LoginResponse.from(loginMemberRequest));
     }
 }

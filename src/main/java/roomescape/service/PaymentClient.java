@@ -1,8 +1,11 @@
 package roomescape.service;
 
-import roomescape.dto.PaymentRequest;
+import roomescape.domain.CancelReason;
+import roomescape.domain.Payment;
 
 public interface PaymentClient {
 
-    void pay(PaymentRequest paymentRequest);
+    void pay(Payment payment);
+
+    void cancel(Payment payment, CancelReason cancelReason);
 }

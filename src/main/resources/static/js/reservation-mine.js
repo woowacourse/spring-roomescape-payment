@@ -32,26 +32,15 @@ function render(data) {
     cancelButton.className = 'btn btn-danger';
     if (status !== '예약') {
       cancelButton.textContent = '대기 취소';
-      cancelButton.onclick = function () {
-        requestDeleteWaiting(id).then(() => window.location.reload());
-      };
     } else {
-      cancelButton.textContent = '삭제';
-      cancelButton.onclick = function () {
-        requestDeleteReservation(id).then(() => window.location.reload());
-      };
+      cancelButton.textContent = '예약 취소';
     }
+    cancelButton.onclick = function () {
+      requestDeleteReservation(id).then(() => window.location.reload());
+    };
+    row.insertCell(6).textContent = item.paymentKey;
+    row.insertCell(7).textContent = item.amount;
     cancelCell.appendChild(cancelButton);
-  });
-}
-
-function requestDeleteWaiting(id) {
-  const endpoint = '/reservations/waiting/' + id;
-  return fetch(endpoint, {
-    method: 'DELETE'
-  }).then(response => {
-    if (response.status === 204) return;
-    throw new Error('Delete failed');
   });
 }
 
