@@ -2,6 +2,7 @@ package roomescape.payment;
 
 import java.util.Map;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import roomescape.global.config.TossPaymentProperties;
 import roomescape.payment.dto.PaymentCancelRequest;
 import roomescape.payment.dto.PaymentCancelResponse;
@@ -10,7 +11,6 @@ import roomescape.payment.dto.PaymentConfirmResponse;
 
 public class TossPaymentClient {
 
-    private static final String DELIMITER = "/";
     private static final String CANCEL_REASON = "cancelReason";
 
     private final RestClient restClient;
@@ -32,8 +32,12 @@ public class TossPaymentClient {
 
     public PaymentCancelResponse cancelPayments(PaymentCancelRequest request, String reason) {
         Map<String, String> cancelRequestBody = Map.of(CANCEL_REASON, reason);
+        String cancelUri = UriComponentsBuilder.fromPath(tossPaymentProperties.api().cancel())
+                .buildAndExpand(request.paymentKey())
+                .toUriString();
+
         return restClient.post()
-                .uri(DELIMITER + request.paymentKey() + tossPaymentProperties.api().cancel())
+                .uri(cancelUri)
                 .body(cancelRequestBody)
                 .retrieve()
                 .toEntity(PaymentCancelResponse.class)
