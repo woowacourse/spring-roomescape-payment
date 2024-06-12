@@ -16,7 +16,7 @@ public record MemberReservationResponse(
         String status,
         long waitingRank,
         String paymentKey,
-        long amount
+        Long amount
 ) {
     public static MemberReservationResponse toResponse(
             ReservationWithRank reservationWithRank,
