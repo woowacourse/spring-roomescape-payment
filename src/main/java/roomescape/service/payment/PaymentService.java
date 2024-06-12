@@ -32,7 +32,7 @@ public class PaymentService {
                 .orElseThrow(NotFoundPaymentException::new);
 
         PaymentCancelOutput cancelOutput = paymentClient.cancelPayment(payment);
-        payment.cancel(cancelOutput.requestedAt(), cancelOutput.approvedAt(), cancelOutput.status());
+        payment.changeStatus(cancelOutput.requestedAt(), cancelOutput.approvedAt(), cancelOutput.status());
     }
 
     public void deleteReservationPayment(Reservation reservation) {
