@@ -39,7 +39,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query(""" 
             select new roomescape.domain.reservation.ReservationWithRank(
-                 r.id, r.theme.name, r.date, r.time.startAt, r.status, p.paymentKey, p.amount,
+                 r.id, r.theme.name, r.date, r.time.startAt, r.status, p.paymentKey, p.amount.amount,
                  (
                      select count(r2) AS waiting_rank
                      from Reservation r2

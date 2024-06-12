@@ -89,7 +89,7 @@ class ThemeJpaRepositoryTest {
         reservationRepository.save(reservation(solar, java, startDate, onePm, WAITING));
         reservationRepository.save(reservation(sun, database, betweenDate, twoPm, RESERVED));
         reservationRepository.save(reservation(bri, database, betweenDate, threePm, RESERVED));
-        reservationRepository.save(reservation(solar, database, laterEnd, twoPm, RESERVED));
+        reservationRepository.save(reservation(solar, database, endDate, twoPm, RESERVED));
         reservationRepository.save(reservation(bri, java, laterEnd, threePm, RESERVED));
         reservationRepository.save(reservation(sun, java, laterEnd, threePm, RESERVED));
         reservationRepository.save(reservation(sun, bed, betweenDate, onePm, RESERVED));
