@@ -2,7 +2,7 @@ package roomescape.service;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import roomescape.domain.Theme;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.service.exception.ReservationExistsException;
@@ -27,11 +27,11 @@ public class ThemeService {
     }
 
     public ThemeDto save(ThemeSaveDto request) {
-        Theme theme = new Theme(request.name(), request.description(), request.thumbnail());
+        Theme theme = new Theme(request.name(), request.description(), request.thumbnail(), request.price());
         validateDuplication(request);
         Theme savedTheme = themeRepository.save(theme);
 
-        return ThemeDto.from(savedTheme);
+        return new ThemeDto(savedTheme);
     }
 
     private void validateDuplication(ThemeSaveDto request) {
@@ -49,7 +49,7 @@ public class ThemeService {
 
     public List<ThemeDto> findAll() {
         return themeRepository.findAll().stream()
-                .map(ThemeDto::from)
+                .map(ThemeDto::new)
                 .toList();
     }
 
@@ -58,7 +58,13 @@ public class ThemeService {
         LocalDate to = LocalDate.now().minusDays(1);
         return themeRepository.findMostReservedThemesInPeriod(from, to,
                         PageRequest.of(0, MAX_POPULAR_THEME_COUNT)).stream()
-                .map(ThemeDto::from)
+                .map(ThemeDto::new)
                 .toList();
+    }
+
+    public ThemeDto findById(Long themeId) {
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("존재하지 않는 테마입니다. (id: %d)", themeId)));
+        return new ThemeDto(theme);
     }
 }

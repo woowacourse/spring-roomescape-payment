@@ -1,27 +1,24 @@
 package roomescape.service.response;
 
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
 
 public record ReservationDto(
         Long id,
         String name,
         ReservationDate date,
-        ReservationTimeDto reservationTimeDto,
-        ThemeDto themeDto) {
+        ReservationTimeDto time,
+        ThemeDto theme,
+        PaymentDto paymentDto) {
 
     public ReservationDto(Reservation reservation) {
         this(
                 reservation.getId(),
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
-                new ReservationTimeDto(
-                        reservation.getTime().getId(),
-                        reservation.getTime().getStartAt()),
-                new ThemeDto(reservation.getTheme().getId(),
-                        reservation.getTheme().getName(),
-                        reservation.getTheme().getDescription(),
-                        reservation.getTheme().getThumbnail())
+                new ReservationTimeDto(reservation.getTime()),
+                new ThemeDto(reservation.getTheme()),
+                PaymentDto.from(reservation.getPayment())
         );
     }
 }

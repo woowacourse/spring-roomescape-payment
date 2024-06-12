@@ -2,14 +2,15 @@ package roomescape.web.controller.response;
 
 import roomescape.service.response.ThemeDto;
 
-public record ThemeResponse(Long id, String name, String description, String thumbnail) {
+public record ThemeResponse(Long id, String name, String description, String thumbnail, Long price) {
 
-    public static ThemeResponse from(ThemeDto appResponse) {
-        return new ThemeResponse(
-                appResponse.id(),
-                appResponse.name(),
-                appResponse.description(),
-                appResponse.thumbnail()
+    public ThemeResponse(ThemeDto themeDto) {
+        this(
+                themeDto.id(),
+                themeDto.name(),
+                themeDto.description(),
+                themeDto.thumbnail(),
+                themeDto.price()
         );
     }
 }

@@ -9,15 +9,17 @@ public record MemberReservationResponse(
         String name,
         LocalDate date,
         ReservationTimeResponse time,
-        ThemeResponse theme) {
+        ThemeResponse theme,
+        PaymentResponse payment) {
 
-    public static MemberReservationResponse from(ReservationDto appResponse) {
-        return new MemberReservationResponse(
+    public MemberReservationResponse(ReservationDto appResponse) {
+        this(
                 appResponse.id(),
                 appResponse.name(),
                 appResponse.date().getDate(),
-                ReservationTimeResponse.from(appResponse.reservationTimeDto()),
-                ThemeResponse.from(appResponse.themeDto())
+                new ReservationTimeResponse(appResponse.time()),
+                new ThemeResponse(appResponse.theme()),
+                new PaymentResponse(appResponse.paymentDto())
         );
     }
 }

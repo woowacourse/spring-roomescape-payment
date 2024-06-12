@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.ReservationTime;
+import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.service.exception.ReservationExistsException;
@@ -46,7 +46,7 @@ class ReservationTimeServiceTest {
                 .thenReturn(reservationTime);
 
         ReservationTimeDto actual = reservationTimeService.save(new ReservationTimeSaveDto(startAt));
-        ReservationTimeDto expected = ReservationTimeDto.from(reservationTime);
+        ReservationTimeDto expected = new ReservationTimeDto(reservationTime);
 
         assertThat(actual).isEqualTo(expected);
     }

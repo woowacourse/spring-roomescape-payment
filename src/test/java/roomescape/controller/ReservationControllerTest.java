@@ -1,13 +1,14 @@
 package roomescape.controller;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
-import roomescape.controller.payment.TestPaymentConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.controller.steps.ReservationAdminSteps;
 import roomescape.controller.steps.ReservationSteps;
-import roomescape.domain.MemberRole;
+import roomescape.domain.member.MemberRole;
+import roomescape.infrastructure.payment.PaymentManager;
+import roomescape.service.response.PaymentDto;
 import roomescape.web.controller.request.MemberReservationRequest;
 
 import java.time.LocalDate;
@@ -15,17 +16,21 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static roomescape.Fixture.*;
+import static roomescape.controller.doc.DocumentFilter.SAVE_RESERVATION;
 
-@ExtendWith(MockitoExtension.class)
-@Import(TestPaymentConfiguration.class)
 class ReservationControllerTest extends ControllerTest {
+
+    @MockBean
+    private PaymentManager paymentManager;
 
     @BeforeEach
     void setInitialData() {
         jdbcTemplate.update("INSERT INTO reservation_time(start_at) VALUES (?)", "12:00");
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)", "방탈출1", "설명1",
-                "https://url1");
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)", "방탈출1", "설명1",
+                "https://url1", 1000L);
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
                 VALID_USER_NAME.getName(), VALID_USER_EMAIL.getEmail(),
                 VALID_USER_PASSWORD.getPassword(), MemberRole.USER.name());
@@ -36,17 +41,20 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("예약을 저장한다. -> 201")
     @Test
     void reserve() {
+        PaymentDto paymentDto = new PaymentDto("paymentKey", "orderId", 1000L);
+        when(paymentManager.approve(any())).thenReturn(paymentDto);
         MemberReservationRequest request = new MemberReservationRequest("2040-01-02", 1L, 1L, "paymentKey", "orderId", 1000L);
-        ReservationSteps.createReservation(request, getUserToken())
-                .statusCode(201)
-                .body("name", is(VALID_USER_NAME.getName()));
-    }
 
-    @DisplayName("예약을 삭제한다. -> 204")
-    @Test
-    void deleteBy() {
-        ReservationSteps.deleteReservation(1L)
-                .statusCode(204);
+        RestAssured.given(spec).log().all()
+                .filter(SAVE_RESERVATION.getValue())
+                .contentType(ContentType.JSON)
+                .cookie(COOKIE_NAME, getUserToken())
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201)
+                .body("name", is(VALID_USER_NAME.getName()))
+                .body("payment.paymentKey", is(paymentDto.paymentKey()));
     }
 
     @DisplayName("예약을 조회한다. -> 200")
@@ -113,6 +121,7 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void reserve_PastTime() {
         MemberReservationRequest request = new MemberReservationRequest("2024-05-10", 100L, 1L, "paymentKey", "orderId", 1000L);
+
         ReservationSteps.createReservation(request, getUserToken())
                 .statusCode(400);
     }
@@ -137,8 +146,8 @@ class ReservationControllerTest extends ControllerTest {
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)",
                 VALID_ADMIN_NAME.getName(), VALID_ADMIN_EMAIL.getEmail(),
                 VALID_ADMIN_PASSWORD.getPassword(), MemberRole.ADMIN.name());
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)",
-                VALID_THEME.getName(), VALID_THEME.getDescription(), VALID_THEME.getThumbnail());
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)",
+                VALID_THEME.getName(), VALID_THEME.getDescription(), VALID_THEME.getThumbnail(), VALID_THEME.getPrice());
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",
                 "2026-02-01", 1L, 1L, 2L);
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",

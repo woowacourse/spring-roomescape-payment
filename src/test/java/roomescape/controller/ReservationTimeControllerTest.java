@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test;
 import roomescape.web.controller.request.ReservationTimeRequest;
 
 import static org.hamcrest.Matchers.is;
+import static roomescape.controller.doc.DocumentFilter.GET_TIMES;
 
-class ReservationTimeController extends ControllerTest {
+class ReservationTimeControllerTest extends ControllerTest {
 
 
     @BeforeEach
@@ -45,7 +46,8 @@ class ReservationTimeController extends ControllerTest {
     @DisplayName("예약 시간을 조회한다. -> 200")
     @Test
     void getReservationTimes() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(GET_TIMES.getValue())
                 .contentType(ContentType.JSON)
                 .when().get("/times")
                 .then().log().all()
@@ -71,8 +73,8 @@ class ReservationTimeController extends ControllerTest {
     @DisplayName("예약이 존재하는 시간 삭제 -> 400")
     @Test
     void delete_ReservationExists() {
-        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail) VALUES (?, ?, ?)", "방탈출1", "설명1",
-                "https://url1");
+        jdbcTemplate.update("INSERT INTO theme(name, description, thumbnail, price) VALUES (?, ?, ?, ?)", "방탈출1", "설명1",
+                "https://url1", 1000L);
         jdbcTemplate.update("INSERT INTO member(name,email,password,role) VALUES (?,?,?,?)", "wiib", "asd@naver.com",
                 "123asd", "ADMIN");
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",

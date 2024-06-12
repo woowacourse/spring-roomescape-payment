@@ -5,8 +5,13 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.domain.*;
+import roomescape.domain.member.*;
 import roomescape.domain.repository.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.ReservationWaiting;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.web.controller.request.ReservationWaitingRequest;
 
@@ -17,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static roomescape.Fixture.VALID_RESERVATION_TIME;
 import static roomescape.Fixture.VALID_THEME;
+import static roomescape.controller.doc.DocumentFilter.SAVE_RESERVATION_WAITING;
 
 public class ReservationWaitingControllerTest extends ControllerTest {
 
@@ -70,7 +76,8 @@ public class ReservationWaitingControllerTest extends ControllerTest {
 
         ReservationWaitingRequest request = new ReservationWaitingRequest(date, time.getId(), theme.getId());
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(SAVE_RESERVATION_WAITING.getValue())
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(request)

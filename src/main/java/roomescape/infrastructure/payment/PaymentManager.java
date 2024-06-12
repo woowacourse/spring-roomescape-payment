@@ -12,6 +12,8 @@ import roomescape.infrastructure.payment.response.PaymentErrorResponse;
 import roomescape.infrastructure.payment.response.PaymentServerErrorCode;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentCancelDto;
+import roomescape.service.response.PaymentDto;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +39,17 @@ public class PaymentManager {
         return "Basic " + new String(encodedBytes);
     }
 
-    public PaymentApproveDto approve(PaymentApproveDto paymentApproveDto) {
+    public void cancel(String paymentKey, PaymentCancelDto paymentCancelDto) {
+        restClient.post()
+                .uri("https://api.tosspayments.com/v1/payments/{paymentKey}/cancel", paymentKey)
+                .header("Authorization", authorizationHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(paymentCancelDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handlePaymentError);
+    }
+
+    public PaymentDto approve(PaymentApproveDto paymentApproveDto) {
         return restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .header("Authorization", authorizationHeader)
@@ -45,7 +57,7 @@ public class PaymentManager {
                 .body(paymentApproveDto)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handlePaymentError)
-                .toEntity(PaymentApproveDto.class).getBody(); // TODO: 다음 단계에서 반환을 위한 별도의 DTO 정의
+                .body(PaymentDto.class);
     }
 
     private void handlePaymentError(HttpRequest request, ClientHttpResponse response) throws IOException {

@@ -1,9 +1,9 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationTime;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.service.exception.ReservationExistsException;
@@ -32,7 +32,7 @@ public class ReservationTimeService {
         validateDuplication(newReservationTime.getStartAt());
         ReservationTime savedTime = reservationTimeRepository.save(newReservationTime);
 
-        return ReservationTimeDto.from(savedTime);
+        return new ReservationTimeDto(savedTime);
     }
 
     private void validateDuplication(LocalTime parsedTime) {
@@ -50,7 +50,7 @@ public class ReservationTimeService {
 
     public List<ReservationTimeDto> findAll() {
         return reservationTimeRepository.findAll().stream()
-                .map(ReservationTimeDto::from)
+                .map(ReservationTimeDto::new)
                 .toList();
     }
 

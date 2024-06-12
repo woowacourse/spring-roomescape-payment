@@ -55,4 +55,11 @@ public class ReservationWaitingController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/reservation/{reservationId}/exists")
+    public ResponseEntity<Boolean> doseExistForReservation(@PathVariable Long reservationId) {
+        boolean isWaitingExist = reservationWaitingService.existsByReservation(reservationId);
+
+        return ResponseEntity.ok(isWaitingExist);
+    }
 }

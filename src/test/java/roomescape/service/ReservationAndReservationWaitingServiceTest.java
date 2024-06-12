@@ -5,15 +5,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.*;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberEmail;
+import roomescape.domain.member.MemberName;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.repository.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.ReservationWaiting;
+import roomescape.domain.reservation.theme.Theme;
+import roomescape.infrastructure.payment.PaymentManager;
+import roomescape.service.request.PaymentCancelDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.Fixture.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -39,6 +52,12 @@ class ReservationAndReservationWaitingServiceTest {
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @MockBean
+    private PaymentManager paymentManager;
+
     private Member member;
     private Theme theme;
     private ReservationTime time;
@@ -60,6 +79,19 @@ class ReservationAndReservationWaitingServiceTest {
         reservationAndWaitingService.deleteReservation(reservation.getId());
 
         assertThat(reservationRepository.findById(reservation.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("결제가 있는 예약 삭제 시 결제도 함께 삭제한다.")
+    void deleteReservationAndPayment() {
+        Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
+        Payment payment = paymentRepository.save(new Payment(reservation, "paymentKey", "orderId"));
+        doNothing().when(paymentManager).cancel(payment.getPaymentKey(), new PaymentCancelDto("cancel"));
+
+        reservationAndWaitingService.deleteReservation(reservation.getId());
+
+        assertThat(reservationRepository.findById(reservation.getId())).isEmpty();
+        assertThat(paymentRepository.findById(payment.getId())).isEmpty();
     }
 
     @Test

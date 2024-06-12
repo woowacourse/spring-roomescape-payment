@@ -6,16 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.response.ReservationTimeDto;
 import roomescape.service.response.ThemeDto;
@@ -78,8 +79,9 @@ class ReservationServiceTest {
                 reservationId,
                 reservation.getMember().getName().getName(),
                 reservation.getDate(),
-                ReservationTimeDto.from(reservation.getTime()),
-                ThemeDto.from(reservation.getTheme()));
+                new ReservationTimeDto(reservation.getTime()),
+                new ThemeDto(reservation.getTheme()),
+                PaymentDto.from(reservation.getPayment()));
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -136,7 +138,7 @@ class ReservationServiceTest {
         String oneMinuteAgo = LocalTime.now().minusMinutes(1).toString();
 
         ReservationTime reservationTime = new ReservationTime(oneMinuteAgo);
-        Theme theme = new Theme("방탈출1", "방탈출1을 한다.", "https://url");
+        Theme theme = new Theme("방탈출1", "방탈출1을 한다.", "https://url", 1000L);
 
         when(reservationTimeRepository.findById(timeId))
                 .thenReturn(Optional.of(reservationTime));

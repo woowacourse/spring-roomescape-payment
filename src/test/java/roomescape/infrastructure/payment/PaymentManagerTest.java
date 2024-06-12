@@ -12,6 +12,8 @@ import roomescape.infrastructure.payment.response.PaymentErrorResponse;
 import roomescape.infrastructure.payment.response.PaymentServerErrorCode;
 import roomescape.service.exception.PaymentException;
 import roomescape.service.request.PaymentApproveDto;
+import roomescape.service.request.PaymentCancelDto;
+import roomescape.service.response.PaymentDto;
 
 import java.io.IOException;
 
@@ -39,14 +41,31 @@ class PaymentManagerTest {
     @Test
     void approve() throws IOException {
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "orderId", 1000L);
+        PaymentDto paymentResponse = new PaymentDto("paymentKey", "orderId", 1000L);
         String paymentApproveJson = objectMapper.writeValueAsString(paymentApproveDto);
+        String paymentResponseJson = objectMapper.writeValueAsString(paymentResponse);
         this.server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(content().json(paymentApproveJson))
-                .andRespond(withSuccess(paymentApproveJson, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(paymentResponseJson, MediaType.APPLICATION_JSON));
 
-        PaymentApproveDto actualResponse = paymentManager.approve(paymentApproveDto);
+        PaymentDto actualResponse = paymentManager.approve(paymentApproveDto);
 
-        assertThat(actualResponse).isEqualTo(paymentApproveDto);
+        assertThat(actualResponse).isEqualTo(paymentResponse);
+        this.server.verify();
+    }
+
+    @DisplayName("올바르게 결체 취소 요청을 보낸다.")
+    @Test
+    void cancel() throws IOException {
+        String paymentKey = "paymentKey";
+        PaymentCancelDto paymentCancelDto = new PaymentCancelDto("취소요청");
+        String paymentCancelJson = objectMapper.writeValueAsString(paymentCancelDto);
+        this.server.expect(requestTo(String.format("https://api.tosspayments.com/v1/payments/%s/cancel", paymentKey)))
+                .andExpect(content().json(paymentCancelJson))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        paymentManager.cancel(paymentKey, paymentCancelDto);
+
         this.server.verify();
     }
 

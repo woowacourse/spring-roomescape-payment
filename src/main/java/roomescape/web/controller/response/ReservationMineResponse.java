@@ -4,13 +4,18 @@ import roomescape.service.response.ReservationDto;
 
 import java.time.LocalDate;
 
-public record ReservationMineResponse(Long reservationId, ThemeResponse theme, LocalDate date,
-                                      ReservationTimeResponse time) {
+public record ReservationMineResponse(
+        Long reservationId,
+        LocalDate date,
+        ThemeResponse theme,
+        ReservationTimeResponse time,
+        PaymentResponse payment) {
 
-    public ReservationMineResponse(ReservationDto reservation) {
-        this(reservation.id(),
-                ThemeResponse.from(reservation.themeDto()),
-                reservation.date().getDate(),
-                ReservationTimeResponse.from(reservation.reservationTimeDto()));
+    public ReservationMineResponse(ReservationDto reservationDto) {
+        this(reservationDto.id(),
+                reservationDto.date().getDate(),
+                new ThemeResponse(reservationDto.theme()),
+                new ReservationTimeResponse(reservationDto.time()),
+                new PaymentResponse(reservationDto.paymentDto()));
     }
 }

@@ -4,6 +4,7 @@ import static roomescape.Fixture.COOKIE_NAME;
 import static roomescape.Fixture.VALID_USER_EMAIL;
 import static roomescape.Fixture.VALID_USER_NAME;
 import static roomescape.Fixture.VALID_USER_PASSWORD;
+import static roomescape.controller.doc.DocumentFilter.*;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.domain.MemberRole;
+import roomescape.domain.member.MemberRole;
 import roomescape.web.controller.request.MemberSignUpRequest;
 import roomescape.web.controller.request.TokenRequest;
 
@@ -35,7 +36,8 @@ class MemberAuthControllerTest extends ControllerTest {
         TokenRequest request = new TokenRequest(VALID_USER_EMAIL.getEmail(),
                 VALID_USER_PASSWORD.getPassword());
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(LOGIN.getValue())
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/login")
@@ -46,10 +48,11 @@ class MemberAuthControllerTest extends ControllerTest {
     @DisplayName("존재하지 않는 회원으로 로그인을 한다. -> 401")
     @Test
     void login_NotMemberEmail() {
-        TokenRequest request = new TokenRequest("회원아님@naver.com",
+        TokenRequest request = new TokenRequest("notmember@naver.com",
                 VALID_USER_PASSWORD.getPassword());
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(NOT_MEMBER_LOGIN.getValue())
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/login")
@@ -194,7 +197,8 @@ class MemberAuthControllerTest extends ControllerTest {
     @DisplayName("로그아웃 한다. -> 200")
     @Test
     void logout() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(LOGOUT.getValue())
                 .cookie(COOKIE_NAME, getUserToken())
                 .when().post("/logout")
                 .then().log().all()

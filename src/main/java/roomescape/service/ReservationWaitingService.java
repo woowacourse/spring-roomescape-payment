@@ -1,8 +1,13 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.*;
+import roomescape.domain.member.Member;
 import roomescape.domain.repository.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.ReservationWaiting;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.service.request.ReservationWaitingSaveDto;
 import roomescape.service.response.ReservationWaitingDto;
 import roomescape.service.response.ReservationWaitingWithRankDto;
@@ -74,16 +79,16 @@ public class ReservationWaitingService {
     }
 
     private void validateNotDuplicated(ReservationWaiting waiting) {
-        Long memberId = waiting.getMember().getId();
+        Member member = waiting.getMember();
         ReservationDate date = waiting.getDate();
-        Long timeId = waiting.getTime().getId();
-        Long themeId = waiting.getTheme().getId();
-        boolean isWaitingExist = reservationWaitingRepository.existsByMemberIdAndDateAndTimeIdAndThemeId(memberId, date, timeId, themeId);
+        ReservationTime time = waiting.getTime();
+        Theme theme = waiting.getTheme();
+        boolean isWaitingExist = reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, date, time, theme);
 
         if (isWaitingExist) {
             throw new IllegalArgumentException(String.format(
                     "동일한 사용자의 중복된 예약 대기를 생성할 수 없습니다. {date: %s, timeId: %d, themeId: %d}",
-                    date.getDate(), timeId, themeId));
+                    date.getDate(), time.getId(), theme.getId()));
         }
     }
 
@@ -117,5 +122,14 @@ public class ReservationWaitingService {
         waiting.setDeniedAt(LocalDateTime.now());
         ReservationWaiting updatedWaiting = reservationWaitingRepository.save(waiting);
         return new ReservationWaitingDto(updatedWaiting);
+    }
+
+    public boolean existsByReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("존재하지 않는 예약입니다. (id: %d)", reservationId)));
+        ReservationDate date = reservation.getDate();
+        ReservationTime time = reservation.getTime();
+        Theme theme = reservation.getTheme();
+        return reservationWaitingRepository.existsByDateAndTimeAndTheme(date, time, theme);
     }
 }

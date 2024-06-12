@@ -1,10 +1,10 @@
 package roomescape.service.response;
 
-import roomescape.domain.Theme;
+import roomescape.domain.reservation.theme.Theme;
 
-public record ThemeDto(Long id, String name, String description, String thumbnail) {
+public record ThemeDto(Long id, String name, String description, String thumbnail, Long price) {
 
-    public static ThemeDto from(Theme theme) {
-        return new ThemeDto(theme.getId(), theme.getName(), theme.getDescription(), theme.getThumbnail());
+    public ThemeDto(Theme theme) {
+        this(theme.getId(), theme.getName(), theme.getDescription(), theme.getThumbnail(), theme.getPrice());
     }
 }

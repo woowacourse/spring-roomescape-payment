@@ -179,9 +179,25 @@ function deleteRow(event) {
     const row = event.target.closest('tr');
     const reservationId = row.cells[0].textContent;
 
-    requestDelete(reservationId)
-        .then(() => row.remove())
-        .catch(error => console.error('Error:', error));
+    fetch(`/reservation-waitings/reservation/${reservationId}/exists`,{
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.status === 200) return response.json();
+        throw new Error('Read failed');
+    }).then(waitingExists => {
+        let deleteReservation = true;
+        if (waitingExists) {
+            deleteReservation = window.confirm("자동 승인으로 결제되지 않은 예약이 생성됩니다.\n기존 예약을 삭제하시겠습니까?");
+        }
+        if (deleteReservation) {
+            requestDelete(reservationId)
+                .then(() => row.remove())
+                .catch(error => console.error('Error:', error));
+        }
+    }).catch(error => console.error("Error fetching waiting exists:", error));
 }
 
 function applyFilter(event) {

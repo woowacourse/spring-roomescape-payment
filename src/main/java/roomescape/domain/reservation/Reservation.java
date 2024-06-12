@@ -1,6 +1,9 @@
-package roomescape.domain;
+package roomescape.domain.reservation;
 
 import jakarta.persistence.*;
+import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.theme.Theme;
 
 @Entity
 public class Reservation {
@@ -25,14 +28,21 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
+
     public Reservation() {
     }
 
     public Reservation(Member member, ReservationDate date, ReservationTime time, Theme theme) {
-        this(null, member, date, time, theme);
+        this(null, member, date, time, theme, null);
     }
 
     public Reservation(Long id, Member member, ReservationDate date, ReservationTime time, Theme theme) {
+        this(id, member, date, time, theme, null);
+    }
+
+    public Reservation(Long id, Member member, ReservationDate date, ReservationTime time, Theme theme, Payment payment) {
         validateMember(member);
         validateDate(date);
         validateTime(time);
@@ -42,6 +52,7 @@ public class Reservation {
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
     private void validateMember(Member member) {
@@ -72,6 +83,10 @@ public class Reservation {
         return date.isBeforeNow() || date.isToday() && time.isBeforeNow();
     }
 
+    public boolean isPriceEqual(Long price) {
+        return theme.isPriceEqual(price);
+    }
+
     public Long getId() {
         return id;
     }
@@ -90,5 +105,20 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public Long getPrice() {
+        return theme.getPrice();
+    }
+
+    public void setPayment(Payment payment) {
+        if (payment == null) {
+            throw new IllegalArgumentException("Payment가 비어 있습니다.");
+        }
+        this.payment = payment;
     }
 }

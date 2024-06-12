@@ -1,7 +1,7 @@
 package roomescape.service.response;
 
-import roomescape.domain.ReservationDate;
-import roomescape.domain.ReservationWaitingWithRank;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationWaitingWithRank;
 
 public record ReservationWaitingWithRankDto(
         Long id,
@@ -17,13 +17,8 @@ public record ReservationWaitingWithRankDto(
                 waitingWithRank.getWaiting().getId(),
                 waitingWithRank.getWaiting().getMember().getName().getName(),
                 waitingWithRank.getWaiting().getDate(),
-                new ReservationTimeDto(
-                        waitingWithRank.getWaiting().getTime().getId(),
-                        waitingWithRank.getWaiting().getTime().getStartAt()),
-                new ThemeDto(waitingWithRank.getWaiting().getTheme().getId(),
-                        waitingWithRank.getWaiting().getTheme().getName(),
-                        waitingWithRank.getWaiting().getTheme().getDescription(),
-                        waitingWithRank.getWaiting().getTheme().getThumbnail()),
+                new ReservationTimeDto(waitingWithRank.getWaiting().getTime()),
+                new ThemeDto(waitingWithRank.getWaiting().getTheme()),
                 waitingWithRank.getRank(),
                 waitingWithRank.getWaiting().getDeniedAt()
         );

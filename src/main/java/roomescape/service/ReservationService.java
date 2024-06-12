@@ -2,14 +2,19 @@ package roomescape.service;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import roomescape.domain.*;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.repository.*;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.theme.Theme;
 import roomescape.service.exception.PastReservationException;
 import roomescape.service.request.AdminSearchedReservationDto;
+import roomescape.service.request.PaymentCancelDto;
 import roomescape.service.request.ReservationSaveDto;
+import roomescape.service.response.PaymentDto;
 import roomescape.service.response.ReservationDto;
 import roomescape.service.specification.ReservationSpecification;
 
@@ -19,6 +24,7 @@ import roomescape.infrastructure.payment.PaymentManager;
 import roomescape.service.request.PaymentApproveDto;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -26,20 +32,46 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentManager paymentManager;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentManager paymentManager) {
+            PaymentManager paymentManager, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentManager = paymentManager;
+        this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public ReservationDto save(ReservationSaveDto reservationSaveDto) {
+        Reservation savedReservation = saveReservation(reservationSaveDto);
+
+        return new ReservationDto(savedReservation);
+    }
+
+    @Transactional
+    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
+        Reservation reservation = saveReservation(reservationSaveDto);
+        validatePaymentAmount(reservation, paymentApproveDto.amount());
+        PaymentDto paymentDto = paymentManager.approve(paymentApproveDto);
+        savePayment(reservation, paymentDto);
+
+        return new ReservationDto(reservation);
+    }
+
+    private void validatePaymentAmount(Reservation reservation, Long amount) {
+        boolean isValidAmount = reservation.isPriceEqual(amount);
+        if (!isValidAmount) {
+            throw new IllegalArgumentException("테마 가격과 결제 금액이 일치하지 않습니다.");
+        }
+    }
+
+    private Reservation saveReservation(ReservationSaveDto reservationSaveDto) {
         Member member = findMember(reservationSaveDto.memberId());
         ReservationDate date = new ReservationDate(reservationSaveDto.date());
         ReservationTime time = findTime(reservationSaveDto.timeId());
@@ -48,14 +80,22 @@ public class ReservationService {
         validatePastReservation(reservation);
         validateDuplication(date, reservationSaveDto.timeId(), reservationSaveDto.themeId());
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return new ReservationDto(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
-    public ReservationDto save(ReservationSaveDto reservationSaveDto, PaymentApproveDto paymentApproveDto) {
-        paymentManager.approve(paymentApproveDto);
-        return save(reservationSaveDto);
+    private void savePayment(Reservation reservation, PaymentDto paymentDto) {
+        Payment payment = new Payment(reservation, paymentDto.paymentKey(), paymentDto.orderId());
+        Payment savedPayment = savePayment(payment);
+        reservation.setPayment(savedPayment);
+    }
+
+    private Payment savePayment(Payment payment) {
+        try {
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            paymentManager.cancel(payment.getPaymentKey(), new PaymentCancelDto("결제 정보 저장 중 오류가 발생했습니다."));
+            throw e;
+        }
     }
 
     private ReservationTime findTime(Long timeId) {
@@ -85,10 +125,6 @@ public class ReservationService {
         }
     }
 
-    public void delete(Long id) {
-        reservationRepository.deleteById(id);
-    }
-
     public List<ReservationDto> findAll() {
         return reservationRepository.findAll().stream()
                 .map(ReservationDto::new)
@@ -105,9 +141,8 @@ public class ReservationService {
     }
 
     public List<ReservationDto> findByMemberId(Long id) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
-
-        return reservations.stream()
+        return reservationRepository.findAllByMemberId(id)
+                .stream()
                 .map(ReservationDto::new)
                 .toList();
     }

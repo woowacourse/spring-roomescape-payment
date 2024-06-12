@@ -17,8 +17,8 @@ public record ReservationWaitingResponse(
                 response.id(),
                 response.name(),
                 response.date().getDate(),
-                ReservationTimeResponse.from(response.reservationTimeDto()),
-                ThemeResponse.from(response.themeDto()),
+                new ReservationTimeResponse(response.reservationTimeDto()),
+                new ThemeResponse(response.themeDto()),
                 response.status()
         );
     }
