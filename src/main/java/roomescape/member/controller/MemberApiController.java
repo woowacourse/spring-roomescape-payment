@@ -29,8 +29,8 @@ public class MemberApiController {
     }
 
     @PostMapping("/members")
-    public ResponseEntity<Void> signup(@Valid @RequestBody MemberSignUpRequest memberSignUpRequest) {
-        Long memberId = memberService.save(memberSignUpRequest);
+    public ResponseEntity<Void> signup(@Valid @RequestBody MemberSignUpRequest request) {
+        Long memberId = memberService.save(request);
 
         return ResponseEntity.created(URI.create("/members/" + memberId)).build();
     }
@@ -43,9 +43,9 @@ public class MemberApiController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody MemberLoginRequest memberLoginRequest,
+    public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request,
                                       HttpServletResponse response) {
-        String token = memberService.createMemberToken(memberLoginRequest);
+        String token = memberService.createMemberToken(request);
         CookieUtils.setCookieBy(response, token);
 
         return ResponseEntity.ok().build();
@@ -53,8 +53,8 @@ public class MemberApiController {
 
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> loginCheck(@Login LoginMemberInToken loginMemberInToken) {
-        MemberResponse memberResponse = memberService.findMemberNameByLoginMember(loginMemberInToken);
+        MemberResponse response = memberService.findMemberNameByLoginMember(loginMemberInToken);
 
-        return ResponseEntity.ok(memberResponse);
+        return ResponseEntity.ok(response);
     }
 }

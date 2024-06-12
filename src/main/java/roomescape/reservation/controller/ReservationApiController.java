@@ -34,18 +34,18 @@ public class ReservationApiController {
 
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> findAll() {
-        List<ReservationResponse> reservationResponses = reservationService.findAll();
+        List<ReservationResponse> responses = reservationService.findAll();
 
-        return ResponseEntity.ok(reservationResponses);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/reservations/search")
     public ResponseEntity<List<ReservationResponse>> findAllBySearchCond(
-            @Valid @ModelAttribute ReservationSearchRequest reservationSearchRequest
+            @Valid @ModelAttribute ReservationSearchRequest request
     ) {
-        List<ReservationResponse> reservationResponses = reservationService.findAllBySearch(reservationSearchRequest);
+        List<ReservationResponse> responses = reservationService.findAllBySearch(request);
 
-        return ResponseEntity.ok(reservationResponses);
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/reservations")
@@ -72,9 +72,9 @@ public class ReservationApiController {
 
     @GetMapping("/reservations/waiting")
     public ResponseEntity<List<WaitingResponse>> findWaiting() {
-        List<WaitingResponse> waitingResponses = reservationService.findWaiting();
+        List<WaitingResponse> responses = reservationService.findWaiting();
 
-        return ResponseEntity.ok(waitingResponses);
+        return ResponseEntity.ok(responses);
     }
 
     @DeleteMapping("/reservations/{id}")
