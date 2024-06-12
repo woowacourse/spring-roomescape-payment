@@ -30,9 +30,9 @@ public class PaymentService {
 
     @Transactional
     public void purchase(PaymentRequest request, long reservationId) {
-        paymentClient.confirm(getAuthorizations(), request);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재 하지 않는 예약은 결제할 수 없습니다."));
+        paymentClient.confirm(getAuthorizations(), request);
         Payment payment = new Payment(request.amount(), request.paymentKey(), reservation);
         paymentRepository.save(payment);
     }
