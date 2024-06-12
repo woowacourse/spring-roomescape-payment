@@ -49,6 +49,10 @@ public class Waiting {
         this.status = status;
     }
 
+    public void toPending() {
+        status = ReservationStatus.PENDING;
+    }
+
     public Long getId() {
         return id;
     }
@@ -71,9 +75,5 @@ public class Waiting {
 
     public ReservationStatus getStatus() {
         return status;
-    }
-
-    public void toPending() {
-        status = ReservationStatus.PENDING;
     }
 }
