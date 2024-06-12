@@ -69,10 +69,6 @@ public class Reservation {
         this.status = ReservationStatus.BOOKED;
     }
 
-    public void changeStatusToPaymentWaiting() {
-        this.status = ReservationStatus.PAYMENT_WAITING;
-    }
-
     public Reservation changeMember(Member member) {
         return new Reservation(this.info, member, ReservationStatus.PAYMENT_WAITING);
     }
