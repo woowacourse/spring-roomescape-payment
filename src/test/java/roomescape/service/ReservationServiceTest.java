@@ -102,13 +102,13 @@ class ReservationServiceTest extends FixtureUsingTest {
     void findAllTest() {
         //given
         reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(1), reservationTime_10_0, theme1,
-                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
         reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(2), reservationTime_10_0, theme1,
-                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
         reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(3), reservationTime_10_0, theme1,
-                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
         reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(4), reservationTime_10_0, theme1,
-                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
 
         //when
         List<ReservationResponse> reservationResponses = reservationService.findAll();
@@ -129,7 +129,7 @@ class ReservationServiceTest extends FixtureUsingTest {
         @BeforeEach
         void addDefaultReservation() {
             defaultReservation = new Reservation(null, defaultDate, reservationTime_10_0, theme1, USER1,
-                    LocalDateTime.now(), ReservationStatus.BOOKED, notPayed);
+                    LocalDateTime.now(), ReservationStatus.BOOKED, null);
             defaultReservation = reservationRepository.save(defaultReservation);
         }
 

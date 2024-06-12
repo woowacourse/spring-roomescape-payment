@@ -24,7 +24,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.domain.Member;
-import roomescape.domain.NotPayed;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
@@ -57,14 +56,12 @@ public class ReservationTimeControllerTest {
 
     private Theme defaultTheme = new Theme("theme1", "description", "thumbnail");
     private Member defaultMember = Fixture.defaultMember;
-    private Payment notPayed = new NotPayed();
 
     @BeforeEach
     void initData() {
         RestAssured.port = port;
         defaultTheme = themeRepository.save(defaultTheme);
         defaultMember = memberRepository.save(defaultMember);
-        notPayed = paymentRepository.save(notPayed);
     }
 
     @DisplayName("여러 예약이 존재할 때 예약 가능 시간을 조회할 수 있다.")
@@ -82,7 +79,7 @@ public class ReservationTimeControllerTest {
         LocalDate findDate = LocalDate.of(2024, 5, 4);
         reservationRepository.save(
                 new Reservation(null, findDate, usedReservationTime, theme, defaultMember, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
 
         //when
         List<AvailableTimeResponse> availableTimeResponses = RestAssured.given().log().all()
@@ -168,7 +165,7 @@ public class ReservationTimeControllerTest {
         void deleteUsedTimeTest() {
             reservationRepository.save(
                     new Reservation(null, LocalDate.now(), usedReservationTime, defaultTheme, defaultMember,
-                            LocalDateTime.now(), ReservationStatus.BOOKED, notPayed)
+                            LocalDateTime.now(), ReservationStatus.BOOKED, null)
             );
 
             RestAssured.given().log().all()

@@ -48,40 +48,40 @@ class ThemeServiceTest extends FixtureUsingTest {
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), reservationTime, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(4), reservationTime, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(5), reservationTime, theme1, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme3, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(2), reservationTime, theme3, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme3, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(1), reservationTime, theme2, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme2, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
 
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().minusDays(3), reservationTime, theme4, USER1, LocalDateTime.now(),
-                        ReservationStatus.BOOKED, notPayed));
+                        ReservationStatus.BOOKED, null));
 
         //when
         List<ThemeResponse> popularThemes = themeService.findAndOrderByPopularity(5);
@@ -125,7 +125,7 @@ class ThemeServiceTest extends FixtureUsingTest {
         //given
         reservationRepository.save(
                 new Reservation(null, LocalDate.now().plusDays(1), reservationTime_10_0, theme1, defaultMember,
-                        LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+                        LocalDateTime.now(), ReservationStatus.BOOKED, null));
 
         //when & then
         assertThatThrownBy(() -> themeService.delete(theme1.getId()))

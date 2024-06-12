@@ -64,7 +64,6 @@ class ReservationRepositoryTest {
         time5 = reservationTimeRepository.save(time5);
 
         defaultMember = memberRepository.save(defaultMember);
-        notPayed = paymentRepository.getNotPayed();
     }
 
     @DisplayName("인기 테마를 구할 수 있다.")

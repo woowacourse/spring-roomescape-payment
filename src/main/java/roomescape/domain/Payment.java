@@ -1,5 +1,6 @@
 package roomescape.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,35 +11,51 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Payment {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private State state;
+    @Column(nullable = false)
+    private String paymentKey;
 
-    public State getState() {
-        return state;
-    }
+    @Column(nullable = false)
+    private String orderId;
 
-    public abstract String getPaymentKey();
+    @Column(nullable = false)
+    private long totalAmount;
 
-    public abstract String getOrderId();
 
-    public abstract Long getAmount();
-
-    //얘가 안에 있는 것이 자연스러운가? 밖에서도 객체를 만들기 위해서 사용하기도 하는데?
-    public enum State {
-        READY, DONE
-    }
-
-    protected Payment(State state) {
-        this.state = state;
+    public Payment(String paymentKey, String orderId, long totalAmount) {
+        validatePaymentKey(paymentKey);
+        validateOrderId(orderId);
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.totalAmount = totalAmount;
     }
 
     protected Payment() {
+
+    }
+
+    private void validatePaymentKey(String paymentKey) {
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("PaymentKey 는 필수값입니다.");
+        }
+    }
+
+    private void validateOrderId(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId 는 필수값입니다.");
+        }
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return totalAmount;
     }
 }

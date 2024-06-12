@@ -13,10 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
+import org.aspectj.apache.bcel.generic.RET;
 import roomescape.exception.RoomescapeException;
 import roomescape.exception.RoomescapeExceptionType;
 
@@ -39,7 +42,7 @@ public class Reservation implements Comparable<Reservation> {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    @ManyToOne
+    @OneToOne
     private Payment payment;
 
     protected Reservation() {
@@ -173,8 +176,8 @@ public class Reservation implements Comparable<Reservation> {
         return reservationStatus;
     }
 
-    public Payment getPayment() {
-        return payment;
+    public Optional<Payment> getPayment() {
+        return Optional.ofNullable(payment);
     }
 
     @Override
@@ -212,5 +215,19 @@ public class Reservation implements Comparable<Reservation> {
                 ", reservationStatus=" + reservationStatus +
                 ", payment=" + payment +
                 '}';
+    }
+
+    public Optional<String> getPaymentKey() {
+        if(payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment.getPaymentKey());
+    }
+
+    public Optional<Long> getAmount() {
+        if (payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment.getAmount());
     }
 }

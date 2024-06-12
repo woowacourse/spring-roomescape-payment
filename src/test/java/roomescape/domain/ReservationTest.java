@@ -28,25 +28,25 @@ class ReservationTest {
     void constructTest() {
         assertAll(
                 () -> assertThatThrownBy(() -> new Reservation(null, DEFAULT_DATE, DEFAULT_TIME, DEFAULT_THEME, null,
-                        LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed()))
+                        LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_MEMBER.getMessage()),
 
                 () -> assertThatThrownBy(
                         () -> new Reservation(null, null, DEFAULT_TIME, DEFAULT_THEME, Fixture.defaultMember,
-                                LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed()))
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_DATE.getMessage()),
 
                 () -> assertThatThrownBy(
                         () -> new Reservation(null, DEFAULT_DATE, null, DEFAULT_THEME, Fixture.defaultMember,
-                                LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed()))
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_TIME.getMessage()),
 
                 () -> assertThatThrownBy(
                         () -> new Reservation(null, DEFAULT_DATE, DEFAULT_TIME, null, Fixture.defaultMember,
-                                LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed()))
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_THEME.getMessage())
         );
@@ -57,10 +57,10 @@ class ReservationTest {
     void compareTo() {
         Reservation first = new Reservation(1L, LocalDate.of(1999, 12, 1), new ReservationTime(
                 LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, LocalDateTime.now(),
-                ReservationStatus.BOOKED, new NotPayed());
+                ReservationStatus.BOOKED, null);
         Reservation second = new Reservation(2L, LocalDate.of(1998, 1, 8), new ReservationTime(
                 LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, LocalDateTime.now(),
-                ReservationStatus.BOOKED, new NotPayed());
+                ReservationStatus.BOOKED, null);
         int compareTo = first.compareTo(second);
         Assertions.assertThat(compareTo)
                 .isGreaterThan(0);
@@ -74,9 +74,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(1L, LocalTime.now());
 
         Reservation savedReservation = new Reservation(1L, date, time, theme, Fixture.defaultMember,
-                LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed());
+                LocalDateTime.now(), ReservationStatus.BOOKED, null);
         Reservation nonSavedReservation = new Reservation(null, date, time, theme, Fixture.defaultMember,
-                LocalDateTime.now(), ReservationStatus.BOOKED, new NotPayed());
+                LocalDateTime.now(), ReservationStatus.BOOKED, null);
 
         assertThat(savedReservation.isSameReservation(nonSavedReservation))
                 .isTrue();
@@ -105,7 +105,7 @@ class ReservationTest {
                 Fixture.defaultMember,
                 LocalDateTime.now(),
                 ReservationStatus.BOOKED,
-                new NotPayed()
+                null
         );
 
         assertAll(

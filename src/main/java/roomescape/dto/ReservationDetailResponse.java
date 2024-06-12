@@ -3,7 +3,6 @@ package roomescape.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.domain.Payment;
-import roomescape.domain.Payment.State;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 
@@ -18,23 +17,23 @@ public record ReservationDetailResponse(
 ) {
 
     public static ReservationDetailResponse from(Reservation reservation, long index) {
+
         return new ReservationDetailResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
                 getStatusName(reservation, index),
-                reservation.getPayment().getPaymentKey(),
-                reservation.getPayment().getAmount()
+                reservation.getPaymentKey().orElse(null),
+                reservation.getAmount().orElse(null)
         );
     }
 
     private static String getStatusName(Reservation reservation, long index) {
         ReservationStatus status = reservation.getReservationStatus();
-        Payment payment = reservation.getPayment();
         return switch (status) {
             case BOOKED -> {
-                if (payment.getState() == State.READY) {
+                if (reservation.getPayment().isEmpty()) {
                     yield "결제 대기";
                 }
                 yield "결제 완료";

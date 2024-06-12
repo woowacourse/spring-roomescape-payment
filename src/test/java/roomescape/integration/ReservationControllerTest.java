@@ -99,7 +99,6 @@ public class ReservationControllerTest {
         token = generateTokenWith(defaultMember);
         othersToken = generateTokenWith(otherMember);
         adminToken = generateTokenWith(admin);
-        notPayed = paymentRepository.getNotPayed();
     }
 
     private String generateTokenWith(Member member) {

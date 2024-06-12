@@ -8,6 +8,7 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,9 +24,7 @@ import roomescape.TestPaymentConfig;
 import roomescape.domain.Email;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
-import roomescape.domain.NotPayed;
 import roomescape.domain.Password;
-import roomescape.domain.Payed;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -84,7 +83,6 @@ public class PaymentControllerTest {
         otherMember = memberRepository.save(otherMember);
         token = generateTokenWith(defaultMember);
         othersToken = generateTokenWith(otherMember);
-        notPayed = paymentRepository.getNotPayed();
     }
 
     private String generateTokenWith(Member member) {
@@ -115,7 +113,7 @@ public class PaymentControllerTest {
                 .extract().jsonPath().get("id");
 
         Reservation savedReservation = reservationRepository.findById((long) savedId).get();
-        assertThat(savedReservation.getPayment()).isInstanceOf(NotPayed.class);
+        assertThat(savedReservation.getPayment()).isEqualTo(Optional.empty());
     }
 
     @DisplayName("결제 대기 상태의 예약을 결제하면 결제 상태로 변경된다.")
@@ -150,6 +148,6 @@ public class PaymentControllerTest {
                 .then().log().all();
 
         Reservation savedReservation = reservationRepository.findById((long) savedId).get();
-        assertThat(savedReservation.getPayment()).isInstanceOf(Payed.class);
+        assertThat(savedReservation.getPayment().isPresent()).isTrue();
     }
 }

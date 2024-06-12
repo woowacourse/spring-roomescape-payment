@@ -62,11 +62,10 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
         Member requestedMember = memberRepository.findById(loginMemberRequest.id())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
-        Payment notPayed = paymentRepository.getNotPayed();
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now(), ReservationStatus.WAITING, notPayed));
+                        LocalDateTime.now(), ReservationStatus.WAITING, null));
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -76,11 +75,10 @@ public class ReservationService {
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_THEME));
         Member requestedMember = memberRepository.findById(reservationRequest.memberId())
                 .orElseThrow(() -> new RoomescapeException(NOT_FOUND_MEMBER));
-        Payment notPayed = paymentRepository.getNotPayed();
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now(), ReservationStatus.WAITING, notPayed));
+                        LocalDateTime.now(), ReservationStatus.WAITING, null));
     }
 
     private ReservationResponse saveReservation(Reservation reservation) {
