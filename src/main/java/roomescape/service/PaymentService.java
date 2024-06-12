@@ -22,20 +22,13 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Transactional(readOnly = true)
-    public Payment findPaymentById(long paymentId) {
-        return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 결제정보 입니다"));
-    }
-
     @Transactional
-    public Long payment(MemberReservationRequest memberReservationRequest) {
+    public Payment payment(MemberReservationRequest memberReservationRequest) {
         Long amount = memberReservationRequest.amount();
         String orderId = memberReservationRequest.orderId();
         String paymentKey = memberReservationRequest.paymentKey();
 
         PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
-        Long paymentId = savePayment(paymentInfo);
 
         restClient.post()
                 .uri(tossPaymentProperties.url().confirm())
@@ -43,12 +36,11 @@ public class PaymentService {
                 .retrieve()
                 .toBodilessEntity();
 
-        return paymentId;
+        return savePayment(paymentInfo);
     }
 
-    private Long savePayment(PaymentInfo paymentInfo) {
+    private Payment savePayment(PaymentInfo paymentInfo) {
         Payment payment = paymentInfo.toEntity();
-        Payment savedPayment = paymentRepository.save(payment);
-        return savedPayment.getId();
+        return paymentRepository.save(payment);
     }
 }

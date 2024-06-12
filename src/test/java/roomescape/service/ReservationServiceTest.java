@@ -59,7 +59,7 @@ class ReservationServiceTest {
         when(timeService.findTimeSlotById(anyLong())).thenReturn(mockTimeSlot);
         when(themeService.findThemeById(anyLong())).thenReturn(mockTheme);
         when(reservationRepository.existsByDateAndTimeAndThemeAndMember(any(), any(), any(), any())).thenReturn(false);
-        when(paymentService.payment(any())).thenReturn(1L);
+        when(paymentService.payment(any())).thenReturn(payment);
         when(reservationRepository.save(any())).thenReturn(reservation);
 
         ReservationResponse response = reservationService.createByClient(reservationRequest, loginMember);

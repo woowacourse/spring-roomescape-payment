@@ -95,8 +95,8 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createByClient(MemberReservationRequest memberReservationRequest, LoginMember member) {
         ReservationRequest reservationRequest = checkAvailableReservation(member.id(), memberReservationRequest);
-        Long paymentId = paymentService.payment(memberReservationRequest);
-        return confirmReservationByClient(reservationRequest, paymentId);
+        Payment payment = paymentService.payment(memberReservationRequest);
+        return confirmReservationByClient(reservationRequest, payment);
     }
 
     @Transactional
@@ -119,11 +119,10 @@ public class ReservationService {
         return ReservationRequest.from(memberId, reservationRequest);
     }
 
-    private ReservationResponse confirmReservationByClient(ReservationRequest reservationRequest, Long paymentId) {
+    private ReservationResponse confirmReservationByClient(ReservationRequest reservationRequest, Payment payment) {
         Member member = memberService.findMemberById(reservationRequest.memberId());
         TimeSlot timeSlot = timeService.findTimeSlotById(reservationRequest.timeId());
         Theme theme = themeService.findThemeById(reservationRequest.themeId());
-        Payment payment = paymentService.findPaymentById(paymentId);
 
         Reservation createdReservation = Reservation.createNewBooking(member, reservationRequest.date(), timeSlot, theme, payment);
         Reservation savedReservation = reservationRepository.save(createdReservation);
