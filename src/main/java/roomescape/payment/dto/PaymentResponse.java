@@ -8,10 +8,10 @@ import roomescape.payment.entity.Payment;
 
 @Schema(description = "결제 응답")
 public record PaymentResponse(
-        @Schema(description = "orderName", defaultValue = "orderName") String orderName,
-        @Schema(description = "paymentKey", defaultValue = "paymentKey") String paymentKey,
-        @Schema(description = "총 금액", defaultValue = "1000") BigDecimal totalAmount,
-        @Schema(description = "승인 날짜", defaultValue = "XXXX-XX-XX") String approvedAt) {
+        @Schema(description = "orderName", example = "orderName") String orderName,
+        @Schema(description = "paymentKey", example = "paymentKey") String paymentKey,
+        @Schema(description = "총 금액", example = "1000") BigDecimal totalAmount,
+        @Schema(description = "승인 날짜", example = "XXXX-XX-XX") String approvedAt) {
     public static PaymentResponse from(PaymentInfo paymentInfo) {
         return new PaymentResponse(paymentInfo.orderName(), paymentInfo.paymentKey(), paymentInfo.totalAmount(), paymentInfo.approvedAt());
     }

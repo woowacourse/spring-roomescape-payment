@@ -10,8 +10,8 @@ import roomescape.time.dto.ReservationTimeResponse;
 
 @Schema(description = "예약 응답")
 public record ReservationResponse(
-        @Schema(description = "예약 id", defaultValue = "1") long id,
-        @Schema(description = "예약 날짜", defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate date,
+        @Schema(description = "예약 id", example = "1") long id,
+        @Schema(description = "예약 날짜", example = "#{T(java.time.LocalDate).now()}") LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme,
         LoginMemberResponse member) {

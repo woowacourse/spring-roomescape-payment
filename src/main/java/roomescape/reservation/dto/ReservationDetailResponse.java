@@ -13,15 +13,15 @@ import roomescape.reservation.entity.Reservation;
 
 @Schema(description = "자신의 예약 내역")
 public record ReservationDetailResponse(
-        @Schema(description = "예약 ID", defaultValue = "1")
+        @Schema(description = "예약 ID", example = "1")
         long reservationId,
-        @Schema(description = "테마 이름", defaultValue = "테마 이름")
+        @Schema(description = "테마 이름", example = "테마 이름")
         String theme,
-        @Schema(description = "예약 날짜", defaultValue = "#{T(java.time.LocalDate).now()}")
+        @Schema(description = "예약 날짜", example = "#{T(java.time.LocalDate).now()}")
         LocalDate date,
-        @Schema(description = "예약 시간", defaultValue = "23:00")
+        @Schema(description = "예약 시간", example = "23:00")
         LocalTime time,
-        @Schema(description = "예약 상태", defaultValue = "예약")
+        @Schema(description = "예약 상태", example = "예약")
         String status
 ) {
     public static ReservationDetailResponse from(Reservation reservation) {

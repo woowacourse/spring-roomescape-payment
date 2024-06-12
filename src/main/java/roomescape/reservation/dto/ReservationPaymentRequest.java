@@ -8,17 +8,17 @@ import roomescape.payment.dto.PaymentRequest;
 
 @Schema(description = "예약 결제 요청")
 public record ReservationPaymentRequest(
-        @Schema(description = "예약 날짜", defaultValue = "#{T(java.time.LocalDate).now()}")
+        @Schema(description = "예약 날짜", example = "#{T(java.time.LocalDate).now()}")
         LocalDate date,
-        @Schema(description = "테마 ID", defaultValue = "1")
+        @Schema(description = "테마 ID", example = "1")
         long themeId,
-        @Schema(description = "예약 시간 ID", defaultValue = "1")
+        @Schema(description = "예약 시간 ID", example = "1")
         long timeId,
-        @Schema(description = "PaymentKey", defaultValue = "paymentKey")
+        @Schema(description = "PaymentKey", example = "paymentKey")
         String paymentKey,
-        @Schema(description = "OrderId", defaultValue = "orderId")
+        @Schema(description = "OrderId", example = "orderId")
         String orderId,
-        @Schema(description = "Amount", defaultValue = "1000")
+        @Schema(description = "Amount", example = "1000")
         BigDecimal amount) {
 
     public PaymentRequest toPaymentRequest() {

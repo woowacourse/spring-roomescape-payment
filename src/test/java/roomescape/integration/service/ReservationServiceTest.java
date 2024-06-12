@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationWaitingDetailResponse;
 import roomescape.auth.domain.Role;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
@@ -182,7 +182,7 @@ class ReservationServiceTest {
         );
 
         //when
-        List<AdminReservationDetailResponse> reservationResponses = reservationService.findAllWaitingReservations();
+        List<ReservationWaitingDetailResponse> reservationResponses = reservationService.findAllWaitingReservations();
 
         //then
         assertThat(reservationResponses).hasSize(2);
@@ -270,7 +270,7 @@ class ReservationServiceTest {
 
         //when
         reservationRepository.deleteById(1L);
-        List<AdminReservationDetailResponse> waitingResponses = reservationService.findAllWaitingReservations();
+        List<ReservationWaitingDetailResponse> waitingResponses = reservationService.findAllWaitingReservations();
         List<ReservationResponse> bookedResponses = reservationService.findAllReservations();
         //then
         assertAll(

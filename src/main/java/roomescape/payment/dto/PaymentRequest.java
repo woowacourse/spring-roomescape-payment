@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "결제 응답")
 public record PaymentRequest(
-        @Schema(description = "paymentKey", defaultValue = "paymentKey") String paymentKey,
-        @Schema(description = "orderId", defaultValue = "orderId") String orderId,
-        @Schema(description = "총 금액", defaultValue = "1000") BigDecimal amount) {
+        @Schema(description = "paymentKey", example = "paymentKey") String paymentKey,
+        @Schema(description = "orderId", example = "orderId") String orderId,
+        @Schema(description = "총 금액", example = "1000") BigDecimal amount) {
 }

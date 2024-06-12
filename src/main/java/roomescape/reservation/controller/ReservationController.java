@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationWaitingDetailResponse;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.application.service.ReservationApplicationService;
 import roomescape.auth.annotation.Authenticated;
@@ -137,12 +137,12 @@ public class ReservationController {
     @Operation(summary = "전체 예약 대기 조회", description = "전체 예약 대기를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "전체 예약 대기 조회 성공",
-                    content = @Content(schema = @Schema(implementation = AdminReservationDetailResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ReservationWaitingDetailResponse.class))),
             @ApiResponse(responseCode = "500", description = """
                     (1) 데이터 베이스 통신 오류로 인한 실패
                     """)})
     @GetMapping("admin/reservations-waiting")
-    public List<AdminReservationDetailResponse> findAllWaitingReservations() {
+    public List<ReservationWaitingDetailResponse> findAllWaitingReservations() {
         return reservationService.findAllWaitingReservations();
     }
 

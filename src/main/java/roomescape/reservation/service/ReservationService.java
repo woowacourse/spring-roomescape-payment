@@ -15,7 +15,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationWaitingDetailResponse;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
@@ -190,12 +190,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<AdminReservationDetailResponse> findAllWaitingReservations() {
+    public List<ReservationWaitingDetailResponse> findAllWaitingReservations() {
         List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
         return reservations.stream()
                 .map(this::createWaiting)
                 .filter(waiting -> !waiting.isOver())
-                .map(AdminReservationDetailResponse::from)
+                .map(ReservationWaitingDetailResponse::from)
                 .toList();
     }
 
