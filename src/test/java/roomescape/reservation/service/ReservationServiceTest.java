@@ -30,8 +30,6 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.dto.PaymentCancelRequest;
-import roomescape.payment.dto.PaymentCancelResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
