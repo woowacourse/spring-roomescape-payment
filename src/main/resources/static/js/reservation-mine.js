@@ -19,18 +19,20 @@ function render(data) {
     const theme = item.theme;
     const date = item.date;
     const time = item.time;
+    const waitingOrder = item.waitingOrder;
     const status = item.status;
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
-    row.insertCell(3).textContent = status;
+    row.insertCell(3).textContent = '';
     row.insertCell(4).textContent = '';
     row.insertCell(5).textContent = '';
     row.insertCell(6).textContent = '';
     row.insertCell(7).textContent = '';
 
-    if (status === '결제 대기') {
+    if (status === 'PAYMENT_WAITING') {
+      row.cells[3].textContent = '결제 대기';
       const paymentCell = row.cells[4];
       const paymentButton = document.createElement("button");
       paymentButton.textContent = '결제';
@@ -39,7 +41,8 @@ function render(data) {
         renderPaymentWidget(item.id);
       }
       paymentCell.appendChild(paymentButton);
-    } else if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+    } else if (status !== 'BOOKED') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
+      row.cells[3].textContent = waitingOrder + '번째 예약 대기';
       const cancelCell = row.cells[5];
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '취소';
@@ -54,6 +57,7 @@ function render(data) {
         예약 완료 상태일 때 결제 정보를 함께 보여주기
         결제 정보 필드명은 자신의 response 에 맞게 변경하기
       */
+      row.cells[3].textContent = '예약 확정'
       const cancelCell = row.cells[5];
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '취소';
