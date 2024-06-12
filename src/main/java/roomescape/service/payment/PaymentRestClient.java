@@ -57,7 +57,7 @@ public class PaymentRestClient {
 
     public void cancel(Payment payment) {
         try {
-            if (payment.isPaidByAdmin()) {
+            if (payment.isByAdmin()) {
                 return;
             }
             restClient.post()

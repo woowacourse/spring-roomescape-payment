@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 @Table(name = "payment")
 public class Payment {
 
+    private static final String ADMIN_PAYMENT_VALUE = "ADMIN";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +22,10 @@ public class Payment {
 
     private long amount;
 
+    public static Payment byAdmin() {
+        return new Payment(ADMIN_PAYMENT_VALUE,ADMIN_PAYMENT_VALUE,0);
+    }
+
     protected Payment() {
     }
 
@@ -29,8 +35,8 @@ public class Payment {
         this.amount = amount;
     }
 
-    public boolean isPaidByAdmin() {
-        return paymentKey.equals("ADMIN");
+    public boolean isByAdmin() {
+        return paymentKey.equals(ADMIN_PAYMENT_VALUE);
     }
 
     public Long getId() {

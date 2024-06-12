@@ -58,7 +58,7 @@ public class ReservationService {
     public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
         ReservationRequest reservationRequest = ReservationRequest.fromAdminRequest(adminReservationRequest);
         Reservation reservation = generateValidReservation(reservationRequest, adminReservationRequest.memberId());
-        Payment adminPayment = new Payment("ADMIN", "ADMIN", 0);
+        Payment adminPayment = Payment.byAdmin();
         paymentRepository.save(adminPayment);
         Reservation savedReservation = reservationRepository.save(reservation.toPaid(adminPayment));
 
