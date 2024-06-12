@@ -7,7 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentFailException;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.CancelRequest;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.TossClientResponse;
 
 public class TossPayRestClient {
 
@@ -19,14 +22,15 @@ public class TossPayRestClient {
         this.restClient = restClient;
     }
 
-    public void pay(PaymentRequest paymentRequest) {
+    public Payment pay(PaymentRequest paymentRequest) {
         try {
-            restClient.post()
+            TossClientResponse response = restClient.post()
                     .uri("/v1/payments/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
-                    .toBodilessEntity();
+                    .body(TossClientResponse.class);
+            return getPayment(response);
         } catch (ResourceAccessException exception) {
             LOGGER.error(exception.getMessage(), exception);
             throw new PaymentFailException(
@@ -34,5 +38,32 @@ public class TossPayRestClient {
                     "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
             );
         }
+    }
+
+    public Payment cancel(CancelRequest cancelRequest) {
+        try {
+            TossClientResponse response = restClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/payments/{paymentKey}/cancel")
+                            .build(cancelRequest.paymentKey()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(cancelRequest)
+                    .retrieve()
+                    .body(TossClientResponse.class);
+            return getPayment(response);
+        } catch (ResourceAccessException exception) {
+            LOGGER.error(exception.getMessage(), exception);
+            throw new PaymentFailException(
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
+            );
+        }
+    }
+
+    private Payment getPayment(TossClientResponse response) {
+        if (response == null) {
+            throw new PaymentFailException("NULL RESPONSE", "결제에 실패했습니다.");
+        }
+        return response.toPayment();
     }
 }

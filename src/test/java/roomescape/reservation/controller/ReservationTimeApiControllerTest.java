@@ -1,7 +1,12 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static roomescape.util.Fixture.TODAY;
+import static roomescape.util.RestDocsFilter.CREATE_RESERVATION_TIME;
+import static roomescape.util.RestDocsFilter.DELETE_RESERVATION_TIME;
+import static roomescape.util.RestDocsFilter.GET_AVAILABLE_RESERVATION_TIME;
+import static roomescape.util.RestDocsFilter.GET_ENTIRE_RESERVATION_TIME;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,13 +29,17 @@ class ReservationTimeApiControllerTest extends IntegrationTest {
     @DisplayName("모든 시간 조회 성공 시 200 응답을 받는다.")
     @Test
     void findAll() {
-        RestAssured.given().log().all()
+        saveReservationTimeAsTen();
+
+        RestAssured.given(spec).log().all()
+                .filter(GET_ENTIRE_RESERVATION_TIME.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
                 .get("/times")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("responses", hasSize(1));
     }
 
     @DisplayName("예약 가능한 시간 조회 성공 시 200응답을 받는다.")
@@ -41,7 +50,8 @@ class ReservationTimeApiControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
         saveSuccessReservationAsDateNow();
 
-        RestAssured.given()
+        RestAssured.given(spec)
+                .filter(GET_AVAILABLE_RESERVATION_TIME.getFilter())
                 .param("date", TODAY.toString())
                 .param("theme-id", 1)
                 .log().all()
@@ -60,7 +70,8 @@ class ReservationTimeApiControllerTest extends IntegrationTest {
     void save() throws JsonProcessingException {
         TimeSaveRequest timeSaveRequest = new TimeSaveRequest(LocalTime.now());
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(CREATE_RESERVATION_TIME.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(timeSaveRequest))
@@ -69,13 +80,15 @@ class ReservationTimeApiControllerTest extends IntegrationTest {
                 .post("/times")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .header("Location", "/times/1");
+                .header("Location", "/times/1")
+                .body(notNullValue());
     }
 
     @DisplayName("시간 삭제 성공시 204 응답을 받는다.")
     @Test
     void delete() {
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(DELETE_RESERVATION_TIME.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()

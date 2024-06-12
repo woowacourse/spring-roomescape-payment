@@ -1,15 +1,20 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.Fixture.TODAY;
+import static roomescape.util.RestDocsFilter.CANCEL_RESERVATION_BY_USER;
+import static roomescape.util.RestDocsFilter.CREATE_RESERVATION_BY_USER;
+import static roomescape.util.RestDocsFilter.CREATE_WAITING;
+import static roomescape.util.RestDocsFilter.DELETE_WAITING;
+import static roomescape.util.RestDocsFilter.GET_MY_RESERVATION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +22,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import roomescape.config.IntegrationTest;
 import roomescape.exception.PaymentFailException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.ReservationSaveRequest;
 import roomescape.util.CookieUtils;
@@ -30,52 +37,22 @@ class ReservationApiControllerTest extends IntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @DisplayName("예약 목록 조회에 성공하면 200 응답을 받는다.")
-    @Test
-    void findAll() {
-        RestAssured.given().log().all()
-                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
-                .accept(ContentType.JSON)
-                .when()
-                .get("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
-    }
-
     @DisplayName("회원별 예약 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findMemberReservations() {
-        RestAssured.given().log().all()
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateTomorrow();
+
+        RestAssured.given(spec).log().all()
+                .filter(GET_MY_RESERVATION.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
                 .get("/reservations/mine")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
-    }
-
-    @DisplayName("테마 아이디, 회원 아이디, 기간 조건 조회에 성공하면 200 응답을 받는다.")
-    @Test
-    void findAllBySearchCond() {
-        saveAdminMemberAsDuck();
-        saveThemeAsHorror();
-        saveReservationTimeAsTen();
-        saveSuccessReservationAsDateNow();
-
-        String yesterday = LocalDate.now().minusDays(1).toString();
-        String tomorrow = LocalDate.now().plusDays(1).toString();
-        RestAssured.given()
-                .queryParam("themeId", 1)
-                .queryParam("memberId", 1)
-                .queryParam("dateFrom", yesterday)
-                .queryParam("dateTo", tomorrow)
-                .log().all()
-                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
-                .when()
-                .get("/reservations/search")
-                .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .contentType(ContentType.JSON)
                 .body("responses", hasSize(1));
     }
 
@@ -88,10 +65,16 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
 
-        doNothing().when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        PaymentResponse paymentResponse = new PaymentResponse("testKey", new BigDecimal("1000"));
 
-        RestAssured.given().log().all()
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doReturn(paymentResponse).when(paymentService).confirm(payment);
+
+        RestAssured.given(spec).log().all()
+                .filter(CREATE_RESERVATION_BY_USER.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(reservationSaveRequest))
@@ -112,8 +95,11 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest
                 = new ReservationSaveRequest(1L, TODAY, 1L, 1L, "testKey", "testId", 1000);
+        PaymentRequest paymentRequest = PaymentRequest.from(reservationSaveRequest);
+        Payment payment = paymentRequest.toPaymentStatusReady();
 
-        doThrow(PaymentFailException.class).when(paymentService).pay(PaymentRequest.from(reservationSaveRequest));
+        doReturn(payment).when(paymentService).createPayment(paymentRequest, 1L);
+        doThrow(PaymentFailException.class).when(paymentService).confirm(payment);
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -135,7 +121,8 @@ class ReservationApiControllerTest extends IntegrationTest {
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(TODAY, 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(CREATE_WAITING.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(reservationSaveRequest))
@@ -147,31 +134,36 @@ class ReservationApiControllerTest extends IntegrationTest {
                 .header("Location", "/reservations/1");
     }
 
-    @DisplayName("관리자가 예약을 성공적으로 추가하면 201 응답과 Location 헤더에 리소스 저장 경로를 받는다.")
+    @DisplayName("예약을 성공적으로 취소하면 200 응답을 받는다.")
     @Test
-    void saveAdminReservation() throws JsonProcessingException {
+    void cancelReservationByUser() {
         saveAdminMemberAsDuck();
         saveThemeAsHorror();
         saveReservationTimeAsTen();
+        saveSuccessReservationAsDateTomorrow();
 
-        ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(1L, TODAY, 1L, 1L);
-
-        RestAssured.given().log().all()
-                .cookie(CookieUtils.TOKEN_KEY, getAdminToken())
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(reservationSaveRequest))
+        RestAssured.given(spec).log().all()
+                .filter(CANCEL_RESERVATION_BY_USER.getFilter())
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()
-                .post("/admin/reservations")
+                .patch("/reservations/{id}", 1L)
                 .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .header("Location", "/reservations/1");
+                .statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("예약을 성공적으로 제거하면 204 응답을 받는다.")
+    @DisplayName("예약 대기를 성공적으로 제거하면 204 응답을 받는다.")
     @Test
     void delete() {
-        RestAssured.given().log().all()
+        saveAdminMemberAsDuck();
+        saveMemberAsKaki();
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateTomorrow();
+        saveWaitingAsDateTomorrow();
+
+        RestAssured.given(spec).log().all()
+                .filter(DELETE_WAITING.getFilter())
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
                 .when()

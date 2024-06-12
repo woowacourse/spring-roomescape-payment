@@ -1,5 +1,5 @@
 let isEditing = false;
-const RESERVATION_API_ENDPOINT = '/reservations';
+const RESERVATION_API_ENDPOINT = '/admin/reservations';
 const TIME_API_ENDPOINT = '/times';
 const THEME_API_ENDPOINT = '/themes';
 const MEMBER_API_ENDPOINT = '/members';
@@ -181,7 +181,10 @@ function deleteRow(event) {
 
   requestDelete(reservationId)
       .then(() => row.remove())
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+      });
 }
 
 function applyFilter(event) {
@@ -200,7 +203,7 @@ function applyFilter(event) {
     'dateTo': dateTo,
   });
 
-  fetch(`/reservations/search?${queryParams.toString()}`, {
+  fetch(`/admin/reservations/search?${queryParams.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -222,7 +225,7 @@ function requestCreate(reservation) {
   return fetch('/admin/reservations', requestOptions)
       .then(response => {
         if (response.status !== 201) {
-          return response.json().then(errorResponse => {
+          return response.text().then(errorResponse => {
             throw new Error(JSON.stringify(errorResponse));
           })
         }
@@ -235,7 +238,7 @@ function requestCreate(reservation) {
 
 function requestDelete(id) {
   const requestOptions = {
-    method: 'DELETE',
+    method: 'PATCH',
   };
 
   return fetch(`${RESERVATION_API_ENDPOINT}/${id}`, requestOptions)

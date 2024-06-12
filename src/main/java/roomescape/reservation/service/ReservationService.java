@@ -42,11 +42,29 @@ public class ReservationService {
         this.memberRepository = memberRepository;
     }
 
-    public ReservationResponse saveReservationSuccess(
+    public ReservationResponse saveReservationPending(
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.SUCCESS);
+        Reservation pendingReservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(),
+                ReservationStatus.PENDING);
+        validateDuplicatedReservationSuccess(pendingReservation);
+        Reservation savedReservation = reservationRepository.save(pendingReservation);
+
+        return ReservationResponse.toResponse(savedReservation);
+    }
+
+    public void rollBackPendingReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new IllegalStateException("결제 대기중인 예약이 아닙니다.");
+        }
+        reservationRepository.deleteById(id);
+    }
+
+    public ReservationResponse saveReservationSuccessByAdmin(ReservationSaveRequest reservationSaveRequest) {
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, reservationSaveRequest.getMemberId(), ReservationStatus.SUCCESS);
         validateDuplicatedReservationSuccess(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -57,16 +75,26 @@ public class ReservationService {
             ReservationSaveRequest reservationSaveRequest,
             LoginMember loginMember
     ) {
-        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember, ReservationStatus.WAIT);
+        Reservation reservation = createValidatedReservationOfStatus(reservationSaveRequest, loginMember.id(), ReservationStatus.WAIT);
         validateDuplicatedReservationWaiting(reservation, loginMember);
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return ReservationResponse.toResponse(savedReservation);
     }
 
+    public ReservationResponse confirmReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new IllegalStateException("결제 대기중인 예약이 아닙니다.");
+        }
+        reservation.updateStatus(ReservationStatus.SUCCESS);
+        return ReservationResponse.toResponse(reservation);
+    }
+
     private Reservation createValidatedReservationOfStatus(
             ReservationSaveRequest reservationSaveRequest,
-            LoginMember loginMember,
+            Long memberId,
             ReservationStatus reservationStatus
     ) {
         ReservationTime reservationTime = reservationTimeRepository.findById(reservationSaveRequest.getTimeId())
@@ -75,7 +103,7 @@ public class ReservationService {
         Theme theme = themeRepository.findById(reservationSaveRequest.getThemeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
 
-        Member member = memberRepository.findById(loginMember.id())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         return reservationSaveRequest.toReservation(member, theme, reservationTime, reservationStatus);
@@ -85,7 +113,7 @@ public class ReservationService {
         boolean existsReservation = reservationRepository.existsByDateAndTimeStartAtAndStatus(
                 reservation.getDate(),
                 reservation.getStartAt(),
-                reservation.getStatus()
+                ReservationStatus.SUCCESS
         );
 
         if (existsReservation) {
@@ -128,10 +156,10 @@ public class ReservationService {
 
         Waitings waitings = new Waitings(waitingReservations);
 
-        return reservationRepository.findAllByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
-                .map(reservation -> MemberReservationResponse.toResponse(
-                        reservation,
-                        waitings.findMemberRank(reservation, loginMember.id())
+        return reservationRepository.findAllExceptCancelByMemberIdFromDateOrderByDateAscTimeStartAtAscCreatedAtAsc(loginMember.id(), LocalDate.now()).stream()
+                .map(reservationWithPayment -> MemberReservationResponse.toResponse(
+                        reservationWithPayment,
+                        waitings.findMemberRank(reservationWithPayment.reservation(), loginMember.id())
                 )).toList();
     }
 
@@ -156,11 +184,11 @@ public class ReservationService {
                 .toList();
     }
 
-    public void delete(Long id) {
+    public void deleteWaitingById(Long id) {
         reservationRepository.deleteById(id);
     }
 
-    public void cancelById(Long id) {
+    public void cancelReservationById(Long id) {
         Reservation canceledReservation = getCanceledReservation(id);
         updateFirstWaitingReservation(canceledReservation);
     }
