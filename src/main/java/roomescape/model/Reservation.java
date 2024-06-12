@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -19,7 +18,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time_id", "theme_id"})})
+@Table(name = "reservation")
 @SQLDelete(sql = "UPDATE reservation set deleted = true WHERE id = ?")
 @SQLRestriction("deleted <> true")
 public class Reservation {

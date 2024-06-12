@@ -24,13 +24,16 @@ public class ReservationWaitingService {
     private final PaymentRepository paymentRepository;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
 
     public ReservationWaitingService(final PaymentRepository paymentRepository,
                                      final WaitingRepository waitingRepository,
-                                     final ReservationRepository reservationRepository) {
+                                     final ReservationRepository reservationRepository,
+                                     final PaymentService paymentService) {
         this.paymentRepository = paymentRepository;
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -66,9 +69,9 @@ public class ReservationWaitingService {
     private void convertWaitingToReservation(Theme theme, LocalDate date, ReservationTime time) {
         Waiting waiting = waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time).orElseThrow(() ->
                 new NotFoundException("해당 테마:[%s], 날짜:[%s], 시간:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(theme.getName(), date, time.getStartAt())));
-
-        reservationRepository.save(new Reservation(date, time, theme, waiting.getMember()));
-
+        final Reservation reservation = new Reservation(date, time, theme, waiting.getMember());
+        reservationRepository.save(reservation);
+        paymentService.addAdminPayment(reservation);
         waitingRepository.deleteById(waiting.getId());
     }
 }
