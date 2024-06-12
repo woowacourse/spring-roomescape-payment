@@ -19,7 +19,6 @@ public class TossPaymentClient implements PaymentClient {
     private static final String CONFIRM_URI = "/v1/payments/confirm";
     private static final String CANCEL_URL = "/v1/payments/%s/cancel";
     private final RestClient restClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     public TossPaymentClient(RestClient.Builder restClientBuilder) {
