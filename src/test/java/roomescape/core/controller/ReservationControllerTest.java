@@ -341,6 +341,7 @@ class ReservationControllerTest {
                                 fieldWithPath("[].date").description("예약한 날짜"),
                                 fieldWithPath("[].theme").description("예약한 테마"),
                                 fieldWithPath("[].time").description("예약한 시간"),
+                                fieldWithPath("[].waitingOrder").description("예약 대기 순서"),
                                 fieldWithPath("[].status").description("예약 상태"),
                                 fieldWithPath("[].paymentKey").description("결제 키").optional(),
                                 fieldWithPath("[].amount").description("결제 금액").optional())))
