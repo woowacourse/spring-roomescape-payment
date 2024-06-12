@@ -4,6 +4,9 @@ import java.time.format.DateTimeFormatter;
 import roomescape.core.domain.Reservation;
 
 public class MyReservationResponse {
+    private static final String NONEXISTENT_PAYMENT_KEY = "NOT_PAID";
+    private static final long NONEXISTENT_PAYMENT_AMOUNT = 0L;
+
     private Long reservationId;
     private String theme;
     private String date;
@@ -35,7 +38,8 @@ public class MyReservationResponse {
 
     public static MyReservationResponse ofReservationWaiting(final Reservation reservation,
                                                              final Integer rank) {
-        return MyReservationResponse.ofReservationWaiting(reservation, rank, "NOT_PAID", 0L);
+        return MyReservationResponse.ofReservationWaiting(reservation, rank, NONEXISTENT_PAYMENT_KEY,
+                NONEXISTENT_PAYMENT_AMOUNT);
     }
 
     public static MyReservationResponse ofReservation(final Reservation reservation,
@@ -47,7 +51,7 @@ public class MyReservationResponse {
     }
 
     public static MyReservationResponse ofReservation(final Reservation reservation) {
-        return MyReservationResponse.ofReservation(reservation, "NOT_PAID", 0L);
+        return MyReservationResponse.ofReservation(reservation, NONEXISTENT_PAYMENT_KEY, NONEXISTENT_PAYMENT_AMOUNT);
     }
 
     private static String waitingRankStatus(final String status, final Integer rank) {
